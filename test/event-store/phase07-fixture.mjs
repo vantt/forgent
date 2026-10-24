@@ -35,3 +35,15 @@ export function fixture(t, { remote = false, machine = true } = {}) {
 export function append(store, events) {
   return store.append('project', events.map(e => ({ eventType: e.type ?? 'work.add', schemaVersion: 1, payload: e.payload ?? { id: 'one', title: 'one' }, ts: e.ts ?? new Date().toISOString() })), {}, 'fixture', []);
 }
+
+/** The Work events of a legacy-layout directory (`events.jsonl` plus `events/*.jsonl`) in the crate's legacy order. */
+export function legacyOrderOf(dir) {
+  const files = {};
+  const baseline = path.join(dir, 'events.jsonl');
+  if (fs.existsSync(baseline)) files[''] = fs.readFileSync(baseline, 'utf8');
+  const shards = path.join(dir, 'events');
+  if (fs.existsSync(shards)) for (const entry of fs.readdirSync(shards, { withFileTypes: true })) {
+    if (entry.isFile() && entry.name.endsWith('.jsonl')) files[entry.name] = fs.readFileSync(path.join(shards, entry.name), 'utf8');
+  }
+  return addon.decodeLegacyFiles(files).map(record => JSON.parse(record.raw));
+}

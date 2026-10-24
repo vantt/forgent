@@ -6,7 +6,6 @@ import os from 'node:os';
 import path from 'node:path';
 import cp from 'node:child_process';
 import { prepareBwrapSync, computeLaunchDigest } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
-import { resolveRuntimeSocketDir } from '../../src/run-supervisor/runtime-dir.mjs';
 
 const BACKEND = { id: 'bwrap', config: { executable: '/usr/bin/bwrap' } };
 
@@ -30,18 +29,47 @@ test('a direct launch has its own pid namespace as pid 1 and never dies with its
   assert.equal(args.includes('--die-with-parent'), false);
 });
 
-test('a terminal launch dies with its parent and binds the runtime socket directory', (t) => {
-  const xdg = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-xdg-'));
-  t.after(() => fs.rmSync(xdg, { recursive: true, force: true }));
+function withRuntimeDir(t, dir) {
   const saved = process.env.XDG_RUNTIME_DIR;
-  process.env.XDG_RUNTIME_DIR = xdg;
+  process.env.XDG_RUNTIME_DIR = dir;
   t.after(() => { if (saved === undefined) delete process.env.XDG_RUNTIME_DIR; else process.env.XDG_RUNTIME_DIR = saved; });
-  const { invocation } = prepare(t, { launchMode: 'terminal' });
+}
+
+test('a terminal launch dies with its parent and binds back read-only only the GO socket its gate dials', (t) => {
+  withRuntimeDir(t, '/run/user/4242');
+  const socket = '/run/user/4242/fgos/0123456789abcdef.sock';
+  const { invocation } = prepare(t, { launchMode: 'terminal', attemptId: 'att-t', gateCommand: ['/host/fgos', 'internal', 'gate', '--go-socket', socket] });
   const args = invocation.args;
-  const socketDir = resolveRuntimeSocketDir();
   assert.ok(args.includes('--die-with-parent'));
-  const bind = args.findIndex((a, i) => a === '--bind' && args[i + 1] === socketDir);
-  assert.ok(bind >= 0 && args[bind + 2] === socketDir);
+  const bind = args.findIndex((a, i) => a === '--ro-bind' && args[i + 1] === socket);
+  assert.ok(bind >= 0 && args[bind + 2] === socket);
+  assert.equal(args.includes(path.dirname(socket)), false, 'never the socket directory, which holds every attempt\'s socket');
+  // A direct attempt dials nothing: its GO channel is an inherited descriptor.
+  const direct = prepare(t, { launchMode: 'direct', attemptId: 'att-d', gateCommand: ['/host/fgos', 'internal', 'gate', '--go-fd', '5'] }).invocation.args;
+  assert.equal(direct.includes(socket), false);
+});
+
+test('a GO socket outside the run supervisor\'s socket directory is refused by name, never bound back', (t) => {
+  withRuntimeDir(t, '/run/user/4242');
+  for (const socket of ['/run/user/4242/bus', '/run/user/4242/fgos/sub/x.sock', 'fgos/x.sock']) {
+    assert.throws(
+      () => prepare(t, { launchMode: 'terminal', attemptId: 'att-t', gateCommand: ['/host/fgos', 'internal', 'gate', '--go-socket', socket] }),
+      (e) => e.code === 'go-socket-outside-runtime-socket-dir',
+      socket,
+    );
+  }
+});
+
+test('a gate named without a path is found on PATH inside the sandbox, never bound from beside the cwd', (t) => {
+  // From a cwd under /tmp the name would resolve to a /tmp path the driver binds back; it must not.
+  const cwd = process.cwd();
+  process.chdir(fs.realpathSync('/tmp'));
+  try {
+    const { invocation } = prepare(t, { launchMode: 'direct', attemptId: 'att-r', gateCommand: ['fgos', 'internal', 'gate'] });
+    assert.equal(invocation.args.includes(path.resolve('fgos')), false);
+  } finally {
+    process.chdir(cwd);
+  }
 });
 
 test('a supervised attempt gets a prefix ending in -- and no worker command; the digest covers prefix, gate and agent argv', (t) => {

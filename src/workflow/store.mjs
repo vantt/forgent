@@ -43,7 +43,8 @@ function workflowRunDir(repoRoot, workflowRunId) {
   return path.join(repoRoot, '.fgos', 'workflow-runs', workflowRunId);
 }
 
-function eventsFilePath(repoRoot, workflowRunId) {
+/** The one place that names a Workflow run's own event log (a different log from the Work history). */
+export function eventsFilePath(repoRoot, workflowRunId) {
   return path.join(workflowRunDir(repoRoot, workflowRunId), 'events.jsonl');
 }
 

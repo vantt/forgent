@@ -32,7 +32,7 @@ runner đọc bảng này để biết vào từ đâu — không có một đi�
 
 | Vai trò tương lai | Đọc gì trước | Vào ở đâu | Không được làm |
 |---|---|---|---|
-| Skill khởi tạo backlog (đề xuất work item mới) | `docs/specs/work-state.md` (schema work) | `fgos add` — CLI, một cửa ghi | Không tự ghi `.fgos/events.jsonl` |
+| Skill khởi tạo backlog (đề xuất work item mới) | `docs/specs/work-state.md` (schema work) | `fgos add` — CLI, một cửa ghi | Không tự ghi nhật ký sự kiện (Event Store) |
 | Skill giám sát vòng runner (dashboard/report) | `fgos list` / `fgos ready` (đọc, không ghi, per request-class D1) | Đọc `state.json` hoặc gọi `ready` | Không suy luận frontier bằng danh sách tay — luôn derive (RUL5 (platform-foundations)) |
 | Skill duyệt đề xuất (review `proposed` → `done`) | Nhánh `fgw/<id>` + báo cáo worker | `fgos move <id> --to done --expect proposed` | Không tự động merge khi review chưa chạy (per D4 — người/vòng review quyết) |
 | Worker kế tiếp trong chain con (agent nối tiếp) | Chính work item đã dispatch (title/kind/refs/verify) | Nhận đúng bốn phần prompt ở trên, không phần nào khác | Không tự gọi `fgos`; không giả định trạng thái ngoài những gì prompt nói |

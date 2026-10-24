@@ -7,6 +7,7 @@
 // rewrote would make every other advisory line in this verb suspect.
 
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -24,6 +25,7 @@ function run(cwd, args) {
 
 function tmpCwd() {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-stale-runs-'));
+  initializeWorkRepository(cwd);
   assert.equal(run(cwd, ['init']).status, 0, 'tmpCwd(): "fgos init" failed to bootstrap .fgos/');
   return cwd;
 }

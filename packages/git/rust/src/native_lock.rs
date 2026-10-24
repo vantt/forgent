@@ -165,7 +165,7 @@ impl GitDriver {
     /// Record an artifact already established as operation-owned by its producer.
     /// The producer must retain its exact creation descriptor shared with the child;
     /// merely discovering a pathname is never ownership. Not exposed to Node callers.
-    #[cfg(test)]
+    #[cfg(all(test, unix))]
     pub(crate) fn record_owned_index_lock(
         &self,
         repo: &RepoHandle,
@@ -760,7 +760,9 @@ mod tests {
         );
     }
 
+    #[cfg(target_os = "linux")]
     struct InterruptExchange(&'static str);
+    #[cfg(target_os = "linux")]
     impl FileSystem for InterruptExchange {
         fn checkpoint(&self, step: &'static str) -> io::Result<()> {
             if step == self.0 { return Err(io::Error::other("interrupted exchange")); }

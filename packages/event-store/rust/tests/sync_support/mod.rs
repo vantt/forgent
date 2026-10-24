@@ -151,6 +151,23 @@ impl Clone {
                 machine: &self.machine,
                 remote: "origin",
                 no_push,
+                opportunistic: false,
+                held_ranks: &[],
+                hot_lock_depth: 0,
+            },
+        )
+    }
+    /// What the start- and end-of-command trigger runs: try the seal lock, never wait.
+    pub fn sync_opportunistic(&self) -> std::result::Result<Synced, Error> {
+        sync(
+            &self.driver,
+            &self.repo,
+            SyncRequest {
+                layout: &self.layout,
+                machine: &self.machine,
+                remote: "origin",
+                no_push: false,
+                opportunistic: true,
                 held_ranks: &[],
                 hot_lock_depth: 0,
             },

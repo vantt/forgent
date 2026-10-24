@@ -17,7 +17,7 @@
     "socket": {
       "kind": "AF_UNIX SOCK_STREAM, listening socket the supervisor creates before it asks terminal-control to launch the pane",
       "path": "envelope.terminal.socketPath; passed to the gate as --go-socket <path>",
-      "directory": "runtime socket dir, mode 0700, owner is the user; the sandbox gets it with a --bind; the socket file mode is 0600",
+      "directory": "runtime socket dir, mode 0700, owner is the user; the sandbox gets only this attempt's socket, with a --ro-bind, never the directory; the socket file mode is 0600",
       "pathLength": "at most 107 bytes (sun_path)",
       "lifetime": "the supervisor unlinks the path once it accepted the gate's connection or the attempt closed; a second connection after GO is refused"
     },

@@ -1,5 +1,5 @@
 $schema: https://json-schema.org/draft/2020-12/schema
-$id: urn:fgos:config-schema:eventStore:v1
+$id: urn:fgos:config-schema:eventStore:v2
 $comment: "owner: event-store"
 description: "Remote, timers and retry limit of the event store."
 type: object
@@ -14,6 +14,10 @@ properties:
     properties:
       intervalSec:
         description: Seconds between seals of the open event segment.
+        type: integer
+        minimum: 1
+      coalesceSec:
+        description: Seconds a lifecycle seal waits for more events of the same unit of work before it seals them as one.
         type: integer
         minimum: 1
   sync:

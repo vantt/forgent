@@ -1,11 +1,13 @@
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import { appendWorkEvent } from '../helpers/work-event-fixture.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { addWork, moveWork, FsmError, resolveWriterLogPath, rebuild } from '../../src/state/store.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { addWork, moveWork, FsmError, rebuild } from '../../src/state/store.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 
 // The OLD stage-based "compound-learn done-gate" (RUL50) is RETIRED by
 // work-item-status-delivered-retrospective-cleanup D1/D4/D11 — done is no
@@ -22,7 +24,7 @@ import { appendEvent } from '../../src/state/events.mjs';
 // once the chain is walked.
 
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-done-gate-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-done-gate-')));
 }
 
 function addCoding(dir, id) {
@@ -60,7 +62,7 @@ function addSynthetic(dir, id) {
 // direct, honest way to get there (same technique test/state/store.test.mjs
 // uses).
 function moveToDurableDoingForTest(dir, id, from = 'todo') {
-  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing' } }, dir);
+  appendWorkEvent(dir, { type: 'work.move', payload: { id, from, to: 'doing' } }, dir);
   rebuild(dir);
 }
 

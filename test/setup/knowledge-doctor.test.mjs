@@ -1,5 +1,6 @@
 import '../helpers/process-tmp-root.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -7,8 +8,8 @@ import path from 'node:path';
 import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { computeKnowledgeProjection } from '../../src/report/knowledge-projection.mjs';
-import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
-import { initStore, registerTopicStore, registerDocStore, supersedeDocStore } from '../../src/state/store.mjs';
+import { DOCTOR_CHECKS, createDoctorRun } from '../../src/setup/checks.mjs';
+import { initStore, registerTopicStore, registerDocStore, supersedeDocStore, moveDocPathStore } from '../../src/state/store.mjs';
 
 test('knowledge-doctor - computeKnowledgeProjection generates expected structure', () => {
   const view = {
@@ -53,7 +54,7 @@ test('knowledge-doctor - doctor registry includes all 10 design-required checks 
 test('knowledge-doctor - doc-registry-stale check passes when up to date', () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doctor-test-'));
   try {
-    const fgosDir = path.join(tmpDir, '.fgos');
+    const fgosDir = initializeWorkRepository(tmpDir);
     initStore(fgosDir);
     registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'test-topic' });
     registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/test/guide.md', docLifecycle: 'active' });
@@ -237,6 +238,54 @@ test('knowledge-doctor - doc-source-conservation does not crash (and just skips 
     const checkObj = DOCTOR_CHECKS.find(c => c.id === 'doc-source-conservation');
     assert.doesNotThrow(() => checkObj.check(tmpDir));
     assert.equal(checkObj.check(tmpDir).passed, true);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-doctor - the doc rows of one doctor run read the Work view once, and a failed read is not retried', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'test-topic' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/test/guide.md', docLifecycle: 'active' });
+    fs.mkdirSync(path.join(tmpDir, 'docs'), { recursive: true });
+    fs.writeFileSync(path.join(tmpDir, 'docs', 'doc-registry.json'), '{}\n');
+
+    const base = createDoctorRun();
+    const computed = [];
+    const run = { once: (key, compute) => base.once(key, () => { computed.push(key); return compute(); }) };
+    const docRows = ['doc-registry-stale', 'doc-alias-broken', 'doc-active-duplicate', 'doc-current-path-missing', 'doc-source-unreachable',
+      'doc-provisional-aged', 'doc-topic-oversized', 'doc-role-underused', 'doc-source-conservation']
+      .map(id => DOCTOR_CHECKS.find(c => c.id === id));
+    for (const row of docRows) row.check(tmpDir, run);
+    assert.equal(computed.length, 1, 'nine doc rows, one read');
+
+    const failing = createDoctorRun();
+    let attempts = 0;
+    const read = () => failing.once('view', () => { attempts += 1; throw new Error('store unreadable'); });
+    assert.throws(read, /store unreadable/);
+    assert.throws(read, /store unreadable/);
+    assert.equal(attempts, 1);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-doctor - doc-alias-broken judges the aliases a real Work store folded', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'test-topic' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/test/old-guide.md', docLifecycle: 'active' });
+    moveDocPathStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', newPath: 'docs/test/guide.md' });
+
+    const check = DOCTOR_CHECKS.find(c => c.id === 'doc-alias-broken');
+    assert.deepEqual(check.check(tmpDir), { passed: true, message: 'no broken doc aliases' });
+
+    // A second live doc taking over the alias string makes it ambiguous.
+    registerDocStore(fgosDir, { docId: 't1:other', topicId: 't1', role: 'notes', currentPath: 'docs/test/old-guide.md', docLifecycle: 'active' });
+    const res = check.check(tmpDir);
+    assert.equal(res.passed, false);
+    assert.match(res.message, /docs\/test\/old-guide\.md/);
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

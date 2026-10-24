@@ -14,7 +14,7 @@ export function percentile(values, fraction) {
   const sorted = [...values].sort((a, b) => a - b);
   return sorted[Math.max(0, Math.ceil(sorted.length * fraction) - 1)];
 }
-export async function benchmark({ root, out, samples = 40, sessions = [1, 10, 15, 20], hostBin, entry = 'host', storeIncrement = false, strace = false, seedItems = 1000, seedHistory } = {}) {
+export async function benchmark({ root, out, samples = 40, sessions = [1, 10, 15, 20], hostBin, entry = 'host', storeIncrement = false, workGate = false, strace = false, seedItems = 1000, seedHistory } = {}) {
   if (!['host', 'node-payload'].includes(entry)) throw new Error('entry must be host or node-payload');
   if (!root || !out) throw new Error('--root and --out required');
   if (!Number.isInteger(samples) || samples < 1 || sessions.some(n => !Number.isInteger(n) || n < 1)) throw new Error('invalid samples/sessions');
@@ -35,7 +35,7 @@ export async function benchmark({ root, out, samples = 40, sessions = [1, 10, 15
   const parent = path.dirname(root);
   const filesystem = execFileSync('findmnt', ['-T', parent, '-n', '-o', 'FSTYPE'], { encoding: 'utf8' }).trim();
   if (filesystem !== 'ext4') throw new Error(`ext4 required; got ${filesystem}`);
-  if (storeIncrement) return storeIncrementBenchmark({root,out,sessions,filesystem,checkout,strace,seedItems,seedHistory});
+  if (storeIncrement || workGate) return storeIncrementBenchmark({root,out,sessions,filesystem,checkout,strace,seedItems,seedHistory,work:workGate});
   hostBin ??= resolveActiveHostBin({ cwd: checkout }).bin;
   if (!hostBin) throw new Error('pass --host-bin (real activated Rust host required)');
   hostBin = fs.realpathSync(hostBin);
@@ -85,8 +85,8 @@ const dir=process.argv[1]; initStore(dir); for(const id of JSON.parse(process.ar
   if (rows.some(r=>r.errors.length)) throw new Error('benchmark has failed mutations; inspect output');
   return result;
 }
-async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,strace,seedItems,seedHistory}) {
-  if (!strace) throw Error('--store-increment requires --strace for the zero-spawn verdict');
+async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,strace,seedItems,seedHistory,work}) {
+  if (!strace) throw Error('--store-increment and --work-gate require --strace for the zero-spawn verdict');
   if (JSON.stringify(sessions)!==JSON.stringify([1,10,15,20])) throw Error('store acceptance requires --sessions 1,10,15,20');
   execFileSync('strace',['-V'],{stdio:'pipe'}); // Missing tool is a hard failure.
   // Build/load the working-tree combined addon, never the activated payload.
@@ -94,7 +94,7 @@ async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,st
   const built=ensureGitAddon();
   fs.mkdirSync(root);
   const stateRoot=path.join(root,'state');fs.mkdirSync(stateRoot,{mode:0o700});
-  const result={contract:'v-spawn-store-increment.v1',filesystem,checkout,
+  const result={contract:work?'v-spawn-work-gate.v1':'v-spawn-store-increment.v1',filesystem,checkout,
     commit:inspectRepo(checkout).resolveCommit({name:'HEAD'}),
     node:process.version,cpu:os.cpus()[0].model,rows:[],verdict:'FAIL'};
   const env={...process.env};for(const k of Object.keys(env))if(k.startsWith('GIT_'))delete env[k];
@@ -107,7 +107,7 @@ async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,st
     const fence=path.join(hot,'locks/activation.lock');fs.mkdirSync(fence,{recursive:true});
     fs.writeFileSync(path.join(fence,'TOMBSTONE'),JSON.stringify({lock:'activation',by:'fgos git',at:'benchmark'}));
     const {benchmarkStore,seedStore}=await import('./store-increment-worker.mjs');
-    const seed=seedStore(benchmarkStore(repo,stateRoot,built.manifest,checkout),{items:seedItems,history:seedHistory});
+    const seed=seedStore(benchmarkStore(repo,stateRoot,built.manifest,checkout,work),{items:seedItems,history:seedHistory,work});
     const barrier=path.join(repo,'barrier');fs.mkdirSync(barrier);
     const children=[];const pending=[];
     let failure;
@@ -117,7 +117,7 @@ async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,st
         const count=Math.floor(200/concurrency)+(i<200%concurrency?1:0);
         const child=spawn('strace',['-f','-e','trace=process,write,fsync,fdatasync','-s','256','-o',log,
           process.execPath,path.join(checkout,'scripts/event-store/store-increment-worker.mjs'),
-          repo,stateRoot,built.manifest,checkout,String(i),String(count),barrier,'yes'],{env});
+          repo,stateRoot,built.manifest,checkout,String(i),String(count),barrier,'yes',work?'work':'store'],{env});
         children.push(child);
         let stdout='',stderr='';child.stdout.on('data',b=>stdout+=b);child.stderr.on('data',b=>stderr+=b);
         const done=new Promise((resolve,reject)=>{child.on('error',reject);child.on('close',code=>{
@@ -156,7 +156,7 @@ async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,st
       }
       const increments=observations.map(o=>o.storeIncrementMs), upperBounds=observations.map(o=>o.incrementUpperBoundMs), waits=observations.map(o=>o.waitMs);
       const row={seed,sessions:concurrency,mutations:observations.length,elapsedMs,windows,spawns,
-        outsideRead:{p50Ms:percentile(observations.map(o=>o.outsideReadMs),.5),p95Ms:percentile(observations.map(o=>o.outsideReadMs),.95)},
+        ...(work?{}:{outsideRead:{p50Ms:percentile(observations.map(o=>o.outsideReadMs),.5),p95Ms:percentile(observations.map(o=>o.outsideReadMs),.95)}}),
         incrementUpperBoundP95Ms:percentile(upperBounds,.95),
         storeIncrementP50Ms:percentile(increments,.5),storeIncrementP95Ms:percentile(increments,.95),
         stages:Object.fromEntries(['readInGate','append','fold','prepareEvents','cacheWrite'].map(stage=>[stage,{
@@ -178,14 +178,14 @@ async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,st
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2); const options = {};
   for(let i=0;i<args.length;i+=2) {
-    if(args[i]==='--store-increment'||args[i]==='--strace'){options[args[i]==='--strace'?'strace':'storeIncrement']=true;i--;continue;}
+    if(['--store-increment','--work-gate','--strace'].includes(args[i])){options[{'--strace':'strace','--work-gate':'workGate','--store-increment':'storeIncrement'}[args[i]]]=true;i--;continue;}
     const key = {'--root':'root','--out':'out','--samples':'samples','--sessions':'sessions','--host-bin':'hostBin','--entry':'entry','--seed-items':'seedItems','--seed-history':'seedHistory'}[args[i]];
     if (!key || args[i+1] === undefined) throw new Error(`unknown/missing argument ${args[i]}`);
     options[key] = ['samples','seedItems'].includes(key) ? Number(args[i+1]) : key==='sessions' ? args[i+1].split(',').map(Number) : args[i+1];
   }
   try { await benchmark(options); }
   catch(error) {
-    console.log(JSON.stringify({contract:options.storeIncrement?'v-spawn-store-increment.v1':'v-spawn-benchmark.v1',verdict:'FAIL',error:error.message}));
+    console.log(JSON.stringify({contract:options.workGate?'v-spawn-work-gate.v1':options.storeIncrement?'v-spawn-store-increment.v1':'v-spawn-benchmark.v1',verdict:'FAIL',error:error.message}));
     process.exitCode=1;
   }
 }

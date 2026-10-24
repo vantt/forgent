@@ -9,11 +9,12 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { initStore, addWork, moveWork, listWork, readRawEvents, readyWork, recordClaimAttempt } from '../../src/state/store.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { appendWorkEvent } from '../helpers/work-event-fixture.mjs';
 import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 import { createWorktree, removeWorktree, createBranchRef, branchNameFor } from '../../src/runner/worktree.mjs';
 import { runOnce as loopRunOnce, runWatch as loopRunWatch, resolveRepoRoot } from '../../src/runner/loop.mjs';
+import { leaveOpenWorkEvent } from '../helpers/open-work-event.mjs';
 import { confinedRunnerConfig, persistRunnerConfig, countWorkerRuns, priorUnitRunsSource, unitRuns } from './loop-worker-fixture.helper.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { confinedUnitConfig } from './driver-unit-fixture.helper.mjs';
@@ -582,7 +583,7 @@ test('runOnce decompose sweep folds an unrecognized item.domain to "coding" (fai
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   const docsRef = 'docs/history/item-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
-  appendEvent(path.join(dir, 'events.jsonl'), {
+  appendWorkEvent(dir, {
     type: 'work.add',
     payload: {
       id: 'item-clarify',
@@ -1887,6 +1888,22 @@ test('runWatch: a cycle that committed is followed by an immediate next cycle; a
   assert.ok(waitedGap > immediateGap, 'the waited (idle) gap is clearly larger than the immediate (committed) gap');
 });
 
+test('runWatch seals what is due on every poll without waiting for the stop, and seals everything when it stops', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const openAgeSec = leaveOpenWorkEvent(repoRoot);
+  assert.ok(openAgeSec() >= 3599, 'the event is open before the loop starts');
+  const controller = new AbortController();
+  let ageAfterFirstCycle;
+  await runWatch({
+    repoRoot, dir, worktreeDir, signal: controller.signal, log: noLog,
+    onCycle: () => { ageAfterFirstCycle = openAgeSec(); controller.abort(); },
+  });
+  assert.ok(ageAfterFirstCycle < 60, 'an event older than the interval is sealed by the poll, before the stop');
+  const fresh = leaveOpenWorkEvent(repoRoot, { ageSec: 30 });
+  await runWatch({ repoRoot, dir, worktreeDir, signal: AbortSignal.abort(), log: noLog });
+  assert.equal(fresh(), 0, 'stopping the loop seals what a poll leaves because it is young');
+});
+
 test('runWatch stops promptly when its AbortSignal aborts mid-wait, and resolves cleanly without throwing', async () => {
   const { repoRoot, dir, worktreeDir } = setup(); // empty frontier -- idle every cycle
   // Aborting at 30ms must end the wait, not let it run to the fallback; the fallback is long
@@ -2152,8 +2169,7 @@ test('tsk-2yo: classificationPatchFromVerdict only builds a patch on a clear dis
 test('tsk-2yo: a headless clear verdict carrying tier/kind/risk actually applies them to the work item via editWork', async () => {
   const { classificationPatchFromVerdict } = await import('../../src/runner/loop.mjs');
   const { editWork } = await import('../../src/state/store.mjs');
-  const dir = mkTempDir('fgos-loop-test-classify-');
-  initStore(dir);
+  const { dir } = setup();
   addWork(dir, {
     id: 'item-headless-classify',
     title: 'Headless classify test',
@@ -2193,7 +2209,7 @@ test('tsk-34o5: startupReap parks a stale doing item with attestation-mismatch w
   activateGitFixture(repoRoot);
   execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
 
-  appendEvent(path.join(dir, 'events.jsonl'), {
+  appendWorkEvent(dir, {
     type: 'executor.dispatch',
     payload: { id, executorId: 'cli', baseCommit, headRef: 'main' },
   });
@@ -2222,7 +2238,7 @@ test('tsk-34o5: startupReap does NOT halt a legitimate retry on a branch with pr
   execFileSync('git', ['commit', '-m', 'attempt 1'], { cwd: repoRoot });
   activateGitFixture(repoRoot);
 
-  appendEvent(path.join(dir, 'events.jsonl'), {
+  appendWorkEvent(dir, {
     type: 'executor.dispatch',
     payload: { id, executorId: 'cli', baseCommit, headRef: branch },
   });
@@ -2233,7 +2249,7 @@ test('tsk-34o5: startupReap does NOT halt a legitimate retry on a branch with pr
   activateGitFixture(repoRoot);
   execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
 
-  appendEvent(path.join(dir, 'events.jsonl'), {
+  appendWorkEvent(dir, {
     type: 'executor.dispatch',
     payload: { id, executorId: 'cli', baseCommit, headRef: branch },
   });

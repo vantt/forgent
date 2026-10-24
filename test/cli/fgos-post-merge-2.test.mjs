@@ -46,6 +46,7 @@ import {
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
+  corruptEventStore,
   makeAlreadyCaughtUpItem,
   makeBlockedBranchItem,
   makeBlockedLeafItem,
@@ -92,24 +93,24 @@ import {
 test('a mutation (add) attempted on an already-corrupt log is refused as corrupt-log, exit 5, no event written', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'before-corruption');
-  fs.appendFileSync(logPath(cwd), 'not valid json\n', 'utf8');
-  const before = eventLines(cwd).length;
+  const damaged = corruptEventStore(cwd);
+  const before = fs.readFileSync(damaged, 'utf8');
 
   const result = run(cwd, ['add', 'after-corruption', '--title', 'X', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 5);
-  assert.equal(eventLines(cwd).length, before);
+  assert.equal(fs.readFileSync(damaged, 'utf8'), before, 'no event written');
 });
 
 
 test('a mutation (move) attempted on an already-corrupt log is refused as corrupt-log, exit 5, no event written', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'move-target');
-  fs.appendFileSync(logPath(cwd), 'not valid json\n', 'utf8');
-  const before = eventLines(cwd).length;
+  const damaged = corruptEventStore(cwd);
+  const before = fs.readFileSync(damaged, 'utf8');
 
   const result = run(cwd, ['move', 'move-target', '--to', 'doing']);
   assert.equal(result.status, 5);
-  assert.equal(eventLines(cwd).length, before);
+  assert.equal(fs.readFileSync(damaged, 'utf8'), before, 'no event written');
 });
 
 
@@ -133,7 +134,7 @@ test('a dependency cycle is impossible to construct: add requires deps to alread
 test('a corrupt trailing line in the event log is reported as corrupt-log, exit 5', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'before-corruption');
-  fs.appendFileSync(logPath(cwd), 'not valid json\n', 'utf8');
+  corruptEventStore(cwd);
 
   const result = run(cwd, ['list']);
   assert.equal(result.status, 5);
@@ -151,13 +152,13 @@ test('an unknown verb is rejected as validation, exit 4', () => {
 });
 
 
-test('GOLDEN request-class: running ready twice never appends to events.jsonl, and the view file is untouched too', () => {
+test('GOLDEN request-class: running ready twice never appends an event, and the view file is untouched too', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'golden-a');
   addOk(cwd, 'golden-b');
   run(cwd, ['move', 'golden-b', '--to', 'doing']);
 
-  const logBefore = fs.readFileSync(logPath(cwd), 'utf8');
+  const logBefore = eventLines(cwd).join('\n');
   const viewExistedBefore = fs.existsSync(viewPath(cwd));
   const viewBefore = viewExistedBefore ? fs.readFileSync(viewPath(cwd), 'utf8') : null;
 
@@ -170,8 +171,8 @@ test('GOLDEN request-class: running ready twice never appends to events.jsonl, a
   // underlying data, not the envelope wrapper.
   assert.deepEqual(envelopeData(first.stdout), envelopeData(second.stdout));
 
-  const logAfter = fs.readFileSync(logPath(cwd), 'utf8');
-  assert.equal(logAfter, logBefore, 'events.jsonl must be byte-identical before/after ready x2');
+  const logAfter = eventLines(cwd).join('\n');
+  assert.equal(logAfter, logBefore, 'the event store must be identical before/after ready x2');
 
   const viewAfter = fs.existsSync(viewPath(cwd)) ? fs.readFileSync(viewPath(cwd), 'utf8') : null;
   assert.equal(viewAfter, viewBefore, 'state.json must be untouched by ready (read never writes the view)');
@@ -222,19 +223,19 @@ test('doc-sources on a docPath with zero linked captures is SUCCESS (exit 0), re
 });
 
 
-test('doc-sources never mutates state: events.jsonl and state.json are byte-identical before/after', () => {
+test('doc-sources never mutates state: the events and state.json are identical before/after', () => {
   const cwd = tmpCwdFromTemplate();
   const dir = path.join(cwd, '.fgos');
   toProposed(cwd, 'doc-sources-readonly');
   addOutcome(dir, { id: 'doc-sources-readonly', docType: 'how-to', docPath: 'docs/how-to/readonly.md' });
 
-  const logBefore = fs.readFileSync(logPath(cwd), 'utf8');
+  const logBefore = eventLines(cwd).join('\n');
   const viewBefore = fs.readFileSync(viewPath(cwd), 'utf8');
 
   const result = run(cwd, ['doc-sources', 'docs/how-to/readonly.md']);
   assert.equal(result.status, 0);
 
-  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), logBefore, 'events.jsonl must be untouched by doc-sources');
+  assert.equal(eventLines(cwd).join('\n'), logBefore, 'the event store must be untouched by doc-sources');
   assert.equal(fs.readFileSync(viewPath(cwd), 'utf8'), viewBefore, 'state.json must be untouched by doc-sources');
 });
 

@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "types": [
+    {
+      "type": "porting.add",
+      "domain": "porting",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "porting.move",
+      "domain": "porting",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    }
+  ]
+}

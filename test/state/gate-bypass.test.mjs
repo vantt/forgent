@@ -1,9 +1,10 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/gate-bypass.test.mjs — docs/history/gate-bypass/plan.md Piece 1.
 // Covers the two cases the plan's risk map flagged as needing explicit proof:
 // the completeness scan must never false-negative on an incomplete artifact,
 // and the D4 hard-gate floor must hold even at the highest level.
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -28,7 +29,7 @@ import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fix
 process.env.HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-home-'));
 
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-')));
 }
 
 // The shared-config-file read path (docs/history/doctor-fix-gate-bypass/
@@ -39,6 +40,7 @@ function tmpDir() {
 // otherwise land on the shared, uncontrolled `os.tmpdir()` itself.
 function tmpFgosDir() {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-repo-'));
+  initializeWorkRepository(repoRoot);
   const fgosDir = path.join(repoRoot, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
   return fgosDir;
@@ -444,7 +446,7 @@ const FGOS_BIN = path.join(REPO_ROOT, 'bin/fgos.mjs');
 
 function tmpGateCheckFixture() {
   const fgosRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-check-cli-'));
-  const fgosDir = path.join(fgosRoot, '.fgos');
+  const fgosDir = initializeWorkRepository(fgosRoot);
   fs.mkdirSync(fgosDir, { recursive: true });
   addWork(fgosDir, { id: 'gate-check-fixture', title: 'Fixture item', description: 'fixture, not real work', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', size: 'light' });
   fs.writeFileSync(path.join(fgosDir, 'gate-bypass.json'), JSON.stringify({ level: 'standard' }));

@@ -12,6 +12,41 @@ import os from 'node:os';
 import path from 'node:path';
 
 const PRIVATE_ROOT_PREFIX = 'fgos-tp-';
+const SEAL_CHILD_WAIT_MS = 20000;
+
+// A CLI Work command hands its seal to a short detached `fgos events seal` child and exits, so a test that drove one
+// can end before the child does. Before the root is removed this process waits, through the process door (identity,
+// never a bare pid), for the seal children of its own root to finish. Test code only: the product has no such wait.
+let processDoor = null;
+import('../../src/runner/dispatch/process-identity.mjs').then((door) => { processDoor = door; }, () => {});
+
+// Directories outside the private root that a test made and drove CLI Work commands in (fixture-dir.mjs): a seal child
+// naming one of them must also end before this process's root, which holds the child's state root, goes away.
+const watchedRoots = new Set();
+/** Also wait, at exit, for the seal children that name `dir`. */
+export function watchSealChildrenOf(dir) { watchedRoots.add(dir); }
+
+function sealChildrenOf(root) {
+  const views = processDoor.scan({});
+  if (views === 'unsupported') return [];
+  return views.filter((view) => {
+    const args = Array.isArray(view.cmdline) ? view.cmdline.join(' ') : String(view.cmdline ?? '');
+    return view.pid !== process.pid && args.includes(root + path.sep) && / events seal /.test(` ${args} `);
+  });
+}
+
+function waitForSealChildren(root) {
+  if (!processDoor) return;
+  const deadline = Date.now() + SEAL_CHILD_WAIT_MS;
+  const pendingSealChildren = () => [root, ...watchedRoots].flatMap((dir) => sealChildrenOf(dir));
+  try {
+    for (let running = pendingSealChildren(); running.length && Date.now() < deadline; running = pendingSealChildren()) {
+      const alive = running.filter((view) => view.tuple !== null && processDoor.judge(view.tuple) !== 'dead');
+      if (!alive.length) return;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
+    }
+  } catch { /* no door in this process: nothing to wait on */ }
+}
 
 function installProcessTempRoot() {
   let root;
@@ -24,6 +59,7 @@ function installProcessTempRoot() {
   process.env.TMP = root;
   process.env.TEMP = root;
   const removeRoot = () => {
+    waitForSealChildren(root);
     if (process.env.FGOS_KEEP_TEST_FIXTURES) return;
     try { fs.rmSync(root, { recursive: true, force: true, maxRetries: 3 }); } catch { /* best effort at exit */ }
   };

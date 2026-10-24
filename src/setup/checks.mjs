@@ -13,6 +13,7 @@ export {
   DOCTOR_CHECKS,
   FIX_REGISTRATIONS,
   registerCheck,
+  createDoctorRun,
   registerFix,
   runFixes,
   resolveMainCheckout,

@@ -17,8 +17,8 @@ import { copyCredentialFiles, credentialWriteBackMarker } from '../../provider-c
 import { expandCredentialHome } from '../../provider-capacity.mjs';
 import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
+import { resolveRuntimeSocketDir } from '../../../../run-supervisor/runtime-dir.mjs';
 import { computeSha256Digest } from '../../proof-helpers.mjs';
-import { ensureRuntimeSocketDir } from '../../../../run-supervisor/runtime-dir.mjs';
 
 export const BWRAP_DRIVER_TYPE = 'bwrap';
 export const BWRAP_DRIVER_VERSION = 'local-bwrap-v1';
@@ -240,6 +240,25 @@ function machinePrivateRefusals(request, resolvedResources) {
     'machine-private-hides-workspace',
     (name, real, root) => `the ${name} "${real}" lies inside the machine-private root "${root}", which is hidden from every confined dispatch.`,
   );
+}
+
+/**
+ * The socket a gate command dials (`--go-socket <path>`), or null when it names none. Only a socket
+ * directly in the run supervisor's socket directory is bound back: any other path could re-expose
+ * something the masks hide, so it is refused by name.
+ */
+function gateGoSocket(gateCommand) {
+  if (!Array.isArray(gateCommand)) return null;
+  const at = gateCommand.indexOf('--go-socket');
+  if (at < 0) return null;
+  const socket = gateCommand[at + 1];
+  const dir = resolveRuntimeSocketDir();
+  if (typeof socket !== 'string' || !path.isAbsolute(socket) || path.dirname(path.resolve(socket)) !== dir) {
+    const err = new Error(`the gate's GO socket "${socket}" is not in the run supervisor's socket directory "${dir}"; only that is bound back into the sandbox.`);
+    err.code = 'go-socket-outside-runtime-socket-dir';
+    throw err;
+  }
+  return socket;
 }
 
 /**
@@ -549,15 +568,13 @@ export function prepareBwrapSync(plan, request, backend) {
     // Only a terminal-mode launch is tied to its launcher's lifetime. A direct attempt must
     // outlive a dead supervisor, so it never gets --die-with-parent.
     const terminal = request.launchMode === 'terminal';
-    if (terminal) {
-      const socketDir = ensureRuntimeSocketDir();
-      bwrapArgs.push('--die-with-parent', '--bind', socketDir, socketDir);
-    }
+    if (terminal) bwrapArgs.push('--die-with-parent');
     const attemptId = typeof request.attemptId === 'string' && request.attemptId !== '' ? request.attemptId : null;
     // The private /tmp above hides whatever lives under the host's /tmp. The gate reads its envelope
-    // from the run directory and is itself a host binary, so each is bound back where it sits.
+    // from the run directory and is itself a host binary, so each is bound back where it sits. A gate
+    // named without a path is found on PATH inside the sandbox, never next to the cwd.
     if (attemptId) {
-      const gateBin = Array.isArray(request.gateCommand) ? request.gateCommand[0] : null;
+      const gateBin = Array.isArray(request.gateCommand) && path.isAbsolute(request.gateCommand[0] ?? '') ? request.gateCommand[0] : null;
       for (const hostPath of [request.context?.runDir, gateBin]) {
         if (typeof hostPath === 'string' && isInsideRoot(path.resolve(hostPath), '/tmp')) {
           bwrapArgs.push('--ro-bind', path.resolve(hostPath), path.resolve(hostPath));
@@ -608,9 +625,14 @@ export function prepareBwrapSync(plan, request, backend) {
     const mounts = resources.filter((r) => r.resource !== 'hidden-root' && r.resource !== 'own-assignment');
     // Files of the attempt the gate must write from inside the sandbox (its exit record and the capture
     // files). The controller creates them empty beforehand; the attempt directory itself stays read-only.
+    // A terminal attempt's gate dials its own GO socket (`--go-socket`), which the supervisor listens on
+    // before the pane runs the launcher; the runtime directory around it is masked (spec section 9.3),
+    // so that one socket is bound back read-only, and no other attempt's.
     const bindAttemptFiles = () => {
       if (!attemptId) return;
       for (const file of request.attemptBinds ?? []) bwrapArgs.push('--bind', file, file);
+      const goSocket = terminal ? gateGoSocket(request.gateCommand) : null;
+      if (goSocket) bwrapArgs.push('--ro-bind', goSocket, goSocket);
     };
     if (!blind) {
       // Only machine-private roots are hidden here (spec section 9.3); with none on the host this

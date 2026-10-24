@@ -20,62 +20,33 @@ pub struct CutoverGrant {
     pub legacy_ref_oid: String,
     pub seal_digest: String,
 }
-// WORK-lane deletion: remove at Event Store cutover with the Work adapter.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct LegacyEventLayout {
-    pub exact_paths: Vec<String>,
-}
-impl LegacyEventLayout {
-    pub(crate) fn validate(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<()> {
-        self.validate_paths(repo)?;
-        let main = scope.handle("main-checkout")
-            .ok_or_else(|| failure("legacy-events-main-borrow-required"))?;
-        if main.path() != repo.trusted_main_root().join(".fgos/locks/main-checkout.lock") {
-            return Err(failure("legacy-events-main-borrow-required"));
-        }
-        fgos_holder_lock::validate(main)
-            .map_err(|_| failure("legacy-events-main-borrow-required"))
-    }
-    // The hook already proves main-50 borrowing from its inherited descriptor.
-    pub(crate) fn validate_paths(&self, repo: &RepoHandle) -> Result<()> {
-        if root(repo)? != repo.trusted_main_root() || self.exact_paths.is_empty() {
-            return Err(failure("legacy-events-main-required"));
-        }
-        let mut seen = BTreeSet::new();
-        for p in &self.exact_paths {
-            let shard = p.strip_prefix(".fgos/events/").is_some_and(|name| {
-                let archived = name.strip_prefix("archive/");
-                let name = archived.unwrap_or(name);
-                !name.is_empty() && !name.contains('/')
-                    && (name.ends_with(".jsonl")
-                        || (archived.is_some() && name.strip_suffix(".manifest.json")
-                            .is_some_and(|stem| !stem.is_empty())))
-            });
-            if !seen.insert(p) || !(p == ".fgos/events.jsonl" || p == ".fgos/porting/events.jsonl" || shard)
-                || crate::fgos_scope_literal(p).is_err() {
-                return Err(failure("invalid-legacy-event-path"));
-            }
-        }
-        Ok(())
-    }
-}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CommitRequest {
     pub writes: Vec<String>,
     pub message: String,
     pub cutover_grant: Option<CutoverGrant>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub legacy_events: Option<LegacyEventLayout>,
+}
+/// Observation-only view of a baseline persisted in the WAL. Recovery needs
+/// the head and the branch; the rest is bound by [`CommitBaseline::record`].
+#[derive(Deserialize)]
+struct StoredBaseline {
+    head: String,
+    reference: String,
+}
+/// Observation-only view of a request persisted in the WAL. Requests written
+/// by earlier releases may carry fields that new requests refuse (the retired
+/// `legacyEvents` declaration); recovery needs only the message, so it reads
+/// that and ignores the rest instead of failing to reconcile a retained attempt.
+#[derive(Deserialize)]
+struct StoredCommitRequest {
+    message: String,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CheckpointRequest {
     pub files: Vec<String>,
     pub message: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub legacy_events: Option<LegacyEventLayout>,
 }
 /// Capture before producer launch. Keep this value for commit-only retry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -86,6 +57,41 @@ pub struct CommitBaseline {
     pub worktree: String,
     pub authority: String,
     pub dirty: Vec<(String, String)>,
+}
+impl CommitBaseline {
+    /// What the intent keeps of the baseline. The dirty list is bound by its
+    /// digest, so the record does not grow with the worktree's dirt.
+    fn record(&self) -> Result<String> {
+        serde_json::to_string(&serde_json::json!({
+            "head": self.head,
+            "reference": self.reference,
+            "worktree": self.worktree,
+            "authority": self.authority,
+            "dirtyDigest": wal::canonical_digest(&self.dirty)?,
+        }))
+        .map_err(failure)
+    }
+    /// Whether an intent's stored baseline is this one, in the bounded form or
+    /// in the full form earlier records carry.
+    fn is_recorded_as(&self, stored: &str) -> Result<bool> {
+        Ok(stored == self.record()? || stored == serde_json::to_string(self).map_err(failure)?)
+    }
+}
+impl CommitRequest {
+    /// What the intent keeps of the request: the message recovery observes and
+    /// a digest of the whole request, so the record does not grow with its paths.
+    fn record(&self) -> Result<String> {
+        serde_json::to_string(&serde_json::json!({
+            "message": self.message,
+            "digest": wal::canonical_digest(self)?,
+        }))
+        .map_err(failure)
+    }
+    /// Whether an intent's stored request is this one, in the bounded form or
+    /// in the full form earlier records carry.
+    fn is_recorded_as(&self, stored: &str) -> Result<bool> {
+        Ok(stored == self.record()? || stored == serde_json::to_string(self).map_err(failure)?)
+    }
 }
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -292,6 +298,8 @@ pub(crate) fn scope<'a>(repo: &RepoHandle, held: Vec<BorrowedHandle<'a>>) -> Res
         let lease = scope
             .handle("dispatch-cwd")
             .ok_or_else(|| failure("checkout-custody-required"))?;
+        #[cfg(not(unix))]
+        let _ = lease;
         #[cfg(unix)]
         if lease.path() != crate::refs::custody_lock_path(repo, root(repo)?)? {
             return Err(failure("checkout-custody-stale"));
@@ -553,12 +561,13 @@ impl GitDriver {
             {
                 fgos_holder_lock::validate_quiescent(handle(scope, repo)?).map_err(failure)?;
                 if let OperationKind::ScopedCommit(payload) = &chain.intent().kind {
-                    let baseline: CommitBaseline =
+                    let baseline: StoredBaseline =
                         serde_json::from_str(&payload.baseline).map_err(failure)?;
-                    if self.checkout_text(repo, scope, &["rev-parse", "HEAD"])? == baseline.head
-                        && self.staged(repo, scope)? == payload.paths
-                    {
-                        self.stage_paths(repo, scope, &["reset", "-q", "HEAD"], &payload.paths)?;
+                    if self.checkout_text(repo, scope, &["rev-parse", "HEAD"])? == baseline.head {
+                        let staged = self.staged(repo, scope)?;
+                        if payload.paths.matches(&staged)? {
+                            self.stage_paths(repo, scope, &["reset", "-q", "HEAD"], &staged)?;
+                        }
                     }
                 }
                 chain = wal
@@ -629,9 +638,9 @@ impl GitDriver {
     ) -> Result<Option<(String, bool)>> {
         let (reference, parents, tree, message) = match &chain.intent().kind {
             OperationKind::ScopedCommit(payload) => {
-                let baseline: CommitBaseline =
+                let baseline: StoredBaseline =
                     serde_json::from_str(&payload.baseline).map_err(failure)?;
-                let request: CommitRequest =
+                let request: StoredCommitRequest =
                     serde_json::from_str(&payload.request).map_err(failure)?;
                 (
                     baseline.reference,
@@ -795,7 +804,7 @@ impl GitDriver {
                         worktree: root(repo)?.to_string_lossy().into(),
                         baseline: String::new(),
                         request: String::new(),
-                        paths: vec![],
+                        paths: wal::PathSet::of(&[]).map_err(failure)?,
                         tree: compact.expected.clone(),
                         cutover_grant: None,
                     })),
@@ -826,17 +835,18 @@ impl GitDriver {
         }
         fgos_holder_lock::validate_quiescent(handle(&scope, repo)?).map_err(failure)?;
         let outcome = if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
-            let baseline: CommitBaseline =
+            let baseline: StoredBaseline =
                 serde_json::from_str(&payload.baseline).map_err(failure)?;
-            if self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])? == baseline.head
-                && self.staged(repo, &scope)? == payload.paths
-            {
-                self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &payload.paths)?;
+            if self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])? == baseline.head {
+                let staged = self.staged(repo, &scope)?;
+                if payload.paths.matches(&staged)? {
+                    self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &staged)?;
+                }
             }
             Outcome::AbandonedBeforeAttempt
         } else {
             require_no_index_lock(&repo.git_dir)?;
-            let baseline: CommitBaseline =
+            let baseline: StoredBaseline =
                 serde_json::from_str(&payload.baseline).map_err(failure)?;
             if let Some((observed, tree_changed)) =
                 self.observe_checkout_commit(repo, &scope, &wal, &chain)?
@@ -865,10 +875,16 @@ impl GitDriver {
                 )?;
                 Outcome::Commit {
                     observed,
-                    contract_violation: tree_changed || files != payload.paths,
+                    contract_violation: tree_changed || !payload.paths.matches(&files)?,
                 }
             } else if self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])? == baseline.head {
-                self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &payload.paths)?;
+                // Staging a human left beside ours stays; only our paths are unstaged.
+                // A bounded record derives its paths from the intent's tree; unstage
+                // them only when they are exactly the recorded set, else leave the index.
+                let ours = self.recorded_paths(repo, &scope, payload, &baseline.head)?;
+                if payload.paths.matches(&ours)? {
+                    self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &ours)?;
+                }
                 Outcome::CommitRejected {
                     cause: "commit-effect-unknown".into(),
                 }
@@ -1060,6 +1076,21 @@ impl GitDriver {
         }
     }
     /// The files Git lists between two commits.
+    /// The paths an intent staged. A digest cannot name them, but the intent's
+    /// tree is the index as staged for them, so its difference from the
+    /// baseline head is the same set.
+    fn recorded_paths(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        payload: &wal::ScopedCommitIntent,
+        head: &str,
+    ) -> Result<Vec<String>> {
+        match &payload.paths {
+            wal::PathSet::Listed(paths) => Ok(paths.clone()),
+            wal::PathSet::Digest(_) => self.changed_paths(repo, scope, head, &payload.tree),
+        }
+    }
     pub(crate) fn changed_paths(
         &self,
         repo: &RepoHandle,
@@ -1266,9 +1297,6 @@ impl GitDriver {
         {
             return Err(failure("invalid-commit-message"));
         }
-        if let Some(layout) = &request.legacy_events {
-            layout.validate(repo, scope)?;
-        }
         let writes = fgos_write_scope::canonicalize_all(&request.writes).map_err(failure)?;
         if baseline.worktree != root(repo)?.to_string_lossy()
             || baseline.authority != binding(handle(scope, repo)?)?
@@ -1301,7 +1329,7 @@ impl GitDriver {
                         worktree: baseline.worktree.clone(),
                         baseline: String::new(),
                         request: String::new(),
-                        paths: vec![],
+                        paths: wal::PathSet::of(&[]).map_err(failure)?,
                         tree: baseline.head.clone(),
                         cutover_grant: None,
                     })),
@@ -1341,8 +1369,8 @@ impl GitDriver {
             let OperationKind::ScopedCommit(payload) = &old.intent().kind else {
                 return Err(failure("operation-id-reused"));
             };
-            if payload.baseline != serde_json::to_string(baseline).map_err(failure)?
-                || payload.request != serde_json::to_string(request).map_err(failure)?
+            if !baseline.is_recorded_as(&payload.baseline)?
+                || !request.is_recorded_as(&payload.request)?
                 || old.intent().writer_identity != writer
             {
                 return Err(failure("operation-id-reused"));
@@ -1391,9 +1419,6 @@ impl GitDriver {
                 selected.push(path);
             }
         }
-        if let Some(layout) = &request.legacy_events {
-            selected.extend(layout.exact_paths.iter().filter(|p| dirty_paths.contains(p)).cloned());
-        }
         if let Some(grant) = &request.cutover_grant {
             if root(repo)? != repo.trusted_main_root() {
                 return Err(failure("cutover-main-required"));
@@ -1429,9 +1454,9 @@ impl GitDriver {
         if selected.is_empty() {
             let kind = OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
                 worktree: baseline.worktree.clone(),
-                baseline: serde_json::to_string(baseline).map_err(failure)?,
-                request: serde_json::to_string(request).map_err(failure)?,
-                paths: vec![],
+                baseline: baseline.record()?,
+                request: request.record()?,
+                paths: wal::PathSet::of(&[])?,
                 tree: self.checkout_text(repo, scope, &["rev-parse", "HEAD^{tree}"])?,
                 cutover_grant: None,
             }));
@@ -1520,11 +1545,15 @@ impl GitDriver {
             sync_staged_objects(repo, &staged_objects, filesystem)?;
             let kind = OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
                 worktree: baseline.worktree.clone(),
-                baseline: serde_json::to_string(baseline).map_err(failure)?,
-                request: serde_json::to_string(request).map_err(failure)?,
-                paths: selected.clone(),
+                baseline: baseline.record()?,
+                request: request.record()?,
+                paths: wal::PathSet::of(&selected)?,
                 tree: tree.clone(),
-                cutover_grant: request.cutover_grant.clone(),
+                cutover_grant: request
+                    .cutover_grant
+                    .as_ref()
+                    .map(wal::CutoverGrantRecord::of)
+                    .transpose()?,
             }));
             let resources = checkout_resources(repo)?;
             crate::refs::admission(&wal, id, &resources)?;
@@ -1766,7 +1795,7 @@ impl GitDriver {
         }
         Ok(())
     }
-    /// Main-only tracked checkpoint; WORK removes explicit legacy-event support at cutover.
+    /// Main-only tracked checkpoint of non-`.fgos` files.
     pub fn checkpoint_tracked_files(
         &self,
         repo: &RepoHandle,
@@ -1775,16 +1804,11 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<CommitResult> {
-        let CheckpointRequest {files, message, legacy_events} = request;
+        let CheckpointRequest {files, message} = request;
         if root(repo)? != repo.trusted_main_root()
-            || files.iter().any(|p| is_store_path(p)
-                && !legacy_events.as_ref().is_some_and(|l| l.exact_paths.contains(p)))
+            || files.iter().any(|p| is_store_path(p))
         {
             return Err(failure("checkpoint-non-event-main-required"));
-        }
-        if let Some(layout) = &legacy_events {
-            layout.validate_paths(repo)?;
-            if layout.exact_paths.iter().any(|p| !files.contains(p)) { return Err(failure("invalid-legacy-event-path")); }
         }
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
@@ -1814,7 +1838,6 @@ impl GitDriver {
                 writes: files,
                 message,
                 cutover_grant: None,
-                legacy_events,
             },
             writer,
             id,

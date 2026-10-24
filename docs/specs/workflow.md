@@ -634,7 +634,7 @@ Mỗi dòng: ai quyết, **tín hiệu quan sát được** sẽ mở lại, và
 
 ## 17. Lịch sử quyết định
 
-### D-ADR0073 (bộ từ workflow / case / unit / pattern / run) — một chữ cho một tầng; supersede phần thuật ngữ "guide" của D-ADR0070
+### D-ADR0073 (bộ từ workflow / case / unit / pattern / run) — một chữ cho một tầng; supersede phần thuật ngữ "guide" của D-ADR0070 (workflow guide + admission ledger)
 
 - **Trạng thái:** **Settled (owner 2026-10-24 12:45, "ok giữ case, chốt bộ từ đi em").**
 - **Bối cảnh:** chữ "pattern" đang gọi cả cơ chế trong code (`solo`, `reviewed`, `panel`, `debate`) lẫn bộ params có tên (`code-change`, `consult`, gọi là preset); chữ "workflow" gọi component, file định nghĩa và một lần chạy; chữ "run" gọi ba tầng (`wf-run-…` là case, `unit-run-…` là unit, `runs/NN` là một ghế chạy một lần, mà Run Supervisor lại gọi là "attempt"); chữ "guide" trùng nghĩa thường ngày (tài liệu hướng dẫn). Owner thấy lẫn trong lúc thiết kế "mức độ áp pattern" ([spec nháp](../../plans/261023-1619-collaboration-degree-spec/spec-draft.md)).

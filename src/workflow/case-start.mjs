@@ -4,8 +4,6 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { normalizeContextRefs } from './definition.mjs';
@@ -22,6 +20,7 @@ import { providerAccountInventory } from '../runner/dispatch/provider-capacity.m
 import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
 import { parseAccountPin } from '../runner/execution/account-pin.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
+import { spawnDetachedCli } from '../cli/detached-child.mjs';
 import { ADVANCE_DETACHED_ENV } from './case-lock.mjs';
 import { assertWriteChains, workflowCheckout } from './unit-handoff.mjs';
 import { RIGOR_ORDER } from './case-projection.mjs';
@@ -115,27 +114,14 @@ export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = wo
  * advance.log beside the event log. `--foreground` is what keeps the child from detaching again.
  */
 export function spawnDetachedAdvance({ mainRoot, workflowRunId, runDir, worktree, cwd, cliPath }) {
-  const cli = cliPath ?? fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
-  const args = [cli, 'workflow', 'resume', workflowRunId, '--dir', mainRoot];
+  const args = ['workflow', 'resume', workflowRunId, '--dir', mainRoot];
   if (worktree) args.push('--worktree', worktree);
   args.push('--foreground');
 
   const logPath = path.join(runDir, 'advance.log');
-  const logFd = fs.openSync(logPath, 'a');
-  let child;
-  try {
-    child = spawn(process.execPath, args, {
-      cwd: cwd ?? process.cwd(),
-      detached: true,
-      env: { ...process.env, [ADVANCE_DETACHED_ENV]: '1' },
-      stdio: ['ignore', logFd, logFd],
-    });
-  } finally {
-    fs.closeSync(logFd);
-  }
-  child.on('error', () => {});
-  child.unref();
-  return { pid: child.pid ?? null, logPath, statusCommand: `fgos workflow status ${workflowRunId}` };
+  const child = spawnDetachedCli({ args, cwd, logPath, cliPath, env: { ...process.env, [ADVANCE_DETACHED_ENV]: '1' } });
+  if (child.error) throw new Error(`cannot start the detached advance: ${child.error}`);
+  return { pid: child.pid, logPath, statusCommand: `fgos workflow status ${workflowRunId}` };
 }
 
 export function detachedResult({ mainRoot, workflowRunId, detached }) {

@@ -9,9 +9,10 @@ import { execFileSync } from 'node:child_process';
 import { resolveDiscovery, RETIRED_P14_PLACEHOLDER, FALLBACK_VERIFY, classificationPatchFromVerdict, assertCallerClassification } from '../../src/intake/discovery.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork, recordGateApprove, readRawEvents } from '../../src/state/store.mjs';
-import { appendEvent, readEvents } from '../../src/state/events.mjs';
+import { appendWorkEvent } from '../helpers/work-event-fixture.mjs';
 import { createWorktree } from '../../src/runner/worktree.mjs';
 import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 
 // tsk-1x3 D1/D9/D16 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
 // `judgeDiscovery` (a nested `claude -p` subprocess) is retired. This file
@@ -47,7 +48,7 @@ import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 // exercise).
 
 function tmpStoreDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-discovery-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-discovery-')));
 }
 
 function sampleWork(overrides = {}) {
@@ -612,13 +613,12 @@ test('resolveDiscovery writes EXACTLY ONE work.edit event carrying priority per 
 // present but not a real RISK_DISCOUNTS key -- the exact real-world shape
 // (67/482 items on the real log) this item exists to make observable.
 // `addWork` itself now enforces risk as an enum (tsk-5wz) so this shape can
-// only exist as LEGACY data today -- same appendEvent bypass technique the
+// only exist as LEGACY data today -- same appendWorkEvent bypass technique the
 // legacy-invalid-shape test above already uses to plant one.
 test('resolveDiscovery logs a decision when work.risk is present but unrecognized, never for a recognized value', () => {
   const storeDir = tmpStoreDir();
-  const logPath = path.join(storeDir, 'events.jsonl');
-  appendEvent(logPath, { type: 'work.add', payload: { ...sampleWork(), id: 'item-unrecognized', risk: 'medium' } });
-  appendEvent(logPath, { type: 'work.add', payload: { ...sampleWork(), id: 'item-recognized', risk: 'heavy' } });
+  appendWorkEvent(storeDir, { type: 'work.add', payload: { ...sampleWork(), id: 'item-unrecognized', risk: 'medium' } });
+  appendWorkEvent(storeDir, { type: 'work.add', payload: { ...sampleWork(), id: 'item-recognized', risk: 'heavy' } });
 
   resolveDiscovery(storeDir, 'item-unrecognized', {}, 'session', { clear: true, verify: 'npm test -- a' });
   resolveDiscovery(storeDir, 'item-recognized', {}, 'session', { clear: true, verify: 'npm test -- b' });
@@ -633,7 +633,6 @@ test('resolveDiscovery logs a decision when work.risk is present but unrecognize
 
 test('resolveDiscovery still updates priority on a legacy-invalid item shape — editWork\'s scoped validation (tsk-1ne) grandfathers the untouched field instead of blocking the patch', () => {
   const storeDir = tmpStoreDir();
-  const logPath = path.join(storeDir, 'events.jsonl');
   // Bypass the normal addWork write door to plant a corrupted item shape
   // (empty `risk`) — replay never validates on fold, so it reads back fine.
   // Before tsk-1ne, editWork's validateWork re-checked the WHOLE merged
@@ -644,7 +643,7 @@ test('resolveDiscovery still updates priority on a legacy-invalid item shape —
   // that re-validation to only the fields a patch actually touches —
   // `risk` is never in this patch (`{priority}` only), so it is now
   // grandfathered and no longer rejected.
-  appendEvent(logPath, { type: 'work.add', payload: { ...sampleWork(), risk: '' } });
+  appendWorkEvent(storeDir, { type: 'work.add', payload: { ...sampleWork(), risk: '' } });
 
   assert.doesNotThrow(() => resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true, verify: 'npm test -- discovered' }));
   const view = listWork(storeDir);

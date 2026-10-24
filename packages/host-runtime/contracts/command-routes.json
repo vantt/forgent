@@ -329,6 +329,15 @@
       "test/rust-host/command-routes.test.mjs"
     ]
   },
+  "events": {
+    "selector": "events",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
   "friction": {
     "selector": "friction",
     "route_kind": "native",
@@ -790,15 +799,6 @@
   },
   "reject": {
     "selector": "reject",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
-    "compatibility_tests": [
-      "test/rust-host/command-routes.test.mjs"
-    ]
-  },
-  "repair": {
-    "selector": "repair",
     "route_kind": "legacy-cli",
     "legacy_payload": "legacy-node",
     "owner_path": "src/cli/command-registry.mjs",

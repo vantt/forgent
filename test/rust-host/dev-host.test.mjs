@@ -10,6 +10,7 @@ import { listLegacyNodeSourceFiles, hashFile, computeArtifactDigest, resolveProd
 import { inspectRepo } from '../../scripts/lib/git-ports.mjs';
 import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { initStore, addWork } from '../../src/state/store.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const binaryName = process.platform === 'win32' ? 'fgos.exe' : 'fgos';
@@ -21,6 +22,7 @@ const cleanEnv = () => {
   delete env.CLAUDE_CODE_SESSION_ID;
   delete env.CARGO_TARGET_DIR;
   delete env.INIT_CWD;
+  delete env.FGOS_STATE_ROOT;
   delete env.FGOS_ACTIVE_RELEASE_PATH;
   delete env.FGOS_ACTIVE_MANIFEST_PATH;
   return env;
@@ -35,7 +37,8 @@ function fixture() {
   const subdir = path.join(workspace, 'nested');
   fs.mkdirSync(subdir, { recursive: true });
   fs.mkdirSync(path.join(root, 'home'));
-  fs.mkdirSync(path.join(root, 'state'));
+  fs.mkdirSync(path.join(root, 'state'), { mode: 0o700 });
+  fs.chmodSync(path.join(root, 'state'), 0o700);
   for (const relative of listLegacyNodeSourceFiles(repoRoot, () => inspectRepo(repoRoot))) {
     const destination = path.join(checkout, relative);
     fs.mkdirSync(path.dirname(destination), { recursive: true });
@@ -52,7 +55,7 @@ function fixture() {
   process.env.FGOS_STATE_HOME = path.join(root, 'state');
   delete process.env.CLAUDE_CODE_SESSION_ID;
   try {
-    const dir = path.join(subdir, '.fgos');
+    const dir = initializeWorkRepository(subdir);
     initStore(dir);
     addWork(dir, { id: 'dev-consumer', title: 'Workspace selected by runtime cwd', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
   } finally {

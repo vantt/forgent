@@ -1,3 +1,6 @@
+import { initializeWorkRepository } from '../../helpers/work-store-release.mjs';
+import { appendWorkEvent } from '../../helpers/work-event-fixture.mjs';
+import { leaveOpenWorkEvent } from '../../helpers/open-work-event.mjs';
 // fgos-cli-harness.mjs -- bộ đồ nghề dùng chung của các file test CLI, tách
 // nguyên văn ra khỏi test/cli/fgos.test.mjs khi file đó được chẻ nhỏ (tsk-3um).
 // Không có test nào ở đây: chỉ import, hằng số và helper mà các file test bên
@@ -16,15 +19,15 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addOutcome, recordFriction, addDiscovery, moveWork, moveStep, addWork, editWork, listWork, StoreError, resolveWriterLogPath, rebuild, initStore } from '../../../src/state/store.mjs';
-import { appendEvent } from '../../../src/state/events.mjs';
+import { addOutcome, recordFriction, addDiscovery, moveWork, moveStep, addWork, editWork, listWork, readRawEvents, StoreError, rebuild, initStore } from '../../../src/state/store.mjs';
+import { appendEvent } from '../../helpers/legacy-event-fixture.mjs';
 import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
 import { createSession, endSession } from '../../../src/runner/session.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
 import { writeCoexistenceManifest } from '../../../src/install/coexist.mjs';
 import { invokeHost } from '../../../src/util/host-bin.mjs';
 import { initFixtureRepo, activateGitFixture } from '../../helpers/git-fixture.mjs';
-import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
+import { projectConfigPath, writeProjectConfig } from '../../helpers/config-fixture.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -37,8 +40,8 @@ const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 // child spawned via run() below always agreed with every OTHER run()-spawned
 // child in the same test (they all inherit the same process.env), but
 // whether a spawned child agreed with a fixture that writes IN-PROCESS (e.g.
-// moveToDurableDoingForTest below, which calls resolveWriterLogPath/
-// appendEvent directly, no subprocess involved) depended on the invoking
+// moveToDurableDoingForTest below, which appends through the Work gate
+// directly, no subprocess involved) depended on the invoking
 // shell: under an agent session, both sides read the identical
 // CLAUDE_CODE_SESSION_ID string and collapsed onto ONE shared writer log
 // (an in-process write landing in the same per-writer sequence a later
@@ -76,12 +79,13 @@ function rawTmpCwd() {
 // explicitly afterward are unaffected — a harmless no-op second call.
 function tmpCwd() {
   const cwd = rawTmpCwd();
+  initializeWorkRepository(cwd);
   assert.equal(run(cwd, ['init']).status, 0, 'tmpCwd(): "fgos init" failed to bootstrap .fgos/');
   return cwd;
 }
 
 function initFgosFixtureInProcess(cwd) {
-  const dir = path.join(cwd, '.fgos');
+  const dir = initializeWorkRepository(cwd);
   initStore(dir);
   try {
     writeCoexistenceManifest(cwd, dir);
@@ -110,6 +114,7 @@ function fgosTemplateSourceDir() {
 
 function tmpCwdFromTemplate() {
   const cwd = rawTmpCwd();
+  initializeWorkRepository(cwd);
   fs.cpSync(fgosTemplateSourceDir(), path.join(cwd, '.fgos'), { recursive: true });
   return cwd;
 }
@@ -148,30 +153,24 @@ function envelopeData(stdout) {
   return envelope.data;
 }
 
-// Tầng A/T2: new events land under `.fgos/events/<writer>-<ts>.jsonl`, not
-// the frozen baseline `logPath(cwd)` (TA-D12) -- this counts/exposes every
-// raw line across BOTH, so every existing caller's "N more events since
-// before" or "find the event with type X" check keeps working unchanged
-// regardless of which physical file the CLI actually wrote to.
+// Damages the open Event Store file the way bit rot or a hand edit would: one recorded event no longer matches its hash.
+// A command seals what it left open when it ends and publishes once per interval, so the file may already be sealed:
+// leave one fresh event open, and keep the commands that follow from sealing it (publishing is explicit-only, and a
+// fresh event is not due), so the damaged file is what they find.
+function corruptEventStore(cwd) {
+  const configPath = projectConfigPath(cwd);
+  const config = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+  writeProjectConfig(cwd, { ...config, eventStore: { ...config.eventStore, sync: { intervalSec: 0 } } });
+  leaveOpenWorkEvent(cwd, { ageSec: 0 });
+  const active = path.join(cwd, '.git', 'fgos', 'events', 'project', 'active.jsonl');
+  fs.writeFileSync(active, fs.readFileSync(active, 'utf8').replace('"payload":{', '"payload":{"tampered":true,'));
+  return active;
+}
+
+// Every raw event of the Event Store, so a "N more events since before" or "find the event with type X" check
+// does not depend on where the store keeps them.
 function eventLines(cwd) {
-  const lines = [];
-  if (fs.existsSync(logPath(cwd))) {
-    lines.push(...fs.readFileSync(logPath(cwd), 'utf8').split('\n').filter(Boolean));
-  }
-  const eventsDir = path.join(cwd, '.fgos', 'events');
-  let names = [];
-  try {
-    names = fs
-      .readdirSync(eventsDir, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
-      .map((entry) => entry.name);
-  } catch {
-    names = [];
-  }
-  for (const name of names) {
-    lines.push(...fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean));
-  }
-  return lines;
+  return readRawEvents(path.join(cwd, '.fgos')).map(event => JSON.stringify(event));
 }
 
 // Effective view (durable status overlaid with any active runtime claim,
@@ -211,7 +210,7 @@ function stateView(cwd) {
 // test/state/store.test.mjs's own moveToDurableDoingForTest uses.
 function moveToDurableDoingForTest(cwd, id, from = 'todo', extra = {}) {
   const dir = path.join(cwd, '.fgos');
-  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing', ...extra } }, dir);
+  appendWorkEvent(dir, { type: 'work.move', payload: { id, from, to: 'doing', ...extra } }, dir);
   rebuild(dir);
 }
 
@@ -602,6 +601,8 @@ function mkLocalDependency() {
 // bookkeeping alongside code.
 function commitPending(cwd, message) {
   execFileSync('git', ['add', '-A'], { cwd });
+  // Events live in the Event Store, so a verb may leave nothing to commit.
+  if (!execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' }).trim()) return;
   execFileSync('git', ['commit', '-q', '-m', message], { cwd });
 }
 
@@ -1158,6 +1159,7 @@ export {
   endSession,
   envelopeData,
   eventLines,
+  corruptEventStore,
   execFileSync,
   fileURLToPath,
   fs,

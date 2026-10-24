@@ -25,6 +25,7 @@ pub struct WorktreeHandle {
 }
 /// The pid a `git worktree lock` reason names: the number after a `pid`
 /// token (`pid 42`, `(pid=42`, `pid:42`). Generic, not tied to any harness.
+#[cfg(target_os = "linux")]
 fn pid_named_by(reason: &str) -> Option<u32> {
     let lower = reason.to_ascii_lowercase();
     let mut from = 0;
@@ -380,13 +381,13 @@ impl GitDriver {
                     _ => return Err(failure("worktree-custody-held-or-unknown")),
                 }
             }
+            Ok(())
         }
         #[cfg(not(unix))]
         {
             let _ = (repo, scope, path);
-            return Err(failure("git-lockscope-unavailable-windows"));
+            Err(failure("git-lockscope-unavailable-windows"))
         }
-        Ok(())
     }
     fn worktree_not_live(&self, path: &Path, warned: &mut BTreeSet<u32>) -> Result<()> {
         use fgos_process::facts::{scan, Scan, ScanFilter};
@@ -445,20 +446,24 @@ impl GitDriver {
         if writer.is_empty() {
             return Err(failure("writer-required"));
         }
-        let mut resource_set = wal::worktree_resources(&kind)?;
-        let existing = match &kind {
-            OperationKind::WorktreeRemove { path, .. } => Some(path.as_ref()),
-            OperationKind::WorktreeMove { source, .. } => Some(source.as_ref()),
-            _ => None,
-        };
+        let resource_set = wal::worktree_resources(&kind)?;
         #[cfg(unix)]
-        if let Some(path) = existing {
-            if !missing(Path::new(path))? {
-            let custody = crate::refs::custody_lock_path(repo, Path::new(path))?;
-            resource_set.push(format!("worktree:{path}:custody:{}", custody.display()));
-            resource_set.sort();
+        let resource_set = {
+            let mut resource_set = resource_set;
+            let existing = match &kind {
+                OperationKind::WorktreeRemove { path, .. } => Some(path.as_ref()),
+                OperationKind::WorktreeMove { source, .. } => Some(source.as_ref()),
+                _ => None,
+            };
+            if let Some(path) = existing {
+                if !missing(Path::new(path))? {
+                    let custody = crate::refs::custody_lock_path(repo, Path::new(path))?;
+                    resource_set.push(format!("worktree:{path}:custody:{}", custody.display()));
+                    resource_set.sort();
+                }
             }
-        }
+            resource_set
+        };
         admission(wal, id, &resource_set)?;
         let request_digest =
             wal::canonical_digest(&(&kind, &old, &next, writer))?;
@@ -586,7 +591,7 @@ impl GitDriver {
         }
         #[cfg(not(unix))]
         {
-            let _ = (scope, parent, base, writer, id);
+            let _ = (repo, scope, parent, base, writer, id);
             Err(failure("git-lockscope-unavailable-windows"))
         }
     }

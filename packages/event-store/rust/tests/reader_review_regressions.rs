@@ -250,6 +250,49 @@ fn tracked_fence_without_fetched_legacy_is_refspec_missing() {
     .unwrap_err();
     assert_eq!(error.code.as_str(), "event-store-refspec-missing");
 }
+/// A clone whose only mapping records predate Git's config sequence cannot
+/// tell which one is current. Diagnostics report that as no provenance, so
+/// the setup fix records an ordered one and the pinned URL is known again.
+#[test]
+fn unordered_historical_mapping_records_read_as_no_provenance_until_setup_records_one() {
+    use fgos_event_store::{diagnostics, refspec};
+    use fgos_git::wal::{self, OperationKind, Outcome, Phase, Wal};
+    let f = Fixture::new();
+    let url = f.driver.remote_url(&f.repo, "origin").unwrap();
+    let maps = refspec::mappings("origin").unwrap();
+    f.driver
+        .ensure_fetch_mapping(&f.repo, "origin", &maps, "shape")
+        .unwrap();
+    let journal = Wal::open(&f.repo).unwrap();
+    let mut intent = journal.inspect("shape").unwrap().intent().clone();
+    fs::remove_dir_all(f.repo.common_dir().join("fgos/git/operations/shape")).unwrap();
+    let OperationKind::ConfigChange(change) = &mut intent.kind else {
+        panic!()
+    };
+    change.config_sequence = None;
+    struct Seed;
+    impl wal::PublicationAuthority for Seed {
+        fn validate_publication_borrow(&self, _: &wal::Intent) -> wal::WalResult<()> {
+            Ok(())
+        }
+    }
+    for id in ["historical-a", "historical-b"] {
+        let wal::Begin::Created(chain) = journal.begin(id, intent.clone(), &Seed).unwrap() else {
+            panic!()
+        };
+        journal
+            .append(&chain, Phase::Outcome(Outcome::ConfigApproved))
+            .unwrap();
+    }
+    let error = refspec::pinned_url(&f.driver, &f.repo, "origin").unwrap_err();
+    assert!(error.detail.contains("fetch-provenance-order-unknown"));
+    let facts = diagnostics::facts(&f.driver, &f.repo, &f.root, "origin").unwrap();
+    assert!(facts["provenance"].is_null());
+    refspec::ensure_refspecs(&f.driver, &f.repo, "origin").unwrap();
+    assert_eq!(refspec::pinned_url(&f.driver, &f.repo, "origin").unwrap(), url);
+    let facts = diagnostics::facts(&f.driver, &f.repo, &f.root, "origin").unwrap();
+    assert_eq!(facts["provenance"]["url"], url);
+}
 #[test]
 fn head_legacy_ignores_project_files_and_nested_shards() {
     let f = Fixture::new();

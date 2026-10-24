@@ -7,6 +7,7 @@ use fgos_event_store::{
 use fgos_git::*;
 use fgos_holder_lock::{acquire, Acquire, Handle, Mode, Resource, Wait};
 use std::{
+    cell::Cell,
     fs,
     path::PathBuf,
     process::Command,
@@ -274,6 +275,52 @@ pub fn commit_tree(p: &dyn Publication, r: &RepoHandle, tree: Oid) -> Oid {
     )
     .unwrap()
 }
+/// A detached HEAD commit holding `files` (slash-separated paths) below `.fgos/`.
+pub fn tracked_head_files(f: &Fixture, p: &dyn Publication, files: &[(&str, &[u8])]) -> Oid {
+    fn tree(f: &Fixture, p: &dyn Publication, files: &[(&str, &[u8])]) -> Oid {
+        let mut entries = Vec::new();
+        let mut dirs: std::collections::BTreeMap<&str, Vec<(&str, &[u8])>> = Default::default();
+        for (path, bytes) in files {
+            match path.split_once('/') {
+                Some((dir, rest)) => dirs.entry(dir).or_default().push((rest, bytes)),
+                None => entries.push(TreeEntry {
+                    name: path.as_bytes().to_vec(),
+                    mode: 0o100644,
+                    oid: p.write_blob(&f.repo, bytes).unwrap(),
+                }),
+            }
+        }
+        for (dir, children) in dirs {
+            entries.push(TreeEntry {
+                name: dir.as_bytes().to_vec(),
+                mode: 0o040000,
+                oid: tree(f, p, &children),
+            });
+        }
+        entries.sort_by(|a, b| a.name.cmp(&b.name));
+        p.write_tree(&f.repo, &entries).unwrap()
+    }
+    let fgos = tree(f, p, files);
+    let root = p
+        .write_tree(
+            &f.repo,
+            &[TreeEntry {
+                name: b".fgos".to_vec(),
+                mode: 0o040000,
+                oid: fgos,
+            }],
+        )
+        .unwrap();
+    let oid = commit_tree(p, &f.repo, root);
+    let result = Command::new("git")
+        .arg("-C")
+        .arg(f.root.join("repo"))
+        .args(["checkout", "-q", "--detach", oid.as_str()])
+        .output()
+        .unwrap();
+    assert!(result.status.success(), "{result:?}");
+    oid
+}
 pub fn tracked_head(f: &Fixture, p: &dyn Publication, path: &[u8], bytes: &[u8]) -> Oid {
     let blob = p.write_blob(&f.repo, bytes).unwrap();
     let fgos = p
@@ -305,4 +352,125 @@ pub fn tracked_head(f: &Fixture, p: &dyn Publication, path: &[u8], bytes: &[u8])
         .unwrap();
     assert!(result.status.success(), "{result:?}");
     oid
+}
+
+/// Counts the reads a walk asks its Git port for.
+pub struct CountingPort<'a> {
+    inner: &'a dyn Inspect,
+    pub single: Cell<usize>,
+    pub many: Cell<usize>,
+    /// Commits asked for through `read_paths_at_many`, other than the tracked fence.
+    pub read_commits: Cell<usize>,
+    /// Requests for the tracked `.fgos/events` fence, however they are batched.
+    pub fence: Cell<usize>,
+    /// `list_tree` calls.
+    pub trees: Cell<usize>,
+    /// `list_refs` calls: every read observes the real ref tips.
+    pub refs: Cell<usize>,
+}
+impl<'a> CountingPort<'a> {
+    pub fn new(inner: &'a dyn Inspect) -> Self {
+        Self {
+            inner,
+            single: Cell::new(0),
+            many: Cell::new(0),
+            read_commits: Cell::new(0),
+            fence: Cell::new(0),
+            trees: Cell::new(0),
+            refs: Cell::new(0),
+        }
+    }
+}
+impl Inspect for CountingPort<'_> {
+    fn resolve_head(&self, repo: &RepoHandle) -> Result<HeadFact> {
+        self.inner.resolve_head(repo)
+    }
+    fn list_tree(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        prefix: &[u8],
+        cursor: Option<TreeCursor>,
+        max_entries: usize,
+    ) -> Result<TreePage> {
+        self.trees.set(self.trees.get() + 1);
+        self.inner
+            .list_tree(repo, revision, prefix, cursor, max_entries)
+    }
+    fn list_refs(
+        &self,
+        repo: &RepoHandle,
+        prefixes: &[RefPrefix],
+        cursor: Option<RefCursor>,
+        max_entries: usize,
+    ) -> Result<RefPage> {
+        self.refs.set(self.refs.get() + 1);
+        self.inner.list_refs(repo, prefixes, cursor, max_entries)
+    }
+    fn read_paths_at(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        paths: &[Vec<u8>],
+        max_blob_bytes: usize,
+    ) -> Result<Vec<PathRead>> {
+        self.single.set(self.single.get() + 1);
+        self.inner
+            .read_paths_at(repo, revision, paths, max_blob_bytes)
+    }
+    fn read_paths_at_many(
+        &self,
+        repo: &RepoHandle,
+        reads: &[(Oid, Vec<Vec<u8>>)],
+        max_blob_bytes: usize,
+    ) -> Result<Vec<Vec<PathRead>>> {
+        self.many.set(self.many.get() + 1);
+        let fence = reads
+            .iter()
+            .filter(|(_, paths)| paths.as_slice() == [b".fgos/events".to_vec()])
+            .count();
+        self.fence.set(self.fence.get() + fence);
+        self.read_commits
+            .set(self.read_commits.get() + reads.len() - fence);
+        self.inner.read_paths_at_many(repo, reads, max_blob_bytes)
+    }
+    fn walk_commits(
+        &self,
+        repo: &RepoHandle,
+        tips: &[Oid],
+        stop: &[Oid],
+        cursor: Option<WalkCursor>,
+        bounds: WalkBounds,
+    ) -> Result<WalkPage> {
+        self.inner.walk_commits(repo, tips, stop, cursor, bounds)
+    }
+    fn configured_fetch_refspecs(
+        &self,
+        repo: &RepoHandle,
+        remote: &str,
+    ) -> Result<Vec<ConfigFact>> {
+        self.inner.configured_fetch_refspecs(repo, remote)
+    }
+    fn push_refspecs(&self, repo: &RepoHandle, remote: &str) -> Result<Vec<ConfigFact>> {
+        self.inner.push_refspecs(repo, remote)
+    }
+    fn remote_url(&self, repo: &RepoHandle, remote: &str) -> Result<String> {
+        self.inner.remote_url(repo, remote)
+    }
+    fn machine_id(&self, repo: &RepoHandle) -> Result<Option<ConfigFact>> {
+        self.inner.machine_id(repo)
+    }
+    fn git_floor_verdict(&self) -> Result<GitFloorVerdict> {
+        self.inner.git_floor_verdict()
+    }
+    fn fetch_mapping_provenance(
+        &self,
+        repo: &RepoHandle,
+        remote: &str,
+    ) -> Result<Option<FetchMappingProvenance>> {
+        self.inner.fetch_mapping_provenance(repo, remote)
+    }
+    fn resolve_repo(&self, path: &std::path::Path) -> Result<ResolveRepo> {
+        self.inner.resolve_repo(path)
+    }
 }

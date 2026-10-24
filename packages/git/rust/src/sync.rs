@@ -214,6 +214,7 @@ impl GitDriver {
             )?;
         // Metadata only: preserve permission bits Git does not represent for
         // clean paths that a later hook may touch before abort.
+        #[cfg_attr(not(unix), allow(unused_mut))]
         let mut clean_modes = std::collections::BTreeMap::new();
         #[cfg(unix)]
         {

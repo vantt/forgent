@@ -38,6 +38,7 @@ import {
 import { addDecision } from '../../src/state/store.mjs';
 import { createSession } from '../../src/runner/session.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { initializeWorkRepository, freezeLegacyWorkFixture } from '../helpers/work-store-release.mjs';
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
@@ -73,9 +74,20 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'changelog-unreleased-stale',
       'work-classification-vocabulary',
       'work-step-vocabulary',
+      'work-recorded-conflicts',
       'domain-workflow-operations-coverage',
       'delivered-not-on-trunk',
       'enduser-docs-index-stale',
+      'event-store-git-version',
+      'event-store-integrity',
+      'event-store-legacy-layout',
+      'event-store-machine-id',
+      'event-store-native-addon',
+      'event-store-open-root',
+      'event-store-orphan-branches',
+      'event-store-refspec',
+      'event-store-sync',
+      'event-store-unsealed',
       'writer-identity-resolvable',
       'identity-machine-id',
       'identity-machine-key',
@@ -84,7 +96,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'identity-project-id',
       'identity-ids-unique',
       'seat-binding-route',
-      'events-jsonl-not-truncated',
       'cli-version-visible',
       'worker-slots-ceiling-usable',
       'workflow-capabilities-configured',
@@ -133,8 +144,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'agy-sub-homes-configured',
       'bwrap-available',
       'curl-available',
-      'main-checkout-guard-warnings',
-      'events-compaction-verified',
       'no-stuck-merge-abort',
       'coordination-protocol-fixtures-valid',
       'coordination-example-requests-valid',
@@ -324,51 +333,6 @@ test('leaf-notify-drift fails and names the leaf when a live session branch over
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-// ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────
-
-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {
-  assert.equal(
-    FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),
-    false,
-  );
-});
-
-test('events-jsonl-not-truncated passes and bootstraps a mark on first run against a healthy log', () => {
-  const dir = initRepo('checks-truncguard-bootstrap-');
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  addWork(fgosDir, { id: 'a', title: 'a', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
-
-  const { passed, message } = checkById('events-jsonl-not-truncated').check(dir);
-  assert.equal(passed, true);
-  assert.match(message, /truncation guard holds/);
-  assert.equal(fs.existsSync(path.join(fgosDir, 'runtime', 'events-jsonl.truncation-guard.json')), true, 'a passing check advances/bootstraps the mark');
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-test('events-jsonl-not-truncated fails when the log was truncated then reappended past the old mark', () => {
-  const dir = initRepo('checks-truncguard-break-');
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  const logPath = path.join(fgosDir, 'events.jsonl');
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 1, ts: '2026-01-01T00:00:00.000Z', type: 'orig', payload: null })}\n`);
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 2, ts: '2026-01-01T00:00:01.000Z', type: 'orig', payload: null })}\n`);
-
-  const first = checkById('events-jsonl-not-truncated').check(dir);
-  assert.equal(first.passed, true, 'first run bootstraps clean');
-
-  // Simulate a stash-style truncation: revert to just line 1, then append a
-  // DIFFERENT event reusing seq 2.
-  fs.writeFileSync(logPath, `${JSON.stringify({ seq: 1, ts: '2026-01-01T00:00:00.000Z', type: 'orig', payload: null })}\n`, 'utf8');
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 2, ts: '2026-01-01T09:00:00.000Z', type: 'post-truncation', payload: null })}\n`);
-
-  const { passed, message } = checkById('events-jsonl-not-truncated').check(dir);
-  assert.equal(passed, false);
-  assert.match(message, /truncation detected/);
-  assert.match(message, /resolve-an-events-jsonl-truncation/);
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
 // ─── work-classification-vocabulary (tsk-6ax) ──────────────────────────────
 // Scoped to OPEN items only (matches the item's own "no open item may carry
 // risk/kind outside its domain's vocabulary" wording) — a resolved item's
@@ -415,6 +379,7 @@ test('work-classification-vocabulary fails and names an OPEN item carrying a sta
     payload: { id: 'stale-risk', title: 'stale-risk', kind: 'bug', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' },
   });
 
+  freezeLegacyWorkFixture(dir);
   const { passed, message } = checkById('work-classification-vocabulary').check(dir);
   assert.equal(passed, false);
   assert.match(message, /stale-risk/);
@@ -432,6 +397,7 @@ test('work-classification-vocabulary fails and names an OPEN item carrying an ou
     payload: { id: 'stale-kind', title: 'stale-kind', kind: 'test', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'true' },
   });
 
+  freezeLegacyWorkFixture(dir);
   const { passed, message } = checkById('work-classification-vocabulary').check(dir);
   assert.equal(passed, false);
   assert.match(message, /stale-kind/);
@@ -448,6 +414,7 @@ test('work-classification-vocabulary passes despite a stale risk/kind on an alre
     payload: { id: 'old-done', title: 'old-done', kind: 'test', status: 'done', deps: [], risk: 'high', refs: [], verify: 'true' },
   });
 
+  freezeLegacyWorkFixture(dir);
   const { passed, message } = checkById('work-classification-vocabulary').check(dir);
   assert.equal(passed, true, message);
   fs.rmSync(dir, { recursive: true, force: true });
@@ -466,6 +433,7 @@ test('work-classification-vocabulary lists every violating id, not just the firs
     payload: { id: 'bad-two', title: 'bad-two', kind: 'feat', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' },
   });
 
+  freezeLegacyWorkFixture(dir);
   const { passed, message } = checkById('work-classification-vocabulary').check(dir);
   assert.equal(passed, false);
   assert.match(message, /bad-one/);
@@ -516,6 +484,7 @@ test('work-step-vocabulary passes when every open item sits at a stage its domai
     payload: { id: 'b', title: 'b', kind: 'feature', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'true', workflowStep: 'executing' },
   });
 
+  freezeLegacyWorkFixture(dir);
   const { passed, message } = checkById('work-step-vocabulary').check(dir);
   assert.equal(passed, true, message);
   fs.rmSync(dir, { recursive: true, force: true });
@@ -530,6 +499,7 @@ test('work-step-vocabulary fails and names an OPEN item sitting at a stage its d
     payload: { id: 'stranded', title: 'stranded', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', workflowStep: 'clarify' },
   });
 
+  freezeLegacyWorkFixture(dir);
   const { passed, message } = checkById('work-step-vocabulary').check(dir);
   assert.equal(passed, false);
   assert.match(message, /stranded/);
@@ -550,6 +520,7 @@ test("work-step-vocabulary judges each item against its OWN domain's stages, not
     payload: { id: 'miscoded', title: 'miscoded', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', workflowStep: 'triage' },
   });
 
+  freezeLegacyWorkFixture(dir);
   const { passed, message } = checkById('work-step-vocabulary').check(dir);
   assert.equal(passed, false);
   assert.match(message, /miscoded/);
@@ -566,6 +537,7 @@ test('work-step-vocabulary passes despite a retired stage on an already-resolved
     payload: { id: 'old-done', title: 'old-done', kind: 'feature', status: 'done', deps: [], risk: 'light', refs: [], verify: 'true', workflowStep: 'clarify' },
   });
 
+  freezeLegacyWorkFixture(dir);
   const { passed, message } = checkById('work-step-vocabulary').check(dir);
   assert.equal(passed, true, message);
   fs.rmSync(dir, { recursive: true, force: true });
@@ -584,6 +556,7 @@ test('work-step-vocabulary lists every violating id, not just the first', () => 
     payload: { id: 'bad-two', title: 'bad-two', kind: 'feature', status: 'awaiting-human', deps: [], risk: 'light', refs: [], verify: 'true', workflowStep: 'clarify' },
   });
 
+  freezeLegacyWorkFixture(dir);
   const { passed, message } = checkById('work-step-vocabulary').check(dir);
   assert.equal(passed, false);
   assert.match(message, /bad-one/);
@@ -718,7 +691,7 @@ test('enduser-docs-index-stale fix is idempotent -- a second run reports changed
 
 test('outside the fgOS source repo, doctor --fix never creates the end-user or decision index -- it only refreshes an adopted one', () => {
   const tmp = mkTemp('fgos-outside-project-fixes-');
-  const fgosDir = path.join(tmp, '.fgos');
+  const fgosDir = initializeWorkRepository(tmp);
   initStore(fgosDir);
   writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
   addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
@@ -740,7 +713,7 @@ function markFgosSourceCheckout(root) {
 
 test('decision-index-stale passes when docs/decisions/index.md does not exist yet (tsk-1lv review-fix F10)', () => {
   const tmp = mkTemp('fgos-decision-index-check-');
-  const fgosDir = path.join(tmp, '.fgos');
+  const fgosDir = initializeWorkRepository(tmp);
   initStore(fgosDir);
   const { passed, message } = checkById('decision-index-stale').check(tmp);
   assert.equal(passed, true);
@@ -750,7 +723,7 @@ test('decision-index-stale passes when docs/decisions/index.md does not exist ye
 
 test('decision-index-stale fails when state.decisions has a scope-carrying decision the on-disk index does not reflect', () => {
   const tmp = mkTemp('fgos-decision-index-check-');
-  const fgosDir = path.join(tmp, '.fgos');
+  const fgosDir = initializeWorkRepository(tmp);
   initStore(fgosDir);
   fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });
   fs.writeFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), '# Decisions index\n\n_No platform/repo-wide decisions recorded yet._\n');
@@ -764,7 +737,7 @@ test('decision-index-stale fails when state.decisions has a scope-carrying decis
 
 test('decision-index-stale passes when the on-disk index already matches state.decisions', () => {
   const tmp = mkTemp('fgos-decision-index-check-');
-  const fgosDir = path.join(tmp, '.fgos');
+  const fgosDir = initializeWorkRepository(tmp);
   initStore(fgosDir);
   markFgosSourceCheckout(tmp);
   addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
@@ -778,7 +751,7 @@ test('decision-index-stale passes when the on-disk index already matches state.d
 
 test('decision-index-stale fix regenerates the index via the same path fgos decision-index uses, resolving the drift', () => {
   const tmp = mkTemp('fgos-decision-index-fix-');
-  const fgosDir = path.join(tmp, '.fgos');
+  const fgosDir = initializeWorkRepository(tmp);
   initStore(fgosDir);
   fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });
   fs.writeFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), '# Decisions index\n\n_No platform/repo-wide decisions recorded yet._\n');
@@ -798,7 +771,7 @@ test('decision-index-stale fix regenerates the index via the same path fgos deci
 
 test('decision-index-stale fix is idempotent -- a second run reports changed:false', () => {
   const tmp = mkTemp('fgos-decision-index-fix-');
-  const fgosDir = path.join(tmp, '.fgos');
+  const fgosDir = initializeWorkRepository(tmp);
   initStore(fgosDir);
   markFgosSourceCheckout(tmp);
   addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
@@ -811,7 +784,7 @@ test('decision-index-stale fix is idempotent -- a second run reports changed:fal
 
 test('decision-index-stale check FAILS when the index is missing but state.decisions has real rows to index -- H2 tsk-1lv round-2 regression (a missing index with real decisions to project is drift, not "nothing to check")', () => {
   const tmp = mkTemp('fgos-decision-index-check-');
-  const fgosDir = path.join(tmp, '.fgos');
+  const fgosDir = initializeWorkRepository(tmp);
   initStore(fgosDir);
   markFgosSourceCheckout(tmp);
   addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
@@ -825,7 +798,7 @@ test('decision-index-stale check FAILS when the index is missing but state.decis
 
 test('decision-index-stale check and fix preserve committed decisions absent from the local store', () => {
   const tmp = mkTemp('fgos-decision-index-fix-');
-  const populatedFgosDir = path.join(tmp, '.fgos');
+  const populatedFgosDir = initializeWorkRepository(tmp);
   initStore(populatedFgosDir);
   markFgosSourceCheckout(tmp);
   addDecision(populatedFgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });

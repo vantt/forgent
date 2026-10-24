@@ -176,7 +176,7 @@ test('Owner stores match their read contracts', () => {
   assert.ok(workRead.properties.type);
   assert.ok(workRead.properties.payload);
 
-  const workEvents = readJsonl('test/fixtures/observe/.fgos/events.jsonl');
+  const workEvents = readJsonl('test/fixtures/observe/work-events.jsonl');
   const allowedWorkTypes = new Set(workRead.properties.type.enum);
   for (const ev of workEvents) {
     assert.ok(allowedWorkTypes.has(ev.type), `Work event type ${ev.type} must be allowed in read contract`);

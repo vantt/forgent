@@ -36,9 +36,9 @@ function mkRepo() {
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
   const fgosDir = path.join(repoRoot, '.fgos');
-  fs.mkdirSync(fgosDir);
-  initStore(fgosDir);
   activateGitFixture(repoRoot);
+  fs.mkdirSync(fgosDir, { recursive: true });
+  initStore(fgosDir);
   return { repoRoot, fgosDir };
 }
 

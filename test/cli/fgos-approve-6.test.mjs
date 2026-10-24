@@ -4,6 +4,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
+import { holdStateInChild } from '../helpers/hold-state-in-child.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   EDIT_BAD_FLAG_CASES,
@@ -138,26 +139,27 @@ test('approve on a risk:heavy runner-sourced item that DOES carry a plan.md on i
 });
 
 
-// --- tsk-480: approve's post-success moveWork guard ------------------------
+// --- approve's post-success moveWork guard ---------------------------------
 //
-// The bug: approve's own success paths call moveWork(...to:'delivered'...)
-// as their last step. Before this fix, a throw there (e.g. an
-// EventLogError('lock-timeout') from events.lock contention) propagated
-// uncaught even though the precondition it was recording (a real merge, or
-// a passed verify) had already happened — leaving the item stuck at
-// awaiting-approval with zero diagnostic trail. FGOS_TEST_FORCE_APPROVE_
-// LOCK_TIMEOUT (bin/fgos.mjs's moveDeliveredOrRecordFault) is a test-only
-// seam, same shape as FGOS_GH_COMMAND, that simulates exactly that failure
-// for one named item id without touching moveWork/store.mjs itself.
+// Approve's own success paths record `delivered` as their last step. A write that cannot happen then
+// (here: another process holds the state mutex past its timeout) must be caught, recorded and left
+// diagnosable instead of crashing uncaught, because the verify that preceded it already happened.
 
-test('approve (pull-door/verify-only): a simulated post-verify lock-timeout is caught, recorded, and left diagnosable instead of crashing uncaught', () => {
+test('approve (pull-door/verify-only): a status write that times out on the held state mutex is caught, recorded, and left diagnosable instead of crashing uncaught', async () => {
   const cwd = tmpCwd();
   addOk(cwd, 'approve-lock-timeout', { verify: 'true' });
   run(cwd, ['move', 'approve-lock-timeout', '--to', 'doing']);
   run(cwd, ['move', 'approve-lock-timeout', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const before = eventLines(cwd).length;
-  const result = run(cwd, ['approve', 'approve-lock-timeout'], { FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT: 'approve-lock-timeout' });
+  const holder = await holdStateInChild(path.join(cwd, '.fgos'));
+  let result;
+  try {
+    result = run(cwd, ['approve', 'approve-lock-timeout']);
+  } finally {
+    holder.child.kill('SIGKILL');
+    await holder.exited;
+  }
 
   // Caught, not an uncaught crash: exit 0, a well-formed envelope, not the
   // generic "fgos: <message>" exit-1/exit-2 shape an unhandled throw would
@@ -167,7 +169,7 @@ test('approve (pull-door/verify-only): a simulated post-verify lock-timeout is c
   assert.equal(data.mode, 'verify-only');
   assert.equal(data.to, 'awaiting-approval');
   assert.equal(data.deliveryUnrecorded, true);
-  assert.match(data.error, /lock-timeout/);
+  assert.match(data.error, /timed out/);
   assert.ok(data.diagnosticLog, 'envelope must point at a real diagnostic log path');
 
   // Visible immediately to whoever is watching the terminal, not just to a
@@ -185,11 +187,11 @@ test('approve (pull-door/verify-only): a simulated post-verify lock-timeout is c
   const record = JSON.parse(diagnosticLines.at(-1));
   assert.equal(record.id, 'approve-lock-timeout');
   assert.equal(record.phase, 'pull-door verify-only');
-  assert.match(record.detail, /lock-timeout/);
+  assert.match(record.detail, /timed out/);
 });
 
 
-test('approve (pull-door/verify-only): with no simulated failure, the same item approves normally — the guard changes nothing on the happy path', () => {
+test('approve (pull-door/verify-only): with the state mutex free, the same item approves normally — the guard changes nothing on the happy path', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'approve-lock-timeout-control', { verify: 'true' });
   run(cwd, ['move', 'approve-lock-timeout-control', '--to', 'doing']);

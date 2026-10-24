@@ -1,16 +1,18 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import { appendWorkEvent } from '../helpers/work-event-fixture.mjs';
 // test/state/awaiting.test.mjs — async-human-gate D2/D5 store round-trip:
 // putInAwaiting/answerAwaiting write through the store and rebuild back into
 // the expected status + gates[id] shape. There is no store.test.mjs; store
 // is otherwise tested through the CLI (see plan.md Slice — Cell 2).
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { addWork, moveWork, putInAwaiting, answerAwaiting, listWork, categoryOf, resolveWriterLogPath, rebuild } from '../../src/state/store.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { addWork, moveWork, putInAwaiting, answerAwaiting, listWork, categoryOf, rebuild } from '../../src/state/store.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 
 // tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
@@ -22,7 +24,7 @@ import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mj
 // honest way to get there (same technique test/state/store.test.mjs's own
 // moveToDurableDoingForTest uses).
 function moveToDurableDoingForTest(dir, id, from = 'todo', extra = {}) {
-  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing', ...extra } }, dir);
+  appendWorkEvent(dir, { type: 'work.move', payload: { id, from, to: 'doing', ...extra } }, dir);
   rebuild(dir);
 }
 
@@ -34,7 +36,7 @@ const VALID_ASK_SECOND = '## Chuyện gì đang xảy ra\n\nSecond round of this
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-awaiting-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-awaiting-')));
 }
 
 function addSampleWork(dir, overrides = {}) {

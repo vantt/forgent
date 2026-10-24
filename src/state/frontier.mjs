@@ -1,7 +1,7 @@
 // frontier.mjs — derive the "ready to start" work items from a view (per D1
 // Epic 2, A2 FIFO). PURE: no fs import, no side effects — this module only
 // reads the `view` object it is handed (built by replay.mjs's `foldEvents`
-// / `rebuildView`, or a literal view in tests) and returns a derived array.
+// or the `listWork` view, or a literal view in tests) and returns a derived array.
 // It never mutates `view` and never writes an event (the one exception is a
 // diagnostic `console.warn` via domain-registry.mjs on a genuinely unrecognized
 // `item.domain` value — never a throw, see base-workflow-model D2/D3).

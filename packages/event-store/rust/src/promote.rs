@@ -51,6 +51,7 @@ pub fn promote(
         },
         &mut guard,
         &OsFileSystem,
+        None,
     )?;
     let branch = Receipt::read(&req.layout.stream(req.branch).sealed())?;
     if branch.last_seq < req.through_seq {
@@ -71,6 +72,7 @@ pub fn promote(
         },
         &mut guard,
         &OsFileSystem,
+        None,
     )?;
     if Receipt::read(&req.layout.stream(&project).sealed())?
         .commit
@@ -108,6 +110,7 @@ pub fn promote(
         },
         &mut guard,
         &OsFileSystem,
+        None,
     )?;
     Ok(a.ack)
 }

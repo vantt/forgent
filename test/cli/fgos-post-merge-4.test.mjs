@@ -452,6 +452,8 @@ test('catchup succeeds when invoked with cwd inside the item\'s own linked workt
   fs.rmdirSync(wt);
   gitAtCwd(cwd, ['worktree', 'add', wt, 'fgw/catchup-worktree-cwd']);
 
+  // Events no longer ride main's tree, so main only drifts past the branch when something is committed on it.
+  gitAtCwd(cwd, ['commit', '--allow-empty', '-q', '-m', 'main advances past the item branch']);
   const mainHeadBefore = gitHead(cwd);
   const result = run(wt, ['catchup', 'catchup-worktree-cwd', '--dir', cwd]);
   assert.equal(result.status, 0, `catchup from inside the item's own worktree unexpectedly failed: ${result.stderr}`);

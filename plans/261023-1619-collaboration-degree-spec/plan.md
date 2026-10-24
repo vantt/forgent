@@ -1,7 +1,7 @@
 ---
 title: "Collaboration degree, Part A: patterns declared in config over four loops, params tuned per run"
-description: "BA-grade change spec draft for owner approval. Part A: a pattern catalog in config (loop + defaults + invariants + promise) over the four code-held loops, replaceable two-way params over unioned floors, a generic bounds shape per loop, a --pattern/--params/--param door, an expanded fail-closed pin, solo verify with a harness receipt, and the physical rename (patterns/ loops vs catalog, runner.loops). Milestone evidence hardening is Part B."
-status: draft
+description: "BA-grade change spec, Part A approved by the owner 2026-10-24 18:09 (not implemented). Part A: a pattern catalog in config (loop + defaults + invariants + promise) over the four code-held loops, replaceable two-way params over unioned floors, a generic bounds shape per loop, a --pattern/--params/--param door, an expanded fail-closed pin, solo verify with a harness receipt, and the physical rename (patterns/ loops vs catalog, runner.loops). Milestone evidence hardening is Part B."
+status: approved
 created: 2026-10-23
 links:
   - spec-draft.md
@@ -32,6 +32,6 @@ Split decided by the COOK lead (RUL104) after two red-team reviews (20 findings,
 | Spec choices to confirm, and the one owner question (D1) | spec-draft.md section 16 |
 | Area specs Part A merges into | spec-draft.md section 18 (`workflow.md`, `runner.md`, `seat-binding.md`, `docs/platform/config/spec.md`) |
 
-Acceptance of Part A: the owner answers D1 and confirms or amends the spec choices in section 16.2; after approval section 18 is merged into the area specs with a minted D-ADR and implementation is planned separately. The runtime verification engineer's replay of P6 rows 6-7 and the solo-verify crash windows is owed against the draft; the deferred non-coding workflow author and downstream operator review it.
+Acceptance of Part A: the owner answered D1 and approved Part A on 2026-10-24 18:09; section 18 is merged into the area specs with a minted D-ADR and implementation is planned separately. The runtime verification engineer's replay of P6 rows 6-7 and the solo-verify crash windows is owed against the draft; the deferred non-coding workflow author and downstream operator review it.
 
 Nothing in the repository other than this directory changed.

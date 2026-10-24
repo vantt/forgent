@@ -26,6 +26,9 @@ pub struct SyncRequest<'a> {
     pub machine: &'a str,
     pub remote: &'a str,
     pub no_push: bool,
+    /// Try the seal lock and skip, rather than wait, when another process holds
+    /// it: the start- and end-of-command trigger never queues behind a seal.
+    pub opportunistic: bool,
     pub held_ranks: &'a [u32],
     pub hot_lock_depth: u32,
 }
@@ -92,6 +95,8 @@ impl Default for SyncRecord {
 pub struct Synced {
     pub mirrors_changed: bool,
     pub warnings: Vec<String>,
+    /// An opportunistic sync found the seal lock held and did nothing.
+    pub busy: bool,
 }
 fn now() -> Result<u64, Error> {
     SystemTime::now()
@@ -264,7 +269,19 @@ pub fn sync_with_fs(
     req: SyncRequest<'_>,
     filesystem: &dyn crate::fsio::FileSystem,
 ) -> Result<Synced, Error> {
-    let mut guard = acquire_seal(req.layout, req.held_ranks, req.hot_lock_depth, false)?.unwrap();
+    let Some(mut guard) = acquire_seal(
+        req.layout,
+        req.held_ranks,
+        req.hot_lock_depth,
+        req.opportunistic,
+    )?
+    else {
+        return Ok(Synced {
+            mirrors_changed: false,
+            warnings: Vec::new(),
+            busy: true,
+        });
+    };
     if repo.common_dir() != req.layout.common_dir {
         return Err(invalid("repository/layout mismatch"));
     }
@@ -294,6 +311,7 @@ pub fn sync_with_fs(
                 },
                 &mut guard,
                 &crate::fsio::OsFileSystem,
+                None,
             ) {
                 seal_errors.push(error);
             }
@@ -504,6 +522,7 @@ pub fn sync_with_fs(
         Ok(Synced {
             mirrors_changed: original != state.tips,
             warnings: state.warnings.clone(),
+            busy: false,
         })
     })();
     state.time = match now() {

@@ -306,6 +306,8 @@ async function typedOperationRows(root, state, index, loader, samples, observer 
   const make = label => {
     const repo = path.join(root, label); git(['init', '-q', '--initial-branch=main', repo]);
     git(['-C', repo, 'config', 'user.name', IDENTITY.name]); git(['-C', repo, 'config', 'user.email', IDENTITY.email]);
+    // Land seals the project before it publishes, and the seal needs the checkout's machine id.
+    git(['-C', repo, 'config', 'fgos.machineId', 'e3-bench']);
     fs.writeFileSync(path.join(repo, 'payload'), 'base\n'); git(['-C', repo, 'add', 'payload']); git(['-C', repo, 'commit', '-qm', 'base']);
     prepareRepo(repo, path.join(repo, '.git'));
     return repo;

@@ -32,6 +32,8 @@ try {
     fs.unlinkSync(path.join(stream, 'hwm.json'));
     fs.appendFileSync(path.join(stream, 'active.jsonl'), '{torn');
   }
+  // The gate never asks Git for write admission; its consumer settles it before entering.
+  store.admitWrites([]);
   withStateTx(hot, () => {
     assert.throws(() => execFileSync(process.execPath, ['-e', '']), { code: 'exec-under-hot-lock' });
     fs.writeSync(2, 'ES_GATE_BEGIN\n');
@@ -39,5 +41,5 @@ try {
     assert.equal(result.ack.lastSeq, recovering ? 2 : 1);
     assert.equal(store.readInGate(result.ack.origin, 'project', 0).events.length, recovering ? 2 : 1);
     fs.writeSync(2, 'ES_GATE_END\n');
-  }, { prefetched: { writer: 'gate-writer', eventStore: store } });
+  }, { prefetched: { writer: 'gate-writer' } });
 } finally { fs.rmSync(temp, { recursive: true, force: true }); }

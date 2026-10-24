@@ -5,6 +5,7 @@
 // import/helper đổi cho khớp phần nào file này thật sự dùng.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import {
   DOCTOR_CHECKS,
   FGOS,
@@ -57,7 +58,7 @@ const checkedPresent = (cwd, ...ids) => writeLocalStatus(path.join(cwd, '.fgos')
 
 test('tool-registry-configured passes as inactive on a fresh project: the standard declares no tool executor', () => {
   const cwd = mkTemp('fgos-tool-registry-inactive-');
-  execFileSync('git', ['init', '-q'], { cwd });
+  initializeWorkRepository(cwd);
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
   assert.equal(passed, true, message);
   assert.match(message, /^inactive/);
@@ -66,7 +67,7 @@ test('tool-registry-configured passes as inactive on a fresh project: the standa
 
 test('tool-registry-configured passes when every declared tool is checked present (full)', () => {
   const cwd = mkTemp('fgos-tool-registry-full-');
-  execFileSync('git', ['init', '-q'], { cwd });
+  initializeWorkRepository(cwd);
   declareExecutor(cwd, 'echo-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   checkedPresent(cwd, 'echo-tool');
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
@@ -77,7 +78,7 @@ test('tool-registry-configured passes when every declared tool is checked presen
 
 test('tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing or never checked (degraded) -- no longer a silent passed:true', () => {
   const cwd = mkTemp('fgos-tool-registry-degraded-');
-  execFileSync('git', ['init', '-q'], { cwd });
+  initializeWorkRepository(cwd);
   declareExecutor(cwd, 'never-checked-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   // The declared tool was never checked, so it stays "unknown", which classifyRegistryPosture reports as degraded.
   const { passed, message } = checkById('tool-registry-configured').check(cwd);

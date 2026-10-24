@@ -10,7 +10,6 @@ import { fileURLToPath } from 'node:url';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { installHook, HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
-import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // tsk-sir -- reproduces the bug this item was filed against: a real linked
 // worktree's `git commit` gets refused by the SAME main-checkout.lock a
@@ -380,63 +379,110 @@ test('tsk-5pb: a normal commit that never touches .fgos/ succeeds on a worker br
   assert.equal(result.status, 0, result.stderr);
 });
 
-// --- tsk-1i3: content-precedence line-count guard on main ------------------
+// --- event-log shrink guard: active only until the Event Store fence exists ---
 
-test('tsk-1i3: a commit on main branch staging a .fgos/*.jsonl modification with fewer lines than HEAD is refused', () => {
+function commitEventLog(mainRoot, name, lines) {
+  fs.writeFileSync(path.join(mainRoot, '.fgos', name), lines);
+  execFileSync('git', ['add', `.fgos/${name}`], { cwd: mainRoot });
+}
+
+function commitStaged(mainRoot, message) {
+  return spawnSync('git', ['commit', '-q', '-m', message], { cwd: mainRoot, encoding: 'utf8' });
+}
+
+test('a commit on main staging an .fgos jsonl log with fewer lines than HEAD is refused before the event fence exists', () => {
   const { mainRoot } = initSharedAbsoluteHooksPathFixture();
-  const jsonlPath = path.join(mainRoot, '.fgos', 'events.jsonl');
-  fs.writeFileSync(jsonlPath, 'line1\nline2\nline3\nline4\nline5\n');
-  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: mainRoot });
-  execFileSync('git', ['commit', '-q', '-m', 'add multi-line events.jsonl'], { cwd: mainRoot });
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\nline3\nline4\nline5\n');
+  assert.equal(commitStaged(mainRoot, 'add multi-line log').status, 0);
 
-  fs.writeFileSync(jsonlPath, 'line1\nline2\n');
-  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: mainRoot });
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\n');
+  const result = commitStaged(mainRoot, 'shrunk log');
 
-  const result = spawnSync('git', ['commit', '-q', '-m', 'regressed events.jsonl commit'], { cwd: mainRoot, encoding: 'utf8' });
-
-  assert.notEqual(result.status, 0, 'commit staging regressed line count on main must be refused');
+  assert.notEqual(result.status, 0, 'a shrunk event log must be refused');
   assert.match(result.stderr, /commit refused/);
   assert.match(result.stderr, /\.fgos\/events\.jsonl/);
   assert.match(result.stderr, /main is left unchanged/i);
-  assert.match(result.stderr, /fix-fgos-write-rejected-merge-block\.md/);
 });
 
-test('tsk-1i3: a commit on main branch staging a .fgos/*.jsonl modification with equal-or-more lines succeeds', () => {
+test('a commit staging an .fgos jsonl log with equal-or-more lines succeeds, and a brand-new log is not refused', () => {
   const { mainRoot } = initSharedAbsoluteHooksPathFixture();
-  const jsonlPath = path.join(mainRoot, '.fgos', 'events.jsonl');
-  fs.writeFileSync(jsonlPath, 'line1\nline2\nline3\n');
-  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: mainRoot });
-  execFileSync('git', ['commit', '-q', '-m', 'add multi-line events.jsonl'], { cwd: mainRoot });
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\nline3\n');
+  assert.equal(commitStaged(mainRoot, 'add log').status, 0);
 
-  fs.writeFileSync(jsonlPath, 'line1\nline2\nline3\nline4\nline5\n');
-  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: mainRoot });
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\nline3\nline4\n');
+  commitEventLog(mainRoot, 'brand-new-log.jsonl', 'line1\nline2\n');
+  const result = commitStaged(mainRoot, 'grow log and add a new one');
 
-  const result = spawnSync('git', ['commit', '-q', '-m', 'appended events.jsonl commit'], { cwd: mainRoot, encoding: 'utf8' });
-
-  assert.equal(result.status, 0, `commit with more lines must succeed -- got: ${result.stderr}`);
+  assert.equal(result.status, 0, result.stderr);
 });
 
-test('tsk-1i3: a deliberate shrink of a non-log .fgos file such as config.json is not refused; only append-only logs are line-count guarded', () => {
+test('a deliberate shrink of a non-log .fgos file such as config.json is not refused', () => {
   const { mainRoot } = initSharedAbsoluteHooksPathFixture();
-  writeRawProjectConfig(mainRoot, '{\n  "a": 1,\n  "b": 2,\n  "c": 3\n}\n');
-  execFileSync('git', ['add', '.fgos/config.yaml'], { cwd: mainRoot });
-  execFileSync('git', ['commit', '-q', '-m', 'add multi-line config.json'], { cwd: mainRoot });
+  commitEventLog(mainRoot, 'config.json', '{\n  "a": 1,\n  "b": 2,\n  "c": 3\n}\n');
+  assert.equal(commitStaged(mainRoot, 'add config').status, 0);
 
-  writeRawProjectConfig(mainRoot, '{\n  "a": 1\n}\n');
-  execFileSync('git', ['add', '.fgos/config.yaml'], { cwd: mainRoot });
+  commitEventLog(mainRoot, 'config.json', '{\n  "a": 1\n}\n');
+  const result = commitStaged(mainRoot, 'remove config entries');
 
-  const result = spawnSync('git', ['commit', '-q', '-m', 'removed config entries'], { cwd: mainRoot, encoding: 'utf8' });
-
-  assert.equal(result.status, 0, `removing entries from config.json on main must succeed -- got: ${result.stderr}`);
+  assert.equal(result.status, 0, result.stderr);
 });
 
-test('tsk-1i3: a brand-new .fgos/* file addition is not refused', () => {
+test('a shrunk .fgos jsonl log whose name git quotes (non-ASCII) is refused like any other', () => {
   const { mainRoot } = initSharedAbsoluteHooksPathFixture();
-  const newFilePath = path.join(mainRoot, '.fgos', 'brand-new-log.jsonl');
-  fs.writeFileSync(newFilePath, 'line1\nline2\n');
-  execFileSync('git', ['add', '.fgos/brand-new-log.jsonl'], { cwd: mainRoot });
+  fs.mkdirSync(path.join(mainRoot, '.fgos', 'events'), { recursive: true });
+  const shard = '.fgos/events/shard-\u00e9.jsonl';
+  fs.writeFileSync(path.join(mainRoot, shard), 'line1\nline2\nline3\n');
+  execFileSync('git', ['add', shard], { cwd: mainRoot });
+  assert.equal(commitStaged(mainRoot, 'add quoted-name shard').status, 0);
 
-  const result = spawnSync('git', ['commit', '-q', '-m', 'add brand new log file'], { cwd: mainRoot, encoding: 'utf8' });
+  fs.writeFileSync(path.join(mainRoot, shard), 'line1\n');
+  execFileSync('git', ['add', shard], { cwd: mainRoot });
+  const result = commitStaged(mainRoot, 'shrink quoted-name shard');
 
-  assert.equal(result.status, 0, `brand-new file addition must succeed -- got: ${result.stderr}`);
+  assert.notEqual(result.status, 0, 'a shrunk log must be refused whatever its file name');
+  assert.match(result.stderr, /line count is lower than HEAD/);
+});
+
+test('a commit is refused, not treated as fence-absent, when HEAD tree cannot be read', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\n');
+  assert.equal(commitStaged(mainRoot, 'add log').status, 0);
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\nline3\n');
+  const tree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { cwd: mainRoot, encoding: 'utf8' }).trim();
+  const objects = execFileSync('git', ['rev-parse', '--git-path', 'objects'], { cwd: mainRoot, encoding: 'utf8' }).trim();
+  fs.rmSync(path.join(mainRoot, objects, tree.slice(0, 2), tree.slice(2)));
+
+  const result = commitStaged(mainRoot, 'commit over an unreadable HEAD tree');
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /could not read HEAD's tree to look for the event fence/);
+});
+
+test('a first commit in a repository with no HEAD yet is not refused as an unreadable fence', () => {
+  const root = mkTempDir('fgos-unborn-fence-');
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: root });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: root });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: root });
+  installHook(root, { absolute: true });
+  fs.writeFileSync(path.join(root, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: root });
+
+  const result = commitStaged(root, 'first commit');
+
+  assert.doesNotMatch(result.stderr, /could not read HEAD's tree/);
+});
+
+test('once the event fence file exists the shrink guard is off, because the logs are retired', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\nline3\nline4\n');
+  assert.equal(commitStaged(mainRoot, 'add log').status, 0);
+  // The fence is the regular file `.fgos/events`; a shrink of a retired log is no longer this guard's concern.
+  fs.writeFileSync(path.join(mainRoot, '.fgos', 'events'), 'fence\n');
+  execFileSync('git', ['add', '.fgos/events'], { cwd: mainRoot });
+  assert.equal(commitStaged(mainRoot, 'install fence').status, 0);
+
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\n');
+  const result = commitStaged(mainRoot, 'shrink retired log');
+
+  assert.doesNotMatch(result.stderr, /line count is lower|must not shrink/);
 });
