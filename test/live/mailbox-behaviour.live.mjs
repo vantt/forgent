@@ -35,7 +35,7 @@
  *                         probes (no model, against scripts/lib/mailbox-role-recorder.mjs),
  *                         fixtures and live cases (V7e, spec §7.6)
  *
- * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`; V7f: `v7f`; V7g: `v7g`; V7h: `v7h`) runs a pre-registered addendum to V6
+ * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`; V7f: `v7f`; V7g: `v7g`; V7h: `v7h`; V7i: `v7i`) runs a pre-registered addendum to V6
  * (scripts/lib/mailbox-behaviour-v7.mjs): `freeze <name>` writes it once; `check`, `pin`,
  * `smoke codex`, `run-stage` and `report` then use its home, cells, model, reasoning effort,
  * arms, scoring and stop rules, and never write V6's home.
@@ -59,6 +59,7 @@ import * as v7e from '../../scripts/lib/mailbox-behaviour-v7e.mjs';
 import * as v7f from '../../scripts/lib/mailbox-behaviour-v7f.mjs';
 import * as v7g from '../../scripts/lib/mailbox-behaviour-v7g.mjs';
 import * as v7h from '../../scripts/lib/mailbox-behaviour-v7h.mjs';
+import * as v7i from '../../scripts/lib/mailbox-behaviour-v7i.mjs';
 import { runStub } from './mailbox-behaviour-stub.mjs';
 import { rolesCarrying, startRecorder, toolCallsIn } from '../../scripts/lib/mailbox-role-recorder.mjs';
 import { installOmpHook, installPiHook } from '../../src/setup/agent-hooks.mjs';
@@ -195,8 +196,30 @@ const MEASURES = {
       phases: v7h.stagePhases,
       order: v7h.stageOrder,
     }),
-    report: ({ results, compare, compareV6, addendum, stage }) => v7h.report({ results, addendum, stage, compare: { piGpt: compare ? runs.readResults(compare) : [], claudeCode: compareV6 ? runs.readResults(compareV6) : [] } }),
+    report: ({ results, compares, addendum, stage }) => v7h.report({ results, addendum, stage, compare: { piGpt: compares.v7e ? runs.readResults(compares.v7e) : [], claudeCode: compares.v6 ? runs.readResults(compares.v6) : [] } }),
     sample: 'sample-v7h',
+  },
+  v7i: {
+    clis: ['omp'],
+    build: v7i.addendumV7i,
+    cells: v7i.cells,
+    baselines: v7i.baselines,
+    measured: (addendum) => ({
+      models: Object.fromEntries(addendum.pairs.map((p) => [p.cli, p.model])),
+      providers: Object.fromEntries(addendum.pairs.map((p) => [p.cli, p.provider])),
+      effort: addendum.thinking,
+      stageARuns: addendum.stageARuns,
+      stageBRuns: addendum.stageBRuns,
+      cap: addendum.cap,
+      groupOf: v7i.pairOf,
+      projectConfig: () => ({ mailbox: { enabled: true } }),
+      scoreRun: (evidence) => v7i.scoreRun(evidence),
+      rules: v7i.stopRules,
+      phases: v7i.stagePhases,
+      order: v7i.stageOrder,
+    }),
+    report: ({ results, compares, addendum, stage }) => v7i.report({ results, addendum, stage, compare: Object.fromEntries(['v7e', 'v7h', 'v7c'].map((k) => [k, compares[k] ? runs.readResults(compares[k]) : []])) }),
+    sample: 'sample-v7i',
   },
 };
 const MEASURE = ADDENDUM_NAME ? MEASURES[ADDENDUM_NAME] : null;
@@ -430,7 +453,7 @@ function context({ dry, stage = null }) {
       ? confined.readPiAccountCredential(PI_ACCOUNT(pair.account), pair.provider)
       : confined.readAccountCredential(ACCOUNT_PROFILE(pair?.account), path.join(base, 'login-read'), pair?.provider ?? confined.ACCOUNT_PROVIDER);
   };
-  const accountLogin = (cli) => ({ cli, credential: dry ? scratchCodexLogin() : pairCredential(cli), provider: pairOfCli(cli)?.provider ?? confined.ACCOUNT_PROVIDER, profile: runs.RUN_PROFILE, ompBin: install.omp, nativesDir: install.natives });
+  const accountLogin = (cli) => ({ cli, credential: dry ? { ...scratchCodexLogin(), ...(pairOfCli(cli)?.provider === 'google-antigravity' ? { projectId: 'scratch-project' } : {}) } : pairCredential(cli), provider: pairOfCli(cli)?.provider ?? confined.ACCOUNT_PROVIDER, settleBy: pairOfCli(cli)?.settleBy ?? null, profile: runs.RUN_PROFILE, ompBin: install.omp, nativesDir: install.natives });
   if (dry) {
     const { host, shimFile } = buildHost(REPO_ROOT, targetDir(REPO_ROOT), path.join(base, 'release'));
     return {
@@ -454,9 +477,12 @@ function context({ dry, stage = null }) {
   const login = { claude: { cli: 'claude', home: os.homedir(), account: 'owner' }, codex: { cli: 'codex', home: live.accountHome('codex', CODEX_TEST_ACCOUNT), account: CODEX_TEST_ACCOUNT } };
   const sentinels = runs.plantSentinels(base, own(HOME_OF.sentinels));
   // A pair whose login pi itself holds: its account file must keep its bytes through the stage.
-  const loginSources = (addendum?.pairs ?? []).filter((p) => p.login === 'pi-account').map((p) => path.join(PI_ACCOUNT(p.account), 'auth.json'));
-  const sourceDigests = new Map(loginSources.map((f) => [f, sha256(f)]));
-  const sourceChanged = () => loginSources.filter((f) => !fs.existsSync(f) || sha256(f) !== sourceDigests.get(f));
+  // A pair's login source keeps its bytes (and an omp profile store its mtime) through the stage.
+  const loginSources = (addendum?.pairs ?? []).filter((p) => ['pi-account', 'omp-profile'].includes(p.login) && p.provider !== confined.ACCOUNT_PROVIDER)
+    .map((p) => (p.login === 'pi-account' ? path.join(PI_ACCOUNT(p.account), 'auth.json') : path.join(ACCOUNT_PROFILE(p.account), 'agent', 'agent.db')));
+  const stampOf = (f) => (fs.existsSync(f) ? `${sha256(f)} ${fs.statSync(f).mtimeMs}` : 'missing');
+  const sourceStamps = new Map(loginSources.map((f) => [f, stampOf(f)]));
+  const sourceChanged = () => loginSources.filter((f) => stampOf(f) !== sourceStamps.get(f));
   const ctx = {
     ...common,
     hostSha256: pin.host.sha256,
@@ -488,7 +514,8 @@ function context({ dry, stage = null }) {
       say(`${new Date().toISOString()} waiting: memory (${problem})`);
       await sleep(60_000);
     }
-    if (runs.EXTENSION_CLIS.includes(cell?.cli)) {
+    // A pair whose CLI refreshes its own copy starts whatever its access token's age (owner option C for P3).
+    if (runs.EXTENSION_CLIS.includes(cell?.cli) && !pairOfCli(cell.cli)?.refreshInRun) {
       // The account's login is read where its owner's omp sessions refresh it; a stale one waits, never refreshes in a run.
       for (const waited = Date.now(); ;) {
         let fresh;
@@ -503,6 +530,7 @@ function context({ dry, stage = null }) {
         await sleep(5 * 60_000);
       }
     }
+    if (runs.EXTENSION_CLIS.includes(cell?.cli)) return null;
     const cliLogin = login[cell?.cli ?? 'claude'];
     if (confined.loginFreshness(cliLogin) !== 'fresh') say(`${new Date().toISOString()} waiting: the ${cliLogin.cli} login is near expiry; its owner's sessions refresh it`);
     try {
@@ -697,11 +725,11 @@ const pct = (x) => (x === null ? '-' : `${Math.round(x * 100)}`);
 const interval = ([lo, hi]) => `${pct(lo)}-${pct(hi)}`;
 const range = (values) => (values.length ? `${Math.min(...values)}-${Math.max(...values)}` : '-');
 
-function cmdReportAddendum({ stage, sample, dry, compare, compareV6 }) {
+function cmdReportAddendum({ stage, sample, dry, compare, compares }) {
   const base = dry ? `${BASE}-dry` : BASE;
   const addendum = readJson(ADDENDUM);
   const results = runs.readResults(path.join(base, 'results.jsonl'));
-  say(MEASURE.report({ results, compare, compareV6, addendum, stage }));
+  say(MEASURE.report({ results, compare, compares, addendum, stage }));
   if (!sample) return;
   const bodies = readData().bodies;
   // The drawer is named; the controller marks in the mark file beside the sample, never here.
@@ -717,8 +745,8 @@ function cmdReportAddendum({ stage, sample, dry, compare, compareV6 }) {
   say(`sample: ${file}`);
 }
 
-function cmdReport({ stage, sample, dry, compare, compareV6 }) {
-  if (ADDENDUM) return cmdReportAddendum({ stage, sample, dry, compare, compareV6 });
+function cmdReport({ stage, sample, dry, compare, compares }) {
+  if (ADDENDUM) return cmdReportAddendum({ stage, sample, dry, compare, compares });
   const base = dry ? `${BASE}-dry` : BASE;
   const results = runs.readResults(path.join(base, 'results.jsonl')).filter((r) => !stage || r.stage === stage);
   const frozen = readJson(PREREGISTRATION);
@@ -848,6 +876,7 @@ async function cmdCheckAddendum() {
   const wiring = ADDENDUM_NAME === 'v7e'
     ? WIRING_V7E.map(([p, variant, behaviour, want]) => [[...v7e.baselines(), ...v7e.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
     : ADDENDUM_NAME === 'v7h' ? wiringOfPairs(v7h.PAIRS).map(([p, variant, behaviour, want]) => [[...v7h.baselines(), ...v7h.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
+    : ADDENDUM_NAME === 'v7i' ? wiringOfPairs(v7i.PAIRS).map(([p, variant, behaviour, want]) => [[...v7i.baselines(), ...v7i.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
     : ADDENDUM_NAME === 'v7f' ? WIRING_V7F.map(([cli, variant, behaviour, want]) => [v7f.cells().find((c) => c.cli === cli && c.variant === variant), behaviour, want])
     : ADDENDUM_NAME === 'v7g' ? WIRING_V7G.map(([variant, behaviour, want]) => [v7g.cells().find((c) => c.variant === variant), behaviour, want])
     : WIRING_V7.map(([arm, variant, behaviour, want]) => [[...v7.baselines(), ...v7.cells()].find((c) => c.arm === arm && c.variant === variant), behaviour, want]);
@@ -861,7 +890,7 @@ async function cmdCheckAddendum() {
     const entry = readJson(path.join(ctx.base, 'ledger', `${line.runId}.json`));
     if (!entry.argv?.length || !entry.maskSha256) failures.push(`${line.runId}: the ledger entry lacks the argv or the mask hash`);
     if (entry.loginSettled !== true) failures.push(`${line.runId}: the ledger entry does not record its login settled`);
-    if (['v7f', 'v7g', 'v7h'].includes(ADDENDUM_NAME) && !entry.launchSettings?.model) failures.push(`${line.runId}: the ledger entry lacks the launch settings`);
+    if (['v7f', 'v7g', 'v7h', 'v7i'].includes(ADDENDUM_NAME) && !entry.launchSettings?.model) failures.push(`${line.runId}: the ledger entry lacks the launch settings`);
     if (!line.hostSha256) failures.push(`${line.runId}: the results line lacks the host hash`);
   }
   if (failures.length) die(`check failed:\n  ${failures.join('\n  ')}`);
@@ -1513,7 +1542,7 @@ if (process.argv[1] === SCRIPT) {
         cmdRescore();
         break;
       case 'report':
-        cmdReport({ stage: option('--stage'), sample: flag('--sample'), dry: flag('--dry'), compare: option('--compare'), compareV6: option('--compare-v6') });
+        cmdReport({ stage: option('--stage'), sample: flag('--sample'), dry: flag('--dry'), compare: option('--compare'), compares: Object.fromEntries(rest.filter((a) => a.startsWith('--compare-')).map((a) => [a.slice('--compare-'.length), option(a)])) });
         break;
       case 'mcp-probe':
         if (['pi', 'omp'].includes(rest[0])) await cmdMcpProbePiOmp(rest[0], { off: !flag('--without-off') });
@@ -1535,7 +1564,7 @@ if (process.argv[1] === SCRIPT) {
         runStub(rest[0], rest.slice(1));
         break;
       default:
-        die('usage: [--addendum v7c|v7e|v7f|v7g|v7h] check | freeze [v7c|v7e|v7f|v7g|v7h] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] [--compare <results>] [--compare-v6 <results>] | rescore --addendum v7f | stub <cli> <argv>', 2);
+        die('usage: [--addendum v7c|v7e|v7f|v7g|v7h|v7i] check | freeze [v7c|v7e|v7f|v7g|v7h|v7i] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] [--compare <results>] [--compare-<v6|v7c|v7e|v7h> <results>] | rescore --addendum v7f | stub <cli> <argv>', 2);
     }
   } catch (error) {
     if (error instanceof live.LiveCliError || error instanceof confined.ConfinedLaunchError) die(error.message, error.code ?? 3);

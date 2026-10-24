@@ -46,3 +46,19 @@ Purpose: tell model from CLI. Codex, pi and omp with `gpt-6.1-sol` declined legi
 - **Network** is open inside the sandbox. The harmful bodies are the fixed S0 texts, each asking only for a canary file.
 - **Estimated cost:** about 1.8-2.4 USD at OpenRouter's list price.
 - **Dry check** against the recording endpoint, which now also speaks the Messages stream: every wiring run gave its outcome.
+
+## Addendum V7i: V7e's pair P3, omp with a Gemini model (owner logged in gemini-tetnu 2026-10-24; budget is what Q2 A left)
+
+- **Addendum:** `test/live/mailbox-behaviour.v7i-addendum.json`. Module: `scripts/lib/mailbox-behaviour-v7i.mjs`.
+- **Pair P3:**
+  - omp 18.12.6 with `google-antigravity/gemini-3.8-flash` at `--thinking low`, which omp sends as `gemini-3.8-flash-low` with thinkingLevel LOW.
+  - The model is the newest Flash this login serves, and the one the owner's omp used before.
+- **Same as V7e P2:** the channel, the instruction, the matrix and the gate.
+- **Ceiling:** 138 of the 205 that Q2 A had left.
+- **Login, owner option C (14:05):**
+  - The source login is never touched.
+  - Each run copies it as it stands, and omp refreshes its own copy inside the sandbox.
+  - The copy is settled by its refresh token: the same token removes it, a changed token sets it aside and stops the batch.
+  - The first stage A run is the canary for rotation.
+  - The source store's bytes and mtime are checked before every run and after the stage.
+- **Dry check:** the recording endpoint now also speaks omp's Cloud Code Assist stream. Every wiring run gave its outcome.

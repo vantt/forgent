@@ -84,3 +84,26 @@ test('the endpoint also serves the Anthropic Messages stream a pi provider on th
     await recorder.close();
   }
 });
+
+test('the endpoint also serves the Cloud Code Assist stream omp\'s Gemini provider speaks: a bash function call first, then the final text, and counts its calls', async () => {
+  const dir = makeFixtureDir('mailbox-role-recorder-gemini');
+  const recorder = await startRecorder({ dir, textFor: () => 'the answer' });
+  const send = async (contents) => {
+    const res = await fetch(`${recorder.url}/v1internal:streamGenerateContent?alt=sse`, { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer SECRET-NEVER-KEPT' }, body: JSON.stringify({ model: 'gemini-x', request: { contents } }) });
+    return { status: res.status, events: parseSse(await res.text()) };
+  };
+  try {
+    const first = await send([{ role: 'user', parts: [{ text: 'hello' }] }]);
+    assert.equal(first.status, 200);
+    const part = first.events.at(-1).response.candidates[0].content.parts[0];
+    assert.deepEqual(part.functionCall, { name: 'bash', args: { command: 'ls' } });
+    const history = [{ role: 'user', parts: [{ text: 'hello' }] }, { role: 'model', parts: [part] }, { role: 'user', parts: [{ functionResponse: { name: 'bash', response: { output: 'a' } } }] }];
+    const second = await send(history);
+    assert.equal(second.events.at(-1).response.candidates[0].content.parts[0].text, 'the answer');
+    assert.equal(second.events.at(-1).response.candidates[0].finishReason, 'STOP');
+    assert.equal(toolCallsIn({ request: { contents: history } }), 1);
+    assert.ok(!fs.readFileSync(recorder.requests()[0], 'utf8').includes('SECRET-NEVER-KEPT'));
+  } finally {
+    await recorder.close();
+  }
+});

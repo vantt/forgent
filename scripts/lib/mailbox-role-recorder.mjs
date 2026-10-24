@@ -5,8 +5,8 @@
  * a harness instrument, never a model. A CLI whose provider base URL points here sends its
  * request; the endpoint keeps the request (path, header names, parsed body; never a header
  * value, so no credential is kept) in a 0600 file inside the run directory and answers in the
- * OpenAI Responses stream shape (or, for a provider on the Anthropic Messages API, that stream
- * shape) with a scripted exchange: while the input holds no tool call,
+ * OpenAI Responses stream shape (or, for a provider on the Anthropic Messages API or Cloud Code
+ * Assist, that stream shape) with a scripted exchange: while the input holds no tool call,
  * one function call running `ls`; after it, the final text `done`. Reading which input item
  * carried an injected marker gives the role each injection method reaches the provider under.
  * Node built-ins only.
@@ -57,9 +57,10 @@ export function scriptedEvents(input, n, forced = null, text = FINAL_TEXT) {
   return events;
 }
 
-/** The tool calls a request's history holds: Responses `function_call` items, or Messages `tool_use` blocks. */
+/** The tool calls a request's history holds: Responses `function_call` items, Messages `tool_use` blocks, or Gemini `functionCall` parts. */
 export function toolCallsIn(body) {
   if (Array.isArray(body?.input)) return body.input.filter((item) => item?.type === 'function_call').length;
+  if (Array.isArray(body?.request?.contents)) return body.request.contents.filter((c) => c.role === 'model').flatMap((c) => c.parts ?? []).filter((p) => p?.functionCall).length;
   return (body?.messages ?? []).filter((m) => m.role === 'assistant' && Array.isArray(m.content)).flatMap((m) => m.content).filter((c) => c?.type === 'tool_use').length;
 }
 
@@ -81,6 +82,17 @@ export function scriptedMessagesEvents(body, n, forced = null, text = FINAL_TEXT
     { type: 'message_delta', delta: { stop_reason: call ? 'tool_use' : 'end_turn', stop_sequence: null }, usage: { output_tokens: 5 } },
     { type: 'message_stop' },
   ];
+}
+
+/**
+ * The events of one scripted Cloud Code Assist stream (`streamGenerateContent`, Gemini's shape
+ * wrapped in `response`): `forced`, else the bash tool running `ls` while the history holds no
+ * call, else the final text.
+ */
+export function scriptedGeminiEvents(body, n, forced = null, text = FINAL_TEXT) {
+  const call = forced ?? (toolCallsIn(body) ? null : SCRIPTED_CALL);
+  const part = call ? { functionCall: { name: call.name, args: JSON.parse(call.arguments) } } : { text };
+  return [{ response: { candidates: [{ content: { role: 'model', parts: [part] }, finishReason: 'STOP', index: 0 }], usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 5, totalTokenCount: 15 }, responseId: `gem_${n}` } }];
 }
 
 /** A request body decoded by its content encoding (the Codex providers compress with zstd). */
@@ -130,14 +142,15 @@ export async function startRecorder({ dir, callFor = () => null, textFor = () =>
       const route = req.url.split('?')[0];
       const events = req.method !== 'POST' ? null
         : /\/responses$/.test(route) ? scriptedEvents(body?.input, n, callFor(body), textFor(body))
-          : /\/messages$/.test(route) ? scriptedMessagesEvents(body, n, callFor(body), textFor(body)) : null;
+          : /\/messages$/.test(route) ? scriptedMessagesEvents(body, n, callFor(body), textFor(body))
+            : /:streamGenerateContent$/.test(route) ? scriptedGeminiEvents(body, n, callFor(body), textFor(body)) : null;
       if (!events) {
         res.writeHead(404, { 'content-type': 'application/json' });
         res.end('{"error":{"message":"not served by the recorder"}}');
         return;
       }
       res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' });
-      for (const event of events) res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
+      for (const event of events) res.write(`${event.type ? `event: ${event.type}\n` : ''}data: ${JSON.stringify(event)}\n\n`);
       res.end();
     });
   });

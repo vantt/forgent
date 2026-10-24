@@ -17,6 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { DatabaseSync } from 'node:sqlite';
 import {
+  credentialRefreshDigest,
   credentialRowsDigest,
   endConfinedRun,
   layOutRunProject,
@@ -663,4 +664,43 @@ test('a pi account of another provider is read from pi\'s own account file witho
   assert.equal(settleCopy(made, path.dirname(home)), null);
   const codex = materializeAccountLogin({ cli: 'pi', home: makeFixtureDir('mbx-pi-login-'), credential: scratchCredential() });
   assert.deepEqual(Object.keys(JSON.parse(fs.readFileSync(codex.copy, 'utf8'))), ['openai-codex'], 'the Codex account stays the default');
+});
+
+test('an omp login copy settled by its refresh token is removed when only its access token was refreshed, and set aside, stopping the batch, when its refresh token changed', () => {
+  const store = (dir, data) => {
+    const file = path.join(dir, 'agent.db');
+    const db = new DatabaseSync(file);
+    db.exec('PRAGMA journal_mode = WAL; CREATE TABLE IF NOT EXISTS auth_credentials (id INTEGER PRIMARY KEY, provider TEXT, credential_type TEXT, data TEXT, disabled_cause TEXT)');
+    db.prepare('INSERT INTO auth_credentials (provider, credential_type, data) VALUES (?, ?, ?)').run('google-antigravity', 'oauth', JSON.stringify(data));
+    db.close();
+    return file;
+  };
+  const refreshAccess = (file, data) => {
+    const db = new DatabaseSync(file);
+    db.prepare('UPDATE auth_credentials SET data = ?').run(JSON.stringify(data));
+    db.close();
+  };
+  const login = { access: 'A1', refresh: 'R1', expires: 1, projectId: 'p' };
+  const kept = store(makeFixtureDir('mbx-omp-refresh-'), login);
+  const made = { copy: kept, snapshot: credentialRefreshDigest(kept), digest: 'refresh' };
+  refreshAccess(kept, { ...login, access: 'A2', expires: 2 });
+  assert.equal(settleCopy(made, path.dirname(kept)), null, 'a new access token under the same refresh token is no change');
+  assert.equal(fs.existsSync(kept), false);
+
+  const rotated = store(makeFixtureDir('mbx-omp-refresh-'), login);
+  const second = { copy: rotated, snapshot: credentialRefreshDigest(rotated), digest: 'refresh' };
+  refreshAccess(rotated, { ...login, access: 'A2', refresh: 'R2' });
+  const settled = settleCopy(second, path.dirname(rotated));
+  assert.match(settled.stop, /login refreshed inside a run/);
+  assert.equal(path.basename(settled.aside), ROTATED_AUTH);
+  assert.equal(fs.existsSync(rotated), false, 'the copy moved aside, never deleted');
+});
+
+test('an omp login copy can be made to settle by its refresh token, and an unknown digest is refused', (t) => {
+  const install = piOmpInstall();
+  if (!install) return t.skip('omp is not installed');
+  const made = materializeAccountLogin({ cli: 'omp', home: makeFixtureDir('mbx-omp-login-'), credential: scratchCredential(), provider: 'google-antigravity', settleBy: 'refresh', profile: 'acct', ompBin: install.omp, nativesDir: install.natives });
+  assert.deepEqual([made.digest, made.snapshot], ['refresh', credentialRefreshDigest(made.copy)]);
+  assert.equal(settleCopy(made, path.dirname(made.copy)), null);
+  assert.throws(() => materializeAccountLogin({ cli: 'pi', home: makeFixtureDir('mbx-pi-login-'), credential: scratchCredential(), settleBy: 'nothing' }), /no login digest nothing/);
 });

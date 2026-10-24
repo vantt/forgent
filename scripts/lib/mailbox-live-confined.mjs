@@ -260,7 +260,23 @@ export function credentialRowsDigest(file) {
   }
 }
 
-const DIGESTS = { bytes: loginDigest, credentials: credentialRowsDigest };
+/**
+ * The sha256 of the refresh tokens of an omp `agent.db`'s credential rows, after folding its WAL:
+ * for a provider whose CLI refreshes its own copy inside a run (a short-lived access token, the
+ * refresh token kept), a new access token is no change; a new refresh token is.
+ */
+export function credentialRefreshDigest(file) {
+  const db = new DatabaseSync(file);
+  try {
+    db.exec('PRAGMA wal_checkpoint(TRUNCATE)');
+    const rows = db.prepare('SELECT provider, data FROM auth_credentials ORDER BY id').all();
+    return crypto.createHash('sha256').update(JSON.stringify(rows.map((r) => [r.provider, JSON.parse(r.data)?.refresh ?? null]))).digest('hex');
+  } finally {
+    db.close();
+  }
+}
+
+const DIGESTS = { bytes: loginDigest, credentials: credentialRowsDigest, refresh: credentialRefreshDigest };
 
 /**
  * Writes the account login of a `cli` (pi or omp) run into its private `home`, under `provider`
@@ -268,7 +284,7 @@ const DIGESTS = { bytes: loginDigest, credentials: credentialRowsDigest };
  * through `<ompBin> auth import -` with the home as `HOME` (the credential on stdin, never in a
  * file). Returns the copy, its snapshot digest and the digest's kind.
  */
-export function materializeAccountLogin({ cli, home, credential, provider = ACCOUNT_PROVIDER, profile = null, ompBin = null, nativesDir = null }) {
+export function materializeAccountLogin({ cli, home, credential, provider = ACCOUNT_PROVIDER, settleBy = null, profile = null, ompBin = null, nativesDir = null }) {
   const spec = ACCOUNT_LOGINS[cli];
   if (!spec) throw new ConfinedLaunchError(`no account login rule for ${cli}`);
   const copy = spec.copyPath(home, profile);
@@ -280,7 +296,10 @@ export function materializeAccountLogin({ cli, home, credential, provider = ACCO
     const out = spawnSync(ompBin, [`--profile=${profile}`, 'auth', 'import', '-'], { input: JSON.stringify({ version: 1, credentials: [{ provider, credential }] }), env, encoding: 'utf8', timeout: 60_000 });
     if (out.status !== 0 || !exists(copy)) throw new ConfinedLaunchError(`omp auth import into the private home failed (exit ${out.status}): ${String(out.stderr).trim().split('\n')[0]}`);
   }
-  return { copy, snapshot: DIGESTS[spec.digest](copy), digest: spec.digest };
+  // `settleBy` names another digest the copy is settled by: `refresh` for a pair whose CLI refreshes its own copy.
+  const digest = settleBy ?? spec.digest;
+  if (!DIGESTS[digest]) throw new ConfinedLaunchError(`no login digest ${digest}`);
+  return { copy, snapshot: DIGESTS[digest](copy), digest };
 }
 
 /**
