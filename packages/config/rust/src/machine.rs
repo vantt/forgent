@@ -1,7 +1,6 @@
 //! Machine files (spec sections 3, 8, 9): the private directory, the gateway token file, the
 //! accounts-only read and the mode findings of the four machine paths. File access reuses the
 //! no-follow primitives of Durable File; this module owns the rules and never echoes a value.
-use std::io;
 use std::path::Path;
 
 use fgos_yaml_doc::Profile;
@@ -17,6 +16,7 @@ use {
     crate::locks::{hold, GLOBAL_CONFIG},
     fgos_durable_file::{ensure_dir_beneath, install_once_with_mode, open_beneath},
     fgos_durable_file::{open_dir_beneath, BeneathError, DirIdentity, Installed},
+    std::io,
 };
 
 /// The tokens' file below the global directory, and the longest line it may hold.

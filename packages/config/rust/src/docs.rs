@@ -32,6 +32,8 @@ pub struct DocFinding {
 /// old doc run, in their original order.
 pub(crate) struct DocChange {
     pub finding: DocFinding,
+    /// Read by the write door, which is Unix only.
+    #[cfg_attr(not(unix), allow(dead_code))]
     pub block: Vec<String>,
 }
 

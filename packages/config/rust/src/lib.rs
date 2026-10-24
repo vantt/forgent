@@ -41,6 +41,8 @@ pub mod docs;
 pub mod doctor;
 pub mod inspect;
 pub mod machine;
+/// The migration writes files through the write door, so it is Unix only like it.
+#[cfg(unix)]
 pub mod migrate;
 #[cfg(feature = "host-provider")]
 pub mod provider;

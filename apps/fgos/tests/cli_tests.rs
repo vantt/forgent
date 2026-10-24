@@ -1722,6 +1722,16 @@ fn config_explain_and_standard_describe_a_key_without_a_secret_value() {
 #[test]
 fn config_check_fails_on_a_fail_row_and_prints_the_row_without_the_value() {
     let sandbox = config_sandbox("check");
+    // A machine with its private directory and token file in order checks clean.
+    let private = sandbox.join("home/.fgos/private");
+    fs::create_dir_all(&private).unwrap();
+    fs::write(private.join("gateway-token"), "0123456789abcdef\n").unwrap();
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(&private, fs::Permissions::from_mode(0o700)).unwrap();
+        fs::set_permissions(private.join("gateway-token"), fs::Permissions::from_mode(0o600)).unwrap();
+    }
     assert_eq!(config_data(&config_run(&sandbox, &["check"], false))["ok"], true);
     fs::write(sandbox.join("project/.fgos/config.yaml"), "gateway:\n  port: 49999\n").unwrap();
     let output = config_run(&sandbox, &["check", "--json"], false);
@@ -1747,6 +1757,7 @@ fn config_set_unset_and_patch_write_through_the_transaction_and_record_the_reaso
     // The note on the key is not dropped silently.
     let plain = config_run(&sandbox, &["unset", "gateBypass.level", "--reason", "back to the standard"], false);
     assert_eq!(plain.status.code(), Some(65));
+    assert!(config_refusal(&plain).contains("pass --acknowledge-comment-loss"));
     let ack = ["unset", "gateBypass.level", "--reason", "back to the standard", "--acknowledge-comment-loss"];
     assert_eq!(config_data(&config_run(&sandbox, &ack, false))["applied"][0]["unset"], true);
     let patch = sandbox.join("patch.yaml");

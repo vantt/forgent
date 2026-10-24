@@ -177,6 +177,7 @@ pub(crate) fn is_doc_line(line: &str) -> bool {
 }
 
 /// Whether a line starts the grammar (`@fgos:`): text carried from outside must never.
+#[cfg(unix)]
 pub(crate) fn is_grammar_line(line: &str) -> bool {
     line.starts_with(text("forbidden-line-start"))
 }
