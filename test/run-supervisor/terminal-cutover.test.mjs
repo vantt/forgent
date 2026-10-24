@@ -159,7 +159,7 @@ test('the brief the pane agent reads names the one result path, the outbox claim
   assert.match(contract.resultClaim?.path ?? '', /outbox[/\\]result-1\.json/, 'the persisted contract agrees with the brief');
 });
 
-test('fgos run with herdr present runs a confined read-only unit in a pane: the gate is inside the sandbox, the socket is bound in, the agent has a pid namespace of its own', { skip: noHost || (!bwrapUsable() && 'bwrap with a pid namespace is not usable here'), timeout: 240_000 }, async () => {
+test('fgos run with herdr present runs a confined read-only unit in a pane: the gate is inside the sandbox, its own socket is bound in, the agent has a pid namespace of its own', { skip: noHost || (!bwrapUsable() && 'bwrap with a pid namespace is not usable here'), timeout: 240_000 }, async () => {
   const project = await newProject('confined', { confined: true });
   const run = project.startFgosRun();
   const brief = await project.waitBriefTyped();
@@ -183,7 +183,8 @@ test('fgos run with herdr present runs a confined read-only unit in a pane: the 
   assert.equal(envelope.containment.preferred, 'linux-gate');
   const prefix = envelope.containment.bwrapPrefix;
   assert.ok(prefix.includes('--die-with-parent'), 'in a pane the sandbox goes with the pane');
-  assert.equal(prefix[prefix.indexOf('--bind', prefix.indexOf('--die-with-parent')) + 1], path.dirname(envelope.terminal.socketPath), 'the socket directory is bound into the sandbox');
+  assert.ok(prefix.some((arg, i) => arg === '--ro-bind' && prefix[i + 1] === envelope.terminal.socketPath), 'the attempt\'s own GO socket is bound into the sandbox');
+  assert.equal(prefix.includes(path.dirname(envelope.terminal.socketPath)), false, 'never the socket directory, which holds every attempt\'s socket');
   assert.ok(agent.pid < 100, `the agent runs in a namespace of its own (pid ${agent.pid})`);
   assert.equal(agent.env.FGOS_SESSION_ID, envelope.identity.writerId);
   assert.equal(project.callsStarting('pane close').length, 1);
