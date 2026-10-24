@@ -1483,7 +1483,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'run',
     invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] [--input <a>,<b>] [--verify "<cmd>"] [--sync <ref>] | --sync <ref> --writes <a>,<b> | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--timeout <dur>] [--account <pool/account>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
-    description: 'Door for one task: `fgos run "<prompt>"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel, debate); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`. Also "record" for inline producer turns.',
+    description: 'Door for one task: `fgos run "<prompt>"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel, debate); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`.',
     parameters: {
       type: 'object',
       positional: ['prompt'],
@@ -1512,13 +1512,6 @@ export const COMMAND_REGISTRY = [
         dir: { type: 'string', description: 'Main repository root directory. Storage follows it; workers start in the current directory, so run from inside that project or pass --worktree (a different project than the current directory is warned about as dir-differs-from-cwd).' },
         worktree: { type: 'string', description: 'Target worktree directory.' },
         json: { type: 'boolean', description: 'Emit machine-readable JSON output.' },
-        sub: { type: 'string', description: 'Sub-verb (e.g. "record").' },
-        'unit-run': { type: 'string', description: '"record" only: unit run ID.' },
-        role: { type: 'string', description: '"record" only: role name (producer).' },
-        round: { type: 'number', description: '"record" only: round number.' },
-        nonce: { type: 'string', description: '"record" only: issued once-nonce.' },
-        evidence: { type: 'string', description: '"record" only: comma-separated evidence file references.' },
-        result: { type: 'string', description: '"record" only: JSON-encoded result object.' },
       },
       required: [],
     },

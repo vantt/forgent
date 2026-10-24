@@ -72,7 +72,6 @@ fn valid_summary(value: &Value, directory_name: &str) -> bool {
         && nullable_string(value.get("pattern"))
         && nullable_string(value.get("capability"))
         && string(&value["outcome"])
-        && value["inline"].is_boolean()
         && value.get("workflow").is_some_and(|link| {
             link.is_null()
                 || ["runId", "stepId", "unitId"]

@@ -2792,37 +2792,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
     }
     case 'run': {
-      const sub = positional[0];
-      if (sub === 'record') {
-        const { recordInlineRun } = await import('../src/runner/execution/run.mjs');
-        const unitRunId = requireField(flags['unit-run'], '--unit-run is required for fgos run record');
-        const role = flags.role || 'producer';
-        const roundStr = requireField(flags.round, '--round is required for fgos run record');
-        const round = Number.parseInt(roundStr, 10);
-        const nonce = requireField(flags.nonce, '--nonce is required for fgos run record');
-        const evidenceStr = requireField(flags.evidence, '--evidence is required for fgos run record');
-        const evidenceRefs = evidenceStr.split(',').map((s) => s.trim()).filter(Boolean);
-        const repoRoot = flags.dir;
-        let resultObj = {};
-        const resultJson = flags.result;
-        if (resultJson) {
-          try {
-            resultObj = JSON.parse(resultJson);
-          } catch (e) {
-            throw new StoreError('validation', `invalid JSON for --result: ${e.message}`);
-          }
-        }
-        return recordInlineRun({
-          unitRunId,
-          role,
-          round,
-          nonce,
-          evidenceRefs,
-          result: resultObj,
-          repoRoot,
-        });
-      }
-
       const { runUnit, resolveGitRoots } = await import('../src/runner/execution/run.mjs');
       const { parseRunTimeout } = await import('../src/runner/dispatch/config.mjs');
       const unitPath = flags.unit;

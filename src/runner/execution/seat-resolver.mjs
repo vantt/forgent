@@ -9,8 +9,8 @@
 //            (src/convention/seat-id.mjs).
 //   role     one of SEAT_ROLES. It says what the seat does for the pattern and keys taste lookups.
 //   posture  how the seat may run. Launch and write behaviour reads posture and never the role or the
-//            id: readOnly, writer, forceOutOfProcess, inlineAllowed, stance (a panel member's passive
-//            stance measurement), verdict (the result is a checker's verdict).
+//            id: readOnly, writer, forceOutOfProcess, stance (a panel member's passive stance
+//            measurement), verdict (the result is a checker's verdict).
 //
 // This module is also the one authority for effective rigor and checker composition.
 
@@ -54,11 +54,11 @@ export class SeatResolutionError extends Error {
 }
 
 const posture = (fields) => Object.freeze({
-  readOnly: false, writer: false, forceOutOfProcess: false, inlineAllowed: false, stance: false, verdict: false, ...fields,
+  readOnly: false, writer: false, forceOutOfProcess: false, stance: false, verdict: false, ...fields,
 });
 
 /** What an ask that names no seat means: the unit's own producer seat. */
-export const PRODUCER_POSTURE = posture({ writer: true, inlineAllowed: true });
+export const PRODUCER_POSTURE = posture({ writer: true });
 
 const noWrites = (unit) => (unit?.writes ?? []).length === 0;
 
@@ -200,12 +200,12 @@ export function resolveSeats({ pattern, unit, runnerConfig }) {
         if (declared.length !== 1 || declared[0].role !== 'producer') throw new SeatResolutionError('a solo unit declares exactly one seat, with role "producer"', 'seat-multiplicity');
         return [withDeclared(declared[0], { seat: declared[0].seat, role: 'producer', posture: posture({ readOnly, writer: true }) })];
       }
-      return [Object.freeze({ seat: 'producer', role: 'producer', posture: posture({ readOnly, writer: true, inlineAllowed: true }) })];
+      return [Object.freeze({ seat: 'producer', role: 'producer', posture: posture({ readOnly, writer: true }) })];
     }
     case 'reviewed': {
       const required = checkerSeatsOf(unit, runnerConfig, params);
       const checkerPosture = (name) => posture({ readOnly: true, forceOutOfProcess: true, verdict: CHECKER_SEATS[name].verdict });
-      const producerPosture = posture({ readOnly, writer: true, inlineAllowed: true });
+      const producerPosture = posture({ readOnly, writer: true });
       if (!declared) {
         return [
           Object.freeze({ seat: 'producer', role: 'producer', posture: producerPosture }),

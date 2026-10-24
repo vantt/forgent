@@ -1123,7 +1123,7 @@ fn native_discussions_reports_owner_voters_and_root_wide_summary_diagnostics() {
         "unitRunId": "unit-run-research", "workflow": null,
         "pattern": "research-fan-out", "capability": "analysis", "outcome": "pass",
         "startedAt": "2026-10-05T12:00:00Z", "settledAt": "2026-10-05T12:01:00Z",
-        "inline": false, "stanceOptions": ["a", "b"],
+        "stanceOptions": ["a", "b"],
         "seats": [
             {"role": "researcher-1", "kind": "panelist", "round": 1, "final": final_attempt, "attempts": [attempt]},
             {"role": "researcher-2", "kind": "panelist", "round": 1, "final": final_attempt, "attempts": [attempt]},

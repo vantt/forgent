@@ -109,7 +109,7 @@ Bảng là một file hợp đồng chung `packages/seat-binding/contracts/seat-
 - Cell không effort chạy ở mức riêng của template invocation (template pi/omp ghi cứng `--thinking medium`); mức đó được ghi lại nhưng không phải lời hứa.
 - Effort mà CLI thật của candidate không render được thì bỏ candidate; với ghim cứng thì từ chối `effort-unsupported`, kèm các mức CLI render được.
 - Từ vựng effort đợt này là `REASONING_EFFORT_VALUES` = `low, medium, high, max` (`config.mjs:519`). Mở rộng (`xhigh`, `minimal`, `off`) và đổi tên model có effort trong tên (gemini `-low`/`-medium`/`-high`) đi cùng diff làm mới model riêng.
-- Lối thoát inline-lead bị bỏ bất cứ khi nào candidate đã cấu hình bị chính sách hoặc nguồn cung loại: trước đợt `bind.mjs:500-514` giao ghế `producer` cho lead phiên với `model: 'default'`, `source: 'session-lead-inline'`, vượt mọi luật tier, cell và trần. Chỉ còn cho Unit không cấu hình candidate nào.
+- Không còn lối thoát inline-lead: ghế không có candidate nào sống sót thì bị từ chối theo tên, kể cả khi không cấu hình candidate nào. Trước đợt `bind.mjs:500-514` giao ghế `producer` cho lead phiên với `model: 'default'`, `source: 'session-lead-inline'`, vượt mọi luật tier, cell và trần; lối hẹp còn lại (Unit không cấu hình candidate nào, phiên không headless) không cửa production nào chạm tới vì mọi cửa đều headless (và mọi workspace đang chạy đều khai `tierFallback` cho đủ tier), nên đã gỡ hẳn cùng `fgos run record`.
 
 ### 5.4 Hợp tier (project thắng, `maxTier` là cần gạt ngân sách)
 
@@ -359,7 +359,7 @@ Owner đã chốt khẩu vị 2026-10-20 13:26: `shape-proposals` một ghế fr
 Plan của code change phải chứng minh mọi mục sau; không mục nào được bỏ:
 
 - hai ghế producer resume riêng biệt;
-- producer của panel không bao giờ chạy inline và không bao giờ ghi;
+- producer của panel không bao giờ ghi;
 - judge của debate độc lập cứng với cả hai bên;
 - bind panel đồng thời theo thứ tự với spread mềm;
 - khuyến nghị workflow thắng `tier` của capability/prefix nhưng thua khoá seat, persona và role;
