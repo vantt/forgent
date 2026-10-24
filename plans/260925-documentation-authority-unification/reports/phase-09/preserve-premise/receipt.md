@@ -1,5 +1,11 @@
 # Preserve-premise follow-up receipt
 
+> Historical W2 receipt below. W4 supersedes the bare-span example predicate,
+> source pin, counts and self-successor proposals: see
+> [misc-fix/receipt.md](../misc-fix/receipt.md) and [checks.json](../misc-fix/checks.json).
+> The former combined `verification.json` remains historical; the scoped W4
+> replay runs the owning G6 assertions without claiming a G2 refresh.
+
 Pin: `3d0169f390e21c67bc3fc69081fd1bc07186599f` (HEAD at execution). Authority: W2 D4b, L12-137, L12-121, L12-35(3). Supersedes the W1 receipt at `bade6b6b3`. **Records task complete; G6 remains unmet.** No source patch, authority flip or independent acceptance is implied.
 
 ## Predicate fixes and replay

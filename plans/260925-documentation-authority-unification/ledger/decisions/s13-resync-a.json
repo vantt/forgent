@@ -59456,7 +59456,7 @@
       },
       "disposition": {
         "kind": "adapted-or-retired-legacy-clause",
-        "reason": "Doctor ID enumerations in legacy have drifted. Candidate rows 7/7b reconcile all 143 checks (135 literal IDs plus 8 loop-registered Git IDs) and 32 fixes, preserving explanatory prose and removing model-policy-tier-coverage. The loop registration is part of the same registry, not an exception.",
+        "reason": "Doctor ID enumerations in legacy have drifted. Candidate rows 7/7b reconcile all 141 checks (133 literal IDs plus 8 loop-registered Git IDs) and 32 fixes, preserving explanatory prose and removing model-policy-tier-coverage. The loop registration is part of the same registry, not an exception.",
         "evidence": [
           "src/setup/registrations.mjs",
           "720891630 (model-policy-tier-coverage retirement)"

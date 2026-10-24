@@ -91,7 +91,14 @@ def main():
         review = json.loads((HERE.parent/'reviews/w2-g6-preserve-review.json').read_text())
         live_pointers = [v['id'] for v in review['verdicts'] if v['verdict']=='REWORK' and v['reason'].startswith('live pointer to')]
         assert len(live_pointers)==29
-        assert all(rows[id]['result']=='park-unconfirmed-preserve-premise' and rows[id]['candidateSuccessors'] and rows[id]['evidence'] is None for id in live_pointers)
+        # Two current-source passages no longer bind at the W4 pin; they stay
+        # parked, never inherit history. Three physical destinations are the
+        # consumer itself and cannot serve as successor proposals (L12-35(7)).
+        self_successors={'f07697','f08033','f08047'}
+        for id in live_pointers:
+            expected='park-current-passage-unbound' if id in {'f08077','f08079'} else 'park-unconfirmed-preserve-premise'
+            assert rows[id]['result']==expected and rows[id]['evidence'] is None
+            assert rows[id]['candidateSuccessors'] or (id in self_successors and rows[id]['excludedSelfSuccessor']==rows[id]['file'])
         removed_ids = ['f00515','f00521','f00525','f01225','f08411']
         assert all(rows[id]['result']=='park-source-removed-by-cutover' and rows[id]['sourceSuccessors'] for id in removed_ids)
         wrapper_ids = ['f05646','f05655','f05661','f05671','f05677','f05693','f05720','f05730','f05742','f06391','f06167']
@@ -100,7 +107,16 @@ def main():
         assert rows['f07526']['result']=='park-unconfirmed-preserve-premise' and rows['f07526']['proposedDisposition']=='repoint-proposal'
         assert rows['f07526']['successor']['path']=='docs/platform/agent-coordination/architecture/dispatch-control-plane.md'
         assert not any(r['result'].startswith('preserve-') for r in rows.values() if not r['sourcePresentAfterCutover'])
-        assert all(r['evidence']['text'] in r['sourceSpans'][0]['text'] for r in rows.values() if (r['evidence'] or {}).get('kind')=='explicit-external-or-example-framing')
+        assert all(r['evidence']['text'] in r['currentUnit'] for r in rows.values() if (r['evidence'] or {}).get('kind')=='explicit-external-or-example-framing')
+        assert proof['positiveEvidenceControls'][0]['span']['text']=='docs/specs/x.md'
+        for id in ['f00167','f08807','f07822','f08072','f08073']:
+            assert rows[id]['result']=='preserve-source-confirmed-history'
+            assert rows[id]['evidence']['kind']=='explicit-external-or-example-framing'
+        for id in ['f07697','f08033','f08047']:
+            assert rows[id]['candidateSuccessors']==[]
+            assert rows[id]['excludedSelfSuccessor']==rows[id]['file']
+            assert rows[id]['result']=='park-unconfirmed-preserve-premise'
+        assert all(r['file'] not in r.get('candidateSuccessors',[]) and r.get('successor',{}).get('path')!=r['file'] for r in rows.values())
         wrapper_lines = []
         # Independently enumerate wrapper positions, rather than inheriting the
         # record's often incorrect "inside carriage" label or reason vocabulary.

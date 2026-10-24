@@ -114,8 +114,9 @@ def historical_evidence(source, line, reason, unit, span):
     if 'Whole-source architecture carriage' in reason and re.search(r'(?m)^Writer type: Agent carriage',source[:7000]) and re.search(r'(?m)^Purpose: Preserve the complete',source[:7000]):
         return {'kind':'explicit-whole-source-carriage-header','text':'Writer type: Agent carriage; Purpose: Preserve the complete'}
     if re.search(r'(?i)(?:upstream source coordinates|external.project|literal example|illustrative|adversarial)', reason):
-        # Require actual quoting/example/source framing; never just the claimed role.
-        marker = re.search(r'(?i)(?:e\.g\.|for example|ví dụ|example project|upstream source|external project)', span.get('text', ''))
+        # The span often contains only a path. Inspect its bound unit, never
+        # the whole file or the record's claimed role (L12-35(1)).
+        marker = re.search(r'(?i)(?:e\.g\.|for example|ví dụ|example project|upstream source|external project)', unit)
         if marker: return {'kind':'explicit-external-or-example-framing', 'text':marker[0]}
     return None
 
@@ -135,7 +136,7 @@ def main():
     ap.add_argument('--out', type=pathlib.Path, default=HERE)
     ap.add_argument('--pin', default='HEAD', help='Commit whose tracked source blobs are proved')
     args = ap.parse_args()
-    assert args.out.resolve() == HERE or str(args.out.resolve()).startswith('/tmp/fgos-work/w2-d4b/')
+    assert args.out.resolve() == HERE or any(str(args.out.resolve()).startswith(p) for p in ['/tmp/fgos-work/w4-misc-fix-brief/', '/tmp/fgos-work/w2-d4b/'])
     args.out.mkdir(parents=True, exist_ok=True)
     pin = git('rev-parse','--verify',args.pin+'^{commit}').decode().strip()
     matrix = json.loads((OLD/'step-07-consumer-cutover-matrix.json').read_text())
@@ -166,7 +167,7 @@ def main():
         if file not in source_cache:
             source_cache[file] = git('show',pin+':'+file).decode() if tracked.get(file) in ('100644','100755') else None
         return source_cache[file]
-    base = pathlib.Path('/tmp/fgos-work/w2-d4b');base.mkdir(parents=True,exist_ok=True)
+    base = pathlib.Path('/tmp/fgos-work/w4-misc-fix-brief');base.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='preserve-',dir=base) as name:
         scratch = pathlib.Path(name)
         run = subprocess.run(['node',str(HERE/'physical-move.mjs'),pin,name],cwd=ROOT,capture_output=True,text=True,check=True)
@@ -251,7 +252,7 @@ def main():
                              recommendationReason='L12-26(8)/L12-35(3) explicitly conserve history-wrapper wording. Add a dated, reachable successor outside the literal snapshot rather than rewriting the historical claim. Lead decides; no product patch or acceptance is implied.',
                              blocker='Lead must approve the row-specific dated note or choose repoint; then compose/review it with the owning file patch before cutover.')
             elif not result.startswith('preserve-'):
-                successors = sorted({s['path'] for r in reach for s in r['successors'] if s['present']})
+                successors = sorted({s['path'] for r in reach for s in r['successors'] if s['present'] and s['path'] != rec['file']})
                 check['candidateSuccessors'] = successors
                 if result == 'park-source-removed-by-cutover':
                     check['owner'] = 'Documentation consumer-composition owner / Lead'
@@ -265,6 +266,10 @@ def main():
                 else:
                     lost = ', '.join(r['path'] for r in reach if not r['afterPresent']) or token
                     check['blocker'] = 'For '+row[0]+' in '+rec['file']+', confirm source-bound non-dereferencing semantics of '+lost+' or co-compose/review the live-pointer successor ('+(', '.join(successors) or 'no exact successor currently bound')+'). Lead owns this row before flip; no Step 5 proof inheritance.'
+            if (not result.startswith('preserve-') and
+                    any(s['path'] == rec['file'] for r in reach for s in r['successors'])):
+                check['excludedSelfSuccessor'] = rec['file']
+                check['blocker'] += ' L12-35(7): the physical move destination is this consumer itself, not an eligible successor link. Review whether to label the legacy coordinate as non-link provenance or remove the live navigation outside literal carriage; do not propose a self-link.'
             if bound and re.search(r'(?i)Canonical architecture moved to:', '\n'.join(source.splitlines()[max(0,current_line-3):current_line])):
                 successor = 'docs/platform/agent-coordination/architecture/dispatch-control-plane.md'
                 assert present(successor) and any(successor==s['path'] for r in reach for s in r['successors'])
@@ -305,7 +310,8 @@ def main():
             ('source text after explicit snapshot boundary', '# Literal Snapshot\n\ndocs/specs/x.md', 'inside literal carriage', 'literal-carriage-section'),
         ]:
             line = len(source.splitlines())
-            span = dict(line=line,text=source.splitlines()[-1])
+            # A real census span is path-only; a whole-line span masks this bug.
+            span = dict(line=line,text='docs/specs/x.md')
             bound = bind_spans(source,[span])
             evidence = historical_evidence(source,line,reason,unit_at(source,bound),span)
             assert evidence and evidence['kind']==expected
@@ -321,7 +327,7 @@ def main():
         judgments = [r for r in rows if not r['result'].startswith('preserve-')]
         # One owning evidence row in proof.json. Secondary indexes carry locators,
         # decisions and digests, not duplicate multi-kilobyte source passages.
-        keys = ['rowId','stage','file','memberId','record','recordLine','currentLines','sourceSha256','itemSha256','result','proposedDisposition','owner','blocker','candidateSuccessors','sourcePresentAfterCutover','sourceSuccessors','successor','recommendationReason']
+        keys = ['rowId','stage','file','memberId','record','recordLine','currentLines','sourceSha256','itemSha256','result','proposedDisposition','owner','blocker','candidateSuccessors','excludedSelfSuccessor','sourcePresentAfterCutover','sourceSuccessors','successor','recommendationReason']
         dump(args.out/'judgments.json',dict(sourceCommit=pin,count=len(judgments),owningEvidence='proof.json#rows[rowId]',rows=[{k:r[k] for k in keys if k in r} for r in judgments]))
         keys += ['decisionOwner','successor','proposedDatedNote','alternatives','recommendationReason']
         dump(args.out/'history-wrapper-proposals.json',dict(sourceCommit=pin,count=sum('decisionOwner' in r for r in rows),owningEvidence='proof.json#rows[rowId]',rows=[{k:r[k] for k in keys if k in r} for r in rows if 'decisionOwner' in r]))
