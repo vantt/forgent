@@ -730,8 +730,9 @@ function probeMachinePrivateHiddenIn({ bwrapBin, root, stand, blind, brokenConfi
       ...(blindVariant ? { override: { controls: { hostRead: 'blind' } } } : {}),
       invocation: { command: 'node', args: ['-e', script], env: {} },
       context: { cwd: project, repoRoot: project, runDir, fgosDir },
-      // A terminal attempt: the prefix ends in `--` and its gate would dial its own GO socket.
-      ...(terminal ? { launchMode, attemptId: `probe-${slug}`, gateCommand: ['fgos', 'internal', 'gate', ...(brokenConfig === 'own-socket' ? [] : ['--go-socket', stand.ownAttempt])] } : {}),
+      // A terminal attempt: the prefix ends in `--` and its gate would dial its own GO socket. The gate
+      // path is absolute: the driver binds a gate binary that lies under /tmp, resolved from the cwd.
+      ...(terminal ? { launchMode, attemptId: `probe-${slug}`, gateCommand: ['/bin/true', 'internal', 'gate', ...(brokenConfig === 'own-socket' ? [] : ['--go-socket', stand.ownAttempt])] } : {}),
     };
     const prepared = prepareBwrapSync({ resources }, request, { id: 'bwrap', config: { executable: bwrapBin } });
     const args = terminal ? [...prepared.invocation.args, 'node', '-e', script] : prepared.invocation.args;
