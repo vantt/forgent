@@ -41,7 +41,7 @@ function workspace() {
 }
 
 /** A real attempt directory at runs/01 of an assignment, as the controller leaves it. */
-function attempt(w, { receipt, claim, side = true, baseline = true, outcomeFiles = {} } = {}) {
+function attempt(w, { receipt, claim, side = true, baseline = true, outcomeFiles = {}, terminal = false } = {}) {
   const assignmentDir = path.join(w.root, 'assignments', 'asg-1');
   const runDir = path.join(assignmentDir, 'runs', '01');
   fs.mkdirSync(path.join(runDir, 'controller'), { recursive: true });
@@ -76,6 +76,7 @@ function attempt(w, { receipt, claim, side = true, baseline = true, outcomeFiles
     deadlines: { softAt: null, idleMs: null, hardCeiling: null, gateKillGraceMs: 1000 },
     agentProtocol: { cli: 'claude', mode: 'direct' },
     sideFile,
+    ...(terminal ? { mode: 'terminal', agentProtocol: { cli: 'claude', mode: 'terminal' }, slot: { key: 'slot-1' } } : {}),
     steps: [step('settle-attempt'), step('finalize-home')],
   };
   envelope.digest = computeSha256Digest(envelope);
@@ -85,6 +86,12 @@ function attempt(w, { receipt, claim, side = true, baseline = true, outcomeFiles
   }
   for (const [name, content] of Object.entries(outcomeFiles)) fs.writeFileSync(path.join(runDir, name), content);
   return { runDir, envelope, control };
+}
+
+/** The fixture release's host answers a terminal-control read with `screen`, as the pane would show it. */
+function paneShows(w, screen) {
+  const answer = JSON.stringify({ v: 1, protocol: 1, op: 'read', result: 'screen', screen });
+  fs.writeFileSync(path.join(w.release, 'bin', 'fgos'), `#!/bin/sh\ncat >/dev/null\ncat <<'ANSWER'\n${answer}\nANSWER\n`, { mode: 0o755 });
 }
 
 function gateExit(over = {}) {
@@ -121,6 +128,21 @@ test('settle-attempt on an exited receipt with an outbox writes result.json; a s
     assert.equal(second.out.detail.settled, 'already');
     assert.deepEqual(fs.readFileSync(path.join(runDir, 'result.json')), bytes);
     assert.equal(generationCount(runDir), generations, 'no new run-control epoch');
+  } finally { w.cleanup(); }
+});
+
+test("a terminal attempt stopped as needs-human is not a provider limit because the agent's own text on its screen mentions one", async () => {
+  const w = workspace();
+  try {
+    paneShows(w, 'I hit a rate limit earlier while fetching the docs, so I waited and retried.\nThe migration needs a decision before I go on.\nDo you want me to drop the old table? (y/n)');
+    const { runDir } = attempt(w, {
+      terminal: true,
+      receipt: { outcome: 'cancelled', reason: 'terminal:needs-human', gateExit: gateExit({ exitCode: null, signal: 'SIGTERM', stoppedBy: 'cancel', cause: 'cancel' }) },
+    });
+    const { exit } = await run('settle-attempt', w, runDir);
+    assert.equal(exit, 0);
+    const { classification } = resultOf(runDir);
+    assert.notEqual(classification.failure?.code, 'provider-limit', JSON.stringify(classification));
   } finally { w.cleanup(); }
 });
 
