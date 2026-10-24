@@ -44,7 +44,38 @@ function installProcessTempRoot() {
     handlers.set(signal, handler);
     process.on(signal, handler);
   }
+  isolateHome(root);
   return root;
+}
+
+// Gives the process an empty home inside its temp root. Config is read from `<home>/.fgos` (the facade's
+// default global directory is `os.homedir()/.fgos`), so a test that does not choose its own home must not see
+// the real machine's global config, which differs from one machine to the next. HOME is a real OS input, so
+// code under test and every child it spawns read the same empty home. A test that means "the real machine"
+// or builds its own home (withHome, an explicit globalDir) overrides this. Git keeps the real global
+// identity through GIT_CONFIG_GLOBAL so a commit in a fixture repository still has an author, and the Rust
+// toolchain keeps its real install through CARGO_HOME and RUSTUP_HOME.
+function isolateHome(root) {
+  const realGitConfig = path.join(os.homedir(), '.gitconfig');
+  const home = path.join(root, 'home');
+  try {
+    fs.mkdirSync(home);
+  } catch {
+    return; // Leave HOME alone: the test's own filesystem calls will fail with the real error.
+  }
+  if (!process.env.GIT_CONFIG_GLOBAL && fs.existsSync(realGitConfig)) process.env.GIT_CONFIG_GLOBAL = realGitConfig;
+  // The Rust toolchain keeps its install under the real home; tests that build or run cargo still need it.
+  for (const [name, dir] of [['CARGO_HOME', '.cargo'], ['RUSTUP_HOME', '.rustup']]) {
+    const real = path.join(os.homedir(), dir);
+    if (!process.env[name] && fs.existsSync(real)) process.env[name] = real;
+  }
+  // The default state root (`<home>/.local/state/fgos`) must already be a private directory: the git door
+  // refuses a group-writable one, and under a group-writable umask a missing one is created that way.
+  const stateRoot = path.join(home, '.local', 'state', 'fgos');
+  fs.mkdirSync(stateRoot, { recursive: true, mode: 0o700 });
+  for (let dir = stateRoot; dir !== home; dir = path.dirname(dir)) fs.chmodSync(dir, 0o700);
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
 }
 
 /** The directory this process's temp files live in. */
