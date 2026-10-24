@@ -1,8 +1,9 @@
 //! Read the execution owner's unit summaries, never its attempts or workflow events.
 
-use fgos_observe::time::{parse_timestamp_millis, ParsedWindow};
+use fgos_host_runtime::civil_time::parse_rfc3339_millis;
+use fgos_observe::time::ParsedWindow;
 use fgos_observe::{
-    Observation, ObservationSource, SourceError, Subject, SubjectKind, UnitSummaryScan, Window,
+    Observation, SourceError, Subject, SubjectKind, UnitSummaryScan, Window,
 };
 use serde_json::Value;
 use std::fs::{self, File};
@@ -12,15 +13,6 @@ use std::path::Path;
 pub const MAX_UNIT_SUMMARY_BYTES: u64 = 1024 * 1024;
 /// The only summary contract version this reader accepts; the Node writer owns the bump.
 pub const UNIT_SUMMARY_VERSION: u64 = 2;
-
-#[derive(Default)]
-pub struct UnitSummarySource;
-
-impl UnitSummarySource {
-    pub fn new() -> Self {
-        Self
-    }
-}
 
 fn string(value: &Value) -> bool {
     value.as_str().is_some_and(|s| !s.trim().is_empty())
@@ -136,16 +128,6 @@ fn read_summary(path: &Path) -> Result<Value, &'static str> {
     serde_json::from_slice(&bytes).map_err(|_| "invalid-json")
 }
 
-impl ObservationSource for UnitSummarySource {
-    fn source_id(&self) -> &'static str {
-        "unit-summary"
-    }
-
-    fn observations(&self, root: &Path, window: &Window) -> Result<Vec<Observation>, SourceError> {
-        Ok(scan_unit_summaries(root, window)?.observations)
-    }
-}
-
 /// Scan direct real unit directories once, without inferring whether missing units are active.
 /// Each directory is either observed, missing, unusable, or valid but outside the window.
 pub fn scan_unit_summaries(root: &Path, window: &Window) -> Result<UnitSummaryScan, SourceError> {
@@ -196,7 +178,7 @@ pub fn scan_unit_summaries(root: &Path, window: &Window) -> Result<UnitSummarySc
                 .as_str()
                 .filter(|ts| !ts.trim().is_empty())
                 .ok_or("missing-timestamp")?;
-            let timestamp = parse_timestamp_millis(ts).ok_or("invalid-timestamp")?;
+            let timestamp = parse_rfc3339_millis(ts).ok_or("invalid-timestamp")?;
             if !valid_summary(&value, name) {
                 return Err("invalid-contract");
             }
@@ -236,7 +218,7 @@ pub fn scan_unit_summaries(root: &Path, window: &Window) -> Result<UnitSummarySc
         });
     }
     scan.observations.sort_by_cached_key(|observation| {
-        parse_timestamp_millis(&observation.ts).expect("validated timestamp")
+        parse_rfc3339_millis(&observation.ts).expect("validated timestamp")
     });
     Ok(scan)
 }

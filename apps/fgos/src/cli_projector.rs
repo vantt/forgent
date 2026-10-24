@@ -28,7 +28,7 @@ pub fn project_cli_invocation(
             ContractRef::from_static("work.gate-bypass.show.request", "1.0.0"),
             Box::new(fgos_work_state::GateBypassShowRequest::default()),
         ),
-        "observe.metrics" => {
+        "observe.metrics" | "observe.friction" => {
             let sub = if args.len() > 1 {
                 args[1].to_string_lossy().to_string()
             } else {
@@ -43,32 +43,7 @@ pub fn project_cli_invocation(
                 Vec::new()
             };
             (
-                ContractRef::from_static("observe.metrics.request", "1.0.0"),
-                Box::new(fgos_observe::ObserveRequest {
-                    operation: operation_id_str.to_string(),
-                    sub,
-                    args: sub_args,
-                    root,
-                    stdin,
-                }),
-            )
-        }
-        "observe.friction" => {
-            let sub = if args.len() > 1 {
-                args[1].to_string_lossy().to_string()
-            } else {
-                String::new()
-            };
-            let sub_args: Vec<String> = if args.len() > 2 {
-                args[2..]
-                    .iter()
-                    .map(|a| a.to_string_lossy().to_string())
-                    .collect()
-            } else {
-                Vec::new()
-            };
-            (
-                ContractRef::from_static("observe.friction.request", "1.0.0"),
+                ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
                 Box::new(fgos_observe::ObserveRequest {
                     operation: operation_id_str.to_string(),
                     sub,

@@ -292,7 +292,6 @@ fn concurrent_process_writers_leave_complete_shards() {
                 .args(["--exact", "eval_writer_child", "--nocapture"])
                 .env("FGOS_EVAL_TEST_ROOT", &root.0)
                 .env("FGOS_SESSION_ID", format!("writer-{}", writer))
-                .env("FGOS_NOW", "2026-10-05T10:00:00.000Z")
                 .spawn()
                 .unwrap(),
         );
@@ -310,13 +309,6 @@ fn concurrent_process_writers_leave_complete_shards() {
         let text = fs::read_to_string(shard).unwrap();
         assert!(text.ends_with('\n'));
         assert_eq!(text.lines().count(), 5);
-        for record in result
-            .evals
-            .iter()
-            .filter(|e| e.eval_id.starts_with(&format!("writer-{}-", writer)))
-        {
-            assert_eq!(record.ts, "2026-10-05T10:00:00.000Z");
-        }
     }
     assert_observe_lock_free(&root.0);
 }

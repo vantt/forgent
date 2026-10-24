@@ -2,45 +2,22 @@
 
 use crate::contract::ObserveRequest;
 use crate::eval_journal::{self, EvalInput};
+use crate::metrics_cli::parse_flags;
 use serde_json::{json, Value};
 
-/// Both `--flag value` and `--flag=value` use the existing Observe convention.
+/// `list` filters by `--harness` / `--question`; `record` takes no flags.
 fn filters(args: &[String], record: bool) -> Result<(Option<String>, Option<String>), String> {
-    let mut harness = None;
-    let mut question = None;
-    let mut i = 0;
-    while i < args.len() {
-        let (name, inline) = match args[i].split_once('=') {
-            Some((name, value)) => (name, Some(value)),
-            None => (args[i].as_str(), None),
-        };
-        if name == "--json" && inline.is_none() {
-            i += 1;
-            continue;
+    let values: &[&str] = if record { &[] } else { &["--harness", "--question"] };
+    let flags = parse_flags("eval", args, values, &[], false)?;
+    for flag in values {
+        if flags.value(flag).is_some_and(|value| value.trim().is_empty()) {
+            return Err(format!("metrics eval: missing value for {flag}"));
         }
-        if name != "--dir" && (record || (name != "--harness" && name != "--question")) {
-            return Err(format!("metrics eval: unknown option {}", args[i]));
-        }
-        let value = if let Some(value) = inline {
-            value
-        } else {
-            i += 1;
-            args.get(i)
-                .filter(|s| !s.starts_with("--"))
-                .ok_or_else(|| format!("missing value for {}", name))?
-                .as_str()
-        };
-        if value.trim().is_empty() {
-            return Err(format!("missing value for {}", name));
-        }
-        match name {
-            "--harness" => harness = Some(value.to_string()),
-            "--question" => question = Some(value.to_string()),
-            _ => {} // --dir is resolved by the native target-root projector.
-        }
-        i += 1;
     }
-    Ok((harness, question))
+    Ok((
+        flags.value("--harness").map(str::to_owned),
+        flags.value("--question").map(str::to_owned),
+    ))
 }
 
 pub fn dispatch_eval(req: &ObserveRequest) -> Result<Value, String> {

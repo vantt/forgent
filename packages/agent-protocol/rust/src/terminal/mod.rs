@@ -6,11 +6,13 @@
 //! [`Terminal::deliver_brief`].
 //! Contract: `packages/agent-protocol/contracts/terminal-outcomes.v1.json`.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use std::time::SystemTime;
 
-use serde_json::{json, Value};
+use serde_json::Value;
 
-use crate::direct::{is_auth_failure, is_quota_limit, newest_result};
+use crate::direct::{is_quota_limit, newest_result, screen_login};
+use crate::outcome::BlockedReason;
 use crate::port::{AgentIo, Inspection, IoError, SendInput};
 
 mod agy;
@@ -22,27 +24,22 @@ mod pi;
 
 use common::*;
 
-/// What only a person can fix before the CLI can serve a round.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TerminalBlock {
-    TrustDialog,
-    Login,
-}
+/// The largest `result-<N>.json` the outbox reads; a claim is a few lines, so a bigger file is
+/// not one.
+pub const MAX_RESULT_BYTES: usize = 16 * 1024 * 1024;
 
-impl TerminalBlock {
-    pub fn as_str(self) -> &'static str {
-        match self {
-            TerminalBlock::TrustDialog => "trust-dialog",
-            TerminalBlock::Login => "login",
-        }
-    }
-}
+/// Receipt reasons for the early ends the supervisor itself names (no adapter outcome behind
+/// them). The adapter outcomes' own reasons come from [`TerminalOutcome::receipt_reason`].
+pub const REASON_FOREGROUND_NOT_AGENT: &str = "terminal:foreground-not-agent";
+pub const REASON_AGENT_NOT_STARTED: &str = "terminal:agent-not-started";
+pub const REASON_RESULT_UNREADABLE: &str = "terminal:result-unreadable";
+pub const REASON_COMPLETED_NO_EXIT: &str = "terminal:completed-no-exit";
 
 /// One outcome per step, exactly the contract's `outcomes`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TerminalOutcome {
     Ready,
-    Blocked(TerminalBlock),
+    Blocked(BlockedReason),
     Delivered,
     DeliveryUnknown,
     Completed { result_path: PathBuf },
@@ -50,19 +47,13 @@ pub enum TerminalOutcome {
 }
 
 impl TerminalOutcome {
-    /// The wire shape: `{ "outcome": <name>, ...fields }`.
-    pub fn to_json(&self) -> Value {
+    /// The receipt's `reason` for an outcome that ends the run early; `None` for a step that went well.
+    pub fn receipt_reason(&self) -> Option<String> {
         match self {
-            TerminalOutcome::Ready => json!({ "outcome": "ready" }),
-            TerminalOutcome::Blocked(reason) => {
-                json!({ "outcome": "blocked", "reason": reason.as_str() })
-            }
-            TerminalOutcome::Delivered => json!({ "outcome": "delivered" }),
-            TerminalOutcome::DeliveryUnknown => json!({ "outcome": "delivery-unknown" }),
-            TerminalOutcome::Completed { result_path } => {
-                json!({ "outcome": "completed", "resultPath": result_path.to_string_lossy() })
-            }
-            TerminalOutcome::NeedsHuman => json!({ "outcome": "needs-human" }),
+            TerminalOutcome::Blocked(reason) => Some(format!("terminal:blocked:{}", reason.as_str())),
+            TerminalOutcome::NeedsHuman => Some("terminal:needs-human".into()),
+            TerminalOutcome::DeliveryUnknown => Some("terminal:delivery-unknown".into()),
+            TerminalOutcome::Ready | TerminalOutcome::Delivered | TerminalOutcome::Completed { .. } => None,
         }
     }
 }
@@ -77,7 +68,7 @@ pub enum Readiness {
     Unverified,
     /// The detector has no verdict; typed at without waiting.
     NoDetector,
-    Blocked(TerminalBlock),
+    Blocked(BlockedReason),
     /// A dialog that is neither a trust dialog nor a login: only a person can answer it.
     NeedsHuman,
     /// The agent never reached a prompt that takes input. Nothing was typed.
@@ -115,9 +106,10 @@ pub enum ExitCommand {
     Keys(&'static [&'static str]),
 }
 
-/// The outbox as the adapter sees it: the newest result file that is complete.
+/// The outbox as the adapter sees it: the newest result file that is complete. Any wait goes
+/// through `io.pause`, the only way time passes in an adapter.
 pub trait Outbox {
-    fn newest_complete(&mut self) -> Option<PathBuf>;
+    fn newest_complete(&mut self, io: &mut dyn AgentIo) -> Option<PathBuf>;
 }
 
 /// Stable invalid publication evidence, including edits made between polls.
@@ -125,12 +117,14 @@ pub trait Outbox {
 pub struct UnreadableResult {
     path: PathBuf,
     bytes: Vec<u8>,
-    modified: std::time::SystemTime,
+    modified: SystemTime,
 }
 
 /// Reads `launch.outboxDir`. A result counts only when it parses as a JSON
-/// object and keeps its size across a short wait: pi creates `result-N.json`
-/// empty and fills it a moment later, and only claude publishes by rename.
+/// object and keeps its bytes and modified time across a short wait: pi creates `result-N.json`
+/// empty and fills it a moment later, and only claude publishes by rename. A result is read
+/// through a no-follow open, regular files only, at most [`MAX_RESULT_BYTES`]; anything else
+/// is as good as absent.
 pub struct FsOutbox {
     dir: PathBuf,
     stable_wait_ms: u64,
@@ -143,43 +137,75 @@ impl FsOutbox {
             stable_wait_ms: 20,
         }
     }
-}
 
-impl FsOutbox {
     /// A nonempty invalid result, unchanged across the publication settle wait.
     /// Keep the contents and timestamp so edits between supervisor polls reset the grace.
-    pub fn newest_unreadable(&mut self) -> Option<UnreadableResult> {
-        let names: Vec<String> = std::fs::read_dir(&self.dir).ok()?
-            .filter_map(|entry| entry.ok()?.file_name().into_string().ok()).collect();
-        let path = newest_result(&self.dir, names.iter().map(String::as_str))?;
-        let bytes = std::fs::read(&path).ok()?;
-        if bytes.is_empty() || serde_json::from_slice::<Value>(&bytes).is_ok_and(|v| v.is_object()) {
-            return None;
-        }
-        let modified = std::fs::metadata(&path).ok()?.modified().ok()?;
-        std::thread::sleep(std::time::Duration::from_millis(self.stable_wait_ms));
-        if std::fs::read(&path).ok()? != bytes || std::fs::metadata(&path).ok()?.modified().ok()? != modified {
-            return None;
-        }
-        Some(UnreadableResult { path, bytes, modified })
+    pub fn newest_unreadable(&mut self, io: &mut dyn AgentIo) -> Option<UnreadableResult> {
+        let found = self.stable_newest(io, |bytes| !bytes.is_empty() && !is_json_object(bytes))?;
+        Some(UnreadableResult { path: found.path, bytes: found.bytes, modified: found.modified })
     }
-}
 
-impl Outbox for FsOutbox {
-    fn newest_complete(&mut self) -> Option<PathBuf> {
+    fn newest_read(&self) -> Option<Found> {
         let names: Vec<String> = std::fs::read_dir(&self.dir)
             .ok()?
             .filter_map(|entry| entry.ok()?.file_name().into_string().ok())
             .collect();
         let path = newest_result(&self.dir, names.iter().map(String::as_str))?;
-        let first = std::fs::read(&path).ok()?;
-        if !serde_json::from_slice::<Value>(&first).ok()?.is_object() {
+        let (bytes, modified) = read_result(&self.dir, &path)?;
+        Some(Found { path, bytes, modified })
+    }
+
+    /// The newest result when `wanted` accepts its bytes and they, with the modified time, are
+    /// unchanged after the stability window. A window the clock did not complete (the run ended
+    /// during the wait) is not stable.
+    fn stable_newest(&self, io: &mut dyn AgentIo, wanted: impl Fn(&[u8]) -> bool) -> Option<Found> {
+        let first = self.newest_read().filter(|read| wanted(&read.bytes))?;
+        let started = io.now_ms();
+        io.pause(self.stable_wait_ms);
+        if io.now_ms().saturating_sub(started) < self.stable_wait_ms {
             return None;
         }
-        std::thread::sleep(std::time::Duration::from_millis(self.stable_wait_ms));
-        let second = std::fs::read(&path).ok()?;
-        (second.len() == first.len()).then_some(path)
+        let (bytes, modified) = read_result(&self.dir, &first.path)?;
+        (bytes == first.bytes && modified == first.modified).then_some(first)
     }
+}
+
+impl Outbox for FsOutbox {
+    fn newest_complete(&mut self, io: &mut dyn AgentIo) -> Option<PathBuf> {
+        self.stable_newest(io, is_json_object).map(|read| read.path)
+    }
+}
+
+struct Found {
+    path: PathBuf,
+    bytes: Vec<u8>,
+    modified: SystemTime,
+}
+
+fn is_json_object(bytes: &[u8]) -> bool {
+    serde_json::from_slice::<Value>(bytes).is_ok_and(|value| value.is_object())
+}
+
+/// The bytes and modified time of the result `path` inside `dir`; `None` for a missing file, a
+/// link, anything but a regular file, or one over [`MAX_RESULT_BYTES`]. Never blocks on a FIFO.
+#[cfg(unix)]
+fn read_result(dir: &Path, path: &Path) -> Option<(Vec<u8>, SystemTime)> {
+    let opened = fgos_durable_file::open_beneath(dir, Path::new(path.file_name()?)).ok()??;
+    let bytes = opened.read(MAX_RESULT_BYTES).ok()?.bytes;
+    Some((bytes, std::fs::symlink_metadata(path).ok()?.modified().ok()?))
+}
+
+#[cfg(windows)]
+fn read_result(_dir: &Path, path: &Path) -> Option<(Vec<u8>, SystemTime)> {
+    use std::io::Read as _;
+    let mut file = fgos_durable_file::open_no_reparse(std::fs::OpenOptions::new().read(true), path).ok()?;
+    let metadata = file.metadata().ok()?;
+    if metadata.len() > MAX_RESULT_BYTES as u64 {
+        return None;
+    }
+    let mut bytes = Vec::new();
+    (&mut file).take(MAX_RESULT_BYTES as u64 + 1).read_to_end(&mut bytes).ok()?;
+    (bytes.len() <= MAX_RESULT_BYTES).then_some((bytes, metadata.modified().ok()?))
 }
 
 /// What differs between CLIs; everything else is shared.
@@ -227,6 +253,10 @@ pub fn adapter_for(cli: &str) -> Option<Terminal> {
     Some(Terminal { profile })
 }
 
+fn quota_on(screen: &str) -> bool {
+    lines_of_interest(screen).iter().any(|line| is_quota_limit(line))
+}
+
 fn lines_of_interest(screen: &str) -> Vec<String> {
     bottom_lines(screen, 12)
         .lines()
@@ -243,8 +273,8 @@ impl Terminal {
         self.profile.exit
     }
 
-    /// A dialog or error on screen that only a person can clear.
-    pub fn classify_blocked(&self, screen: &str) -> Option<TerminalBlock> {
+    /// A dialog or error on screen that only a person can clear: a trust dialog or a dead login.
+    pub fn classify_blocked(&self, screen: &str) -> Option<BlockedReason> {
         let lowered = bottom_lines(screen, 20).to_lowercase();
         if self
             .profile
@@ -252,19 +282,28 @@ impl Terminal {
             .iter()
             .any(|marker| lowered.contains(marker))
         {
-            return Some(TerminalBlock::TrustDialog);
+            return Some(BlockedReason::TrustDialog);
         }
         lines_of_interest(screen)
             .iter()
-            .any(|line| is_auth_failure(line))
-            .then_some(TerminalBlock::Login)
+            .any(|line| screen_login(line))
+            .then_some(BlockedReason::Login)
+    }
+
+    /// Why the agent has stopped on this screen: a blocking dialog, a dead login or a used-up
+    /// quota. Only for the places that already know the agent stopped; the screen-only checks
+    /// (start banner, ready gate, unruled wait) use `classify_blocked`, so quota text left in
+    /// scrollback never stops a launch.
+    fn stop_reason(&self, screen: &str) -> Option<BlockedReason> {
+        self.classify_blocked(screen)
+            .or_else(|| quota_on(screen).then_some(BlockedReason::UsageLimit))
     }
 
     fn blocked_readiness(&self, io: &mut dyn AgentIo) -> Readiness {
         match io
             .screen()
             .ok()
-            .and_then(|screen| self.classify_blocked(&screen))
+            .and_then(|screen| self.stop_reason(&screen))
         {
             Some(reason) => Readiness::Blocked(reason),
             None => Readiness::NeedsHuman,
@@ -385,7 +424,7 @@ impl Terminal {
                 let since = *unruled_since.get_or_insert_with(|| io.now_ms());
                 let Ok(screen) = io.screen() else {
                     io.pause(PROMPT_SETTLE_MS);
-                    return Readiness::Ready;
+                    return Readiness::Unverified;
                 };
                 if let Some(reason) = self.classify_blocked(&screen) {
                     return Readiness::Blocked(reason);
@@ -504,7 +543,7 @@ impl Terminal {
         let mut no_draft = 0;
         let mut working_since: Option<u64> = None;
         while io.now_ms() < deadline {
-            if outbox.newest_complete().is_some() {
+            if outbox.newest_complete(io).is_some() {
                 return TerminalOutcome::Delivered;
             }
             let seen: Inspection = match io.inspect() {
@@ -576,13 +615,13 @@ impl Terminal {
 
     /// One look while the agent works: a complete result file wins over
     /// anything on screen; otherwise a dialog or a provider limit the agent
-    /// cannot get past without a person ends the wait. `None` keeps waiting.
+    /// cannot get past without a person ends the wait, named `blocked`. `None` keeps waiting.
     pub fn detect_completed(
         &self,
         io: &mut dyn AgentIo,
         outbox: &mut dyn Outbox,
     ) -> Option<TerminalOutcome> {
-        if let Some(result_path) = outbox.newest_complete() {
+        if let Some(result_path) = outbox.newest_complete(io) {
             return Some(TerminalOutcome::Completed { result_path });
         }
         let seen = io.inspect().ok()?;
@@ -592,11 +631,8 @@ impl Terminal {
         }
         if state != "working" && !seen.visible_working {
             let screen = io.screen().ok()?;
-            if lines_of_interest(&screen)
-                .iter()
-                .any(|line| is_quota_limit(line))
-            {
-                return Some(TerminalOutcome::NeedsHuman);
+            if quota_on(&screen) {
+                return Some(TerminalOutcome::Blocked(BlockedReason::UsageLimit));
             }
         }
         None

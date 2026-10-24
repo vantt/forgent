@@ -1,9 +1,9 @@
 //! Run Result Evaluator observation source (Lane A2 - Phase F2).
 
 pub mod unit_summary;
-pub use unit_summary::{scan_unit_summaries, UnitSummarySource};
+pub use unit_summary::scan_unit_summaries;
 
-use fgos_observe::time::parse_timestamp_millis;
+use fgos_host_runtime::civil_time::parse_rfc3339_millis;
 use fgos_observe::{Observation, ObservationSource, SourceError, Subject, SubjectKind, Window};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -565,10 +565,7 @@ fn scan_assignment_runs(
         {
             scan.recent_runs += 1;
         }
-        let record: Value = match File::open(&result_path)
-            .ok()
-            .and_then(|file| serde_json::from_reader(BufReader::new(file)).ok())
-        {
+        let record: Value = match read_run_record(&result_path) {
             Some(record) => record,
             None => {
                 scan.skip("unparseable");
@@ -613,7 +610,7 @@ fn scan_assignment_runs(
         };
         // Windows compare settlement time; a value that is not an RFC3339
         // instant cannot be placed in any window, so it is not admitted.
-        if parse_timestamp_millis(timestamp).is_none() {
+        if parse_rfc3339_millis(timestamp).is_none() {
             scan.skip("invalid-timestamp");
             continue;
         }
@@ -633,6 +630,109 @@ fn scan_assignment_runs(
         ));
     }
     Ok(())
+}
+
+/// Top-level `result.json` keys the scan and the outcome derivation read.
+/// Every other key (the bulky `evidence` above all) is skipped unparsed.
+const RECORD_KEYS: &[&str] = &[
+    "runId",
+    "unitRunId",
+    "settledAt",
+    "timestamp",
+    "executorId",
+    "executor",
+    "status",
+    "confinement",
+    "durationMs",
+    "usage",
+    "classification",
+    "adapter",
+    "role",
+    "contract",
+    "outcome",
+    "reason",
+    "confidence",
+    "runtime",
+    "agentClaim",
+];
+
+/// Keeps `RECORD_KEYS` of a top-level object (explicit `null` included) and
+/// ignores the rest; any other top-level value is passed through unchanged.
+struct RecordSeed;
+
+impl<'de> serde::de::DeserializeSeed<'de> for RecordSeed {
+    type Value = Value;
+
+    fn deserialize<D: serde::Deserializer<'de>>(self, deserializer: D) -> Result<Value, D::Error> {
+        deserializer.deserialize_any(RecordVisitor)
+    }
+}
+
+struct RecordVisitor;
+
+impl<'de> serde::de::Visitor<'de> for RecordVisitor {
+    type Value = Value;
+
+    fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.write_str("any JSON value")
+    }
+
+    fn visit_map<A: serde::de::MapAccess<'de>>(self, mut map: A) -> Result<Value, A::Error> {
+        let mut kept = serde_json::Map::new();
+        while let Some(key) = map.next_key::<String>()? {
+            if RECORD_KEYS.contains(&key.as_str()) {
+                kept.insert(key, map.next_value::<Value>()?);
+            } else {
+                map.next_value::<serde::de::IgnoredAny>()?;
+            }
+        }
+        Ok(Value::Object(kept))
+    }
+
+    fn visit_seq<A: serde::de::SeqAccess<'de>>(self, seq: A) -> Result<Value, A::Error> {
+        Value::deserialize(serde::de::value::SeqAccessDeserializer::new(seq))
+    }
+
+    fn visit_bool<E>(self, v: bool) -> Result<Value, E> {
+        Ok(Value::Bool(v))
+    }
+
+    fn visit_i64<E>(self, v: i64) -> Result<Value, E> {
+        Ok(Value::from(v))
+    }
+
+    fn visit_u64<E>(self, v: u64) -> Result<Value, E> {
+        Ok(Value::from(v))
+    }
+
+    fn visit_f64<E>(self, v: f64) -> Result<Value, E> {
+        Ok(Value::from(v))
+    }
+
+    fn visit_str<E>(self, v: &str) -> Result<Value, E> {
+        Ok(Value::String(v.to_string()))
+    }
+
+    fn visit_string<E>(self, v: String) -> Result<Value, E> {
+        Ok(Value::String(v))
+    }
+
+    fn visit_unit<E>(self) -> Result<Value, E> {
+        Ok(Value::Null)
+    }
+
+    fn visit_none<E>(self) -> Result<Value, E> {
+        Ok(Value::Null)
+    }
+}
+
+/// Read one `result.json`; `None` when unreadable or not JSON.
+fn read_run_record(path: &Path) -> Option<Value> {
+    let bytes = std::fs::read(path).ok()?;
+    let mut de = serde_json::Deserializer::from_slice(&bytes);
+    let value = serde::de::DeserializeSeed::deserialize(RecordSeed, &mut de).ok()?;
+    de.end().ok()?;
+    Some(value)
 }
 
 fn run_observation(

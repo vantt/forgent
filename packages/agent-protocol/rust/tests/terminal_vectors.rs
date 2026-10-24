@@ -3,8 +3,12 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
 
-use fgos_agent_protocol::terminal::{adapter_for, ExitCommand, FsOutbox, Outbox, Readiness};
-use fgos_agent_protocol::{AgentIo, Inspection, IoError, SendInput};
+use fgos_agent_protocol::terminal::{
+    adapter_for, ExitCommand, FsOutbox, Outbox, Readiness, TerminalOutcome, MAX_RESULT_BYTES,
+    REASON_AGENT_NOT_STARTED, REASON_COMPLETED_NO_EXIT, REASON_FOREGROUND_NOT_AGENT,
+    REASON_RESULT_UNREADABLE,
+};
+use fgos_agent_protocol::{AgentIo, BlockedReason, Inspection, IoError, SendInput};
 use serde_json::{json, Value};
 
 const CLIS: [&str; 5] = ["claude", "codex", "agy", "pi", "omp"];
@@ -100,12 +104,6 @@ impl AgentIo for ScriptedPane {
         self.sent.push(input.clone());
         Ok(())
     }
-    fn read(&mut self) -> Result<Vec<String>, IoError> {
-        Ok(self.frame().screen.lines().map(str::to_string).collect())
-    }
-    fn activity(&self) -> Option<u64> {
-        None
-    }
     fn screen(&mut self) -> Result<String, IoError> {
         Ok(self.frame().screen.clone())
     }
@@ -127,7 +125,7 @@ struct ScriptedOutbox {
 }
 
 impl Outbox for ScriptedOutbox {
-    fn newest_complete(&mut self) -> Option<PathBuf> {
+    fn newest_complete(&mut self, _io: &mut dyn AgentIo) -> Option<PathBuf> {
         let now = self.now.get();
         let frame = self
             .frames
@@ -139,6 +137,20 @@ impl Outbox for ScriptedOutbox {
             .result
             .as_ref()
             .map(|name| Path::new("/run/outbox").join(name))
+    }
+}
+
+/// The contract's wire shape of an outcome: `{ "outcome": <name>, ...fields }`.
+fn wire(outcome: &TerminalOutcome) -> Value {
+    match outcome {
+        TerminalOutcome::Ready => json!({ "outcome": "ready" }),
+        TerminalOutcome::Blocked(reason) => json!({ "outcome": "blocked", "reason": reason.as_str() }),
+        TerminalOutcome::Delivered => json!({ "outcome": "delivered" }),
+        TerminalOutcome::DeliveryUnknown => json!({ "outcome": "delivery-unknown" }),
+        TerminalOutcome::Completed { result_path } => {
+            json!({ "outcome": "completed", "resultPath": result_path.to_string_lossy() })
+        }
+        TerminalOutcome::NeedsHuman => json!({ "outcome": "needs-human" }),
     }
 }
 
@@ -220,13 +232,11 @@ fn terminal_every_cli_vector_resolves_as_recorded() {
                         0,
                         "{name}: nothing is typed while waiting"
                     );
-                    readiness.outcome().to_json()
+                    wire(&readiness.outcome())
                 }
-                "deliver-brief" => adapter
-                    .deliver_brief(&mut pane, message, &mut outbox)
-                    .to_json(),
+                "deliver-brief" => wire(&adapter.deliver_brief(&mut pane, message, &mut outbox)),
                 "detect-completed" => match adapter.detect_completed(&mut pane, &mut outbox) {
-                    Some(outcome) => outcome.to_json(),
+                    Some(outcome) => wire(&outcome),
                     None => json!({ "outcome": "none" }),
                 },
                 "classify-blocked" => {
@@ -285,6 +295,29 @@ fn terminal_every_cli_vector_resolves_as_recorded() {
     }
 }
 
+/// An io that only has a clock: every wait advances it, or does not when `cut_short` says the run ended.
+#[derive(Default)]
+struct Clock {
+    now: u64,
+    cut_short: bool,
+    pauses: Vec<u64>,
+}
+
+impl AgentIo for Clock {
+    fn send(&mut self, _: &SendInput) -> Result<(), IoError> {
+        Err(IoError::Unsupported)
+    }
+    fn now_ms(&self) -> u64 {
+        self.now
+    }
+    fn pause(&mut self, ms: u64) {
+        self.pauses.push(ms);
+        if !self.cut_short {
+            self.now += ms;
+        }
+    }
+}
+
 fn scratch_dir(tag: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!("agent-protocol-{tag}-{}", std::process::id()));
     let _ = fs::remove_dir_all(&dir);
@@ -297,7 +330,7 @@ fn terminal_a_result_file_counts_only_once_it_is_complete_json() {
     let dir = scratch_dir("outbox");
     let mut outbox = FsOutbox::new(&dir);
     assert_eq!(
-        outbox.newest_complete(),
+        outbox.newest_complete(&mut Clock::default()),
         None,
         "an empty outbox has no result"
     );
@@ -305,18 +338,18 @@ fn terminal_a_result_file_counts_only_once_it_is_complete_json() {
     // pi creates the file empty and fills it a moment later.
     fs::write(dir.join("result-1.json"), "").unwrap();
     assert_eq!(
-        outbox.newest_complete(),
+        outbox.newest_complete(&mut Clock::default()),
         None,
         "a 0-byte file is not a result"
     );
     fs::write(dir.join("result-1.json"), "{\"status\":\"do").unwrap();
     assert_eq!(
-        outbox.newest_complete(),
+        outbox.newest_complete(&mut Clock::default()),
         None,
         "a half-written file is not a result"
     );
     fs::write(dir.join("result-1.json"), "{\"status\":\"done\"}\n").unwrap();
-    assert_eq!(outbox.newest_complete(), Some(dir.join("result-1.json")));
+    assert_eq!(outbox.newest_complete(&mut Clock::default()), Some(dir.join("result-1.json")));
 
     // claude's temp name is never a result; a newer incomplete result hides nothing it has not earned.
     fs::write(
@@ -324,18 +357,72 @@ fn terminal_a_result_file_counts_only_once_it_is_complete_json() {
         "{\"status\":\"done\"}",
     )
     .unwrap();
-    assert_eq!(outbox.newest_complete(), Some(dir.join("result-1.json")));
+    assert_eq!(outbox.newest_complete(&mut Clock::default()), Some(dir.join("result-1.json")));
     fs::write(dir.join("result-2.json"), "").unwrap();
     assert_eq!(
-        outbox.newest_complete(),
+        outbox.newest_complete(&mut Clock::default()),
         None,
         "the newest result is still being written"
     );
     fs::write(dir.join("result-2.json"), "[1]").unwrap();
-    assert_eq!(outbox.newest_complete(), None, "a result is a JSON object");
+    assert_eq!(outbox.newest_complete(&mut Clock::default()), None, "a result is a JSON object");
     fs::write(dir.join("result-2.json"), "{}").unwrap();
-    assert_eq!(outbox.newest_complete(), Some(dir.join("result-2.json")));
+    assert_eq!(outbox.newest_complete(&mut Clock::default()), Some(dir.join("result-2.json")));
     fs::remove_dir_all(&dir).unwrap();
+}
+
+#[test]
+fn a_stability_wait_the_run_cut_short_is_not_stable_and_the_wait_goes_through_pause() {
+    let dir = scratch_dir("cut-short");
+    fs::write(dir.join("result-1.json"), "{}").unwrap();
+    let mut io = Clock::default();
+    assert_eq!(FsOutbox::new(&dir).newest_complete(&mut io), Some(dir.join("result-1.json")));
+    assert_eq!(io.pauses, vec![20], "the stability wait is one pause on the adapter clock");
+    let mut ended = Clock { cut_short: true, ..Clock::default() };
+    assert_eq!(FsOutbox::new(&dir).newest_complete(&mut ended), None, "a cut-short window proves nothing");
+    fs::write(dir.join("result-2.json"), "not json").unwrap();
+    assert!(FsOutbox::new(&dir).newest_unreadable(&mut ended).is_none());
+    fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
+fn every_receipt_reason_and_stop_constant_is_named_in_the_contract() {
+    let contract = fs::read_to_string(
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../contracts/terminal-outcomes.v1.json"),
+    )
+    .unwrap();
+    let doc: Value = serde_json::from_str(&contract).unwrap();
+    let prose = doc["mapping"]["toReceiptReason"].as_str().unwrap();
+    let done = || PathBuf::from("/run/outbox/result-1.json");
+    let rendered = [
+        TerminalOutcome::Blocked(BlockedReason::TrustDialog),
+        TerminalOutcome::Blocked(BlockedReason::Login),
+        TerminalOutcome::Blocked(BlockedReason::UsageLimit),
+        TerminalOutcome::NeedsHuman,
+        TerminalOutcome::DeliveryUnknown,
+    ]
+    .map(|outcome| outcome.receipt_reason().expect("an early end names its reason"));
+    assert_eq!(
+        rendered,
+        [
+            "terminal:blocked:trust-dialog",
+            "terminal:blocked:login",
+            "terminal:blocked:usage-limit",
+            "terminal:needs-human",
+            "terminal:delivery-unknown",
+        ]
+    );
+    for reason in rendered.iter().map(String::as_str).chain([
+        REASON_FOREGROUND_NOT_AGENT,
+        REASON_AGENT_NOT_STARTED,
+        REASON_RESULT_UNREADABLE,
+        REASON_COMPLETED_NO_EXIT,
+    ]) {
+        assert!(prose.contains(reason), "{reason} is not named in toReceiptReason");
+    }
+    for step in [TerminalOutcome::Ready, TerminalOutcome::Delivered, TerminalOutcome::Completed { result_path: done() }] {
+        assert_eq!(step.receipt_reason(), None, "{step:?} ends nothing early");
+    }
 }
 
 #[test]
@@ -451,17 +538,72 @@ fn unreadable_results_exclude_empty_and_completed_publications_and_track_edits()
     let dir = scratch_dir("unreadable");
     let path = dir.join("result-1.json");
     let mut outbox = FsOutbox::new(&dir);
-    assert!(outbox.newest_unreadable().is_none());
+    assert!(outbox.newest_unreadable(&mut Clock::default()).is_none());
     fs::write(&path, "").unwrap();
-    assert!(outbox.newest_unreadable().is_none());
+    assert!(outbox.newest_unreadable(&mut Clock::default()).is_none());
     fs::write(&path, "{\"summary\":\"raw\nnewline\"}").unwrap();
-    let first = outbox.newest_unreadable().unwrap();
-    assert_eq!(outbox.newest_unreadable(), Some(first.clone()));
+    let first = outbox.newest_unreadable(&mut Clock::default()).unwrap();
+    assert_eq!(outbox.newest_unreadable(&mut Clock::default()), Some(first.clone()));
     fs::write(&path, "[1]").unwrap();
-    assert_ne!(outbox.newest_unreadable(), Some(first));
+    assert_ne!(outbox.newest_unreadable(&mut Clock::default()), Some(first));
     fs::write(&path, "{}").unwrap();
-    assert!(outbox.newest_unreadable().is_none());
-    assert_eq!(outbox.newest_complete(), Some(path));
+    assert!(outbox.newest_unreadable(&mut Clock::default()).is_none());
+    assert_eq!(outbox.newest_complete(&mut Clock::default()), Some(path));
+    fs::remove_dir_all(dir).unwrap();
+}
+
+/// Runs one outbox read on its own thread and reports whether it finished within
+/// `limit`; a read stuck on a FIFO is released afterwards by opening the FIFO's
+/// writer side, so a red run fails fast and leaves no blocked thread behind.
+#[cfg(unix)]
+fn outbox_read_finishes_within<T: Send + 'static>(
+    fifo: &Path,
+    limit: std::time::Duration,
+    read: impl FnOnce() -> T + Send + 'static,
+) -> Option<T> {
+    let (done, finished) = std::sync::mpsc::channel();
+    let reader = std::thread::spawn(move || {
+        let _ = done.send(read());
+    });
+    let answer = finished.recv_timeout(limit).ok();
+    if answer.is_none() {
+        drop(fs::OpenOptions::new().write(true).open(fifo));
+    }
+    let _ = reader.join();
+    answer
+}
+
+#[cfg(unix)]
+#[test]
+fn a_fifo_named_like_a_result_is_never_read_and_both_outbox_reads_return_none_promptly() {
+    let dir = scratch_dir("fifo-result");
+    let fifo = dir.join("result-1.json");
+    let made = std::process::Command::new("mkfifo").arg(&fifo).status().unwrap();
+    assert!(made.success(), "mkfifo failed");
+    let limit = std::time::Duration::from_secs(2);
+
+    let complete_dir = dir.clone();
+    let complete = outbox_read_finishes_within(&fifo, limit, move || FsOutbox::new(complete_dir).newest_complete(&mut Clock::default()));
+    let unreadable_dir = dir.clone();
+    let unreadable = outbox_read_finishes_within(&fifo, limit, move || FsOutbox::new(unreadable_dir).newest_unreadable(&mut Clock::default()));
+    assert_eq!(
+        (complete, unreadable.map(|found| found.is_some())),
+        (Some(None), Some(false)),
+        "(newest_complete, newest_unreadable found) on a FIFO result; None = still blocked after 2 s"
+    );
+    fs::remove_dir_all(dir).unwrap();
+}
+
+/// Larger than any result claim an agent writes; the outbox's result size cap
+/// (`MAX_RESULT_BYTES` once defined) sits below it.
+const OVERSIZED_RESULT_BYTES: usize = MAX_RESULT_BYTES + 1;
+
+#[test]
+fn an_oversized_result_file_is_not_taken_as_complete() {
+    let dir = scratch_dir("oversized-result");
+    let padding = "a".repeat(OVERSIZED_RESULT_BYTES);
+    fs::write(dir.join("result-1.json"), format!("{{\"status\":\"done\",\"pad\":\"{padding}\"}}")).unwrap();
+    assert_eq!(FsOutbox::new(&dir).newest_complete(&mut Clock::default()), None, "an oversized result was read whole and accepted");
     fs::remove_dir_all(dir).unwrap();
 }
 
@@ -494,12 +636,6 @@ impl AgentIo for EndingPane {
         self.accepted.push(input.clone());
         Ok(())
     }
-    fn read(&mut self) -> Result<Vec<String>, IoError> {
-        Err(IoError::Unsupported)
-    }
-    fn activity(&self) -> Option<u64> {
-        None
-    }
     fn screen(&mut self) -> Result<String, IoError> {
         self.gate()?;
         Ok("ready".into())
@@ -522,7 +658,7 @@ impl AgentIo for EndingPane {
 struct NoOutbox;
 
 impl Outbox for NoOutbox {
-    fn newest_complete(&mut self) -> Option<PathBuf> {
+    fn newest_complete(&mut self, _io: &mut dyn AgentIo) -> Option<PathBuf> {
         None
     }
 }
@@ -533,7 +669,7 @@ fn terminal_delivery_sends_nothing_once_the_attempt_is_ending() {
         let adapter = adapter_for(cli).unwrap();
         let mut pane = EndingPane::new();
         let outcome = adapter.deliver_brief(&mut pane, "Read the brief file and do the task.", &mut NoOutbox);
-        assert_eq!(outcome.to_json(), json!({ "outcome": "delivery-unknown" }), "{cli}");
+        assert_eq!(wire(&outcome), json!({ "outcome": "delivery-unknown" }), "{cli}");
         assert_eq!(pane.accepted.len(), 1, "{cli}: only the brief itself went in before the stop");
         assert!(pane.accepted.iter().all(|s| s.text.is_some()), "{cli}: no key press after the stop");
     }
@@ -546,7 +682,7 @@ fn terminal_delivery_into_an_attempt_that_is_already_ending_types_nothing() {
         let mut pane = EndingPane::new();
         pane.ending = true;
         let outcome = adapter.deliver_brief(&mut pane, "Read the brief file and do the task.", &mut NoOutbox);
-        assert_eq!(outcome.to_json(), json!({ "outcome": "delivery-unknown" }), "{cli}");
+        assert_eq!(wire(&outcome), json!({ "outcome": "delivery-unknown" }), "{cli}");
         assert!(pane.accepted.is_empty(), "{cli}: nothing reaches the pane");
     }
 }

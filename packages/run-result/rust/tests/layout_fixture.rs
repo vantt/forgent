@@ -1,11 +1,30 @@
-use fgos_observe::{ObservationSource, ObserveRequest, Window};
-use fgos_run_result::{
-    scan_coverage, scan_runs, scan_unit_summaries, RunResultSource, MAX_ASSIGNMENT_DEPTH,
-};
+use fgos_observe::{ObservationSource, Window};
+use fgos_run_result::{scan_coverage, scan_runs, RunResultSource, MAX_ASSIGNMENT_DEPTH};
 use serde_json::{json, Value};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
+
+#[cfg(unix)]
+use fgos_observe::{
+    ObserveRequest, SourceError, WorkEntropySignalsRecord, WorkObservationSource, WorkOutcomesRecord,
+};
+#[cfg(unix)]
+use fgos_run_result::scan_unit_summaries;
+
+#[cfg(unix)]
+struct NoWork;
+
+#[cfg(unix)]
+impl WorkObservationSource for NoWork {
+    fn read_outcomes_report(&self, _: &Path, _: Option<&str>) -> Result<WorkOutcomesRecord, SourceError> {
+        panic!("this verb must not read the work store")
+    }
+
+    fn read_entropy_signals(&self, _: &Path) -> Result<WorkEntropySignalsRecord, SourceError> {
+        panic!("this verb must not read the work store")
+    }
+}
 
 static NEXT_TEMP: AtomicU64 = AtomicU64::new(0);
 
@@ -176,7 +195,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     let coverage = fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )
@@ -188,7 +207,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     let runs = fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )
@@ -198,7 +217,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     let harness = fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )
@@ -226,7 +245,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     let windowed_runs = fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )
@@ -236,7 +255,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     let windowed_harness = fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )
@@ -246,17 +265,17 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     assert!(fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )
     .unwrap_err()
-    .contains("unexpected argument for metrics coverage"));
+    .contains("metrics coverage: unknown option --since"));
     req.args.clear();
     let windowed_coverage = fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )
@@ -547,6 +566,73 @@ fn owner_settlement_requires_regular_parseable_metadata_without_changing_results
             assert_eq!(record["timestamp"], owner_time);
         }
     }
+    assert_accounting(&root.0);
+}
+
+#[test]
+fn settlement_time_admits_only_valid_rfc3339_instants() {
+    let root = FixtureRoot::new();
+    let cases = [
+        ("leap-day", "2028-02-29T23:59:59Z", true),
+        ("offset-fraction", "2026-10-05T12:00:00.250+07:00", true),
+        ("lower-case", "2026-10-05t10:00:00z", true),
+        ("not-leap", "2026-02-29T00:00:00Z", false),
+        ("hour-24", "2026-10-05T24:00:00Z", false),
+        ("bad-offset", "2026-10-05T10:00:00+24:00", false),
+        ("no-zone", "2026-10-05T10:00:00", false),
+        ("empty-fraction", "2026-10-05T10:00:00.Z", false),
+        ("padded", " 2026-10-05T10:00:00Z ", false),
+    ];
+    for (id, time, _) in cases {
+        root.result(id, "01", &json!({"runId": id, "settledAt": time}));
+    }
+    let scan = scan_runs(&root.0).unwrap();
+    for (id, _, admitted) in cases {
+        assert_eq!(
+            scan.runs.iter().any(|o| o.subject.id == id),
+            admitted,
+            "{id}"
+        );
+    }
+    assert_eq!(scan.skipped["invalid-timestamp"], 6);
+    assert_accounting(&root.0);
+}
+
+#[test]
+fn run_scan_keeps_explicit_nulls_and_does_not_reclassify_non_object_results() {
+    let root = FixtureRoot::new();
+    root.result(
+        "null-contract",
+        "01",
+        &json!({"runId": "null-contract", "settledAt": "2026-10-05T10:00:00Z", "contract": null}),
+    );
+    root.result(
+        "null-classification",
+        "01",
+        &json!({
+            "runId": "null-classification", "settledAt": "2026-10-05T10:00:00Z",
+            "status": "done", "classification": null
+        }),
+    );
+    root.result(
+        "null-executor-id",
+        "01",
+        &json!({
+            "runId": "null-executor-id", "settledAt": "2026-10-05T10:00:00Z",
+            "status": "done", "executorId": null, "executor": "claude",
+            "evidence": {"bulky": [1, 2, 3]}
+        }),
+    );
+    root.result("top-level-array", "01", &json!([{"runId": "inside"}]));
+    let scan = scan_runs(&root.0).unwrap();
+    assert_eq!(scan.skipped.get("unparseable"), None);
+    assert_eq!(scan.skipped["no-run-id"], 1);
+    let by_id = |id: &str| scan.runs.iter().find(|o| o.subject.id == id).unwrap();
+    assert_eq!(by_id("null-contract").attrs["outcome"]["reason"], "unsupported-contract");
+    let classification = by_id("null-classification");
+    assert_eq!(classification.attrs["classification"], Value::Null);
+    assert_eq!(classification.attrs["category"], "ok");
+    assert_eq!(by_id("null-executor-id").attrs["executor"], Value::Null);
     assert_accounting(&root.0);
 }
 

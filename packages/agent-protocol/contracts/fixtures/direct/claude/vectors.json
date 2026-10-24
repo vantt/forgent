@@ -1,6 +1,5 @@
 {
   "cli": "claude",
-  "stdinPolicy": "null-device",
   "source": "standard login prompt wording; the logged-out vector is the real tail of `claude -p` run with an empty HOME (2026-10-18)",
   "vectors": [
     {
