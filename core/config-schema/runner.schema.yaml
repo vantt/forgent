@@ -332,11 +332,9 @@ $defs:
           description: "Whether the seat may use this executor across provider families."
           type: boolean
       required: [executor]
-  tierCell:
-    description: "The model a family uses at one tier: a model id, model@pool, an object with model, pool and effort, or a non-empty list of those in the order they are tried."
-    type: [string, object, array]
-    minLength: 1
-    minItems: 1
+  tierEntry:
+    description: "One model of a tier cell: a model id, model@pool (split at the last @, so a model id may itself contain @), or an object with model, pool and effort."
+    additionalProperties: false
     properties:
       model:
         description: "Model id."
@@ -350,24 +348,39 @@ $defs:
         description: "Reasoning effort sent with the model."
         type: string
         enum: [low, medium, high, max]
-    required: [model]
+    oneOf:
+      - description: "A model id."
+        type: string
+        pattern: "^[^@]+$"
+      - description: "A model id and the pool that serves it, joined by the last @."
+        type: string
+        pattern: "^.+@[^@]+$"
+      - description: "A model with its pool and reasoning effort."
+        type: object
+        required: [model]
+  tierCell:
+    description: "The model a family uses at one tier: a model id, model@pool, an object with model, pool and effort, or a non-empty list of those in the order they are tried. A cell is replaced whole by a higher layer, never merged."
+    x-fgos-merge: leaf
+    properties:
+      model:
+        description: "Model id."
+        type: string
+        minLength: 1
+      pool:
+        description: "Account pool that serves the model."
+        type: string
+        minLength: 1
+      effort:
+        description: "Reasoning effort sent with the model."
+        type: string
+        enum: [low, medium, high, max]
     items:
-      type: [string, object]
-      minLength: 1
-      properties:
-        model:
-          description: "Model id."
-          type: string
-          minLength: 1
-        pool:
-          description: "Account pool that serves the model."
-          type: string
-          minLength: 1
-        effort:
-          description: "Reasoning effort sent with the model."
-          type: string
-          enum: [low, medium, high, max]
-      required: [model]
+      $ref: "#/$defs/tierEntry"
+    oneOf:
+      - $ref: "#/$defs/tierEntry"
+      - description: "A non-empty list of entries."
+        type: array
+        minItems: 1
   seatTaste:
     description: "The tier and executors one role, persona or seat prefers."
     type: object

@@ -17,7 +17,8 @@ use fgos_yaml_doc::{Profile, Segment};
 use serde_json::Value;
 
 use crate::files::{read_beneath, LoadedFile, JSON_NAME, PRIVATE_DIR_MODE, PRIVATE_FILE_MODE};
-use crate::machine::{beneath, hold_global, refused, token};
+use crate::locks::{hold, GLOBAL_CONFIG};
+use crate::machine::{beneath, refused, token};
 use crate::schema::{descend, json_at, load};
 use crate::scope::SourceKind;
 use crate::snapshot::{accounts_source, carries, split_global, Context, SnapshotError};
@@ -172,11 +173,21 @@ fn states(keys: &[Key], dest: &Dest, missing_ok: bool) -> Result<Vec<Held>, Snap
     }
 }
 
-/// What would be moved and what the destination holds already; names, counts and states only.
+/// What would be moved from the global JSON and what the destination holds already; names,
+/// counts and states only.
 pub fn plan(ctx: &Context, global_dir: &Path) -> Result<Vec<Pending>, SnapshotError> {
-    let Some((_, json)) = open_source(global_dir)? else {
-        return Ok(Vec::new());
-    };
+    match open_source(global_dir)? {
+        Some((_, json)) => classify(ctx, global_dir, &json),
+        None => Ok(Vec::new()),
+    }
+}
+
+/// The moved keys of any config file's `json` and what the destination holds for each.
+pub fn classify(
+    ctx: &Context,
+    global_dir: &Path,
+    json: &Value,
+) -> Result<Vec<Pending>, SnapshotError> {
     let dest = destination(global_dir)?;
     let entries = |value: &Value| match value {
         Value::Null => 0,
@@ -184,7 +195,7 @@ pub fn plan(ctx: &Context, global_dir: &Path) -> Result<Vec<Pending>, SnapshotEr
         Value::Array(items) => items.len(),
         _ => 1,
     };
-    keys(ctx, &json)?
+    keys(ctx, json)?
         .iter()
         .map(|key| {
             let path = format_path(&key.path);
@@ -318,7 +329,12 @@ pub fn finish(
     }
     confined(req)?;
     let (global, (parent, dir)) = (&req.roots.global_dir, split_global(&req.roots.global_dir)?);
-    let _lock = hold_global(&req.lock_root, req.lock_wait_ms)?;
+    let _lock = hold(
+        GLOBAL_CONFIG,
+        Path::new(""),
+        &req.lock_root,
+        req.lock_wait_ms,
+    )?;
     let Some((file, json)) = open_source(global)? else {
         return Ok(Moved::default());
     };

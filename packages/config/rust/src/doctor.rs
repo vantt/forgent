@@ -3,26 +3,26 @@
 //! broken project file never hides a finding about the others. A finding names the row, file,
 //! position and path, never a value. Severity per consumer, descriptions and fix ids live in
 //! `contracts/doctor-rows.v1.json`; Node reads the same file and holds no row logic.
-//! What only the machine-file component can observe (modes, the token file, whether a moved key
-//! already sits in its destination) arrives as [`MachineFacts`].
+//! The machine files are observed here through `machine` and `relocate`: modes, the token file and
+//! whether a moved key already sits in its destination. Repairs live in `repair`.
 use std::fs;
 use std::path::Path;
 use std::time::{Duration, SystemTime};
 
-use fgos_identity::WriterIdentity;
 use fgos_yaml_doc::path::format_path;
 use fgos_yaml_doc::{parse, Document, Profile, Segment};
 use serde_json::Value;
 
 use crate::docs::{plan, DocKind};
-use crate::files::{read_beneath, select_source, FileError, LoadedFile, ModeFinding, Source};
+use crate::files::{read_beneath, select_source, FileError, LoadedFile, Source};
 use crate::files::{JSON_NAME, YAML_NAME};
 use crate::grammar::{is_migrated_reason, parse_block};
+use crate::machine::{modes, unready};
+use crate::relocate::{classify, Held};
 use crate::schema::{descend, json_at, key_span};
 use crate::scope::{judge, SourceKind};
 use crate::snapshot::{snapshot, Context, SessionClass, SnapshotError, SnapshotRequest};
-use crate::write::{commit, refresh, snapshot_with, without_project};
-use crate::write::{Edit, Step, WriteRequest};
+use crate::write::{snapshot_with, without_project};
 use crate::ConfigRefusal;
 
 fn contract() -> &'static Value {
@@ -39,24 +39,6 @@ pub enum Consumer {
 pub enum Severity {
     Fail,
     Warn,
-}
-
-/// Where a key that sits in a config file already is in the file it belongs in.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Destination {
-    Absent,
-    Equal,
-    Different,
-}
-
-/// What the machine-file component observed; the engine turns it into rows.
-#[derive(Default)]
-pub struct MachineFacts {
-    pub modes: Vec<ModeFinding>,
-    /// Why `~/.fgos/private` or the token file is not in order, when it is not.
-    pub machine_files: Option<String>,
-    /// The destination of each moved key found in a config file, by path text.
-    pub destinations: Vec<(String, Destination)>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -151,38 +133,10 @@ fn leaves(json: &Value) -> Vec<Vec<Segment>> {
     out
 }
 
-/// The paths holding only values equal to the standard: each is the highest key that can go whole.
-fn redundant_roots(
-    ctx: &Context,
-    value: &Value,
-    path: &mut Vec<Segment>,
-    out: &mut Vec<Vec<Segment>>,
-) {
-    let Some(map) = value.as_object().filter(|m| !m.is_empty()) else {
-        if ctx.standard.value_at(path) == Some(value) {
-            out.push(path.clone());
-        }
-        return;
-    };
-    let before = out.len();
-    for (key, child) in map {
-        path.push(Segment::Key(key.clone()));
-        redundant_roots(ctx, child, path, out);
-        path.pop();
-    }
-    // Every child went whole: nothing else is left in this mapping, so it goes whole too.
-    let whole =
-        out.len() - before == map.len() && out[before..].iter().all(|p| p.len() == path.len() + 1);
-    if whole && !path.is_empty() {
-        out.truncate(before);
-        out.push(path.clone());
-    }
-}
-
 /// One parsed config file with what its rows need.
 struct Judged<'a> {
     ctx: &'a Context<'a>,
-    facts: &'a MachineFacts,
+    global: &'a Path,
     role: &'static str,
     kind: SourceKind,
     name: String,
@@ -200,6 +154,10 @@ impl Judged<'_> {
         if legacy {
             self.put(out, "config-format-legacy-json", &[], "legacy");
         }
+        let moved = match self.kind {
+            SourceKind::Accounts => Vec::new(),
+            _ => classify(ctx, self.global, &json).unwrap_or_default(),
+        };
         let mut blocked: Vec<String> = Vec::new();
         for refusal in judge(ctx.schemas, self.kind, &json, Some(self.doc)) {
             blocked.extend(refusal.path.clone());
@@ -207,16 +165,18 @@ impl Judged<'_> {
                 out.push(refused("config-schema", &refusal, &self.name));
                 continue;
             }
-            let state = self
-                .facts
-                .destinations
-                .iter()
-                .find(|d| Some(&d.0) == refusal.path.as_ref());
-            let state = state.map_or(Destination::Absent, |d| d.1);
+            let at = refusal.path.as_deref();
+            let state = moved.iter().find(|m| Some(m.path.as_str()) == at);
+            let state = state.map_or(Held::Missing, |m| m.destination);
             let mut found = refused("config-key-in-wrong-file", &refusal, &self.name);
-            found.detail = format!("destination-{state:?}").to_lowercase();
-            let copy = self.role == "global" && state == Destination::Absent;
-            found.fix = copy.then_some("copy-to-destination").filter(|_| !legacy);
+            let word = match state {
+                Held::Missing => "absent",
+                Held::Equal => "equal",
+                Held::Differs => "different",
+            };
+            found.detail = format!("destination-{word}");
+            let copy = self.role == "global" && legacy && state == Held::Missing;
+            found.fix = copy.then_some("copy-to-destination");
             out.push(found);
         }
         if legacy || self.kind == SourceKind::Accounts {
@@ -261,8 +221,10 @@ impl Judged<'_> {
     }
 }
 
-/// Files directly under `~/.fgos` (not the config files) that hold an account pool or a token.
-fn strays(ctx: &Context, global: &Path, out: &mut Vec<Finding>) {
+/// Names of the files directly under `~/.fgos` (not the config files) that hold an account pool or a
+/// token.
+pub(crate) fn strays(ctx: &Context, global: &Path) -> Vec<String> {
+    let mut out = Vec::new();
     let max = Profile::StrictConfig.limits().input_bytes as u64;
     for entry in fs::read_dir(global).into_iter().flatten().flatten() {
         let (path, name) = (
@@ -283,10 +245,11 @@ fn strays(ctx: &Context, global: &Path, out: &mut Vec<Finding>) {
             !held
         });
         if held {
-            let found = Finding::new("config-secret-outside-private", "holds-account-or-token");
-            out.push(found.at(&name, &[], None));
+            out.push(name);
         }
     }
+    out.sort();
+    out
 }
 
 fn stale_backups(dirs: [&Path; 2], now: SystemTime, out: &mut Vec<Finding>) {
@@ -307,12 +270,7 @@ fn stale_backups(dirs: [&Path; 2], now: SystemTime, out: &mut Vec<Finding>) {
 const BROKEN: [&str; 3] = ["config-parse", "config-schema", "config-key-in-wrong-file"];
 
 /// Every finding for the files at `roots`, each source on its own. `now` dates the backups.
-pub fn check(
-    ctx: &Context,
-    roots: &SnapshotRequest,
-    facts: &MachineFacts,
-    now: SystemTime,
-) -> Vec<Finding> {
+pub fn check(ctx: &Context, roots: &SnapshotRequest, now: SystemTime) -> Vec<Finding> {
     let max = Profile::StrictConfig.limits().input_bytes;
     let global = (
         roots.global_dir.parent(),
@@ -371,7 +329,7 @@ pub fn check(
         };
         let judged = Judged {
             ctx,
-            facts,
+            global: &roots.global_dir,
             role,
             kind,
             name,
@@ -400,7 +358,7 @@ pub fn check(
                     let kind = SourceKind::Accounts;
                     Judged {
                         ctx,
-                        facts,
+                        global: &roots.global_dir,
                         role: "accounts",
                         kind,
                         name,
@@ -420,90 +378,21 @@ pub fn check(
             schema_rows(error, "merged", &mut out);
         }
     }
-    for mode in &facts.modes {
+    let (modes, unready) = (modes(&roots.global_dir), unready(&roots.global_dir));
+    let unready = unready.or_else(|| modes.is_err().then(|| "unreadable".into()));
+    out.extend(modes.unwrap_or_default().iter().map(|mode| {
         let detail = format!("expected {:o} found {:o}", mode.expected, mode.actual);
-        out.push(Finding::new("config-global-permissions", &detail).at(&mode.file, &[], None));
+        Finding::new("config-global-permissions", &detail).at(&mode.file, &[], None)
+    }));
+    out.extend(unready.map(|why| Finding::new("config-machine-files", &why)));
+    for name in strays(ctx, &roots.global_dir) {
+        let found = Finding::new("config-secret-outside-private", "holds-account-or-token");
+        out.push(found.at(&name, &[], None));
     }
-    if let Some(why) = &facts.machine_files {
-        out.push(Finding::new("config-machine-files", why));
-    }
-    strays(ctx, &roots.global_dir, &mut out);
-    let backups = [".fgos/runtime/config-migrate", "private/config-migrate"];
     let dirs = [
-        roots.project_root.join(backups[0]),
-        roots.global_dir.join(backups[1]),
+        roots.project_root.join(".fgos/runtime/config-migrate"),
+        roots.global_dir.join("private/config-migrate"),
     ];
     stale_backups([&dirs[0], &dirs[1]], now, &mut out);
     out
-}
-
-/// What `fix` did, by fix id and path; never a value.
-#[derive(Debug, Default, PartialEq, Eq)]
-pub struct FixReport {
-    pub applied: Vec<(&'static str, String)>,
-    /// Fix ids this build leaves to the machine-file component.
-    pub skipped: Vec<String>,
-}
-
-/// The YAML file a request targets; none when it is absent or still legacy JSON.
-fn yaml_file(req: &WriteRequest) -> Result<Option<LoadedFile>, SnapshotError> {
-    let global = &req.roots.global_dir;
-    let (root, dir) = match req.target {
-        SourceKind::Project => (req.roots.project_root.as_path(), Path::new(".fgos")),
-        _ => (
-            global.parent().unwrap_or(Path::new("")),
-            global.file_name().map_or(Path::new(".fgos"), Path::new),
-        ),
-    };
-    match select_source(root, dir, Profile::StrictConfig.limits().input_bytes)? {
-        Source::Yaml(file) => Ok(Some(file)),
-        _ => Ok(None),
-    }
-}
-
-/// Applies the named repairs a check offered, to the project and global YAML files through the one
-/// write transaction (`req` builds each target's request with its current revision). A file with
-/// nothing to repair is left untouched, so a second run changes nothing. Removing a value that
-/// carries a note needs `acknowledge`. Fix ids the machine-file component owns are listed as skipped.
-pub fn fix(
-    ctx: &Context,
-    req: impl Fn(SourceKind) -> WriteRequest,
-    writer: &WriterIdentity,
-    ids: &[&str],
-    acknowledge: bool,
-) -> Result<FixReport, SnapshotError> {
-    let mut report = FixReport::default();
-    for id in ids {
-        let known = ["refresh-docs", "remove-redundant"]
-            .into_iter()
-            .find(|k| k == id);
-        let Some(id) = known else {
-            report.skipped.push(id.to_string());
-            continue;
-        };
-        for kind in [SourceKind::Project, SourceKind::Global] {
-            let mut request = req(kind);
-            let Some(file) = yaml_file(&request)? else {
-                continue;
-            };
-            let done = if id == "refresh-docs" {
-                refresh(ctx, request, writer, |_: Step| Ok(()))?
-            } else {
-                let json = parse(&file.bytes, Profile::StrictConfig, YAML_NAME)?.to_json()?;
-                let mut roots = Vec::new();
-                redundant_roots(ctx, &json, &mut Vec::new(), &mut roots);
-                request.edits = roots.into_iter().map(|path| Edit::Unset { path }).collect();
-                request.acknowledge_comment_loss = acknowledge;
-                request.reason = "[doctor:fix] equal to the standard".into();
-                if request.edits.is_empty() {
-                    continue;
-                }
-                commit(ctx, &request, writer)?
-            };
-            report
-                .applied
-                .extend(done.applied.into_iter().map(|(path, _)| (id, path)));
-        }
-    }
-    Ok(report)
 }

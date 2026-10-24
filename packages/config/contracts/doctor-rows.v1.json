@@ -85,7 +85,7 @@
     },
     {
       "id": "config-key-in-wrong-file",
-      "description": "An account pool or the gateway token sits in a config file. The destination decides: equal there is the state after the copy stage (the finishing verb removes the source); a project file has no fix.",
+      "description": "An account pool or the gateway token sits in a config file. The destination decides: equal there is the state after the copy stage (the finishing verb removes the source); only the legacy global JSON file has a fix (the relocation reads that file); a project file has none.",
       "doctor": "fail",
       "check": "fail",
       "fix": "copy-to-destination",
