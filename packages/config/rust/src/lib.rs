@@ -37,6 +37,7 @@ pub mod standard;
 pub mod validate;
 // Slice D modules, declared here so later phases never edit this file; each stub names its phase.
 pub mod docs;
+#[cfg(unix)]
 pub mod doctor;
 pub mod inspect;
 pub mod machine;
@@ -44,6 +45,8 @@ pub mod migrate;
 #[cfg(feature = "host-provider")]
 pub mod provider;
 pub mod relocate;
+#[cfg(unix)]
+pub mod repair;
 pub mod session;
 /// The write door needs the no-follow directory primitives of Durable File, which are Unix only.
 #[cfg(unix)]

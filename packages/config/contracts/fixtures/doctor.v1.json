@@ -1,6 +1,6 @@
 {
  "version": 1,
- "about": "Owning cases of the findings engine (docs/platform/config/spec.md sections 7, 11, 13) and of the repairs. Shared `schemas` and `standard`. Input: files (as the snapshot fixture), facts ({modes: [file, expected, actual], machine_files, destinations: [path, absent|equal|different]}), stale and fresh (files whose mtime is set 40 and 1 days before `now`), fix (fix ids to apply) and ack. Expect for a check: rows ([row, file, path] triples, compared as sets), details (`row path` to detail, the last word of it), fixes (row to fix id), severity (row to [doctor, check]), absent (text no finding may contain). Expect for a fix: applied ([fix id, path]), files (after), code (a refusal's rule or id); the repair is run twice and the second run must apply nothing.",
+ "about": "Owning cases of the findings engine (docs/platform/config/spec.md sections 7, 11, 13) and of the repairs. Shared `schemas` and `standard`. Input: files (as the snapshot fixture), machine (`bare`: no private directory or token; every other case gets a healthy machine), modes (file under the global directory to the mode set before the check), class, stale and fresh (files whose mtime is set 40 and 1 days before `now`), fix (fix ids to apply) and ack. Expect for a check: rows ([row, file, path] triples, compared as sets), details (`row path` to detail, the last word of it), fixes (row to fix id), severity (row to [doctor, check]), absent (text no finding may contain). Expect for a fix: applied ([fix id, path]), files (after), absent (paths that must be gone), modes (path to mode after), code (a refusal's rule or id); the repair is run twice and the second run must apply nothing.",
  "schemas": {
   "gateBypass": [
    "type: object",
@@ -430,13 +430,11 @@
   },
   {
    "id": "a-pool-in-the-global-file-is-a-wrong-file-row-with-a-copy-fix",
-   "why": "spec 11/13: no destination yet, so it fails and offers the copy",
+   "why": "spec 11/13: the legacy global JSON still holds the pool and the destination lacks it, so it fails and offers the copy",
    "input": {
     "files": {
-     "home/.fgos/config.yaml": [
-      "accounts:",
-      "  a:",
-      "    login: x"
+     "home/.fgos/config.json": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
      ]
     },
     "writer": {
@@ -446,8 +444,13 @@
    "expect": {
     "rows": [
      [
+      "config-format-legacy-json",
+      "global:config.json",
+      null
+     ],
+     [
       "config-key-in-wrong-file",
-      "global:config.yaml",
+      "global:config.json",
       "accounts"
      ]
     ],
@@ -464,7 +467,10 @@
    "why": "spec 13: the state after the copy stage",
    "input": {
     "files": {
-     "home/.fgos/config.yaml": [
+     "home/.fgos/config.json": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ],
+     "home/.fgos/private/accounts.yaml": [
       "accounts:",
       "  a:",
       "    login: x"
@@ -472,21 +478,18 @@
     },
     "writer": {
      "session": "vantt"
-    },
-    "facts": {
-     "destinations": [
-      [
-       "accounts",
-       "equal"
-      ]
-     ]
     }
    },
    "expect": {
     "rows": [
      [
+      "config-format-legacy-json",
+      "global:config.json",
+      null
+     ],
+     [
       "config-key-in-wrong-file",
-      "global:config.yaml",
+      "global:config.json",
       "accounts"
      ]
     ],
@@ -501,6 +504,82 @@
       "warn",
       "warn"
      ]
+    }
+   }
+  },
+  {
+   "id": "a-pool-whose-destination-differs-fails-with-no-fix",
+   "why": "spec 13: the destination holds another value for the key; the copy would refuse, so none is offered",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ],
+     "home/.fgos/private/accounts.yaml": [
+      "accounts:",
+      "  a:",
+      "    login: y"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-format-legacy-json",
+      "global:config.json",
+      null
+     ],
+     [
+      "config-key-in-wrong-file",
+      "global:config.json",
+      "accounts"
+     ]
+    ],
+    "fixes": {
+     "config-key-in-wrong-file": null
+    },
+    "details": {
+     "config-key-in-wrong-file accounts": "destination-different"
+    },
+    "severity": {
+     "config-key-in-wrong-file": [
+      "fail",
+      "fail"
+     ]
+    }
+   }
+  },
+  {
+   "id": "a-pool-in-the-global-yaml-file-has-no-copy-fix",
+   "why": "the relocation reads the legacy JSON only, so a hand-written YAML global file gets the row and no repair",
+   "input": {
+    "files": {
+     "home/.fgos/config.yaml": [
+      "accounts:",
+      "  a:",
+      "    login: x"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-key-in-wrong-file",
+      "global:config.yaml",
+      "accounts"
+     ]
+    ],
+    "fixes": {
+     "config-key-in-wrong-file": null
+    },
+    "details": {
+     "config-key-in-wrong-file accounts": "destination-absent"
     }
    }
   },
@@ -533,29 +612,31 @@
    }
   },
   {
-   "id": "permissions-and-machine-files-come-from-the-facts",
-   "why": "spec 9/11: the machine-file component observes, the engine names the rows",
+   "id": "permissions-and-machine-files-are-observed-on-disk",
+   "why": "spec 9/11: a config file wider than 0600 and a machine without a private directory or token",
    "input": {
-    "files": {},
+    "files": {
+     "home/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  level: light"
+     ]
+    },
     "writer": {
      "session": "vantt"
     },
-    "facts": {
-     "modes": [
-      [
-       "home/.fgos/config.yaml",
-       384,
-       420
-      ]
-     ],
-     "machine_files": "token-missing"
+    "machine": "bare",
+    "modes": {
+     "config.yaml": 420
     }
    },
    "expect": {
     "rows": [
      [
       "config-global-permissions",
-      "home/.fgos/config.yaml",
+      "config.yaml",
       null
      ],
      [
@@ -563,6 +644,71 @@
       null,
       null
      ]
+    ],
+    "details": {
+     "config-machine-files ": "private-missing"
+    }
+   }
+  },
+  {
+   "id": "a-private-directory-without-a-token-is-a-machine-files-row",
+   "why": "spec 9/11: the token file is missing",
+   "input": {
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "accounts:",
+      "  a:",
+      "    login: x"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "machine": "bare"
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-machine-files",
+      null,
+      null
+     ]
+    ],
+    "details": {
+     "config-machine-files ": "token-missing"
+    },
+    "fixes": {
+     "config-machine-files": "create-machine-files"
+    }
+   }
+  },
+  {
+   "id": "a-token-file-wider-than-0600-is-a-permission-row-and-an-invalid-token",
+   "why": "spec 9: the token mode is reported by both, never its value",
+   "input": {
+    "files": {},
+    "writer": {
+     "session": "vantt"
+    },
+    "modes": {
+     "private/gateway-token": 420
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-global-permissions",
+      "private/gateway-token",
+      null
+     ],
+     [
+      "config-machine-files",
+      null,
+      null
+     ]
+    ],
+    "absent": [
+     "tok-1"
     ]
    }
   },
@@ -800,11 +946,11 @@
    }
   },
   {
-   "id": "fix-leaves-machine-file-fixes-to-their-component",
-   "why": "the engine repairs files through the write transaction only",
+   "id": "fix-chmod-sets-the-expected-modes-and-is-idempotent",
+   "why": "spec 9: a wide config file and token go to 0600",
    "input": {
     "files": {
-     "project/.fgos/config.yaml": [
+     "home/.fgos/config.yaml": [
       "# @fgos:doc Gate bypass settings.",
       "gateBypass:",
       "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
@@ -815,9 +961,187 @@
     "writer": {
      "session": "vantt"
     },
+    "modes": {
+     "config.yaml": 420,
+     "private/gateway-token": 416
+    },
     "fix": [
-     "chmod",
+     "chmod"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "chmod",
+      "config.yaml"
+     ],
+     [
+      "chmod",
+      "private/gateway-token"
+     ]
+    ],
+    "modes": {
+     "home/.fgos/config.yaml": 384,
+     "home/.fgos/private/gateway-token": 384
+    }
+   }
+  },
+  {
+   "id": "fix-create-machine-files-makes-the-private-directory-and-token-once",
+   "why": "spec 8/9: created 0600 inside a 0700 directory; a second run keeps the token",
+   "input": {
+    "files": {},
+    "writer": {
+     "session": "vantt"
+    },
+    "machine": "bare",
+    "fix": [
      "create-machine-files"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "create-machine-files",
+      "private/gateway-token"
+     ]
+    ],
+    "modes": {
+     "home/.fgos/private": 448,
+     "home/.fgos/private/gateway-token": 384
+    }
+   }
+  },
+  {
+   "id": "fix-copy-to-destination-writes-the-accounts-file-and-keeps-the-source",
+   "why": "spec 13 stage 1: the pool is copied; the source still holds it, so the second run copies nothing",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "copy-to-destination"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "copy-to-destination",
+      "accounts"
+     ]
+    ],
+    "files": {
+     "home/.fgos/config.json": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ],
+     "home/.fgos/private/accounts.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "accounts:",
+      "  a:",
+      "    # @fgos:why [vantt] [migrate] carried over from ~/.fgos/config.json, reason never recorded",
+      "    login: x"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-move-under-private-installs-then-removes-the-loose-file",
+   "why": "spec 11: a backup holding a pool moves into private/ and the source goes",
+   "input": {
+    "files": {
+     "home/.fgos/config.json.bak-1": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-under-private"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "move-under-private",
+      "config.json.bak-1"
+     ]
+    ],
+    "files": {
+     "home/.fgos/private/config.json.bak-1": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ]
+    },
+    "absent": [
+     "home/.fgos/config.json.bak-1"
+    ],
+    "modes": {
+     "home/.fgos/private/config.json.bak-1": 384
+    }
+   }
+  },
+  {
+   "id": "fix-move-under-private-refuses-when-private-holds-another-file-by-that-name",
+   "why": "nothing is lost: the source stays",
+   "input": {
+    "files": {
+     "home/.fgos/config.json.bak-1": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ],
+     "home/.fgos/private/config.json.bak-1": [
+      "{}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-under-private"
+    ]
+   },
+   "expect": {
+    "code": "config-move-destination-differs",
+    "files": {
+     "home/.fgos/config.json.bak-1": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-is-refused-in-a-confined-session",
+   "why": "spec 9: repairs write machine files, which a confined session may not",
+   "input": {
+    "files": {},
+    "writer": {
+     "session": "vantt"
+    },
+    "class": "confined",
+    "fix": [
+     "chmod"
+    ]
+   },
+   "expect": {
+    "code": "config-write-confined"
+   }
+  },
+  {
+   "id": "fix-leaves-an-unknown-id-as-skipped",
+   "why": "an id this build does not know is reported, not applied",
+   "input": {
+    "files": {},
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "no-such-fix"
     ]
    },
    "expect": {

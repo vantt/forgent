@@ -20,7 +20,7 @@ use {
 };
 
 /// The tokens' file below the global directory, and the longest line it may hold.
-const TOKEN_FILE: &str = "private/gateway-token";
+pub(crate) const TOKEN_FILE: &str = "private/gateway-token";
 const TOKEN_MAX: usize = 512;
 
 pub(crate) fn refused(code: &'static str, file: &str, why: Option<&str>) -> SnapshotError {
@@ -239,4 +239,36 @@ pub fn modes(global_dir: &Path) -> Result<Vec<ModeFinding>, SnapshotError> {
 #[cfg(unix)]
 pub fn fix_modes(global_dir: &Path) -> Result<Vec<ModeFinding>, SnapshotError> {
     sweep(global_dir, true)
+}
+
+/// Why the private directory or the token file is not in order, as a keyword (never a value):
+/// `private-missing`, `token-missing`, `token-invalid <reason>` or `unreadable`; none when both are.
+#[cfg(unix)]
+pub fn unready(global_dir: &Path) -> Option<String> {
+    let reason = |error: SnapshotError| match error {
+        SnapshotError::Refused(all) => all.first().map_or("unreadable".into(), |r| {
+            let why = r.detail.as_ref().and_then(|d| d.keyword.as_deref());
+            [Some(r.code), why]
+                .into_iter()
+                .flatten()
+                .collect::<Vec<_>>()
+                .join(" ")
+        }),
+        SnapshotError::Io(_) => "unreadable".into(),
+    };
+    match token::read(global_dir) {
+        Ok(Some(_)) => None,
+        Err(error) => Some(reason(error)),
+        Ok(None) => {
+            let private = split_global(global_dir).map(|(parent, dir)| {
+                open_dir_beneath(parent, &dir.join("private")).map_err(beneath)
+            });
+            Some(match private {
+                Ok(Ok(Some(_))) => "token-missing".into(),
+                Ok(Ok(None)) => "private-missing".into(),
+                Ok(Err(error)) => reason(error),
+                Err(refusal) => reason(refusal.into()),
+            })
+        }
+    }
 }

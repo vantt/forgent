@@ -173,11 +173,21 @@ fn states(keys: &[Key], dest: &Dest, missing_ok: bool) -> Result<Vec<Held>, Snap
     }
 }
 
-/// What would be moved and what the destination holds already; names, counts and states only.
+/// What would be moved from the global JSON and what the destination holds already; names,
+/// counts and states only.
 pub fn plan(ctx: &Context, global_dir: &Path) -> Result<Vec<Pending>, SnapshotError> {
-    let Some((_, json)) = open_source(global_dir)? else {
-        return Ok(Vec::new());
-    };
+    match open_source(global_dir)? {
+        Some((_, json)) => classify(ctx, global_dir, &json),
+        None => Ok(Vec::new()),
+    }
+}
+
+/// The moved keys of any config file's `json` and what the destination holds for each.
+pub fn classify(
+    ctx: &Context,
+    global_dir: &Path,
+    json: &Value,
+) -> Result<Vec<Pending>, SnapshotError> {
     let dest = destination(global_dir)?;
     let entries = |value: &Value| match value {
         Value::Null => 0,
@@ -185,7 +195,7 @@ pub fn plan(ctx: &Context, global_dir: &Path) -> Result<Vec<Pending>, SnapshotEr
         Value::Array(items) => items.len(),
         _ => 1,
     };
-    keys(ctx, &json)?
+    keys(ctx, json)?
         .iter()
         .map(|key| {
             let path = format_path(&key.path);

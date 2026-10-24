@@ -6,41 +6,45 @@ mod common;
 
 use std::collections::BTreeSet;
 use std::fs;
+use std::os::unix::fs::PermissionsExt;
 use std::time::{Duration, SystemTime};
 
 use fgos_config::detect::NoDetectors;
-use fgos_config::doctor::{check, fix, Consumer, Destination, Finding, MachineFacts, Severity};
-use fgos_config::files::ModeFinding;
+use fgos_config::doctor::{check, Consumer, Finding, Severity};
+use fgos_config::repair::fix;
 use fgos_config::scope::SourceKind;
 use fgos_config::snapshot::{Context, SnapshotError};
 use serde_json::{json, Value};
 
 const DAY: u64 = 86_400;
 
-fn facts(spec: &Value) -> MachineFacts {
-    let state = |s: &Value| match s.as_str() {
-        Some("equal") => Destination::Equal,
-        Some("different") => Destination::Different,
-        _ => Destination::Absent,
-    };
-    MachineFacts {
-        modes: spec["modes"]
-            .as_array()
-            .into_iter()
-            .flatten()
-            .map(|m| ModeFinding {
-                file: m[0].as_str().unwrap().into(),
-                expected: m[1].as_u64().unwrap() as u32,
-                actual: m[2].as_u64().unwrap() as u32,
-            })
-            .collect(),
-        machine_files: spec["machine_files"].as_str().map(String::from),
-        destinations: spec["destinations"]
-            .as_array()
-            .into_iter()
-            .flatten()
-            .map(|d| (d[0].as_str().unwrap().into(), state(&d[1])))
-            .collect(),
+/// A healthy machine under `home/.fgos`: owner-only modes on the machine files, a private
+/// directory and a token. The case's `machine: "bare"` leaves the token and directory out, and its
+/// `modes` (file under the global directory to mode) state other modes.
+fn settle(dir: &std::path::Path, input: &Value) {
+    let (global, mode) = (dir.join("home/.fgos"), |p: &std::path::Path, m: u32| {
+        fs::set_permissions(p, fs::Permissions::from_mode(m)).unwrap();
+    });
+    let private = global.join("private");
+    if input["machine"] != "bare" {
+        fs::create_dir_all(&private).unwrap();
+        fs::write(private.join("gateway-token"), "tok-1\n").unwrap();
+    }
+    for rel in [
+        "config.yaml",
+        "config.json",
+        "private/accounts.yaml",
+        "private/gateway-token",
+    ] {
+        if global.join(rel).exists() {
+            mode(&global.join(rel), 0o600);
+        }
+    }
+    if private.exists() {
+        mode(&private, 0o700);
+    }
+    for (rel, bits) in input["modes"].as_object().into_iter().flatten() {
+        mode(&global.join(rel), bits.as_u64().unwrap() as u32);
     }
 }
 
@@ -80,6 +84,7 @@ fn doctor_cases() {
         let roots = common::lay_out(&dir, input);
         fs::create_dir_all(dir.join("project")).unwrap();
         fs::create_dir_all(dir.join("home/.fgos")).unwrap();
+        settle(&dir, input);
         age(&dir, &input["stale"], 40, now);
         age(&dir, &input["fresh"], 1, now);
         if input["fix"].is_array() {
@@ -87,7 +92,7 @@ fn doctor_cases() {
             let _ = fs::remove_dir_all(&dir);
             continue;
         }
-        let found = check(&ctx, &roots, &facts(&input["facts"]), now);
+        let found = check(&ctx, &roots, now);
         let got: BTreeSet<String> = found.iter().map(|f| triple(f).to_string()).collect();
         let expect: BTreeSet<String> = want["rows"]
             .as_array()
@@ -183,6 +188,20 @@ fn run_fix(
             fs::read_to_string(dir.join(rel)).unwrap(),
             common::text(lines),
             "{id}: {rel}"
+        );
+    }
+    for rel in want["absent"].as_array().into_iter().flatten() {
+        assert!(
+            !dir.join(rel.as_str().unwrap()).exists(),
+            "{id}: {rel} is still there"
+        );
+    }
+    for (rel, bits) in want["modes"].as_object().into_iter().flatten() {
+        let found = fs::metadata(dir.join(rel)).unwrap().permissions().mode() & 0o777;
+        assert_eq!(
+            u64::from(found),
+            bits.as_u64().unwrap(),
+            "{id}: mode of {rel}"
         );
     }
     let again = fix(ctx, build, &writer, &ids, ack).unwrap();
