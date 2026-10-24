@@ -1,0 +1,83 @@
+✖ 1. a controller killed with SIGKILL after the binding: the supervisor briefs the agent, the result settles, the pane closes
+✖ a declared standalone skill and text quoted into a data command are not sites
+✖ after prepare
+✖ a herdr-spawn seat runs as a terminal attempt: brief typed by the supervisor, pane closed once, settled by the step
+✖ a holder workflow admits its writing unit using its origin, with one sidecar read for execution
+✖ a missing receipt at next is observed-only through Node and keeps that attribution after cleanup
+✖ a recreated worktree does not inherit a rejected Sync from the dead checkout
+✖ a SIGKILL during consumer verification releases authority; Node recovery and a fresh Land succeed
+✖ baseline-dirty paths changed by the producer are excluded with an explicit receipt report
+✖ before prepare
+✖ before publish
+✖ commit: controller death retains custody and recovers immutable commit without replay
+✖ dead vocabulary guard: the fgos gateway and the herdr-dashboard plugin never go by their retired names
+✖ detached sessions allocate unique mkdtemp paths and validate the session id
+✖ detached undelivered tip requires a surviving non-fgos ref
+✖ dev door runs the real Node consumer from INIT_CWD with shared-default Cargo output
+✖ direct audit rejects a symlink output before reading the corpus
+✖ documentation lease admission refuses non-holder runs before writes and lets its holder reach a worker attempt
+✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json
+✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json
+✖ download: --from beats FGCTL_FROM beats FGCTL_VERSION (the losing sources are never touched)
+✖ download: with no pin and nothing explicit, init resolves and installs the latest release
+✖ established worktree operation ids return without repeating effects and bind all inputs
+✖ even a dangling native index lock names inspected repair before publication
+✖ event-store product code has no Git spawn site and no classified spawn: its Git work goes through the typed ports
+✖ executeAssignment: a second, DIFFERENT Assignment targeting the same cwd is refused while the first cli-spawn Run is still live, and --force-shared-cwd refuses a writer
+✖ fgos --help --json through the host is the whole manifest, byte-identical to the Node payload
+✖ Item 3: Idempotent re-run skips stage_release entirely (does not contend for install.lock)
+✖ L1: ./bin/fgos and bin/fgos are treated as a collision, not two different digests
+✖ Land materializes tracked non-event store bytes stripped by worker allocation before verification
+✖ landRunnerItem does not false-flag an already-merged branch over a legitimate .fgos/ divergence (tsk-52p regression)
+✖ listSessions reflects the registry and is empty after every session ends
+✖ literal path "literal*star" commits and replays losslessly
+✖ locked worktrees and submodules refuse before attempting removal or relocation
+✖ main checkout allocation supports .claude/worktrees and rejects admin or linked nesting
+✖ move --to delivered without --override-reason refuses even with an EMPTY --override-reason value (validation, not a silent bypass)
+✖ P6 HIGH regression: staging a candidate with an in-root directory symlink triggers quarantine and puts nothing in releases/
+✖ P6 HIGH regression: staging a candidate with an unlisted payload symlink triggers quarantine and puts nothing in releases/
+✖ P7: Candidate preflight failure refuses init before publishing activation and writes no host-visible projections or activation.json
+✖ plain worktree with tracked .fgos preserves modifications
+✖ plain worktree with tracked .fgos removes cleanly
+✖ Proof gap closure: staging a candidate with mismatched components.legacyNode.digest triggers quarantine and puts nothing in releases/
+✖ R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.json, activation.json, and passes preflight/tail
+✖ R1: CLI recognizes valid subcommands; refuses unrecognized subcommands
+✖ R6 & R9: Concurrent stage invocations observe lock refusal (exactly one winner)
+✖ R6 & R9: Corrupting one byte before staging triggers quarantine and puts nothing in releases/
+✖ R6 & R9: Re-staging an already-staged digest is a no-op (manifest mtime unchanged)
+✖ R6 & R9: Staging a valid release tree verifies digests and creates releases/<digest>
+✖ R7: A .tar.gz with a path-traversing member alongside a valid release is refused, nothing published, no leftover temp dir
+✖ R7: A .tar.gz with a symlink member alongside a valid release is refused, nothing published
+✖ R7: Staging from a .tar.gz archive extracts with pure Rust and stages successfully
+✖ R8: status --json on empty store reports empty array, not an error
+✖ recreated skip-worktree tracked state is preserved even with identical bytes
+✖ runner Land refuses a scoped branch when the lease is acquired after admission
+✖ runner liveness retains current decision assertions with complete-record consumer evidence
+✖ ScopedCommit refuses invalid requests, post-preflight staging and replay of a rejected attempt
+✖ stripped tracked state is clean for removal and reappearing worker state is preserved
+✖ Sync abort restores pre-merge permission bits on clean merged paths
+✖ sync: controller death retains custody and recovers unknown rejection without replay
+✖ test/cli/fgos-approve-2.test.mjs
+✖ test/cli/fgos-approve-3.test.mjs
+✖ test/cli/fgos-approve-5.test.mjs
+✖ test/cli/fgos-approve.test.mjs
+✖ test/cli/fgos-claim-2.test.mjs
+✖ test/cli/fgos-claim.test.mjs
+✖ test/cli/fgos-iron-law-gate.test.mjs
+✖ test/cli/fgos-merge.test.mjs
+✖ test/cli/fgos-post-merge-3.test.mjs
+✖ test/cli/fgos-post-merge-4.test.mjs
+✖ test/cli/fgos-return.test.mjs
+✖ test/distribution/native-addon.test.mjs
+✖ test/e2e/documentation-cutover-lease-hooks.test.mjs
+✖ test/e2e/pr-gate.test.mjs
+✖ test/e2e/runner-loop.test.mjs
+✖ test/event-store/migrate.test.mjs
+✖ test/event-store/store-hardening.test.mjs
+✖ the static scan reports a Git spawn in each shape a literal search misses
+✖ workflow Land refuses a scoped branch when the lease is acquired after admission
+✖ Worktree create, move, guarded remove (files)
+✖ Worktree create, move, guarded remove (reftable)
+✖ Worktree create strips tracked worker state without touching main state
+✖ Worktree custody requires the actual holder
+✖ Worktree remove preserves a live cwd
