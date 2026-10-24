@@ -65,7 +65,7 @@ fn child_entry() {
         }
         "snapshot" => {
             for _ in 0..arg {
-                dispatch_snapshot(&snapshot_request(&root), Some(&EmptyWork)).expect("snapshot");
+                dispatch_snapshot(&snapshot_request(&root), &EmptyWork).expect("snapshot");
             }
         }
         other => panic!("unknown role {other}"),
@@ -131,18 +131,19 @@ fn a_taker_waits_for_a_holder_that_releases() {
 }
 
 #[test]
-fn a_taker_times_out_after_the_acquire_timeout_on_a_long_holder() {
+fn a_taker_times_out_on_a_holder_that_never_releases() {
     let root = temp_root("timeout");
     let ready = root.join("ready");
     let mut holder = spawn("hold", &root, &ready, 0, None);
     wait_ready(&ready, &mut holder);
+    let wait = Duration::from_millis(300);
     let started = Instant::now();
-    match acquire_store_lock(&root) {
+    match acquire_store_lock_within(&root, wait) {
         Err(ObserveLockError::Timeout(path)) => assert_eq!(path, observe_lock_path(&root)),
         other => panic!("expected observe-lock-timeout: {:?}", other.err()),
     }
     let waited = started.elapsed();
-    assert!(waited >= ACQUIRE_TIMEOUT && waited < ACQUIRE_TIMEOUT + Duration::from_secs(3), "{waited:?}");
+    assert!(waited >= wait && waited < wait + Duration::from_secs(2), "{waited:?}");
     let _ = fs::remove_dir_all(&root);
 }
 

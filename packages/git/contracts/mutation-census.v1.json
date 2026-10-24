@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1638fe595d469f33168943464460bdb3a31643c46771f03a9a62e10c05190214",
+  "payloadDigest": "8ffbcdfca01ac85cb02f175e2fdbf317c80a55fea38f4dc476665cbdb48efbec",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -508,7 +508,7 @@
     "packages/observe/rust/tests/eval_journal_test.rs": "74a971ad5037703b4e335a2ac3be9934e5ce47a967621798b0a91901724e06e1",
     "packages/observe/rust/tests/fixture_test.rs": "e0cb4d30f7eba464691a035b424e9228f45dd1fbd279524c581d93a5c91e6eb5",
     "packages/observe/rust/tests/harness_protocols_test.rs": "6dbd5029eddedc023ac9862b7cce8fb1da97a85440362f2d8bf35e6641f5dac2",
-    "packages/observe/rust/tests/store_lock_multiprocess.rs": "1d2d7b81cb0cbfe069b35d165726d0ef1cb53ff5c404312ddfe41e81d97e9ab9",
+    "packages/observe/rust/tests/store_lock_multiprocess.rs": "065e10636b1ae69da2a460bcf12e6b2fb07d75e6f33545cda534ba9017dddaa9",
     "packages/process/rust/src/containment/linux.rs": "ec81a42175f9a3f35a14c3e7ae876662f7c47f5ec04c97345fd4b1b7f0730202",
     "packages/process/rust/src/containment/macos.rs": "31a264b6acabe03d5dde68e61d4dc07cc6f438daf04141af05548fa1849ea2e7",
     "packages/process/rust/src/containment/mod.rs": "04e2a8947ad40862050b17a14cdd854f63bcce3b429452c9036abb9839b7486b",
