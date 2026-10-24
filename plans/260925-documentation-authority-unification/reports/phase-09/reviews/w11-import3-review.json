@@ -1,0 +1,11 @@
+{
+  "verdict": "accept-with-followups",
+  "reviewedCommit": "d786e305e",
+  "commits": ["7693ae514", "d786e305e"],
+  "findings": [
+    {"id": "F1", "severity": "medium", "verdict": "open", "summary": "phase-09 file still says the import-3 legacy re-sync is blocked, not complete; d786e305e resolved it but did not update the writable phase file", "evidence": "phase-09-atomic-platform-authority-cutover.md:104 (added 7693ae514); unchanged in d786e305e"},
+    {"id": "F2", "severity": "medium", "verdict": "open", "summary": "audit-report.py exit 1: audit-ownership 0 with no failing rows, but both checks.mjs children died on git-floor-probe-failed (EROFS) after loading the cached native addon; combined checks have no verdict", "evidence": "receipt.json auditNativeDiagnostic, ownershipAudit; checks-w11.json subcommandOutputs; .fgos/runtime/git-addon mtime 2026-10-24 11:31 (no new staging)"},
+    {"id": "F3", "severity": "low", "verdict": "open", "summary": "With w8/w9 prepared shards applied, the drift scan reports 2 changed-unit gaps (README, repo-layout-vision) because the source join does not inherit sourcePath through supersession; disclosed, out of scope, needs a composition owner", "evidence": "scanner-proof.json preparedComposition.counts.missingChangedUnits=2, limits[1]"},
+    {"id": "F4", "severity": "info", "verdict": "accepted", "summary": "Carry, ledger, scanner and ratchet verified: 46/47 main + lines are verbatim (banner adapted, declared); no invented lines; 98 changed or added rows recompute (hash, target digest, self-inclusive ancestry); every touched row pending; scanner diff limited to the appliedToDocs guard; ratchet changes only the 3 digests; ratchet exit 0; rebind --check exit 0; scan --check exit 0", "evidence": "independent re-extraction with scripts/generate-doc-inventory.mjs; git diff 571a996f5^1 571a996f5 -- docs/specs vs git diff d786e305e^ d786e305e; previousMainMergeAccounting.objectSha256 recomputed at 814c06f3d"}
+  ]
+}
