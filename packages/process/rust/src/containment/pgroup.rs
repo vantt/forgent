@@ -4,14 +4,14 @@
 //! `proc_listpids` on macOS.
 
 use std::fs::File;
-use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
-use super::SpawnSpec;
+use super::{ContainmentError, GateChild, SpawnSpec};
 use crate::control::{self, Signal};
 use crate::facts::{self, ProcTuple, Verdict};
 use crate::platform::as_pid_t;
-use crate::{signal_settled, DomainState, KillOutcome};
+use crate::mapped::{spawn_mapped, MappedLead, MappedSpawn, MappedStdio};
+use crate::{signal_settled, DomainState, FdSlot, KillOutcome, ProcId};
 
 pub(crate) const POLL: Duration = Duration::from_millis(10);
 
@@ -152,16 +152,40 @@ pub(crate) fn wait_until(limit: Duration, mut done: impl FnMut() -> bool) -> boo
     }
 }
 
-pub(crate) fn apply_stdio(cmd: &mut Command, spec: &SpawnSpec) {
-    let pick = |file: &Option<File>| file.as_ref().and_then(|f| f.try_clone().ok()).map_or_else(Stdio::null, Stdio::from);
-    cmd.env_clear().envs(&spec.env).current_dir(&spec.cwd);
-    cmd.stdin(pick(&spec.stdin)).stdout(pick(&spec.stdout)).stderr(pick(&spec.stderr));
+/// The gate's start request: `argv` (program first), the spec's exact
+/// environment, directory and stdio (`/dev/null` where none is given).
+pub(crate) fn gate_request<'a>(argv: Vec<String>, spec: &'a SpawnSpec, lead: MappedLead) -> MappedSpawn<'a> {
+    let stdio = |file: &'a Option<File>| file.as_ref().map_or(MappedStdio::Null, MappedStdio::File);
+    MappedSpawn {
+        argv: argv.into_iter().map(Into::into).collect(),
+        env: spec.env.iter().map(|(k, v)| (k.into(), v.into())).collect(),
+        clear_env: true,
+        cwd: Some(spec.cwd.clone()),
+        lead,
+        stdio: [stdio(&spec.stdin), stdio(&spec.stdout), stdio(&spec.stderr)],
+    }
+}
+
+/// Start the gate as the leader of its own session and process group with
+/// the spec's descriptor map, and read its identity with `identity`.
+pub(crate) fn spawn_leader(spec: &SpawnSpec, identity: impl Fn(ProcId) -> Option<ProcTuple>) -> Result<(GateChild, ProcTuple), ContainmentError> {
+    if spec.argv.is_empty() {
+        return Err(ContainmentError::SpawnFailed("empty gate command".into()));
+    }
+    let map: Vec<(FdSlot, &File)> = spec.fd_map.iter().map(|(slot, file)| (*slot, file)).collect();
+    let mut child = spawn_mapped(&gate_request(spec.argv.clone(), spec, MappedLead::Session), &map).map_err(|err| ContainmentError::SpawnFailed(err.to_string()))?;
+    let Some(root) = identity(ProcId(child.id())) else {
+        let _ = child.kill();
+        let _ = child.wait();
+        return Err(ContainmentError::SpawnFailed("gate left before its identity was read".into()));
+    };
+    Ok((child, root))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ProcId;
+    use std::process::Command;
 
     /// A leader that is gone (its pid was reaped and its start time never matched).
     fn dead_leader() -> ProcTuple {

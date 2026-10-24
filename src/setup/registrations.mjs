@@ -5410,13 +5410,13 @@ export function checkConfinementProbeFreshness() {
 
   return {
     passed: true,
-    message: 'confinement probe freshness: all 8 local-bwrap-v1 probes passed (fresh)',
+    message: `confinement probe freshness: all ${probeResult.results.length} local-bwrap-v1 probes passed (fresh)`,
   };
 }
 
 registerCheck({
   id: 'confinement-probe-freshness',
-  description: 'confinement probe freshness status (runs the 8-probe falsification harness against the registered bwrap backend)',
+  description: 'confinement probe freshness status (runs the falsification probe harness against the registered bwrap backend)',
   check: () => checkConfinementProbeFreshness(),
 });
 
@@ -6098,7 +6098,7 @@ registerCheck({
 
 registerCheck({
   id: 'identity-pinned-machines',
-  description: 'lists the machine keys this machine pinned the first time it saw each machine (informational, for the one-time fingerprint comparison across machines); `fgos identity pins --forget <machine-id>` accepts a re-key',
+  description: 'lists the machine keys this machine pinned the first time it saw each machine (informational, for the one-time fingerprint comparison across machines; names the pins still `seen`, not yet confirmed with `fgos identity pins --confirm <machine-id> --fingerprint <fp>`); `fgos identity pins --forget <machine-id>` accepts a re-key',
   check: (cwd) => checkIdentityPinnedMachines(cwd),
 });
 

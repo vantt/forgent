@@ -174,3 +174,17 @@ pub fn write_request(
     };
     (request, file)
 }
+
+/// The options of a migration run in a case directory (locks beside the files).
+pub fn migrate_options(
+    dir: &Path,
+    accept: bool,
+    dry_run: bool,
+) -> fgos_config::migrate::MigrateOptions {
+    fgos_config::migrate::MigrateOptions {
+        accept_machine_overrides: accept,
+        dry_run,
+        lock_root: dir.join("locks"),
+        lock_wait_ms: 2000,
+    }
+}

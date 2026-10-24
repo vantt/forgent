@@ -73,6 +73,42 @@
       "origin": "chosen",
       "section": "9",
       "meaning": "The platform has no no-follow open, so a file rule cannot be enforced."
+    },
+    {
+      "id": "config-token-invalid",
+      "origin": "chosen",
+      "section": "8, 9",
+      "meaning": "The gateway token file is a symlink or not regular, wider than 0600, or not exactly one line of printable ASCII; the reason keyword (symlink, mode, shape) says which, never the value."
+    },
+    {
+      "id": "config-machine-check-required",
+      "origin": "chosen",
+      "section": "13",
+      "meaning": "The removal stage of a key move was called without the machine check: it needs the owner's statement that no release on this machine reads the keys from the global file."
+    },
+    {
+      "id": "config-move-destination-differs",
+      "origin": "chosen",
+      "section": "13",
+      "meaning": "The accounts file or the token file already holds different data than the global file's key (or, for the removal stage, none); names the file and the key path, never a value."
+    },
+    {
+      "id": "config-migrate-equivalence-failed",
+      "origin": "chosen",
+      "section": "13",
+      "meaning": "The effective value read through the migrated file differs from the one read through the JSON file on a path no listed machine override explains; nothing is written."
+    },
+    {
+      "id": "config-migrate-machine-overrides-pending",
+      "origin": "chosen",
+      "section": "13",
+      "meaning": "Dropping values equal to the standard changes the effective value on this machine, where the global file holds a different one; the paths are listed and the run needs --accept-machine-overrides."
+    },
+    {
+      "id": "config-migrate-source-invalid",
+      "origin": "chosen",
+      "section": "13",
+      "meaning": "The legacy file is missing, does not parse, or holds something the migration cannot carry over (a forged grammar line in a $comment); nothing is written."
     }
   ],
   "reserved-prefixes": [

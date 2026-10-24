@@ -385,3 +385,37 @@ fn the_real_runner_keys_sit_in_the_files_scopes_and_sensitivities_the_spec_gives
     );
     read_back("seats-project", Some(&seats), None).unwrap();
 }
+
+#[test]
+fn a_tier_cell_in_a_higher_layer_replaces_the_lower_layers_whole_cell_in_any_form() {
+    // The standard holds an object at claude.mini and a string at claude.nano; the owner's global
+    // file states a string and the project states an object, a list and a pooled string.
+    let global = json!({ "runner": { "modelPolicies": { "claude": { "mini": "sonnet" } } } });
+    let got = read_back("cell-string-over-object", None, Some(&global)).unwrap();
+    assert_eq!(got["runner"]["modelPolicies"]["claude"]["mini"], "sonnet");
+
+    let cells = [
+        json!({ "model": "opus", "pool": "vertex" }),
+        json!(["opus@vertex", { "model": "sonnet", "effort": "low" }]),
+        json!("opus@vertex"),
+    ];
+    for (at, cell) in cells.into_iter().enumerate() {
+        let project =
+            json!({ "runner": { "modelPolicies": { "claude": { "nano": cell, "mini": cell } } } });
+        let got = read_back(&format!("cell-form-{at}"), Some(&project), Some(&global)).unwrap();
+        let policies = &got["runner"]["modelPolicies"]["claude"];
+        assert_eq!(
+            (&policies["nano"], &policies["mini"]),
+            (&cell, &cell),
+            "{cell}"
+        );
+    }
+    for (at, bad) in [json!([]), json!({ "pool": "vertex" }), json!(""), json!(7)]
+        .into_iter()
+        .enumerate()
+    {
+        let project = json!({ "runner": { "modelPolicies": { "claude": { "nano": bad } } } });
+        let refused = read_back(&format!("cell-bad-{at}"), Some(&project), None).unwrap_err();
+        assert_eq!(refused, vec!["config-schema"], "{bad}");
+    }
+}

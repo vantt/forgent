@@ -1456,11 +1456,11 @@ fn identity_machine_reads_refuses_and_sets_the_alias_through_the_state_root() {
     let _ = fs::remove_dir_all(&state);
 }
 
-/// `fgos identity pins`: the wiring of the read and of `--forget` (read versus
+/// `fgos identity pins`: the wiring of the read, `--confirm` and `--forget` (read versus
 /// write operation, flag validation, exit code of a refusal). What a pin is and
 /// when it is made is owned by the identity crate's signing tests.
 #[test]
-fn identity_pins_lists_the_pinned_machines_and_forgets_one_by_id() {
+fn identity_pins_lists_confirms_and_forgets_a_pin_by_machine_id() {
     let state = std::env::temp_dir().join(format!("fgos_test_identity_pins_{}", std::process::id()));
     let _ = fs::remove_dir_all(&state);
     fs::create_dir_all(state.join("identity/pins")).unwrap();
@@ -1473,7 +1473,32 @@ fn identity_pins_lists_the_pinned_machines_and_forgets_one_by_id() {
         identity_command(&[&["pins"], args].concat()).env("FGOS_STATE_ROOT", &state).output().unwrap()
     };
 
-    assert_eq!(identity_data(&pins(&["--json"])), serde_json::json!({ "pins": [pin] }));
+    // A pin file written without `state` lists as `seen`.
+    let seen = serde_json::json!({
+        "v": 1, "machineId": pin["machineId"], "publicKey": pin["publicKey"], "fingerprint": pin["fingerprint"],
+        "firstSeen": pin["firstSeen"], "state": "seen"
+    });
+    assert_eq!(identity_data(&pins(&["--json"])), serde_json::json!({ "pins": [seen] }));
+    let fingerprint = pin["fingerprint"].as_str().unwrap();
+    for refused in [
+        pins(&["--confirm", "peer-abc234"]),
+        pins(&["--fingerprint", fingerprint]),
+        pins(&["--confirm", "peer-abc234", "--fingerprint", fingerprint, "--forget", "peer-abc234"]),
+    ] {
+        assert_ne!(refused.status.code(), Some(0), "--confirm needs --fingerprint and excludes --forget");
+    }
+    let absent = pins(&["--confirm", "other-abc234", "--fingerprint", fingerprint]);
+    assert_eq!(absent.status.code(), Some(65));
+    assert!(String::from_utf8_lossy(&absent.stderr).contains("[pin-missing]"));
+    let wrong = pins(&["--confirm", "peer-abc234", "--fingerprint", "SHA256:other"]);
+    assert_eq!(wrong.status.code(), Some(65));
+    let stderr = String::from_utf8_lossy(&wrong.stderr);
+    assert!(stderr.contains("[fingerprint-mismatch]") && stderr.contains(fingerprint) && stderr.contains("SHA256:other"), "{stderr}");
+    let confirmed = identity_data(&pins(&["--confirm", "peer-abc234", "--fingerprint", fingerprint]));
+    assert_eq!(confirmed["confirmed"]["state"], "confirmed");
+    assert!(confirmed["confirmed"]["confirmedAt"].is_string());
+    assert_eq!(identity_data(&pins(&["--json"]))["pins"][0], confirmed["confirmed"]);
+    let pin = confirmed["confirmed"].clone();
     let missing = pins(&["--forget", "other-abc234"]);
     assert_eq!(missing.status.code(), Some(65));
     assert!(String::from_utf8_lossy(&missing.stderr).contains("[pin-not-found]"));
@@ -1654,4 +1679,170 @@ fn host_pins_the_state_root_for_the_node_payload() {
     assert_eq!(run(None), "/custom/state-home");
     assert_eq!(run(Some("/already/pinned")), "/already/pinned");
     let _ = fs::remove_dir_all(&dir);
+}
+
+// ---- `fgos config`: one wiring case per verb family; the behaviours are owned by the
+// `fgos-config` crate tests, these prove the verbs are routed, projected and exit as documented.
+
+/// A fresh project, home and state root; the state root is left for fgos to create (mode 0700).
+fn config_sandbox(name: &str) -> PathBuf {
+    let dir = std::env::temp_dir().join(format!("fgos_test_config_{name}_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&dir);
+    fs::create_dir_all(dir.join("project/.fgos")).unwrap();
+    fs::create_dir_all(dir.join("home")).unwrap();
+    dir
+}
+
+fn config_run(sandbox: &std::path::Path, args: &[&str], confined: bool) -> std::process::Output {
+    let mut cmd = Command::new(fgos_bin());
+    cmd.arg("config").args(args).arg("--dir").arg(sandbox.join("project"));
+    cmd.current_dir(sandbox.join("project"));
+    cmd.env("HOME", sandbox.join("home")).env("FGOS_STATE_ROOT", sandbox.join("state"));
+    cmd.env("FGOS_SESSION_ID", "config-test-writer");
+    cmd.env_remove("FGOS_CONFINED");
+    if confined {
+        cmd.env("FGOS_CONFINED", "1");
+    }
+    cmd.output().unwrap()
+}
+
+fn config_data(output: &std::process::Output) -> serde_json::Value {
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "config must exit 0, stderr={}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).expect("a JSON envelope");
+    assert_eq!(parsed["contract"], "fgos.v1");
+    parsed["data"].clone()
+}
+
+fn config_refusal(output: &std::process::Output) -> String {
+    assert_eq!(output.status.code(), Some(65), "stderr={}", String::from_utf8_lossy(&output.stderr));
+    String::from_utf8_lossy(&output.stderr).into_owned()
+}
+
+#[test]
+fn config_show_prints_the_value_with_where_it_came_from() {
+    let sandbox = config_sandbox("show");
+    fs::write(sandbox.join("project/.fgos/config.yaml"), "gateBypass:\n  level: light\n").unwrap();
+    let shown = config_data(&config_run(&sandbox, &["show", "--path", "gateBypass.level", "--json"], false));
+    assert_eq!(shown["value"], "light");
+    assert_eq!(shown["provenance"][0]["layer"], "project");
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+#[test]
+fn config_explain_and_standard_describe_a_key_without_a_secret_value() {
+    let sandbox = config_sandbox("explain");
+    let explained = config_data(&config_run(&sandbox, &["explain", "gateway.token"], false));
+    assert_eq!(explained["scope"], "global-only");
+    assert_eq!(explained["sensitivity"], "secret-value");
+    let fragment = config_data(&config_run(&sandbox, &["standard", "--path", "gateway.port"], false));
+    assert!(fragment["fragment"].as_str().unwrap().contains("port: 4170"));
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+#[test]
+fn config_check_fails_on_a_fail_row_and_prints_the_row_without_the_value() {
+    let sandbox = config_sandbox("check");
+    // A machine with its private directory and token file in order checks clean.
+    let private = sandbox.join("home/.fgos/private");
+    fs::create_dir_all(&private).unwrap();
+    fs::write(private.join("gateway-token"), "0123456789abcdef\n").unwrap();
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(&private, fs::Permissions::from_mode(0o700)).unwrap();
+        fs::set_permissions(private.join("gateway-token"), fs::Permissions::from_mode(0o600)).unwrap();
+    }
+    assert_eq!(config_data(&config_run(&sandbox, &["check"], false))["ok"], true);
+    fs::write(sandbox.join("project/.fgos/config.yaml"), "gateway:\n  port: 49999\n").unwrap();
+    let output = config_run(&sandbox, &["check", "--json"], false);
+    assert_eq!(output.status.code(), Some(65));
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("config-schema"), "{stdout}");
+    assert!(!stdout.contains("49999"), "a finding never carries a value: {stdout}");
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+#[test]
+fn config_set_unset_and_patch_write_through_the_transaction_and_record_the_reason() {
+    let sandbox = config_sandbox("write");
+    let file = sandbox.join("project/.fgos/config.yaml");
+    let set = |reason: &str| config_run(&sandbox, &["set", "gateBypass.level", "light", "--reason", reason], false);
+    assert_eq!(config_data(&set("light gates while auditing"))["applied"][0]["path"], "gateBypass.level");
+    let text = fs::read_to_string(&file).unwrap();
+    assert!(text.contains("@fgos:why [config-test-writer] light gates while auditing"), "{text}");
+    let shown = config_data(&config_run(&sandbox, &["show", "--path", "gateBypass.level"], false));
+    assert_eq!(shown["value"], "light");
+    assert!(config_refusal(&config_run(&sandbox, &["set", "gateBypass.level", "heavy"], false))
+        .contains("config-comment-reason-required"));
+    // The note on the key is not dropped silently.
+    let plain = config_run(&sandbox, &["unset", "gateBypass.level", "--reason", "back to the standard"], false);
+    assert_eq!(plain.status.code(), Some(65));
+    assert!(config_refusal(&plain).contains("pass --acknowledge-comment-loss"));
+    let ack = ["unset", "gateBypass.level", "--reason", "back to the standard", "--acknowledge-comment-loss"];
+    assert_eq!(config_data(&config_run(&sandbox, &ack, false))["applied"][0]["unset"], true);
+    let patch = sandbox.join("patch.yaml");
+    fs::write(&patch, "- set: gateBypass.level\n  value: standard\n- set: cleanup.enabled\n  value: true\n").unwrap();
+    let applied = config_data(&config_run(&sandbox, &["patch", patch.to_str().unwrap(), "--reason", "tune both"], false));
+    assert_eq!(applied["applied"].as_array().unwrap().len(), 2);
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+#[test]
+fn config_writes_are_refused_for_a_confined_session_before_any_file_is_read() {
+    let sandbox = config_sandbox("confined");
+    let output = config_run(&sandbox, &["set", "gateBypass.level", "light", "--reason", "should not land"], true);
+    assert!(config_refusal(&output).contains("config-write-confined"));
+    assert!(!sandbox.join("project/.fgos/config.yaml").exists());
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+#[test]
+fn config_migrate_converts_a_legacy_project_file_and_leaves_the_tombstone() {
+    let sandbox = config_sandbox("migrate");
+    let json = sandbox.join("project/.fgos/config.json");
+    fs::write(&json, "{\"gateBypass\":{\"level\":\"light\"},\"gateway\":{\"port\":4170,\"token\":null}}\n").unwrap();
+    let dry = config_data(&config_run(&sandbox, &["migrate", "--dry-run"], false));
+    assert_eq!(dry["kept"][0], "gateBypass.level");
+    assert!(!sandbox.join("project/.fgos/config.yaml").exists());
+    let done = config_data(&config_run(&sandbox, &["migrate"], false));
+    assert_eq!(done["dryRun"], false);
+    assert!(fs::read_to_string(&json).unwrap().starts_with("moved to .fgos/config.yaml"));
+    let yaml = fs::read_to_string(sandbox.join("project/.fgos/config.yaml")).unwrap();
+    assert!(yaml.contains("[migrate] carried over from config.json"), "{yaml}");
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+#[test]
+fn config_migrate_global_copies_first_and_refuses_the_removal_without_the_machine_check() {
+    let sandbox = config_sandbox("global");
+    fs::create_dir_all(sandbox.join("home/.fgos")).unwrap();
+    let global = sandbox.join("home/.fgos/config.json");
+    let legacy = "{\"runner\":{\"llmAccounts\":{\"claude\":{\"work\":{\"login\":\"~/.claude-work\"}}}}}\n";
+    fs::write(&global, legacy).unwrap();
+    let copied = config_data(&config_run(&sandbox, &["migrate", "--global"], false));
+    assert_eq!(copied["stage"], "copy");
+    assert!(sandbox.join("home/.fgos/private/accounts.yaml").exists());
+    assert_eq!(fs::read_to_string(&global).unwrap(), legacy, "stage 1 keeps the source");
+    let refused = config_run(&sandbox, &["migrate", "--global", "--finish"], false);
+    assert!(config_refusal(&refused).contains("config-machine-check-required"));
+    let finished = config_data(&config_run(&sandbox, &["migrate", "--global", "--finish", "--machine-checked"], false));
+    assert_eq!(finished["stage"], "finish");
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+#[test]
+fn config_refresh_docs_rewrites_doc_lines_once_and_then_has_nothing_to_do() {
+    let sandbox = config_sandbox("refresh");
+    let file = sandbox.join("project/.fgos/config.yaml");
+    fs::write(&file, "gateBypass:\n  level: light\n").unwrap();
+    let first = config_data(&config_run(&sandbox, &["refresh-docs"], false));
+    assert_eq!(first["nothingToDo"], false);
+    assert!(fs::read_to_string(&file).unwrap().contains("# @fgos:doc Gate bypass level"));
+    assert_eq!(config_data(&config_run(&sandbox, &["refresh-docs"], false))["nothingToDo"], true);
+    let _ = fs::remove_dir_all(&sandbox);
 }

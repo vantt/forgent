@@ -13,7 +13,7 @@ use fgos_yaml_doc::path::format_path;
 use fgos_yaml_doc::{Segment, Value as Doc};
 use jsonschema::error::ValidationErrorKind as Kind;
 use jsonschema::{Draft, Registry, Validator};
-use serde_json::{json, Value};
+use serde_json::Value;
 
 use crate::schema::{unescape_pointer, Schemas};
 use crate::ConfigRefusal;
@@ -157,26 +157,84 @@ pub(crate) fn meta_check(doc: &Doc) -> Result<Vec<(&'static str, Vec<Segment>)>,
 }
 
 impl Schemas {
-    /// The effective value against the section schemas: one root whose properties each refer to a
-    /// section schema by its `$id`, compiled on first use.
+    /// The effective value against every section schema.
     pub fn validate(&self, effective: &Doc) -> Result<Vec<Violation>, ConfigRefusal> {
-        self.checker
-            .get_or_init(|| {
-                let sections: Vec<&Doc> = self.sections.iter().map(|s| s.doc.value()).collect();
-                let properties: serde_json::Map<String, Value> = self
-                    .sections
-                    .iter()
-                    .map(|s| (s.name.clone(), json!({ "$ref": s.root["$id"] })))
-                    .collect();
-                let root = json!({
-                    "$schema": "https://json-schema.org/draft/2020-12/schema",
-                    "type": "object",
-                    "properties": properties,
-                });
-                Checker::new(&Doc::from_json(&root), &sections)
-            })
-            .as_ref()
-            .map_err(Clone::clone)?
-            .check(effective)
+        self.validate_sections(effective, |_| true)
+    }
+
+    /// The effective value against the schemas of the sections `wanted` names. A section's validator
+    /// is compiled the first time it is needed and kept, so a read pays only for the sections its
+    /// files hold; a section no file wrote is the bundled standard, which the crate's own tests
+    /// validate. A top-level key no schema describes is not judged here (scope judges it).
+    pub fn validate_sections(
+        &self,
+        effective: &Doc,
+        wanted: impl Fn(&str) -> bool,
+    ) -> Result<Vec<Violation>, ConfigRefusal> {
+        let Doc::Map(entries) = effective else {
+            return Ok(Vec::new());
+        };
+        let mut out = Vec::new();
+        for (at, section) in self.sections.iter().enumerate() {
+            let Some((_, value)) = entries.iter().find(|(key, _)| *key == section.name) else {
+                continue;
+            };
+            if !wanted(&section.name) {
+                continue;
+            }
+            let checker = self.checkers[at]
+                .get_or_init(|| Checker::new(section.doc.value(), &[]))
+                .as_ref()
+                .map_err(Clone::clone)?;
+            for mut found in checker.check(value)? {
+                found.path.insert(0, Segment::Key(section.name.clone()));
+                out.push(found);
+            }
+        }
+        out.sort_by_cached_key(|v| {
+            (
+                format_path(&v.path),
+                v.keyword.clone(),
+                v.schema_path.clone(),
+            )
+        });
+        out.dedup();
+        Ok(out)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn only_the_sections_asked_for_are_compiled_and_judged() {
+        let (schemas, _) = Schemas::bundled().unwrap();
+        let bad = |name: &str| Doc::from_json(&json!({ name: { "port": "not a number" } }));
+        let mixed = Doc::from_json(
+            &json!({ "gateway": { "port": "x" }, "terminal": { "allocationGraceMs": "y" } }),
+        );
+        let found = schemas
+            .validate_sections(&mixed, |s| s == "gateway")
+            .unwrap();
+        assert!(
+            found
+                .iter()
+                .all(|v| v.path[0] == Segment::Key("gateway".into()))
+                && !found.is_empty()
+        );
+        let compiled: Vec<_> = (0..schemas.sections.len())
+            .filter(|i| schemas.checkers[*i].get().is_some())
+            .collect();
+        assert_eq!(compiled.len(), 1, "one validator, the section asked for");
+        assert_eq!(schemas.sections[compiled[0]].name, "gateway");
+        // The full check compiles the rest once and keeps them.
+        assert!(!schemas.validate(&bad("gateway")).unwrap().is_empty());
+        assert!(schemas
+            .validate(&mixed)
+            .unwrap()
+            .iter()
+            .any(|v| v.path[0] == Segment::Key("terminal".into())));
     }
 }

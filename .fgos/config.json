@@ -1511,7 +1511,7 @@
   },
   "invariantChecks": {
     "commands": [
-      "node --test test/architecture.test.mjs"
+      "node scripts/run-tests.mjs test/architecture.test.mjs"
     ]
   },
   "workerSlots": {

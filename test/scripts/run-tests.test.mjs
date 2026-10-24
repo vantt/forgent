@@ -8,7 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { parseEtime, parsePs, treeOf, findOverdue } from '../../scripts/lib/test-file-watchdog.mjs';
-import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runChosenTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes } from '../../scripts/run-tests.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 function tmpFixtureRoot() {
@@ -175,6 +175,27 @@ test('runTests spawns node --test with the discovered files as argv elements and
   assert.deepEqual(captured.argv, ['--test', GUARD_ARG, SPY_ARG, path.relative(root, f)]);
   assert.equal(captured.opts.env.PATH, '/usr/bin');
   assert.equal(captured.opts.env.UNRELATED, 'kept');
+});
+
+test('chosen test files run alone in the staged environment, and a path that is not a file fails by name before anything spawns', () => {
+  const root = tmpFixtureRoot();
+  const f = write(root, 'x.test.mjs');
+  let captured = null;
+  const ran = runChosenTests(['x.test.mjs'], {
+    cwd: root, forwardedArgs: ['--test-reporter=tap'], env: { PATH: process.env.PATH },
+    spawn: (execPath, argv, opts) => { captured = { argv, env: opts.env }; return { status: 0 }; },
+  });
+  assert.equal(ran.status, 0);
+  assert.deepEqual(captured.argv, ['--test', GUARD_ARG, SPY_ARG, '--test-reporter=tap', path.relative(root, f)]);
+  assert.ok(captured.env.FGOS_ACTIVE_MANIFEST_PATH && fs.existsSync(captured.env.FGOS_ACTIVE_MANIFEST_PATH), 'the addon manifest is staged for the child');
+  assert.ok(captured.env.FGOS_HOST_BIN, 'the host binary is staged for the child');
+
+  let spawned = false;
+  const missing = runChosenTests(['x.test.mjs', 'gone.test.mjs'], { cwd: root, spawn: () => { spawned = true; return { status: 0 }; } });
+  assert.equal(spawned, false);
+  assert.equal(missing.status, 1);
+  assert.match(missing.message, /gone\.test\.mjs/);
+  assert.doesNotMatch(missing.message, /x\.test\.mjs/);
 });
 
 test('runTests forwards extra runner args without letting them replace the full file list (R5)', () => {

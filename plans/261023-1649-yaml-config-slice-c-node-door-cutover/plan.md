@@ -1,9 +1,9 @@
 ---
 title: "YAML Document + Config foundation, Slice C: native-door cutover (yaml and config namespaces, one Node facade, every reader and writer moved, js-yaml and src/config deleted)"
-description: "Three landings: A (yaml namespace, js-yaml deleted, RUL101 superseded), B (config namespace entries snapshot/explain/applyPatch/init, crate additions, Node facade), C (the cutover: ~100 Node reader sites, 5 writers, Rust readers, fixture helper flip, guards, then the live migration of this repository as its first committed step)."
+description: "Three landings: A (yaml namespace, js-yaml deleted, RUL101 superseded), B (config namespace entries check/fix/accounts from Slice D phase 11 plus snapshot/explain/applyPatch/init, crate additions, Node facade), C (the cutover: ~100 Node reader sites, 5 writers, Rust readers, Node doctor rows and setup, account and token readers from Slice D phases 12 to 14, fixture helper flip, guards, then the live migration of this repository as its first committed step)."
 status: in-progress
 priority: P1
-effort: 131h
+effort: 147h
 branch: cfg/slice-c-yaml (A), cfg/slice-c-door (B), cfg/slice-c (C): linked worktrees; never the shared main checkout
 tags: [config, yaml, node-door, cutover, migration, rust]
 lane: CFG
@@ -13,14 +13,16 @@ created: 2026-10-23
 
 # YAML Document + Config, Slice C
 
-Specs (signed 2026-10-22, amended 2026-10-23): [Config](../../docs/platform/config/spec.md) sections 5, 12, 13, 15 (source of truth), [YAML Document](../../docs/platform/yaml-document/spec.md) sections 10, 12, [Distribution](../../docs/specs/distribution.md) (RUL101, RUL107). Board row: CFG in [the program board](../261017-1313-fgos-platform-program-board/plan.md). Built on: [Slice D plan](../261023-1627-yaml-config-slice-d-migrate-and-machine-files/plan.md) (**written, not yet landed when this plan was made; every fact about D below is tagged [D-ASSUMED] and re-read by phase 00 against D as landed**), [Slice B plan](../261023-1018-yaml-config-slice-b-config-crate/plan.md) (landed, crate `fgos-config`, 2,372 source lines), Slice A (landed, `fgos-yaml-doc`). Owner-approved order: **D before C** for the config cutover; landing A touches nothing D owns except two addon files (see order).
+Specs (signed 2026-10-22, amended 2026-10-23): [Config](../../docs/platform/config/spec.md) sections 5, 12, 13, 15 (source of truth), [YAML Document](../../docs/platform/yaml-document/spec.md) sections 10, 12, [Distribution](../../docs/specs/distribution.md) (RUL101, RUL107). Board row: CFG in [the program board](../261017-1313-fgos-platform-program-board/plan.md). Built on: [Slice D plan](../261023-1627-yaml-config-slice-d-migrate-and-machine-files/plan.md) (**closed 2026-10-24 by the owner's option B: phases 00 to 10 and 17 landed on `cfg/slice-d` (verbs at `221bbd58b`); its phases 11 to 14 moved into this plan, see "Absorbed from Slice D"; the facts about D below are as landed, checked against the tree on 2026-10-24, and phase 00 re-verifies them at its start**), [Slice B plan](../261023-1018-yaml-config-slice-b-config-crate/plan.md) (landed, crate `fgos-config`, 2,372 source lines), Slice A (landed, `fgos-yaml-doc`). Owner-approved order: **D before C** for the config cutover (done); landing A shares no file with D any more, because the addon's `config` namespace is created here by landing B.
 
 > Frame approved by the owner 2026-10-23 20:19 (D first; C landing A in parallel).
+
+> **Scope widened by the owner 2026-10-24 10:00 (option B):** Slice D closed at about 3,290 net source lines and handed this slice its phases 11 (native door `config`: `check`, `fix`, `accounts`), 12 (Node doctor rows and setup), 13 (account readers) and 14 (gateway token reader), because this slice is the reader cutover and opens the door anyway. Budget and landing placement below are updated; the detailed spec of each is the D phase file linked in the phase table (not copied here). D's phase 15 stage 2 (remove the old account and token keys) waits for the readers below.
 
 ## Outcome
 
 1. **No JavaScript YAML parser.** `src/util/yaml.mjs` keeps `parseYaml(text, { filename })` and `describeYamlError` over the addon's `yaml` namespace (tool profile); `src/util/third-party/js-yaml.mjs` (3,614 lines) and its hash test are deleted; RUL101 is superseded by a new decision id; objects handed to JavaScript are built with define semantics; a Rust panic never crosses the boundary; one Node wiring proof per namespace.
-2. **One Node config door.** The addon's `config` namespace (D opened `check`, `fix`, `accounts`) gains `snapshot`, `explain`, `applyPatch` and `init`; one facade module `src/config/facade.mjs` (it absorbs D's `machine-config.mjs`) is the only Node code that reads or writes a config file. The effective value comes from the crate (project over global over standard, accounts layer when unconfined, `command` keys from the main checkout), never from a JavaScript merge.
+2. **One Node config door.** The addon's `config` namespace (opened here with `check`, `fix`, `accounts`, D phase 11) gains `snapshot`, `explain`, `applyPatch` and `init`; one facade module `src/config/facade.mjs` (it holds the client functions D phase 11 describes for `machine-config.mjs`, which is never created) is the only Node code that reads or writes a config file. The effective value comes from the crate (project over global over standard, accounts layer when unconfined, `command` keys from the main checkout), never from a JavaScript merge.
 3. **Every reader and writer moved, the old path deleted in the same change (L10).** About 100 Node call sites in about 35 files (re-counted by phase 00), the 7 bypass readers (plus a shell reader and a second `bin` cache reader the inventory did not list), the 5 `JSON.stringify` writers, the write-on-read in `ensureRunnerConfigForDir`, `mergeWithGlobalConfig`, config-specific `mergeConfigDefaults`, the 13 remaining `registerConfigDefault` calls, `DEFAULT_RUNNER_CONFIG`, `sanitizeGlobalLayer`, `stripConfigComments`, the tier-ladder `$comment` code, `src/config/*`. Rust readers move: `apps/fgos-gateway` (the rest of `gateway.*`), `packages/herdr-fgos-common`, `packages/work-state`, `herdr-dashboard`.
 4. **The cutover, once.** Landing C merges the readers, the deletions, the fixture helper flip and the **live migration of this repository** (`fgos config migrate`, Slice D's G-D1 answer A) as one change; per-machine activation follows Slice D's G-D3 evidence.
 5. **Guards.** Architecture tests fail on any read of a config file outside the facade and on any YAML library outside the door.
@@ -30,6 +32,10 @@ Specs (signed 2026-10-22, amended 2026-10-23): [Config](../../docs/platform/conf
 | Item | Where | Note |
 |---|---|---|
 | `yaml` namespace, js-yaml deletion, RUL101 supersession, define semantics, panic capture, one wiring proof per namespace | 01-04 | independent of D except two addon files |
+| `config` entries `check`, `fix`, `accounts` (Slice D phase 11, absorbed) | D-11 | landing B, before 06; the Node client functions are written in the facade (07), not in a `machine-config.mjs` that 07 would delete |
+| Node doctor rows (`config-checks.mjs`), setup creates the machine files, `gateway` default retired (Slice D phase 12) | D-12 | landing C; the Rust rows (`doctor.rs`, `repair.rs`) landed in D |
+| Account readers on the accounts file (Slice D phase 13) | D-13 | landing C, after 10, 12, 13, through the facade (decision C22) |
+| Gateway reads the token file (Slice D phase 14) | D-14 | landing C, before 16 (same `gateway.rs`) |
 | `config` entries `snapshot`, `explain`, `applyPatch` | 05-06 | `explain` and `applyPatch` have **no in-repo Node caller after the five writers are gone** (phase 00 proves it with `rg`); they are in scope because the request and spec section 12 name them and land with one wiring proof each. Option to defer: saves about 45 lines (Unresolved 1) |
 | `init` and its setup call (Slice D's list) | 05, 06, 15 | a fourth door entry; consumer is `fgos setup` |
 | Real `detected` PATH probe and the executor template data (Slice D's list) | 05 | Rust, data in a contract file; the JS copy in `config.mjs` dies in 10 |
@@ -42,6 +48,7 @@ Specs (signed 2026-10-22, amended 2026-10-23): [Config](../../docs/platform/conf
 | Architecture tests: no config read outside the facade, no YAML library outside the door | 03, 19 | |
 | Fixture helper flip | 18 | one change in `test/helpers/config-fixture.mjs` |
 | Live migration of this repository | 21 | first committed step of landing C |
+| Machine rollout stage 2 (remove old account and token keys, `--finish --machine-checked`, G-D3) | 22 | per machine, after that machine runs landing C; stage 1 is available now (decision C23) |
 | Cutover preconditions as a stopping phase | 20 | |
 | **Not built:** a stronger confined fact, `fgctl init` writing the header-only file, converting the global file (D24), a JavaScript fallback anywhere, Windows (gate G4) | | named so nobody assumes them |
 
@@ -52,45 +59,69 @@ The new snapshot refuses this repository's project file (a `gateway` section on 
 | Landing | Phases | What changes at runtime | Branch |
 |---|---|---|---|
 | **A** yaml door | 00 (yaml part), 01-04 | every YAML parse goes through the addon; js-yaml gone | `cfg/slice-c-yaml` |
-| **B** additive config door | 05-08 | nothing calls it yet: crate additions, addon entries, facade, cost measurement | `cfg/slice-c-door` |
-| **C** cutover | 09-23 | readers and writers move, files deleted, this repository migrated, guards on | `cfg/slice-c` |
+| **B** additive config door | 05, D-11, 06-08 | nothing calls it yet: crate additions, addon entries (D's `check`, `fix`, `accounts` first), facade, cost measurement | `cfg/slice-c-door` |
+| **C** cutover | 09-23, D-12 to D-14 | readers and writers move (account and token readers included), doctor rows registered in Node, files deleted, this repository migrated, guards on | `cfg/slice-c` |
 
-A may start before D lands except where it shares files with D phase 11 (`packages/git/node-addon/src/lib.rs`, `Cargo.toml`, `src/native/door.mjs`): the later lander rebases. B and C wait for D landed on main (D phases 00-15, 17; D phase 16 is the rehearsal this plan's phase 21 executes live).
+A has no shared file with D any more (D phase 11 is now landing B's, after A, on the same three files `packages/git/node-addon/src/lib.rs`, `Cargo.toml`, `src/native/door.mjs`). B and C wait for D landed on main (D phases 00-10 and 17, closed 2026-10-24; D phase 16 is the rehearsal this plan's phase 21 executes live). **Why D-12 to D-14 are in C and not in B:** D-12 swaps the `gateway-token-configured` row and deletes the `gateway` default, D-13 and D-14 switch the readers of accounts and token; the readers and the writer of those keys move together (L10), and a reader switch changes what every machine reads, which B is defined not to do. **Why D-11 is in B:** three additive addon entries nothing calls until D-12.
+
+## Facts settled by Slice D (landed on `cfg/slice-d`, checked 2026-10-24; these replace the earlier assumptions)
+
+| Fact | Evidence |
+|---|---|
+| The confined marker is the environment variable `FGOS_CONFINED=1`, set by the bwrap driver in every confined worker; `session_class(lookup: impl Fn(&str) -> Option<String>) -> SessionClass` (`Confined` or `Unconfined`) is a pure function, the crate reads no environment, and the marker is information, not the boundary (the mask is) | `packages/config/rust/src/session.rs:15-23`, `src/runner/dispatch/confinement/drivers/bwrap.mjs:29` |
+| `~/.fgos/private` is hidden from every confined dispatch (`MACHINE_PRIVATE_ROOTS`), a workspace inside it is refused (`machine-private-hides-workspace`), probes are 9 (10 with blind) | D phase 02 report, `confinement-authority.md` 9.3 |
+| The accounts-only read is `fgos_config::machine::accounts::read(ctx, req) -> AccountsView { present, state, revision, value }`, valid without a project or global file; a confined session gets `UnavailableConfined` and the file is not opened | `packages/config/rust/src/machine.rs:134-175` |
+| The findings engine is `doctor::check(ctx, roots, now) -> Vec<Finding>` and the repairs are `repair::fix(ctx, req, writer, ids, acknowledge) -> FixReport` (confined: `config-write-confined`); the row contract is `packages/config/contracts/doctor-rows.v1.json` | `doctor.rs:273`, `repair.rs:179` |
+| The native verbs exist in the host (`fgos config show\|explain\|standard\|check\|set\|unset\|patch\|migrate\|refresh-docs`), a refusal or a failing `check` exits 65, write verbs and `check` refuse off Unix with `config-platform-unsupported`; `trusted_root` is `RepoHandle::trusted_main_root()` | `provider.rs`, `provider/unix_verbs.rs:25`, `provider.rs:256` |
+| The host's bundled context (`Bundle`: schemas, standard, digest) is private to `provider.rs` behind the `host-provider` feature, so phase 05's public bundled context constructor is still missing and is built there | `provider.rs:206` |
+| The addon has **no** `config` namespace yet: D phase 11 (absorbed) creates it. `explain` exists as `inspect::explain` and is reused by phase 06 | `rg` over `packages/git/node-addon/src`, `inspect.rs:45` |
+| The `gateway` `registerConfigDefault` and every account and token reader are **unchanged** (D phases 12 to 14 not built) | `rg` over `src`, `apps/fgos-gateway/src` |
+| Slice D landed about 3,290 net source lines (ceiling 3,300); Rust overrun factor about 1.36x | D plan, "Measured at close" |
+
+## Absorbed from Slice D
+
+D-11 to D-14 above are Slice D's phases 11 to 14, moved by the owner's option B (2026-10-24 10:00). Their D phase files are the detailed spec (context, design, steps, owning proofs) and are not copied here; each carries a banner saying so. Decisions C22 and C23 list every deviation. D's phase 15 (machine rollout runbook) is split: stage 1 now, stage 2 in phase 22. D's phase 16 was already this plan's phase 21.
 
 ## Phases
 
 | Phase | Content | Owning proof | Waits for |
 |---|---|---|---|
-| [00](phase-00-facts.md) | Prior art, D as landed, enumerated readers/writers/tests/YAML consumers, per-reader outcome table, board start line. No code | facts re-verified file:line; D-ASSUMED tags resolved | A: nothing. B, C part: D landed |
+| [00](phase-00-facts.md) | Prior art, D as landed, enumerated readers/writers/tests/YAML consumers, per-reader outcome table, board start line. No code | facts re-verified file:line; the "Facts settled by Slice D" table below re-read against the tree | A: nothing. B, C part: D landed (done) |
 | [01](phase-01-addon-yaml-namespace.md) | Addon `yaml` namespace, the shared `marshal` helper (JSON text out, panic guard, failure shape) | `marshal.rs` unit tests; yaml-doc goldens (Slice A) own parse semantics | 00 |
 | [02](phase-02-yaml-door-repoint.md) | `src/util/yaml.mjs` over the addon, `describeYamlError`, ABI marker, Node wiring proofs, retire the Node-test mapping fixture | `test/util/yaml.test.mjs` (wiring only) | 01 |
 | [03](phase-03-delete-js-yaml-and-yaml-guard.md) | Delete js-yaml and its hash test; YAML guard rewritten; scripts that parse YAML outside a release stage the addon; cargo-deny bans | architecture test (YAML guard) | 02 |
 | [04](phase-04-landing-a-docs.md) | RUL101 supersession (new id), spec status lines, CHANGELOG, backlog, board; landing A | text re-read against code | 03 |
 | [05](phase-05-crate-additions.md) | Crate: `init`, machine view, `PathDetectors` + `detected.v1.json` | `tests/golden_init.rs`, `tests/detect_path.rs`, `tests/machine_view.rs` | 00, D landed |
-| [06](phase-06-addon-config-entries.md) | Addon `snapshot`, `explain`, `applyPatch`, `init`; class, trusted root, cache, `sections`; marker `config: 2` | `test/config/config-door.test.mjs` (one per entry) | 05, 02 |
-| [07](phase-07-node-facade.md) | `src/config/facade.mjs` (absorbs `machine-config.mjs`), null-prototype marshal, error type, manifest row | `test/config/facade.test.mjs` | 06 |
+| [D-11](../261023-1627-yaml-config-slice-d-migrate-and-machine-files/phase-11-native-door.md) | **Absorbed from Slice D.** Addon `config` namespace `check`, `fix`, `accounts`; `versions()` key `"config": 1`; door marker check. Node client functions go into the facade (07), not a `machine-config.mjs` | `test/config/config-door.test.mjs` (one per entry) | 05, 02 |
+| [06](phase-06-addon-config-entries.md) | Addon `snapshot`, `explain`, `applyPatch`, `init`; class, trusted root, cache, `sections`; marker `config: 2` | `test/config/config-door.test.mjs` (one per entry) | 05, 02, D-11 |
+| [07](phase-07-node-facade.md) | `src/config/facade.mjs` (holds `checkConfig`, `fixConfig`, `readMachineAccounts` of D-11), null-prototype marshal, error type, manifest row | `test/config/facade.test.mjs` | 06 |
 | [08](phase-08-cost-gate.md) | Cold start, warm read and marshal cost measured; stop condition and owner gate G-C2 | measurement report | 07 |
 | [09](phase-09-parity-sweep.md) | Effective-value parity sweep (old readers vs new snapshot) over every project; fixture refusal census | report, no source | 08 (landing B on the branch) |
+| [D-12](../261023-1627-yaml-config-slice-d-migrate-and-machine-files/phase-12-node-doctor-and-setup.md) | **Absorbed from Slice D.** `src/setup/config-checks.mjs` over the facade's `checkConfig`/`fixConfig`, retire the `gateway` default, setup creates the machine files, `gateway-token-configured` on the token file | one wiring test per row family | 07, 09, landing B |
 | [10](phase-10-runner-loaders.md) | Runner loaders in `dispatch/config.mjs`: one read-only loader, explicit-path rule, deletions | `dispatch*.test.mjs` moved, one loader wiring case | 07, 09 |
 | [11](phase-11-loader-callers.md) | About 20 `ensureRunnerConfigForDir` / `loadRunnerConfigFromDir` callers (not `bin/fgos.mjs`) | existing tests, moved | 10 |
 | [12](phase-12-single-value-readers.md) | State and runner single-value readers (gate bypass with provenance, ceiling, iron law, invariant and setup commands, event store, terminal, grace, compaction, guard, gateway port) | existing tests, moved; one trusted-root wiring test | 07, 09 |
 | [13](phase-13-setup-side-readers.md) | Setup-side readers outside `registrations.mjs`, the `seat-binding-config` row, `config-checks.mjs` import | existing tests, moved | 07, 09 |
+| [D-13](../261023-1627-yaml-config-slice-d-migrate-and-machine-files/phase-13-account-readers.md) | **Absorbed from Slice D.** Every account-inventory reader (lease, probe, doctor, `dispatch`), error texts, fixtures moved to the accounts file. Through the facade: no `withMachineAccounts` (decision C22) | existing lease/probe/doctor tests, moved | 10, 12, 13, D-12 |
 | [14](phase-14-registrations.md) | `registrations.mjs`: about 45 readers, 13 registered defaults, their fixes, 3 writers, `ensureSharedConfigDefaults` | existing doctor tests, moved | 10, 13 |
 | [15](phase-15-bin-and-setup-flow.md) | `bin/fgos.mjs` (8 reader sites, setup flow, `init`), `bin` cache out of config (incl. the shell reader), tier-ladder module deleted | `bin-discovery` and setup tests, moved | 11, 13, 14 |
-| [16](phase-16-rust-consumers.md) | Gateway rest of `gateway.*`, `herdr-fgos-common`, `herdr-dashboard`, `work-state` | each crate's own unit tests | 05 (crate), D 14 |
+| [D-14](../261023-1627-yaml-config-slice-d-migrate-and-machine-files/phase-14-gateway-token-reader.md) | **Absorbed from Slice D.** `apps/fgos-gateway` reads the token file; message text; dependency cost measured against D5 (gate G-C3 applies) | gateway unit tests | 05 (crate) |
+| [16](phase-16-rust-consumers.md) | Gateway rest of `gateway.*`, `herdr-fgos-common`, `herdr-dashboard`, `work-state` | each crate's own unit tests | 05 (crate), D-14 |
 | [17](phase-17-hook-lock-rows-and-fail-closed.md) | `.githooks/pre-commit` config check, `LOCK_FILES` rows, `dispatch-decide` hook on a config refusal | hook test, lock-row test | 07 |
 | [18](phase-18-fixture-flip-and-old-module-deletion.md) | Fixture helper writes YAML in one change; every test moved; `src/config/*` and its tests deleted | the whole suite | 10-17 |
 | [19](phase-19-architecture-guards.md) | Guards: no config read outside the facade (Node, Rust, shell), manifest rows | `test/architecture.test.mjs` | 18 |
 | [20](phase-20-cutover-preflight.md) | **Stops if any precondition fails**; owner gate G-C1 per machine | the checklist output | 19, D landed and activated |
 | [21](phase-21-live-migration-and-final-gates.md) | Live migration of this repository, final gates | rehearsal golden (D) + live doctor | 20, G-C1 |
-| [22](phase-22-landing-and-rollout.md) | Landing C, per-machine activation, the other workspaces, severity raise, evidence | live `fgos config check` and doctor on each machine | 21 |
+| [22](phase-22-landing-and-rollout.md) | Landing C, per-machine activation, **Slice D's stage 2 per machine (G-D3)**, the other workspaces, severity raise, evidence | live `fgos config check` and doctor on each machine | 21 |
 | [23](phase-23-docs-closeout.md) | Spec status and history lines, distribution, runner and seat-binding spec lines, CHANGELOG, board, backlog, budget count | `cargo test --workspace`, `npm test`, sequential | 22 |
 
-Parallelism (file-disjoint, see ownership): after 07 and 09 land on `cfg/slice-c`, tracks {10 -> 11}, {12}, {13 -> 14 -> 15}, {16}, {17} run in parallel (15 also waits for 11). 18 joins them all; 19, 20, 21, 22, 23 are sequential. A question parked on G-C2 blocks 09 onward; G-C1 blocks only the machine it names.
+Parallelism (file-disjoint, see ownership): after 07 and 09 land on `cfg/slice-c`, tracks {D-12 -> 10 -> 11}, {12}, {13 -> 14 -> 15}, {D-14 -> 16}, {17} run in parallel (15 also waits for 11; 13 and 14 wait for D-12 because all three edit `src/setup`; D-13 runs after 10, 12 and 13 because it edits account-reader lines in files those phases own). 18 joins them all; 19, 20, 21, 22, 23 are sequential. A question parked on G-C2 blocks 09 onward; G-C1 blocks only the machine it names.
 
-Effort by phase (hours, excluding owner wait; sum 131): 00 3, 01 5, 02 5, 03 4, 04 2, 05 7, 06 7, 07 6, 08 2, 09 5, 10 8, 11 4, 12 6, 13 6, 14 10, 15 7, 16 6, 17 4, 18 12, 19 5, 20 3, 21 4, 22 6, 23 4. Slice B planned 52h and finished the crate in about 3 hours of wall clock with parallel agents; this is a calibration, not a promise: the reader moves are many small edits and the fixture strictness census (phase 09) may move hours between 10-14 and 18.
+Effort by phase (hours, excluding owner wait; sum 147, of which 16 are Slice D's absorbed phases: D-11 4, D-12 5, D-13 5, D-14 2): 00 3, 01 5, 02 5, 03 4, 04 2, 05 7, 06 7, 07 6, 08 2, 09 5, 10 8, 11 4, 12 6, 13 6, 14 10, 15 7, 16 6, 17 4, 18 12, 19 5, 20 3, 21 4, 22 6, 23 4. Slice B planned 52h and finished the crate in about 3 hours of wall clock with parallel agents; this is a calibration, not a promise: the reader moves are many small edits and the fixture strictness census (phase 09) may move hours between 10-14 and 18.
 
 ## File ownership (no two parallel phases touch the same file)
+
+The absorbed phases D-11 to D-14 own the files their D phase file lists under "Files it may touch" (with `src/config/machine-config.mjs` replaced by `src/config/facade.mjs`, owned by 07); only the shared-file order below is restated.
 
 | Phase | Owns |
 |---|---|
@@ -100,7 +131,7 @@ Effort by phase (hours, excluding owner wait; sum 131): 00 3, 01 5, 02 5, 03 4, 
 | 04 | `docs/specs/distribution.md`, `docs/platform/yaml-document/spec.md` (status lines), `docs/platform/component-boundary.md` (YAML row), `docs/specs/reading-map.md`, `docs/backlog.md`, `CHANGELOG.md`, board `plan.md` and `log.md` |
 | 05 | `packages/config/rust/src/{write,detect,machine}.rs` (appended; D owns the rest), `packages/config/contracts/detected.v1.json` (new), `contracts/fixtures/{init,detect,machine-view}.v1.json`, `tests/{golden_init,detect_path,machine_view}.rs`, ids appended to `contracts/failure-codes.v1.json` |
 | 06 | `packages/git/node-addon/src/config.rs` (appended), `src/lib.rs` (`"config": 2`), `src/native/door.mjs` (`config >= 2` check), `test/config/config-door.test.mjs` (appended) |
-| 07 | `src/config/facade.mjs` (new), `src/config/machine-config.mjs` (deleted) and the import lines of its importers (list from phase 00: at least `src/setup/config-checks.mjs`, the D account-reader sites), `docs/architecture-manifest.json` (facade row), `test/config/facade.test.mjs` (new) |
+| 07 | `src/config/facade.mjs` (new; `machine-config.mjs` is never created, so there is nothing to delete or re-import: D-12 and D-13 import the facade), `docs/architecture-manifest.json` (facade row), `test/config/facade.test.mjs` (new) |
 | 08 | `plans/reports/measure-*` (name from `fgos convention name`), nothing else |
 | 09 | scratch under `.fgos/runtime/tmp/`, `plans/reports/sweep-*`, nothing else |
 | 10 | `src/runner/dispatch/config.mjs`, `src/runner/dispatch.mjs`, `src/runner/dispatch/{llm-accounts,provider-capacity,resolve}.mjs`, `src/runner/execution/{seat-policy,run}.mjs`, `src/state/tool-registry.mjs` (only if it imports a deleted symbol), `test/helpers/committed-config.mjs`, `test/runner/{dispatch,dispatch-config-patterns,config-seat-binding-layers,tier-fallback-config}.test.mjs` |
@@ -118,12 +149,12 @@ Effort by phase (hours, excluding owner wait; sum 131): 00 3, 01 5, 02 5, 03 4, 
 | 22 | board `plan.md` and `log.md`, `plans/reports/landing-*`, `packages/config/contracts/doctor-rows.v1.json` (one severity value) |
 | 23 | `docs/platform/config/spec.md`, `docs/platform/yaml-document/spec.md`, `docs/specs/{seat-binding,runner,distribution,reading-map}.md`, `docs/platform/component-boundary.md`, `docs/backlog.md`, `CHANGELOG.md`, board |
 
-Shared edits handled in order: `src/native/door.mjs` and `packages/git/node-addon/src/lib.rs` (D 11, then 01 and 02, then 06); `docs/architecture-manifest.json` (03, 07, 19); `test/architecture.test.mjs` (03, then 19); `packages/config/rust/src/write.rs` and `machine.rs` (D, then 05); `src/setup/registrations.mjs` (D 12, 07's import line, then 14 alone); `bin/fgos.mjs` (15 alone; 11 skips it); `packages/config/contracts/failure-codes.v1.json` (D, then 05); `CHANGELOG.md` (04 appends the A lines, 23 the rest). Boards' "File chung dễ va" rows touched: see "Board announcements".
+Shared edits handled in order: `src/native/door.mjs` and `packages/git/node-addon/src/lib.rs` (01 and 02, then D-11, then 06); `docs/architecture-manifest.json` (03, 07, 19); `test/architecture.test.mjs` (03, then 19); `packages/config/rust/src/write.rs` and `machine.rs` (D as landed, then 05); `src/setup/registrations.mjs` (07's import line, D-12, then 14 alone); `bin/fgos.mjs` (15 alone; 11 skips it; D-13's two message strings go in 15's edit); `apps/fgos-gateway/src/gateway.rs` (D-14, then 16); the account-reader sites in `src/runner/dispatch/{llm-accounts,provider-capacity}.mjs` and neighbours (10, 12 and 13 first, then D-13); `packages/config/contracts/failure-codes.v1.json` (D as landed, then 05); `CHANGELOG.md` (04 appends the A lines, 23 the rest). Boards' "File chung dễ va" rows touched: see "Board announcements".
 
 ## Frame (to be approved by the owner with this plan; the budget is a proposal)
 
 - **Scope:** the files in the ownership table and nothing else. Out of frame (ask first): converting the global file (D24), a stronger confined fact, `fgctl init` writing config, any third-party crate, a change to a locked law, a change to the YAML Document or Config spec beyond status, decision and history lines, a JavaScript fallback parser or merger, Windows (G4), behaviour changes to a reader beyond the outcome table of phase 00.
-- **Budget, measured against B and D (B planned 1,300 Rust source lines and landed 2,372, 1.82x; D estimates 2,450 with caps summing 2,610):**
+- **Budget, measured against B and D (B planned 1,300 Rust source lines and landed 2,372, 1.82x over base; D estimated 2,360 for its landed phases and landed 3,211 gross added Rust source lines (config crate 2,971, `apps/fgos/src` 190, durable-file 25, `catalog.rs` 25), an overrun factor of about 1.36x over an estimate that was already base x 1.8; D's Node confinement code came in under its caps, 224 against 260). D's net at close was about 3,290 lines against its raised 3,300 ceiling.** The four absorbed phases bring D's own caps with them (D plan, per-module caps), and the factor is applied to their estimates:
 
 | Module | Phase | Estimate (base x 1.8) | Cap (lines, comments and blanks included) |
 |---|---|---|---|
@@ -134,9 +165,11 @@ Shared edits handled in order: `src/native/door.mjs` and `packages/git/node-addo
 | crate `machine.rs` delta (machine view) | 05 | 25 | 50 |
 | node-addon `config.rs` delta (4 entries, class, trusted root, cache, sections) | 06 | 100 | 190 |
 | gateway, herdr, work-state, dashboard (gross added; deletions counted apart) | 16 | 30 | 60 |
+| node-addon `config.rs` base (`check`, `fix`, `accounts`; D phase 11, D's cap kept) | D-11 | 60 (about 82 with the 1.36x factor) | 110 |
+| gateway token read (D phase 14, D's cap kept) | D-14 | 30 (about 41 with the factor) | 60 |
 
-  Sum of estimates about 330 lines of Rust source, sum of caps 610, **hard ceiling 700 lines added** counted by `find packages/git/node-addon/src/yaml.rs packages/git/node-addon/src/marshal.rs packages/git/node-addon/src/config.rs packages/config/rust/src apps/fgos-gateway/src packages/herdr-fgos-common/rust/src herdr-dashboard/src packages/work-state/rust/src -name '*.rs' | xargs wc -l` before and after (baseline taken after D landed; deletions reported separately, about 100 expected), reported in every commit message. Rust tests about 1.1x the added source (about 360 lines), fixture JSON about 400 lines.
-- **Node source (the number this slice must shrink):** added about 750 lines (facade 260 cap including D's 90 it absorbs, `yaml.mjs` 50, loaders 70, readers 260, setup flow 90, helper 20), **removed about 1,550** (`src/config` 235, `dispatch/config.mjs` defaults, sanitize, strip, bootstrap, detect and ensure about 330, `registrations.mjs` seeds, fixes, writers and checks about 520, `tier-ladder-comment.mjs` 38, D's `machine-config.mjs` 90, `yaml.mjs` 67, reader rewrites about 270) **plus the vendored `js-yaml.mjs` 3,614 lines counted apart**. Cap on lines added: 900. Success criterion: net (added minus removed, vendored file excluded) at most **-400**, counted by `git diff --numstat origin/main...HEAD -- src bin scripts ':!src/util/third-party'` summed, reported per phase. A phase that would pass its cap, or a net that cannot reach -400, stops and reports in the decision-question template; it never trims requested behaviour to fit.
+  Sum of estimates about 420 lines of Rust source (about 460 with the factor on the two absorbed rows), sum of caps 780, **hard ceiling 870 lines added** (the previous 700 plus the absorbed caps 110 and 60) counted by `find packages/git/node-addon/src/yaml.rs packages/git/node-addon/src/marshal.rs packages/git/node-addon/src/config.rs packages/config/rust/src apps/fgos-gateway/src packages/herdr-fgos-common/rust/src herdr-dashboard/src packages/work-state/rust/src -name '*.rs' | xargs wc -l` before and after (baseline taken at D as closed, before D-11; deletions reported separately, about 100 expected), reported in every commit message. Rust tests about 1.1x the added source (about 360 lines), fixture JSON about 400 lines.
+- **Node source (the number this slice must shrink):** added about 1,010 lines (facade 260 cap including D-11's client functions, `yaml.mjs` 50, loaders 70, readers 260, setup flow 90, helper 20, plus D-12's `config-checks.mjs` 140 and D-12 and D-13's reader and registration edits 120, the caps D set), **removed about 1,460** (`src/config` 235, `dispatch/config.mjs` defaults, sanitize, strip, bootstrap, detect and ensure about 330, `registrations.mjs` seeds, fixes, writers and checks about 520, `tier-ladder-comment.mjs` 38, `yaml.mjs` 67, reader rewrites about 270; D's `machine-config.mjs` is no longer in this list because it is never created) **plus the vendored `js-yaml.mjs` 3,614 lines counted apart**. Cap on lines added: 1,160. Estimated net about -450, so the criterion below keeps a margin of about 50 lines; D's Node numbers came in under their caps, so no overrun factor is applied to Node, but a phase that reaches 1.36x on D-12 and D-13 (about 350 lines) would put the net near -360 and stops and reports. Success criterion: net (added minus removed, vendored file excluded) at most **-400**, counted by `git diff --numstat origin/main...HEAD -- src bin scripts ':!src/util/third-party'` summed, reported per phase. A phase that would pass its cap, or a net that cannot reach -400, stops and reports in the decision-question template; it never trims requested behaviour to fit.
 - **Tests:** new about 650 lines (door and facade wiring about 330, architecture guards about 150, hook and lock-row about 80, yaml wiring about 60, helper about 30); retired about 450 (`test/config/*` 245, `config-fixture.test.mjs` 44, `tier-ladder-comment.test.mjs` 77, `yaml.test.mjs` shrinks 154 to about 60), plus the edits of every test that wrote or read config bytes (count in phase 09). Reported net.
 
 ## Constraints
@@ -203,12 +236,14 @@ Cheapest model that does the job reliably. **Haiku:** 00 (re-run), 03 deletions,
 | C13 | The doctor row `config-awareness` (`registrations.mjs:2069-2093`, `describeConfigAwareness`) is retired: which level is active is `fgos config show` provenance plus rows `config-legacy-shadowed` and `config-format-legacy-json`. | RUL104: a second way to answer the same question would be larger, not better. Phase 00 confirms no spec row promises it by name. |
 | C14 | The `dispatch-decide` PreToolUse hook (`scripts/dispatch-decide-hook.mjs`, header says it fails open on any failure) **refuses** when `decide` fails with a `config-*` refusal and keeps failing open on an infrastructure hiccup (stdin, spawn, timeout). | Spec section 11: "enforcement hooks such as `dispatch-decide` fail closed" for a config that does not parse; the header's fail-open covers a different case. Confirm at frame approval (Unresolved 2). |
 | C15 | `.githooks/pre-commit` runs the native verb `fgos config check` through the host binary it already resolves (`resolveActiveHostBin`, `.githooks/pre-commit:560`) when a staged path is a config file; a failure refuses the commit; **no host binary found warns and continues**, the same posture as its lock check (`:154`). | Spec section 11; a hook is a cold client of the host (`:109-112`), so no addon load and no Node facade. |
-| C16 | D's `withMachineAccounts` is deleted: the unconfined snapshot already carries the accounts layer. `readMachineAccounts` stays for the doctor and for callers that run without a valid project file. | D7 was an interim seam while Node had no snapshot (L10). |
+| C16 | `withMachineAccounts` (D phase 13's seam) is not built: the unconfined snapshot already carries the accounts layer. `readMachineAccounts` (the door's `accounts` entry, in the facade) stays for the doctor and for callers that run without a valid project file. | D7 was an interim seam while Node had no snapshot; building it in D-13 and deleting it in phase 10 to 14 would add and remove the same lines (L10, RUL104). See C22. |
 | C17 | `config-format-legacy-json` becomes a failure in phase 22, after every workspace in the preflight list is migrated or the owner names an exception; it is a one-value edit in `doctor-rows.v1.json` (D19). | A legacy-JSON project cannot be written by any door (`config-format-legacy-json`, B D11): the row says so. |
 | C18 | Seat Binding `$comment`: `stripConfigComments`, `tier-ladder-comment.mjs`, the `seat-binding-config` row and the `bin/fgos.mjs` refresh are deleted; a decision line in `docs/specs/seat-binding.md` records that the representation clause of D-ADR0072 is superseded (spec section 7 requires it in the same change). | Migration (D) converts `$comment` to doc lines; nothing writes one afterwards. |
 | C19 | Scripts that parse YAML outside a release payload stage the addon with `ensureGitAddon` from `scripts/lib/git-addon-stage.mjs` (the leaf the test launcher and the git scripts already use) before their first parse; the first run builds with cargo, later runs reuse the digest-keyed stage. | There is no fallback parser (spec), and a bare checkout cannot load the in-process door (`.githooks/pre-commit:109-112`). |
 | C20 | The fixture helper writes `config.yaml` (and the global `config.yaml`) holding the value as JSON text with the `# @fgos:v1` header; JSON text is valid `strict-config` YAML. Reads go through `readProjectConfig`/`readGlobalConfig` helpers built on the door. The legacy-JSON read path keeps one proof (facade test over a real `config.json`, plus B's `files_select.rs`). | The format switch is one change in the helper (spec G5); the tests need valid files, not generated comments. |
 | C21 | RUL id for the YAML supersession: the next free `RUL` id at landing time (phase 04 re-greps; `RUL107` is the highest in `docs/specs/distribution.md` today). | |
+| C22 | The absorbed phases keep D's designs except two changes forced by moving into this slice: (a) D-11's Node client lives in `facade.mjs`, never in `machine-config.mjs`; (b) D-13 reads accounts through the facade, so its deliverable is the reader-site edit list, the error texts and the fixture moves of D phase 13 without `withMachineAccounts`. D-11 to D-14 are otherwise executed from their D phase files. | Avoids a 90-line module and a 30-line seam that this slice would delete in the same landing; the owner's option B moved the phases, it did not ask for the seam. Reversible: build the seam as D phase 13 describes. |
+| C23 | D's stage 2 (`fgos config migrate --global --finish --machine-checked`) runs **after** a machine runs landing C, in phase 22, per machine and per G-D3; stage 1 runs **before** that machine's activation. Precondition 3 below is rewritten accordingly. | Stage 2 deletes the keys the old readers use, so it is safe only once the new readers are active on that machine; requiring it before activation (the earlier text) would be circular after the owner's option B. After stage 1 the old keys still exist, so an older release is unharmed by it. |
 
 ## Reader semantics that change (the reason for phase 00's table and phase 09's sweep)
 
@@ -220,9 +255,9 @@ Cheapest model that does the job reliably. **Haiku:** 00 (re-run), 03 deletions,
 
 ## Cutover preconditions (phase 20 stops if any fails; each is evidence, not belief)
 
-1. Slice D is on main and activated on the machine under test (`fgos config --help` lists the verbs; `addon.versions().config >= 1`).
+1. Slice D is on main and activated on the machine under test (`fgos config --help` lists the verbs), and landing B is activated there (`addon.versions().config >= 2`).
 2. On every machine and every activated project, `fgos config check` passes the new snapshot on both files, **or that project is migrated first** (`fgos config migrate`, its own item). Projects come from activation records (`<project>/.fgos/installation/activation.json`; phase 00 lists them with a `find`), expected set: design-lap: forgentX, mdview, mcp-skill-hub; fg-server: `~/projects/forgent`; fg-server2: `~/projects/forgent`; plus this repository. Known blockers: this repository (migrated in phase 21), and on each machine the owner's global-file cleanup that B's D10 named (`runner.rigorToTier`, extended tier cells).
-3. Account pools and the gateway token are in `~/.fgos/private` on each machine (D stage 1) **and** no older release on that machine reads the old keys: D's stage 2 (`migrate --global --finish --machine-checked`) done with the owner's recorded G-D3 answer. The technical minimum is stage 1 (D8 makes the snapshot tolerate a held copy); the stricter reading is the requested one, so a machine without stage 2 is simply not activated yet.
+3. Account pools and the gateway token are in `~/.fgos/private` on each machine (D's stage 1, `fgos config migrate --global`, source keys kept; D8 makes the snapshot tolerate the held copy). D's stage 2 (`--finish --machine-checked`, G-D3) is **not** a precondition: it removes keys the old readers use, so it runs per machine after that machine runs landing C (phase 22, decision C23). A machine with an older release still installed is not activated (checked in the list of releases, not by stage 2).
 4. The Windows release waits for gate G4: no Windows asset is produced from landing C.
 5. `fgctl` still works on a tombstoned checkout (it is Rust and reads no Node config): `fgctl status` run on a scratch copy; this is what makes rollback possible.
 6. `cargo test --workspace --jobs 4`, `npm test`, the gateway and dashboard test suites green on `cfg/slice-c` merged with `origin/main`, run sequentially (the 18 red `npm test` cases, backlog p-5d2e1c9a, are not made worse).
@@ -242,7 +277,7 @@ Cheapest model that does the job reliably. **Haiku:** 00 (re-run), 03 deletions,
 | Trusted-root resolution costs a git open per read, or misbehaves in a non-repository | M x M | memo, fallback to project root, measured | 06, 08 |
 | `fgos config set --global` is refused while the global file is JSON | H x L | named refusal (`config-format-legacy-json`) with the reason; conversion is D24 / Ideas I2 | 22 |
 | Dependency growth of `fgos-config` in `herdr-dashboard` and the gateway | M x L | D5 threshold, gate G-C3 | 16 |
-| Rust source budget exceeded (B ran 1.82x over base) | M x M | caps per module, ceiling 700, running total in every commit | all |
+| Rust source budget exceeded (B ran 1.82x over base, D 1.36x over its own estimate) | M x M | caps per module, ceiling 870, running total in every commit | all |
 | Shared files collide with other lanes | M x M | board post first, merge `origin/main` at every phase start, land second rebases | all |
 | Out of RAM | M x H | `free -g` gate, `--jobs 4`, sequential gates | all |
 
@@ -283,18 +318,18 @@ Post the start line at phase 00 (lane CFG, Slice C, three landings, every shared
 
 ## Owner gates (decision-question template, `core/skills/_shared/decision-question.md`)
 
-Frame approval (with this plan): the scope, the three landings, the budget (Rust about 330 lines with ceiling 700; Node net at most -400; effort 131h) and the confirmations in Unresolved 1-3. Gates are posted when their phase is reached; each parks only what it names.
+Frame approval (with this plan): the scope, the three landings, the budget (Rust about 420 lines with ceiling 870; Node net at most -400; effort 147h) and the confirmations in Unresolved 1-3. Gates are posted when their phase is reached; each parks only what it names.
 
 ### G-C1: may the cutover be activated on this machine now? (parks that machine only; phase 20)
 
 **What is happening.** Landing C turns every reader of `config.json` in Node and Rust into a reader of the new snapshot and migrates this repository's project file to YAML with a tombstone in `.fgos/config.json`. A machine that activates it while another release on it still reads `~/.fgos/config.json` accounts or token, or while a project it hosts does not pass `fgos config check`, loses leases or stops every verb there.
 
-**Cause.** Checked by phase 20's checklist for that machine: the list of activated releases and projects from activation records, `fgos config check` per project and for the global file, `~/.fgos/private` modes and contents (names only), D's stage 2 evidence and G-D3 answer, the parity sweep differences for each project.
+**Cause.** Checked by phase 20's checklist for that machine: the list of activated releases and projects from activation records, `fgos config check` per project and for the global file, `~/.fgos/private` modes and contents (names only), D's stage 1 evidence (stage 2 follows activation), the parity sweep differences for each project.
 
 **Options.**
 - **A. Activate machines whose checklist is fully green, one at a time, starting with the machine that has one release and one project (D's G2); leave the others on the old release.** Gain: no machine is surprised. Harm: two releases coexist for a while; the shared repository checkout on an old-release machine must not be pulled past the tombstone. Cost: none extra.
-- **B. Wait until every machine is ready, then activate all.** Gain: one release everywhere. Harm: one unchecked machine (fg-server2 for D's stage 2) blocks all.
-- **C. Activate with D stage 1 only where an older release remains.** Gain: no wait. Harm: the older release still breaks on the tombstone in this repository's checkout, and the owner confirmed no older release as a precondition. Not offered as viable.
+- **B. Wait until every machine is ready, then activate all.** Gain: one release everywhere. Harm: one unchecked machine (fg-server2: releases and stage 1 not yet checked) blocks all.
+- **C. Activate with D stage 1 only where an older release remains.** Gain: no wait. Harm: the older release still breaks on the tombstone in this repository's checkout, and the owner confirmed no older release on the machine as a precondition (a checklist line). Not offered as viable.
 
 **Recommendation.** A.
 
@@ -330,7 +365,7 @@ Frame approval (with this plan): the scope, the three landings, the budget (Rust
 - `rg -n "config\.json|config\.yaml|accounts\.yaml|gateway-token" src bin scripts apps packages herdr-dashboard --glob '*.{mjs,cjs,rs,sh}'` finds only the facade, `fgos-config`, the messages and tombstone text the guard allowlists, and the Rust constants of the crate.
 - Acceptance 4 (a read never writes: a run in a project with no config creates no file), 5 (a short project file inherits the rest of the standard), 8 (Rust and Node read through one implementation), 13 (a worker's worktree edit does not change a merge-gate command), 14 (a confined write is refused through the Node door), 15 (`gateway.token` is `<redacted>` in `check` output), 16 (a snapshot object has no prototype; `__proto__` is an own key in the `yaml` result and cannot change a prototype), 17 (an older reader refuses the tombstone) each have a named passing test or live check.
 - This repository: `.fgos/config.yaml` exists, `.fgos/config.json` holds the tombstone, `fgos config check` and `fgos doctor` show no failure from config rows, every Node verb runs, the parity report lists only the expected differences.
-- Net Node source (vendored file excluded) at most -400 and Rust source added at most 700, reported per phase and in the landing lines; the cold-start numbers of phase 08 are in the closeout.
+- Net Node source (vendored file excluded) at most -400 and Rust source added at most 870, reported per phase and in the landing lines; the cold-start numbers of phase 08 are in the closeout.
 
 ## Ideas for the owner (beyond the spec; none is in the budget unless chosen)
 
@@ -350,9 +385,9 @@ Frame approval (with this plan): the scope, the three landings, the budget (Rust
 2. Confirm C14: `dispatch-decide` refuses on a `config-*` refusal and stays open on an infrastructure failure.
 3. Confirm C13 (retire `config-awareness`) and C11 (the `bin` cache leaves config; a stale `bin` key only warns).
 4. C6 keeps `--config <path>` through the YAML door; the alternative is removing the flag from `discover`, `plan` and the third verb.
-5. D as landed may differ from [D-ASSUMED] (marker name, `session_class` signature, door entry names, location of `accounts::read`); phase 00 adapts and records, a changed D contract goes back to the owner only if it changes this scope.
+5. Settled: D as landed is recorded in "Facts settled by Slice D"; phase 00 re-verifies it at its start and records any difference, a changed D contract goes back to the owner only if it changes this scope.
 6. Third-party projects outside the owner's machines: C17 raises `config-format-legacy-json` to a failure for them too; is a release note enough (CHANGELOG), or should the severity wait a release?
-7. Whether fg-server2 can reach D's stage 2 before landing C is unknown (G2 left it unchecked); under G-C1 option A it simply activates later.
+7. Whether fg-server2 can reach D's stage 1 before landing C is unknown (G2 left it unchecked); under G-C1 option A it simply activates later, and its stage 2 follows its own activation.
 
 ## Coordinator answers (2026-10-23 19:00, settled by analysis; owner may overrule at frame approval)
 

@@ -1,4 +1,10 @@
 {
+  "config": {
+    "route_kind": "native",
+    "operation_id": "config.read",
+    "owner_path": "packages/config/rust",
+    "subcommands": true
+  },
   "convention": {
     "route_kind": "native",
     "operation_id": "convention.query",

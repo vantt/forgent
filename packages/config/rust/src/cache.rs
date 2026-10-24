@@ -1,6 +1,7 @@
 //! Cache by content (spec section 5): a snapshot is reused while every source's size and sha256,
-//! the bundle digest and the request are unchanged. The cache is a value the caller owns.
-use crate::snapshot::{build, read_sources, Context, Snapshot, SnapshotError, SnapshotRequest};
+//! the token file, the bundle digest and the request are unchanged. The cache is a value the caller owns.
+use crate::snapshot::{build, machine_sources, read_sources, token_revision, Src};
+use crate::snapshot::{Context, Snapshot, SnapshotError, SnapshotRequest};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct CacheStats {
@@ -8,12 +9,13 @@ pub struct CacheStats {
     pub misses: u64,
 }
 
-type Key = (SnapshotRequest, String, Vec<Option<(usize, String)>>);
+type Sum = Option<(usize, String)>;
+/// The request, the bundle digest, the detectors' fingerprint, each source's sum and the token file's.
+type Key = (SnapshotRequest, String, String, Vec<Sum>, Sum);
 
 #[derive(Default)]
 pub struct SnapshotCache {
-    /// The key is `None` for a snapshot with a detected value: `PATH` is not a hashed source.
-    held: Option<(Option<Key>, Snapshot)>,
+    held: Option<(Key, Snapshot)>,
     pub stats: CacheStats,
 }
 
@@ -23,20 +25,48 @@ pub fn snapshot_cached<'c>(
     ctx: &Context,
     req: &SnapshotRequest,
 ) -> Result<&'c Snapshot, SnapshotError> {
-    let srcs = read_sources(req)?;
+    cached(cache, ctx, req, read_sources(req)?)
+}
+
+/// [`snapshot_cached`] for the machine view (`machine::snapshot`): the same key over the machine's
+/// own sources, so it can neither hit nor evict a project read held by the same cache.
+pub fn machine_cached<'c>(
+    cache: &'c mut SnapshotCache,
+    ctx: &Context,
+    global_dir: &std::path::Path,
+    class: crate::snapshot::SessionClass,
+) -> Result<&'c Snapshot, SnapshotError> {
+    let none = std::path::PathBuf::new();
+    let req = SnapshotRequest {
+        project_root: none.clone(),
+        trusted_root: none,
+        global_dir: global_dir.into(),
+        class,
+    };
+    cached(cache, ctx, &req, machine_sources(&req)?)
+}
+
+fn cached<'c>(
+    cache: &'c mut SnapshotCache,
+    ctx: &Context,
+    req: &SnapshotRequest,
+    srcs: Vec<Src>,
+) -> Result<&'c Snapshot, SnapshotError> {
     let sums = srcs
         .iter()
         .map(|s| s.file.as_ref().map(|f| (f.bytes.len(), f.revision.clone())));
-    let key: Key = (req.clone(), ctx.digest.to_string(), sums.collect());
-    if matches!(&cache.held, Some((Some(held), _)) if *held == key) {
+    let token = token_revision(&req.global_dir);
+    let key: Key = (
+        req.clone(),
+        ctx.digest.to_string(),
+        ctx.detectors.fingerprint(),
+        sums.collect(),
+        token,
+    );
+    if matches!(&cache.held, Some((held, _)) if *held == key) {
         cache.stats.hits += 1;
     } else {
-        let snapshot = build(ctx, req, &srcs)?;
-        let detected = snapshot
-            .origins
-            .iter()
-            .any(|o| o.provenance.layer == "detected");
-        cache.held = Some(((!detected).then_some(key), snapshot));
+        cache.held = Some((key, build(ctx, req, &srcs)?));
         cache.stats.misses += 1;
     }
     cache

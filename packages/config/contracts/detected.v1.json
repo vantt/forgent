@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "about": "What PathDetectors finds for runner.executor (spec section 8): the candidate programs in order of preference, and the verified executor entry for each one that has one. A candidate with no template (codex: no verified argv exists for it) is found but yields no executor, so the caller is told to set one by hand rather than being handed a guess. The claude template equals the claude-cli invocation of the runner standard; a test pins the two.",
+  "candidates": ["claude", "codex"],
+  "templates": {
+    "claude": {
+      "command": "claude",
+      "args": ["-p", "{prompt}", "--model", "{model}", "--permission-mode", "acceptEdits"]
+    }
+  }
+}

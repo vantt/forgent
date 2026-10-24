@@ -651,7 +651,28 @@ export function queueAfterStaging(options, {
   }
 }
 
+/**
+ * Runs only the chosen test files, in the same staged environment as the full run (`runSelectedTests`
+ * stages the addon and host through `buildTestEnv`), without the full-suite queue. Paths resolve against
+ * `cwd`; one that is not an existing file fails the run by name before anything spawns.
+ */
+export function runChosenTests(paths, { cwd = REPO_ROOT, ...options } = {}) {
+  const files = paths.map((file) => path.resolve(cwd, file));
+  const missing = paths.filter((_, i) => !fs.existsSync(files[i]) || !fs.statSync(files[i]).isFile());
+  if (missing.length > 0) {
+    return { status: 1, files: [], message: `run-tests: no such test file: ${missing.join(', ')}` };
+  }
+  return runSelectedTests(files, { cwd, ...options });
+}
+
 if (isMainModule(import.meta.url)) {
+  const argv = process.argv.slice(2);
+  const chosen = argv.filter((arg) => arg.endsWith(TEST_FILE_SUFFIX));
+  if (chosen.length > 0) {
+    const { status, message } = runChosenTests(chosen, { forwardedArgs: argv.filter((arg) => !chosen.includes(arg)) });
+    if (message) console.error(message);
+    process.exit(status);
+  }
   const { status, message, files, wallSeconds } = runTests({
     forwardedArgs: process.argv.slice(2),
     queue: (options) => queueAfterStaging(options),

@@ -213,3 +213,37 @@ fn ensure_dir_creates_missing_directories_with_the_mode_under_umask_and_keeps_ex
     ));
     assert!(!base.join("outside/made").exists());
 }
+
+#[test]
+fn open_dir_reads_and_changes_the_mode_through_the_descriptor_and_never_creates_or_follows() {
+    use fgos_durable_file::open_dir_beneath;
+    let base = tree("dirmode");
+    let root = base.join("root");
+    let mode_of = |p: &Path| fs::metadata(p).unwrap().permissions().mode() & 0o777;
+    fs::set_permissions(root.join(".fgos/sub"), fs::Permissions::from_mode(0o755)).unwrap();
+    let dir = open_dir_beneath(&root, Path::new(".fgos/sub"))
+        .unwrap()
+        .unwrap();
+    assert_eq!(dir.mode().unwrap(), 0o755);
+    dir.set_mode(0o700).unwrap();
+    assert_eq!(mode_of(&root.join(".fgos/sub")), 0o700);
+    let file = open_beneath(&root, Path::new(".fgos/config.yaml"))
+        .unwrap()
+        .unwrap();
+    file.set_mode(0o600).unwrap();
+    assert_eq!(mode_of(&root.join(".fgos/config.yaml")), 0o600);
+    assert!(open_dir_beneath(&root, Path::new(".fgos/absent"))
+        .unwrap()
+        .is_none());
+    assert!(!root.join(".fgos/absent").exists());
+    symlink(base.join("outside"), root.join("evil")).unwrap();
+    for relative in ["evil", "evil/inner", ".fgos/config.yaml"] {
+        assert!(
+            matches!(
+                open_dir_beneath(&root, Path::new(relative)),
+                Err(BeneathError::Refused(_))
+            ),
+            "{relative}"
+        );
+    }
+}

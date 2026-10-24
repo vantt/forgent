@@ -100,6 +100,83 @@
       "test/rust-host/command-routes.test.mjs"
     ]
   },
+  "config": {
+    "selector": "config",
+    "route_kind": "native",
+    "operation_id": "config.read",
+    "owner_path": "packages/config/rust",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ],
+    "subcommands": true,
+    "subcommand_flags": {
+      "check": [
+        "dir",
+        "help",
+        "json"
+      ],
+      "explain": [
+        "dir",
+        "help",
+        "json",
+        "path"
+      ],
+      "migrate": [
+        "accept-machine-overrides",
+        "dir",
+        "dry-run",
+        "finish",
+        "global",
+        "help",
+        "json",
+        "machine-checked"
+      ],
+      "patch": [
+        "dir",
+        "file",
+        "global",
+        "help",
+        "json",
+        "reason"
+      ],
+      "refresh-docs": [
+        "dir",
+        "global",
+        "help",
+        "json"
+      ],
+      "set": [
+        "dir",
+        "global",
+        "help",
+        "json",
+        "path",
+        "reason",
+        "value"
+      ],
+      "show": [
+        "dir",
+        "help",
+        "json",
+        "path"
+      ],
+      "standard": [
+        "dir",
+        "help",
+        "json",
+        "path"
+      ],
+      "unset": [
+        "acknowledge-comment-loss",
+        "dir",
+        "global",
+        "help",
+        "json",
+        "path",
+        "reason"
+      ]
+    }
+  },
   "conflicts": {
     "selector": "conflicts",
     "route_kind": "legacy-cli",
@@ -441,7 +518,9 @@
         "release"
       ],
       "pins": [
+        "confirm",
         "dir",
+        "fingerprint",
         "forget",
         "help",
         "json"

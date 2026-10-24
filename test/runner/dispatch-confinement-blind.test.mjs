@@ -11,7 +11,7 @@ import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 
-import { assessBwrap, prepareBwrap } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
+import { assessBwrap, prepareBwrap, CONFINED_MARKER_ENV } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
 import { executeThroughConfinement } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { loadAttestationRecord, saveProbeCacheRecord } from '../../src/runner/dispatch/confinement/attestation-store.mjs';
@@ -100,8 +100,13 @@ function makeProject() {
   const tempRoot = path.join(root, 'confinement-temp');
   const peerHome = write(path.join(tempRoot, 'disp_peer', 'home', 'transcript.txt'), 'PEER-HOME\n');
 
+  // A fixture home with no `.fgos/private`: the driver resolves `{home}` from HOME, so the host's own
+  // machine-private directory can never change what these tests compare.
+  const home = path.join(root, 'home');
+  fs.mkdirSync(home, { recursive: true });
+
   return {
-    root, proj, fgosDir, runDir, ownDir, ownBrief, ownRef, peerReport, gateAnswer, repoFile, herdrDir, socket,
+    root, home, proj, fgosDir, runDir, ownDir, ownBrief, ownRef, peerReport, gateAnswer, repoFile, herdrDir, socket,
     tempRoot, peerHome, homeDir: path.join(tempRoot, 'disp_self', 'home'), outbox: path.join(runDir, 'outbox'),
   };
 }
@@ -125,10 +130,22 @@ function requestFor(project, { blind = true, script = 'process.exit(0)', context
   });
 }
 
+/** `os.homedir()` is what the driver resolves `{home}` from; point it at the fixture for one synchronous call. */
+function withFixtureHome(project, fn) {
+  const previous = process.env.HOME;
+  process.env.HOME = project.home;
+  try {
+    return fn();
+  } finally {
+    if (previous === undefined) delete process.env.HOME;
+    else process.env.HOME = previous;
+  }
+}
+
 async function prepare(project, options) {
   const request = requestFor(project, options);
   const backend = BWRAP_BACKEND(project);
-  const assessment = assessBwrap(request, backend);
+  const assessment = withFixtureHome(project, () => assessBwrap(request, backend));
   assert.deepEqual(assessment.mismatches, []);
   const prepared = await prepareBwrap({ resources: assessment.resources, coverage: assessment.coverage }, request, backend);
   return { request, assessment, prepared };
@@ -304,7 +321,7 @@ test('a non-blind dispatch\'s argv has the pid namespace but no mask, binds in r
   const { prepared, assessment } = await prepare(project, { blind: false });
   const args = prepared.invocation.args;
   const head = args.slice(0, args.indexOf('--'));
-  const expected = ['--ro-bind', '/', '/', '--dev', '/dev', '--proc', '/proc', '--tmpfs', '/tmp', '--unshare-pid', '--as-pid-1'];
+  const expected = ['--ro-bind', '/', '/', '--dev', '/dev', '--proc', '/proc', '--tmpfs', '/tmp', '--unshare-pid', '--as-pid-1', '--setenv', CONFINED_MARKER_ENV, '1'];
   for (const res of assessment.resources) {
     const writable = res.access === 'write' || res.access === 'read-write';
     expected.push(writable ? '--bind' : '--ro-bind', res.hostTarget, res.executionTarget.path);
@@ -387,9 +404,9 @@ test('the probe set grows by one for a blind dispatch and keeps its own fingerpr
   assert.notDeepEqual(plain, blind);
 
   if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
-  assert.equal(runAllConfinementProbes({ bwrapBin: '/usr/bin/bwrap' }).results.length, 8);
+  assert.equal(runAllConfinementProbes({ bwrapBin: '/usr/bin/bwrap' }).results.length, 9);
   const withBlind = runAllConfinementProbes({ bwrapBin: '/usr/bin/bwrap', blind: true });
-  assert.equal(withBlind.results.length, 9);
+  assert.equal(withBlind.results.length, 10);
   assert.equal(withBlind.results.at(-1).probe, 'peer-run-hidden');
   assert.equal(withBlind.passed, true, withBlind.message);
 });
@@ -469,7 +486,7 @@ test('a blind dispatch is refused, with a named reason, when it cannot be enforc
 
 test('refs inside the dispatch\'s own directory and outside every hidden root are accepted', () => {
   const project = makeProject();
-  const assessment = assessBwrap(requestFor(project, { contextRefs: [project.ownRef, 'src/file.txt', project.repoFile] }), BWRAP_BACKEND(project));
+  const assessment = withFixtureHome(project, () => assessBwrap(requestFor(project, { contextRefs: [project.ownRef, 'src/file.txt', project.repoFile] }), BWRAP_BACKEND(project)));
   assert.deepEqual(assessment.mismatches, []);
 });
 

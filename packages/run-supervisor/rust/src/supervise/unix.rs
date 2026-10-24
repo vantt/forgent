@@ -9,10 +9,9 @@ use std::os::fd::{AsRawFd, OwnedFd};
 use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
 use std::os::unix::net::UnixStream;
 use std::path::{Path, PathBuf};
-use std::process::Child;
 use std::time::{Duration, Instant};
 
-use fgos_process::containment::{select, ContainmentDomain, ContainmentDriver, SelectEnv, SpawnSpec, StartMode};
+use fgos_process::containment::{select, ContainmentDomain, ContainmentDriver, GateChild, SelectEnv, SpawnSpec, StartMode};
 #[cfg(target_os = "linux")]
 use fgos_process::containment::{BwrapPidns, LinuxPgroup};
 use fgos_process::control::{signal_by_identity, take_inherited, Signal};
@@ -97,7 +96,7 @@ impl GoLink {
     }
 
     /// The channel, once the gate is running. A socketpair is connected from the start.
-    pub(super) fn open(mut self, _gate: &mut Child, _since: Instant) -> Option<Go> {
+    pub(super) fn open(mut self, _gate: &mut GateChild, _since: Instant) -> Option<Go> {
         self.mine.take().map(Go)
     }
 }
