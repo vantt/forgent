@@ -36,3 +36,25 @@ Owner answers to the batched decision questions: **(1) "A: Khai miễn trừ c�
 Full `npm test` in isolated clones: plan branch 77db6ed2b **8,948 / 8,409 pass / 440 fail / 2 cancelled**; main 62ce98513 **8,587 / 369 fail**. 83 branch-only titles classified by a debugger with single-file reruns in both clones (`suite-attribution-77db6ed2b.md`): **A 6** (branch-caused), **B 71** (load: all pass alone in both clones), **C 3** (clone under /tmp unreadable by confinement / allowlisted path), **D 3** (dead-vocabulary guard P7-DOC-GAP-05; two reproduction recipes). The six A: two lease-race mocks read `prepare.call(...)` synchronously but main cca48c63a made native `GitLand.prepare` async; the runner-liveness registry pin was stale after main f06b30fa3. Fixed in 53b2b718f; verified: in the addon-staged /tmp clone `merge-land` 0 exit and `doc-runner-liveness` 0 exit; in a clone outside /tmp (`/home/vantt/projects/fgos-p9-verify-clone`) `run-case-admission` 15/15 and `units-runner` 30/30 (the C rows pass there).
 Census hook (main 8ba869cd0): every linked worktree runs the main checkout's hook and scanner; on this branch the commit used `git -c core.hooksPath=<worktree>/.githooks` (no check skipped). `censusDrift` hashed only `kindOf` code files, so the census-recorded declarations JSON always read as drift; fixed in db4b7de4d with an owning test (red without the fix, green with). Both reported to the hook owner on the board (ea7295288).
 Disk: the machine reached 97%; the Lead removed this session's reviewer scratch under /tmp/fgos-work (w2-*, w3-*, w4-*, review-*, p8-audit-*; regenerable, nothing uncommitted), 14 GB → 36 GB free. Older `mut*`, `mutbase`, `probe-repo` (2026-10-19, not this track) left untouched.
+
+## L13-8 — Correction to L13-7 and the second gate wave (Lead, 2026-10-24 14:20)
+
+**Dated correction to L13-7 (its text is kept above).**
+- **B class.** "B 71 (load: all pass alone in both clones)" is false for three titles. `test/e2e/pr-gate.test.mjs` and `test/e2e/runner-loop.test.mjs` fail alone in both clones; these are residual failures shared with main. The host help `--json` test fails alone in the main clone.
+  - True wording: 68 pass alone in both clones, and the suite logs carry watchdog and git-timeout signatures (git timeouts 23 on the branch vs 2 on main, containment-unproven 14 vs 0, 17 files killed by the 600 s watchdog).
+  - "Load" is inferred from these signatures, not measured: no load average was recorded, and the branch runs 361 more tests.
+  - Source: `reviews/w5-suite-fix-review.{md,json}`.
+- **D class.** The two step10 reproduction recipes are not an allowed red. They fail because 217 bound rows per manifest drifted from their target units (`noNewDoubleOwnership`). The drift comes from the legacy resyncs and later doc edits. Brief `w5-rebind-brief.md` rebinds them with a rerunnable `rebind.py --check`, which runs again at the final pin.
+
+**Merged since L13-7:**
+- ad94156cf (misc fix), fast-forward.
+- 22ff13db5 (archive retained set), merge 1975d4403. This merge commit sits outside the first-parent pair walk of check A, so its paths are covered by its review, not by pair accounting.
+- Pairs for 7c50f1552 … ad94156cf (62 per manifest; authorities L12-137, L13-6, L13-7) accounted in 1c7af13dc. A and B are ok on both manifests.
+
+**Reviews:**
+
+| Review | Result | Follow-up |
+|---|---|---|
+| misc | 9 APPROVE / 2 REWORK: doctor split is 136 + 5, not 133 + 8; example framing must be line-scoped | `w5-misc-rework-brief.md` |
+| G4 wrapper | 6 APPROVE / 1 REWORK (High): `.call`, `Reflect.apply` and array-slot callers escape a declared wrapper | `w5-g4-escape-brief.md`. The pre-existing export-alias scan gap goes to the Git owner as an open item, not fixed here |
+| suite fix | 3 APPROVE / 1 REWORK | the B-class correction above |

@@ -1,0 +1,30 @@
+{
+  "scope": "Commit 53b2b718f (lease-race prepare mocks, runner identity registry re-pin) and record L13-7 in reports/phase-09/owner-answers.md",
+  "commit": "53b2b718f9e90ba50ab2039b74e1a8cbd3261851",
+  "verdicts": [
+    {
+      "id": "mocks-await-native-prepare",
+      "verdict": "APPROVE",
+      "locator": "test/runner/merge-land.test.mjs:117-120; test/workflow/units-runner.test.mjs:227-230",
+      "reason": "Native GitLand.prepare returns a promise on both the held-lock path (answer) and the thread path (spawn) (packages/git/node-addon/src/git/land.rs:59-62,76-81,129-175). The port forwards it (src/git/land.mjs), and the production callers await it (src/runner/merge.mjs:920, src/workflow/runner.mjs:626). Assertions, acquire timing and the publish mock are unchanged. There is no test-only branch."
+    },
+    {
+      "id": "registry-repin-reproducible",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "reason": "The re-pin is not runner-only. The repo-wide carry, used because single-source carry refuses (L12-125 precedent), adds 7 documents and 952 units, 151 gaps and 134 retired units, all disclosed in the receipt. A rerun of generate-doc-inventory.mjs --carry-forward-identity-registry from the 53b2b718f^ registry at a1fae5356 into scratch exited 0. All non-id content is identical, and all 92,935 carried claim ids and all gap and retired ids are identical. The only differences are randomOpaqueId values for the new units and documents, and _binding.path, whose sha256 and bytes are equal. Runner units stay 517 -> 517."
+    },
+    {
+      "id": "l13-7-b-class-overclaim",
+      "verdict": "REWORK",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md:36 (L13-7, 'B 71 (load: all pass alone in both clones)')",
+      "reason": "15 of the 16 B titles spot-checked pass alone in both clones. The 16th (help --json) passes alone on the branch and fails alone in main, as the table says. C and D are confirmed. Three B rows do not pass alone in both clones: test/e2e/pr-gate.test.mjs and test/e2e/runner-loop.test.mjs fail alone in both clones, and help --json fails alone in the main clone. The load cause is inferred, since no load-average measurement was recorded. Fix: replace the parenthetical with '(load: watchdog/git-timeout signatures; 68 pass alone in both clones; pr-gate and runner-loop residual failures shared with main; host help --json flaky alone in main)'."
+    },
+    {
+      "id": "touched-files-run",
+      "verdict": "APPROVE",
+      "locator": "test/runner/merge-land.test.mjs; test/workflow/units-runner.test.mjs",
+      "reason": "Both files ran in W with env -u CLAUDE_CODE_SESSION_ID, FGOS_HOST_BIN=<release a970a7e6>/bin/fgos and a staged addon cache hit (9181583a2b89d38b). merge-land: 22/22, exit 0. units-runner: 30/30, exit 0. All six lease-race subtests pass. There were no unhandled rejections and no YAML-addon failures."
+    }
+  ]
+}
