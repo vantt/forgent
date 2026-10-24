@@ -45,7 +45,8 @@ Check: `git -C "$W" rev-parse HEAD` and `git -C "$LW" rev-parse HEAD` both print
    Expect `clean` from the scan. At 14:05 it listed, besides your own session (`claude` 2498074 on pts/4, pane of herdr):
    - three other `claude` sessions with cwd `$M`: 1537854 (`HERDR_PANE_ID=w6:pEQ`), 2329277 (`w6:pDG`), 3195835 (`w6:pDP`). Ask their owners to exit them (or `cd` out is impossible for a running claude). `migrate` refuses `event-store-writers-active` while any of them has its cwd in `$M` or a worktree; it excludes only its own ancestor chain.
    - your own old background shell 37282 (`until grep -q DIRSDONE …w8-dirs.out; do sleep 10; done`, child of your claude, 3.5 h old). It is a sibling of `migrate`, not an ancestor, so it counts: stop it yourself (`kill 37282`) if it is still there.
-   - my check runs (cargo, node) in `$W`; they end before 15:00, I report it.
+   - the interactive `zsh` of each of those herdr panes (1533583, 2326673, 3195315) also has cwd `$M`, and it stays after its `claude` exits. In each pane, after the session exits, type `cd ~` (or close the pane). Your own pane's `zsh` (2497419) is an ancestor of your session and is excluded.
+   - my check runs in `$W` ended at 14:19 (scan at 14:19 lists none of mine).
    **Stop condition:** anything but `clean` after the owners were asked. Do not continue.
 2. `fgos internal git-grant-check --protocol 1 --operation probe` → a typed refusal (the route exists on the active host). Anything else: stop.
 3. Tracked event changes of this machine: `git -C "$M" status --porcelain --untracked-files=all -- .fgos/events .fgos/events.jsonl docs/distillery/state/porting .gitattributes`.
