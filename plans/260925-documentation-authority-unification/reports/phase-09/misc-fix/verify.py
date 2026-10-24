@@ -72,7 +72,7 @@ def main():
     marker="        assert collections.Counter(r['stage'] for r in proof['rows'])"
     section=marker+owner.split(marker,1)[1].split("\n    command = ['git','diff','--check']",1)[0]
     header="import collections,json,pathlib,re,subprocess\n"
-    header+="HERE=pathlib.Path("+repr(str(ROOT/G6))+")\npin="+repr(pin)+"\n"
+    header+="HERE=pathlib.Path("+repr(str(ROOT/G6))+")\npin="+repr(g6pin)+"\n"
     header+="proof=json.loads((HERE/'proof.json').read_text())\n"
     header+="def source(file): return subprocess.check_output(['git','show',pin+':'+file],text=True)\n"
     assertions=SCRATCH/'g6-owning-assertions.py'
@@ -81,8 +81,8 @@ def main():
     examples=['f00167','f08807','f07822','f08072','f08073']
     self_links=['f07697','f08033','f08047']
     run(['git','diff','--check'])
-    result=dict(status='scoped-replay-passed-not-gate-acceptance',sourceCommit=pin,
-                sourcePinScope='G6 tracked source blobs at input HEAD; record inputs remain working-tree inputs. Binding refresh replays its original W4 preimage pin.',
+    result=dict(status='scoped-replay-passed-not-gate-acceptance',sourceCommit=pin,g6SourceCommit=g6pin,
+                sourcePinScope='G6 replay and owning assertions at proof.json sourceCommit; registry/nav/rebind checks at HEAD. Binding refresh replays its original W4 preimage pin.',
                 combinedVerifierResult=str(G6/'verification.json'),
                 commands=commands,comparisons=comparisons,counts=proof['counts'],registrations=registrations,doctorCheckSplit=split,
                 changedExampleRows=examples,selfLinkProposalsRemoved=self_links,

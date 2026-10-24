@@ -1,0 +1,102 @@
+{
+  "scope": "30ed2bbf4 contract headers + afb5bb35c sentence-scoped example evidence + 6c628b07e Lead script edits",
+  "commit": "0d468a225",
+  "verdicts": [
+    {
+      "id": "A1-gateway-readiness",
+      "verdict": "APPROVE",
+      "locator": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md:3-12",
+      "reason": "Fenced txt header has all six fields and they match the body; zero removed lines; Related paths exist."
+    },
+    {
+      "id": "A2-vendored-yaml-parser",
+      "verdict": "APPROVE",
+      "locator": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md:3-12",
+      "reason": "Marked as a superseded historical pointer, consistent with its Status line; both anchors resolve; no claim dropped."
+    },
+    {
+      "id": "A3-conserved-dispatch-doctrine",
+      "verdict": "APPROVE",
+      "locator": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md:3-13",
+      "reason": "Purpose covers the native-first, session-merge and operation-template sections; the decision anchor resolves to the 0026 heading; Related paths exist."
+    },
+    {
+      "id": "A4-non-transitioning-records",
+      "verdict": "APPROVE",
+      "locator": "docs/platform/work-state/contracts/non-transitioning-records.md:3-12",
+      "reason": "Fields match the decision/outcome record body; STR70a stays proposed; Related paths exist."
+    },
+    {
+      "id": "A5-check-H",
+      "verdict": "APPROVE",
+      "locator": "test/scripts/doc-rationale-reproduction.test.mjs",
+      "reason": "8/8 pass in W with the activated release host; the test asserts checks.mjs exits 0."
+    },
+    {
+      "id": "A6-rebind-receipt",
+      "verdict": "APPROVE",
+      "locator": "reports/phase-09/rebind/receipt.md",
+      "reason": "rebind.py --check reports drift 0 at 0d468a225; zero applied rows matches the receipt."
+    },
+    {
+      "id": "B1-sentence-cell-scope",
+      "verdict": "APPROVE",
+      "locator": "reports/phase-09/preserve-premise/proof.py:118-133",
+      "reason": "The marker search is bounded by |, '. ' (not inside e.g.), '; ' and an em dash around columnStart; an ambiguous column gives no evidence."
+    },
+    {
+      "id": "B2-placeholder-illustrative",
+      "verdict": "APPROVE",
+      "locator": "reports/phase-09/preserve-premise/proof.py:131-133",
+      "reason": "Standalone placeholder evidence requires 'illustrative' in the reason; the only non-illustrative placeholder row (f00167) has an in-sentence e.g."
+    },
+    {
+      "id": "B3-negative-controls",
+      "verdict": "APPROVE",
+      "locator": "proof.json negativeDecisionProbes",
+      "reason": "10 controls, including a same-line marker in a different sentence, after a semicolon, before an em dash and in a different cell; all park with evidence null."
+    },
+    {
+      "id": "B4-f07821",
+      "verdict": "APPROVE",
+      "locator": "proof.json rows f07821",
+      "reason": "preserve-operand-reachability-unchanged, evidence null, column 939, line 67; also asserted by the owning verifier."
+    },
+    {
+      "id": "B5-f07822-f08072",
+      "verdict": "APPROVE",
+      "locator": "proof.json rows f07822,f08072",
+      "reason": "Both confirmed through their own placeholder (<id>, <feature>), each with an Illustrative reason."
+    },
+    {
+      "id": "B6-double-replay-counts",
+      "verdict": "APPROVE",
+      "locator": "reports/phase-09/preserve-premise/receipt.md",
+      "reason": "Two runs at 4178dcc6e are byte-identical and equal to the committed artifacts; the counts 2574/1416/959/57 match."
+    },
+    {
+      "id": "B7-misc-verify-exit",
+      "verdict": "APPROVE",
+      "locator": "reports/phase-09/misc-fix/verify.py",
+      "reason": "Exits 0 in a shared clone at 0d468a225."
+    },
+    {
+      "id": "B8-lead-verify-pin",
+      "verdict": "REWORK",
+      "locator": "reports/phase-09/misc-fix/verify.py:75,84-85",
+      "reason": "The replay is at g6pin but the owning G6 assertions still read sources at HEAD against line numbers recorded at the pin, so the pins are mixed. checks.json records sourceCommit=HEAD and the scope as 'G6 blobs at input HEAD'. Fix: pin=repr(g6pin) in the line-75 header, add g6SourceCommit to result and reword sourcePinScope. The fix was tested and exits 0."
+    },
+    {
+      "id": "B9-combined-verifier",
+      "verdict": "APPROVE",
+      "locator": "reports/phase-09/preserve-premise/verify.py:26",
+      "reason": "--pin HEAD exits 1 only at the G2 census pin assertion."
+    },
+    {
+      "id": "B10-misc-receipt-stale",
+      "verdict": "REWORK",
+      "locator": "reports/phase-09/misc-fix/receipt.md:52-67",
+      "reason": "Still shows 2524/1415/1010/6, the false 'does not admit new marker-free rows' and the open four-row qualification. Lead acceptance of the 51 new placeholder confirmations is not recorded in owner-answers L13-9. Fix: apply the handoff numbers and the A42 ruling, and add the acceptance line citing sentence-delta.json."
+    }
+  ]
+}

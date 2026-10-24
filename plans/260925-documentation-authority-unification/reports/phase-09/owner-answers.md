@@ -66,7 +66,7 @@ Disk: the machine reached 97%; the Lead removed this session's reviewer scratch 
 **Lead rulings under A42:**
 1. **Ownership rebinds.** The `misc-fix/rebind.py` preimage conflict is resolved in that phase-09 record tool, which now reads its preimages from its own pin. No embedded phase-06 checker changed (L13-3). 217 rows were applied (8e7c6ee93): 93 anchor-only rows keep their status; 124 content rows are pending re-review (A22, `rebind/rereview-claim-ids.json`).
 2. **Archive retention is direct links only.** The transitive closure would have kept 637 files / 281,770,653 B and was rejected; its evidence is `archive/link-closure.json`. Four direct ruling targets are kept (783,918 B).
-3. **Example framing is scoped to the sentence or table cell (afb5bb35c).** f00445, f08621, f08646 and f08700 keep `preserve-operand-reachability-unchanged`.
+3. **Example framing is scoped to the sentence or table cell (afb5bb35c).** f00445, f08621, f08646 and f08700 keep `preserve-operand-reachability-unchanged`. The general illustrative-placeholder rule is accepted. A span whose path holds a `<placeholder>` is evidence on its own when the reason says illustrative. This moved 51 rows from parked to confirmed (6 → 57 example/placeholder rows; list in `preserve-premise/sentence-delta.json`; review `reviews/w7-header-sentence-review.md`).
 4. **Two script fixes by the Lead in this commit:**
    - `preserve-premise/proof.py` now accepts any `/tmp/fgos-work/` output directory, not only one Doer's scratch name.
    - `misc-fix/verify.py` replays the G6 artifacts at the `sourceCommit` that `proof.json` records, not at HEAD. Proof that this is correct: `proof.py --pin 4178dcc6e` output is byte-equal to the committed `proof.json`.

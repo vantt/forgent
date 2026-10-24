@@ -50,7 +50,7 @@ Prior art: W4 `ad94156cf` widened example matching; `b25dadae2`/`bade6b6b3` own 
 
 `historical_evidence()` receives all bound `currentLines` and searches **only those physical lines** for example markers. Expanded `currentUnit` remains a source witness, never the example search surface. The added negative control has a marker on the next line **inside the same unit** and parks. The three older negative controls still reject; the two older positive controls remain, plus one placeholder-citation control. No cases were retired.
 
-Where a line is framed and the path itself has a placeholder, the evidence cites that path/placeholder instead of a distant same-line marker. This does **not** admit new marker-free rows. In particular f07822 now cites `docs/history/<id>/iron-law-evidence.md` / `<id>`, not the unrelated `ví dụ` about `evolve --submit`.
+Where a line is framed and the path itself has a placeholder, the evidence cites that path/placeholder instead of a distant same-line marker. (Superseded by the sentence-scope wave below: an illustrative `<placeholder>` in the span is now evidence on its own.) In particular f07822 now cites `docs/history/<id>/iron-law-evidence.md` / `<id>`, not the unrelated `ví dụ` about `evolve --submit`.
 
 All **5,413** identities (4,804 Step 3 + 609 Step 4), **38** retire-with-tree exclusions, **136** catalog batches and **27** zero-edge batches are conserved. Before is the delivered W4 proof at `23f6eaccf`; after is the input HEAD above.
 
@@ -67,7 +67,7 @@ All **5,413** identities (4,804 Step 3 + 609 Step 4), **38** retire-with-tree ex
 
 Nine rows return to `park-unconfirmed-preserve-premise`, with no evidence: **f00166, f03953, f07667, f08643, f08645, f08668, f08681, f08748, f08817**.
 
-**Explicit qualification to the brief's “do the same” request:** f00445, f08621, f08646 and f08700 lose all example/history evidence, but are **not parked by the existing premise contract**: their exact operands exist before and after the physical cutover, so they become `preserve-operand-reachability-unchanged`. Twelve other rows take the same route. This is bounded reachability, not historical/external semantics or runtime parity. Forcing these into parks would change the separate stable-operand rule; that was not silently done. The Lead should adjudicate this wording/expectation before accepting the rework.
+**Explicit qualification to the brief's “do the same” request:** f00445, f08621, f08646 and f08700 lose all example/history evidence, but are **not parked by the existing premise contract**: their exact operands exist before and after the physical cutover, so they become `preserve-operand-reachability-unchanged`. Twelve other rows take the same route. This is bounded reachability, not historical/external semantics or runtime parity. Forcing these into parks would change the separate stable-operand rule; that was not silently done. Lead ruling L13-9 (A42): these four rows keep `preserve-operand-reachability-unchanged`.
 
 The five prior named rows still confirm under the line rule:
 
@@ -104,3 +104,19 @@ All paths above are under `plans/260925-documentation-authority-unification/`. F
 - Lead residual, untouched: `docs/distribution-vision.md:87` and `docs/explanation/iron-law-classification-recipe-path.md:45` still say `git rev-parse --git-common-dir`. The former is a dated code reading; the latter needs its owning review.
 - No pair accounting or manifest/register write: Lead handles it after merge. Independent G6 review, final-pin replay, all parks and wrapper co-composition remain open.
 - Scratch only `/tmp/fgos-work/w5-misc-rework/`. No Git mutation, fgOS CLI/lifecycle, secrets, product source, full npm/Cargo suite, product test, setup/doctor execution, service or preview. Impact-analysis: **degraded/unqueried** (CLI forbidden, no exposed GitNexus tool). Markdown preview deferred to Lead to avoid extra service state. No user-visible product behavior change or component-boundary change.
+
+## Sentence-scope wave (afb5bb35c, Lead update 2026-10-24 20:35)
+
+The tables above show the line-scope wave and are superseded for counts. At `afb5bb35c`, with `proof.py --pin 4178dcc6e`, the counts are:
+- source-confirmed history: **2,574**
+- stable operand reachability: **1,416**
+- park, unconfirmed premise: **959**
+- park, unbound passage: 137
+- park, absent source: 2
+- park, removed by cutover: 162
+- dated wrapper note: 163
+- example or placeholder evidence rows: **57**
+
+The jump from 6 to 57 comes from the general illustrative-placeholder rule: a span whose path holds a `<placeholder>` cannot point at a real file. That rule moved 51 rows from parked to confirmed, and every one is listed in `../preserve-premise/sentence-delta.json`. Lead accepted it under L13-9.
+
+`verify.py` now replays the G6 artifacts and runs the owning G6 assertions at `proof.json`'s `sourceCommit` (recorded as `g6SourceCommit`). The registry, navigation and rebind checks run at HEAD.
