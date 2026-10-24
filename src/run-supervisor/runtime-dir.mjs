@@ -18,14 +18,19 @@ export class RuntimeDirError extends Error {
   }
 }
 
+/** The one reader of the user runtime directory: `$XDG_RUNTIME_DIR` when it is an absolute path, else null. */
+export function userRuntimeDir({ env = process.env } = {}) {
+  const xdg = env.XDG_RUNTIME_DIR;
+  return typeof xdg === 'string' && path.isAbsolute(xdg) ? xdg : null;
+}
+
 /**
  * `$XDG_RUNTIME_DIR/fgos`, else `/tmp/fgos-<uid>`. Pure path resolution: `ensureRuntimeSocketDir`
  * creates and checks it.
  */
 export function resolveRuntimeSocketDir({ env = process.env, uid = process.getuid?.() ?? 0 } = {}) {
-  const xdg = env.XDG_RUNTIME_DIR;
-  if (typeof xdg === 'string' && path.isAbsolute(xdg)) return path.join(xdg, 'fgos');
-  return path.join('/tmp', `fgos-${uid}`);
+  const xdg = userRuntimeDir({ env });
+  return xdg ? path.join(xdg, 'fgos') : path.join('/tmp', `fgos-${uid}`);
 }
 
 /**

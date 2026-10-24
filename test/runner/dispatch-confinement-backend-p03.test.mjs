@@ -193,10 +193,10 @@ test('R2: resolveConfinementResources resolves run-output, workspace, private-ho
       context: { runDir, repoRoot: wsDir, fgosDir },
       grants,
       backendConfig: { tempRoot: tmp },
-      // A fixture home and runtime dir: the host's own `~/.fgos/private` and Claude Code
-      // session socket directory must not add a mask to this list.
+      // A fixture home and an absent Claude socket base: the host's own `~/.fgos/private` and
+      // Claude Code session socket directory must not add a mask to this list.
       homeDir: tmp,
-      runtimeDir: tmp,
+      claudeSocketBase: path.join(tmp, 'absent'),
     });
 
     assert.equal(resolved.length, 3);

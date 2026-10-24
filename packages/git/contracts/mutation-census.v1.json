@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f5dbe389bc4e1a55386197ceba4877ea3908a4737e61f571c458491c4b6adefb",
+  "payloadDigest": "487e5a8021b271128e675ba5c79cfc1b0c9bfaeba6aaec43b0f0d7db44f3c5a3",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -837,7 +837,7 @@
     "src/run-supervisor/legacy-sweep.mjs": "63d49b8910513337ae01810361b02fdcc2a4c8ab5ab17fcf5c52de1f9474d51a",
     "src/run-supervisor/payload-root.mjs": "b1ad1d5402b921254d06aecf20a7bc1fe322845c0ab72f028c5fb7047402bdd9",
     "src/run-supervisor/protocol.mjs": "84c0eaa3c8a94429c4c207d2a80d9e7851914cd64985e82f8507ffcbead63b7c",
-    "src/run-supervisor/runtime-dir.mjs": "321bbaf39f909ae909face6daa40c0a187e165fd0faebd743a74895b9a3840fc",
+    "src/run-supervisor/runtime-dir.mjs": "2f02f66882dd2e81b3cc7e9f402fdd0c4c4001e9ceb42e6c4e8984f2e0f2f594",
     "src/run-supervisor/step-support.mjs": "40c78da932dafd643762ff5c32e1f8a3844d5a7f9cd7ec64055b8b1343f614f9",
     "src/run-supervisor/steps/cleanup-trust.mjs": "4427bcd94a9469eb2063403207866ef1d28ae2941987bc8f31853c2fb4b2f0b6",
     "src/run-supervisor/steps/finalize-home.mjs": "a44414ab2ddc7e8056bbf042069983bca4b98143628e748ddc594d0cbff312b8",
@@ -867,9 +867,9 @@
     "src/runner/dispatch/confinement/cleanup.mjs": "9d498d83b5eaba5f23964ce8b683cb511656de43787a52811404ad094ce36d19",
     "src/runner/dispatch/confinement/drivers/bwrap.mjs": "e7ab1058f20053a3b5891df503faa3b07e5f5e5e98a5b8159cb6897c28d0628d",
     "src/runner/dispatch/confinement/policies.mjs": "8d7341c02c6f3d664030347d1047315a4ddbccfb2c264c49b8bea0d9b6d9f008",
-    "src/runner/dispatch/confinement/probes/harness.mjs": "587ac8b6f6ac8394bb05852233f365df738dbf5f9d401c3f7896c78ab26ce69f",
+    "src/runner/dispatch/confinement/probes/harness.mjs": "33cb3791ec0835514ddda02371fa08f3fad62373df5e3528837e3164d399ab8f",
     "src/runner/dispatch/confinement/request.mjs": "aba50726b489db9763742539c462cf269461943576472c71e84d2d7fe248f185",
-    "src/runner/dispatch/confinement/resources.mjs": "da535d6288dc015f8167d2abe41250f7245aff6a9ea9338c087af9b5d61c8f64",
+    "src/runner/dispatch/confinement/resources.mjs": "4b365cf41a0bec8b3c1bb2d3ba3a5ea25aeeba72d45e15435331a9910acaa97c",
     "src/runner/dispatch/cwd-lock.mjs": "3ea87d04c00433f2d410b02fc5b971d681acbc744de6d3587269bc20f57b2e23",
     "src/runner/dispatch/dispatch-error.mjs": "a23e9b79cd73a43eb1e0b9d9afc5710e9210514079515007d36fbbce089e4cbd",
     "src/runner/dispatch/effective-execution-contract.mjs": "2c9f4561cb879685614677eaee0c417b536943059c8c6c36ee567d91cfb54adf",
@@ -3118,7 +3118,7 @@
     {
       "path": "src/setup/registrations.mjs",
       "line": 5549,
-      "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:728",
+      "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:751",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -3132,7 +3132,7 @@
     {
       "path": "src/setup/registrations.mjs",
       "line": 5597,
-      "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:524",
+      "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:525",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
