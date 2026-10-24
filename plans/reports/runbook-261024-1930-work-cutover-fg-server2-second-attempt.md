@@ -8,10 +8,11 @@ Prepared 2026-10-24 19:30 (Asia/Saigon) by the WORK lane controller. It replaces
 - **Empty operation directory.** The refusal left `event-store-cutover-9f371889…-1` with no record. `659e368e5` keeps such a directory out of the WAL scan, and `cutover_operation_id` treats it as a free attempt. Without it the new code read the real WAL as `git-wal-corrupt`. OPC: MERGE.
 - **Unordered fetch-mapping records.** Two 10-19 records without a config sequence made every Event Store diagnostic fail (`fetch-provenance-order-unknown`). `2e6814faf` reads that as no provenance; the setup fix inside migrate records an ordered one. The `--check` of the first attempt already recorded it on this checkout.
 - **Quiesce gate.** `556453735` (merge `217a67c18`, HARDEN: APPROVE): a process whose cwd is in the checkout counts only when its argv could be fgOS. Idle shells and Claude Code sessions no longer block migrate, so **nobody has to exit their session**. Any `node` process with cwd in the checkout still counts (for example an agent CLI started as `node …/codex`).
+- **Route wiring proof** of the quiesce scan moved to the new rule (`0df15a1ad`; TEST found it red on the full gate): the child is a `bash` named `fgos` with cwd in the workspace.
 - **Key-order proof** made explicit (`d0734ca23`, TEST accepted).
 - **Rehearsal of the real write path** on a full-size clone with a local bare mirror as origin (`/home/vantt/projects/forgent-worktrees/rehearse-es`): parity equal (0 differences, 33,718 events, revision `af617cb5…`), real migrate committed (99 files), release staged and upgraded, `fgctl verify` ok, every `event-store-*` and `git-*` doctor row green, `events sync` pushed both refs, `rebuild` revision equal, write smoke (`add`, `move`) sealed within about 1 s. A copied WAL cannot be rehearsed (the WAL is bound to its common dir's dev:inode), so the real WAL was checked with the new code's read-only doctor: every `event-store-*` row passes except the expected `event-store-migration-required`.
 - The rehearsal's `fgos setup` already added the `eventStore.*` defaults to the global `~/.fgos/config.json`; the old release ignores them (checked). Step 10's `globalConfigAddedKeys` may therefore be empty.
-- Release candidate rebuilt from the final tip: `sha256:85b82ccfb91672f7e0873523a128620d6167a1fa1a0be31aaf09415bd6ea1e21`, 858 files, in `$STAGED`.
+- Release candidate rebuilt from the final tip: `sha256:882b8df676cda24e7d0a2837a7c97aea485faffe8500c5737e10cb4e21863fb6`, 858 files, in `$STAGED`.
 - On this checkout a local `refs/fgos/legacy` (`dc82cbae0`, from the first attempt) exists; migrate replaces it by CAS (`import.action` `replace-unfenced-stale`, rehearsed).
 
 ## Variables (paste once into the shell you run everything from)
@@ -25,8 +26,8 @@ export RELT=/home/vantt/projects/.cargo-out-land-261024-es              # releas
 export STAGED=/home/vantt/projects/.fgos-staged-261024-es               # built release tree
 export B=$M/.fgos/runtime/tmp/landing-es-cutover-261024b                 # backups
 export PREV=sha256:d6d3d08224e56894becb095d69a572a3255e5272bd94b37eb6988d39f93344c0   # active release now
-export NEW=sha256:85b82ccfb91672f7e0873523a128620d6167a1fa1a0be31aaf09415bd6ea1e21    # candidate in $STAGED
-export TIP=659e368e54bc807a4cc2d180a83c4cf1ec3c8188
+export NEW=sha256:882b8df676cda24e7d0a2837a7c97aea485faffe8500c5737e10cb4e21863fb6    # candidate in $STAGED
+export TIP=0df15a1adec6b36fed347abf2f700d5c9d6704f1
 cd /tmp
 ```
 
