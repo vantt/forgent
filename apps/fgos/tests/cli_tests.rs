@@ -1731,3 +1731,82 @@ fn config_check_fails_on_a_fail_row_and_prints_the_row_without_the_value() {
     assert!(!stdout.contains("49999"), "a finding never carries a value: {stdout}");
     let _ = fs::remove_dir_all(&sandbox);
 }
+
+#[test]
+fn config_set_unset_and_patch_write_through_the_transaction_and_record_the_reason() {
+    let sandbox = config_sandbox("write");
+    let file = sandbox.join("project/.fgos/config.yaml");
+    let set = |reason: &str| config_run(&sandbox, &["set", "gateBypass.level", "light", "--reason", reason], false);
+    assert_eq!(config_data(&set("light gates while auditing"))["applied"][0]["path"], "gateBypass.level");
+    let text = fs::read_to_string(&file).unwrap();
+    assert!(text.contains("@fgos:why [config-test-writer] light gates while auditing"), "{text}");
+    let shown = config_data(&config_run(&sandbox, &["show", "--path", "gateBypass.level"], false));
+    assert_eq!(shown["value"], "light");
+    assert!(config_refusal(&config_run(&sandbox, &["set", "gateBypass.level", "heavy"], false))
+        .contains("config-comment-reason-required"));
+    // The note on the key is not dropped silently.
+    let plain = config_run(&sandbox, &["unset", "gateBypass.level", "--reason", "back to the standard"], false);
+    assert_eq!(plain.status.code(), Some(65));
+    let ack = ["unset", "gateBypass.level", "--reason", "back to the standard", "--acknowledge-comment-loss"];
+    assert_eq!(config_data(&config_run(&sandbox, &ack, false))["applied"][0]["unset"], true);
+    let patch = sandbox.join("patch.yaml");
+    fs::write(&patch, "- set: gateBypass.level\n  value: standard\n- set: cleanup.enabled\n  value: true\n").unwrap();
+    let applied = config_data(&config_run(&sandbox, &["patch", patch.to_str().unwrap(), "--reason", "tune both"], false));
+    assert_eq!(applied["applied"].as_array().unwrap().len(), 2);
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+#[test]
+fn config_writes_are_refused_for_a_confined_session_before_any_file_is_read() {
+    let sandbox = config_sandbox("confined");
+    let output = config_run(&sandbox, &["set", "gateBypass.level", "light", "--reason", "should not land"], true);
+    assert!(config_refusal(&output).contains("config-write-confined"));
+    assert!(!sandbox.join("project/.fgos/config.yaml").exists());
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+#[test]
+fn config_migrate_converts_a_legacy_project_file_and_leaves_the_tombstone() {
+    let sandbox = config_sandbox("migrate");
+    let json = sandbox.join("project/.fgos/config.json");
+    fs::write(&json, "{\"gateBypass\":{\"level\":\"light\"},\"gateway\":{\"port\":4170,\"token\":null}}\n").unwrap();
+    let dry = config_data(&config_run(&sandbox, &["migrate", "--dry-run"], false));
+    assert_eq!(dry["kept"][0], "gateBypass.level");
+    assert!(!sandbox.join("project/.fgos/config.yaml").exists());
+    let done = config_data(&config_run(&sandbox, &["migrate"], false));
+    assert_eq!(done["dryRun"], false);
+    assert!(fs::read_to_string(&json).unwrap().starts_with("moved to .fgos/config.yaml"));
+    let yaml = fs::read_to_string(sandbox.join("project/.fgos/config.yaml")).unwrap();
+    assert!(yaml.contains("[migrate] carried over from config.json"), "{yaml}");
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+#[test]
+fn config_migrate_global_copies_first_and_refuses_the_removal_without_the_machine_check() {
+    let sandbox = config_sandbox("global");
+    fs::create_dir_all(sandbox.join("home/.fgos")).unwrap();
+    let global = sandbox.join("home/.fgos/config.json");
+    let legacy = "{\"runner\":{\"llmAccounts\":{\"claude\":{\"work\":{\"login\":\"~/.claude-work\"}}}}}\n";
+    fs::write(&global, legacy).unwrap();
+    let copied = config_data(&config_run(&sandbox, &["migrate", "--global"], false));
+    assert_eq!(copied["stage"], "copy");
+    assert!(sandbox.join("home/.fgos/private/accounts.yaml").exists());
+    assert_eq!(fs::read_to_string(&global).unwrap(), legacy, "stage 1 keeps the source");
+    let refused = config_run(&sandbox, &["migrate", "--global", "--finish"], false);
+    assert!(config_refusal(&refused).contains("config-machine-check-required"));
+    let finished = config_data(&config_run(&sandbox, &["migrate", "--global", "--finish", "--machine-checked"], false));
+    assert_eq!(finished["stage"], "finish");
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+#[test]
+fn config_refresh_docs_rewrites_doc_lines_once_and_then_has_nothing_to_do() {
+    let sandbox = config_sandbox("refresh");
+    let file = sandbox.join("project/.fgos/config.yaml");
+    fs::write(&file, "gateBypass:\n  level: light\n").unwrap();
+    let first = config_data(&config_run(&sandbox, &["refresh-docs"], false));
+    assert_eq!(first["nothingToDo"], false);
+    assert!(fs::read_to_string(&file).unwrap().contains("# @fgos:doc Gate bypass level"));
+    assert_eq!(config_data(&config_run(&sandbox, &["refresh-docs"], false))["nothingToDo"], true);
+    let _ = fs::remove_dir_all(&sandbox);
+}
