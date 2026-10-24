@@ -217,8 +217,6 @@ def classify_passage(passage, pin):
     else:
         # Map the bound interval through actual line edits. An unchanged operand
         # can locate a changed passage, but cannot certify its meaning.
-        old = blob(passage['authorPin'], path)
-        oldlines = old.decode('utf-8', errors='replace').splitlines(True) if old else []
         candidates = []
         if start and end:
             for tag, a, b, c, d in line_opcodes(passage['authorPin'], pin, path, current_path):
@@ -236,7 +234,10 @@ def classify_passage(passage, pin):
         if candidates:
             lo = min(a for a, b in candidates)
             hi = max(b for a, b in candidates)
-            kind, value, newstart = 'changed', ''.join(lines[lo:hi]), lo + 1
+            value, newstart = ''.join(lines[lo:hi]), lo + 1
+            # Repeated equal text has no unique global locator, but the edit
+            # mapping can still identify its exact moved interval.
+            kind = 'moved' if value == text else 'changed'
         else:
             # Keep a current neighbouring passage as absence evidence, never
             # pretend that it is the vanished passage.
@@ -327,23 +328,42 @@ def spec_chains():
     return chains
 
 
+def chain_identity(chain):
+    """Content identity shared by the sweep and independent replay check."""
+    return [{'specId': s.get('id', s.get('patchSpecId')),
+             'beforeSha256': s['beforeSha256'],
+             'expectedAfterSha256': s['expectedAfterSha256'],
+             'diffSha256': sha(s['diff'])} for s in chain]
+
+
 def spec_sweep(pin):
     effective = {}
     packet = HERE / 'recomposed.json'
     if packet.exists():
         effective = {s['path']: s for s in load(packet)['specs']}
     drift = []
+    chain_mismatches = []
     rows = []
-    for path, chain in sorted(spec_chains().items()):
+    chains = spec_chains()
+    for path, chain in sorted(chains.items()):
         data = blob(pin, path)
         requires_absent = chain[0].get('requiresAbsent', False)
         actual = sha(data) if data is not None else (sha(b'') if requires_absent else None)
         chosen = effective.get(path)
+        expected_chain = chain_identity(chain)
+        recorded_chain = [{k: edge.get(k) for k in expected_chain[0]}
+                          for edge in chosen.get('predecessorChain', [])] if chosen else []
+        chain_matches = recorded_chain == expected_chain
+        if not chain_matches:
+            chain_mismatches.append({'path': path, 'recordedChain': recorded_chain,
+                                     'currentCompositionChain': expected_chain,
+                                     'error': 'recomposed body missing or stale; recompose before G9 can pass'})
         before = chosen['beforeSha256'] if chosen else chain[0]['beforeSha256']
         row = {'path': path, 'currentFileSha256': sha(data) if data is not None else None,
                'guardedPreimageSha256': actual, 'beforeSha256': before,
                'specId': chosen['id'] if chosen else chain[0].get('id', chain[0].get('patchSpecId')),
                'historicalSpecIds': [s.get('id', s.get('patchSpecId')) for s in chain],
+               'predecessorChainMatchesCurrentComposition': chain_matches,
                'requiresAbsent': requires_absent,
                'absenceGuardHolds': data is None if requires_absent else None,
                'evidenceOnly': any(s.get('evidenceOnly') for s in chain),
@@ -351,11 +371,11 @@ def spec_sweep(pin):
         rows.append(row)
         if row['drifted']:
             drift.append(row)
-    extras = sorted(set(effective) - set(spec_chains()))
+    extras = sorted(set(effective) - set(chains))
     ordered = load(P8 / 'step-07-patch-order.json')['patches']
     parks = [{'specId': s['patchSpecId'], 'path': s['path'], 'status': s['status'],
               'reason': 'No executable body at this path; see composition/actions.json for the retired-path/successor action.'}
-             for s in ordered if s['path'] not in spec_chains()]
+             for s in ordered if s['path'] not in chains]
     errors = load(packet).get('unresolved', []) if packet.exists() else []
     historical = []
     for origin, key in [(P8 / 'step-07-composed-patches.json', 'patches'),
@@ -372,7 +392,8 @@ def spec_sweep(pin):
                                'predecessor': spec.get('predecessor'), 'replaces': spec.get('replaces'),
                                'effectiveSuccessorId': effective.get(spec['path'], {}).get('id'),
                                'policy': 'Historical/staged preimages are retained, never independently executable. The effective current-byte successor is the check guard.'})
-    return {'files': rows, 'drifted': drift, 'unrecognizedEffectivePaths': extras,
+    return {'files': rows, 'drifted': drift, 'predecessorChainMismatches': chain_mismatches,
+            'unrecognizedEffectivePaths': extras,
             'uncomposedHistoricalParks': parks, 'recompositionErrors': errors,
             'historicalComposedInputSweep': historical}
 
@@ -435,7 +456,8 @@ def main():
     if args.details:
         result['records'] = rows
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    if args.check and (errors or specs['drifted'] or specs['unrecognizedEffectivePaths'] or specs['recompositionErrors']):
+    if args.check and (errors or specs['drifted'] or specs['predecessorChainMismatches'] or
+                       specs['unrecognizedEffectivePaths'] or specs['recompositionErrors']):
         return 1
     return 0
 

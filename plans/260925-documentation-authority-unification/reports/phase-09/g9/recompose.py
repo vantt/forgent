@@ -16,7 +16,7 @@ import tempfile
 
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
-TMP = Path('/tmp/fgos-work/w9-g9')
+TMP = Path('/tmp/fgos-work/w10-g9-rework')
 TMP.mkdir(parents=True, exist_ok=True)
 
 
@@ -41,7 +41,7 @@ def relocate(before, spec, commands):
                 cp = subprocess.run(['patch', '--batch', '--fuzz=0', '--reject-file=-', '-p1'],
                                     input=spec['diff'], text=True, cwd=name, capture_output=True)
                 commands.append({'argv': ['patch', '--batch', '--fuzz=0', '--reject-file=-', '-p1'],
-                                 'cwd': 'disposable directory under /tmp/fgos-work/w9-g9',
+                                 'cwd': str(TMP) + ' (disposable historical subdirectory)',
                                  'path': spec['path'], 'direction': 'historical-step-forward',
                                  'exit': cp.returncode, 'stdout': cp.stdout, 'stderr': cp.stderr})
                 if cp.returncode:
@@ -113,7 +113,7 @@ def replay(path, before, after, forward, rollback, commands, creation=False):
                 cp = subprocess.run(['patch', '--batch', '--fuzz=0', '--reject-file=-', '-p1'],
                                     input=diff, text=True, cwd=root, capture_output=True)
                 commands.append({'argv': ['patch', '--batch', '--fuzz=0', '--reject-file=-', '-p1'],
-                                 'cwd': 'disposable directory under /tmp/fgos-work/w9-g9',
+                                 'cwd': str(TMP) + ' (disposable replay subdirectory)',
                                  'path': path, 'direction': direction, 'exit': cp.returncode,
                                  'stdout': cp.stdout, 'stderr': cp.stderr})
                 if cp.returncode:

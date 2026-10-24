@@ -1,78 +1,79 @@
-# Interim source-context receipt
+# Interim source-context receipt — rework
 
-Source pin: `cd4f80eccbb5c44893daec58af416395d139494b` (HEAD for this turn), **not final pin F**. The interim sweep passes; this is author evidence, not independent approval or G9 closure.
+Source pin: `d14d89865b44018db48d12fa8b3f5279a2dbc905`, **not final pin F**. This supersedes the earlier receipt's current counts and replay claims. **G9 sweep and composition verification pass; the assignment is blocked only on the pre-existing legacy-ratchet failures below.** No independent acceptance or gate closure is claimed.
 
 ## Records and dispositions
 
-The three cohorts contain 684 memberships: 518 (10/30/478), L12-130 overlaps 144 (10/9/125), and W0 deferred 22 (11/4/7). Their union is **574 physical records**; revision rows remain distinct.
+The three cohorts still contain **684 memberships / 574 physical records**: changed 518 (10/30/478), overlaps 144 (10/9/125), W0 deferred 22 (11/4/7). Revision rows remain distinct.
 
-- Record classification: **55 unchanged, 68 moved, 373 changed, 78 absent**.
-- Passage classification: 3,576 unchanged, 12,522 moved, 4,101 changed, 995 absent. Git-detected file renames and same-file movement are both covered.
-- Dispositions: **214 still valid as recorded, 7 need recomposition, 353 owned parks**.
+| Classification | Records | Passages |
+|---|---:|---:|
+| unchanged | 55 | 3,576 |
+| moved | 88 | 12,766 |
+| changed | 353 | 3,857 |
+| absent | 78 | 995 |
 
-`judgments.json` contains one disposition per physical record, current line ranges and hashes, and evidence joins into `passages.json`. Every row has direct source evidence. Large passages use exact line intervals, complete digests and Git retrieval commands, not truncated-text hashes. Missing sources have tree/deletion evidence; a nonexistent line is never invented. `source-context.json` preserves cohort membership.
+Dispositions: **229 still-valid-as-recorded, 7 needs-recomposition, 338 owned-park**. The parks remain owned by **Documentation source-binding reviewer / Lead (G9)**, with row-specific next actions, ranges and evidence hashes. These are conservative author dispositions, not semantic approvals or runtime parity.
 
-The 353 parks are real remaining work, owned by **Documentation source-binding reviewer / Lead (G9)**. Each names its unresolved slots and a concrete source/root, retirement or successor-binding action before F. They are judged parks, not ready consumers. Exact passages retain only their original bounded decision; changed non-document operations retain it only where their exact operand and prior non-document category survive. No runtime parity or absence of new consumers is inferred.
+The existing edit-interval mapping now classifies a mapped passage as **moved when its full bytes equal the bound passage**, even when that text occurs more than once. This corrects 244 passage classifications and **20 changed/parked records → moved/still-valid**. No ambiguous occurrence is selected by guessing. [w10-judgment-delta.json](w10-judgment-delta.json) lists all 20 record ids and all disposition changes.
 
-## Specs and replay
+The five unexplained still-valid judgments are now **owned parks**, not approvals:
 
-`recomposed.json` consolidates **545 effective file bodies** onto current bytes and retains their predecessor/replacement chains. There are 536 existing-file hash guards and nine declared creations with a verified absence guard and empty virtual preimage; these are not claimed to be hashes of nonexistent files. Forty-six bodies intentionally change no bytes. Seventy-nine generated-output bodies remain evidence only: source plus regeneration is still the application door. Fourteen bodies retain their final-pin application condition.
+- `step04-009.jsonl:3`: changed `docs/architecture-manifest.json` dependency.
+- `step04-030.jsonl:4`: changed `docs/backlog.md` dependency.
+- `step04-030.jsonl:8`: changed `docs/specs/reading-map.md` dependency; that retired-path park is explicitly **not** validity evidence.
+- `generators-skills-and-support.jsonl:3` and `:96`: changed canonical `domains/coding/skills/_shared/coding-cell-policy.md` dependency.
 
-The all-spec sweep also reports all 545 historical bodies (423 Step 7 plus 122 composition entries), including superseded/staged preimages: 32 Step 7 and 52 composition preimages differ from current source bytes. Their effective replacements, not their historical approvals, are the execution candidates. The action-linked no-op for `src/setup/git-hooks.mjs`, omitted from `effectiveSpecIds`, is included. Four old-path parks remain explicit actions rather than invented patches: generated end-user index, renamed Session Identity, retiring legacy reading map, and legacy Workflow's successor holder. See `sweep-check.json` and `composition/actions.json`.
+The classifier/judge records these dependencies separately from primary passages and names them in each park's next action. The seven pre-existing needs-recomposition judgments remain pending, with dependency review explicitly unresolved; none is relabelled still-valid. `verify.py` now rejects any still-valid judgment that hides a changed explicit/canonical dependency. Other disposition changes: none.
 
-Fifteen selected chain inputs needed current-byte rebinding; all were recomposed and replayed:
+## Recomposition and chain guard
 
-- `.githooks/pre-commit`
-- `docs/io-contract.md`
-- `docs/platform/agent-confinement/contracts/confinement-authority-v1.md`
-- `docs/platform/agent-confinement/decisions/confinement-authority-decisions.md`
-- `docs/platform/agent-confinement/history/rollout-and-settled-facts.md`
-- `docs/platform/agent-coordination/decisions/README.md`
-- `docs/platform/runner/architecture/h-69197b459754.md`
-- `docs/platform/runner/architecture/h-7af1f0242611.md`
-- `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`
-- `docs/reading-map.md`
-- `plugins/fgOS/skills/terminal/SKILL.md`
-- `src/runner/dispatch/assignment-runner.mjs`
-- `src/runner/dispatch/confinement/policies.mjs`
-- `src/runner/dispatch/herdr-round.mjs`
-- `test/runner/dispatch-worker-session.test.mjs`
+`recomposed.json` still contains **545 bodies**: 536 existing files and nine absence-guarded creations; 46 no-byte-change bodies, 79 generator-evidence-only bodies, 14 final-pin-conditional bodies. Every nonempty body replays forward and rollback with `patch --batch --fuzz=0 --reject-file=- -p1`, whole-file guards, and byte-exact restoration. Nothing is applied to the checkout.
 
-The existing Step 7 authored-hunk parser and exact locator were reused. The reading-map resolution preserves current hot-lock, Workflow case/guide and kernel session-lock prose; only the historical path substitutions are carried forward (`reading-map-resolution.json`, 12 current entries). Every nonempty consolidated patch passed **`patch --batch --fuzz=0 --reject-file=- -p1` forward and rollback**, with a whole-file hash guard before each invocation and byte-exact restoration. No patch was applied to the checkout.
+Exactly these five body diffs changed; the other **540 body diffs/hashes are unchanged** ([w10-recomposition-delta.json](w10-recomposition-delta.json)):
 
-## SHA provenance and exact re-pinned files
+- `docs/platform/agent-protocol/spec.md`
+- `docs/platform/event-store/spec.md` (including the witness #16 correction)
+- `docs/platform/git/spec.md`
+- `docs/platform/process/spec.md`
+- `docs/platform/terminal-control/spec.md`
 
-`sha-map.json` proves stable patch-id equality for `92260972c → 5965143b4`, `a27d85d0a → e70742232`, and retained-branch twin `3bbfa5a80 → e5af4c501`. Full SHAs and patch-ids are recorded there. The first pair also has byte-equal docs/ledger/frozen-checker input trees. Twelve equivalences were replayed in verification; nine others are historical Work-export discoveries, deliberately not re-pinned. The broad discovery's unresolved historical/measurement pins and non-commit candidates remain listed, not silently declared equivalent.
+`sweep.py --check` now compares each recomposed predecessor chain's **ordered spec id, before hash, expected-after hash and diff hash** with the current `spec_chains()`. Missing/stale chains fail closed; source preimage equality alone is insufficient. `verify.py` reuses the same content-identity projection instead of maintaining a second contract.
 
-**Only these nine existing record files changed** (12 pin-valued leaves, including two composite Git locators; no other JSON values changed):
+The real check **exited 1 before recomposition**, naming exactly those five stale chains ([w10-before-recompose-check.json](w10-before-recompose-check.json)); the classifier's pending judgment refresh was also reported, not hidden. An isolated in-memory replay of the real old packet confirms the five chain mismatches while current judgment errors are zero ([w10-chain-control.json](w10-chain-control.json)). Final `sweep-check.json`: **0 source drift, 0 chain mismatches, 0 judgment errors, 0 unresolved recompositions; exit 0**.
 
-- `plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json`
-- `plans/260925-documentation-authority-unification/reports/phase-09/import2/checks.json`
-- `plans/260925-documentation-authority-unification/reports/phase-09/import2/deferred-rebinds.json`
-- `plans/260925-documentation-authority-unification/reports/phase-09/import2/merge-accounting.json`
-- `plans/260925-documentation-authority-unification/reports/phase-09/import2/receipt.json`
-- `plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json`
-- `plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json`
-- `plans/260925-documentation-authority-unification/reports/phase-09/g0fix/needs-writes.json`
-- `plans/260925-documentation-authority-unification/reports/phase-09/g0fix/receipt.json`
+Reused: Step 7 authored-hunk parser/exact locator, existing current-byte composer and GNU patch, existing evidence joins and shared provenance map. Prior-art Git searches locate these mechanisms in `4f08d504d`; the sibling gloss rewrite is `928f5cc14`. No component-boundary change. `impact-analysis: degraded` under the explicit no-CLI grant; caller inspection found only the G9 scripts, not product runtime callers.
 
-`record-repins.json` authenticates every changed leaf against the patch-id map. Historical stdout and prose stay verbatim. **The frozen checker's `scripts/check-legacy-docs-ratchet.exceptions.json#/previousMainMergeAccounting/inputCommit` remains outside this exact write scope**; Lead owns its retirement/accounting disposition. Thus this turn does not claim the entire w4 source-pin-provenance REWORK closed or authorize deletion of any retained ref. No extra write permission is requested for this interim slice.
+## Ratchet pin and blocker
 
-## Commands and limits
+The only exceptions-ledger edit is `previousMainMergeAccounting.inputCommit`: `92260972c…` → **`5965143b4fd56df6698b2096df1a672d26293c90`**. Both commits have stable patch-id `585be0a439f62fe3c25787d27bb35ba6714bd426`; the new commit is an ancestor of the source pin. **The complete exceptions file at the two commits is byte-equal**, SHA-256 `67d639b04bce8342a1bcd245a1b6736bbbddfcd33f47ed2664c90a524cc5e65e`. The retained object's hash remains `4957bd9e261f8a51a6e2d94910a62a26a1bb1f4517f2b562d1d0bec8c201e2a7`. Commands and exact evidence: [w10-ratchet-repin.json](w10-ratchet-repin.json).
 
-Let `G=plans/260925-documentation-authority-unification/reports/phase-09/g9`:
+**The required ratchet exit 0 is not achieved.** `node scripts/check-legacy-docs-ratchet.mjs` exits **1**, with three existing exception-digest mismatches:
 
-- `python3 -B "$G/recompose.py" --pin HEAD` — **0**, twice; 1,515 logged patch invocations per author replay.
-- `python3 -B "$G/judge.py" --pin HEAD` — **0**, twice.
-- `python3 -B "$G/verify.py" --pin HEAD` — **0**; all effective bodies replayed and all evidence joins checked; altered passage, missing row and altered record controls reject.
-- `python3 -B "$G/sweep.py" --check` — **0**: zero unjudged rows, zero effective drift, zero unresolved recomposition errors.
-- `python3 -B "$G/sweep.py" --pin HEAD^ --check` — **0**: another commit with identical source bytes does not reopen judgments merely because the retrieval commit differs.
-- `python3 -B "$G/sweep.py" --pin 5e03159334df726e43ffe9505ad4ed43f72ba94d --check` — **1, expected**: actual source deltas reject current judgments/guards.
-- `python3 -B "$G/provenance.py"` — **0** for the discovery run; its patch-id commands/exits are retained in `sha-map.json`, with applied decisions added afterwards.
-- Read-only `git diff --check`, `git diff --cached --name-only`, and scope/status audits — **0**; index empty, writes confined to this directory and the nine files above.
+- `docs/specs/confinement-authority.md`
+- `docs/specs/reading-map.md`
+- `docs/specs/seat-binding.md`
 
-`commands.json`, `patch-commands.json`, `source-read-commands.json`, `verification-commands.json`, `sweep-check.json.commands`, and `record-repins.json.commands` retain proof command arguments and exits. Missing-source Git reads may exit 128 as explicit absence evidence, never as successful reads. `determinism.json` proves both complete author replays produced byte-identical patch, judgment and evidence artifacts.
+Running with the **unmodified HEAD exceptions file** exported to scratch gives the identical JSON findings/stats as the re-pinned file: [before](w10-ratchet-before.json), [after](w10-ratchet-after.json). The pin change does not cause or resolve them. No baseline, expected digest, rationale, or exception allowance was changed to manufacture green. Lead must review/account the current legacy bytes or authorize their correction; the brief's pin-only repair does not establish that approval. No additional write path is requested: `needsWrites=[]`.
 
-Early development attempts were not proof: one sweep exited 1 on the two provenance shapes, two incomplete composers exited 1 before exact/creation and reading-map handling was corrected, exploratory missing-path reads exited 1, and a broad first provenance scan timed out at 300 seconds before its key filter was bounded. Read-only history/exploration queries also timed out; none is reported as a pass.
+## Commands and exits
 
-No docs/product code/test edits, fgOS CLI, product tests, full suite, pair accounting, Git writes, `.fgos` reads, secret reads or ref deletion. Outbox publication is the required assignment exception. Independent source/parity review, the owned parks and final-pin delta work remain open.
+Let `G=plans/260925-documentation-authority-unification/reports/phase-09/g9` and `C=../composition` relative to G. All Python runs use `python3 -B`. Exact subprocess argv, exits and outputs/digests are retained in `w10-commands.json`, `patch-commands.json`, `source-read-commands.json`, `verification-commands.json`, `sweep-check.json.commands`, `w10-ratchet-repin.json.commands` and the composition `w10-*commands.json` files.
+
+| Command | Exit / result |
+|---|---|
+| `python3 -B "$G/sweep.py" --check` before recompose | **1**, expected stale chains + judgments pending classifier refresh |
+| `python3 -B "$G/recompose.py" --pin HEAD` | **0**; 545 bodies, zero unresolved; **1,515 patch invocations, all 0** |
+| `python3 -B "$G/judge.py" --pin HEAD` | **0** on all four author runs; final 229 / 7 / 338 |
+| `python3 -B "$G/verify.py" --pin HEAD` | **0** on all four runs; final 545 roundtrips, **998 patch invocations all 0**, 12 patch-id equivalences, 10 direct historical pin fields, complete evidence joins and existing negative controls |
+| `python3 -B "$G/sweep.py" --check` after judgment refresh | **0** on all four runs; final counts above |
+| `python3 -B …/composition/w10-rework.py --prepare` | **0**, witness #16 regenerated; all 104 after-lines read |
+| `python3 -B …/composition/w10-rework.py --verify` | First **1**, scratch output-name adaptation accidentally renamed a ledger input; corrected scoped adaptation **0**. Full composition/resolver and independent replay pass; citation 130 → 0. See composition receipt. |
+| `node scripts/check-legacy-docs-ratchet.mjs` (three default invocations) | **1** each; same three pre-existing failures; log + `w10-commands.json` stderr retained |
+| Same checker `--json`, and `--exceptions /tmp/fgos-work/w10-g9-rework/head-exceptions.json --json` | **1 / 1**, byte-equal result objects |
+| Read-only Git `rev-parse`, `show`, `patch-id --stable`, `merge-base --is-ancestor`, history/caller/status/diff inspections | **0**; missing-source reads **128** are explicit absence evidence, not successes |
+| `git diff --check`; `git diff --cached --name-only` | **0 / 0**, index empty; final scope audit in `w10-final-audit.json` |
+
+Authoring harness attempts are not acceptance proof: `run-g9.py` first exited **1** when the real ratchet returned 1 rather than the requested 0; `final-g9.py` first exited **1** when its five-park assertion exposed a temporary 4-park/1-recomposition result. Correcting the policy to park all five gave **0**. Earlier temporary policy had parked the seven pending recompositions too; that over-broad disposition was corrected and rerun. No failed attempt is represented as green. The preliminary read-only check also exited **1**, before the published before-recompose check.
+
+Older `commands.json`, `determinism.json`, `integrity.json`, `final-audit.json`, historical-pin controls and re-pin receipts remain historical evidence at their own pins; they are **not** this tree's completion claim. Current owning outputs are the files named above. Scratch is confined to `/tmp/fgos-work/w10-g9-rework/` and removed at handoff. No live docs/product code/tests, `.fgos`, secrets, Git writes, fgOS CLI, pair accounting, baseline changes, suite runs or preview service. Assignment outbox publication is the required exception. Final-pin acceptance, parks, semantic review and full-suite parity remain Lead-owned.

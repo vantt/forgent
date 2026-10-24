@@ -1,0 +1,24 @@
+{
+  "exit": 0,
+  "command": {
+    "argv": [
+      "node",
+      "scripts/check-decision-citation-drift.mjs"
+    ],
+    "cwd": "/tmp/fgos-work/w10-g9-rework/verified-tree",
+    "exit": 0,
+    "stdout": "check-decision-citation-drift: no findings.\n",
+    "stderr": ""
+  },
+  "beforeFinalPinFFindings": 130,
+  "afterFinalPinFFindings": 0,
+  "baselineSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+  "baselineUnchanged": true,
+  "witnessesVerified": 104,
+  "correctedWitnessIndices": [
+    16
+  ],
+  "correctedSpecs": 1,
+  "skillGeneratorExit": 0,
+  "meaning": "Zero findings, not merely zero new/unbaselined findings. Both scans run after the real skill generator; no baseline bytes changed."
+}

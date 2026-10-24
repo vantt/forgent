@@ -60,7 +60,12 @@ def main():
         primary = [p for p in row['passages'] if p['path'] == row['path']]
         changed = [p for p in primary if p['classification'] in ('changed', 'absent')]
         missing = [p for p in changed if p['classification'] == 'absent']
-        unresolved = []
+        # A byte-equal primary passage cannot certify a changed dependency
+        # that brought the row into the overlap/source-render cohort.
+        dependency_changes = [p for p in row['passages']
+                              if p['passageId'] in ('explicit-overlap-dependency', 'canonical-source-dependency')
+                              and p['classification'] in ('changed', 'absent')]
+        unresolved = list(dependency_changes)
         retained = []
         for p in changed:
             ident = str(p['passageId']).split('/caller')[0]
@@ -84,27 +89,41 @@ def main():
         j = {k: row[k] for k in ['id', 'recordFile', 'recordLine', 'recordSha256', 'memberships',
                                  'path', 'classification', 'currentFileSha256']}
         j.update(evidenceSha256=sweep.evidence_digest(row['passages']), retainedNonDocumentOperands=retained)
-        if not changed:
+        if dependency_changes:
+            j['unresolvedDependencies'] = [{'path': p['currentPath'], 'passageId': p['passageId'],
+                                            'currentSha256': p['currentSha256']}
+                                           for p in dependency_changes]
+        if not changed and not dependency_changes:
             j.update(disposition='still-valid-as-recorded',
                      reason='Every bound primary consumer passage is byte-equal at the current locator (including moved passages). Retain only its existing operand/retirement decision; protected co-cuts remain explicitly witnessed at current hashes. This does not assert whole-file parity, no new consumers, or final-pin acceptance.')
         elif not unresolved:
             j.update(disposition='still-valid-as-recorded',
                      reason='Changed surrounding context still contains every exact operative expression listed in retainedNonDocumentOperands. Each was already explicitly rejected as a non-document use; preserve that bounded classification, not a runtime-behaviour or fixture approval. Unchanged/moved primary passages retain their original decision.')
-        elif prepared and spec and not missing:
+        elif prepared and spec and not missing and changed:
             j.update(disposition='needs-recomposition', patchSpecId=spec['id'],
                      patchRef='recomposed.json#' + spec['id'],
                      reason='The authored consumer patch must be rebound to this current whole-file preimage; the G9 body and its historical predecessor chain are prepared and fuzz=0 replayed forward/rollback byte-exact. Current non-document operands are retained only where separately listed; semantic/parity acceptance still belongs to independent review.')
+            if dependency_changes:
+                j['reason'] += (' Changed dependencies remain unresolved and must be reviewed with the prepared body: ' +
+                                ', '.join(p['currentPath'] for p in dependency_changes) +
+                                '. This is pending recomposition/review, not a still-valid judgment.')
         else:
             slots = list(dict.fromkeys(str(p['passageId']) for p in unresolved))
             locations = list(dict.fromkeys((p['startLine'], p['endLine']) for p in unresolved if p['startLine']))
             j.update(disposition='owned-park', owner=OWNER,
                      reason=('The bound source file/passage disappeared; the old decision is not transferable to a replacement mechanism.' if missing else
+                             'The primary passage or prepared body does not establish independence from the changed explicit overlap/canonical source dependency. The legacy reading map, when present, remains an old-path park, never validity evidence.' if dependency_changes else
                              'Changed source/caller context is not justified by an exact surviving non-document operand or an authored current-byte consumer patch. Do not promote the old preserve/reject/park premise to acceptance.'),
                      unresolvedPassageIds=slots,
                      nextAction=('Resolve ' + row['recordFile'] + ':' + str(row['recordLine']) +
                                  ' against ' + row['path'] + ' at current ranges ' + str(locations) +
                                  '. Inspect slots ' + ', '.join(slots) +
                                  '; bind each remaining operand to its current operation/root and source owner, or explicitly retire it with the removal proof. Keep this row parked until that bounded source decision and, if needed, its exact successor patch are independently reviewed before F. Do not run the historical patch.'))
+            if dependency_changes:
+                j['nextAction'] += (' Review changed dependencies: ' + '; '.join(
+                    p['currentPath'] + ':' + str(p['startLine']) + '-' + str(p['endLine']) +
+                    ' (' + p['passageId'] + ')' for p in dependency_changes) +
+                    '; prove each change irrelevant to the recorded decision or rebind/retire it explicitly.')
             if row['currentFileSha256'] is None:
                 j['absenceEvidence'] = {'treeObjectId': tree,
                                         'pathListingSha256': sweep.sha(sweep.git('ls-tree', pin, '--', row['path'])),

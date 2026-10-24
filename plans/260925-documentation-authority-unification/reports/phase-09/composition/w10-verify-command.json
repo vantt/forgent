@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "python3",
+    "-B",
+    "/tmp/fgos-work/w10-g9-rework/verify.py"
+  ],
+  "exit": 0,
+  "stdout": "{\n  \"exit\": 0,\n  \"sourceCommit\": \"eb744281deba853f201cda15dcb4876300a1d638\",\n  \"verifiedCheckout\": \"d14d89865b44018db48d12fa8b3f5279a2dbc905\",\n  \"resolver\": \"reports/phase-09/ledgerfix/bindings.py: documents, rows, supersessions, effective, catalog, unit_for, digest\",\n  \"extractorAdaptation\": \"Scratch-only relocation of extract-units.mjs output directory; extraction logic and both embedded immutable extractors unchanged.\",\n  \"sourceBindingAssertions\": 171,\n  \"effectiveBindingRefreshAssertions\": 162,\n  \"effectiveUnitCarryAssertions\": 9,\n  \"distinctTerminalBindings\": 90,\n  \"bindingRefreshTerminalBindings\": 81,\n  \"unitCarryTerminalBindings\": 9,\n  \"duplicateOriginAssertions\": 81,\n  \"operativeOverlays\": 90,\n  \"headingCurrentRows\": 44,\n  \"headingExcludedLookupRows\": 44,\n  \"currentRowsAdded\": 90,\n  \"ambiguousSupersessions\": 0,\n  \"overlayHashesVerified\": 134,\n  \"sourceRowsVerified\": 171,\n  \"movedBodyUnresolved\": 0,\n  \"movedHeadingsUnresolved\": 0,\n  \"allRawBindingAssertions\": 13752,\n  \"distinctEffectiveBindings\": 12510,\n  \"targetFiles\": 285,\n  \"allUnresolvedAssertions\": 556,\n  \"distinctUnresolvedBindings\": 407,\n  \"distinctUnresolvedBefore\": 497,\n  \"componentUnresolvedAssertionsBefore\": 177,\n  \"componentUnresolvedAssertionsAfter\": 6,\n  \"componentUnresolvedDistinctBindingsAfter\": 4,\n  \"remainingDriftExplanation\": \"The 6 remaining component-boundary assertions (4 distinct endpoints) are the reviewed predecessor table edit, not moved units. Other full-chain drift is disclosed, not fixed or hidden; post-apply systemic rebind remains Lead-owned.\",\n  \"independentG0Review\": \"pending\"\n}\n",
+  "stderr": ""
+}

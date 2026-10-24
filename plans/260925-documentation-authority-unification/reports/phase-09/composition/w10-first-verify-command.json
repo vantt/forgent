@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "python3",
+    "-B",
+    "/tmp/fgos-work/w10-g9-rework/verify.py"
+  ],
+  "exit": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/tmp/fgos-work/w10-g9-rework/verify.py\", line 44, in <module>\n    body=docs[str(LEDGER/'w10-component-carriage-body-overlays.json')]\nKeyError: 'plans/260925-documentation-authority-unification/ledger/decisions/w10-component-carriage-body-overlays.json'\n"
+}

@@ -371,7 +371,7 @@
     ]
   },
   "previousMainMergeAccounting": {
-    "inputCommit": "92260972cb2dc2ab3740859dc1c005bb9be42857",
+    "inputCommit": "5965143b4fd56df6698b2096df1a672d26293c90",
     "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
     "commit": "022c0ee67447d40ff72bdee307e1988aae2f36a0",
     "objectSha256": "4957bd9e261f8a51a6e2d94910a62a26a1bb1f4517f2b562d1d0bec8c201e2a7",

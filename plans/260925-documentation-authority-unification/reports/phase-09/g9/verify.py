@@ -11,7 +11,7 @@ import tempfile
 
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
-TMP = Path('/tmp/fgos-work/w9-g9')
+TMP = Path('/tmp/fgos-work/w10-g9-rework')
 TMP.mkdir(parents=True, exist_ok=True)
 sp = importlib.util.spec_from_file_location('g9_sweep', HERE / 'sweep.py')
 sweep = importlib.util.module_from_spec(sp)
@@ -38,13 +38,9 @@ def main():
         assert before is not None and sweep.sha(before) == spec['beforeSha256'], path
         # Verify predecessor identity and body digests against original records,
         # not only a self-consistent recomposed packet.
-        originals = selected[path]
-        assert len(originals) == len(spec['predecessorChain'])
-        for original, edge in zip(originals, spec['predecessorChain']):
-            assert edge['specId'] == original.get('id', original.get('patchSpecId'))
-            assert edge['beforeSha256'] == original['beforeSha256']
-            assert edge['expectedAfterSha256'] == original['expectedAfterSha256']
-            assert edge['diffSha256'] == sweep.sha(original['diff'])
+        expected = sweep.chain_identity(selected[path])
+        assert [{k: edge.get(k) for k in expected[0]}
+                for edge in spec['predecessorChain']] == expected, path
         with tempfile.TemporaryDirectory(dir=TMP, prefix='verification-') as name:
             target = Path(name) / path
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -73,6 +69,9 @@ def main():
     bodies = sweep.load(HERE / 'passages.json')['passages']
     for judgment in judgments:
         row = byid[judgment['id']]
+        if judgment['disposition'] == 'still-valid-as-recorded':
+            assert not any(p['passageId'] in ('explicit-overlap-dependency', 'canonical-source-dependency')
+                           and p['classification'] in ('changed', 'absent') for p in row['passages']), row['id']
         for actual, witness in zip(row['passages'], judgment['evidence']):
             body = {k: v for k, v in actual.items() if k not in ['passageId', 'recordedDisposition']}
             stored = bodies[witness['evidenceRef'].split('#', 1)[1]]

@@ -1,0 +1,4 @@
+check-legacy-docs-ratchet: 3 violation(s) found under legacy roots:
+  - [unaccounted-edit] docs/specs/confinement-authority.md: modified maintained file has exception but digest mismatch (expected 7b37adb1c1bf751cd9e87d9d17c748343012738cc860f8dba74d950069afb34e, got f13fc58b938d464fb8a0db4fe651720d7566ea02d5a003f4a581717defba0564)
+  - [unaccounted-edit] docs/specs/reading-map.md: modified maintained file has exception but digest mismatch (expected 70b55dd49b5f5eebe6203ff4bae1fe853a6c14136ce5e26bdb26b56fd4e3421b, got 46c52e950dab2606b1ca5e6fb0c76d310c3316b065855e77c00e3834bd2d7e8e)
+  - [unaccounted-edit] docs/specs/seat-binding.md: new maintained file has exception but digest mismatch (expected d297de21e54e8a8f1cf32b71b288036154f285065d86e0002b352b4a92ebeb13, got be53fb710688f798fe9dd488466e21e5dd539e27550dfa7910522ac0056a20be)

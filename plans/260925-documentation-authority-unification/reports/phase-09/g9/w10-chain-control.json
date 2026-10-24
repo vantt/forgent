@@ -1,0 +1,156 @@
+{
+  "staleRealPacketMismatches": [
+    {
+      "path": "docs/platform/agent-protocol/spec.md",
+      "recordedChain": [
+        {
+          "specId": "file:docs/platform/agent-protocol/spec.md",
+          "beforeSha256": "6bd368bab828957e2deded14d6f3bf8c571a8ff44eefa45e61f7eb30a506b0bd",
+          "expectedAfterSha256": "0fe37f248a5281441b075104a586484b55f22d82e391a6e98a91f4decfa7fd58",
+          "diffSha256": "4ff0bd2ca7c0b95ad96307fe002a0e63ab73963dfaf7105cf5768699a888db62"
+        },
+        {
+          "specId": "w8:gloss:docs/platform/agent-protocol/spec.md",
+          "beforeSha256": "0fe37f248a5281441b075104a586484b55f22d82e391a6e98a91f4decfa7fd58",
+          "expectedAfterSha256": "cb02896630a5df118f6a6103236f03053db85ee80961d11ef659e082ce4aaa8b",
+          "diffSha256": "8c2d0b63ecca3554f039cd9a14f6e1c4778d61422e57dab821cf5f5cca68e226"
+        }
+      ],
+      "currentCompositionChain": [
+        {
+          "specId": "file:docs/platform/agent-protocol/spec.md",
+          "beforeSha256": "6bd368bab828957e2deded14d6f3bf8c571a8ff44eefa45e61f7eb30a506b0bd",
+          "expectedAfterSha256": "0fe37f248a5281441b075104a586484b55f22d82e391a6e98a91f4decfa7fd58",
+          "diffSha256": "4ff0bd2ca7c0b95ad96307fe002a0e63ab73963dfaf7105cf5768699a888db62"
+        },
+        {
+          "specId": "w8:gloss:docs/platform/agent-protocol/spec.md",
+          "beforeSha256": "0fe37f248a5281441b075104a586484b55f22d82e391a6e98a91f4decfa7fd58",
+          "expectedAfterSha256": "f21425ed4cb40d71e92fd5d5ae81cd50ea098844b668542181b00e9ec8dc031e",
+          "diffSha256": "8c2caa612865aafb348ed8e9b7eda61d9e7170173301001d582efd73b748b9b7"
+        }
+      ],
+      "error": "recomposed body missing or stale; recompose before G9 can pass"
+    },
+    {
+      "path": "docs/platform/event-store/spec.md",
+      "recordedChain": [
+        {
+          "specId": "w8:gloss:docs/platform/event-store/spec.md",
+          "beforeSha256": "06d74072fd4ee70b2427e363b2f00300664b8580a2113e882930f29e0835fbe0",
+          "expectedAfterSha256": "b0d3da372952e6ac2ab3b5e616a31a3ee9d71c55db671117390a983b0ea2792d",
+          "diffSha256": "d7b71adbb6b357d029ba7111d63f08c52beb7ed2bc8a0a6f0e4a034b89ff6b37"
+        }
+      ],
+      "currentCompositionChain": [
+        {
+          "specId": "w8:gloss:docs/platform/event-store/spec.md",
+          "beforeSha256": "06d74072fd4ee70b2427e363b2f00300664b8580a2113e882930f29e0835fbe0",
+          "expectedAfterSha256": "061f4d67b6b493a69007391b688dcabdb3ff7c2822d4e185b87f86fbce80683b",
+          "diffSha256": "3e6e8e4febdeac5b470b15b59792ac68c13a66d0d6bcf4ede1417f81c0ce7bf6"
+        }
+      ],
+      "error": "recomposed body missing or stale; recompose before G9 can pass"
+    },
+    {
+      "path": "docs/platform/git/spec.md",
+      "recordedChain": [
+        {
+          "specId": "w8:repin:w2:predecessor:docs/platform/git/spec.md",
+          "beforeSha256": "63856aff2b0d80be616388cd3059ccfbebcd096d9e55ec83b19cd3ec4a748d9e",
+          "expectedAfterSha256": "fc3f666950a4b9c70fa90904ced2897b1edf0cdd219ff44313317e67dc511b41",
+          "diffSha256": "a6296d870020152f4790c872a5cecac1c561666863943970296c034afb365b5e"
+        },
+        {
+          "specId": "w8:gloss:docs/platform/git/spec.md",
+          "beforeSha256": "fc3f666950a4b9c70fa90904ced2897b1edf0cdd219ff44313317e67dc511b41",
+          "expectedAfterSha256": "912e18c3c2bcfd85377abc4b492d64e9a4b64ced8727cdc272e1587fbbc28a76",
+          "diffSha256": "b1bf1c3a4f5193eb1cb9f7a883ec66c2be033b41b473e1c08fc4f7bbb90a7c4c"
+        }
+      ],
+      "currentCompositionChain": [
+        {
+          "specId": "w8:repin:w2:predecessor:docs/platform/git/spec.md",
+          "beforeSha256": "63856aff2b0d80be616388cd3059ccfbebcd096d9e55ec83b19cd3ec4a748d9e",
+          "expectedAfterSha256": "fc3f666950a4b9c70fa90904ced2897b1edf0cdd219ff44313317e67dc511b41",
+          "diffSha256": "a6296d870020152f4790c872a5cecac1c561666863943970296c034afb365b5e"
+        },
+        {
+          "specId": "w8:gloss:docs/platform/git/spec.md",
+          "beforeSha256": "fc3f666950a4b9c70fa90904ced2897b1edf0cdd219ff44313317e67dc511b41",
+          "expectedAfterSha256": "f9c14f9d06a5fff19ec346ab78d78b581ac683023f64bbd7fdad9e4131308e9f",
+          "diffSha256": "ecfea9164ff999c46564926ab9d69bc33c271a742ddbbcd597e9512b87a59588"
+        }
+      ],
+      "error": "recomposed body missing or stale; recompose before G9 can pass"
+    },
+    {
+      "path": "docs/platform/process/spec.md",
+      "recordedChain": [
+        {
+          "specId": "hunk-park:docs/platform/process/spec.md",
+          "beforeSha256": "1ed03ecc353df1b180802791cdb904904f6141347720339347377cb5b48236db",
+          "expectedAfterSha256": "2f64f7e783fba8fb1a59203781ed6176e65ec79c1489ea1af7b0ec0628d1b290",
+          "diffSha256": "fd47af2f5eae43b278ea3e500bd2d86f155548eebdda9536bdb8f1234ad91ef1"
+        },
+        {
+          "specId": "w8:gloss:docs/platform/process/spec.md",
+          "beforeSha256": "2f64f7e783fba8fb1a59203781ed6176e65ec79c1489ea1af7b0ec0628d1b290",
+          "expectedAfterSha256": "fba913315219d7b4d5687fd9ae5086aafc7ba97e9e69046280b01e8d00d7a08f",
+          "diffSha256": "8840976e4a638e61e2ed4fbe3b54cc9f9a8f64b06ccfa076568b3ded46532f8d"
+        }
+      ],
+      "currentCompositionChain": [
+        {
+          "specId": "hunk-park:docs/platform/process/spec.md",
+          "beforeSha256": "1ed03ecc353df1b180802791cdb904904f6141347720339347377cb5b48236db",
+          "expectedAfterSha256": "2f64f7e783fba8fb1a59203781ed6176e65ec79c1489ea1af7b0ec0628d1b290",
+          "diffSha256": "fd47af2f5eae43b278ea3e500bd2d86f155548eebdda9536bdb8f1234ad91ef1"
+        },
+        {
+          "specId": "w8:gloss:docs/platform/process/spec.md",
+          "beforeSha256": "2f64f7e783fba8fb1a59203781ed6176e65ec79c1489ea1af7b0ec0628d1b290",
+          "expectedAfterSha256": "6c0c0793016ff22233e542b7e836c06128efb3fc6cef045bafbc626e94106cfe",
+          "diffSha256": "0afb69e44d58deddc53b8a05de14a1cce97c6f8ebbd2b50738db9314a0a1edc6"
+        }
+      ],
+      "error": "recomposed body missing or stale; recompose before G9 can pass"
+    },
+    {
+      "path": "docs/platform/terminal-control/spec.md",
+      "recordedChain": [
+        {
+          "specId": "w8:base:docs/platform/terminal-control/spec.md",
+          "beforeSha256": "c464ce042ccb9c29ff9471f3485f4c906ace06d848006e056494d0024c0bac94",
+          "expectedAfterSha256": "cf8be0860804b2cd05ad58fbe56343cdf9c5b91422acee96d516ad1038b6c916",
+          "diffSha256": "6cc216055b85d7f3ee78df6a72bbdf5cbc893dc6428edd0a4fb8ca5ad15eb604"
+        },
+        {
+          "specId": "w8:gloss:docs/platform/terminal-control/spec.md",
+          "beforeSha256": "cf8be0860804b2cd05ad58fbe56343cdf9c5b91422acee96d516ad1038b6c916",
+          "expectedAfterSha256": "0cdb198c1e80c22c693979e374351f966db169225fab2288ffba6a5ae704b982",
+          "diffSha256": "0f293138ab84839b89a6d436c39b10e3b9fba543431158023df3ebd511cabb24"
+        }
+      ],
+      "currentCompositionChain": [
+        {
+          "specId": "w8:base:docs/platform/terminal-control/spec.md",
+          "beforeSha256": "c464ce042ccb9c29ff9471f3485f4c906ace06d848006e056494d0024c0bac94",
+          "expectedAfterSha256": "cf8be0860804b2cd05ad58fbe56343cdf9c5b91422acee96d516ad1038b6c916",
+          "diffSha256": "6cc216055b85d7f3ee78df6a72bbdf5cbc893dc6428edd0a4fb8ca5ad15eb604"
+        },
+        {
+          "specId": "w8:gloss:docs/platform/terminal-control/spec.md",
+          "beforeSha256": "cf8be0860804b2cd05ad58fbe56343cdf9c5b91422acee96d516ad1038b6c916",
+          "expectedAfterSha256": "31b58697f3140b26f563b272d4ea1b4b33d4dc8107aac6369cc28d69100b5363",
+          "diffSha256": "fe2030c969fb3fe1bbfb4a4a7150cbce98f61412a3870af32e92f2a3157c87fd"
+        }
+      ],
+      "error": "recomposed body missing or stale; recompose before G9 can pass"
+    }
+  ],
+  "currentJudgmentErrors": 0,
+  "currentPacketMismatches": 0,
+  "inMemoryOnly": true,
+  "reason": "The before-recompose --check actually exited 1; this isolated replay confirms the five stale chains independently of the classifier judgment refresh."
+}

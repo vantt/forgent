@@ -1,0 +1,120 @@
+{
+  "oldCommit": "92260972cb2dc2ab3740859dc1c005bb9be42857",
+  "newCommit": "5965143b4fd56df6698b2096df1a672d26293c90",
+  "stablePatchId": "585be0a439f62fe3c25787d27bb35ba6714bd426",
+  "wholeExceptionsBlobByteEqual": true,
+  "blobSha256": "67d639b04bce8342a1bcd245a1b6736bbbddfcd33f47ed2664c90a524cc5e65e",
+  "objectSha256": "4957bd9e261f8a51a6e2d94910a62a26a1bb1f4517f2b562d1d0bec8c201e2a7",
+  "expectedObjectSha256": "4957bd9e261f8a51a6e2d94910a62a26a1bb1f4517f2b562d1d0bec8c201e2a7",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "92260972c^{commit}"
+      ],
+      "exit": 0,
+      "stdoutSha256": "856860989700ff27b60e87b30827eb40bedaece5a3ae3d8fde70c10f7043a8df",
+      "stdoutBytes": 41,
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "5965143b4^{commit}"
+      ],
+      "exit": 0,
+      "stdoutSha256": "7bc2bd20bcb6e47b5e83ff8c5c3d47582f93b1d638927ef04443da6b5697d380",
+      "stdoutBytes": 41,
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "--format=commit %H",
+        "92260972cb2dc2ab3740859dc1c005bb9be42857"
+      ],
+      "exit": 0,
+      "stdoutSha256": "2604b926f5f33ec29a983d737803f432b38c52eb437909f769916658ab17add2",
+      "stdoutBytes": 2204931,
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "exit": 0,
+      "stdoutSha256": "99ecf3687729b5ef0e3b3c585dbdc833f5b057145fbc65e70f6d17117ab2a4b6",
+      "stdoutBytes": 82,
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "92260972cb2dc2ab3740859dc1c005bb9be42857:scripts/check-legacy-docs-ratchet.exceptions.json"
+      ],
+      "exit": 0,
+      "stdoutSha256": "67d639b04bce8342a1bcd245a1b6736bbbddfcd33f47ed2664c90a524cc5e65e",
+      "stdoutBytes": 78315,
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "--format=commit %H",
+        "5965143b4fd56df6698b2096df1a672d26293c90"
+      ],
+      "exit": 0,
+      "stdoutSha256": "dfcab9c53b8c44a5958d5cf47c17ed4eb75eab746d8f0e5e9635d750da68d82f",
+      "stdoutBytes": 2204931,
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "exit": 0,
+      "stdoutSha256": "acc383ca574165e409ae08ad02b391acf2b07d9c4f4e0fb3f7a208d28bb03900",
+      "stdoutBytes": 82,
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "5965143b4fd56df6698b2096df1a672d26293c90:scripts/check-legacy-docs-ratchet.exceptions.json"
+      ],
+      "exit": 0,
+      "stdoutSha256": "67d639b04bce8342a1bcd245a1b6736bbbddfcd33f47ed2664c90a524cc5e65e",
+      "stdoutBytes": 78315,
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "5965143b4fd56df6698b2096df1a672d26293c90",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 0,
+      "stderr": ""
+    }
+  ]
+}

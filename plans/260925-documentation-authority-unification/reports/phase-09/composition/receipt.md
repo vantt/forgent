@@ -1,42 +1,50 @@
-# Composition receipt — reworked records, not live application
+# Composition receipt — replayed records, not live application
 
-Record pin: `eb744281deba853f201cda15dcb4876300a1d638`; replayed checkout: `70e57b016452c455c28cae7e2d983c6e34bbf34c`. Authority: **L13-11.2**. This receipt supersedes the earlier overlay/gloss/action evidence; other `w8-*` proofs remain historical. No documentation authority is promoted, no gate is closed, and no prepared patch is applied outside scratch.
+Current replay pin: **`d14d89865b44018db48d12fa8b3f5279a2dbc905`**. The packet's original author pin `eb744281deba853f201cda15dcb4876300a1d638` remains provenance, not a claim that these proofs ran there. Authority: L13-11.2 and the bounded rework brief. **Composition verification passes.** No documentation authority is promoted, no gate is closed, and no patch is applied outside scratch. This supersedes earlier receipt replay/gloss evidence; historical `w8-*`/`w9-*` artifacts remain dated evidence.
 
-## Binding repair
+## Gloss repair
 
-- The resolver reproduces **171 affected originating assertions**, whose effective destinations are **162 `bindingRefresh` occurrences + 9 `unitCarries` occurrences** in `s14-resync-b.json`. These are **90 distinct terminal rows: 81 + 9**, not 171 distinct rows. The other 81 occurrences are earlier claims resolving to those same terminals.
-- `ledger/decisions/w9-component-carriage-body-overlays.json` adds **90 operative overlays** and **171 explicit origin → terminal → overlay joins**. Adding two supersession edges for the same terminal would be ambiguous; those duplicate edges were not fabricated to meet an occurrence count.
-- Every target is the moved history file's body anchor with the **same `textDigest` and body bytes**. Repeated identical text is disambiguated by the preserved ancestry suffix. All 171 joins resolve; **0 moved body bindings and 0 moved heading bindings remain unresolved**.
-- The existing heading shard keeps **44 operative overlays**. Its **44 lookup-only records** now live under `alreadySupersededHistoricalBindings`, an existing `bindings.py` snapshot exclusion. `rows()` sees exactly 44 current rows, not 88; no resolver/code change was needed. All original 88 records remain preserved as JSON values.
-- **134 current overlay hashes**, anchors and ancestry verify; no ambiguous supersession edges. Independent **G0 review remains pending**.
+Read all **104 witness after-lines** again for doubled words, dangling articles and broken prose caused by removing an id. **One fix**, zero-based **witness #16**:
 
-The complete post-chain scan resolves **13,752 originating assertions / 12,510 distinct effective bindings / 285 target files**. Residual drift is explicitly **556 assertions / 407 distinct bindings**, inventoried in [w9-unresolved-bindings.json](w9-unresolved-bindings.json). Component-boundary failures fall **177 → 6**; the remaining six are the previously reviewed table-edit drift (four distinct endpoints), not moved units. This is **not** a claim that all ledger bindings are green. Systemic post-apply rebind remains Lead-owned.
+- File: `docs/platform/event-store/spec.md:1138`.
+- Before: `consumer streams (plan porting uses …)`.
+- After: `consumer streams (in the plan, porting uses …)`.
 
-## Glosses and action
+The existing `w8:gloss:docs/platform/event-store/spec.md` forward diff, rollback diff and expected-after hash were regenerated from the actual replayed preimage; the witness was regenerated too. All 104 witness before/after lines match their exact replayed locators. No other removal-induced doubled-word/dangling-article fault was found. The earlier seven fixes (#3, #9, #15, #33, #86, #87, #96) remain; optional grammatical redundancy was not expanded into polish. [w10-gloss-audit.json](w10-gloss-audit.json) lists the complete review set and the exact fix.
 
-Seven witnesses (**zero-based indices 3, 9, 15, 33, 86, 87, 96**) are reworded in five existing `w8:gloss:*` specs. Forward/rollback diffs and after hashes were regenerated; all **104 witnesses** reproduce from replayed bytes. The Process Facts historical title and its later cross-reference use identical wording.
+Full-chain replay: **79 effective + 14 conditional F specs + 13 external predecessor applications = 106 steps on 74 files**, with **424 GNU patch invocations, all exit 0**. Every step is hash-guarded, rolled back byte-exact and reapplied; full reverse rollback restores every original byte and original absence. Independent replay separately passes **221 patch invocations**, including generator evidence, with the same 74-file restoration. See [w10-chain-verification.json](w10-chain-verification.json) and [w10-independent-verification.json](w10-independent-verification.json).
 
-After the real skill generator, the citation checker reports **130 findings before F → “no findings” after F**, not merely zero new findings. Baseline bytes remain unchanged (`ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff`). The 14 F specs remain prepared-only, subject to the final-pin docs lease and exact preimage checks.
+After the **real skill generator**, citation drift is **130 findings without F (exit 1, negative control) → no findings with F (exit 0)**. This is zero findings, not merely zero new findings. The baseline remains byte-identical, SHA-256 `ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff`. Evidence: [w10-citation-before-f.json](w10-citation-before-f.json), [w10-citation-verification.json](w10-citation-verification.json). The 14 F specs are still prepared-only and require final-pin lease/preimage acceptance.
 
-`actions.json#/actions/4.path` now equals `effectivePath`: `docs/platform/workflow/spec.md`. Its before/current-source/after hashes match that holder and its patch. The original action identity and explicitly labelled legacy-source provenance remain available.
+G9 was recomposed against this chain. Exactly five current bodies changed (`agent-protocol`, `event-store`, `git`, `process`, `terminal-control` specs); the other 540 body diffs/hashes did not. The new G9 chain-identity check fails before recomposition and passes afterwards. See [G9 receipt](../g9/receipt.md) for counts, controls and its separate pre-existing ratchet blocker.
+
+## Binding and action verification retained
+
+The existing shared resolver and both immutable extractors were rerun, not replaced:
+
+- **171 originating assertions** resolve through **162 binding-refresh occurrences + 9 unit-carry occurrences** to **90 distinct terminal rows (81 + 9)**. The other 81 occurrences are earlier claims superseding into those terminals; they are not a reason to invent duplicate supersession edges.
+- All 171 joins resolve to the 90 operative body overlays. Target body bytes and text digests equal the original component-boundary blocks, with repeated text disambiguated by preserved ancestry. **Zero moved-body and zero moved-heading bindings are unresolved**.
+- Heading shard: **44 operative overlays + 44 excluded lookup snapshots**; the existing `rows()` snapshot policy excludes the latter. **134 overlay hashes/anchors/ancestries verify**, with no ambiguous supersession edge. No ledger/resolver edit was required in this turn.
+- Full scan: **13,752 assertions / 12,510 distinct effective bindings / 285 target files**, zero missing files. Residual drift remains **556 assertions / 407 distinct bindings**, explicitly **not all green**. Component-boundary unresolved assertions fall **177 → 6 (4 distinct endpoints)**, all reviewed table-edit drift rather than moved bodies. Systemic post-apply rebind remains Lead-owned. The W10 review's historical split (361 chain-induced + 46 pre-existing distinct bindings) is not recomputed or newly asserted here.
+- `actions.json#/actions/4.path` and `effectivePath` still equal `docs/platform/workflow/spec.md`, with source/preimage/postimage hashes matching the composed holder. Historical identity and labelled legacy-source provenance remain unchanged.
+
+Evidence: [w10-gap05-verification.json](w10-gap05-verification.json), [w10-unresolved-bindings.json](w10-unresolved-bindings.json), [w10-action-verification.json](w10-action-verification.json). Independent G0 acceptance remains pending. No component-boundary change.
 
 ## Commands and exits
 
-[w9-commands.json](w9-commands.json) records every verifier subprocess's exact argv, cwd and exit, including failed/negative attempts: **2,211 commands, 2,207 exit 0, 4 exit 1**. Large stdout is content-hashed rather than duplicated. Outer authoring/inspection commands and two tool timeouts are listed separately there; a timeout has no invented process exit.
+The complete reproduction door is `python3 -B plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-rework.py --verify`, from the repository root with a fresh `/tmp/fgos-work/w10-g9-rework/`. [w10-replay-recipes.json](w10-replay-recipes.json) embeds the adapted actual scripts; only scratch/output locations and correction metadata differ from the W9 recipe. Shared resolver/extraction logic is unchanged. The existing Step 7 authored-hunk/parser and published chain replay are reused, not replaced by fuzzy matching.
 
-| Command / proof | Counts and exit |
+| Command / proof | Exit / evidence |
 |---|---|
-| Final full-chain `patch --batch --fuzz=0 -p1` replay | **79 effective + 14 F + 13 predecessor applications; 74 files; 424 patch invocations, all 0**. Each step rolls back exactly; full reverse rollback restores original bytes and original absence. |
-| Reused standalone independent replay | **221 patch invocations, all 0**, including generator-evidence roundtrips; 74 files exact. The first attempt timed out at 200 s; the retry exited 0. |
-| `node scripts/build-skill-wrappers.mjs` | Final before-F and after-F runs each **0**. |
-| `node scripts/check-decision-citation-drift.mjs` | Before F **1** (130 findings, expected); after F **0** (no findings). Three before-F runs across authoring attempts account for three recorded exit-1 commands. |
-| Shared `bindings.py` + both immutable extractors | Final catalog/resolution/hash checks **0**. Initial catalog command **1** for a missing scratch registry fixture; copying the existing immutable registry corrected it. |
-| `python3 -B …/overlays.py` | Initial **1** on repeated-digest ambiguity, before publication; corrected digest + ancestry join **0**. |
-| `python3 -B …/verify.py` | Initial **1** because the assertion expected the weaker “no new findings” message; actual scan was already clean. Both corrected runs **0**. |
-| `python3 -B …/publish.py` | **0**; publishes generated evidence and reproduction recipes. |
-| Read-only Git history/status/diff inspections | **0** on completed commands; one combined history inspection timed out at 10 s. No Git write. |
-| Final JSON/scope/value-preservation checks and `git diff --check` | **0**; see `w9-scope-verification.json`. |
+| `python3 -B …/composition/w10-rework.py --prepare` | **0**; initial full-chain byte replay, #16 regeneration. `w10-prepare-commands.json`: **425 commands, all 0**, including 424 patch calls. |
+| `python3 -B …/composition/w10-rework.py --verify` | Final **0**. `w10-verify-command.json` records the reused verifier's exact argv/stdout/stderr. |
+| Reused scratch `python3 -B …/verify.py` | **0**; patch, witness, citation, bindings, overlays and action checks pass. `w10-commands.json`: **522 commands, 521 exit 0 / 1 exit 1** (the intended before-F citation negative), including 513 patch invocations (89 before F + 424 full-chain). |
+| `node scripts/build-skill-wrappers.mjs` in before-F/full-chain scratch trees | **0 / 0**. |
+| `node scripts/check-decision-citation-drift.mjs` in those trees | **1 / 0**, 130 findings / no findings. |
+| Shared Node extractor adapter / read-only Git pin inspection | **0**. |
+| Reused scratch `python3 -B …/independent-replay.py` | **0**; 221 patch invocations all 0. Exact commands are in `w10-independent-verification.json`; outer exit/stderr in `w10-independent-command.json`. |
+| `git diff --check`, scope/value audit | **0**; see G9 `w10-final-audit.json`. |
 
-Reproduction: [w9-replay-recipes.json](w9-replay-recipes.json) embeds the actual scripts. Extract into a clean `/tmp/fgos-work/w9-comp-rework/`, then run both verifier commands with **`python3 -B` from the repository root**. The shared extractor adapter changes only its scratch-output path; its extraction logic and both embedded extractors remain unchanged.
+One development attempt of `--verify` exited **1**: an over-broad output-name substitution also renamed the ledger input to a nonexistent `w10-component-carriage-body-overlays.json`. No ledger was edited. The adaptation was restricted to the six output filenames, the two disposable scratch verification trees were removed, and the full verifier reran green. `w10-first-verify-command.json` retains that actual error; `w10-first-commands.json` retains **520 subprocess commands (519 exit 0, one expected citation-negative exit 1)** before the Python assertion. The scratch cleanup command exited 0. No failed attempt is presented as evidence of completion.
 
-Only the two granted record subtrees were changed. No live `docs/`, product code/tests, baseline, state/secrets, pair accounting, Git write, fgOS CLI, full suite or preview service. `impact-analysis: degraded` under the explicit no-CLI, records-only grant; no production symbol changed. Historical focused-test, UI, index and switchboard proofs were not rerun or represented as new evidence. **`needsWrites=[]`**. Final-pin approval, independent G0/G7/G9 review, actual cutover generators/doctor, systemic rebind and full-suite parity remain separate Lead-owned gates.
+Only composition records and G9 records plus the separately authorized exceptions **pin field** changed. No live docs, product code/tests, baseline, pair accounting, Git write, fgOS CLI, state/secrets, full suite or preview service. `impact-analysis: degraded` under the explicit records-only/no-CLI brief. Scratch is deleted at handoff. `needsWrites=[]`. The default legacy ratchet remains **exit 1 on three pre-existing digest mismatches**, independently proven unchanged by the pin repair; therefore the overall assignment is blocked, not done. Final-pin approval, independent review, actual cutover generators/doctor, systemic rebind and full-suite parity remain separate Lead-owned gates.

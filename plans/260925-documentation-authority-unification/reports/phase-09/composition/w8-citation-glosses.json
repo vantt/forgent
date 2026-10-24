@@ -198,7 +198,7 @@
         "D9"
       ],
       "before": "- Section 5 names `project:<name>` consumer streams (plan D9: porting uses `project:porting`, Work keeps `project`). The crate already accepted them and seals them onto the machine's `events` ref with their own `seq` (`seal_publication.rs`, `project_consumer_streams_share_one_ref_without_false_move_or_sequence_reuse`).",
-      "after": "- Section 5 names `project:<name>` consumer streams (plan porting uses `project:porting`, Work keeps `project`). The crate already accepted them and seals them onto the machine's `events` ref with their own `seq` (`seal_publication.rs`, `project_consumer_streams_share_one_ref_without_false_move_or_sequence_reuse`).",
+      "after": "- Section 5 names `project:<name>` consumer streams (in the plan, porting uses `project:porting`, Work keeps `project`). The crate already accepted them and seals them onto the machine's `events` ref with their own `seq` (`seal_publication.rs`, `project_consumer_streams_share_one_ref_without_false_move_or_sequence_reuse`).",
       "ownership": "main-at-F"
     },
     {

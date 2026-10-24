@@ -1,5 +1,5 @@
 {
-  "pin": "cd4f80eccbb5c44893daec58af416395d139494b",
+  "pin": "d14d89865b44018db48d12fa8b3f5279a2dbc905",
   "status": "pass",
   "uniqueRecords": 574,
   "cohortMemberships": 684,
@@ -2198,7 +2198,7 @@
     {
       "path": "docs/platform/agent-protocol/spec.md",
       "beforeSha256": "6bd368bab828957e2deded14d6f3bf8c571a8ff44eefa45e61f7eb30a506b0bd",
-      "expectedAfterSha256": "cb02896630a5df118f6a6103236f03053db85ee80961d11ef659e082ce4aaa8b",
+      "expectedAfterSha256": "f21425ed4cb40d71e92fd5d5ae81cd50ea098844b668542181b00e9ec8dc031e",
       "roundtripExact": true
     },
     {
@@ -2264,13 +2264,13 @@
     {
       "path": "docs/platform/event-store/spec.md",
       "beforeSha256": "06d74072fd4ee70b2427e363b2f00300664b8580a2113e882930f29e0835fbe0",
-      "expectedAfterSha256": "b0d3da372952e6ac2ab3b5e616a31a3ee9d71c55db671117390a983b0ea2792d",
+      "expectedAfterSha256": "061f4d67b6b493a69007391b688dcabdb3ff7c2822d4e185b87f86fbce80683b",
       "roundtripExact": true
     },
     {
       "path": "docs/platform/git/spec.md",
       "beforeSha256": "63856aff2b0d80be616388cd3059ccfbebcd096d9e55ec83b19cd3ec4a748d9e",
-      "expectedAfterSha256": "912e18c3c2bcfd85377abc4b492d64e9a4b64ced8727cdc272e1587fbbc28a76",
+      "expectedAfterSha256": "f9c14f9d06a5fff19ec346ab78d78b581ac683023f64bbd7fdad9e4131308e9f",
       "roundtripExact": true
     },
     {
@@ -2390,7 +2390,7 @@
     {
       "path": "docs/platform/process/spec.md",
       "beforeSha256": "1ed03ecc353df1b180802791cdb904904f6141347720339347377cb5b48236db",
-      "expectedAfterSha256": "fba913315219d7b4d5687fd9ae5086aafc7ba97e9e69046280b01e8d00d7a08f",
+      "expectedAfterSha256": "6c0c0793016ff22233e542b7e836c06128efb3fc6cef045bafbc626e94106cfe",
       "roundtripExact": true
     },
     {
@@ -2564,7 +2564,7 @@
     {
       "path": "docs/platform/terminal-control/spec.md",
       "beforeSha256": "c464ce042ccb9c29ff9471f3485f4c906ace06d848006e056494d0024c0bac94",
-      "expectedAfterSha256": "0cdb198c1e80c22c693979e374351f966db169225fab2288ffba6a5ae704b982",
+      "expectedAfterSha256": "31b58697f3140b26f563b272d4ea1b4b33d4dc8107aac6369cc28d69100b5363",
       "roundtripExact": true
     },
     {

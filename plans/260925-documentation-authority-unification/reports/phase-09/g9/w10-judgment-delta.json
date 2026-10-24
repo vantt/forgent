@@ -1,0 +1,247 @@
+{
+  "recordChanges": [
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:3",
+      "classificationBefore": "changed",
+      "classificationAfter": "changed",
+      "dispositionBefore": "still-valid-as-recorded",
+      "dispositionAfter": "owned-park",
+      "unresolvedDependencies": [
+        {
+          "path": "domains/coding/skills/_shared/coding-cell-policy.md",
+          "passageId": "canonical-source-dependency",
+          "currentSha256": "c8bb7df8a38059cc8bbe70adc524acf2838f0c7d5e785b894f0c6a17724aa0b7"
+        }
+      ]
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:96",
+      "classificationBefore": "changed",
+      "classificationAfter": "changed",
+      "dispositionBefore": "still-valid-as-recorded",
+      "dispositionAfter": "owned-park",
+      "unresolvedDependencies": [
+        {
+          "path": "domains/coding/skills/_shared/coding-cell-policy.md",
+          "passageId": "canonical-source-dependency",
+          "currentSha256": "c8bb7df8a38059cc8bbe70adc524acf2838f0c7d5e785b894f0c6a17724aa0b7"
+        }
+      ]
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl:34",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl:52",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl:57",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl:62",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl:66",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl:72",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl:140",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl:145",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl:150",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl:158",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl:75",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl:109",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl:110",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl:122",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl:159",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl:165",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl:3",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl:25",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl:28",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl:33",
+      "classificationBefore": "changed",
+      "classificationAfter": "moved",
+      "dispositionBefore": "owned-park",
+      "dispositionAfter": "still-valid-as-recorded",
+      "unresolvedDependencies": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl:3",
+      "classificationBefore": "changed",
+      "classificationAfter": "changed",
+      "dispositionBefore": "still-valid-as-recorded",
+      "dispositionAfter": "owned-park",
+      "unresolvedDependencies": [
+        {
+          "path": "docs/architecture-manifest.json",
+          "passageId": "explicit-overlap-dependency",
+          "currentSha256": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174"
+        }
+      ]
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl:4",
+      "classificationBefore": "changed",
+      "classificationAfter": "changed",
+      "dispositionBefore": "still-valid-as-recorded",
+      "dispositionAfter": "owned-park",
+      "unresolvedDependencies": [
+        {
+          "path": "docs/backlog.md",
+          "passageId": "explicit-overlap-dependency",
+          "currentSha256": "d0fb356de66a0bdfffac2f9835678bd4001d68779003c381e34a4f2bc9e49306"
+        }
+      ]
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl:8",
+      "classificationBefore": "changed",
+      "classificationAfter": "changed",
+      "dispositionBefore": "still-valid-as-recorded",
+      "dispositionAfter": "owned-park",
+      "unresolvedDependencies": [
+        {
+          "path": "docs/specs/reading-map.md",
+          "passageId": "explicit-overlap-dependency",
+          "currentSha256": "46c52e950dab2606b1ca5e6fb0c76d310c3316b065855e77c00e3834bd2d7e8e"
+        }
+      ]
+    }
+  ],
+  "duplicateLineRowsReclassified": 20,
+  "dependencyRowsParked": 5,
+  "classificationCounts": {
+    "unchanged": 55,
+    "moved": 88,
+    "changed": 353,
+    "absent": 78
+  },
+  "dispositionCounts": {
+    "still-valid-as-recorded": 229,
+    "owned-park": 338,
+    "needs-recomposition": 7
+  }
+}

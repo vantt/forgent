@@ -1,0 +1,11 @@
+{
+  "bodyChanges": [
+    "docs/platform/agent-protocol/spec.md",
+    "docs/platform/event-store/spec.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/process/spec.md",
+    "docs/platform/terminal-control/spec.md"
+  ],
+  "unchangedBodies": 540,
+  "unresolved": []
+}
