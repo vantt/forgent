@@ -4,14 +4,14 @@ Author once; --check replays authoring bytes, then accounts for live rebindings.
 """
 import sys
 sys.dont_write_bytecode = True
-import argparse, copy, json, pathlib, subprocess
+import argparse, copy, json, pathlib, runpy, subprocess, tempfile
 P = pathlib.Path('plans/260925-documentation-authority-unification')
 O = P/'reports/phase-09/misc-fix'
 SHARD = P/'ledger/decisions/s17-misc-review-fixes.json'
 sys.path.insert(0, str(P/'reports/phase-09/ledgerfix'))
 from bindings import documents, rows, supersessions, effective, at, digest, payload, sha, KEYS, head
 PATHS = ['docs/platform/packaging-distribution/spec.md', 'docs/reading-map.md']
-SCRATCH = pathlib.Path('/tmp/fgos-work/w11-misc-pin/misc')
+SCRATCH = pathlib.Path('/tmp/fgos-work')
 FIELDS = ['anchor','unitKind','title','textDigest','startLine','endLine','ancestry']
 
 
@@ -24,16 +24,22 @@ def author_commit():
                                     str(O/'binding-refresh.json')], text=True).strip()
 
 
+def pinned_request(request, commit):
+    return dict(request, paths=[], virtual=request.get('virtual', []) +
+                [dict(path=f, content=source(commit, f)) for f in request.get('paths', [])])
+
+
 def extract(request, commit=None):
     if commit:
-        request = dict(request, paths=[], virtual=request.get('virtual', []) +
-                       [dict(path=f, content=source(commit, f)) for f in request.get('paths', [])])
+        request = pinned_request(request, commit)
     # Only scratch plumbing changes; both embedded extractors stay byte-frozen.
     adapter = (P/'reports/phase-09/g0fix/extract-units.mjs').read_text()
-    adapter = adapter.replace('/tmp/fgos-work/w3-ledger-fix-brief/extractors', str(SCRATCH/'extractors'))
     SCRATCH.mkdir(parents=True, exist_ok=True)
-    script = SCRATCH/'extract-units.mjs'; script.write_text(adapter)
-    data = json.loads(subprocess.check_output(['node',str(script)], input=json.dumps(request).encode()))
+    with tempfile.TemporaryDirectory(prefix='misc-extract-', dir=SCRATCH) as name:
+        scratch = pathlib.Path(name)
+        adapter = adapter.replace('/tmp/fgos-work/w3-ledger-fix-brief/extractors', str(scratch/'extractors'))
+        script = scratch/'extract-units.mjs'; script.write_text(adapter)
+        data = json.loads(subprocess.check_output(['node',str(script)], input=json.dumps(request).encode()))
     for entry in data['catalog'].values():
         for u in entry['units']:
             if u['unitKind']=='heading': u['ancestry'].append(u['title'])
@@ -56,9 +62,14 @@ def preimages(pin):
             for f in paths if pathlib.PurePosixPath(f).suffix == '.json'}
 
 
-def generate(pin):
+def generate(pin, commit=None):
     virtual=[dict(path='before-'+str(i)+'.md', content=subprocess.check_output(['git','show',pin+':'+f]).decode()) for i,f in enumerate(PATHS)]
-    data=extract(dict(paths=PATHS,virtual=virtual)); cat=data['catalog']
+    # Keep the extractor's one-request call contract for the owning rebind
+    # preflight, which supplies that port itself. Pin docs via virtual bytes.
+    request = dict(paths=PATHS, virtual=virtual)
+    if commit:
+        request = pinned_request(request, commit)
+    data=extract(request); cat=data['catalog']
     docs=preimages(pin); docs.pop(str(SHARD),None); links=supersessions(docs)
     overlays=[]; changes=[]; checked=0
     for f,d in docs.items():
@@ -99,13 +110,17 @@ def generate(pin):
 
 
 def later_preimages(commit):
-    """Only recorded changes, not an unchanged row's incidental snapshot."""
+    """Committed full-row transitions; snapshots and binding-only records cannot
+    authorize edits to a misc row's identity, content or disposition.
+    """
     reports = P/'reports/phase-09'
     paths = set(reports.rglob('binding-refresh.json'))
     paths.update(f for folder in reports.iterdir() if folder.is_dir() and
                  (folder.name.startswith('import') or folder.name == 'rebind')
                  for f in folder.rglob('*.json'))
-    found = set()
+    found = []
+    # Reuse import3's hash-checked content-addressed witness expander.
+    expand = runpy.run_path(str(reports/'import3/resync.py'))['expand_report']
     for path in sorted(paths):
         written = subprocess.check_output(['git', 'log', '-1', '--format=%H', '--',
                                            str(path)], text=True).strip()
@@ -114,7 +129,9 @@ def later_preimages(commit):
         if subprocess.run(['git', 'merge-base', '--is-ancestor', commit, written],
                           check=False).returncode:
             continue
-        doc = json.loads(path.read_text())
+        raw = json.loads(path.read_text())
+        # Compact references are not changed prose.
+        doc = expand(copy.deepcopy(raw))
         if doc.get('status') == 'blocked':
             continue
         for key in ('changes', 'rebindings', 'refresh', 'rows', 'records'):
@@ -122,44 +139,56 @@ def later_preimages(commit):
                 if not isinstance(row, dict) or row.get('applied') is False:
                     continue
                 file, ptr = row.get('shard', row.get('file')), row.get('pointer')
-                old = row.get('oldBinding', row.get('before', {}))
-                predecessor = row.get('supersedesBinding')
-                if predecessor and 'before' in row:
-                    file = predecessor['shard']
-                    ptr = predecessor.get('pointer') or '/'+predecessor['collection']+'/'+str(predecessor['index'])
-                    unit = old.get('selected', old)
-                    old = dict(targetOwner=row.get('targetOwnerBefore', row.get('targetOwner')),
-                               targetAnchor=predecessor['targetAnchor'],
-                               targetUnitDigest=predecessor['targetUnitDigest'],
-                               targetAncestry=unit.get('ancestry'))
-                if not file or not ptr or not ('after' in row or 'newBinding' in row):
+                if file != str(SHARD):
                     continue
-                if 'targetOwner' not in old and 'targetOwnerBefore' in row:
-                    old = dict(targetOwner=row['targetOwnerBefore'], targetAnchor=old['anchor'],
-                               targetUnitDigest=old['digest'], targetAncestry=old.get('ancestry'))
-                if old.get('targetOwner') and old.get('targetUnitDigest'):
-                    found.add((file, ptr, digest(old)))
+                old, new = row.get('before', {}), row.get('after', {})
+                if not ptr or not all(k in old and k in new for k in KEYS):
+                    continue
+                assert raw == json.loads(source(written, path)), ('unaccounted misc-fix overlays: uncommitted record', str(path))
+                found.append(dict(shard=file, pointer=ptr, before=old, after=new,
+                                  record=str(path), commit=written))
     return found
 
 
 def check_live(shard, commit, docs=None):
     docs = documents() if docs is None else docs
+    assert {ptr for ptr, _ in rows(docs[str(SHARD)])} == {ptr for ptr, _ in rows(shard)}, 'unaccounted misc-fix overlay row set'
     links = supersessions(docs)
     recorded = later_preimages(commit)
-    missing = []
+    # Current recipe on AUTHORING docs preserves the intentional 136/5 prose
+    # correction without treating today's doc edits as a new authoring baseline.
+    pin = json.loads(source(commit, O/'binding-refresh.json'))['sourceHead']
+    corrected, _ = generate(pin, commit)
+    evidence = []
     for ptr, row in rows(shard):
         file = str(SHARD)
-        try:
-            live = at(docs[file], ptr)
-        except (KeyError, IndexError):
-            live = None
-        if live is not None:
-            ef, ep, current = effective(file, ptr, live, docs, links)
-            if (ef, ep) == (file, ptr) and payload(current) == payload(row):
-                continue
-        if (file, ptr, digest(row)) not in recorded:
-            missing.append(dict(shard=file, pointer=ptr, binding=payload(row)))
-    assert not missing, ('unaccounted misc-fix overlays', missing)
+        expected = copy.deepcopy(row)
+        if 'disposition' in at(corrected, ptr):
+            expected['disposition'] = copy.deepcopy(at(corrected, ptr)['disposition'])
+        used = []
+        transitions = [r for r in recorded if (r['shard'], r['pointer']) == (file, ptr)]
+        while True:
+            matches = [r for r in transitions if r['before'] == expected]
+            assert len(matches) <= 1, ('ambiguous misc-fix rebind', ptr)
+            if not matches:
+                break
+            change = matches[0]
+            assert change['after'] != expected, ('unchanged snapshot is not a rebind', ptr)
+            expected = copy.deepcopy(change['after'])
+            transitions.remove(change)
+            used.append(dict(record=change['record'], commit=change['commit']))
+        live = at(docs[file], ptr)
+        ef, ep, current = effective(file, ptr, live, docs, links)
+        assert (ef, ep) == (file, ptr), ('unaccounted misc-fix overlays', ptr, ef, ep)
+        assert current.get('bindingSha256') == digest(current), ('misc-fix live binding hash', ptr)
+        # No committed exact-claim/binding approval exists for these pending
+        # overlays. A rebind is not a review and cannot carry approval forward.
+        assert current.get('reviewStatus') == 'pending', ('misc-fix live review requires committed exact-claim/binding approval', ptr)
+        assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,
+                                     sorted(k for k in current.keys() | expected.keys()
+                                            if (k in current) != (k in expected) or current.get(k) != expected.get(k)))
+        evidence.append(dict(pointer=ptr, laterRebinds=used, reviewStatus='pending'))
+    return evidence
 
 
 def check(pin, docs=None):
@@ -170,7 +199,7 @@ def check(pin, docs=None):
     exec(compile(source(commit, O/'rebind.py'), str(O/'rebind.py')+'@'+commit, 'exec'), recipe)
     recipe['documents'] = lambda: preimages(pin)
     recipe['preimages'] = preimages
-    recipe['extract'] = lambda request: extract(request, commit)
+    recipe['extract'] = lambda request: extract(pinned_request(request, commit))
     shard,record=recipe['generate'](pin)
     assert json.loads(source(commit, SHARD))==shard
     assert json.loads(source(commit, O/'binding-refresh.json'))==record

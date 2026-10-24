@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "python3",
+    "-B",
+    "-c",
+    "import runpy; m=runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/g9/w12-gloss-polish.py'); m['main'].__globals__['PREFIX']='w13'; m['main']()"
+  ],
+  "exit": 0,
+  "stdout": "{\n  \"pin\": \"8b4d778d32b5930ab7c80d9d19b2f26b95441ee1\",\n  \"status\": \"pass\",\n  \"scratchRemoved\": true\n}\n",
+  "stderr": ""
+}

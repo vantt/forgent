@@ -1,0 +1,206 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "{\"changedRows\": 27, \"contentChangedRows\": 21, \"effectiveBindingsChecked\": 283, \"sourceHead\": \"23f6eaccf5eb195a8f50e5788d38f386a901b6d2\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/pin-controls.py"
+      ],
+      "exit": 0,
+      "stdout": "{\"controls\": [{\"name\": \"corrupt-author-overlay\", \"exit\": 1}, {\"name\": \"drop-later-rebind-preimage\", \"exit\": 1}, {\"name\": \"live-reviewStatus-2\", \"exit\": 1}, {\"name\": \"live-reviewStatus-14\", \"exit\": 1}, {\"name\": \"live-bindingSha256-2\", \"exit\": 1}, {\"name\": \"live-bindingSha256-14\", \"exit\": 1}, {\"name\": \"live-disposition-2\", \"exit\": 1}, {\"name\": \"live-disposition-14\", \"exit\": 1}, {\"name\": \"live-sourceContent-2\", \"exit\": 1}, {\"name\": \"live-sourceContent-14\", \"exit\": 1}, {\"name\": \"live-claimId-2\", \"exit\": 1}, {\"name\": \"live-claimId-14\", \"exit\": 1}, {\"name\": \"live-sourcePath-2\", \"exit\": 1}, {\"name\": \"live-sourcePath-14\", \"exit\": 1}, {\"name\": \"live-sourceAnchor-2\", \"exit\": 1}, {\"name\": \"live-sourceAnchor-14\", \"exit\": 1}, {\"name\": \"live-sourceUnitDigest-2\", \"exit\": 1}, {\"name\": \"live-sourceUnitDigest-14\", \"exit\": 1}, {\"name\": \"live-sourceAncestry-2\", \"exit\": 1}, {\"name\": \"live-sourceAncestry-14\", \"exit\": 1}, {\"name\": \"live-unitKind-2\", \"exit\": 1}, {\"name\": \"live-unitKind-14\", \"exit\": 1}, {\"name\": \"live-targetUnitDigest-2\", \"exit\": 1}, {\"name\": \"live-targetUnitDigest-14\", \"exit\": 1}, {\"name\": \"append-row\", \"exit\": 1}, {\"name\": \"remove-row\", \"exit\": 1}], \"expectedFailuresObserved\": true}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import pathlib,runpy,sys,tempfile\np=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py')\nm=runpy.run_path(str(p))\nwith tempfile.TemporaryDirectory(prefix='live-rebind-',dir='/tmp/fgos-work') as name:\n m['main'].__globals__['SCRATCH']=pathlib.Path(name)\n sys.argv=[str(p),'--check']\n raise SystemExit(m['main']())\n"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"drift\": 0,\n  \"rows\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py"
+      ],
+      "exit": 0,
+      "stdout": "{\"byteIdenticalArtifacts\": 4, \"counts\": {\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 137, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 623, \"preserve-operand-reachability-unchanged\": 1394, \"preserve-source-confirmed-history\": 2926, \"repoint-proposal\": 6}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}, \"doctorCheckSplit\": {\"literal\": 136, \"loopIds\": [\"git-worktree-recovery\", \"git-component-compatible\", \"git-repository-config\", \"git-operation-journal\", \"git-native-locks\"], \"loopRegistered\": 5}, \"registrations\": {\"Check\": 141, \"Fix\": 32}, \"status\": \"scoped-replay-passed-not-gate-acceptance\"}\n",
+      "stderr": ""
+    }
+  ],
+  "liveRows": [
+    {
+      "pointer": "/bindingRefresh/0",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/1",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/2",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/3",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/4",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/5",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/6",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/7",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/8",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/9",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/10",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/11",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/12",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/13",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/14",
+      "laterRebinds": [
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-09/import3/binding-refresh.json",
+          "commit": "d786e305eb20dfdda8d1634b227bd9f8a9328541"
+        }
+      ],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/15",
+      "laterRebinds": [
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-09/import3/binding-refresh.json",
+          "commit": "d786e305eb20dfdda8d1634b227bd9f8a9328541"
+        }
+      ],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/16",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/17",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/18",
+      "laterRebinds": [
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-09/import3/binding-refresh.json",
+          "commit": "d786e305eb20dfdda8d1634b227bd9f8a9328541"
+        }
+      ],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/19",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/20",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/21",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/22",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/23",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/24",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/25",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    },
+    {
+      "pointer": "/bindingRefresh/26",
+      "laterRebinds": [],
+      "reviewStatus": "pending"
+    }
+  ],
+  "oneRequestExtractorPreflightPasses": true,
+  "staleW11DirectoryPresentAtStart": false,
+  "staleW11DirectoryPresentAtEnd": false,
+  "scratchAfter": [],
+  "initialImplementationFailures": [
+    "Full-row comparison initially rejected import3 compact text refs; fixed by reusing hash-checked expand_report, not by relaxing equality.",
+    "One-request preflight control exposed the author-replay lambda passing two arguments; centralized pinned virtual requests and kept the extractor port one-request."
+  ]
+}

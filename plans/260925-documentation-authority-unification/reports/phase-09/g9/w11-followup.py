@@ -21,7 +21,7 @@ sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[4]
 COMP = HERE.parent / 'composition'
-TMP = Path('/tmp/fgos-work/w11-g9')
+TMP = None  # Assigned only inside this run's disposable workspace.
 COMMANDS = []
 BASELINE = 'd786e305eb20dfdda8d1634b227bd9f8a9328541'
 
@@ -165,8 +165,16 @@ def prepare(pin):
     audit_glosses(witnesses, fixes, pin)
 
 
-def audit_glosses(witnesses, fixes, pin):
-    """Audit all witnesses, including adjacent one-item-per-line local lists."""
+def audit_glosses(witnesses, fixes, pin, after_bytes=None):
+    """Audit witnesses against surrounding after-file lines, not witness density."""
+    if after_bytes is None:
+        chains = sweep.spec_chains()
+        after_bytes = {}
+        for path in sorted({w['file'] for w in witnesses['witnesses']}):
+            current = (sweep.blob(pin, path) or b'').decode()
+            for spec in chains[path]:
+                current, _ = r.relocate(current, spec, [])
+            after_bytes[path] = current
     def labels(text):
         found = re.findall(r'\bD(\d+):', text)
         for bold in re.findall(r'\*\*([^*]+)\*\*', text):
@@ -179,9 +187,9 @@ def audit_glosses(witnesses, fixes, pin):
         return list(dict.fromkeys(found))
 
     def vertical_label(text):
-        return re.match(r'^\s*(?:[-+*]\s+)?(?:\*\*)?(D\d+|\d+|[A-Za-z])(?:[.),:]|\s+\()', text)
+        return re.match(r'^\s*(?:[-+*]\s+)?(?:\*\*)?\(?(D\d+|\d+|[A-Za-z])(?:[.),:]|\s+\()', text)
 
-    rows = witnesses['witnesses']
+    originals = {(w['file'], w['line']): w['before'] for w in witnesses['witnesses']}
     audit = []
     for index, witness in enumerate(witnesses['witnesses']):
         text = witness['after']
@@ -194,17 +202,35 @@ def audit_glosses(witnesses, fixes, pin):
         doubled = [{'offset': m.start(), 'text': m[0]} for m in
                    re.finditer(r'\b([^\W\d_]+)\s+\1\b', prose, re.IGNORECASE)]
         original_labels = labels(witness['before'])
-        neighbors = [j for j in [index - 1, index + 1] if 0 <= j < len(rows)
-                     and rows[j]['file'] == witness['file']
-                     and abs(rows[j]['line'] - witness['line']) == 1
-                     and vertical_label(rows[j]['before'])]
-        vertical = bool(vertical_label(witness['before']) and neighbors)
+        lines = after_bytes[witness['file']].splitlines()
+        position = witness['line'] - 1
+        assert 0 <= position < len(lines), (witness['file'], witness['line'])
+        assert lines[position] == text, ('witness after-bytes mismatch', index)
+        neighbors = []
+        for j in [position-1, position+1]:
+            if not 0 <= j < len(lines):
+                continue
+            before_neighbor = originals.get((witness['file'], j+1), '')
+            if vertical_label(lines[j]) or vertical_label(before_neighbor):
+                # Retain the older all-glossed-list loss control as well: if
+                # every label was stripped, authenticate its original witness.
+                neighbors.append(dict(line=j+1, text=lines[j],
+                                      beforeWitness=before_neighbor or None))
+        prefix = vertical_label(witness['before'])
+        vertical = bool(prefix and neighbors)
+        # An existing numbered item may contain one decision citation inside
+        # its title (e.g. '10. **D2: ...**'). Preserve the OUTER list label,
+        # not that unrelated citation; grouped inline lists still keep theirs.
+        if vertical and not prefix[1].startswith('D'):
+            original_labels = ([prefix[1]] if len(original_labels) <= 1 else
+                               list(dict.fromkeys([prefix[1]] + original_labels)))
         ordered = len(original_labels) > 1 or vertical
         # Preserve every number/letter, including gaps and labels grouped on
         # one physical line. Parenthesized labels do not look like decision ids.
         retained = [label for label in original_labels if
                     re.search(r'\(' + re.escape(label) + r'\)|\bÝ ' + re.escape(label) + r':', text)
-                    or (not re.search(r'\bD\d+\b', witness['before']) and
+                    or ((not re.search(r'\bD\d+\b', witness['before']) or
+                         (vertical and label == prefix[1] and not prefix[1].startswith('D'))) and
                         re.search(r'(?:^|\s|\*\*)' + re.escape(label) + r'[.):]', text))]
         missing = [label for label in original_labels if ordered and label not in retained]
         reviews = []
@@ -221,7 +247,7 @@ def audit_glosses(witnesses, fixes, pin):
                       'lowercaseAfterFullStop': lowercase, 'doubledWords': doubled,
                       'originalLocalLabels': original_labels, 'retainedListLabels': retained,
                       'lostListLabels': missing, 'verticalList': vertical,
-                      'adjacentListWitnesses': neighbors if vertical else [],
+                      'adjacentAfterListLines': neighbors if vertical else [],
                       'labelReview': 'vertical local list; all labels required' if vertical else
                                      'inline local list; all labels required' if ordered else
                                      'single citation prefix is not an ordered list' if original_labels else 'no local list',
@@ -232,7 +258,7 @@ def audit_glosses(witnesses, fixes, pin):
         'pin': pin, 'witnessesRead': list(range(len(audit))), 'witnesses': audit,
         'rules': {'sentenceStarts': 'Unicode lowercase letter after full stop + whitespace; strip emphasis and exclude inline code/link destinations',
                   'doubledWords': 'case-insensitive adjacent Unicode words',
-                  'listLabels': 'Inline multi-label lists and adjacent numbered/lettered vertical items retain every original label (including gaps and grouped labels); decision labels become (n) or Ý n:, not section labels.'},
+                  'listLabels': 'Inline multi-label lists and vertical items with numbered/lettered neighbours in the complete after-file retain every original label, even for a lone witness (including gaps and grouped labels); decision labels become (n) or Ý n:, not section labels.'},
         'fixes': fixes, 'reviewRequired': [row['index'] for row in audit if row['status'] == 'review-required'],
         'claimLimit': 'Mechanical prose audit; real replay separately authenticates all 104 witness lines.'})
 
@@ -378,8 +404,8 @@ def newline_proof(pin):
          'semantics': 'Only one added/removed final LF; not arbitrary whitespace or CRLF normalization.'})
 
 
-def main():
-    TMP.mkdir(parents=True, exist_ok=True)
+def followup():
+    assert TMP is not None
     pin = run(['git', 'rev-parse', 'HEAD']).decode().strip()
     baseline = {name: json.loads(run(['git', 'show', BASELINE + ':' + str(
         (HERE / (name + '.json')).relative_to(ROOT))])) for name in ['judgments', 'recomposed']}
@@ -411,6 +437,16 @@ def main():
     negative_control(pin)
     save(HERE / 'w11-commands.json', COMMANDS)
     print(json.dumps({'pin': pin, 'status': 'pass', 'scratch': str(TMP)}, indent=2))
+
+
+def main():
+    global TMP
+    with r.workspace('g9-followup-') as name:
+        TMP = Path(name)
+        try:
+            followup()
+        finally:
+            TMP = None
 
 
 if __name__ == '__main__':

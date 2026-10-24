@@ -11,11 +11,11 @@ HERE=pathlib.Path(__file__).resolve().parent
 ROOT=HERE.parents[4]
 P=pathlib.Path('plans/260925-documentation-authority-unification')
 G6=P/'reports/phase-09/preserve-premise'
-SCRATCH=pathlib.Path('/tmp/fgos-work/w11-misc-pin/verify')
+SCRATCH=pathlib.Path('/tmp/fgos-work')
 sha=lambda b:hashlib.sha256(b).hexdigest()
 
 
-def main():
+def verify(SCRATCH):
     commands=[]
     def run(argv,**kw):
         proc=subprocess.run(argv,cwd=ROOT,capture_output=True,text=True,**kw)
@@ -108,6 +108,12 @@ def main():
                         'markdown preview (Lead custody; no extra service/state writes)'])
     (HERE/'checks.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
     print(json.dumps(dict(status=result['status'],byteIdenticalArtifacts=len(comparisons),counts=proof['counts'],registrations=registrations,doctorCheckSplit=split),sort_keys=True))
+
+
+def main():
+    SCRATCH.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='misc-verify-', dir=SCRATCH) as name:
+        verify(pathlib.Path(name))
 
 
 if __name__=='__main__':main()

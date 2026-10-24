@@ -1,0 +1,13 @@
+{
+  "pin": "8b4d778d32b5930ab7c80d9d19b2f26b95441ee1",
+  "changedBodies": [
+    {
+      "path": "docs/platform/agent-mailbox/spec.md",
+      "oldAfterSha256": "19e4186c8ef1843e888563de63e280ab8dffb3715367980395c6bdf004c3759d",
+      "afterSha256": "c9db17997add6fe300c1326bac618002ea89ff37bbdeec57f70cadce066e899e",
+      "preimageUnchanged": true
+    }
+  ],
+  "unchangedBodyDiffs": 544,
+  "totalBodies": 545
+}

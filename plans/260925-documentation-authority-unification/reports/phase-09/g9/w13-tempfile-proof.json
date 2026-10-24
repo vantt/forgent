@@ -1,0 +1,15 @@
+{
+  "pin": "8b4d778d32b5930ab7c80d9d19b2f26b95441ee1",
+  "exit": 0,
+  "beforeChecks": [
+    "controls-mv__f9xn"
+  ],
+  "afterSweep": [
+    "controls-mv__f9xn"
+  ],
+  "afterVerify": [
+    "controls-mv__f9xn"
+  ],
+  "scratchRemoved": true,
+  "importCreatesDirectory": false
+}

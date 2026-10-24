@@ -1,5 +1,67 @@
 # Gloss polish receipt — replayed records only
 
+## Current hardening replay
+
+Check HEAD: **`8b4d778d32b5930ab7c80d9d19b2f26b95441ee1`**; author provenance
+`sourceCommit` in the composition packet is unchanged. These remain prepared
+records, never live-doc changes or final-pin/gate acceptance.
+
+Witness **#2** now says the two forks were *recorded at the time*, and that the
+Stop-drain decision was later settled so only wake-enabled mail starts an idle
+turn. [w13-preparation.json](w13-preparation.json) records the exact old/new line
+and the **one changed gloss spec** (mailbox), including diff, inverse and hashes.
+No other witness changes. Its G9 body was recomposed; the other 544 body
+patches/hashes are unchanged ([delta](../g9/w13-recomposition-delta.json)).
+
+The full [w10-gloss-audit.json](w10-gloss-audit.json) is regenerated for all **104**
+witnesses: **102 pass, two reviewed matches, zero review-required**. Vertical
+classification uses neighbouring physical lines in the complete after-file,
+not just neighbouring witnesses, so a lone glossed list item is covered.
+Original adjacent witnesses additionally retain the earlier simultaneous-loss
+proof. Outer numbered items are distinguished from embedded single citations.
+[w13-audit-controls.json](w13-audit-controls.json) keeps the full real/synthetic
+lone-witness controls and earlier simultaneous-loss/restoration controls.
+
+The complete chain replays **106 steps across 74 files** with
+`patch --batch --fuzz=0 -p1`: **424 calls, all exit 0**, per-step rollback and full
+reverse rollback byte-exact. [Chain proof](w13-chain-verification.json).
+[Independent replay](w13-independent-verification.json): **221 patch calls, all
+exit 0**, same 74 files and generator evidence. All 104 witness before/after
+lines equal replayed bytes. Scratch skill generation exits 0; the full-chain
+citation scan exits **0 with 0 findings** and unchanged baseline. The intentional
+before-F control still exits 1 with 130 findings.
+[Citation proof](w13-citation-verification.json).
+
+| Command (all Python uses `python3 -B`) | Exit |
+|---|---:|
+| Existing `g9/w12-gloss-polish.py` via `-c`, setting `PREFIX='w13'` | 0 |
+| Scratch composition `verify.py` / `independent-replay.py` | 0 / 0 |
+| `patch --batch --fuzz=0 -p1`, full forward/rollback chain | 424 calls, all 0 |
+| Scratch skill generator / full citation scan | 0 / 0; 0 findings |
+| `g9/recompose.py --pin HEAD` | 0; 545 bodies |
+| `g9/sweep.py --check --pin HEAD` / `g9/verify.py --pin HEAD` | 0 / 0 |
+| `misc-fix/verify.py` / `misc-fix/rebind.py --check` | 0 / 0 |
+| Owning `rebind/rebind.py --check`, scratch-only relocation | 0 |
+| `git diff --check` | 0 |
+
+Exact argv/exits: [w13-commands.json](w13-commands.json),
+[reproduction](../g9/w13-reproduction.json), and
+[misc proof](../misc-fix/w13-live-proof.json). The binding/action proof and residual
+inventory are rerun, not promoted: [gap05](w13-gap05-verification.json),
+[unresolved bindings](w13-unresolved-bindings.json), [action](w13-action-verification.json).
+No judge/ledger, origin accounting, semantic approval or residual-drift claim changes.
+All scratch uses unique owned tempfile directories under `/tmp/fgos-work` and is
+removed, including after exceptions and overlapping runs; the base is empty after
+checks ([cleanup/overlap proof](../g9/w13-final-audit.json)).
+
+Prior art and limits: reused W11 recipes/audit, exact locator and shared resolver,
+not a new mechanism. Impact-analysis degraded (CLI forbidden; no MCP exposed).
+Only scoped records/tooling changed; no docs/ledger, Git/fgOS state, pair
+accounting, suites or preview service. `needsWrites=[]`. Earlier receipt below is
+historical, not the current replay pin or current changed-body count.
+
+## Earlier gloss-polish replay
+
 Current replay/check pin: **`8fd37e3590d3654729cf2d177c90bb0fbb17dff9`** (`HEAD` during this run). **Composition replay, citation scan and G9 checks pass.** This supersedes the previous receipt's current gloss/replay claims; W11 evidence remains historical. The packet's `sourceCommit` (`eb744281deba853f201cda15dcb4876300a1d638`) remains author provenance, not this replay pin. Nothing is applied outside scratch; no final-pin F approval, authority promotion, independent acceptance or gate closure is claimed.
 
 ## Gloss repairs and complete audit

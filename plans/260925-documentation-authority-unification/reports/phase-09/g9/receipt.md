@@ -1,5 +1,76 @@
 # Gloss polish and sweep hygiene receipt
 
+## Current live-check / replay hardening
+
+Check HEAD: **`8b4d778d32b5930ab7c80d9d19b2f26b95441ee1`**, not final pin F.
+The complete [reproduction](w13-reproduction.json) exits **0**. The existing
+polish driver is reused with `PREFIX='w13'`; exact `python3 -B -c` argv and all
+subprocess exits are retained there and in [w13-commands.json](w13-commands.json).
+No live doc or ledger bytes were edited.
+
+- Witness #2 now describes two forks **recorded at the time** and explicitly
+  says the Stop-drain decision was later settled. It no longer calls an answered
+  decision open. The mailbox gloss spec's diff, inverse and witness are regenerated.
+- The owning audit reads the physical lines immediately above/below each witness
+  in the **complete replayed after-file**, including unglossed items. It keeps the
+  earlier before-witness evidence for simultaneous loss of every adjacent label.
+  A single decision citation inside an already numbered item is not confused
+  with its outer list number. Full result: **104 witnesses; 102 pass + 2 reviewed
+  matches; 0 review-required**; 11 vertical-list witnesses.
+- Existing simultaneous-label-loss controls remain, and new lone-witness controls
+  strip labels from each git row and from numbered, lettered and decision-labelled
+  samples with unglossed neighbours. All reject loss and accept restored labels.
+  [Audit and full controls](../composition/w13-audit-controls.json).
+- Full prepared chain: 74 files / 106 steps, **424 patch calls, all exit 0**,
+  per-step and full reverse rollback byte-exact. Independent replay: **221 patch
+  calls, all exit 0**. Citation scan after the real scratch skill generator:
+  **0 findings / exit 0**, not merely zero new findings. The before-F negative
+  scan still reports its expected 130 findings / exit 1; baseline unchanged.
+- G9 recomposes **545 bodies**. Only `docs/platform/agent-mailbox/spec.md` changes
+  body diff/hash; its preimage and the other **544 body diffs/hashes** are unchanged.
+  [Delta](w13-recomposition-delta.json). Sweep reports zero current drift,
+  predecessor-chain mismatches, body mismatches or judgment errors. Evidence joins,
+  provenance checks, counts, judgments and parks are unchanged.
+
+### Scratch lifetime and overlap
+
+`recompose.workspace()` lazily uses a unique `tempfile.mkdtemp` directly below
+`/tmp/fgos-work`, then removes **only its own directory** in `finally`. It never
+removes the shared base. Both historical G9 driver entry points now own a unique
+workspace too; no fixed workspace is reused or deleted by another invocation.
+Imports create no scratch directory. Normal/exception controls keep two separate
+processes' workspaces alive simultaneously: finishing the first leaves the
+second intact. Two real overlapping sweep checks both exit **0**. Every check
+leaves the base empty. Evidence: [final audit](w13-final-audit.json) and
+[actual check snapshots](w13-tempfile-proof.json).
+
+### Commands and exits
+
+Let `P=plans/260925-documentation-authority-unification/reports/phase-09`.
+
+| Command | Exit |
+|---|---:|
+| Existing polish driver via `python3 -B -c` with `PREFIX='w13'` | 0 |
+| `python3 -B "$P/g9/recompose.py" --pin HEAD` | 0 |
+| `python3 -B "$P/g9/sweep.py" --check --pin HEAD` | 0; two additional concurrent runs also 0 |
+| `python3 -B "$P/g9/verify.py" --pin HEAD` | 0 |
+| Scratch composition `verify.py` / `independent-replay.py`, both `python3 -B` | 0 / 0 |
+| `python3 -B "$P/misc-fix/verify.py"` | 0 |
+| `python3 -B "$P/misc-fix/rebind.py" --check` | 0 |
+| Owning `rebind/rebind.py --check`, scratch-only wrapper | 0; drift 0 |
+| `git diff --check` | 0 |
+
+The first enclosing attempt (exit 1) is retained in [w13-first-attempt.json](w13-first-attempt.json):
+the stronger context exposed witness #0's outer number versus embedded citation.
+The list parser was corrected; no witness was exempted and no proof weakened.
+Prior art reused: exact authored-hunk relocation, Step 7 parser, full/independent
+composition recipes, GNU patch and owning audit. Impact-analysis degraded under
+the no-CLI grant. No Git writes, fgOS CLI/state, suites, pair accounting, new
+product feature or preview service. `needsWrites=[]`; no authority promotion,
+independent acceptance or gate closure claimed. Earlier receipt below is historical.
+
+## Earlier gloss-polish run
+
 Replay/check pin: **`8fd37e3590d3654729cf2d177c90bb0fbb17dff9`** (`HEAD` during this run), **not final pin F**. The complete reproduction, `sweep.py --check --pin HEAD` and `verify.py --pin HEAD` exit **0**. This receipt supersedes current completion claims in the previous receipt; W11 artifacts remain historical evidence at their own pins. No authority promotion, semantic acceptance, parity or gate closure is claimed.
 
 ## Bounded repairs

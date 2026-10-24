@@ -1,0 +1,17 @@
+{
+  "pin": "8b4d778d32b5930ab7c80d9d19b2f26b95441ee1",
+  "status": "pass",
+  "uniqueRecords": 574,
+  "cohortMemberships": 684,
+  "effectiveFiles": 545,
+  "purePinFieldsVerified": 10,
+  "patchIdEquivalencesVerified": 12,
+  "negativeControls": [
+    "changed passage digest rejects judgment",
+    "missing row rejects judgment",
+    "changed record body rejects judgment",
+    "same source bytes at another commit retain their content-bound judgment"
+  ],
+  "independentAcceptance": false,
+  "scope": "Byte/provenance replay only; no owning product parity, semantic approval, final pin F or gate closure."
+}

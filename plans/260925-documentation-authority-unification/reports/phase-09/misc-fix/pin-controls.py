@@ -11,7 +11,7 @@ import json, pathlib, subprocess, tempfile
 
 P = pathlib.Path('plans/260925-documentation-authority-unification')
 O = P/'reports/phase-09/misc-fix'
-SCRATCH = pathlib.Path('/tmp/fgos-work/w11-misc-pin')
+SCRATCH = pathlib.Path('/tmp/fgos-work')
 
 
 def main():
@@ -52,14 +52,50 @@ def read(path, *args, **kwargs):
 with patch.object(pathlib.Path, 'read_text', read):
     m['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit)
 """.replace('COPY', repr(str(dropped))).replace('RECORD', repr(str(record_path)))
-        for name, code, failure in [
-                ('corrupt-author-overlay', author_code, 'assert json.loads(source(commit, SHARD))==shard'),
-                ('drop-later-rebind-preimage', live_code, 'unaccounted misc-fix overlays')]:
+        cases = [
+            ('corrupt-author-overlay', author_code, 'assert json.loads(source(commit, SHARD))==shard'),
+            ('drop-later-rebind-preimage', live_code, 'unaccounted misc-fix overlays')]
+        for field, value, failure in [
+                ('reviewStatus', 'approved', 'misc-fix live review requires'),
+                ('bindingSha256', '0'*64, 'misc-fix live binding hash'),
+                ('disposition', 'unrecorded disposition', 'live row differs'),
+                ('sourceContent', 'unrecorded content', 'live row differs'),
+                ('claimId', 'unrecorded identity', 'live row differs'),
+                ('sourcePath', 'unrecorded.md', 'live row differs'),
+                ('sourceAnchor', 'unrecorded-anchor', 'live row differs'),
+                ('sourceUnitDigest', '0'*64, 'live row differs'),
+                ('sourceAncestry', ['Unrecorded'], 'live row differs'),
+                ('unitKind', 'unrecorded-kind', 'live row differs'),
+                ('targetUnitDigest', '0'*64, 'misc-fix live binding hash')]:
+            for index in [2, 14]:
+                mutated = base/(field+'-'+str(index)+'.json')
+                ledger = json.loads(shard.read_text())
+                ledger['bindingRefresh'][index][field] = value
+                mutated.write_text(json.dumps(ledger))
+                code = common + """docs = m['documents']()
+docs[str(m['SHARD'])] = json.loads(pathlib.Path(COPY).read_text())
+m['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)
+""".replace('COPY', repr(str(mutated)))
+                cases.append(('live-'+field+'-'+str(index), code, failure))
+        for mode in ['append', 'remove']:
+            ledger = json.loads(shard.read_text())
+            if mode == 'append':
+                ledger['bindingRefresh'].append(ledger['bindingRefresh'][2])
+            else:
+                ledger['bindingRefresh'].pop()
+            mutated = base/(mode+'-row.json')
+            mutated.write_text(json.dumps(ledger))
+            code = common + """docs = m['documents']()
+docs[str(m['SHARD'])] = json.loads(pathlib.Path(COPY).read_text())
+m['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)
+""".replace('COPY', repr(str(mutated)))
+            cases.append((mode+'-row', code, 'unaccounted misc-fix overlay row set'))
+        for name, code, failure in cases:
             command = ['python3', '-B', '-c', code]
             proc = subprocess.run(command, capture_output=True, text=True)
             assert proc.returncode == 1 and failure in proc.stderr, (name, proc.returncode, proc.stderr)
-            if name == 'drop-later-rebind-preimage':
-                assert '/bindingRefresh/14' in proc.stderr
+            if name.startswith('live-'):
+                assert '/bindingRefresh/'+name.rsplit('-', 1)[1] in proc.stderr
             controls.append(dict(name=name, argv=command, exit=proc.returncode,
                                  stdout=proc.stdout, stderr=proc.stderr, expectedFailureObserved=True))
     result = dict(authoringCommit=author, controls=controls, scratchCopiesRemoved=True)

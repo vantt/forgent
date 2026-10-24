@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "python3",
+    "-B",
+    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py"
+  ],
+  "exit": 0,
+  "stdout": "{\"byteIdenticalArtifacts\": 4, \"counts\": {\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 137, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 623, \"preserve-operand-reachability-unchanged\": 1394, \"preserve-source-confirmed-history\": 2926, \"repoint-proposal\": 6}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}, \"doctorCheckSplit\": {\"literal\": 136, \"loopIds\": [\"git-worktree-recovery\", \"git-component-compatible\", \"git-repository-config\", \"git-operation-journal\", \"git-native-locks\"], \"loopRegistered\": 5}, \"registrations\": {\"Check\": 141, \"Fix\": 32}, \"status\": \"scoped-replay-passed-not-gate-acceptance\"}\n",
+  "stderr": ""
+}

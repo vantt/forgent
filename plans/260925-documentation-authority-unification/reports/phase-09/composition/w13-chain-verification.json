@@ -1,0 +1,456 @@
+{
+  "effectiveSpecs": 79,
+  "finalPinFSpecs": 14,
+  "predecessorApplications": 13,
+  "files": 74,
+  "steps": 106,
+  "fullRollbackExact": true,
+  "perStepRollbackExact": true,
+  "fileHashes": [
+    {
+      "path": "apps/fgos-gateway/Cargo.toml",
+      "beforeSha256": "ff55747c22cfb9c9e78f0b619271962185edb1682c4bd2e0dbf625b93aedc7fb",
+      "initiallyAbsent": false,
+      "afterSha256": "2a2b52c7eeff282c9a4756c777383d72b0ee05d66a987a27b7920a986d8fcbca"
+    },
+    {
+      "path": "apps/fgos-gateway/src/mcp.rs",
+      "beforeSha256": "d1c162643e93c2547656b1e034b84967efab2adb20090a1c058859593f36e6f8",
+      "initiallyAbsent": false,
+      "afterSha256": "1eebed5c1cf45ac231286a0d099a6ef7dc6d66578ee30f53f4c64986be3fb86f"
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "beforeSha256": "ccab81b65e2cd9b92bc2b902caf3446fa95119890088a735dc314b107f7c78ca",
+      "initiallyAbsent": false,
+      "afterSha256": "9b90e37c81498b4f9667d9f96e5e0c8c26241b26eefb8e016af17d9dd4f56d4c"
+    },
+    {
+      "path": "docs/platform/git/spec.md",
+      "beforeSha256": "63856aff2b0d80be616388cd3059ccfbebcd096d9e55ec83b19cd3ec4a748d9e",
+      "initiallyAbsent": false,
+      "afterSha256": "1217581e7cf00e9db85957f1ebd4747c2a3345a0a8d68515661e1ca207c324be"
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/README.md",
+      "beforeSha256": "87a6a9af2251e06e320f06e9095009942f96889d3a045f54301d1f8750c5dc84",
+      "initiallyAbsent": false,
+      "afterSha256": "cde1b8dbca8c60c70e6078b383943da95d6fc48bb0b43809361d270985d98515"
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "beforeSha256": "b3b06ff39ad72d33773a888b5c42cae601de120bab6699ed4a912823a7a1543f",
+      "initiallyAbsent": false,
+      "afterSha256": "08fd6d8b64a17a384fef0e7a76606335972ad6ed3f283431e24cb235aabb0ac0"
+    },
+    {
+      "path": "docs/platform/runner/README.md",
+      "beforeSha256": "c636d7cc4539adb8ef7ab50114f8aa200195ffce421a9192bb9a50addb1fb7dc",
+      "initiallyAbsent": false,
+      "afterSha256": "526cb7d1c0d5e4cf82dc0f7a94462e69443ac9a9893d90425650feb604930561"
+    },
+    {
+      "path": "src/cli/command-registry.mjs",
+      "beforeSha256": "43fccafb0c1e5f75ae8104c5ac035b93aa5d2c03089fc571c6f5bb8b2b2f6ea3",
+      "initiallyAbsent": false,
+      "afterSha256": "94dc9cc3ac081221b895cacba18ae337bf9816bf2be3199088f969ceff9d36d4"
+    },
+    {
+      "path": "src/runner/worktree.mjs",
+      "beforeSha256": "387c3bd8e74e4951cea295cfe0f9802bff5011fc849ee543e7f11101109c6788",
+      "initiallyAbsent": false,
+      "afterSha256": "193773ec31567a8ecc55410abdc2354ba154bcca529d0704116303aff778ec12"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "beforeSha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c",
+      "initiallyAbsent": false,
+      "afterSha256": "864d4006973fdf2898434a72d7f5a7f1b66289779285fc7b6dfb76a6f39837e8"
+    },
+    {
+      "path": "test/runner/dispatch-executor-profile.test.mjs",
+      "beforeSha256": "692cb5fc0fb4752ce5f0830d353c4aaf5f62b776c790aa8fbf3b7a02f04c10d3",
+      "initiallyAbsent": false,
+      "afterSha256": "03ec239425055ec84a72b252d24aa5d0e5af82eb89c2cf0c62cee3db0431a646"
+    },
+    {
+      "path": "test/runner/worktree.test.mjs",
+      "beforeSha256": "f04c17f51ba77ccb4a5e86d34f23803dee8f84282e11541bd00c5104afb9cd0f",
+      "initiallyAbsent": false,
+      "afterSha256": "4c107acf174418be06e74e6c21b98e3a9eef10415bd8fd79335beab68129ea88"
+    },
+    {
+      "path": "test/cli/fgos-merge.test.mjs",
+      "beforeSha256": "e6ecac9546eb9fea6188b88179883c7c1212c8048c5f0cc2e1347c1fd3cfed3d",
+      "initiallyAbsent": false,
+      "afterSha256": "158da8685668a64f7487b27c01572061f4ab9b3291df7aa5b3470199d2524bfd"
+    },
+    {
+      "path": "docs/how-to/fix-bare-citation-findings.md",
+      "beforeSha256": "11d8cb55ff745f5cce515eb3617327fd396b4e25a0adbddb682ebbc32caf9961",
+      "initiallyAbsent": false,
+      "afterSha256": "a32b04a88eb652018241b08107fb655787647214d5bb469b20e9b709d5e6be38"
+    },
+    {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "beforeSha256": "20a3161a93d9c99555b852058e0c139d27f58b9aa4d8b22f22513e8c32272f10",
+      "initiallyAbsent": false,
+      "afterSha256": "a8d54d134cc0329a2be3227560d0b63131e25d2032492b585f8cf56a99c4e112"
+    },
+    {
+      "path": "core/skills/_shared/citation-format.md",
+      "beforeSha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+      "initiallyAbsent": false,
+      "afterSha256": "589e65ffeccaf45b3de4d1047eaec5face605265b05bbf462939c50677651fdd"
+    },
+    {
+      "path": "scripts/check-decision-citation-drift.mjs",
+      "beforeSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+      "initiallyAbsent": false,
+      "afterSha256": "414bbeb1ec669330158bae0f5b48a0f2573ca07a2e7b4b8821b417446a8212d9"
+    },
+    {
+      "path": "test/scripts/check-decision-citation-drift.test.mjs",
+      "beforeSha256": "c1255ef2d4640f712fa8b973104f29f25cd3814cda6dcbbac7aeea6995a48af0",
+      "initiallyAbsent": false,
+      "afterSha256": "3ab6164012aca71c12dc427781039b7e0c9b9254e6b37b602eb3249f68551a6e"
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "beforeSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e",
+      "initiallyAbsent": false,
+      "afterSha256": "1756414ad9721b55f54b6587dbd108336b37cec88e86cd363cf9398b1df2e666"
+    },
+    {
+      "path": "src/state/store.mjs",
+      "beforeSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
+      "initiallyAbsent": false,
+      "afterSha256": "dab9d2421d59b17bd1610baa98e371ed376bc8ceee3dec316cbd04a45abe4f22"
+    },
+    {
+      "path": "AGENTS.md",
+      "beforeSha256": "30f6499b652d02e15f1f24144dd90731a1ad49a312e968dae3b04fc11cd7227d",
+      "initiallyAbsent": false,
+      "afterSha256": "53e9bdde5d98a51b6eaca164b4f36c096fc7d98fadc2d7e08965092517a51935"
+    },
+    {
+      "path": "docs/platform/process/spec.md",
+      "beforeSha256": "1ed03ecc353df1b180802791cdb904904f6141347720339347377cb5b48236db",
+      "initiallyAbsent": false,
+      "afterSha256": "6c0c0793016ff22233e542b7e836c06128efb3fc6cef045bafbc626e94106cfe"
+    },
+    {
+      "path": "docs/platform/identity/spec.md",
+      "beforeSha256": "c84d037198f648ff713e2d5e998a9b6f4a2b98ded36f84102ed7d9bfa8624fd0",
+      "initiallyAbsent": false,
+      "afterSha256": "7c5672b66cc6496c901e014ae0e5bee564b30f77100d6b2f03c7c8eb785805df"
+    },
+    {
+      "path": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "beforeSha256": "b25d732a432dbbfb144c23652cd48204cbf211b4389237dccd0ec46bbd24faf3",
+      "initiallyAbsent": false,
+      "afterSha256": "b19ae1b2833e894b1d4b424b95a95aa2e3c94fe696943f78591761283b16b486"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "beforeSha256": "6a84574a194e8ec9c05b9e59d228417e884f28a718ecfe2a8986a170107e58da",
+      "initiallyAbsent": false,
+      "afterSha256": "03184762a6e2320ce627176cd2a53c8e33356a5178ecb9c1b53af4d04c9759b4"
+    },
+    {
+      "path": "test/runner/merge.test.mjs",
+      "beforeSha256": "44e8822ee9addea2722d2921cddcfb5d2fa25f8f1a16cbd35dd81bdfce948308",
+      "initiallyAbsent": false,
+      "afterSha256": "1f0d6a3df0595b28d255e8e6b08ae8603680b76b0ab7c59f64f822ced8bc43fb"
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "beforeSha256": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
+      "initiallyAbsent": false,
+      "afterSha256": "b35cf993a51aee0f337651d2ede725c66a8a2f0195fbf635f26c0a09ce758e77"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "beforeSha256": "36a638a0bcc156ac4aab3866514f3a875330fa0d6c5f609dcd989d5c21023bbd",
+      "initiallyAbsent": false,
+      "afterSha256": "9b27161416aaeb694515ac0dd49b8def11fd427272aab384dc8a9722922a0d94"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "beforeSha256": "3cccc8cff795fe5b589c19f8aed2e9bc23594ead0aa39009dba1be0eb52b37e6",
+      "initiallyAbsent": false,
+      "afterSha256": "3c5bdbe47e33ba6bc56e78fe61891dfc358b11f1ba0051201d8c1ee4f48b95db"
+    },
+    {
+      "path": "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+      "beforeSha256": "1d419499c1f0fad727a3dded7ff5e1f73c92f50fef4c45a1c76013920233414a",
+      "initiallyAbsent": false,
+      "afterSha256": "13bf4f1a8df8e9d1bf91b79304866ad710936f666d7f9d58c80fe6c15f766a3b"
+    },
+    {
+      "path": "test/runner/dead-vocabulary-guard.test.mjs",
+      "beforeSha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+      "initiallyAbsent": false,
+      "afterSha256": "c18c1b3d929ff87a489b6c38a332e003601e16b80d1f25eb71c0e56ad7cc15bc"
+    },
+    {
+      "path": "scripts/test-proof-inventory.mjs",
+      "beforeSha256": "61a54de2d57888dadb31138db836c569d5663046f4f835bf63061b43cbb77a35",
+      "initiallyAbsent": false,
+      "afterSha256": "7b514348054c0c85cc3e3517c2184a7ab4d5eeb1b4f274a40673045d83c74422"
+    },
+    {
+      "path": "docs/doc-governance.md",
+      "beforeSha256": "a2b0df6a5910c3d5e12ce7f9cd5db3f587095ff3c57f4d1978f933d308d2bfc7",
+      "initiallyAbsent": false,
+      "afterSha256": "4e4de787f1ccc55d0cb4496ccc71b796002e6e52417add5ebd3ab50df8b40c01"
+    },
+    {
+      "path": "docs/README.md",
+      "beforeSha256": "d8af6a844d56e11a1b54832dcb54b3ce84f915ee74b81c98386cc88f818eaa98",
+      "initiallyAbsent": false,
+      "afterSha256": "c029726690503fe1a59d976eb2b9117b811126b3f2ae011cef300120cfabfad4"
+    },
+    {
+      "path": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "beforeSha256": "001a90b4a3a001d513a0457394b4b8a69320ee2a4865b0b0561bd4d1da39a997",
+      "initiallyAbsent": false,
+      "afterSha256": "d9481a0f3c9ad754864de88604e203ad2404498eaf7d59024d96421d134ba5b4"
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "beforeSha256": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621",
+      "initiallyAbsent": false,
+      "afterSha256": "df3c2ae49a5827ef1a35dd7d3c7ebae87fc30616e5ee180e63160e84049186ae"
+    },
+    {
+      "path": "docs/user/README.md",
+      "beforeSha256": "29ea4aab53013f1f5f474ace8d2ec35566fc41c36a0d12b9f642e69320e3e8d6",
+      "initiallyAbsent": false,
+      "afterSha256": "489c9cad33bdff8c5c9b5d8ae3372b9f304e4746e8007e350622bc94c0ff6481"
+    },
+    {
+      "path": "docs/platform/migration-authoring-rules.md",
+      "beforeSha256": "7b7d5bd462e55d6ac9ee993bbbb12607e37c8de19cb004e9d8bd4b020c605163",
+      "initiallyAbsent": false,
+      "afterSha256": "315e25fd29cb76c123f18fe03d2edd682253de770e497ace746f1d72e0ddebe2"
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "beforeSha256": "40b8f3d8ed14f9b9e7f3cb1fcb663dcceefb9fee23f0ddeb5bca82512170da89",
+      "initiallyAbsent": false,
+      "afterSha256": "df2d949b90a0e56bd7385cb32becfe8d22034d916e39fa0b7e7c268d32337837"
+    },
+    {
+      "path": "docs/platform/proposals/documentation-system-unification.md",
+      "beforeSha256": "4fd8ed58e3b9e1267eb571a8dc5ede23b79324af0a1022634424da46f22b1197",
+      "initiallyAbsent": false,
+      "afterSha256": "9c0996a829f277d01857fee49a82790489eed2b619ee7b5e41221664a749c7a4"
+    },
+    {
+      "path": "docs/platform/vision.md",
+      "beforeSha256": "682192b6df66b26feb445963d59a39ac3a366439923838e8904189056c91cb17",
+      "initiallyAbsent": false,
+      "afterSha256": "dda0552476f7952311b4f55a245d037e805818e26de8019d060c8ee381cdf31e"
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/roadmap.md",
+      "beforeSha256": "b754ba350d11bb56d93912f42b3d1dec9fa2cef2d3e425fc0586f1a5f1517e8e",
+      "initiallyAbsent": false,
+      "afterSha256": "30fcf044fbd7489c4d4f6504a76b6caf5378889bd59112e465ae28f546b9e33b"
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "beforeSha256": "50099b7a34e0f160bb9d5a8bb56527531ef747a31cca021302eae981d9e05a99",
+      "initiallyAbsent": false,
+      "afterSha256": "513b529445112a817d0b14bcbc9bbe70a1f8bccbc6fdba06fd17285f0a44726c"
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+      "beforeSha256": "9ee4f29458ce8631cb9df0818b3d27ef17d715ea18f631248676e868ccd4f8c0",
+      "initiallyAbsent": false,
+      "afterSha256": "ddb23e0d7a71cd447fb42a8a1fa466056516ce71a17ad81fe2d34b0b996f1a09"
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "beforeSha256": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+      "initiallyAbsent": false,
+      "afterSha256": "57f8efcf8b197ada08a831398c4072a56973dd9d182f35a681f9e33b88fdc9f4"
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "beforeSha256": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e",
+      "initiallyAbsent": false,
+      "afterSha256": "744679068b71590aaa87c5c47e93ba943df11639df2b58def6111f95d3a6d75a"
+    },
+    {
+      "path": "docs/platform/platform-foundations.md",
+      "beforeSha256": "7bc5be11431ffc33c8bd636301eac20aa1128946bc6c45e8e43ea7dbab4e4aa0",
+      "initiallyAbsent": false,
+      "afterSha256": "50e3b2b76a3946400c4f654cbefc6659420a894aad082a0e9a542d28fc182151"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/README.md",
+      "beforeSha256": "de511be6b465433d260a468633f29c6849756cc68f0998749145cf3864a0b525",
+      "initiallyAbsent": false,
+      "afterSha256": "2fb3c8e6e5488f660d4adaa0a541e287bfb44134ffd241e196c61021d4bd04c0"
+    },
+    {
+      "path": "docs/platform/work-state/README.md",
+      "beforeSha256": "8d9967f96128ef6705ede2e3e74b617ad5884c7798c2a4e2f0214a1c00fdc22f",
+      "initiallyAbsent": false,
+      "afterSha256": "859c7fdbb1c9b52adaca5f1a8bbe5129114d68fbf78129cbafe2fb350e33b400"
+    },
+    {
+      "path": "docs/platform/README.md",
+      "beforeSha256": "1ced7aa146e2669d4ac346edba862422b5b4ee0af3fb86bbe4fea9b636d60ac0",
+      "initiallyAbsent": false,
+      "afterSha256": "9ca32e20e043beb272269e36aedfe2ea9e243a2dd2d326ab00e729d7920fe01f"
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+      "beforeSha256": "f1af5a4cf9705322fd21d12ce41e4fa9a0138ca9792e1c14b5f32606a1fb6318",
+      "initiallyAbsent": false,
+      "afterSha256": "bb9ffab90d3d9bd3fdb7287852ac7c7b8fc1057de4af9ee06e613bc8ddcdc40b"
+    },
+    {
+      "path": "docs/platform/system-overview/spec.md",
+      "beforeSha256": "a9cf64fb4b42aaefdff0b6e0a5fc0f875730f769acc4598ac29922a5cffe60bb",
+      "initiallyAbsent": false,
+      "afterSha256": "12cbd3fa0df162a8eda9dc64a21d738d6e5194787dc745b5c349bc2c35f790c6"
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "beforeSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+      "initiallyAbsent": false,
+      "afterSha256": "489086e5f1f5a48417c7b28b2aea56d4ffd8da9702b4c9ba02e2f709d470461b"
+    },
+    {
+      "path": "docs/platform/agent-coordination/spec.md",
+      "beforeSha256": "1306d4f34b42fb2f6eaf9aff1dfb894e300e989975ab0ba9a0842847f24d22c9",
+      "initiallyAbsent": false,
+      "afterSha256": "28f21b37a4f4334cbe438ab89707e25cf313ce3929d284799addc69370f5f2b6"
+    },
+    {
+      "path": "docs/platform/workflow/spec.md",
+      "beforeSha256": "0ce96d282b026df85d96aa20c42b3e934b3b3f739a13edcf0aee6905465e1d7c",
+      "initiallyAbsent": false,
+      "afterSha256": "6f9b26430c16fa5f489c127d766a3bfc59ad28aef768094af18a355254a940ef"
+    },
+    {
+      "path": "docs/platform/governance.md",
+      "beforeSha256": "0e7d820925c594df12b2895a18158fdb91a2e2c5cf257f5d61463b3e9f7af536",
+      "initiallyAbsent": false,
+      "afterSha256": "c57fb9a788e9b4ad00fe588d83a9a41e91dda463d27e700188fb7c7565496ee2"
+    },
+    {
+      "path": "docs/transitional-switchboard.md",
+      "beforeSha256": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+      "initiallyAbsent": false,
+      "afterSha256": "adb51802d2432ff699650b55f32efdd4974e1c8b6c9b8d4f0a4dea06737661e0"
+    },
+    {
+      "path": "docs/platform/documentation/switchboard.md",
+      "beforeSha256": "f58542c47377976500986df9364802e7c4d58709467c93775dff1cb8fd2e9886",
+      "initiallyAbsent": false,
+      "afterSha256": "089bd2ab3aa1337216cb7604899ddf71b8efa8f70fdba4d0add21b1022c9e0c1"
+    },
+    {
+      "path": "docs/platform/system-architecture/history/component-boundary-source-carriage.md",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "initiallyAbsent": true,
+      "afterSha256": "d9cf0c435ca28f31f943b72a1965d0ac8714261999f8f6fbeab66899bb188960"
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "beforeSha256": "348fb00440ab449972706c129caffff1e7316a4156f70a7909e720425a412c46",
+      "initiallyAbsent": false,
+      "afterSha256": "d8e336015a9afa856fc54fafa14ef1b6ae996069fb40049451322981972a03bc"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "beforeSha256": "b7f4e590dbb6b10579466a589e26c5dd161c43c0841a4cefe39bdf20a9caf501",
+      "initiallyAbsent": false,
+      "afterSha256": "c6f3eb6e0ef208d2721fe88d37bcdca04a574cac50f2133c559b8dd24202c2f1"
+    },
+    {
+      "path": "docs/platform/terminal-control/spec.md",
+      "beforeSha256": "c464ce042ccb9c29ff9471f3485f4c906ace06d848006e056494d0024c0bac94",
+      "initiallyAbsent": false,
+      "afterSha256": "31b58697f3140b26f563b272d4ea1b4b33d4dc8107aac6369cc28d69100b5363"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+      "beforeSha256": "21b8491c94440d62f00035e4f1d90fda24212676466e41300b38d0a2f8053c35",
+      "initiallyAbsent": false,
+      "afterSha256": "2ea132c12e95f67d908a4a0bfb6513c09ad8f9b5fb01281ac4716a80772aa79c"
+    },
+    {
+      "path": "docs/platform/runner/spec.md",
+      "beforeSha256": "db6d09b5d82fb60465fa46f4bef17be5d8d8e251bc05ddf30d3ad9f219802718",
+      "initiallyAbsent": false,
+      "afterSha256": "3f87884f32ceb07841239274b7dc14370d315f0892a04b1e913cf9145c06fe21"
+    },
+    {
+      "path": "docs/platform/work-state/spec.md",
+      "beforeSha256": "8fad2d269f635ce4a00093500daeb8825e95765d65e133479da4821f7aa5238e",
+      "initiallyAbsent": false,
+      "afterSha256": "12e6ceae00eda6b236fb620a5a0b9e97cec04996028d792f884c3f540d29b572"
+    },
+    {
+      "path": "core/skills/fgos-researching/SKILL.md",
+      "beforeSha256": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+      "initiallyAbsent": false,
+      "afterSha256": "26a8d7e2f909f53fad478a98ba010cb85ef0de7d405516f1b01d6a7967e061dc"
+    },
+    {
+      "path": "docs/platform/agent-mailbox/spec.md",
+      "beforeSha256": "2b16fd4743bcaa63eaece85cf951a03ce18accca7527cbe9273a8195f389606a",
+      "initiallyAbsent": false,
+      "afterSha256": "c9db17997add6fe300c1326bac618002ea89ff37bbdeec57f70cadce066e899e"
+    },
+    {
+      "path": "docs/platform/agent-protocol/spec.md",
+      "beforeSha256": "6bd368bab828957e2deded14d6f3bf8c571a8ff44eefa45e61f7eb30a506b0bd",
+      "initiallyAbsent": false,
+      "afterSha256": "f21425ed4cb40d71e92fd5d5ae81cd50ea098844b668542181b00e9ec8dc031e"
+    },
+    {
+      "path": "docs/platform/coexistence/spec.md",
+      "beforeSha256": "954d7bc90bb7ee28a45c8f9c5a48fdb3fab119e06e0d902ffdfce438cb5b4d5f",
+      "initiallyAbsent": false,
+      "afterSha256": "4076287bc4658b76618047a347bc32a9719200f7f4cedb6479291bdeb6686b8f"
+    },
+    {
+      "path": "docs/platform/config/spec.md",
+      "beforeSha256": "99a0e0b2dcf4c231b424761e94f9c2f32e951834acc8e576505ae528307e9be3",
+      "initiallyAbsent": false,
+      "afterSha256": "4ffb09e0ca4823579e9c3db0ed5c24b651041f9253262a7516be52536c45ab01"
+    },
+    {
+      "path": "docs/platform/event-store/spec.md",
+      "beforeSha256": "06d74072fd4ee70b2427e363b2f00300664b8580a2113e882930f29e0835fbe0",
+      "initiallyAbsent": false,
+      "afterSha256": "061f4d67b6b493a69007391b688dcabdb3ff7c2822d4e185b87f86fbce80683b"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "beforeSha256": "b1b20b788fd8b881ef34b076d2ea8eaf89a070dbc7fdd0465beb48704ddefab1",
+      "initiallyAbsent": false,
+      "afterSha256": "86b3d095ed4b47560d5427f5546cb1ecbe6942bc38b4bda513ad92749329c9be"
+    },
+    {
+      "path": "docs/platform/run-supervisor/spec.md",
+      "beforeSha256": "91cb0302588801a989846109d6a7c9298c28b842709195618f7c22d02ef19011",
+      "initiallyAbsent": false,
+      "afterSha256": "4ed3fd5c0449afc6280d80f1f63f28576579f8d49c7cbcde368dbb4fbb1307c1"
+    },
+    {
+      "path": "docs/platform/yaml-document/spec.md",
+      "beforeSha256": "5761841f0f3b8f2d48193ab6f171184cfed6f92faa3a730a2c149c2dae364850",
+      "initiallyAbsent": false,
+      "afterSha256": "714d27777d1f476405425875b41d6fecec143694d1bf6a311f7c535bbb8959d4"
+    }
+  ],
+  "patchInvocations": 424
+}

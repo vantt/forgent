@@ -1,5 +1,5 @@
 {
-  "pin": "8fd37e3590d3654729cf2d177c90bb0fbb17dff9",
+  "pin": "8b4d778d32b5930ab7c80d9d19b2f26b95441ee1",
   "status": "pass",
   "uniqueRecords": 574,
   "cohortMemberships": 684,
@@ -2192,7 +2192,7 @@
     {
       "path": "docs/platform/agent-mailbox/spec.md",
       "beforeSha256": "2b16fd4743bcaa63eaece85cf951a03ce18accca7527cbe9273a8195f389606a",
-      "expectedAfterSha256": "19e4186c8ef1843e888563de63e280ab8dffb3715367980395c6bdf004c3759d",
+      "expectedAfterSha256": "c9db17997add6fe300c1326bac618002ea89ff37bbdeec57f70cadce066e899e",
       "roundtripExact": true
     },
     {

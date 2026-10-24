@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "python3",
+    "-B",
+    "-c",
+    "import runpy; m=runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/g9/w12-gloss-polish.py'); m['main'].__globals__['PREFIX']='w13'; m['main']()"
+  ],
+  "exit": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/g9/w12-gloss-polish.py\", line 286, in main\n    polish()\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/g9/w12-gloss-polish.py\", line 249, in polish\n    repair(pin)\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/g9/w12-gloss-polish.py\", line 151, in repair\n    audit_controls(original, witnesses, fixes, pin)\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/g9/w12-gloss-polish.py\", line 209, in audit_controls\n    assert len(audit['witnesses']) == 104 and not audit['reviewRequired'], audit['reviewRequired']\nAssertionError: [0]\n"
+}

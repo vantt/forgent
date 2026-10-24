@@ -1,0 +1,760 @@
+{
+  "pin": "8b4d778d32b5930ab7c80d9d19b2f26b95441ee1",
+  "exit": 0,
+  "historicalReviewRequired": [],
+  "verticalMissingLabelRows": [
+    {
+      "originalIndex": 35,
+      "index": 0,
+      "file": "docs/platform/git/spec.md",
+      "line": 1075,
+      "before": "  - **D1 (order)**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read).",
+      "after": "  - **Order**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read).",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "1"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "1"
+      ],
+      "verticalList": true,
+      "adjacentAfterListLines": [
+        {
+          "line": 1076,
+          "text": "  - **(2), (3) Sequence counter and the scp form**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
+          "beforeWitness": null
+        }
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    },
+    {
+      "originalIndex": 36,
+      "index": 0,
+      "file": "docs/platform/git/spec.md",
+      "line": 1076,
+      "before": "  - **D2, D3 (sequence counter and the scp form)**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
+      "after": "  - **Sequence counter and the scp form**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "2",
+        "3"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "2",
+        "3"
+      ],
+      "verticalList": true,
+      "adjacentAfterListLines": [
+        {
+          "line": 1075,
+          "text": "  - **(1) Order**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read).",
+          "beforeWitness": null
+        },
+        {
+          "line": 1077,
+          "text": "  - **(4) Worktree-add fsync count** went to the owner as a question and is not part of this entry. **(5), (6) Test move-down and per-operation herdr command counts**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+          "beforeWitness": null
+        }
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    },
+    {
+      "originalIndex": 37,
+      "index": 0,
+      "file": "docs/platform/git/spec.md",
+      "line": 1077,
+      "before": "  - **D4 (fsync count of a worktree add)** went to the owner as a question and is not part of this entry. **D5, D6**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+      "after": "  - **Worktree-add fsync count** went to the owner as a question and is not part of this entry. **Test move-down and per-operation herdr command counts**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "4",
+        "5",
+        "6"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "4",
+        "5",
+        "6"
+      ],
+      "verticalList": true,
+      "adjacentAfterListLines": [
+        {
+          "line": 1076,
+          "text": "  - **(2), (3) Sequence counter and the scp form**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
+          "beforeWitness": null
+        },
+        {
+          "line": 1078,
+          "text": "  - **(7) WAL digest**: kept by evidence, no byte-equality run (§10). **(8) Drains**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+          "beforeWitness": null
+        }
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    },
+    {
+      "originalIndex": 38,
+      "index": 0,
+      "file": "docs/platform/git/spec.md",
+      "line": 1078,
+      "before": "  - **D7 (WAL digest)**: kept by evidence, no byte-equality run (§10). **D8 (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+      "after": "  - **WAL digest**: kept by evidence, no byte-equality run (§10). **Drains**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "7",
+        "8"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "7",
+        "8"
+      ],
+      "verticalList": true,
+      "adjacentAfterListLines": [
+        {
+          "line": 1077,
+          "text": "  - **(4) Worktree-add fsync count** went to the owner as a question and is not part of this entry. **(5), (6) Test move-down and per-operation herdr command counts**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+          "beforeWitness": null
+        },
+        {
+          "line": 1079,
+          "text": "  - **(9) Parked**: a per-process repository handle cache, `PATH` out of the floor key.",
+          "beforeWitness": null
+        }
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    },
+    {
+      "originalIndex": 39,
+      "index": 0,
+      "file": "docs/platform/git/spec.md",
+      "line": 1079,
+      "before": "  - **D9 (parked)**: a per-process repository handle cache, `PATH` out of the floor key.",
+      "after": "  - **Parked**: a per-process repository handle cache, `PATH` out of the floor key.",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "9"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "9"
+      ],
+      "verticalList": true,
+      "adjacentAfterListLines": [
+        {
+          "line": 1078,
+          "text": "  - **(7) WAL digest**: kept by evidence, no byte-equality run (§10). **(8) Drains**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+          "beforeWitness": null
+        }
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    }
+  ],
+  "allLabelsStrippedRows": [
+    {
+      "index": 35,
+      "file": "docs/platform/git/spec.md",
+      "line": 1075,
+      "before": "  - **D1 (order)**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read).",
+      "after": "  - **Order**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read).",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "1"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "1"
+      ],
+      "verticalList": true,
+      "adjacentAfterListLines": [
+        {
+          "line": 1076,
+          "text": "  - **Sequence counter and the scp form**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
+          "beforeWitness": "  - **D2, D3 (sequence counter and the scp form)**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease."
+        }
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    },
+    {
+      "index": 36,
+      "file": "docs/platform/git/spec.md",
+      "line": 1076,
+      "before": "  - **D2, D3 (sequence counter and the scp form)**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
+      "after": "  - **Sequence counter and the scp form**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "2",
+        "3"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "2",
+        "3"
+      ],
+      "verticalList": true,
+      "adjacentAfterListLines": [
+        {
+          "line": 1075,
+          "text": "  - **Order**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read).",
+          "beforeWitness": "  - **D1 (order)**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read)."
+        },
+        {
+          "line": 1077,
+          "text": "  - **Worktree-add fsync count** went to the owner as a question and is not part of this entry. **Test move-down and per-operation herdr command counts**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+          "beforeWitness": "  - **D4 (fsync count of a worktree add)** went to the owner as a question and is not part of this entry. **D5, D6**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar."
+        }
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    },
+    {
+      "index": 37,
+      "file": "docs/platform/git/spec.md",
+      "line": 1077,
+      "before": "  - **D4 (fsync count of a worktree add)** went to the owner as a question and is not part of this entry. **D5, D6**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+      "after": "  - **Worktree-add fsync count** went to the owner as a question and is not part of this entry. **Test move-down and per-operation herdr command counts**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "4",
+        "5",
+        "6"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "4",
+        "5",
+        "6"
+      ],
+      "verticalList": true,
+      "adjacentAfterListLines": [
+        {
+          "line": 1076,
+          "text": "  - **Sequence counter and the scp form**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
+          "beforeWitness": "  - **D2, D3 (sequence counter and the scp form)**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease."
+        },
+        {
+          "line": 1078,
+          "text": "  - **WAL digest**: kept by evidence, no byte-equality run (§10). **Drains**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+          "beforeWitness": "  - **D7 (WAL digest)**: kept by evidence, no byte-equality run (§10). **D8 (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields)."
+        }
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    },
+    {
+      "index": 38,
+      "file": "docs/platform/git/spec.md",
+      "line": 1078,
+      "before": "  - **D7 (WAL digest)**: kept by evidence, no byte-equality run (§10). **D8 (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+      "after": "  - **WAL digest**: kept by evidence, no byte-equality run (§10). **Drains**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "7",
+        "8"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "7",
+        "8"
+      ],
+      "verticalList": true,
+      "adjacentAfterListLines": [
+        {
+          "line": 1077,
+          "text": "  - **Worktree-add fsync count** went to the owner as a question and is not part of this entry. **Test move-down and per-operation herdr command counts**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+          "beforeWitness": "  - **D4 (fsync count of a worktree add)** went to the owner as a question and is not part of this entry. **D5, D6**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar."
+        },
+        {
+          "line": 1079,
+          "text": "  - **Parked**: a per-process repository handle cache, `PATH` out of the floor key.",
+          "beforeWitness": "  - **D9 (parked)**: a per-process repository handle cache, `PATH` out of the floor key."
+        }
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    },
+    {
+      "index": 39,
+      "file": "docs/platform/git/spec.md",
+      "line": 1079,
+      "before": "  - **D9 (parked)**: a per-process repository handle cache, `PATH` out of the floor key.",
+      "after": "  - **Parked**: a per-process repository handle cache, `PATH` out of the floor key.",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "9"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "9"
+      ],
+      "verticalList": true,
+      "adjacentAfterListLines": [
+        {
+          "line": 1078,
+          "text": "  - **WAL digest**: kept by evidence, no byte-equality run (§10). **Drains**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+          "beforeWitness": "  - **D7 (WAL digest)**: kept by evidence, no byte-equality run (§10). **D8 (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields)."
+        }
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    }
+  ],
+  "genericListControls": [
+    {
+      "kind": "numbered",
+      "singleWitnessLostLabel": {
+        "index": 0,
+        "file": "numbered",
+        "line": 2,
+        "before": "2. Original item",
+        "after": "Replacement item",
+        "lowercaseAfterFullStop": [],
+        "doubledWords": [],
+        "originalLocalLabels": [
+          "2"
+        ],
+        "retainedListLabels": [],
+        "lostListLabels": [
+          "2"
+        ],
+        "verticalList": true,
+        "adjacentAfterListLines": [
+          {
+            "line": 1,
+            "text": "1. Untouched item",
+            "beforeWitness": null
+          },
+          {
+            "line": 3,
+            "text": "3. Untouched item",
+            "beforeWitness": null
+          }
+        ],
+        "labelReview": "vertical local list; all labels required",
+        "matchReviews": [],
+        "status": "review-required"
+      },
+      "restoredLabel": {
+        "index": 0,
+        "file": "numbered",
+        "line": 2,
+        "before": "2. Original item",
+        "after": "(2) Replacement item",
+        "lowercaseAfterFullStop": [],
+        "doubledWords": [],
+        "originalLocalLabels": [
+          "2"
+        ],
+        "retainedListLabels": [
+          "2"
+        ],
+        "lostListLabels": [],
+        "verticalList": true,
+        "adjacentAfterListLines": [
+          {
+            "line": 1,
+            "text": "1. Untouched item",
+            "beforeWitness": null
+          },
+          {
+            "line": 3,
+            "text": "3. Untouched item",
+            "beforeWitness": null
+          }
+        ],
+        "labelReview": "vertical local list; all labels required",
+        "matchReviews": [],
+        "status": "pass"
+      },
+      "simultaneousLoss": {
+        "pin": "8b4d778d32b5930ab7c80d9d19b2f26b95441ee1",
+        "witnessesRead": [
+          0,
+          1
+        ],
+        "witnesses": [
+          {
+            "index": 0,
+            "file": "numbered",
+            "line": 1,
+            "before": "1. Original item",
+            "after": "Replacement item",
+            "lowercaseAfterFullStop": [],
+            "doubledWords": [],
+            "originalLocalLabels": [
+              "1"
+            ],
+            "retainedListLabels": [],
+            "lostListLabels": [
+              "1"
+            ],
+            "verticalList": true,
+            "adjacentAfterListLines": [
+              {
+                "line": 2,
+                "text": "Replacement item",
+                "beforeWitness": "2. Original item"
+              }
+            ],
+            "labelReview": "vertical local list; all labels required",
+            "matchReviews": [],
+            "status": "review-required"
+          },
+          {
+            "index": 1,
+            "file": "numbered",
+            "line": 2,
+            "before": "2. Original item",
+            "after": "Replacement item",
+            "lowercaseAfterFullStop": [],
+            "doubledWords": [],
+            "originalLocalLabels": [
+              "2"
+            ],
+            "retainedListLabels": [],
+            "lostListLabels": [
+              "2"
+            ],
+            "verticalList": true,
+            "adjacentAfterListLines": [
+              {
+                "line": 1,
+                "text": "Replacement item",
+                "beforeWitness": "1. Original item"
+              }
+            ],
+            "labelReview": "vertical local list; all labels required",
+            "matchReviews": [],
+            "status": "review-required"
+          }
+        ],
+        "rules": {
+          "sentenceStarts": "Unicode lowercase letter after full stop + whitespace; strip emphasis and exclude inline code/link destinations",
+          "doubledWords": "case-insensitive adjacent Unicode words",
+          "listLabels": "Inline multi-label lists and vertical items with numbered/lettered neighbours in the complete after-file retain every original label, even for a lone witness (including gaps and grouped labels); decision labels become (n) or Ý n:, not section labels."
+        },
+        "fixes": [],
+        "reviewRequired": [
+          0,
+          1
+        ],
+        "claimLimit": "Mechanical prose audit; real replay separately authenticates all 104 witness lines."
+      },
+      "simultaneousRestorationPasses": true
+    },
+    {
+      "kind": "lettered",
+      "singleWitnessLostLabel": {
+        "index": 0,
+        "file": "lettered",
+        "line": 2,
+        "before": "B. Original item",
+        "after": "Replacement item",
+        "lowercaseAfterFullStop": [],
+        "doubledWords": [],
+        "originalLocalLabels": [
+          "B"
+        ],
+        "retainedListLabels": [],
+        "lostListLabels": [
+          "B"
+        ],
+        "verticalList": true,
+        "adjacentAfterListLines": [
+          {
+            "line": 1,
+            "text": "A. Untouched item",
+            "beforeWitness": null
+          },
+          {
+            "line": 3,
+            "text": "C. Untouched item",
+            "beforeWitness": null
+          }
+        ],
+        "labelReview": "vertical local list; all labels required",
+        "matchReviews": [],
+        "status": "review-required"
+      },
+      "restoredLabel": {
+        "index": 0,
+        "file": "lettered",
+        "line": 2,
+        "before": "B. Original item",
+        "after": "(B) Replacement item",
+        "lowercaseAfterFullStop": [],
+        "doubledWords": [],
+        "originalLocalLabels": [
+          "B"
+        ],
+        "retainedListLabels": [
+          "B"
+        ],
+        "lostListLabels": [],
+        "verticalList": true,
+        "adjacentAfterListLines": [
+          {
+            "line": 1,
+            "text": "A. Untouched item",
+            "beforeWitness": null
+          },
+          {
+            "line": 3,
+            "text": "C. Untouched item",
+            "beforeWitness": null
+          }
+        ],
+        "labelReview": "vertical local list; all labels required",
+        "matchReviews": [],
+        "status": "pass"
+      },
+      "simultaneousLoss": {
+        "pin": "8b4d778d32b5930ab7c80d9d19b2f26b95441ee1",
+        "witnessesRead": [
+          0,
+          1
+        ],
+        "witnesses": [
+          {
+            "index": 0,
+            "file": "lettered",
+            "line": 1,
+            "before": "A. Original item",
+            "after": "Replacement item",
+            "lowercaseAfterFullStop": [],
+            "doubledWords": [],
+            "originalLocalLabels": [
+              "A"
+            ],
+            "retainedListLabels": [],
+            "lostListLabels": [
+              "A"
+            ],
+            "verticalList": true,
+            "adjacentAfterListLines": [
+              {
+                "line": 2,
+                "text": "Replacement item",
+                "beforeWitness": "B. Original item"
+              }
+            ],
+            "labelReview": "vertical local list; all labels required",
+            "matchReviews": [],
+            "status": "review-required"
+          },
+          {
+            "index": 1,
+            "file": "lettered",
+            "line": 2,
+            "before": "B. Original item",
+            "after": "Replacement item",
+            "lowercaseAfterFullStop": [],
+            "doubledWords": [],
+            "originalLocalLabels": [
+              "B"
+            ],
+            "retainedListLabels": [],
+            "lostListLabels": [
+              "B"
+            ],
+            "verticalList": true,
+            "adjacentAfterListLines": [
+              {
+                "line": 1,
+                "text": "Replacement item",
+                "beforeWitness": "A. Original item"
+              }
+            ],
+            "labelReview": "vertical local list; all labels required",
+            "matchReviews": [],
+            "status": "review-required"
+          }
+        ],
+        "rules": {
+          "sentenceStarts": "Unicode lowercase letter after full stop + whitespace; strip emphasis and exclude inline code/link destinations",
+          "doubledWords": "case-insensitive adjacent Unicode words",
+          "listLabels": "Inline multi-label lists and vertical items with numbered/lettered neighbours in the complete after-file retain every original label, even for a lone witness (including gaps and grouped labels); decision labels become (n) or Ý n:, not section labels."
+        },
+        "fixes": [],
+        "reviewRequired": [
+          0,
+          1
+        ],
+        "claimLimit": "Mechanical prose audit; real replay separately authenticates all 104 witness lines."
+      },
+      "simultaneousRestorationPasses": true
+    },
+    {
+      "kind": "decision",
+      "singleWitnessLostLabel": {
+        "index": 0,
+        "file": "decision",
+        "line": 2,
+        "before": "D2. Original item",
+        "after": "Replacement item",
+        "lowercaseAfterFullStop": [],
+        "doubledWords": [],
+        "originalLocalLabels": [
+          "2"
+        ],
+        "retainedListLabels": [],
+        "lostListLabels": [
+          "2"
+        ],
+        "verticalList": true,
+        "adjacentAfterListLines": [
+          {
+            "line": 1,
+            "text": "D1. Untouched item",
+            "beforeWitness": null
+          },
+          {
+            "line": 3,
+            "text": "D3. Untouched item",
+            "beforeWitness": null
+          }
+        ],
+        "labelReview": "vertical local list; all labels required",
+        "matchReviews": [],
+        "status": "review-required"
+      },
+      "restoredLabel": {
+        "index": 0,
+        "file": "decision",
+        "line": 2,
+        "before": "D2. Original item",
+        "after": "(2) Replacement item",
+        "lowercaseAfterFullStop": [],
+        "doubledWords": [],
+        "originalLocalLabels": [
+          "2"
+        ],
+        "retainedListLabels": [
+          "2"
+        ],
+        "lostListLabels": [],
+        "verticalList": true,
+        "adjacentAfterListLines": [
+          {
+            "line": 1,
+            "text": "D1. Untouched item",
+            "beforeWitness": null
+          },
+          {
+            "line": 3,
+            "text": "D3. Untouched item",
+            "beforeWitness": null
+          }
+        ],
+        "labelReview": "vertical local list; all labels required",
+        "matchReviews": [],
+        "status": "pass"
+      },
+      "simultaneousLoss": {
+        "pin": "8b4d778d32b5930ab7c80d9d19b2f26b95441ee1",
+        "witnessesRead": [
+          0,
+          1
+        ],
+        "witnesses": [
+          {
+            "index": 0,
+            "file": "decision",
+            "line": 1,
+            "before": "D1. Original item",
+            "after": "Replacement item",
+            "lowercaseAfterFullStop": [],
+            "doubledWords": [],
+            "originalLocalLabels": [
+              "1"
+            ],
+            "retainedListLabels": [],
+            "lostListLabels": [
+              "1"
+            ],
+            "verticalList": true,
+            "adjacentAfterListLines": [
+              {
+                "line": 2,
+                "text": "Replacement item",
+                "beforeWitness": "D2. Original item"
+              }
+            ],
+            "labelReview": "vertical local list; all labels required",
+            "matchReviews": [],
+            "status": "review-required"
+          },
+          {
+            "index": 1,
+            "file": "decision",
+            "line": 2,
+            "before": "D2. Original item",
+            "after": "Replacement item",
+            "lowercaseAfterFullStop": [],
+            "doubledWords": [],
+            "originalLocalLabels": [
+              "2"
+            ],
+            "retainedListLabels": [],
+            "lostListLabels": [
+              "2"
+            ],
+            "verticalList": true,
+            "adjacentAfterListLines": [
+              {
+                "line": 1,
+                "text": "Replacement item",
+                "beforeWitness": "D1. Original item"
+              }
+            ],
+            "labelReview": "vertical local list; all labels required",
+            "matchReviews": [],
+            "status": "review-required"
+          }
+        ],
+        "rules": {
+          "sentenceStarts": "Unicode lowercase letter after full stop + whitespace; strip emphasis and exclude inline code/link destinations",
+          "doubledWords": "case-insensitive adjacent Unicode words",
+          "listLabels": "Inline multi-label lists and vertical items with numbered/lettered neighbours in the complete after-file retain every original label, even for a lone witness (including gaps and grouped labels); decision labels become (n) or Ý n:, not section labels."
+        },
+        "fixes": [],
+        "reviewRequired": [
+          0,
+          1
+        ],
+        "claimLimit": "Mechanical prose audit; real replay separately authenticates all 104 witness lines."
+      },
+      "simultaneousRestorationPasses": true
+    }
+  ],
+  "allWitnesses": 104,
+  "currentReviewRequired": []
+}

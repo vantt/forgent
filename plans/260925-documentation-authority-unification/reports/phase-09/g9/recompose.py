@@ -12,32 +12,24 @@ import importlib.util
 import json
 from pathlib import Path
 import subprocess
+import shutil
 import sys
 import tempfile
 
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
-TMP = Path('/tmp/fgos-work/w12-gloss')
+TMP = Path('/tmp/fgos-work')
 
 
 @contextmanager
 def workspace(prefix):
-    """Allocate lazily; checks leave neither replay files nor an empty root."""
+    """Each call owns one unique directory; never remove a shared parent."""
+    TMP.mkdir(parents=True, exist_ok=True)
+    name = tempfile.mkdtemp(dir=TMP, prefix=prefix)
     try:
-        TMP.mkdir(parents=True)
-        created = True
-    except FileExistsError:
-        created = False
-    try:
-        with tempfile.TemporaryDirectory(dir=TMP, prefix=prefix) as name:
-            yield name
+        yield name
     finally:
-        if created:
-            try:
-                TMP.rmdir()
-            except OSError:
-                # Another replay still owns content in the shared root.
-                pass
+        shutil.rmtree(name)
 
 
 def module(name, path):

@@ -7,11 +7,11 @@
         "python3",
         "-B",
         "-c",
-        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\nreal = m['source']\ndef source(commit_arg, path):\n    return pathlib.Path('/tmp/fgos-work/w11-misc-pin/controls-ztozqxw1/author-shard.json').read_text() if commit_arg == commit and path == m['SHARD'] else real(commit_arg, path)\nwith patch.dict(g, source=source):\n    m['check'](pin)\n"
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\nreal = m['source']\ndef source(commit_arg, path):\n    return pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/author-shard.json').read_text() if commit_arg == commit and path == m['SHARD'] else real(commit_arg, path)\nwith patch.dict(g, source=source):\n    m['check'](pin)\n"
       ],
       "exit": 1,
       "stdout": "",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 11, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 175, in check\n    assert json.loads(source(commit, SHARD))==shard\nAssertionError\n",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 11, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 204, in check\n    assert json.loads(source(commit, SHARD))==shard\nAssertionError\n",
       "expectedFailureObserved": true
     },
     {
@@ -20,11 +20,323 @@
         "python3",
         "-B",
         "-c",
-        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\nreal = pathlib.Path.read_text\ndef read(path, *args, **kwargs):\n    return real(pathlib.Path('/tmp/fgos-work/w11-misc-pin/controls-ztozqxw1/later-record.json'), *args, **kwargs) if path == pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-09/import3/binding-refresh.json') else real(path, *args, **kwargs)\nwith patch.object(pathlib.Path, 'read_text', read):\n    m['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit)\n"
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\nreal = pathlib.Path.read_text\ndef read(path, *args, **kwargs):\n    return real(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/later-record.json'), *args, **kwargs) if path == pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-09/import3/binding-refresh.json') else real(path, *args, **kwargs)\nwith patch.object(pathlib.Path, 'read_text', read):\n    m['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit)\n"
       ],
       "exit": 1,
       "stdout": "",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 11, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 162, in check_live\n    assert not missing, ('unaccounted misc-fix overlays', missing)\nAssertionError: ('unaccounted misc-fix overlays', [{'shard': 'plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json', 'pointer': '/bindingRefresh/14', 'binding': {'targetOwner': 'docs/reading-map.md', 'targetAnchor': 'unheaded-block-16', 'targetUnitDigest': '4adf4507972f828f2b6d0bea54e373b00d516415960520c0bf38d3fac20f25c0', 'targetAncestry': ['Documentation Reading Map', '5. Detailed Product And Source Map']}}])\n",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 11, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 157, in check_live\n    recorded = later_preimages(commit)\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 147, in later_preimages\n    assert raw == json.loads(source(written, path)), ('unaccounted misc-fix overlays: uncommitted record', str(path))\nAssertionError: ('unaccounted misc-fix overlays: uncommitted record', 'plans/260925-documentation-authority-unification/reports/phase-09/import3/binding-refresh.json')\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-reviewStatus-2",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/reviewStatus-2.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 186, in check_live\n    assert current.get('reviewStatus') == 'pending', ('misc-fix live review requires committed exact-claim/binding approval', ptr)\nAssertionError: ('misc-fix live review requires committed exact-claim/binding approval', '/bindingRefresh/2')\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-reviewStatus-14",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/reviewStatus-14.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 186, in check_live\n    assert current.get('reviewStatus') == 'pending', ('misc-fix live review requires committed exact-claim/binding approval', ptr)\nAssertionError: ('misc-fix live review requires committed exact-claim/binding approval', '/bindingRefresh/14')\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-bindingSha256-2",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/bindingSha256-2.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 183, in check_live\n    assert current.get('bindingSha256') == digest(current), ('misc-fix live binding hash', ptr)\nAssertionError: ('misc-fix live binding hash', '/bindingRefresh/2')\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-bindingSha256-14",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/bindingSha256-14.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 183, in check_live\n    assert current.get('bindingSha256') == digest(current), ('misc-fix live binding hash', ptr)\nAssertionError: ('misc-fix live binding hash', '/bindingRefresh/14')\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-disposition-2",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/disposition-2.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/2', ['disposition'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-disposition-14",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/disposition-14.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/14', ['disposition'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-sourceContent-2",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/sourceContent-2.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/2', ['sourceContent'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-sourceContent-14",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/sourceContent-14.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/14', ['sourceContent'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-claimId-2",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/claimId-2.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/2', ['claimId'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-claimId-14",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/claimId-14.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/14', ['claimId'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-sourcePath-2",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/sourcePath-2.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/2', ['sourcePath'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-sourcePath-14",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/sourcePath-14.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/14', ['sourcePath'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-sourceAnchor-2",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/sourceAnchor-2.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/2', ['sourceAnchor'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-sourceAnchor-14",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/sourceAnchor-14.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/14', ['sourceAnchor'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-sourceUnitDigest-2",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/sourceUnitDigest-2.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/2', ['sourceUnitDigest'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-sourceUnitDigest-14",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/sourceUnitDigest-14.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/14', ['sourceUnitDigest'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-sourceAncestry-2",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/sourceAncestry-2.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/2', ['sourceAncestry'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-sourceAncestry-14",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/sourceAncestry-14.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/14', ['sourceAncestry'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-unitKind-2",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/unitKind-2.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/2', ['unitKind'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-unitKind-14",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/unitKind-14.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/14', ['unitKind'])\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-targetUnitDigest-2",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/targetUnitDigest-2.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 183, in check_live\n    assert current.get('bindingSha256') == digest(current), ('misc-fix live binding hash', ptr)\nAssertionError: ('misc-fix live binding hash', '/bindingRefresh/2')\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "live-targetUnitDigest-14",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/targetUnitDigest-14.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 183, in check_live\n    assert current.get('bindingSha256') == digest(current), ('misc-fix live binding hash', ptr)\nAssertionError: ('misc-fix live binding hash', '/bindingRefresh/14')\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "append-row",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/append-row.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 155, in check_live\n    assert {ptr for ptr, _ in rows(docs[str(SHARD)])} == {ptr for ptr, _ in rows(shard)}, 'unaccounted misc-fix overlay row set'\nAssertionError: unaccounted misc-fix overlay row set\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "remove-row",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\ndocs = m['documents']()\ndocs[str(m['SHARD'])] = json.loads(pathlib.Path('/tmp/fgos-work/controls-uwp6_0uu/remove-row.json').read_text())\nm['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit, docs)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 155, in check_live\n    assert {ptr for ptr, _ in rows(docs[str(SHARD)])} == {ptr for ptr, _ in rows(shard)}, 'unaccounted misc-fix overlay row set'\nAssertionError: unaccounted misc-fix overlay row set\n",
       "expectedFailureObserved": true
     }
   ],

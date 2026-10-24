@@ -1,6 +1,6 @@
 {
   "status": "scoped-replay-passed-not-gate-acceptance",
-  "sourceCommit": "335b7faa9e21005478b80ccb5691056201d8c048",
+  "sourceCommit": "8b4d778d32b5930ab7c80d9d19b2f26b95441ee1",
   "g6SourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
   "miscAuthoringCommit": "ad94156cf9c463018060f3ae32ff6a17c4874033",
   "sourcePinScope": "Misc authoring recipe, ledger and docs at the last commit writing misc-fix/binding-refresh.json, with its recorded sourceHead preimages; live overlay custody and registry census at HEAD. G6 replay and owning assertions at proof.json sourceCommit.",
@@ -13,7 +13,7 @@
         "HEAD"
       ],
       "exit": 0,
-      "stdout": "335b7faa9e21005478b80ccb5691056201d8c048\n",
+      "stdout": "8b4d778d32b5930ab7c80d9d19b2f26b95441ee1\n",
       "stderr": ""
     },
     {
@@ -30,7 +30,7 @@
     {
       "argv": [
         "node",
-        "/tmp/fgos-work/w11-misc-pin/verify/registry.mjs"
+        "/tmp/fgos-work/misc-verify-ra28s9lz/registry.mjs"
       ],
       "exit": 0,
       "stdout": "{\"Check\":141,\"Fix\":32}\n",
@@ -72,11 +72,11 @@
       "argv": [
         "python3",
         "-B",
-        "/tmp/fgos-work/w11-misc-pin/verify/proof.py",
+        "/tmp/fgos-work/misc-verify-ra28s9lz/proof.py",
         "--pin",
         "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
         "--out",
-        "/tmp/fgos-work/w11-misc-pin/verify/double-1htm6u1o/1"
+        "/tmp/fgos-work/misc-verify-ra28s9lz/double-njettf4c/1"
       ],
       "exit": 0,
       "stdout": "{\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 137, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 623, \"preserve-operand-reachability-unchanged\": 1394, \"preserve-source-confirmed-history\": 2926, \"repoint-proposal\": 6}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}\n",
@@ -86,11 +86,11 @@
       "argv": [
         "python3",
         "-B",
-        "/tmp/fgos-work/w11-misc-pin/verify/proof.py",
+        "/tmp/fgos-work/misc-verify-ra28s9lz/proof.py",
         "--pin",
         "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
         "--out",
-        "/tmp/fgos-work/w11-misc-pin/verify/double-1htm6u1o/2"
+        "/tmp/fgos-work/misc-verify-ra28s9lz/double-njettf4c/2"
       ],
       "exit": 0,
       "stdout": "{\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 137, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 623, \"preserve-operand-reachability-unchanged\": 1394, \"preserve-source-confirmed-history\": 2926, \"repoint-proposal\": 6}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}\n",
@@ -100,7 +100,7 @@
       "argv": [
         "python3",
         "-B",
-        "/tmp/fgos-work/w11-misc-pin/verify/g6-owning-assertions.py"
+        "/tmp/fgos-work/misc-verify-ra28s9lz/g6-owning-assertions.py"
       ],
       "exit": 0,
       "stdout": "owning G6 assertions passed\n",
