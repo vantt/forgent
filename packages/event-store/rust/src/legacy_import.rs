@@ -832,14 +832,13 @@ fn cutover_operation_id(repo: &RepoHandle, head: &str) -> Result<String, Error> 
             wal.compacted(&id).map_err(|e| invalid(e.to_string()))?
         {
             Some(receipt.outcome().map_err(|e| invalid(e.to_string()))?)
+        } else if !wal.known_id(&id).map_err(|e| invalid(e.to_string()))? {
+            // Free, or a directory that never received record zero: a crash or
+            // refusal between mkdir and the intent left nothing to recover, and
+            // ScopedCommit reuses such a directory on its next begin.
+            return Ok(id);
         } else {
-            match wal.inspect(&id) {
-                Ok(chain) => chain.outcome().cloned(),
-                Err(fgos_git::wal::WalError::Io(e)) if e.kind() == std::io::ErrorKind::NotFound => {
-                    return Ok(id)
-                }
-                Err(e) => return Err(invalid(e.to_string())),
-            }
+            wal.inspect(&id).map_err(|e| invalid(e.to_string()))?.outcome().cloned()
         };
         // Only a settled no-effect attempt frees its id. An open chain, a commit
         // (even one whose HEAD was later reset by hand) and an effect-unknown

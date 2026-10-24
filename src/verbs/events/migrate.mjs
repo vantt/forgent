@@ -252,6 +252,6 @@ export function importPlan({ dataTree, legacyRefOid, existingLegacyOid, legacyMi
 export function cutoverFailure(error) {
   let code = error.code, cause;
   try { const native = JSON.parse(error.message); code = native.code ?? code; cause = native.cause; } catch {}
-  const ordinary = new Set(['commit-rejected', 'checkout-required', 'lock-order-violation', 'git-dual-borrow-unavailable', 'main-checkout-authority-mismatch', 'checkout-custody-required', 'checkout-custody-stale', 'checkout-authority-required', 'git-lockscope-unavailable-windows', 'invalid-commit-message', 'foreign-merge-head', 'foreign-staged-index', 'source-baseline-stale', 'cutover-main-required', 'cutover-exact-deletions-required', 'cutover-legacy-ref-mismatch', 'cutover-seal-digest-mismatch', 'staged-set-mismatch', 'literal-path-staging-failed', 'commit-snapshot-non-file']);
+  const ordinary = new Set(['commit-rejected', 'checkout-required', 'lock-order-violation', 'git-dual-borrow-unavailable', 'main-checkout-authority-mismatch', 'checkout-custody-required', 'checkout-custody-stale', 'checkout-authority-required', 'git-lockscope-unavailable-windows', 'invalid-commit-message', 'wal-record-too-large', 'foreign-merge-head', 'foreign-staged-index', 'source-baseline-stale', 'cutover-main-required', 'cutover-exact-deletions-required', 'cutover-legacy-ref-mismatch', 'cutover-seal-digest-mismatch', 'staged-set-mismatch', 'literal-path-staging-failed', 'commit-snapshot-non-file']);
   return { code, cause, restore: (code === 'refused' && ordinary.has(cause)) || ordinary.has(code) };
 }

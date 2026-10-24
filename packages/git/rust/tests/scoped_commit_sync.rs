@@ -376,6 +376,55 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
     assert!(f.main.join("untracked").exists());
 }
 #[test]
+fn cutover_commit_of_a_thousand_legacy_shards_in_a_dirty_worktree_stays_within_the_record_bound() {
+    use sha2::{Digest, Sha256};
+    let f = Fixture::new();
+    fs::create_dir_all(f.main.join(".fgos/events")).unwrap();
+    let deleted: Vec<String> = (0..1000)
+        .map(|n| format!(".fgos/events/01ee0bbf-a05d-4a38-8851-72998ac7{n:04}-20260824T111356014Z.jsonl"))
+        .collect();
+    for p in &deleted {
+        fs::write(f.main.join(p), "legacy\n").unwrap();
+    }
+    fs::write(f.main.join("seal.json"), "sealed\n").unwrap();
+    let mut add = vec!["add", "--", "seal.json"];
+    add.extend(deleted.iter().map(String::as_str));
+    git(&f.main, &add);
+    git(&f.main, &["commit", "-qm", "legacy"]);
+    let legacy = git(&f.main, &["rev-parse", "HEAD"]);
+    git(&f.main, &["update-ref", "refs/fgos/legacy", &legacy]);
+    fs::create_dir_all(f.main.join("scratch")).unwrap();
+    for n in 0..600 {
+        fs::write(f.main.join(format!("scratch/untracked-entry-{n:04}-with-a-realistic-name.md")), "dirt").unwrap();
+    }
+    let main = match f.driver.resolve_repo(&f.main, &f.main).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    let baseline = f.driver.preflight_commit(&main, vec![], None).unwrap();
+    assert!(baseline.dirty.len() >= 600);
+    for p in &deleted {
+        fs::remove_file(f.main.join(p)).unwrap();
+    }
+    fs::remove_dir(f.main.join(".fgos/events")).unwrap();
+    fs::write(f.main.join(".fgos/events"), "legacy fence\n").unwrap();
+    let request = CommitRequest {
+        writes: vec!["logs".into()],
+        message: "cutover".into(),
+        cutover_grant: Some(CutoverGrant {
+            exact_paths: deleted.clone(),
+            legacy_ref_oid: legacy,
+            seal_digest: format!("{:x}", Sha256::digest(b"sealed\n")),
+        }),
+    };
+    let result = f
+        .driver
+        .scoped_commit(&main, vec![], &baseline, &request, "fixture", "cutover-large", &wal::OsFileSystem)
+        .unwrap();
+    assert_eq!(result.status, ResultCode::Committed);
+    assert_eq!(result.files.len(), 1001);
+}
+#[test]
 fn baseline_only_cutover_commits_the_event_fence() {
     use sha2::{Digest, Sha256};
     for tracked_fence in [false, true] {
@@ -439,6 +488,11 @@ fn baseline_only_cutover_commits_the_event_fence() {
 fn interrupted(f: &Fixture, id: &str, phase: u8, sync: bool) -> wal::Chain {
     interrupted_resources(f, id, phase, sync, false, None)
 }
+/// The same interruption, recorded in the bounded form new intents use: the
+/// selected paths as a digest and a baseline without its dirty list.
+fn interrupted_digest(f: &Fixture, id: &str, phase: u8) -> wal::Chain {
+    interrupted_as(f, id, phase, false, false, None, true)
+}
 /// `stored_request` replaces the serialized request the intent persists, to
 /// reproduce what an earlier release wrote.
 fn interrupted_resources(
@@ -448,6 +502,17 @@ fn interrupted_resources(
     sync: bool,
     legacy: bool,
     stored_request: Option<String>,
+) -> wal::Chain {
+    interrupted_as(f, id, phase, sync, legacy, stored_request, false)
+}
+fn interrupted_as(
+    f: &Fixture,
+    id: &str,
+    phase: u8,
+    sync: bool,
+    legacy: bool,
+    stored_request: Option<String>,
+    bounded: bool,
 ) -> wal::Chain {
     use wal::*;
     struct Held<'a>(&'a Handle);
@@ -485,9 +550,13 @@ fn interrupted_resources(
     } else {
         OperationKind::ScopedCommit(Box::new(ScopedCommitIntent {
             worktree: baseline.worktree.clone(),
-            baseline: serde_json::to_string(&baseline).unwrap(),
+            baseline: if bounded {
+                serde_json::json!({"head": baseline.head, "reference": baseline.reference, "worktree": baseline.worktree, "authority": baseline.authority, "dirtyDigest": "0".repeat(64)}).to_string()
+            } else {
+                serde_json::to_string(&baseline).unwrap()
+            },
             request: stored_request.unwrap_or_else(|| serde_json::to_string(&request).unwrap()),
-            paths: vec!["a".into()],
+            paths: if bounded { PathSet::of(&["a".to_string()]).unwrap() } else { vec!["a".into()].into() },
             tree,
             cutover_grant: None,
         }))
@@ -540,6 +609,33 @@ fn interrupted_resources(
         git(&f.tree, &["reset", "-q", "HEAD"]);
     }
     chain
+}
+#[test]
+fn commit_whose_intent_exceeds_the_record_bound_is_refused_before_any_record_and_retries_cleanly() {
+    let f = Fixture::new();
+    let head = git(&f.tree, &["rev-parse", "HEAD"]);
+    let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
+    fs::write(f.tree.join("fresh"), "producer bytes").unwrap();
+    let request = |message: String| CommitRequest {
+        writes: vec!["fresh".into()],
+        message,
+        cutover_grant: None,
+    };
+    let error = f
+        .driver
+        .scoped_commit(&f.repo, f.held(), &baseline, &request("m".repeat(200 * 1024)), "fixture", "too-large", &wal::OsFileSystem)
+        .unwrap_err();
+    assert_eq!(error.cause, "wal-record-too-large");
+    assert_eq!(error.code, ResultCode::Refused);
+    assert_eq!(git(&f.tree, &["rev-parse", "HEAD"]), head);
+    assert_eq!(git(&f.tree, &["diff", "--cached", "--name-only"]), "");
+    assert_eq!(fs::read_to_string(f.tree.join("fresh")).unwrap(), "producer bytes");
+    assert!(!wal::Wal::open(&f.repo).unwrap().known_id("too-large").unwrap());
+    let result = f
+        .driver
+        .scoped_commit(&f.repo, f.held(), &baseline, &request("small".into()), "fixture", "too-large", &wal::OsFileSystem)
+        .unwrap();
+    assert_eq!(result.status, ResultCode::Committed);
 }
 fn fresh_commit(f: &Fixture, id: &str) {
     let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
@@ -793,6 +889,21 @@ fn recovery_observes_hook_modified_overtaken_and_aba_commits() {
     }
 }
 
+#[test]
+fn recovery_of_a_bounded_record_unstages_only_its_own_paths() {
+    let f = Fixture::new();
+    interrupted_digest(&f, "unknown-digest", 2);
+    fs::write(f.tree.join("human"), "keep staged").unwrap();
+    git(&f.tree, &["add", "human"]);
+    let outcome = f
+        .driver
+        .recover_scoped_commit(&f.repo, f.held(), "fixture", "unknown-digest", &wal::OsFileSystem)
+        .unwrap();
+    assert!(
+        matches!(outcome, wal::Outcome::CommitRejected { cause } if cause == "commit-effect-unknown")
+    );
+    assert_eq!(git(&f.tree, &["diff", "--cached", "--name-only"]), "human");
+}
 #[test]
 fn unknown_replay_keeps_cause_and_recovery_preserves_foreign_staging() {
     let f = Fixture::new();

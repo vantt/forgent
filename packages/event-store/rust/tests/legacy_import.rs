@@ -230,3 +230,23 @@ fn a_root_porting_log_alone_still_needs_migration_before_a_write() {
         "event-store-migration-required"
     );
 }
+#[test]
+fn a_cutover_operation_directory_without_an_intent_does_not_block_the_next_attempt() {
+    let f = Fixture::new();
+    legacy(&f, false);
+    let head = inventory(&f.driver, &f.repo).unwrap().from_commit;
+    let import = || {
+        import_legacy(&f.driver, &f.repo, &f.layout, head.as_str(), &[], 0)
+    };
+    let first = import().unwrap();
+    let id = format!("event-store-cutover-{}-1", &head.as_str()[..32]);
+    assert_eq!(first["operationId"], id);
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        fs::DirBuilder::new()
+            .mode(0o700)
+            .create(f.repo.common_dir().join("fgos/git/operations").join(&id))
+            .unwrap();
+    }
+    assert_eq!(import().unwrap()["operationId"], id);
+}

@@ -27,6 +27,13 @@ pub struct CommitRequest {
     pub message: String,
     pub cutover_grant: Option<CutoverGrant>,
 }
+/// Observation-only view of a baseline persisted in the WAL. Recovery needs
+/// the head and the branch; the rest is bound by [`CommitBaseline::record`].
+#[derive(Deserialize)]
+struct StoredBaseline {
+    head: String,
+    reference: String,
+}
 /// Observation-only view of a request persisted in the WAL. Requests written
 /// by earlier releases may carry fields that new requests refuse (the retired
 /// `legacyEvents` declaration); recovery needs only the message, so it reads
@@ -50,6 +57,41 @@ pub struct CommitBaseline {
     pub worktree: String,
     pub authority: String,
     pub dirty: Vec<(String, String)>,
+}
+impl CommitBaseline {
+    /// What the intent keeps of the baseline. The dirty list is bound by its
+    /// digest, so the record does not grow with the worktree's dirt.
+    fn record(&self) -> Result<String> {
+        serde_json::to_string(&serde_json::json!({
+            "head": self.head,
+            "reference": self.reference,
+            "worktree": self.worktree,
+            "authority": self.authority,
+            "dirtyDigest": wal::canonical_digest(&self.dirty)?,
+        }))
+        .map_err(failure)
+    }
+    /// Whether an intent's stored baseline is this one, in the bounded form or
+    /// in the full form earlier records carry.
+    fn is_recorded_as(&self, stored: &str) -> Result<bool> {
+        Ok(stored == self.record()? || stored == serde_json::to_string(self).map_err(failure)?)
+    }
+}
+impl CommitRequest {
+    /// What the intent keeps of the request: the message recovery observes and
+    /// a digest of the whole request, so the record does not grow with its paths.
+    fn record(&self) -> Result<String> {
+        serde_json::to_string(&serde_json::json!({
+            "message": self.message,
+            "digest": wal::canonical_digest(self)?,
+        }))
+        .map_err(failure)
+    }
+    /// Whether an intent's stored request is this one, in the bounded form or
+    /// in the full form earlier records carry.
+    fn is_recorded_as(&self, stored: &str) -> Result<bool> {
+        Ok(stored == self.record()? || stored == serde_json::to_string(self).map_err(failure)?)
+    }
 }
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -517,12 +559,13 @@ impl GitDriver {
             {
                 fgos_holder_lock::validate_quiescent(handle(scope, repo)?).map_err(failure)?;
                 if let OperationKind::ScopedCommit(payload) = &chain.intent().kind {
-                    let baseline: CommitBaseline =
+                    let baseline: StoredBaseline =
                         serde_json::from_str(&payload.baseline).map_err(failure)?;
-                    if self.checkout_text(repo, scope, &["rev-parse", "HEAD"])? == baseline.head
-                        && self.staged(repo, scope)? == payload.paths
-                    {
-                        self.stage_paths(repo, scope, &["reset", "-q", "HEAD"], &payload.paths)?;
+                    if self.checkout_text(repo, scope, &["rev-parse", "HEAD"])? == baseline.head {
+                        let staged = self.staged(repo, scope)?;
+                        if payload.paths.matches(&staged)? {
+                            self.stage_paths(repo, scope, &["reset", "-q", "HEAD"], &staged)?;
+                        }
                     }
                 }
                 chain = wal
@@ -593,7 +636,7 @@ impl GitDriver {
     ) -> Result<Option<(String, bool)>> {
         let (reference, parents, tree, message) = match &chain.intent().kind {
             OperationKind::ScopedCommit(payload) => {
-                let baseline: CommitBaseline =
+                let baseline: StoredBaseline =
                     serde_json::from_str(&payload.baseline).map_err(failure)?;
                 let request: StoredCommitRequest =
                     serde_json::from_str(&payload.request).map_err(failure)?;
@@ -759,7 +802,7 @@ impl GitDriver {
                         worktree: root(repo)?.to_string_lossy().into(),
                         baseline: String::new(),
                         request: String::new(),
-                        paths: vec![],
+                        paths: wal::PathSet::of(&[]).map_err(failure)?,
                         tree: compact.expected.clone(),
                         cutover_grant: None,
                     })),
@@ -790,17 +833,18 @@ impl GitDriver {
         }
         fgos_holder_lock::validate_quiescent(handle(&scope, repo)?).map_err(failure)?;
         let outcome = if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
-            let baseline: CommitBaseline =
+            let baseline: StoredBaseline =
                 serde_json::from_str(&payload.baseline).map_err(failure)?;
-            if self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])? == baseline.head
-                && self.staged(repo, &scope)? == payload.paths
-            {
-                self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &payload.paths)?;
+            if self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])? == baseline.head {
+                let staged = self.staged(repo, &scope)?;
+                if payload.paths.matches(&staged)? {
+                    self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &staged)?;
+                }
             }
             Outcome::AbandonedBeforeAttempt
         } else {
             require_no_index_lock(&repo.git_dir)?;
-            let baseline: CommitBaseline =
+            let baseline: StoredBaseline =
                 serde_json::from_str(&payload.baseline).map_err(failure)?;
             if let Some((observed, tree_changed)) =
                 self.observe_checkout_commit(repo, &scope, &wal, &chain)?
@@ -829,10 +873,12 @@ impl GitDriver {
                 )?;
                 Outcome::Commit {
                     observed,
-                    contract_violation: tree_changed || files != payload.paths,
+                    contract_violation: tree_changed || !payload.paths.matches(&files)?,
                 }
             } else if self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])? == baseline.head {
-                self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &payload.paths)?;
+                // Staging a human left beside ours stays; only our paths are unstaged.
+                let ours = self.recorded_paths(repo, &scope, payload, &baseline.head)?;
+                self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &ours)?;
                 Outcome::CommitRejected {
                     cause: "commit-effect-unknown".into(),
                 }
@@ -1024,6 +1070,21 @@ impl GitDriver {
         }
     }
     /// The files Git lists between two commits.
+    /// The paths an intent staged. A digest cannot name them, but the intent's
+    /// tree is the index as staged for them, so its difference from the
+    /// baseline head is the same set.
+    fn recorded_paths(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        payload: &wal::ScopedCommitIntent,
+        head: &str,
+    ) -> Result<Vec<String>> {
+        match &payload.paths {
+            wal::PathSet::Listed(paths) => Ok(paths.clone()),
+            wal::PathSet::Digest(_) => self.changed_paths(repo, scope, head, &payload.tree),
+        }
+    }
     pub(crate) fn changed_paths(
         &self,
         repo: &RepoHandle,
@@ -1262,7 +1323,7 @@ impl GitDriver {
                         worktree: baseline.worktree.clone(),
                         baseline: String::new(),
                         request: String::new(),
-                        paths: vec![],
+                        paths: wal::PathSet::of(&[]).map_err(failure)?,
                         tree: baseline.head.clone(),
                         cutover_grant: None,
                     })),
@@ -1302,8 +1363,8 @@ impl GitDriver {
             let OperationKind::ScopedCommit(payload) = &old.intent().kind else {
                 return Err(failure("operation-id-reused"));
             };
-            if payload.baseline != serde_json::to_string(baseline).map_err(failure)?
-                || payload.request != serde_json::to_string(request).map_err(failure)?
+            if !baseline.is_recorded_as(&payload.baseline)?
+                || !request.is_recorded_as(&payload.request)?
                 || old.intent().writer_identity != writer
             {
                 return Err(failure("operation-id-reused"));
@@ -1387,9 +1448,9 @@ impl GitDriver {
         if selected.is_empty() {
             let kind = OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
                 worktree: baseline.worktree.clone(),
-                baseline: serde_json::to_string(baseline).map_err(failure)?,
-                request: serde_json::to_string(request).map_err(failure)?,
-                paths: vec![],
+                baseline: baseline.record()?,
+                request: request.record()?,
+                paths: wal::PathSet::of(&[])?,
                 tree: self.checkout_text(repo, scope, &["rev-parse", "HEAD^{tree}"])?,
                 cutover_grant: None,
             }));
@@ -1478,11 +1539,15 @@ impl GitDriver {
             sync_staged_objects(repo, &staged_objects, filesystem)?;
             let kind = OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
                 worktree: baseline.worktree.clone(),
-                baseline: serde_json::to_string(baseline).map_err(failure)?,
-                request: serde_json::to_string(request).map_err(failure)?,
-                paths: selected.clone(),
+                baseline: baseline.record()?,
+                request: request.record()?,
+                paths: wal::PathSet::of(&selected)?,
                 tree: tree.clone(),
-                cutover_grant: request.cutover_grant.clone(),
+                cutover_grant: request
+                    .cutover_grant
+                    .as_ref()
+                    .map(wal::CutoverGrantRecord::of)
+                    .transpose()?,
             }));
             let resources = checkout_resources(repo)?;
             crate::refs::admission(&wal, id, &resources)?;

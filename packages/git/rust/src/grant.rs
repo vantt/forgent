@@ -67,9 +67,7 @@ impl GitDriver {
             let mut staged = self.hook_deletions(repo, index)?;
             staged.sort();
             let grant = payload.cutover_grant.as_ref().ok_or_else(||failure("cutover-grant-missing"))?;
-            let mut exact = grant.exact_paths.clone();
-            exact.sort();
-            if staged.is_empty() || staged != exact {
+            if staged.is_empty() || !grant.exact_paths.matches(&staged)? {
                 return Err(failure("cutover-exact-paths-mismatch"));
             }
             // Read-only calls scrub hook GIT_*; only the index query keeps validated authority.

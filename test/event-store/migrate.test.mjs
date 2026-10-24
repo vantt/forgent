@@ -134,6 +134,8 @@ test('cutover restoration respects typed recovery and unknown outcomes', () => {
   }
   assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'commit-rejected' }))).restore, true);
   assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'source-baseline-stale' }))).restore, true);
+  // Git refuses an oversized intent before it creates any record, so nothing names the attempt.
+  assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'wal-record-too-large' }))).restore, true);
   assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'checkout-command-failed' }))).restore, false);
   // Topology is re-checked before every Git child, so this refusal can follow the attempt.
   assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'untrusted-worktree' }))).restore, false);
