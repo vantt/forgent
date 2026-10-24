@@ -9,8 +9,8 @@
 //   6. no inherited writable fd survives outside explicit grant (MED-1 fix)
 //   7. executor credentials read-only
 //   8. host read and network not overclaimed
-//   9. machine-private roots (Config's private directory, Claude Code session sockets) hidden under
-//      every built-in policy (spec section 9.3)
+//   9. machine-private roots (Config's private directory, the user runtime directory, Claude Code
+//      session sockets, herdr's sockets) hidden under every built-in policy (spec section 9.3)
 //   10. (blind dispatches only) a peer's run state hidden
 //
 // Every probe includes a RED FALSIFIER: a deliberately broken sandbox config
@@ -553,49 +553,67 @@ export function probePeerRunHidden({ bwrapBin = '/usr/bin/bwrap', scratchDir, br
 
 /**
  * Probe 9: machine-private roots (spec section 9.3) are hidden from a worker under every
- * built-in policy, and under `hostRead: blind` as well when `blind` is set. The home is a
- * stand-in in the scratch directory, handed to the real resolver and to the worker alike, with a
- * file planted where the driver masks; the argv comes from the real prepareBwrap. The worker
- * must find neither file and an empty directory, still write its outbox, and see its workspace
- * the way the policy grants it. A stand-in Claude socket base holds a listening unix socket in
- * `cc-socks/`, where Claude Code keeps its session control sockets: the worker must not connect to it.
+ * built-in policy, and under `hostRead: blind` as well when `blind` is set, for a direct and a
+ * terminal launch. Stand-ins in a short scratch directory, handed to the real resolver and to the
+ * worker alike: a home with files planted in `.fgos/private` and a listening herdr socket in
+ * `.config/herdr`; a user runtime directory with listening stand-ins of the systemd user manager,
+ * the session bus, ssh-agent and two attempts' GO sockets under `fgos/`; and a Claude socket base
+ * outside it (Claude Code's fallback when the runtime directory is unset) with a session socket in
+ * `cc-socks/`. The argv comes from the real prepareBwrap. The worker must reach none of them, but a
+ * terminal launch reaches its own GO socket; it still writes its outbox and sees its workspace the
+ * way the policy grants it.
  *
- * RED FALSIFIERS (`brokenConfig`): `true` drops every machine-private mask, and the worker must read
- * the planted files and connect to the planted socket; `'session-sockets'` drops only the `cc-socks`
- * mask, and the worker must connect to the socket while the planted files stay hidden.
+ * RED FALSIFIERS (`brokenConfig`): `true` drops every machine-private mask, and the worker must reach
+ * everything; a name in MACHINE_PRIVATE_FALSIFIERS drops exactly that one mask, and the worker must
+ * reach exactly what that mask hides while everything else stays hidden; `'own-socket'` launches the
+ * terminal attempts with a gate that names no GO socket, and their worker must not reach its own.
  */
+export const MACHINE_PRIVATE_FALSIFIERS = Object.freeze({
+  private: Object.freeze(['accounts', 'token']),
+  'runtime-dir': Object.freeze(['systemd', 'bus', 'sshAgent', 'otherAttempt']),
+  'session-sockets': Object.freeze(['sessionSocket']),
+  herdr: Object.freeze(['herdr']),
+});
+
 export function probeMachinePrivateHidden({ bwrapBin = '/usr/bin/bwrap', scratchDir, blind = false, brokenConfig = false } = {}) {
   // The sandbox starts with an empty /tmp, which would hide a planted file by itself and let the probe
-  // pass without the mask: the stand-in home must live where the sandbox sees the host.
+  // pass without the mask: the stand-ins must live where the sandbox sees the host.
   const scratch = fs.realpathSync(scratchDir);
   const ownsRoot = scratch === '/tmp' || scratch.startsWith('/tmp/');
   const root = ownsRoot ? fs.mkdtempSync('/var/tmp/fgos-machine-private-probe-') : scratch;
-  // A unix socket path must fit sun_path: the stand-in socket base sits in the scratch directory when
-  // that is short enough, else in /var/tmp; both are host paths the sandbox sees.
-  const claudeSocketBase = shortSocketBase(root);
-  if (!claudeSocketBase) {
+  // A unix socket path must fit sun_path: the stand-ins sit in the scratch directory when that is
+  // short enough, else in /var/tmp; both are host paths the sandbox sees.
+  const short = shortStandInDir(root);
+  if (!short) {
     if (ownsRoot) fs.rmSync(root, { recursive: true, force: true });
     return { probe: 'machine-private-hidden', passed: false, detail: `machine-private probe failed: no directory short enough for a unix socket path (tried ${root} and /var/tmp)` };
   }
-  const socketPath = path.join(claudeSocketBase, SESSION_SOCKET_DIR, '4242.sock');
-  fs.mkdirSync(path.dirname(socketPath), { mode: 0o700 });
-  // listen() on a path binds synchronously; the kernel queues the worker's connect while spawnSync blocks.
-  const server = net.createServer((conn) => conn.destroy());
-  server.listen(socketPath);
-  server.unref();
+  const servers = [];
   try {
-    return probeMachinePrivateHiddenIn({ bwrapBin, root, claudeSocketBase, socketPath, blind, brokenConfig });
+    const stand = machinePrivateStandIns(short);
+    for (const socket of Object.values(stand.sockets)) {
+      fs.mkdirSync(path.dirname(socket), { recursive: true, mode: 0o700 });
+      // listen() on a path binds synchronously; the kernel queues the worker's connect while spawnSync blocks.
+      const server = net.createServer((conn) => conn.destroy());
+      server.listen(socket);
+      server.unref();
+      servers.push(server);
+    }
+    return probeMachinePrivateHiddenIn({ bwrapBin, root, stand, blind, brokenConfig });
   } finally {
-    server.close();
-    fs.rmSync(claudeSocketBase, { recursive: true, force: true });
+    for (const server of servers) server.close();
+    fs.rmSync(short, { recursive: true, force: true });
     if (ownsRoot) fs.rmSync(root, { recursive: true, force: true });
   }
 }
 
-/** A fresh directory under the first candidate whose `<dir>/cc-socks/4242.sock` fits a unix socket path, or null. */
-function shortSocketBase(root) {
+/** The longest stand-in socket path below the short directory. */
+const LONGEST_STAND_IN = path.join('r', 'fgos', 'other-attempt.sock');
+
+/** A fresh directory under the first candidate whose longest stand-in socket fits a unix socket path, or null. */
+function shortStandInDir(root) {
   for (const parent of [root, '/var/tmp']) {
-    if (Buffer.byteLength(path.join(parent, 'fgos-rt-XXXXXX', SESSION_SOCKET_DIR, '4242.sock')) > SOCKET_PATH_MAX_BYTES) continue;
+    if (Buffer.byteLength(path.join(parent, 'fgos-rt-XXXXXX', LONGEST_STAND_IN)) > SOCKET_PATH_MAX_BYTES) continue;
     try {
       return fs.mkdtempSync(path.join(parent, 'fgos-rt-'));
     } catch {
@@ -605,24 +623,60 @@ function shortSocketBase(root) {
   return null;
 }
 
-/** Which machine-private masks a falsifier leaves out. */
-function droppedByFalsifier(res, brokenConfig) {
-  if (!res.machinePrivate || !brokenConfig) return false;
-  return brokenConfig === 'session-sockets' ? path.basename(res.hostTarget) === SESSION_SOCKET_DIR : true;
+/** The stand-in host: a home (`h`), a user runtime directory (`r`) and a Claude socket base outside it (`c`). */
+function machinePrivateStandIns(short) {
+  const home = path.join(short, 'h');
+  const runtimeDir = path.join(short, 'r');
+  const claudeSocketBase = path.join(short, 'c');
+  const privateDir = path.join(home, '.fgos', 'private');
+  const herdrDir = path.join(home, '.config', 'herdr');
+  for (const dir of [privateDir, runtimeDir, claudeSocketBase]) fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+  const planted = { accounts: path.join(privateDir, 'accounts.yaml'), token: path.join(privateDir, 'gateway-token') };
+  for (const file of Object.values(planted)) fs.writeFileSync(file, 'PLANTED');
+  return {
+    home,
+    runtimeDir,
+    claudeSocketBase,
+    privateDir,
+    planted,
+    herdrSocketPath: path.join(herdrDir, 'herdr.sock'),
+    ownAttempt: path.join(runtimeDir, 'fgos', 'own-attempt.sock'),
+    sockets: {
+      systemd: path.join(runtimeDir, 'systemd', 'private'),
+      bus: path.join(runtimeDir, 'bus'),
+      sshAgent: path.join(runtimeDir, 'openssh_agent'),
+      otherAttempt: path.join(runtimeDir, 'fgos', 'other-attempt.sock'),
+      ownAttempt: path.join(runtimeDir, 'fgos', 'own-attempt.sock'),
+      sessionSocket: path.join(claudeSocketBase, SESSION_SOCKET_DIR, '4242.sock'),
+      herdr: path.join(herdrDir, 'herdr.sock'),
+    },
+    // The host directory each named falsifier unmasks.
+    masks: {
+      private: privateDir,
+      'runtime-dir': runtimeDir,
+      'session-sockets': path.join(claudeSocketBase, SESSION_SOCKET_DIR),
+      herdr: herdrDir,
+    },
+  };
 }
 
-function probeMachinePrivateHiddenIn({ bwrapBin, root, claudeSocketBase, socketPath, blind, brokenConfig }) {
-  const home = path.join(root, 'home');
-  const privateDir = path.join(home, '.fgos', 'private');
-  const planted = [path.join(privateDir, 'accounts.yaml'), path.join(privateDir, 'gateway-token')];
-  fs.mkdirSync(privateDir, { recursive: true });
-  for (const file of planted) fs.writeFileSync(file, 'PLANTED');
+/** Which machine-private masks a falsifier leaves out. */
+function droppedByFalsifier(res, brokenConfig, stand) {
+  if (!res.machinePrivate || !brokenConfig || brokenConfig === 'own-socket') return false;
+  return brokenConfig === true || res.hostTarget === fs.realpathSync(stand.masks[brokenConfig]);
+}
 
+function probeMachinePrivateHiddenIn({ bwrapBin, root, stand, blind, brokenConfig }) {
+  if (brokenConfig && brokenConfig !== true && brokenConfig !== 'own-socket' && !(brokenConfig in MACHINE_PRIVATE_FALSIFIERS)) {
+    throw new Error(`unknown machine-private falsifier "${brokenConfig}"`);
+  }
+  const hiddenKeys = Object.values(MACHINE_PRIVATE_FALSIFIERS).flat();
   const failures = [];
-  const variants = BUILTIN_POLICY_IDS.flatMap((policyId) => (blind ? [[policyId, false], [policyId, true]] : [[policyId, false]]));
-  for (const [policyId, blindVariant] of variants) {
-    const label = `${policyId}${blindVariant ? '+blind' : ''}`;
-    const dir = path.join(root, label.replace('+', '-'));
+  const variants = BUILTIN_POLICY_IDS.flatMap((policyId) => (blind ? [false, true] : [false]).flatMap((blindVariant) => ['direct', 'terminal'].map((launchMode) => [policyId, blindVariant, launchMode])));
+  for (const [policyId, blindVariant, launchMode] of variants) {
+    const label = `${policyId}${blindVariant ? '+blind' : ''}/${launchMode}`;
+    const slug = label.replace(/[+/]/g, '-');
+    const dir = path.join(root, slug);
     const project = path.join(dir, 'project');
     const fgosDir = path.join(project, '.fgos');
     const ownDir = path.join(fgosDir, 'assignments', 'probe-unit', 'self', '1');
@@ -635,15 +689,18 @@ function probeMachinePrivateHiddenIn({ bwrapBin, root, claudeSocketBase, socketP
     const grants = BUILTIN_POLICIES[policyId].grants;
 
     const resources = resolveConfinementResources({
-      dispatchId: `probe-machine-private-${label.replace('+', '-')}`,
+      dispatchId: `probe-machine-private-${slug}`,
       context: { cwd: project, repoRoot: project, runDir, fgosDir, assignmentLaunchContext: {} },
       grants,
       backendConfig: { tempRoot: path.join(dir, 'confinement-temp') },
       providerSources: { credentialsPath: credsDir },
       blind: blindVariant,
-      homeDir: home,
-      claudeSocketBase,
-    }).filter((res) => !droppedByFalsifier(res, brokenConfig));
+      homeDir: stand.home,
+      claudeSocketBase: stand.claudeSocketBase,
+      xdgRuntimeDir: stand.runtimeDir,
+      xdgConfigHome: null,
+      herdrSocketPath: stand.herdrSocketPath,
+    }).filter((res) => !droppedByFalsifier(res, brokenConfig, stand));
 
     const script = `
       const fs = require('fs');
@@ -654,24 +711,43 @@ function probeMachinePrivateHiddenIn({ bwrapBin, root, claudeSocketBase, socketP
         c.on('connect', () => { c.destroy(); done('ok'); });
         c.on('error', (e) => done(e.code));
       });
-      connect(${JSON.stringify(socketPath)}).then((socket) => process.stdout.write(JSON.stringify({
-        socket,
-        marker: process.env[${JSON.stringify(CONFINED_MARKER_ENV)}],
-        accounts: code(() => fs.readFileSync(${JSON.stringify(planted[0])})),
-        token: code(() => fs.readFileSync(${JSON.stringify(planted[1])})),
-        entries: (() => { try { return fs.readdirSync(${JSON.stringify(privateDir)}).length; } catch (e) { return e.code; } })(),
-        outbox: code(() => fs.writeFileSync(${JSON.stringify(outboxFile)}, 'WRITTEN')),
-        workspace: code(() => fs.writeFileSync(${JSON.stringify(workspaceFile)}, 'WRITTEN')),
-      })));
+      (async () => {
+        const seen = {};
+        for (const [name, socket] of Object.entries(${JSON.stringify(stand.sockets)})) seen[name] = await connect(socket);
+        Object.assign(seen, {
+          marker: process.env[${JSON.stringify(CONFINED_MARKER_ENV)}],
+          accounts: code(() => fs.readFileSync(${JSON.stringify(stand.planted.accounts)})),
+          token: code(() => fs.readFileSync(${JSON.stringify(stand.planted.token)})),
+          entries: (() => { try { return fs.readdirSync(${JSON.stringify(stand.privateDir)}).length; } catch (e) { return e.code; } })(),
+          outbox: code(() => fs.writeFileSync(${JSON.stringify(outboxFile)}, 'WRITTEN')),
+          workspace: code(() => fs.writeFileSync(${JSON.stringify(workspaceFile)}, 'WRITTEN')),
+        });
+        process.stdout.write(JSON.stringify(seen));
+      })();
     `;
+    const terminal = launchMode === 'terminal';
     const request = {
-      dispatchId: `probe-machine-private-${label.replace('+', '-')}`,
+      dispatchId: `probe-machine-private-${slug}`,
       ...(blindVariant ? { override: { controls: { hostRead: 'blind' } } } : {}),
       invocation: { command: 'node', args: ['-e', script], env: {} },
       context: { cwd: project, repoRoot: project, runDir, fgosDir },
+      // A terminal attempt: the prefix ends in `--` and its gate would dial its own GO socket. The gate
+      // path is absolute: the driver binds a gate binary that lies under /tmp, resolved from the cwd.
+      ...(terminal ? { launchMode, attemptId: `probe-${slug}`, gateCommand: ['/bin/true', 'internal', 'gate', ...(brokenConfig === 'own-socket' ? [] : ['--go-socket', stand.ownAttempt])] } : {}),
     };
-    const prepared = prepareBwrapSync({ resources }, request, { id: 'bwrap', config: { executable: bwrapBin } });
-    const res = cp.spawnSync(prepared.invocation.command, prepared.invocation.args, { encoding: 'utf8' });
+    // The driver binds back only a GO socket in the run supervisor's socket directory, which it reads
+    // from $XDG_RUNTIME_DIR: point that at the stand-in for this synchronous call.
+    const previousRuntimeDir = process.env.XDG_RUNTIME_DIR;
+    process.env.XDG_RUNTIME_DIR = stand.runtimeDir;
+    let prepared;
+    try {
+      prepared = prepareBwrapSync({ resources }, request, { id: 'bwrap', config: { executable: bwrapBin } });
+    } finally {
+      if (previousRuntimeDir === undefined) delete process.env.XDG_RUNTIME_DIR;
+      else process.env.XDG_RUNTIME_DIR = previousRuntimeDir;
+    }
+    const args = terminal ? [...prepared.invocation.args, 'node', '-e', script] : prepared.invocation.args;
+    const res = cp.spawnSync(prepared.invocation.command, args, { encoding: 'utf8' });
 
     let seen = null;
     try {
@@ -683,10 +759,9 @@ function probeMachinePrivateHiddenIn({ bwrapBin, root, claudeSocketBase, socketP
     const outboxHostSide = fs.existsSync(outboxFile) && fs.readFileSync(outboxFile, 'utf8') === 'WRITTEN';
     const ok = Boolean(seen)
       && seen.marker === '1'
-      && seen.accounts === 'ENOENT'
-      && seen.token === 'ENOENT'
+      && hiddenKeys.every((key) => seen[key] === 'ENOENT')
       && seen.entries === 0
-      && seen.socket === 'ENOENT'
+      && seen.ownAttempt === (terminal ? 'ok' : 'ENOENT')
       && seen.outbox === 'ok'
       && outboxHostSide
       && (workspaceWritable ? seen.workspace === 'ok' : seen.workspace === 'EROFS');
@@ -698,7 +773,7 @@ function probeMachinePrivateHiddenIn({ bwrapBin, root, claudeSocketBase, socketP
     probe: 'machine-private-hidden',
     passed,
     detail: passed
-      ? `a worker under ${variants.length} policy and hostRead combinations cannot read a machine-private directory or reach a Claude Code session socket, and keeps its outbox and workspace`
+      ? `a worker under ${variants.length} policy, hostRead and launch combinations cannot read a machine-private directory or reach a runtime-directory, Claude Code session, herdr or other attempt's socket, and keeps its own GO socket, outbox and workspace`
       : `machine-private probe failed: ${failures.join('; ')}`,
   };
 }
