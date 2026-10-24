@@ -1,9 +1,9 @@
 //! Run Result Evaluator observation source (Lane A2 - Phase F2).
 
 pub mod unit_summary;
-pub use unit_summary::{scan_unit_summaries, UnitSummarySource};
+pub use unit_summary::scan_unit_summaries;
 
-use fgos_observe::time::parse_timestamp_millis;
+use fgos_host_runtime::civil_time::parse_rfc3339_millis;
 use fgos_observe::{Observation, ObservationSource, SourceError, Subject, SubjectKind, Window};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -613,7 +613,7 @@ fn scan_assignment_runs(
         };
         // Windows compare settlement time; a value that is not an RFC3339
         // instant cannot be placed in any window, so it is not admitted.
-        if parse_timestamp_millis(timestamp).is_none() {
+        if parse_rfc3339_millis(timestamp).is_none() {
             scan.skip("invalid-timestamp");
             continue;
         }

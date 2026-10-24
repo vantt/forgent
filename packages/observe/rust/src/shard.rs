@@ -139,8 +139,9 @@ pub fn shard_path(root: &Path, store: &str) -> io::Result<PathBuf> {
 /// Opens a regular file without following a link: a non-regular entry is
 /// refused before opening, `O_NOFOLLOW` closes the final-component race on
 /// Unix (`O_NONBLOCK` keeps a raced FIFO from hanging the open), and the
-/// opened descriptor is checked again. Other hosts have only the metadata
-/// check (a check-then-open race).
+/// opened descriptor is checked again. Windows opens through
+/// `fgos_durable_file::open_no_reparse`, which refuses a reparse point at the
+/// leaf; the metadata check before it is the same early refusal as on Unix.
 fn open_regular(path: &Path, options: &mut OpenOptions) -> io::Result<File> {
     match fs::symlink_metadata(path) {
         Ok(metadata) if !metadata.file_type().is_file() => return Err(not_regular(path)),
@@ -149,11 +150,12 @@ fn open_regular(path: &Path, options: &mut OpenOptions) -> io::Result<File> {
         Err(e) => return Err(e),
     }
     #[cfg(unix)]
-    {
+    let file = {
         use std::os::unix::fs::OpenOptionsExt;
-        options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
-    }
-    let file = options.open(path)?;
+        options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK).open(path)?
+    };
+    #[cfg(windows)]
+    let file = fgos_durable_file::open_no_reparse(options, path)?;
     if !file.metadata()?.is_file() {
         return Err(not_regular(path));
     }

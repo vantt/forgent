@@ -1,4 +1,4 @@
-//! Operation providers for Observe component: `ObserveMetricsProvider` and `ObserveFrictionProvider`.
+//! The operation provider of the Observe component: one provider type for `observe.metrics` and `observe.friction`.
 
 use crate::contract::{LegacyFrictionSource, ObserveRequest};
 use crate::{friction_cli, metrics_cli};
@@ -37,65 +37,60 @@ fn rooted(req: &ObserveRequest, writes: bool) -> Result<Cow<'_, ObserveRequest>,
     Ok(Cow::Owned(ObserveRequest { root, ..req.clone() }))
 }
 
-pub const OBSERVE_METRICS_DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
-    provider_id: Cow::Borrowed("observe.metrics"),
-    operation_id: OperationId::from_static("observe.metrics"),
-    component_class: Cow::Borrowed("observe"),
-    mechanism: Cow::Borrowed("builtin"),
-    lifecycle: ProviderLifecycle::Singleton,
-    request_contract: ContractRef::from_static("observe.metrics.request", "1.0.0"),
-    outcome_contract: ContractRef::from_static("observe.metrics.outcome", "1.0.0"),
-    allowed_hosts: &["cli", "remote"],
-    allowed_modes: &["sync"],
-    capabilities: &[],
-    replacement: None,
-    concurrency: None,
-    health: None,
-};
-
-pub const OBSERVE_FRICTION_DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
-    provider_id: Cow::Borrowed("observe.friction"),
-    operation_id: OperationId::from_static("observe.friction"),
-    component_class: Cow::Borrowed("observe"),
-    mechanism: Cow::Borrowed("builtin"),
-    lifecycle: ProviderLifecycle::Singleton,
-    request_contract: ContractRef::from_static("observe.friction.request", "1.0.0"),
-    outcome_contract: ContractRef::from_static("observe.friction.outcome", "1.0.0"),
-    allowed_hosts: &["cli", "remote"],
-    allowed_modes: &["sync"],
-    capabilities: &[],
-    replacement: None,
-    concurrency: None,
-    health: None,
-};
-
-#[derive(Clone)]
-pub struct ObserveMetricsProvider {
-    descriptor: ProviderDescriptor,
-    sources: Arc<Vec<Box<dyn crate::ObservationSource>>>,
-    work_source: Arc<Option<Box<dyn crate::WorkObservationSource>>>,
-    coverage_scanner: metrics_cli::coverage::CoverageScanner,
-    unit_summary_scanner: crate::UnitSummaryScanner,
-}
-
-impl ObserveMetricsProvider {
-    pub fn with_sources(
-        sources: Vec<Box<dyn crate::ObservationSource>>,
-        work_source: Option<Box<dyn crate::WorkObservationSource>>,
-        coverage_scanner: metrics_cli::coverage::CoverageScanner,
-        unit_summary_scanner: crate::UnitSummaryScanner,
-    ) -> Self {
-        Self {
-            descriptor: OBSERVE_METRICS_DESCRIPTOR,
-            sources: Arc::new(sources),
-            work_source: Arc::new(work_source),
-            coverage_scanner,
-            unit_summary_scanner,
-        }
+const fn observe_descriptor(
+    operation: &'static str,
+    request_contract: &'static str,
+    outcome_contract: &'static str,
+) -> ProviderDescriptor {
+    ProviderDescriptor {
+        provider_id: Cow::Borrowed(operation),
+        operation_id: OperationId::from_static(operation),
+        component_class: Cow::Borrowed("observe"),
+        mechanism: Cow::Borrowed("builtin"),
+        lifecycle: ProviderLifecycle::Singleton,
+        request_contract: ContractRef::from_static(request_contract, "1.0.0"),
+        outcome_contract: ContractRef::from_static(outcome_contract, "1.0.0"),
+        allowed_hosts: &["cli", "remote"],
+        allowed_modes: &["sync"],
+        capabilities: &[],
+        replacement: None,
+        concurrency: None,
+        health: None,
     }
 }
 
-impl OperationProvider for ObserveMetricsProvider {
+pub const OBSERVE_METRICS_DESCRIPTOR: ProviderDescriptor =
+    observe_descriptor("observe.metrics", "observe.metrics.request", "observe.metrics.outcome");
+
+pub const OBSERVE_FRICTION_DESCRIPTOR: ProviderDescriptor =
+    observe_descriptor("observe.friction", "observe.friction.request", "observe.friction.outcome");
+
+/// What the composition root gives Observe: the observation sources and
+/// scanners the metrics verbs read, the work store they need, and the legacy
+/// friction logs `friction migrate` imports.
+pub struct ObserveWiring {
+    pub sources: Vec<Box<dyn crate::ObservationSource>>,
+    pub work_source: Box<dyn crate::WorkObservationSource>,
+    pub coverage_scanner: metrics_cli::coverage::CoverageScanner,
+    pub unit_summary_scanner: crate::UnitSummaryScanner,
+    pub legacy_friction_sources: Vec<Box<dyn LegacyFrictionSource>>,
+}
+
+/// The provider of one of Observe's two operations; the request's operation id
+/// picks the verb family.
+#[derive(Clone)]
+pub struct ObserveProvider {
+    descriptor: ProviderDescriptor,
+    wiring: Arc<ObserveWiring>,
+}
+
+impl ObserveProvider {
+    pub fn for_descriptor(descriptor: ProviderDescriptor, wiring: Arc<ObserveWiring>) -> Self {
+        Self { descriptor, wiring }
+    }
+}
+
+impl OperationProvider for ObserveProvider {
     fn descriptor(&self) -> &ProviderDescriptor {
         &self.descriptor
     }
@@ -108,86 +103,37 @@ impl OperationProvider for ObserveMetricsProvider {
         events: &'a dyn EventSink,
     ) -> Pin<Box<dyn Future<Output = Result<ProviderOutcome, ProviderError>> + Send + 'a>> {
         Box::pin(async move {
-            events.record_event("observe.metrics.invoked");
+            let operation = request.operation.as_str();
+            events.record_event(&format!("{operation}.invoked"));
             let req = request
                 .input
                 .downcast_ref::<ObserveRequest>()
                 .ok_or_else(|| {
                     ProviderError::SemanticValidation("input is not ObserveRequest".into())
                 })?;
-            let req = rooted(req, metrics_cli::writes(req))?;
-            let req: &ObserveRequest = &req;
-
-            let work_src_ref: Option<&dyn crate::WorkObservationSource> =
-                self.work_source.as_ref().as_ref().map(|b| b.as_ref());
-            let res_json = metrics_cli::dispatch(
-                req,
-                &self.sources,
-                work_src_ref,
-                self.coverage_scanner,
-                self.unit_summary_scanner,
-            )
+            let wiring = &*self.wiring;
+            let res_json = match operation {
+                "observe.metrics" => {
+                    let req = rooted(req, metrics_cli::writes(req))?;
+                    metrics_cli::dispatch(
+                        &req,
+                        &wiring.sources,
+                        wiring.work_source.as_ref(),
+                        wiring.coverage_scanner,
+                        wiring.unit_summary_scanner,
+                    )
+                }
+                "observe.friction" => {
+                    let req = rooted(req, friction_cli::writes(req))?;
+                    friction_cli::dispatch(&req, &wiring.legacy_friction_sources)
+                }
+                other => {
+                    return Err(ProviderError::SemanticValidation(format!(
+                        "observe does not serve operation {other}"
+                    )))
+                }
+            }
             .map_err(ProviderError::ProviderFailed)?;
-            Ok(ProviderOutcome::completed(
-                self.descriptor().outcome_contract.clone(),
-                Box::new(JsonOutcome(res_json)),
-            ))
-        })
-    }
-}
-
-#[derive(Clone)]
-pub struct ObserveFrictionProvider {
-    descriptor: ProviderDescriptor,
-    legacy_sources: Arc<Vec<Box<dyn LegacyFrictionSource>>>,
-}
-
-impl ObserveFrictionProvider {
-    pub fn new() -> Self {
-        Self {
-            descriptor: OBSERVE_FRICTION_DESCRIPTOR,
-            legacy_sources: Arc::new(Vec::new()),
-        }
-    }
-
-    pub fn with_legacy_sources(sources: Vec<Box<dyn LegacyFrictionSource>>) -> Self {
-        Self {
-            descriptor: OBSERVE_FRICTION_DESCRIPTOR,
-            legacy_sources: Arc::new(sources),
-        }
-    }
-}
-
-impl Default for ObserveFrictionProvider {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl OperationProvider for ObserveFrictionProvider {
-    fn descriptor(&self) -> &ProviderDescriptor {
-        &self.descriptor
-    }
-
-    fn invoke<'a>(
-        &'a self,
-        _invocation: &'a HostInvocation,
-        request: OperationRequest,
-        _control: InvocationControl,
-        events: &'a dyn EventSink,
-    ) -> Pin<Box<dyn Future<Output = Result<ProviderOutcome, ProviderError>> + Send + 'a>> {
-        Box::pin(async move {
-            events.record_event("observe.friction.invoked");
-            let req = request
-                .input
-                .downcast_ref::<ObserveRequest>()
-                .ok_or_else(|| {
-                    ProviderError::SemanticValidation("input is not ObserveRequest".into())
-                })?;
-            let req = rooted(req, friction_cli::writes(req))?;
-            let req: &ObserveRequest = &req;
-            let res_json = friction_cli::dispatch(req, &self.legacy_sources)
-                .map_err(ProviderError::ProviderFailed)?;
             Ok(ProviderOutcome::completed(
                 self.descriptor().outcome_contract.clone(),
                 Box::new(JsonOutcome(res_json)),

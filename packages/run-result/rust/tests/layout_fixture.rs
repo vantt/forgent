@@ -1,11 +1,30 @@
-use fgos_observe::{ObservationSource, ObserveRequest, Window};
-use fgos_run_result::{
-    scan_coverage, scan_runs, scan_unit_summaries, RunResultSource, MAX_ASSIGNMENT_DEPTH,
-};
+use fgos_observe::{ObservationSource, Window};
+use fgos_run_result::{scan_coverage, scan_runs, RunResultSource, MAX_ASSIGNMENT_DEPTH};
 use serde_json::{json, Value};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
+
+#[cfg(unix)]
+use fgos_observe::{
+    ObserveRequest, SourceError, WorkEntropySignalsRecord, WorkObservationSource, WorkOutcomesRecord,
+};
+#[cfg(unix)]
+use fgos_run_result::scan_unit_summaries;
+
+#[cfg(unix)]
+struct NoWork;
+
+#[cfg(unix)]
+impl WorkObservationSource for NoWork {
+    fn read_outcomes_report(&self, _: &Path, _: Option<&str>) -> Result<WorkOutcomesRecord, SourceError> {
+        panic!("this verb must not read the work store")
+    }
+
+    fn read_entropy_signals(&self, _: &Path) -> Result<WorkEntropySignalsRecord, SourceError> {
+        panic!("this verb must not read the work store")
+    }
+}
 
 static NEXT_TEMP: AtomicU64 = AtomicU64::new(0);
 
@@ -176,7 +195,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     let coverage = fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )
@@ -188,7 +207,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     let runs = fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )
@@ -198,7 +217,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     let harness = fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )
@@ -226,7 +245,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     let windowed_runs = fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )
@@ -236,7 +255,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     let windowed_harness = fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )
@@ -246,17 +265,17 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     assert!(fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )
     .unwrap_err()
-    .contains("unexpected argument for metrics coverage"));
+    .contains("metrics coverage: unknown option --since"));
     req.args.clear();
     let windowed_coverage = fgos_observe::metrics_cli::dispatch(
         &req,
         &sources,
-        None,
+        &NoWork,
         scan_coverage,
         scan_unit_summaries,
     )

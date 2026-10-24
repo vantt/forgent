@@ -22,7 +22,7 @@ impl ParsedWindow {
                     let parsed = if value.len() == 10 {
                         parse_date_midnight_millis(value)
                     } else {
-                        parse_timestamp_millis(value)
+                        parse_rfc3339_millis(value)
                     };
                     parsed.ok_or_else(|| {
                         format!("invalid {name} timestamp: {value}; expected YYYY-MM-DD or RFC3339")
@@ -44,10 +44,6 @@ impl ParsedWindow {
         self.since.is_none_or(|since| timestamp_millis >= since)
             && self.until.is_none_or(|until| timestamp_millis <= until)
     }
-}
-
-pub fn parse_timestamp_millis(timestamp: &str) -> Option<i64> {
-    parse_rfc3339_millis(timestamp)
 }
 
 /// The current time as an RFC 3339 UTC stamp with milliseconds. Within one
@@ -78,20 +74,20 @@ mod tests {
     #[test]
     fn now_is_strictly_increasing_within_a_process_and_parses() {
         let stamps: Vec<String> = (0..50).map(|_| now_iso()).collect();
-        let instants: Vec<i64> = stamps.iter().map(|s| parse_timestamp_millis(s).expect(s)).collect();
+        let instants: Vec<i64> = stamps.iter().map(|s| parse_rfc3339_millis(s).expect(s)).collect();
         assert!(instants.windows(2).all(|pair| pair[0] < pair[1]), "{stamps:?}");
         assert!(stamps.iter().all(|s| s.ends_with('Z')));
     }
 
     #[test]
     fn windows_are_temporal_inclusive_and_date_bounds_are_utc_midnight() {
-        let instant = parse_timestamp_millis("2026-10-05T00:00:00.250Z").unwrap();
+        let instant = parse_rfc3339_millis("2026-10-05T00:00:00.250Z").unwrap();
         assert_eq!(
-            parse_timestamp_millis("2026-10-05T02:00:00.250+02:00"),
+            parse_rfc3339_millis("2026-10-05T02:00:00.250+02:00"),
             Some(instant)
         );
         assert_eq!(
-            parse_timestamp_millis("2026-10-04T19:00:00.250-05:00"),
+            parse_rfc3339_millis("2026-10-04T19:00:00.250-05:00"),
             Some(instant)
         );
         let exact = ParsedWindow::parse(&Window {

@@ -1,6 +1,9 @@
 use fgos_observe::metrics_cli::discussions::dispatch_discussions;
-use fgos_observe::{Observation, ObservationSource, ObserveRequest, SourceError, Window};
-use fgos_run_result::{scan_coverage, scan_unit_summaries, RunResultSource, UnitSummarySource};
+use fgos_observe::{
+    Observation, ObservationSource, ObserveRequest, SourceError, WorkEntropySignalsRecord,
+    WorkObservationSource, WorkOutcomesRecord, Window,
+};
+use fgos_run_result::{scan_coverage, scan_unit_summaries, RunResultSource};
 use serde_json::{json, Value};
 use std::fs;
 use std::path::PathBuf;
@@ -28,6 +31,23 @@ impl ObservationSource for UnavailableTranscripts {
             source_id: "claude-transcripts",
             message: "unrelated transcript source must not be read".to_owned(),
         })
+    }
+}
+
+// The same barrier for the work store: a discussion never reads it.
+struct UnavailableWork;
+
+impl WorkObservationSource for UnavailableWork {
+    fn read_outcomes_report(
+        &self,
+        _: &std::path::Path,
+        _: Option<&str>,
+    ) -> Result<WorkOutcomesRecord, SourceError> {
+        panic!("a discussion must not read the work store")
+    }
+
+    fn read_entropy_signals(&self, _: &std::path::Path) -> Result<WorkEntropySignalsRecord, SourceError> {
+        panic!("a discussion must not read the work store")
     }
 }
 
@@ -63,13 +83,12 @@ impl Fixture {
         };
         let sources: Vec<Box<dyn ObservationSource>> = vec![
             Box::new(RunResultSource::new()),
-            Box::new(UnitSummarySource::new()),
             Box::new(UnavailableTranscripts),
         ];
         fgos_observe::metrics_cli::dispatch(
             &request,
             &sources,
-            None,
+            &UnavailableWork,
             scan_coverage,
             scan_unit_summaries,
         )
@@ -289,8 +308,7 @@ fn summary_source_never_rebuilds_results_and_does_not_double_count_runs() {
         .unwrap(),
     )
     .unwrap();
-    let source = UnitSummarySource::new();
-    let mut observations = source.observations(&root.0, &Window::default()).unwrap();
+    let mut observations = scan_unit_summaries(&root.0, &Window::default()).unwrap().observations;
     assert_eq!(observations.len(), 1); // result-only unit does not become a discussion
     assert_eq!(observations[0].source, "unit-summary");
     assert_eq!(observations[0].kind, "unit.settled");
@@ -468,9 +486,9 @@ fn fallback_provenance_objects_are_consumed_and_preserved_without_reselection() 
             None,
         ));
     root.summary(&summary);
-    let source = UnitSummarySource::new()
-        .observations(&root.0, &Window::default())
-        .unwrap();
+    let source = scan_unit_summaries(&root.0, &Window::default())
+        .unwrap()
+        .observations;
     assert_eq!(source.len(), 1);
     assert_eq!(
         source[0].attrs["seats"][0]["final"]["fallbackFrom"],
@@ -522,12 +540,11 @@ fn summary_and_cli_windows_compare_offset_timestamps_temporally_and_include_equa
         summary["settledAt"] = json!(timestamp);
         root.summary(&summary);
     }
-    let source = UnitSummarySource::new();
     let bounds = Window {
         since: Some("2026-10-05T00:00:00Z".into()),
         until: Some("2026-10-05T00:00:00.000Z".into()),
     };
-    let observations = source.observations(&root.0, &bounds).unwrap();
+    let observations = scan_unit_summaries(&root.0, &bounds).unwrap().observations;
     assert_eq!(observations.len(), 2);
     assert!(observations
         .iter()
@@ -567,7 +584,6 @@ fn summary_and_cli_windows_compare_offset_timestamps_temporally_and_include_equa
 #[test]
 fn invalid_timestamp_bounds_are_named_errors_before_scanning() {
     let root = Fixture::new();
-    let source = UnitSummarySource::new();
     for (flag, value) in [("--since", "2026-02-30"), ("--until", "not-a-timestamp")] {
         let request = ObserveRequest {
             operation: "metrics".into(),
@@ -583,8 +599,7 @@ fn invalid_timestamp_bounds_are_named_errors_before_scanning() {
             since: (flag == "--since").then(|| value.to_owned()),
             until: (flag == "--until").then(|| value.to_owned()),
         };
-        assert!(source
-            .observations(&root.0, &window)
+        assert!(scan_unit_summaries(&root.0, &window)
             .unwrap_err()
             .to_string()
             .contains(&format!("invalid {flag}")));

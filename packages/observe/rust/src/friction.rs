@@ -3,7 +3,8 @@
 use crate::contract::{LegacyFrictionRecord, LegacyFrictionSource, Subject, Window};
 use crate::shard::{self, is_session_shard, StoredRecord, TornTail, UnsafeShard};
 use crate::store_lock::acquire_store_lock;
-use crate::time::{now_iso, parse_timestamp_millis, ParsedWindow};
+use crate::time::{now_iso, ParsedWindow};
+use fgos_host_runtime::civil_time::parse_rfc3339_millis;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::{HashMap, HashSet};
@@ -149,8 +150,8 @@ impl Event {
 /// resolve with no stamp of its own) means "just after" the stamp before it.
 fn stamp_millis(ts: &str) -> Option<i64> {
     match ts.strip_suffix('~') {
-        Some(base) => parse_timestamp_millis(base).map(|millis| millis + 1),
-        None => parse_timestamp_millis(ts),
+        Some(base) => parse_rfc3339_millis(base).map(|millis| millis + 1),
+        None => parse_rfc3339_millis(ts),
     }
 }
 

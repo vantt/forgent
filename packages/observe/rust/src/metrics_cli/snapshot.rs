@@ -7,6 +7,7 @@
 use crate::case_journal;
 use crate::contract::{ObserveRequest, WorkObservationSource};
 use crate::metrics_cli::entropy::calculate_entropy_score_and_parts;
+use crate::metrics_cli::parse_flags;
 use crate::shard::{self, TornTail};
 use crate::store_lock::acquire_store_lock;
 use crate::time::now_iso;
@@ -14,25 +15,10 @@ use serde_json::json;
 
 pub fn dispatch_snapshot(
     req: &ObserveRequest,
-    work_source: Option<&dyn WorkObservationSource>,
+    work_source: &dyn WorkObservationSource,
 ) -> Result<serde_json::Value, String> {
-    let mut i = 0;
-    while i < req.args.len() {
-        let arg = &req.args[i];
-        if arg == "--dir" {
-            i += 2;
-            continue;
-        } else if arg.starts_with("--dir=") {
-            i += 1;
-            continue;
-        } else {
-            return Err(format!("unexpected argument for metrics snapshot: {}", arg));
-        }
-    }
-
-    let ws =
-        work_source.ok_or_else(|| "work source not available for metrics snapshot".to_string())?;
-    let entropy_calc = calculate_entropy_score_and_parts(&req.root, ws)?;
+    parse_flags("snapshot", &req.args, &[], &[], false)?;
+    let entropy_calc = calculate_entropy_score_and_parts(&req.root, work_source)?;
     let now = now_iso();
 
     // Check currently open case if any
