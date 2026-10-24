@@ -7,6 +7,7 @@
 // FGOS_KEEP_TEST_FIXTURES=1 keeps the directory for debugging (same switch as fixture-dir.mjs).
 // SIGINT/SIGTERM/SIGHUP still clean up (without changing the process's signal semantics); a process killed by SIGKILL cannot, under scripts/run-tests.mjs the run directory covers it.
 
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -88,18 +89,20 @@ function installProcessTempRoot() {
 // default global directory is `os.homedir()/.fgos`), so a test that does not choose its own home must not see
 // the real machine's global config, which differs from one machine to the next. HOME is a real OS input, so
 // code under test and every child it spawns read the same empty home. A test that means "the real machine"
-// or builds its own home (withHome, an explicit globalDir) overrides this. Git keeps the real global
-// identity through GIT_CONFIG_GLOBAL so a commit in a fixture repository still has an author, and the Rust
-// toolchain keeps its real install through CARGO_HOME and RUSTUP_HOME.
+// or builds its own home (withHome, an explicit globalDir) overrides this. The new home gets a `.gitconfig`
+// holding only the real global identity, so a commit in a fixture repository still has an author. Neither
+// GIT_CONFIG_GLOBAL nor an `include.path` would do: the git driver drops every `GIT_*` variable from the git
+// it runs and refuses a config that includes another file. The Rust toolchain keeps its real install through
+// CARGO_HOME and RUSTUP_HOME.
 function isolateHome(root) {
-  const realGitConfig = path.join(os.homedir(), '.gitconfig');
   const home = path.join(root, 'home');
   try {
     fs.mkdirSync(home);
   } catch {
     return; // Leave HOME alone: the test's own filesystem calls will fail with the real error.
   }
-  if (!process.env.GIT_CONFIG_GLOBAL && fs.existsSync(realGitConfig)) process.env.GIT_CONFIG_GLOBAL = realGitConfig;
+  const identity = ['name', 'email'].map((key) => [key, realGitIdentity(key)]).filter(([, value]) => value);
+  if (identity.length) fs.writeFileSync(path.join(home, '.gitconfig'), `[user]\n${identity.map(([key, value]) => `\t${key} = ${value}\n`).join('')}`);
   // The Rust toolchain keeps its install under the real home; tests that build or run cargo still need it.
   for (const [name, dir] of [['CARGO_HOME', '.cargo'], ['RUSTUP_HOME', '.rustup']]) {
     const real = path.join(os.homedir(), dir);
@@ -112,6 +115,14 @@ function isolateHome(root) {
   for (let dir = stateRoot; dir !== home; dir = path.dirname(dir)) fs.chmodSync(dir, 0o700);
   process.env.HOME = home;
   process.env.USERPROFILE = home;
+}
+
+function realGitIdentity(key) {
+  try {
+    return execFileSync('git', ['config', '--global', '--get', `user.${key}`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return ''; // Not set: a fixture commit fails with git's own "Author identity unknown", as on such a machine.
+  }
 }
 
 /** The directory this process's temp files live in. */
