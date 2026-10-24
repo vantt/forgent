@@ -2,11 +2,11 @@
   "version": 2,
   "status": "done",
   "meaning": "Authored and focused-verified only; independent review and authority cutover are not claimed.",
-  "sourceHead": "92260972cb2dc2ab3740859dc1c005bb9be42857",
+  "sourceHead": "5965143b4fd56df6698b2096df1a672d26293c90",
   "brief": "plans/260925-documentation-authority-unification/reports/phase-09/w3-import2-brief.md",
   "completedAt": "2026-10-24T03:16:26.446622+00:00",
   "supersedes": {
-    "blockedReceiptAt": "92260972cb2dc2ab3740859dc1c005bb9be42857:plans/260925-documentation-authority-unification/reports/phase-09/import2/receipt.json",
+    "blockedReceiptAt": "5965143b4fd56df6698b2096df1a672d26293c90:plans/260925-documentation-authority-unification/reports/phase-09/import2/receipt.json",
     "scopeCorrection": "docs/reading-map.md explicitly writable for this continuation"
   },
   "needsWrites": [],
@@ -27,7 +27,7 @@
   },
   "step0": {
     "status": "pass",
-    "authorSourcePin": "92260972cb2dc2ab3740859dc1c005bb9be42857",
+    "authorSourcePin": "5965143b4fd56df6698b2096df1a672d26293c90",
     "effectiveBindingsChecked": 791,
     "historicalOverlayPredecessorsNotRewritten": 277,
     "preimageAuthenticatedBindings": 769,

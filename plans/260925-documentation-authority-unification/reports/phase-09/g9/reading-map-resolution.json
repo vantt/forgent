@@ -1,0 +1,185 @@
+{
+  "path": "docs/reading-map.md",
+  "sourceCommit": "cd4f80eccbb5c44893daec58af416395d139494b",
+  "reason": "Keep current hot-lock wording, current guide/case Workflow model and kernel session mutex. Reapply only the original reviewed path operand substitutions, matched to each unique current source-map entry; do not restore stale events.lock, step-fsm/DAG or sessions.lock prose. Other newly added entries and truth corrections remain untouched.",
+  "rows": [
+    {
+      "authoredOldSha256": "cd779fba20f9e696d8e62cbc8f3873587c2cb0dcac8ae313e0cdbce769a36acc",
+      "authoredNewSha256": "4eb0d4e0f72a6c1336c53983667ca3c4da0928a52cba1c4617bfbc5c360d384b",
+      "edits": [
+        {
+          "currentLine": 150,
+          "before": "- `bin/fgos.mjs` — CLI một cửa của work-state; chạy `node bin/fgos.mjs <verb>`; gồm verb `edit` — sửa đè các trường (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent — str7-str8-priority-intent) trên một item đã có, cùng cửa ghi CTR002 như `add`/`move`; gồm verb `take`/`return` — cửa pull giao–nhận việc cho tác nhân ngoài runner; gồm verb `pick` — cửa pull GỘP `take` + dựng workspace (`createWorktree`), role cố định `session`, không cờ `--role` (theo str83-fgos-slash-commands); gồm verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, một cổng cho mọi đề xuất `awaiting-approval`, nay leaf-vs-root-aware (con nhập vào nhánh của gốc, gốc nhập vào cây chính); `review`/`approve` nay chấp nhận thêm `--github [--pr <n>]` — vận chuyển thay thế CÙNG cổng duyệt qua GitHub thay vì diff/merge cục bộ (chỉ nguồn runner, theo github-adapter, spec: docs/specs/runner.md); gồm verb `catchup` — đồng bộ lại một việc đỗ vì gãy nhập/trôi tích hợp (spec: docs/specs/runner.md); gồm verb `session` (`start`/`end`/`list`) — vòng đời phiên checkout đa-phiên tùy chọn, mỗi phiên một worktree detached-HEAD cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink (spec: docs/specs/runner.md); spec: docs/specs/work-state.md\n",
+          "after": "- `bin/fgos.mjs` — CLI một cửa của work-state; chạy `node bin/fgos.mjs <verb>`; gồm verb `edit` — sửa đè các trường (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent — str7-str8-priority-intent) trên một item đã có, cùng cửa ghi CTR002 như `add`/`move`; gồm verb `take`/`return` — cửa pull giao–nhận việc cho tác nhân ngoài runner; gồm verb `pick` — cửa pull GỘP `take` + dựng workspace (`createWorktree`), role cố định `session`, không cờ `--role` (theo str83-fgos-slash-commands); gồm verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, một cổng cho mọi đề xuất `awaiting-approval`, nay leaf-vs-root-aware (con nhập vào nhánh của gốc, gốc nhập vào cây chính); `review`/`approve` nay chấp nhận thêm `--github [--pr <n>]` — vận chuyển thay thế CÙNG cổng duyệt qua GitHub thay vì diff/merge cục bộ (chỉ nguồn runner, theo github-adapter, spec: docs/platform/runner/spec.md); gồm verb `catchup` — đồng bộ lại một việc đỗ vì gãy nhập/trôi tích hợp (spec: docs/platform/runner/spec.md); gồm verb `session` (`start`/`end`/`list`) — vòng đời phiên checkout đa-phiên tùy chọn, mỗi phiên một worktree detached-HEAD cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink (spec: docs/platform/runner/spec.md); spec: docs/platform/work-state/spec.md\n",
+          "pathPairs": [
+            [
+              "docs/specs/runner.md",
+              "docs/platform/runner/spec.md"
+            ],
+            [
+              "docs/specs/work-state.md",
+              "docs/platform/work-state/spec.md"
+            ]
+          ],
+          "beforeSha256": "f4c312bdea8d754d637795f0e43e8b017180a1e312176845dea1a69e4d6d3f5a",
+          "afterSha256": "e787481a2d5ec63a85119add69f77411fd8d6024159c318d20de3c569ce6b173"
+        },
+        {
+          "currentLine": 151,
+          "before": "- `src/state/` — lõi work-state: events (nhật ký; `appendEvent` nay chạy trong mutex nóng `state` (`withStateTx`, `src/state/hot-lock.mjs`) — xem spec Work-State RUL10 (tiền đề có ngưỡng — một người ghi tại một thời điểm; multi-agent ghi đồng thời qua mutex nóng `state`)), work (schema — STATUSES + STAGES + field `parent` lineage + field `domain`), fsm (bảng chuyển status + CAS), stage (bảng chuyển stage + CAS, chiều vĩ mô song song fsm; cạnh chuyển-stage tra theo domain của item — `coding`: `discovery → exploring → planning → executing`, trong đó phán-quyết `clear` ở `discovery` bỏ qua `exploring` để sang thẳng `planning` còn `unclear` đi qua `exploring`; tên `decompose` vẫn còn nhưng chỉ là bí danh legacy chỉ-để-rút-cạn (không việc MỚI nào vào được nữa); `synthetic`: một stage, không cạnh nào), domains (sổ đăng ký domain — stage list + step-mapping base-workflow + cạnh-chuyển mỗi domain; `coding` + ba domain minh họa/thử-nghiệm `synthetic` (đúng một stage), `triage`, `fixture-marketing`; base-workflow-model STR18, hoàn tất S1+S2), replay (fold), frontier (truy vấn sẵn-sàng — lọc theo status, stage domain-aware, VÀ lineage qua `parent`), dep-graph (dò chu trình trên `deps` — bất biến phi-chu-trình tại cửa ghi, per work-graph-intelligence S1), store (chủ ghi duy nhất + readRawEvents), envelope (phong bì output CTR001, `wrapEnvelope` — nay bọc MỌI verb ở một cửa in trong `bin/fgos.mjs main()`, STR37; spec: docs/specs/work-state.md §envelope)\n",
+          "after": "- `src/state/` — lõi work-state: events (nhật ký; `appendEvent` nay chạy trong mutex nóng `state` (`withStateTx`, `src/state/hot-lock.mjs`) — xem spec Work-State RUL10 (tiền đề có ngưỡng — một người ghi tại một thời điểm; multi-agent ghi đồng thời qua mutex nóng `state`)), work (schema — STATUSES + STAGES + field `parent` lineage + field `domain`), fsm (bảng chuyển status + CAS), stage (bảng chuyển stage + CAS, chiều vĩ mô song song fsm; cạnh chuyển-stage tra theo domain của item — `coding`: `discovery → exploring → planning → executing`, trong đó phán-quyết `clear` ở `discovery` bỏ qua `exploring` để sang thẳng `planning` còn `unclear` đi qua `exploring`; tên `decompose` vẫn còn nhưng chỉ là bí danh legacy chỉ-để-rút-cạn (không việc MỚI nào vào được nữa); `synthetic`: một stage, không cạnh nào), domains (sổ đăng ký domain — stage list + step-mapping base-workflow + cạnh-chuyển mỗi domain; `coding` + ba domain minh họa/thử-nghiệm `synthetic` (đúng một stage), `triage`, `fixture-marketing`; base-workflow-model STR18, hoàn tất S1+S2), replay (fold), frontier (truy vấn sẵn-sàng — lọc theo status, stage domain-aware, VÀ lineage qua `parent`), dep-graph (dò chu trình trên `deps` — bất biến phi-chu-trình tại cửa ghi, per work-graph-intelligence S1), store (chủ ghi duy nhất + readRawEvents), envelope (phong bì output CTR001, `wrapEnvelope` — nay bọc MỌI verb ở một cửa in trong `bin/fgos.mjs main()`, STR37; spec: docs/platform/work-state/contracts/cli-io-contract.md#3-output-direction-unified-envelope §envelope)\n",
+          "pathPairs": [
+            [
+              "docs/specs/work-state.md",
+              "docs/platform/work-state/contracts/cli-io-contract.md#3-output-direction-unified-envelope"
+            ]
+          ],
+          "beforeSha256": "aefde6a27895a523df09531f82d2edf5e4836dc1c68dd618e23d0147d83e028b",
+          "afterSha256": "c38b1fe3b1592804643c122b82d3fbb127bf2283151c4cb6c8474c22b801613e"
+        },
+        {
+          "currentLine": 152,
+          "before": "- `src/cli/command-registry.mjs` — sổ verb máy-đọc của CLI (STR37, kernel, thuần dữ liệu): `SCHEMA_VERSION` + `COMMAND_REGISTRY` (mọi verb với `{name, invoke, description, parameters, examples, access read|mutation, deprecated}`); `bin/fgos.mjs` `--help [--json]` và `<verb> [<sub>] --help [--json]` sinh sổ từ đây; verb có sub-verb mang `subcommands`, `HELP_SELECTORS` (`--help`, `-h`) thành route của Rust host qua `scripts/export-command-selectors.mjs`; test chống-lệch `test/cli/fgos-manifest.test.mjs`, `test/cli/subcommand-flag-drift.test.mjs` (cờ handler ↔ schema sub-verb), `test/cli/fgos-verb-help-json.test.mjs`, `test/rust-host/help-routes.test.mjs` (qua host thật); spec: docs/specs/work-state.md §sổ verb\n",
+          "after": "- `src/cli/command-registry.mjs` — sổ verb máy-đọc của CLI (STR37, kernel, thuần dữ liệu): `SCHEMA_VERSION` + `COMMAND_REGISTRY` (mọi verb với `{name, invoke, description, parameters, examples, access read|mutation, deprecated}`); `bin/fgos.mjs` `--help [--json]` và `<verb> [<sub>] --help [--json]` sinh sổ từ đây; verb có sub-verb mang `subcommands`, `HELP_SELECTORS` (`--help`, `-h`) thành route của Rust host qua `scripts/export-command-selectors.mjs`; test chống-lệch `test/cli/fgos-manifest.test.mjs`, `test/cli/subcommand-flag-drift.test.mjs` (cờ handler ↔ schema sub-verb), `test/cli/fgos-verb-help-json.test.mjs`, `test/rust-host/help-routes.test.mjs` (qua host thật); spec: docs/platform/work-state/contracts/cli-io-contract.md#7-machine-readable-verb-registry §sổ verb\n",
+          "pathPairs": [
+            [
+              "docs/specs/work-state.md",
+              "docs/platform/work-state/contracts/cli-io-contract.md#7-machine-readable-verb-registry"
+            ]
+          ],
+          "beforeSha256": "fdc66a2c2a4ca29d17e27a08beba4e5848a1cbf087ba043c0f8384fbe772a97a",
+          "afterSha256": "13a10c2cc6c6e073f26d0f955af6a2a849db047d0ed86f861407648a328c4c7e"
+        }
+      ]
+    },
+    {
+      "authoredOldSha256": "d744478a7b8959f162bbeb20bae0bb923bde06720558ea0b028653e205667571",
+      "authoredNewSha256": "3a80bbf33f516ba80b53f8f79a7b5e5bd953dab1348c08b368b5646065b1d515",
+      "edits": [
+        {
+          "currentLine": 163,
+          "before": "- `src/workflow/` (`definition.mjs`, `guide-schema.mjs`, `loader.mjs`, `runner.mjs` = Playbook proposer, `units-source.mjs`; case model: `case-projection.mjs` pure fold, `case-admission.mjs` admission predicate, `case-admission-port.mjs` port implementation, `case-bindings.mjs` worktree bindings, `case-runtime.mjs` reservation/settle/gate-answer files, `case-frame.mjs` nested frame, `case-lock.mjs` `advance` hold, `case-start.mjs`, `case-verbs.mjs` start/status/answer/resume/close, `case-close.mjs`; `unit-handoff.mjs`, `ref-digests.mjs`, `store.mjs` ledger) + `src/runner/execution/case-admission-port.mjs` (port contract owned by the Execution Core) + `core/workflows/*.yaml` — Workflow engine: guide + case ledger, admission, human gates, Playbook proposer; `units-source.mjs` dịch units file của `fgos workflow start --units` thành Workflow tạm (RUL89 (workflow start --units)); spec: `docs/specs/runner.md`\n",
+          "after": "- `src/workflow/` (`definition.mjs`, `guide-schema.mjs`, `loader.mjs`, `runner.mjs` = Playbook proposer, `units-source.mjs`; case model: `case-projection.mjs` pure fold, `case-admission.mjs` admission predicate, `case-admission-port.mjs` port implementation, `case-bindings.mjs` worktree bindings, `case-runtime.mjs` reservation/settle/gate-answer files, `case-frame.mjs` nested frame, `case-lock.mjs` `advance` hold, `case-start.mjs`, `case-verbs.mjs` start/status/answer/resume/close, `case-close.mjs`; `unit-handoff.mjs`, `ref-digests.mjs`, `store.mjs` ledger) + `src/runner/execution/case-admission-port.mjs` (port contract owned by the Execution Core) + `core/workflows/*.yaml` — Workflow engine: guide + case ledger, admission, human gates, Playbook proposer; `units-source.mjs` dịch units file của `fgos workflow start --units` thành Workflow tạm (RUL89 (workflow start --units)); spec: `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules`\n",
+          "pathPairs": [
+            [
+              "docs/specs/runner.md",
+              "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules"
+            ]
+          ],
+          "beforeSha256": "51e08ca8267608b93ee6ef97900abf73e2d3245dd5c440bea2607313d38798da",
+          "afterSha256": "be3064328ce834396b49b65fcbef7fef95ea37ed730b1ae5c54bf87956d3f7b2"
+        },
+        {
+          "currentLine": 166,
+          "before": "- `src/runner/execution/` (`unit.mjs`, `bind.mjs`, `run.mjs`, `patterns/`) — Execution Core (Request-to-Run P1/P2/P4): Unit (hợp đồng dữ liệu duy nhất), `bind()` (chọn executor 5 mức), `fgos run` (cửa chạy mới, herdr mặc định), CollaborationPattern (`solo`, `reviewed`, `panel` + presets `consult`, `research-fan-out`, `rfc`, `code-change`); `src/runner/dispatch/write-scope.mjs` — matcher duy nhất của phạm vi ghi Unit (RUL84 (one write-scope matcher)), dùng cho runner commit, settlement và Workflow; spec: `docs/specs/runner.md`\n",
+          "after": "- `src/runner/execution/` (`unit.mjs`, `bind.mjs`, `run.mjs`, `patterns/`) — Execution Core (Request-to-Run P1/P2/P4): Unit (hợp đồng dữ liệu duy nhất), `bind()` (chọn executor 5 mức), `fgos run` (cửa chạy mới, herdr mặc định), CollaborationPattern (`solo`, `reviewed`, `panel` + presets `consult`, `research-fan-out`, `rfc`, `code-change`); `src/runner/dispatch/write-scope.mjs` — matcher duy nhất của phạm vi ghi Unit (RUL84 (one write-scope matcher)), dùng cho runner commit, settlement và Workflow; spec: `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules`\n",
+          "pathPairs": [
+            [
+              "docs/specs/runner.md",
+              "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules"
+            ]
+          ],
+          "beforeSha256": "80bc050683f6c55a82b4167a0af25ea2389d5936190ffe229c7aedfc04fe9029",
+          "afterSha256": "23c5c37252062eb9d8f68d5f41c11241cb985bbfa4029a1bdfedb854c48cc84a"
+        }
+      ]
+    },
+    {
+      "authoredOldSha256": "cc6262e5225b5e0a2d94bb3ab272cf8d871547fee85f795a478b5c62fed47281",
+      "authoredNewSha256": "ec3d116230790d04b6cd10ae63836f28d11383bd3df1879db61f5803358b114c",
+      "edits": [
+        {
+          "currentLine": 169,
+          "before": "- `src/runner/merge.mjs` — cơ chế cổng duyệt PR nội bộ (`classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`), dùng bởi `bin/fgos.mjs` verb `review`/`approve`/`reject`, nay tham số hóa được nhánh đích (cây chính hoặc nhánh của gốc — cây nhánh tích hợp); `catchup` (bin/fgos.mjs) dùng lại cùng cơ chế git cho cả tầng con→gốc lẫn gốc→cây chính; `isMainWorktree` (STR44) — chặn cấu trúc (không dựa sổ đăng ký session) xác nhận `cwd` LÀ worktree chính trước khi `approve` merge/verify, bắt cả worktree tay không đăng ký qua `fgos session start` — cùng `detectTrunk` nay ở `src/runner/worktree.mjs` (theo tsk-49i), không còn ở file này; spec: docs/specs/runner.md\n",
+          "after": "- `src/runner/merge.mjs` — cơ chế cổng duyệt PR nội bộ (`classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`), dùng bởi `bin/fgos.mjs` verb `review`/`approve`/`reject`, nay tham số hóa được nhánh đích (cây chính hoặc nhánh của gốc — cây nhánh tích hợp); `catchup` (bin/fgos.mjs) dùng lại cùng cơ chế git cho cả tầng con→gốc lẫn gốc→cây chính; `isMainWorktree` (STR44) — chặn cấu trúc (không dựa sổ đăng ký session) xác nhận `cwd` LÀ worktree chính trước khi `approve` merge/verify, bắt cả worktree tay không đăng ký qua `fgos session start` — cùng `detectTrunk` nay ở `src/runner/worktree.mjs` (theo tsk-49i), không còn ở file này; spec: docs/platform/runner/spec.md\n",
+          "pathPairs": [
+            [
+              "docs/specs/runner.md",
+              "docs/platform/runner/spec.md"
+            ]
+          ],
+          "beforeSha256": "2e1fae077ababbdf1d2b316245b96d4ecc53c4e6b0f9b966b0788a486b38a55d",
+          "afterSha256": "d64bb40d145273c7e0ec0da8c84df8d55e5616cd9b0ade63cbc19cc11a97e4f3"
+        },
+        {
+          "currentLine": 170,
+          "before": "- `src/verbs/<domain>/<verb>.mjs` — tầng use-case của CLI (theo tsk-49i): logic nghiệp vụ của một verb, chữ ký thống nhất `<verb>UseCase(ctx, options)` — `ctx` là thứ adapter tính từ môi trường (`{dir, cwd?, repoRoot?}`, use-case KHÔNG BAO GIỜ tự đọc `process.cwd()`/`process.env`/argv), `options` là flag đã parse; trả đúng payload `fgos.v1` (bọc envelope + map exit-code vẫn ở `bin/fgos.mjs`), refusal vẫn `throw StoreError`. Cụm đầu tiên: `src/verbs/merge/` (`merge`/`approve`/`review`/`sync-root`/`catchup`/`reject`/`promote-to-component`) — `bin/fgos.mjs` cho 7 verb này nay chỉ parse args, tính `repoRoot` theo chính sách RIÊNG của từng verb, gọi một hàm use-case. Không ngụ ý migrate 7 file use-case-rank sẵn có (`runner/loop.mjs`, `intake/*`, `setup/*`, `state/cursor.mjs`); spec: docs/specs/runner.md\n",
+          "after": "- `src/verbs/<domain>/<verb>.mjs` — tầng use-case của CLI (theo tsk-49i): logic nghiệp vụ của một verb, chữ ký thống nhất `<verb>UseCase(ctx, options)` — `ctx` là thứ adapter tính từ môi trường (`{dir, cwd?, repoRoot?}`, use-case KHÔNG BAO GIỜ tự đọc `process.cwd()`/`process.env`/argv), `options` là flag đã parse; trả đúng payload `fgos.v1` (bọc envelope + map exit-code vẫn ở `bin/fgos.mjs`), refusal vẫn `throw StoreError`. Cụm đầu tiên: `src/verbs/merge/` (`merge`/`approve`/`review`/`sync-root`/`catchup`/`reject`/`promote-to-component`) — `bin/fgos.mjs` cho 7 verb này nay chỉ parse args, tính `repoRoot` theo chính sách RIÊNG của từng verb, gọi một hàm use-case. Không ngụ ý migrate 7 file use-case-rank sẵn có (`runner/loop.mjs`, `intake/*`, `setup/*`, `state/cursor.mjs`); spec: docs/platform/runner/spec.md\n",
+          "pathPairs": [
+            [
+              "docs/specs/runner.md",
+              "docs/platform/runner/spec.md"
+            ]
+          ],
+          "beforeSha256": "47a1eb808fef4f47c60c4bafbea1e75d1be060c4b7d2c44a0ef5f5b9447d086f",
+          "afterSha256": "68d66240380571c7b5683c0ed45f6aaa0516a43b29a7635eccb6d6cc465c4ba6"
+        },
+        {
+          "currentLine": 171,
+          "before": "- `src/report/item-trace.mjs` — trace outcome/friction của MỘT item, đọc thuần trên view (`collectOutcomeEntry`/`collectFrictionData`/`collectReviewTrace`); dùng chung bởi `review` (use-case) và `check`/`show`/`doc-sources`/`evolve` (`bin/fgos.mjs`); spec: docs/specs/runner.md\n",
+          "after": "- `src/report/item-trace.mjs` — trace outcome/friction của MỘT item, đọc thuần trên view (`collectOutcomeEntry`/`collectFrictionData`/`collectReviewTrace`); dùng chung bởi `review` (use-case) và `check`/`show`/`doc-sources`/`evolve` (`bin/fgos.mjs`); spec: docs/platform/runner/spec.md\n",
+          "pathPairs": [
+            [
+              "docs/specs/runner.md",
+              "docs/platform/runner/spec.md"
+            ]
+          ],
+          "beforeSha256": "a6829de75b2601b637e87dcd3a05c01f68c49acf079616268c4b9c3297d19a5b",
+          "afterSha256": "746ddbf6f86d1cd5926f45026336e282a0ac6ab341fb7a229959acc03b2f3d31"
+        },
+        {
+          "currentLine": 172,
+          "before": "- `src/runner/github-adapter.mjs` — vận chuyển GitHub thuần cho cổng duyệt PR nội bộ (`createGitHubPR`/`viewGitHubPRStatus`/`mergeGitHubPR`/`classifyGhFailure`, shell ra `gh` CLI thật, layer infra), dùng bởi `bin/fgos.mjs` verb `review`/`approve --github`; spec: docs/specs/runner.md\n",
+          "after": "- `src/runner/github-adapter.mjs` — vận chuyển GitHub thuần cho cổng duyệt PR nội bộ (`createGitHubPR`/`viewGitHubPRStatus`/`mergeGitHubPR`/`classifyGhFailure`, shell ra `gh` CLI thật, layer infra), dùng bởi `bin/fgos.mjs` verb `review`/`approve --github`; spec: docs/platform/runner/spec.md\n",
+          "pathPairs": [
+            [
+              "docs/specs/runner.md",
+              "docs/platform/runner/spec.md"
+            ]
+          ],
+          "beforeSha256": "225a429451e2e5183335f081865887e011f090ede7fd75167626a47d7ad89df2",
+          "afterSha256": "dc91b79baa23b5c9912e623abe4b13c08343d256b666e3d51b77214755e144a4"
+        },
+        {
+          "currentLine": 173,
+          "before": "- `src/runner/worker-log.mjs` — cửa ghi DUY NHẤT cho bản ghi output cục bộ của trợ lý (`.fgos/logs/<id>.log`, git-ignored): `appendWorkerLog` — khối kết-cục cuối, gọi bởi `loop.mjs` sau mỗi lượt dispatch; `appendWorkerLogChunk` — live tee từng chunk stdout/stderr khi đến (STR39), gọi bởi `dispatch.mjs`'s `spawnWorker` qua `opts.onChunk`; spec: docs/specs/runner.md\n",
+          "after": "- `src/runner/worker-log.mjs` — cửa ghi DUY NHẤT cho bản ghi output cục bộ của trợ lý (`.fgos/logs/<id>.log`, git-ignored): `appendWorkerLog` — khối kết-cục cuối, gọi bởi `loop.mjs` sau mỗi lượt dispatch; `appendWorkerLogChunk` — live tee từng chunk stdout/stderr khi đến (STR39), gọi bởi `dispatch.mjs`'s `spawnWorker` qua `opts.onChunk`; spec: docs/platform/runner/spec.md\n",
+          "pathPairs": [
+            [
+              "docs/specs/runner.md",
+              "docs/platform/runner/spec.md"
+            ]
+          ],
+          "beforeSha256": "783e8c488f28ac103f7a886fbaaa72ce418d5b86181b9ea37a74bdd243f67dc3",
+          "afterSha256": "f94804d7f1b446a685789936ae9e10f4cccb3778c32b4d2f2a66786f097e1e5e"
+        },
+        {
+          "currentLine": 174,
+          "before": "- `src/runner/session.mjs` — vòng đời phiên checkout đa-phiên tùy chọn (fgos-multi-session-checkout, STR35): `createSession`/`endSession`/`listSessions`/`reclaimOrphanedSessions`, worktree detached-HEAD mỗi phiên (`git worktree add --detach`), `.fgos` symlink dùng chung (KHÔNG BAO GIỜ sao chép), sổ `.fgos/sessions.json` canh bởi kernel mutex `.fgos/locks/sessions.lock` riêng (holder-lock); dùng bởi `bin/fgos.mjs` verb `session`; spec: docs/specs/runner.md\n",
+          "after": "- `src/runner/session.mjs` — vòng đời phiên checkout đa-phiên tùy chọn (fgos-multi-session-checkout, STR35): `createSession`/`endSession`/`listSessions`/`reclaimOrphanedSessions`, worktree detached-HEAD mỗi phiên (`git worktree add --detach`), `.fgos` symlink dùng chung (KHÔNG BAO GIỜ sao chép), sổ `.fgos/sessions.json` canh bởi kernel mutex `.fgos/locks/sessions.lock` riêng (holder-lock); dùng bởi `bin/fgos.mjs` verb `session`; spec: docs/platform/runner/spec.md\n",
+          "pathPairs": [
+            [
+              "docs/specs/runner.md",
+              "docs/platform/runner/spec.md"
+            ]
+          ],
+          "beforeSha256": "ab06bbf4251e5061887efea6229fa3e51a6a19097826f9ce481d07b6b2fd75a0",
+          "afterSha256": "b604055d9a68d53fcb2b16e97da19f25e41a999069cf334a0cf72a58cc34801b"
+        },
+        {
+          "currentLine": 175,
+          "before": "- `packages/observe/rust/src/metrics_cli/entropy.rs` — tín hiệu entropy-trend + đếm compounding (thuần, đọc trên view work-state), surfaced qua `fgos metrics entropy`; spec: docs/specs/runner.md\n",
+          "after": "- `packages/observe/rust/src/metrics_cli/entropy.rs` — tín hiệu entropy-trend + đếm compounding (thuần, đọc trên view work-state), surfaced qua `fgos metrics entropy`; spec: docs/platform/runner/spec.md\n",
+          "pathPairs": [
+            [
+              "docs/specs/runner.md",
+              "docs/platform/runner/spec.md"
+            ]
+          ],
+          "beforeSha256": "f5465d55067284d132e9afc88be4dc22be44ccd99adc70b7d1c3eeab0e59507f",
+          "afterSha256": "09e871ea419305de7bde5e66bf596ab3123466ca3c8bc5884e0aea0d4f5060dc"
+        }
+      ]
+    }
+  ]
+}

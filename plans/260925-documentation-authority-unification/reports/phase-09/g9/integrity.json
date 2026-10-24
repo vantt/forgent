@@ -1,0 +1,166 @@
+{
+  "sourcePin": "cd4f80eccbb5c44893daec58af416395d139494b",
+  "files": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/commands.json",
+      "sha256": "a459c97cbd4adf8fecb2382728dd3520c21f528ee57d250be0b171f601c757cc",
+      "bytes": 6219
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/determinism.json",
+      "sha256": "cabf4eb63405d5dde58bcf1678123bfabe60c99a7152c639fb7f60ec4ecc5ae0",
+      "bytes": 793
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/final-audit.json",
+      "sha256": "29870674d55fc702ea9bbb515f93486b8399eef2027ff59533ce6c595b226a26",
+      "bytes": 4821
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/historical-pin-negative.json",
+      "sha256": "38bcd01899b32edec876a68bf6170d6ce6dbf7ea449a740b68161f8789444384",
+      "bytes": 1670762
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/judge.py",
+      "sha256": "3752f3298b75766ba48a715102edf35dc5dd145c260cb5090a6c521a99e1f024",
+      "bytes": 10440
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/judgments.json",
+      "sha256": "e362272d0d40adae68eb56fd6c7d6560b9c574495bcdd147ff26b75d1d455545",
+      "bytes": 15899918
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/passages.json",
+      "sha256": "da39c723559f69debe050336551ad14cad6602867bfe6298bd8a7baf82d690a4",
+      "bytes": 41497640
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/patch-commands.json",
+      "sha256": "ed70bc79af85ba2645871d8ebf78ac1cb9daf7e11d24688f116c780543f907e5",
+      "bytes": 688165
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/provenance.py",
+      "sha256": "bcdac0f052f5d5548b05d446033f988053d91394561c22b1ccec8500d637a0c8",
+      "bytes": 5214
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/reading-map-resolution.json",
+      "sha256": "3de9f457ef8166eed3b37c63ec09a575a6885a2973e077af1e21fd2c1b6f06e1",
+      "bytes": 24450
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/receipt.md",
+      "sha256": "2454e94176d2229467cdd75ab9ee9cf8d81df9714f53eb3ac4b67ebc7f379c33",
+      "bytes": 8745
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recompose.py",
+      "sha256": "2ab830dae6688ab63161356f7c5407e14e7bb947c9b6c23ea7d3cc014efc75f3",
+      "bytes": 11110
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+      "sha256": "1d0fed91705f87af92d0b6cb20e0e6715363227b08ab449faf783b1610dc742f",
+      "bytes": 3310746
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/record-repins.json",
+      "sha256": "b911ee6a46885e60e82f269228c14c3feee6ddaa33e8672b5f731ee53b96801e",
+      "bytes": 9829365
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/same-bytes-pin-check.json",
+      "sha256": "0a8d1901a1a84cb3e6b7c3a403329e5c57a5d948dea1f3f1dbccebb042522fa9",
+      "bytes": 1541779
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/sha-map.json",
+      "sha256": "60926fd858a5d098c55c45911fa48cd916242a080dd79d950a81c02f28a80b11",
+      "bytes": 85671
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/source-context.json",
+      "sha256": "47436e537d3fad595bac3739d0aeab43644f594bc62ef5e8f6a812cef53f4f71",
+      "bytes": 540075
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/source-read-commands.json",
+      "sha256": "078520c604c2d9a476292264cd8aa058e51ec2447c5e6f9a1f42e6198b8a47b1",
+      "bytes": 365950
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep-check.json",
+      "sha256": "09dad1bdf7f6f9e40af72f7e232f8e99443bc077157aa0180efd1ec1a851ff7d",
+      "bytes": 1541778
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+      "sha256": "b8443b2286326f1b993c61354d268ba7fe39f1939d232a2dc8a633efd9fa3ce4",
+      "bytes": 23020
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/verification-commands.json",
+      "sha256": "68e870c2d1e122982d545422364694d918210f82a1ad6e7675beaaa04d3a9c0d",
+      "bytes": 941616
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/verification.json",
+      "sha256": "aac2b4c1a81ad7278e8bc0ebf9dd342996f7b2a1ec048d0a6e70b8ced294b9f9",
+      "bytes": 177964
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/verify.py",
+      "sha256": "2b8e7a138351cb956c782e19aae85c3194c278e59dd085e1bbbbb16a3139f80e",
+      "bytes": 8521
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json",
+      "sha256": "21c929a38c55acc934c2d7b2fb946a8102c751595c0b3bc21a80d971e89d805b",
+      "bytes": 4934358
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/checks.json",
+      "sha256": "b4bf6b2ae65b7ad1f1662a612dfcc85d94a6b6da393d01403e5fe1ebf6c734a4",
+      "bytes": 8500
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/deferred-rebinds.json",
+      "sha256": "cc48732f8084368f804b4fd331e80f6900cd19d77e9b01a97380f1d1e9a11d2b",
+      "bytes": 118781
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/merge-accounting.json",
+      "sha256": "9fd11fcaed97ece384454cae8798a21f2163246e9b2776fc87f65b106be507a9",
+      "bytes": 560014
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/receipt.json",
+      "sha256": "79ba03217fca562ef3f9afbfadde88cc9151a884be7242bbbc2b93edc7a01628",
+      "bytes": 12657
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json",
+      "sha256": "d41657b84741fdd6efe652df13f33d1fd1c9e6e7d847dea9a85e80ee70b32cb1",
+      "bytes": 3191689
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
+      "sha256": "5d6417422c11037c861150cc107313643c0aba0827c1d2202a101c692e545cc7",
+      "bytes": 450270
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/needs-writes.json",
+      "sha256": "6f5b829a533677d5b77d29e566bfffb3bbacd70f125acd01569779a342ac4a2f",
+      "bytes": 8047
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/receipt.json",
+      "sha256": "689269c33bd769c81c3e6ac65517d37338b3c9a78a116aeb300b6d1bb0cd6909",
+      "bytes": 7860
+    }
+  ],
+  "selfExcluded": true
+}

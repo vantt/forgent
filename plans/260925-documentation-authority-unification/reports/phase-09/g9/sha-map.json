@@ -1,0 +1,2618 @@
+{
+  "sourceCommit": "cd4f80eccbb5c44893daec58af416395d139494b",
+  "doerPinsRepinned": ["92260972cb2dc2ab3740859dc1c005bb9be42857", "a27d85d0a"],
+  "repinnedRecords": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import2/checks.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import2/deferred-rebinds.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import2/merge-accounting.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import2/receipt.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/needs-writes.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/receipt.json"
+  ],
+  "historicalExportPolicy": "Nine other patch-id-equal mappings and 24 unresolved old Work/measurement pins are discovery evidence only. Do not rewrite frozen state-path exports or historical measurements: they are not Doer replay pins. The unavailable array also includes blob/tree fields caught by the broad pin-name prefilter, not 37 missing source commits.",
+  "retainedBranchTwin": {
+    "ref": "keep/w1-d2-late-areas",
+    "oldCommit": "3bbfa5a803fcbce4e56ea0db25a9266e8105141a",
+    "newCommit": "e5af4c501e35b46a045d85c433755f0dd2cba064",
+    "oldPatchId": "d0228b2a7e6ecb3528fb1925033e1d2e2018e4fd",
+    "newPatchId": "d0228b2a7e6ecb3528fb1925033e1d2e2018e4fd",
+    "patchIdsEqual": true,
+    "action": "Equivalence recorded; no active pure JSON Doer pin to this side-branch commit was found. Do not delete the ref in this assignment."
+  },
+  "inputTreeComparison": {
+    "command": ["git", "diff", "--name-only", "92260972cb2dc2ab3740859dc1c005bb9be42857", "5965143b4fd56df6698b2096df1a672d26293c90", "--", "docs", "plans/260925-documentation-authority-unification/ledger", "scripts/check-legacy-docs-ratchet.exceptions.json"],
+    "exit": 0,
+    "stdout": ""
+  },
+  "outsideRecordScope": {
+    "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+    "field": "previousMainMergeAccounting.inputCommit",
+    "action": "Untouched frozen checker input, outside this brief's writable list. Lead retains this residual for Decision F retirement/current cutover accounting; this assignment does not claim w4 source-pin-provenance fully closed. Historical stdout/prose likewise remains verbatim."
+  },
+  "method": "stable git patch-id, exact equality; plan-ancestry candidate search by title; no title-only equivalence",
+  "scannedPureCommitTokens": 2696,
+  "alreadyAncestralTokens": 2624,
+  "mappings": [
+    {
+      "oldToken": "047f03fbb132f7bd76fbfe0ae5da22452172429a",
+      "oldCommit": "047f03fbb132f7bd76fbfe0ae5da22452172429a",
+      "subject": "docs(tsk-5vl): iron-law-evidence.md -- failing-test-first proof for catchup repoRoot fix",
+      "oldPatchId": "e95ecb90ba33af8c170b5192b3e1924db4fcea8c",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 27585,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "2656e7c9308cb29e2ef7ff827e44aa61d7a12425",
+          "patchId": "e95ecb90ba33af8c170b5192b3e1924db4fcea8c"
+        }
+      ],
+      "equalPlanCommits": [
+        "2656e7c9308cb29e2ef7ff827e44aa61d7a12425"
+      ],
+      "newCommit": "2656e7c9308cb29e2ef7ff827e44aa61d7a12425",
+      "newPatchId": "e95ecb90ba33af8c170b5192b3e1924db4fcea8c",
+      "patchIdsEqual": true
+    },
+    {
+      "oldToken": "0ea3d45f2bf5e688512f82de5ad52e183aeca72b",
+      "oldCommit": "0ea3d45f2bf5e688512f82de5ad52e183aeca72b",
+      "subject": "tsk-4e1: add iron-law evidence",
+      "oldPatchId": "e1aadfb8d14eff4dd6eb6290903d547059ac679e",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 32105,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "1c3052fa4a39873b36d81419153d89591734702e",
+          "patchId": "e1aadfb8d14eff4dd6eb6290903d547059ac679e"
+        }
+      ],
+      "equalPlanCommits": [
+        "1c3052fa4a39873b36d81419153d89591734702e"
+      ],
+      "newCommit": "1c3052fa4a39873b36d81419153d89591734702e",
+      "newPatchId": "e1aadfb8d14eff4dd6eb6290903d547059ac679e",
+      "patchIdsEqual": true
+    },
+    {
+      "oldToken": "3ecec74e00cbda3dae156eea4b80ede39d5c64d1",
+      "oldCommit": "3ecec74e00cbda3dae156eea4b80ede39d5c64d1",
+      "subject": "docs(tsk-25b): shape the split into two independently workable pieces",
+      "oldPatchId": "cb6b7a0550431d22181013d2ce0c61e669e4c073",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 28058,
+          "key": "branchHeadAtTake"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 28068,
+          "key": "branchHeadAtTake"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "3f103312f89447250942ca07fbe532f01a28e369",
+          "patchId": "cb6b7a0550431d22181013d2ce0c61e669e4c073"
+        }
+      ],
+      "equalPlanCommits": [
+        "3f103312f89447250942ca07fbe532f01a28e369"
+      ],
+      "newCommit": "3f103312f89447250942ca07fbe532f01a28e369",
+      "newPatchId": "cb6b7a0550431d22181013d2ce0c61e669e4c073",
+      "patchIdsEqual": true
+    },
+    {
+      "oldToken": "55f05b01453d9567cb6d0f7dac06574d1e68f625",
+      "oldCommit": "55f05b01453d9567cb6d0f7dac06574d1e68f625",
+      "subject": "docs(tsk-3cx): shape plan.md -- high-risk lane, split into driver + two launcher pieces",
+      "oldPatchId": "afea1e0fd7697a63784ef5471a4a591e1d319f25",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 27933,
+          "key": "branchHeadAtTake"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 27953,
+          "key": "branchHeadAtTake"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "091e9109af1cdfbcec106de67e0d1eca06a2fc92",
+          "patchId": "afea1e0fd7697a63784ef5471a4a591e1d319f25"
+        }
+      ],
+      "equalPlanCommits": [
+        "091e9109af1cdfbcec106de67e0d1eca06a2fc92"
+      ],
+      "newCommit": "091e9109af1cdfbcec106de67e0d1eca06a2fc92",
+      "newPatchId": "afea1e0fd7697a63784ef5471a4a591e1d319f25",
+      "patchIdsEqual": true
+    },
+    {
+      "oldToken": "80bdb894db4891cf07c9be29abf47a9df9e913c0",
+      "oldCommit": "80bdb894db4891cf07c9be29abf47a9df9e913c0",
+      "subject": "test(tsk-67g): move the ten environment-building tests out of checks.test.mjs",
+      "oldPatchId": "7d0f04367132a145023a3a6e57cbcb629d65d15e",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 28069,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "518e031ca3340425c02146c28dd3381253eb43ed",
+          "patchId": "7d0f04367132a145023a3a6e57cbcb629d65d15e"
+        }
+      ],
+      "equalPlanCommits": [
+        "518e031ca3340425c02146c28dd3381253eb43ed"
+      ],
+      "newCommit": "518e031ca3340425c02146c28dd3381253eb43ed",
+      "newPatchId": "7d0f04367132a145023a3a6e57cbcb629d65d15e",
+      "patchIdsEqual": true
+    },
+    {
+      "oldToken": "8ab621cdebdca4f1c3ce1177a07f1964ee2f788c",
+      "oldCommit": "8ab621cdebdca4f1c3ce1177a07f1964ee2f788c",
+      "subject": "docs(tsk-516): Iron Law evidence -- failing-before/passing-after transcripts",
+      "oldPatchId": "5cb7b36ca81934f2052be12dd5044dd2dba99da3",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 27660,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "3a1aabe7c2f1a5917da20575421a971b815ba413",
+          "patchId": "5cb7b36ca81934f2052be12dd5044dd2dba99da3"
+        }
+      ],
+      "equalPlanCommits": [
+        "3a1aabe7c2f1a5917da20575421a971b815ba413"
+      ],
+      "newCommit": "3a1aabe7c2f1a5917da20575421a971b815ba413",
+      "newPatchId": "5cb7b36ca81934f2052be12dd5044dd2dba99da3",
+      "patchIdsEqual": true
+    },
+    {
+      "oldToken": "92260972cb2dc2ab3740859dc1c005bb9be42857",
+      "oldCommit": "92260972cb2dc2ab3740859dc1c005bb9be42857",
+      "subject": "docs(plan): record the second import's navigation blocker and current drift",
+      "oldPatchId": "585be0a439f62fe3c25787d27bb35ba6714bd426",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json",
+          "line": 2,
+          "key": "sourceHEAD"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/checks.json",
+          "line": 2,
+          "key": "sourceHEAD"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/deferred-rebinds.json",
+          "line": 2,
+          "key": "inputHEAD"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/merge-accounting.json",
+          "line": 2,
+          "key": "inputHEAD"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/receipt.json",
+          "line": 5,
+          "key": "sourceHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/receipt.json",
+          "line": 30,
+          "key": "authorSourcePin"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json",
+          "line": 4,
+          "key": "head"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
+          "line": 4,
+          "key": "sourcePin"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "5965143b4fd56df6698b2096df1a672d26293c90",
+          "patchId": "585be0a439f62fe3c25787d27bb35ba6714bd426"
+        }
+      ],
+      "equalPlanCommits": [
+        "5965143b4fd56df6698b2096df1a672d26293c90"
+      ],
+      "newCommit": "5965143b4fd56df6698b2096df1a672d26293c90",
+      "newPatchId": "585be0a439f62fe3c25787d27bb35ba6714bd426",
+      "patchIdsEqual": true
+    },
+    {
+      "oldToken": "a27d85d0a",
+      "oldCommit": "a27d85d0a8b83572f911800b3495463d1ac8fa4c",
+      "subject": "docs(plan): unify binding hashes and refresh the reviewed residuals",
+      "oldPatchId": "e8e4a00af1052903cf32138b24e9ac62835ee7bd",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/needs-writes.json",
+          "line": 4,
+          "key": "continuationSourceCommit"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/receipt.json",
+          "line": 5,
+          "key": "continuationSourceCommit"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "e7074223277e2879d6599f57656037f8efa31ee9",
+          "patchId": "e8e4a00af1052903cf32138b24e9ac62835ee7bd"
+        }
+      ],
+      "equalPlanCommits": [
+        "e7074223277e2879d6599f57656037f8efa31ee9"
+      ],
+      "newCommit": "e7074223277e2879d6599f57656037f8efa31ee9",
+      "newPatchId": "e8e4a00af1052903cf32138b24e9ac62835ee7bd",
+      "patchIdsEqual": true
+    },
+    {
+      "oldToken": "a49d407c63eb30e770d8947f663e5ef36a284600",
+      "oldCommit": "a49d407c63eb30e770d8947f663e5ef36a284600",
+      "subject": "docs(tsk-54j): add iron law evidence for the area spec",
+      "oldPatchId": "84b8c581380296c78fd596b72ae0b3111903e23e",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 28865,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "f4957151f00a7d6210765a3653b7b2425ec25713",
+          "patchId": "84b8c581380296c78fd596b72ae0b3111903e23e"
+        }
+      ],
+      "equalPlanCommits": [
+        "f4957151f00a7d6210765a3653b7b2425ec25713"
+      ],
+      "newCommit": "f4957151f00a7d6210765a3653b7b2425ec25713",
+      "newPatchId": "84b8c581380296c78fd596b72ae0b3111903e23e",
+      "patchIdsEqual": true
+    },
+    {
+      "oldToken": "b3144f7d5e6c8038fe543b5a850d8d2066a15818",
+      "oldCommit": "b3144f7d5e6c8038fe543b5a850d8d2066a15818",
+      "subject": "refactor(tsk-3i4): make retro-next a launcher that hands its picked item to the driver",
+      "oldPatchId": "44d285a2469be735ac33ae5fddb706b1655145a0",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 27944,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "a8475c465c907d2d9af8cd8c1a2e49fc84e0ed9b",
+          "patchId": "44d285a2469be735ac33ae5fddb706b1655145a0"
+        }
+      ],
+      "equalPlanCommits": [
+        "a8475c465c907d2d9af8cd8c1a2e49fc84e0ed9b"
+      ],
+      "newCommit": "a8475c465c907d2d9af8cd8c1a2e49fc84e0ed9b",
+      "newPatchId": "44d285a2469be735ac33ae5fddb706b1655145a0",
+      "patchIdsEqual": true
+    },
+    {
+      "oldToken": "f6b152ecfaaeafef5708269ccb87177df7ef73e9",
+      "oldCommit": "f6b152ecfaaeafef5708269ccb87177df7ef73e9",
+      "subject": "docs(tsk-kia): give cleanup-next the shared stop-reason marker line, pin its exit-code branch as deliberate",
+      "oldPatchId": "a4198cef3536206e5b866f03685bf30cee9410e2",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 27954,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "5d20ca5620d90f419da157c45c86bcdc9c37f4a2",
+          "patchId": "a4198cef3536206e5b866f03685bf30cee9410e2"
+        }
+      ],
+      "equalPlanCommits": [
+        "5d20ca5620d90f419da157c45c86bcdc9c37f4a2"
+      ],
+      "newCommit": "5d20ca5620d90f419da157c45c86bcdc9c37f4a2",
+      "newPatchId": "a4198cef3536206e5b866f03685bf30cee9410e2",
+      "patchIdsEqual": true
+    }
+  ],
+  "unresolved": [
+    {
+      "oldToken": "0624ee54f842d5c9e8e31514661cc517310c70f8",
+      "oldCommit": "0624ee54f842d5c9e8e31514661cc517310c70f8",
+      "subject": "feat(examples): add dispatch-proof-agy reverseString demo (tsk-1fk)",
+      "oldPatchId": "9299540f4972e1e6c8b7b361afd25848753aa930",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 30416,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "10efc5ec33a5a7e2f2dd4eeb9f38b4ce6fc74ee6",
+      "oldCommit": "10efc5ec33a5a7e2f2dd4eeb9f38b4ce6fc74ee6",
+      "subject": "merge main into fgw/tsk-6av: pick up tsk-oet/tsk-6al regression fix before return (tsk-6av)",
+      "oldPatchId": null,
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 32589,
+          "key": "branchHeadAtTake"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "168ba03d990dedd82d11871d6d9e853b1e54f700",
+      "oldCommit": "168ba03d990dedd82d11871d6d9e853b1e54f700",
+      "subject": "docs(tsk-1fp-6): fold superseding decision D6 into distribution spec body",
+      "oldPatchId": "3961bfa545d3e81cb28c189fb278627cc25455b3",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 30626,
+          "key": "branchHeadAtTake"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "18ecdd32f06758d8d6270ea830b6acc2bfbde39c",
+      "oldCommit": "18ecdd32f06758d8d6270ea830b6acc2bfbde39c",
+      "subject": "test(tsk-3um): split the CLI suite into ten files so it stops governing wall-clock",
+      "oldPatchId": "2c75607d35fd452622f5cfe68b2bdf571687bf96",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 28059,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "a20c69ef32325e597d10f3ea154cd66b8b4438af",
+          "patchId": "00b7db0a5377cbc41b2a7c799ca2e8268136a16c"
+        }
+      ],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "21cb56c58b701c5a872919b4d06d4b342471d0b2",
+      "oldCommit": "21cb56c58b701c5a872919b4d06d4b342471d0b2",
+      "subject": "fix(herdr-plugin): on-demand fg:operation panes, fix dead double-launch guard (tsk-3fk)",
+      "oldPatchId": "dadbd8ec9622209aa3a4cd90c820a5c1328ea617",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 28173,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "2968682e745c1749fad065bba0274c89bb492cfd",
+      "oldCommit": "2968682e745c1749fad065bba0274c89bb492cfd",
+      "subject": "docs(tsk-3f9): Iron Law evidence for launcher-vocabulary-guard fix",
+      "oldPatchId": "6c150c5b198feccee132a54ab6b1e48764791e2e",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 27181,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "2cb75d198c24aaa401783516cc61ad1138c9cc08",
+      "oldCommit": "2cb75d198c24aaa401783516cc61ad1138c9cc08",
+      "subject": "docs(tsk-5l0): Iron Law failing-test-first evidence",
+      "oldPatchId": "ddf2a6e512bc0320c7607094bc250384453135a5",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 34356,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "2fe1a7970a457bfbc1eb0fbe8b3a9c6111413990",
+      "oldCommit": "2fe1a7970a457bfbc1eb0fbe8b3a9c6111413990",
+      "subject": "catch-up: merge main into fgw/tsk-1z1",
+      "oldPatchId": null,
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 31487,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "3ffef038fc2e6b035540e132ac9bc636ce5ececc",
+      "oldCommit": "3ffef038fc2e6b035540e132ac9bc636ce5ececc",
+      "subject": "feat(tsk-ogx): doctor check for domain workflow stage/skillMap coverage",
+      "oldPatchId": "98ea7811980c77ee93bdcebe4f52e6b44929d1a5",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 30274,
+          "key": "headAtReturn"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "a52e2b66834aa95cc5705ac649ab38643cb8a8db",
+          "patchId": "8f802715e2bed6cddad69537a3d144da63abbe8d"
+        }
+      ],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "48fe78afd8f37d4f217ba01ea8bf68d7e4eefb3e",
+      "oldCommit": "48fe78afd8f37d4f217ba01ea8bf68d7e4eefb3e",
+      "subject": "fix(routing): edit the true skill source, not the generated render target (tsk-4dk-2)",
+      "oldPatchId": "70496aba745758ad47b834c81344bf9b7b475139",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 32513,
+          "key": "branchHeadAtTake"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 32514,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "5d444b5a90a70a66549b00b27f0252a2b134aea1",
+      "oldCommit": "5d444b5a90a70a66549b00b27f0252a2b134aea1",
+      "subject": "Merge branch 'fgw/tsk-2sr' into HEAD",
+      "oldPatchId": null,
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 27943,
+          "key": "branchHeadAtTake"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "6543c9bb67bd06a69d5486fa0d2432e948d5a656",
+      "oldCommit": "6543c9bb67bd06a69d5486fa0d2432e948d5a656",
+      "subject": "fix(tsk-4wt): refuse bare docs-index from a linked worktree",
+      "oldPatchId": "bb9a4a35269bbfc6498a170feae8af640d5cb3ab",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 23712,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "715357777913a11d7bc208de74858dbace5d9bd9",
+      "oldCommit": "715357777913a11d7bc208de74858dbace5d9bd9",
+      "subject": "docs(tsk-4dk): finalize plan — split into catch-up sweep + advisory visibility",
+      "oldPatchId": "9787ad8ecafddceea0eee9c09a1dd64f3669c99a",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 32504,
+          "key": "branchHeadAtTake"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "915033afb0744cd71435aee5f7abb64f026324e1",
+      "oldCommit": "915033afb0744cd71435aee5f7abb64f026324e1",
+      "subject": "feat(tsk-cgg): add events.jsonl truncation guard, catching git stash/checkout/reset/clean loss",
+      "oldPatchId": "1d182f0e98a660fd318db0d9817a202fba3ebc93",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 27768,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "4845367005578c7feefa9595a2ac44bae4bc206c",
+          "patchId": "e3cb2e4f0f690f03d3031550fae3b3ccc2025821"
+        }
+      ],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "93d8e653c8ae3a7d5094e17d8ab58e16580b1e17",
+      "oldCommit": "93d8e653c8ae3a7d5094e17d8ab58e16580b1e17",
+      "subject": "refactor(tsk-2sr): resolve the driver advance-axis from item position, make awaiting-approval an overridable ceiling",
+      "oldPatchId": "ce5f4f61fd583db109d85c71c510a6f0020b1b8a",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 27934,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [
+        {
+          "commit": "7cd06e835aa09701fe3b84c2f3305dca19e53f84",
+          "patchId": "e40f16f5896acb9d176c2677051232c19e82944d"
+        }
+      ],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "99f244d89e490a4af39cacaefd63f724a8f4dd7b",
+      "oldCommit": "99f244d89e490a4af39cacaefd63f724a8f4dd7b",
+      "subject": "docs(tsk-4wt): shape plan.md for docs-index worktree-null fix",
+      "oldPatchId": "8a5f3c4adef0a3a5dd70bbec2179b58744ffec42",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 23710,
+          "key": "headAtTake"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "c1589cf55b7797f3819c0929fceeab8a205bf5c4",
+      "oldCommit": "c1589cf55b7797f3819c0929fceeab8a205bf5c4",
+      "subject": "fix(state): lock and monotonic guard writeGuardMark (tsk-5ie)",
+      "oldPatchId": "5fbc58a13c630ff73346b35c610dc91eb2920956",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 34369,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "c7a3282acd8953d70ed53e08ed358fe585e4683e",
+      "oldCommit": "c7a3282acd8953d70ed53e08ed358fe585e4683e",
+      "subject": "chore(fgos): retro-loop sweep — synthesize 14 retrospective items",
+      "oldPatchId": "6135826e20fa1fa9a3d77b37fc6d3a62fdc2cb71",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 23485,
+          "key": "branchHeadAtTake"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 23486,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "cc69b1b30ee224e7618319fb2da714d394343733",
+      "oldCommit": "cc69b1b30ee224e7618319fb2da714d394343733",
+      "subject": "docs(tsk-2c2): Iron Law evidence -- failing-before/passing-after transcript",
+      "oldPatchId": "b3ae79f4fd52e7a1e2ecb217cf1751c36d6f6e58",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 26401,
+          "key": "branchHeadAtTake"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 26402,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "d19ca14f84d362c11ee6fb6fa633ab20d9e29a79",
+      "oldCommit": "d19ca14f84d362c11ee6fb6fa633ab20d9e29a79",
+      "subject": "plan(smoke-tsk-56w-2-child): pass-through plan for fanout smoke-test chore",
+      "oldPatchId": "d11cf873ab5bfcee1ac289c0eca53f47886b7f28",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 31437,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "d893da2ff7aeac94b736a1cb59bc1c04d5897cdc",
+      "oldCommit": "d893da2ff7aeac94b736a1cb59bc1c04d5897cdc",
+      "subject": "merge main into fgw/tsk-4n7: pick up already-completed children tsk-3wl/tsk-bvh",
+      "oldPatchId": null,
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 26298,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "e448723d51d7b4118cc33931f1524d3f41687b8f",
+      "oldCommit": "e448723d51d7b4118cc33931f1524d3f41687b8f",
+      "subject": "tsk-4dc: write planning-stage plan.md and retroactive RESEARCH.md (mode tiny)",
+      "oldPatchId": "b2481af82e18050e54bd1a8d11454058be976282",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 33445,
+          "key": "branchHeadAtTake"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "e5c468aba138b68207412cdef20a8acbf80a17c5",
+      "oldCommit": "e5c468aba138b68207412cdef20a8acbf80a17c5",
+      "subject": "measurement tree: e6cd1f07ca29b6afc173644e359ec25fd8b2f02b without committed phase-02 inventory artifacts",
+      "oldPatchId": "bdf959a59b3a92188777de3e82690658daa6d0f0",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/resync-261006/inventory-comparison.json",
+          "line": 7,
+          "key": "commit"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/resync-261006/inventory-comparison.json",
+          "line": 72,
+          "key": "commit"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    },
+    {
+      "oldToken": "fa535b36578a6cfa87f8667dbe41cba058e53052",
+      "oldCommit": "fa535b36578a6cfa87f8667dbe41cba058e53052",
+      "subject": "docs(skills): sharpen fgos-fanout Known hazard with dual-pointer finding (tsk-4o7)",
+      "oldPatchId": "dd33a9185cb4c93fe5b90742dffe0a2940cf79df",
+      "occurrences": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 32121,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "candidates": [],
+      "equalPlanCommits": [],
+      "reason": "no uniquely patch-id-equal ancestor found; do not repin"
+    }
+  ],
+  "unavailable": [
+    {
+      "token": "080e7ccad88dbbfa472be335759efc991b150ce1",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-70-merge-rebindings.json",
+          "line": 2,
+          "key": "inputHEAD"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "087261fbdea2cb5d4ca6ce644172b9024b757161",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 23685,
+          "key": "headAtTake"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "0ed877f5dd4a3d91155c5c1c6e383b4d67ae7ae6",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/attempt-1/rehearsal.json",
+          "line": 50,
+          "key": "commit"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "0f9619f2952d8353b1eb6e67343d47bddf3870f2",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 31574,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "128539f8039584dfe15fa0d19b1b56087be9e49a",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 15,
+          "key": "HEADBlob"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 16,
+          "key": "mainPinBlob"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "21f0e83d6ce48418cc1c86e97de3a7a6ffb7fb03",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/initial-w2-post-move-replay.json",
+          "line": 7394,
+          "key": "fixtureCommit"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "2855e090550a50b67409ba2f1a771071618ab944",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal.json",
+          "line": 17,
+          "key": "commit"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "2be28c51e38df6bbe8df740a56ccf7f336875b2f",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-classification-verification.json",
+          "line": 611,
+          "key": "receiptCommit"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "2e2fe74304bb6732b0307bb822c338d93dbc7569",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-triage-1276467f3.md.json",
+          "line": 752,
+          "key": "headBlob"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/step8-carriage-accounting.json",
+          "line": 678,
+          "key": "headBlob"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/step8-triage.json",
+          "line": 671,
+          "key": "headBlob"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "2f23dfc46aae5d3012bb762e0abb23c665c5692b",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 31581,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "4fe78f4eb8106cb412a109abf9b47fb6ebbef426",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 20,
+          "key": "HEADBlob"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 21,
+          "key": "mainPinBlob"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "5ac81d8dcf4ecb311a13b343b87545acc131b58b",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-classification-verification.json",
+          "line": 612,
+          "key": "reportCommit"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "5c60928919f4681bd6ad2be67c2665b662c1526e",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 31567,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "63a2cb78586805cfccd765b8f6a814351281c6d5",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-triage-1276467f3.md.json",
+          "line": 855,
+          "key": "headBlob"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/step8-carriage-accounting.json",
+          "line": 795,
+          "key": "headBlob"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/step8-triage.json",
+          "line": 771,
+          "key": "headBlob"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "65b13dc28aad7f55611284cf583ecb950ce653fe",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 30,
+          "key": "HEADBlob"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 31,
+          "key": "mainPinBlob"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "67668fc9db514f50dcb38af4aa0bedd76f160838",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 35,
+          "key": "HEADBlob"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 36,
+          "key": "mainPinBlob"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "6c21d329290ef9d31c87471f91ceb7c2ae02eb44",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-author-checks.json",
+          "line": 200,
+          "key": "headBlob"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "6e8edbbf2e2bceec0918895fe8941e3d4139b75f",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 28887,
+          "key": "branchHeadAtReturn"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "77894fdd",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-ui-render.json",
+          "line": 7,
+          "key": "committed"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "91994c2dfecde49a53707884476340eb4d6dab95",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-01/part-01.json",
+          "line": 1677,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-02/part-01.json",
+          "line": 1677,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 639,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 448,
+          "key": "treeObjectAtHead"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "95ac7071400d96f0f443338cadb60fbb72d5e800",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 24960,
+          "key": "headAtTake"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "9a32c086a8aef423aa75fff2cc35ce6e785de7fe",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/attempt-1/rehearsal.json",
+          "line": 17,
+          "key": "commit"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "9a4bb6234e160823979b43df102c5bc399fec217",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal.json",
+          "line": 4,
+          "key": "archiveCommit"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "9fde1adb5591f83112c9fae0fbaf294ae65281b3",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 24961,
+          "key": "headAtReturn"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "a0b53acb71176399ed1242aa1e5a9f0e5a70fa2d",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 23653,
+          "key": "branchHeadAtTake"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "a1417c009fb4e4a5f7b8503bd7d75f78acc40c63",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-01/part-01.json",
+          "line": 1663,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-02/part-01.json",
+          "line": 1663,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 625,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 434,
+          "key": "treeObjectAtHead"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "a72613549cb484e4c368325d1e5bb8248b2f9cb3",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal.json",
+          "line": 5,
+          "key": "removalCommit"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal.json",
+          "line": 62103,
+          "key": "removalCommit"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal.json",
+          "line": 62124,
+          "key": "removalCommit"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "af09a76635ca155bc507c3bc76ef0bccdfeb7085",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal.json",
+          "line": 30792,
+          "key": "commit"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "c30222425e7e6fe6d19f4d8ac457a0d531da2ee1",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-state-path-export-v2.json",
+          "line": 23043,
+          "key": "branchHeadAtTake"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "ce7737fe3b4659867ab309107ae9ed763b494354",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w2-post-move-replay.json",
+          "line": 7394,
+          "key": "fixtureCommit"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "cf882633907b929f28094d2f0621fe8133a7e621",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 911,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 979,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1047,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1115,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1183,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1251,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1319,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1387,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1455,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1523,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1591,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1659,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1727,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1795,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1863,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+          "line": 1931,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 621,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 668,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 715,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 762,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 809,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 856,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 903,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 950,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 997,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 1044,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 1091,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 1138,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 1185,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 1232,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 1279,
+          "key": "treeObjectAtHead"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+          "line": 1326,
+          "key": "treeObjectAtHead"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "dabe4ca279462e2f206e3a7fbfeda160c0967805",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 45,
+          "key": "HEADBlob"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 46,
+          "key": "mainPinBlob"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "ddfa78cc7183cf1f7db8ee64d2339653a0aa0023",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-carriage-accounting.json",
+          "line": 1518,
+          "key": "headBlob"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-source-blobs.json",
+          "line": 7,
+          "key": "headBlob"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "e767e56ee0587655d752ed30f3ce39681f626eea",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/attempt-1/rehearsal.json",
+          "line": 4,
+          "key": "archiveCommit"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "e868f0da911a5400516bfae06442431cb07dec67",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 25,
+          "key": "HEADBlob"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 26,
+          "key": "mainPinBlob"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "fb7a9f3afc913fc6229c6073064add731c66a80d",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 40,
+          "key": "HEADBlob"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-suite-attribution.json",
+          "line": 41,
+          "key": "mainPinBlob"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    },
+    {
+      "token": "fe9b2780651a79da8190586df56e659f0a707b39",
+      "sites": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/attempt-1/rehearsal.json",
+          "line": 5,
+          "key": "removalCommit"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/attempt-1/rehearsal.json",
+          "line": 659,
+          "key": "removalCommit"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/attempt-1/rehearsal.json",
+          "line": 680,
+          "key": "removalCommit"
+        }
+      ],
+      "reason": "not a locally resolvable commit"
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "047f03fbb132f7bd76fbfe0ae5da22452172429a"
+      ],
+      "exit": 0,
+      "stdoutSha256": "b1079d6f41c8afcb56eb643264bac4077d109d9df3099e5591eeac482a6cc69e"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "047f03fbb132f7bd76fbfe0ae5da22452172429a",
+      "exit": 0,
+      "stdout": "e95ecb90ba33af8c170b5192b3e1924db4fcea8c 047f03fbb132f7bd76fbfe0ae5da22452172429a\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "2656e7c9308cb29e2ef7ff827e44aa61d7a12425"
+      ],
+      "exit": 0,
+      "stdoutSha256": "b67b8aceea88d9234baa7bb2022006d9c641a8e37b487c9ca3fe04498cc3bca8"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "2656e7c9308cb29e2ef7ff827e44aa61d7a12425",
+      "exit": 0,
+      "stdout": "e95ecb90ba33af8c170b5192b3e1924db4fcea8c 2656e7c9308cb29e2ef7ff827e44aa61d7a12425\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "0624ee54f842d5c9e8e31514661cc517310c70f8"
+      ],
+      "exit": 0,
+      "stdoutSha256": "5b8ae20fc62678556825d8295c9be31cd82242a365410b91fb54a602c0a927f2"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "0624ee54f842d5c9e8e31514661cc517310c70f8",
+      "exit": 0,
+      "stdout": "9299540f4972e1e6c8b7b361afd25848753aa930 0624ee54f842d5c9e8e31514661cc517310c70f8\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "0ea3d45f2bf5e688512f82de5ad52e183aeca72b"
+      ],
+      "exit": 0,
+      "stdoutSha256": "624560fcced97a9d39e641f96a58ddd8994d44de3e9b361dd4aa9a36754dfc96"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "0ea3d45f2bf5e688512f82de5ad52e183aeca72b",
+      "exit": 0,
+      "stdout": "e1aadfb8d14eff4dd6eb6290903d547059ac679e 0ea3d45f2bf5e688512f82de5ad52e183aeca72b\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "1c3052fa4a39873b36d81419153d89591734702e"
+      ],
+      "exit": 0,
+      "stdoutSha256": "120182f3bb1770d798d4ee17ec83265bd72507c0e0f147eb5de21ffc7e1ee45e"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "1c3052fa4a39873b36d81419153d89591734702e",
+      "exit": 0,
+      "stdout": "e1aadfb8d14eff4dd6eb6290903d547059ac679e 1c3052fa4a39873b36d81419153d89591734702e\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "10efc5ec33a5a7e2f2dd4eeb9f38b4ce6fc74ee6"
+      ],
+      "exit": 0,
+      "stdoutSha256": "5606cc81a93f5cfc9b15caac7ec6374b3c3764a66d8b6c44ba815d389a0877f6"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "10efc5ec33a5a7e2f2dd4eeb9f38b4ce6fc74ee6",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "168ba03d990dedd82d11871d6d9e853b1e54f700"
+      ],
+      "exit": 0,
+      "stdoutSha256": "818da3b03618a2b9fba9c8ad627c9bee7ef8f6bc9ee7937225251da3eca63c5a"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "168ba03d990dedd82d11871d6d9e853b1e54f700",
+      "exit": 0,
+      "stdout": "3961bfa545d3e81cb28c189fb278627cc25455b3 168ba03d990dedd82d11871d6d9e853b1e54f700\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "18ecdd32f06758d8d6270ea830b6acc2bfbde39c"
+      ],
+      "exit": 0,
+      "stdoutSha256": "692539fe2a239799f63de878be28ebb106eeb565e63199f340a0818884200622"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "18ecdd32f06758d8d6270ea830b6acc2bfbde39c",
+      "exit": 0,
+      "stdout": "2c75607d35fd452622f5cfe68b2bdf571687bf96 18ecdd32f06758d8d6270ea830b6acc2bfbde39c\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "a20c69ef32325e597d10f3ea154cd66b8b4438af"
+      ],
+      "exit": 0,
+      "stdoutSha256": "2e7c63f46a3d228b55cea98d5bd275fd07ffaef78b9415191f73eeac0fc29418"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "a20c69ef32325e597d10f3ea154cd66b8b4438af",
+      "exit": 0,
+      "stdout": "00b7db0a5377cbc41b2a7c799ca2e8268136a16c a20c69ef32325e597d10f3ea154cd66b8b4438af\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "21cb56c58b701c5a872919b4d06d4b342471d0b2"
+      ],
+      "exit": 0,
+      "stdoutSha256": "591123a2ab38184d8a286151077ee57aec95131dfb47ca2242e282a2b79dcfd1"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "21cb56c58b701c5a872919b4d06d4b342471d0b2",
+      "exit": 0,
+      "stdout": "dadbd8ec9622209aa3a4cd90c820a5c1328ea617 21cb56c58b701c5a872919b4d06d4b342471d0b2\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "2968682e745c1749fad065bba0274c89bb492cfd"
+      ],
+      "exit": 0,
+      "stdoutSha256": "669061fd443a431015fc53c36ab99dd0587f1c7a8f9922645ed96403f641b1a7"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "2968682e745c1749fad065bba0274c89bb492cfd",
+      "exit": 0,
+      "stdout": "6c150c5b198feccee132a54ab6b1e48764791e2e 2968682e745c1749fad065bba0274c89bb492cfd\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "2cb75d198c24aaa401783516cc61ad1138c9cc08"
+      ],
+      "exit": 0,
+      "stdoutSha256": "ce055ca4933e2776f45d446fead6f2bc7204bfd5e73893382b84ba4c06fcf878"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "2cb75d198c24aaa401783516cc61ad1138c9cc08",
+      "exit": 0,
+      "stdout": "ddf2a6e512bc0320c7607094bc250384453135a5 2cb75d198c24aaa401783516cc61ad1138c9cc08\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "2fe1a7970a457bfbc1eb0fbe8b3a9c6111413990"
+      ],
+      "exit": 0,
+      "stdoutSha256": "4e9f8d0f43f6880c53e29769482ce5cf9af49ba3d0ef6ec41587df353122a946"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "2fe1a7970a457bfbc1eb0fbe8b3a9c6111413990",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "3ecec74e00cbda3dae156eea4b80ede39d5c64d1"
+      ],
+      "exit": 0,
+      "stdoutSha256": "d162ab28ebe880856486ef36805f485b191c22bfa56a8ba9135c222c8fc53846"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "3ecec74e00cbda3dae156eea4b80ede39d5c64d1",
+      "exit": 0,
+      "stdout": "cb6b7a0550431d22181013d2ce0c61e669e4c073 3ecec74e00cbda3dae156eea4b80ede39d5c64d1\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "3f103312f89447250942ca07fbe532f01a28e369"
+      ],
+      "exit": 0,
+      "stdoutSha256": "479c5694dbb14b17849c1dbd28b031a2a2eafcfe7a524b7ea6428459d71e0c7b"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "3f103312f89447250942ca07fbe532f01a28e369",
+      "exit": 0,
+      "stdout": "cb6b7a0550431d22181013d2ce0c61e669e4c073 3f103312f89447250942ca07fbe532f01a28e369\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "3ffef038fc2e6b035540e132ac9bc636ce5ececc"
+      ],
+      "exit": 0,
+      "stdoutSha256": "0d9d478d1b39e4b9c2abd7c8c86c7c89756edf7d834381577ba4107e4f863db8"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "3ffef038fc2e6b035540e132ac9bc636ce5ececc",
+      "exit": 0,
+      "stdout": "98ea7811980c77ee93bdcebe4f52e6b44929d1a5 3ffef038fc2e6b035540e132ac9bc636ce5ececc\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "a52e2b66834aa95cc5705ac649ab38643cb8a8db"
+      ],
+      "exit": 0,
+      "stdoutSha256": "9c679e22e3e054f6f85d474cf68411ae10ed5d4e0ca42ec3eff290ca69b6ab56"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "a52e2b66834aa95cc5705ac649ab38643cb8a8db",
+      "exit": 0,
+      "stdout": "8f802715e2bed6cddad69537a3d144da63abbe8d a52e2b66834aa95cc5705ac649ab38643cb8a8db\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "48fe78afd8f37d4f217ba01ea8bf68d7e4eefb3e"
+      ],
+      "exit": 0,
+      "stdoutSha256": "ac6d980e2dd7de666efa13e0836e3f427c820a0b5208e28ff3b1d6a818ec4304"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "48fe78afd8f37d4f217ba01ea8bf68d7e4eefb3e",
+      "exit": 0,
+      "stdout": "70496aba745758ad47b834c81344bf9b7b475139 48fe78afd8f37d4f217ba01ea8bf68d7e4eefb3e\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "55f05b01453d9567cb6d0f7dac06574d1e68f625"
+      ],
+      "exit": 0,
+      "stdoutSha256": "09df5568ec728c729841e435716e976708ddecc0983d31f4104e12f070ade339"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "55f05b01453d9567cb6d0f7dac06574d1e68f625",
+      "exit": 0,
+      "stdout": "afea1e0fd7697a63784ef5471a4a591e1d319f25 55f05b01453d9567cb6d0f7dac06574d1e68f625\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "091e9109af1cdfbcec106de67e0d1eca06a2fc92"
+      ],
+      "exit": 0,
+      "stdoutSha256": "daa711ea90099620e1a8e902788e9be5a231692ecd098abf8c05d8975d43197d"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "091e9109af1cdfbcec106de67e0d1eca06a2fc92",
+      "exit": 0,
+      "stdout": "afea1e0fd7697a63784ef5471a4a591e1d319f25 091e9109af1cdfbcec106de67e0d1eca06a2fc92\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "5d444b5a90a70a66549b00b27f0252a2b134aea1"
+      ],
+      "exit": 0,
+      "stdoutSha256": "0ac38ff2cf0f627ddfc5a92e107ebc8e9fff9af537649372e2504054130da785"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "5d444b5a90a70a66549b00b27f0252a2b134aea1",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "6543c9bb67bd06a69d5486fa0d2432e948d5a656"
+      ],
+      "exit": 0,
+      "stdoutSha256": "08c14206a33635b34afec7da6b5814382022327009b329f1136f340565522263"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "6543c9bb67bd06a69d5486fa0d2432e948d5a656",
+      "exit": 0,
+      "stdout": "bb9a4a35269bbfc6498a170feae8af640d5cb3ab 6543c9bb67bd06a69d5486fa0d2432e948d5a656\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "715357777913a11d7bc208de74858dbace5d9bd9"
+      ],
+      "exit": 0,
+      "stdoutSha256": "1b48825eb2ddde205e2316f8a8fb254b2b0014312c5ad38c026c0ae98b06a6c4"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "715357777913a11d7bc208de74858dbace5d9bd9",
+      "exit": 0,
+      "stdout": "9787ad8ecafddceea0eee9c09a1dd64f3669c99a 715357777913a11d7bc208de74858dbace5d9bd9\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "80bdb894db4891cf07c9be29abf47a9df9e913c0"
+      ],
+      "exit": 0,
+      "stdoutSha256": "bdb1282aae6ee992506bbad91f2bf92f7e7e65157d32a3ee9ae0368bb2e64d97"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "80bdb894db4891cf07c9be29abf47a9df9e913c0",
+      "exit": 0,
+      "stdout": "7d0f04367132a145023a3a6e57cbcb629d65d15e 80bdb894db4891cf07c9be29abf47a9df9e913c0\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "518e031ca3340425c02146c28dd3381253eb43ed"
+      ],
+      "exit": 0,
+      "stdoutSha256": "372ecbae4d8c108955af8018518968320efa6f65f66f4ac7ff01d797763e9eaf"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "518e031ca3340425c02146c28dd3381253eb43ed",
+      "exit": 0,
+      "stdout": "7d0f04367132a145023a3a6e57cbcb629d65d15e 518e031ca3340425c02146c28dd3381253eb43ed\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "8ab621cdebdca4f1c3ce1177a07f1964ee2f788c"
+      ],
+      "exit": 0,
+      "stdoutSha256": "e75b7d8740420cd4b67abade77f1645721858104e9f35260afbac6fca1b300b5"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "8ab621cdebdca4f1c3ce1177a07f1964ee2f788c",
+      "exit": 0,
+      "stdout": "5cb7b36ca81934f2052be12dd5044dd2dba99da3 8ab621cdebdca4f1c3ce1177a07f1964ee2f788c\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "3a1aabe7c2f1a5917da20575421a971b815ba413"
+      ],
+      "exit": 0,
+      "stdoutSha256": "a9ad5cb643dd83f85498c2d1b83ecb749e64bec63d3e579a713871b1bdbdaca0"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "3a1aabe7c2f1a5917da20575421a971b815ba413",
+      "exit": 0,
+      "stdout": "5cb7b36ca81934f2052be12dd5044dd2dba99da3 3a1aabe7c2f1a5917da20575421a971b815ba413\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "915033afb0744cd71435aee5f7abb64f026324e1"
+      ],
+      "exit": 0,
+      "stdoutSha256": "e44f91f51647d39470b45a0e846d7da8ed35e30ddd38df2e7e05620f0e15c8dd"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "915033afb0744cd71435aee5f7abb64f026324e1",
+      "exit": 0,
+      "stdout": "1d182f0e98a660fd318db0d9817a202fba3ebc93 915033afb0744cd71435aee5f7abb64f026324e1\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "4845367005578c7feefa9595a2ac44bae4bc206c"
+      ],
+      "exit": 0,
+      "stdoutSha256": "0336408d3391915dc6acb819f41796cc56d044e257b51b4705c6988061506112"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "4845367005578c7feefa9595a2ac44bae4bc206c",
+      "exit": 0,
+      "stdout": "e3cb2e4f0f690f03d3031550fae3b3ccc2025821 4845367005578c7feefa9595a2ac44bae4bc206c\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "92260972cb2dc2ab3740859dc1c005bb9be42857"
+      ],
+      "exit": 0,
+      "stdoutSha256": "2604b926f5f33ec29a983d737803f432b38c52eb437909f769916658ab17add2"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "92260972cb2dc2ab3740859dc1c005bb9be42857",
+      "exit": 0,
+      "stdout": "585be0a439f62fe3c25787d27bb35ba6714bd426 92260972cb2dc2ab3740859dc1c005bb9be42857\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "5965143b4fd56df6698b2096df1a672d26293c90"
+      ],
+      "exit": 0,
+      "stdoutSha256": "dfcab9c53b8c44a5958d5cf47c17ed4eb75eab746d8f0e5e9635d750da68d82f"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "5965143b4fd56df6698b2096df1a672d26293c90",
+      "exit": 0,
+      "stdout": "585be0a439f62fe3c25787d27bb35ba6714bd426 5965143b4fd56df6698b2096df1a672d26293c90\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "93d8e653c8ae3a7d5094e17d8ab58e16580b1e17"
+      ],
+      "exit": 0,
+      "stdoutSha256": "13995df422fa6c9cdc776ba511d1ad63587010bc58329accccbf58e67597cd18"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "93d8e653c8ae3a7d5094e17d8ab58e16580b1e17",
+      "exit": 0,
+      "stdout": "ce5f4f61fd583db109d85c71c510a6f0020b1b8a 93d8e653c8ae3a7d5094e17d8ab58e16580b1e17\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "7cd06e835aa09701fe3b84c2f3305dca19e53f84"
+      ],
+      "exit": 0,
+      "stdoutSha256": "c786bc2cff559d064c6daad812f2e411e3305ba0c10bfa3af96135aa01c660b5"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "7cd06e835aa09701fe3b84c2f3305dca19e53f84",
+      "exit": 0,
+      "stdout": "e40f16f5896acb9d176c2677051232c19e82944d 7cd06e835aa09701fe3b84c2f3305dca19e53f84\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "99f244d89e490a4af39cacaefd63f724a8f4dd7b"
+      ],
+      "exit": 0,
+      "stdoutSha256": "eeb7d7bfe06418c9031e7d0dc243c8933a87017eecbf23fac72cc267558cffbd"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "99f244d89e490a4af39cacaefd63f724a8f4dd7b",
+      "exit": 0,
+      "stdout": "8a5f3c4adef0a3a5dd70bbec2179b58744ffec42 99f244d89e490a4af39cacaefd63f724a8f4dd7b\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "a27d85d0a8b83572f911800b3495463d1ac8fa4c"
+      ],
+      "exit": 0,
+      "stdoutSha256": "c5cf733f36bb54584cf91e386ef8c051385ca0f2d9cdbb9c8a735ff43acb60cf"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "a27d85d0a8b83572f911800b3495463d1ac8fa4c",
+      "exit": 0,
+      "stdout": "e8e4a00af1052903cf32138b24e9ac62835ee7bd a27d85d0a8b83572f911800b3495463d1ac8fa4c\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "e7074223277e2879d6599f57656037f8efa31ee9"
+      ],
+      "exit": 0,
+      "stdoutSha256": "7613d54f55d28ea592b8860196ca03ff4951f15294823fb62320e735c3cdd534"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "e7074223277e2879d6599f57656037f8efa31ee9",
+      "exit": 0,
+      "stdout": "e8e4a00af1052903cf32138b24e9ac62835ee7bd e7074223277e2879d6599f57656037f8efa31ee9\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "a49d407c63eb30e770d8947f663e5ef36a284600"
+      ],
+      "exit": 0,
+      "stdoutSha256": "e1900ce3f1ca1f621531af37177e285cbb257cd0044716b9f378ed2d140ecd45"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "a49d407c63eb30e770d8947f663e5ef36a284600",
+      "exit": 0,
+      "stdout": "84b8c581380296c78fd596b72ae0b3111903e23e a49d407c63eb30e770d8947f663e5ef36a284600\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "f4957151f00a7d6210765a3653b7b2425ec25713"
+      ],
+      "exit": 0,
+      "stdoutSha256": "4b434b7f1d93a0a804f1bda83b27e886cd60ff9732d5a68cc13103b6a5c3c23a"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "f4957151f00a7d6210765a3653b7b2425ec25713",
+      "exit": 0,
+      "stdout": "84b8c581380296c78fd596b72ae0b3111903e23e f4957151f00a7d6210765a3653b7b2425ec25713\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "b3144f7d5e6c8038fe543b5a850d8d2066a15818"
+      ],
+      "exit": 0,
+      "stdoutSha256": "1e37d13acf855a16a570ae6ad76d98b69c9de268c77a4dd8a243d542c4cbee17"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "b3144f7d5e6c8038fe543b5a850d8d2066a15818",
+      "exit": 0,
+      "stdout": "44d285a2469be735ac33ae5fddb706b1655145a0 b3144f7d5e6c8038fe543b5a850d8d2066a15818\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "a8475c465c907d2d9af8cd8c1a2e49fc84e0ed9b"
+      ],
+      "exit": 0,
+      "stdoutSha256": "2e54c2280925038ea081fcf849a69fa17041634761df913768641cc2d8da510a"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "a8475c465c907d2d9af8cd8c1a2e49fc84e0ed9b",
+      "exit": 0,
+      "stdout": "44d285a2469be735ac33ae5fddb706b1655145a0 a8475c465c907d2d9af8cd8c1a2e49fc84e0ed9b\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "c1589cf55b7797f3819c0929fceeab8a205bf5c4"
+      ],
+      "exit": 0,
+      "stdoutSha256": "4d1d2ccfdde3cf30a9d8cad149583757ea8f378579538ec7b11807ce506e83da"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "c1589cf55b7797f3819c0929fceeab8a205bf5c4",
+      "exit": 0,
+      "stdout": "5fbc58a13c630ff73346b35c610dc91eb2920956 c1589cf55b7797f3819c0929fceeab8a205bf5c4\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "c7a3282acd8953d70ed53e08ed358fe585e4683e"
+      ],
+      "exit": 0,
+      "stdoutSha256": "63c9a55a3e26c096a5652836c71ff01ee2758fa2467645913c620ec0d9435ad6"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "c7a3282acd8953d70ed53e08ed358fe585e4683e",
+      "exit": 0,
+      "stdout": "6135826e20fa1fa9a3d77b37fc6d3a62fdc2cb71 c7a3282acd8953d70ed53e08ed358fe585e4683e\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "cc69b1b30ee224e7618319fb2da714d394343733"
+      ],
+      "exit": 0,
+      "stdoutSha256": "a8fd05ee2a1c42fd23fedf2d50fc716176e7263e667fbe474bad7e0e69879295"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "cc69b1b30ee224e7618319fb2da714d394343733",
+      "exit": 0,
+      "stdout": "b3ae79f4fd52e7a1e2ecb217cf1751c36d6f6e58 cc69b1b30ee224e7618319fb2da714d394343733\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "d19ca14f84d362c11ee6fb6fa633ab20d9e29a79"
+      ],
+      "exit": 0,
+      "stdoutSha256": "03690a2134b9cf8a36095f7c897410c6d76ac9174cff46bd68d1277dde9347fe"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "d19ca14f84d362c11ee6fb6fa633ab20d9e29a79",
+      "exit": 0,
+      "stdout": "d11cf873ab5bfcee1ac289c0eca53f47886b7f28 d19ca14f84d362c11ee6fb6fa633ab20d9e29a79\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "d893da2ff7aeac94b736a1cb59bc1c04d5897cdc"
+      ],
+      "exit": 0,
+      "stdoutSha256": "597ed3e53394b7550d8181895d4972735fc5a486a6750ccd6dda218ab9adb216"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "d893da2ff7aeac94b736a1cb59bc1c04d5897cdc",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "e448723d51d7b4118cc33931f1524d3f41687b8f"
+      ],
+      "exit": 0,
+      "stdoutSha256": "a23401be567d03ba18b2aa65f315a254e5421bcd5e50c356c74cd2f74dcd1a3e"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "e448723d51d7b4118cc33931f1524d3f41687b8f",
+      "exit": 0,
+      "stdout": "b2481af82e18050e54bd1a8d11454058be976282 e448723d51d7b4118cc33931f1524d3f41687b8f\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "e5c468aba138b68207412cdef20a8acbf80a17c5"
+      ],
+      "exit": 0,
+      "stdoutSha256": "69fc4b99ca0019cda74edf46969d10a9deb5c2f857306d20081fc9a617cee5c8"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "e5c468aba138b68207412cdef20a8acbf80a17c5",
+      "exit": 0,
+      "stdout": "bdf959a59b3a92188777de3e82690658daa6d0f0 e5c468aba138b68207412cdef20a8acbf80a17c5\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "f6b152ecfaaeafef5708269ccb87177df7ef73e9"
+      ],
+      "exit": 0,
+      "stdoutSha256": "ccde22244c05fa19ec9533e937f35b9c5ec423c14a89eec9178b4f60c22fc799"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "f6b152ecfaaeafef5708269ccb87177df7ef73e9",
+      "exit": 0,
+      "stdout": "a4198cef3536206e5b866f03685bf30cee9410e2 f6b152ecfaaeafef5708269ccb87177df7ef73e9\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "5d20ca5620d90f419da157c45c86bcdc9c37f4a2"
+      ],
+      "exit": 0,
+      "stdoutSha256": "35080af348b8b87204f106a3b9610f4c7dd28f6ca9b4cee57d7919a4c93603c5"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "5d20ca5620d90f419da157c45c86bcdc9c37f4a2",
+      "exit": 0,
+      "stdout": "a4198cef3536206e5b866f03685bf30cee9410e2 5d20ca5620d90f419da157c45c86bcdc9c37f4a2\n"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "--format=commit %H",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--binary",
+        "fa535b36578a6cfa87f8667dbe41cba058e53052"
+      ],
+      "exit": 0,
+      "stdoutSha256": "494f889b61c50b6f0e154dd70e58290868f4618ceefd6fe521e5862b1b6645df"
+    },
+    {
+      "argv": [
+        "git",
+        "patch-id",
+        "--stable"
+      ],
+      "stdinCommit": "fa535b36578a6cfa87f8667dbe41cba058e53052",
+      "exit": 0,
+      "stdout": "dd33a9185cb4c93fe5b90742dffe0a2940cf79df fa535b36578a6cfa87f8667dbe41cba058e53052\n"
+    }
+  ],
+  "scope": "Pin-valued JSON fields under reports/ and ledger/ only. Historical prose is not rewritten."
+}

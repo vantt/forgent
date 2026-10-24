@@ -1,0 +1,3289 @@
+{
+  "pin": "cd4f80eccbb5c44893daec58af416395d139494b",
+  "status": "pass",
+  "uniqueRecords": 574,
+  "cohortMemberships": 684,
+  "effectiveFiles": 545,
+  "roundtripFiles": [
+    {
+      "path": ".agents/skills/_shared/ak-cook-worker-contract.md",
+      "beforeSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "expectedAfterSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/_shared/capability-catalog.md",
+      "beforeSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "expectedAfterSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/_shared/catchup-self-recovery.md",
+      "beforeSha256": "575cbf6b4a7b1ab056895575b53848d8fcd0c8174f10c050c412a8e753552a4c",
+      "expectedAfterSha256": "5c28f38990c6f0fa4cd57d7fb8f0b8a4bbb9c53567e179e2b3a69a2328aa1a0f",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/_shared/citation-format.md",
+      "beforeSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+      "expectedAfterSha256": "a6c834b250d83fbf68c42a0b87a93c128cb7dfeb28d07904134bae32fc93afb2",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/_shared/coding-worker-contract.md",
+      "beforeSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+      "expectedAfterSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "beforeSha256": "be25f15a828a2558ef5ffa931f10002760133dca0db77399eb489a63ebde40c0",
+      "expectedAfterSha256": "b84b818a921c440ed327d5edb07cd3cdda8e3a81b51974856ab444f82819bdfb",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/_shared/planning-capability-awareness.md",
+      "beforeSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "expectedAfterSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/distill/SKILL.md",
+      "beforeSha256": "f77023f445a8ceaa8c64cea237504712aa76b9f0f8c07cd8843d991c93ea4bec",
+      "expectedAfterSha256": "f77023f445a8ceaa8c64cea237504712aa76b9f0f8c07cd8843d991c93ea4bec",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/distill/references/consult-protocol.md",
+      "beforeSha256": "7ec5aa4089421501593c89f9a9b0bb48acc5941f3c8dc1f1094bd25887977503",
+      "expectedAfterSha256": "7ec5aa4089421501593c89f9a9b0bb48acc5941f3c8dc1f1094bd25887977503",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/distill/references/deep-dive-protocol.md",
+      "beforeSha256": "68b6d315bae45d3710dd2b3be685d8f1db11fe7369fdcdfa778e1ad72ab80536",
+      "expectedAfterSha256": "68b6d315bae45d3710dd2b3be685d8f1db11fe7369fdcdfa778e1ad72ab80536",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/distill/references/extract-rules.md",
+      "beforeSha256": "0274798f6e0e24c576bf5f721ebd1a74559f1a044536902748aa6df7fa3122a8",
+      "expectedAfterSha256": "0274798f6e0e24c576bf5f721ebd1a74559f1a044536902748aa6df7fa3122a8",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/distill/scripts/distill.mjs",
+      "beforeSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+      "expectedAfterSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "beforeSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+      "expectedAfterSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-clarifying/SKILL.md",
+      "beforeSha256": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
+      "expectedAfterSha256": "53d83811c8d2357e2b0ec3d7baa428e9350f41a1bbddb54a36d775c4c2bbb9f9",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-discovering/SKILL.md",
+      "beforeSha256": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d",
+      "expectedAfterSha256": "d3f72471400100733dde1d67997578750201a1b9d925e940be8d0a2189b655da",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-exploring/SKILL.md",
+      "beforeSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+      "expectedAfterSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "beforeSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "expectedAfterSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "beforeSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "expectedAfterSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "beforeSha256": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2",
+      "expectedAfterSha256": "ea26b214e482b93ac34b3650a6c4ddfd7161618ceb317dbb849285bb8839a3bc",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-implement/SKILL.md",
+      "beforeSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+      "expectedAfterSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "beforeSha256": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+      "expectedAfterSha256": "5c09c38ed592fd2fd0e7cbca6d02934dc676c41dae311c5aba0f14861c5542cd",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "beforeSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "expectedAfterSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-knowledge/SKILL.md",
+      "beforeSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+      "expectedAfterSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/SKILL.md",
+      "beforeSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "expectedAfterSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "beforeSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "expectedAfterSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "beforeSha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+      "expectedAfterSha256": "bf5fb8c3c1ddd09fcaed0774d2c24f906ba9125f74ee3e76d5d55ae9a4285674",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-shaping/SKILL.md",
+      "beforeSha256": "2faa2da065e638c09210d0515d0550d13b26605afa018a496f0eb1819438ecf3",
+      "expectedAfterSha256": "af9e3de7c660b46169675422520102072e23cfd012626c1c8dbb7f31f6677c94",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/SKILL.md",
+      "beforeSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "expectedAfterSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "beforeSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "expectedAfterSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "beforeSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "expectedAfterSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-indexing/SKILL.md",
+      "beforeSha256": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
+      "expectedAfterSha256": "1405226ce6624ad9c57ea910b6952e6f0690406fa21ba67e99f54f50ddbf7a74",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/fgos-researching/SKILL.md",
+      "beforeSha256": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
+      "expectedAfterSha256": "81f94ec67b7cafe77a809e786b00f304c505a52cade46ec75a5be2b3ed996e93",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/instruction-audit/SKILL.md",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "0269219bf0ecffddabc89246be5e5a9e9376512bf43a42c1a38535457395dcc5",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/instruction-audit/references/lane-prompts.md",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "adac8362adbb7eb04c163fbcf3cdb16aa566e61a6f4a6a9351c07d4fc4d08d52",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/instruction-audit/references/report-template.md",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "9d3b7abfd876d88e8a6a7e1820ea6a2aaf02472a75a69603921344fa0db699d6",
+      "roundtripExact": true
+    },
+    {
+      "path": ".agents/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/distill/scripts/distill.mjs",
+      "beforeSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+      "expectedAfterSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "beforeSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+      "expectedAfterSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "beforeSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "expectedAfterSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "beforeSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "expectedAfterSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "beforeSha256": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2",
+      "expectedAfterSha256": "ea26b214e482b93ac34b3650a6c4ddfd7161618ceb317dbb849285bb8839a3bc",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "beforeSha256": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+      "expectedAfterSha256": "5c09c38ed592fd2fd0e7cbca6d02934dc676c41dae311c5aba0f14861c5542cd",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "beforeSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "expectedAfterSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "beforeSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "expectedAfterSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "beforeSha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+      "expectedAfterSha256": "bf5fb8c3c1ddd09fcaed0774d2c24f906ba9125f74ee3e76d5d55ae9a4285674",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-shaping/SKILL.md",
+      "beforeSha256": "27e123882bde8196b7d79142a3a4707f924de1e4ff282fd6be1029c7b23277fa",
+      "expectedAfterSha256": "27e123882bde8196b7d79142a3a4707f924de1e4ff282fd6be1029c7b23277fa",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "beforeSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "expectedAfterSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "beforeSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "expectedAfterSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/instruction-audit/SKILL.md",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "a587d3b798d3b82d8c0ec87e4ab7964ff25ba184ea8bcceeccf218610b4042fc",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/instruction-audit/references/lane-prompts.md",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "adac8362adbb7eb04c163fbcf3cdb16aa566e61a6f4a6a9351c07d4fc4d08d52",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/instruction-audit/references/report-template.md",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "9d3b7abfd876d88e8a6a7e1820ea6a2aaf02472a75a69603921344fa0db699d6",
+      "roundtripExact": true
+    },
+    {
+      "path": ".claude/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490",
+      "roundtripExact": true
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "beforeSha256": "c92f7d0e1a3358e395a3bdaffbc05dcead2fd4acc8e94bbc0a0d237a183b72f6",
+      "expectedAfterSha256": "a3516350464a3788bedbd68aa71e27c6ff0cd0591e8ea0e9e2b6e02547ef1921",
+      "roundtripExact": true
+    },
+    {
+      "path": "AGENTS.md",
+      "beforeSha256": "30f6499b652d02e15f1f24144dd90731a1ad49a312e968dae3b04fc11cd7227d",
+      "expectedAfterSha256": "53e9bdde5d98a51b6eaca164b4f36c096fc7d98fadc2d7e08965092517a51935",
+      "roundtripExact": true
+    },
+    {
+      "path": "apps/fgos-gateway/Cargo.toml",
+      "beforeSha256": "ff55747c22cfb9c9e78f0b619271962185edb1682c4bd2e0dbf625b93aedc7fb",
+      "expectedAfterSha256": "2a2b52c7eeff282c9a4756c777383d72b0ee05d66a987a27b7920a986d8fcbca",
+      "roundtripExact": true
+    },
+    {
+      "path": "apps/fgos-gateway/src/gateway.rs",
+      "beforeSha256": "24439c4bc70c23b47979f1d3aa853b653828d73b1b3d7a1264c03f94c5de4a47",
+      "expectedAfterSha256": "8b65cdd32eb7714b00af345a1adaea9bcd965452f59453e6f0bc43c119f9a35e",
+      "roundtripExact": true
+    },
+    {
+      "path": "apps/fgos-gateway/src/mcp.rs",
+      "beforeSha256": "d1c162643e93c2547656b1e034b84967efab2adb20090a1c058859593f36e6f8",
+      "expectedAfterSha256": "1eebed5c1cf45ac231286a0d099a6ef7dc6d66578ee30f53f4c64986be3fb86f",
+      "roundtripExact": true
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/App.test.tsx",
+      "beforeSha256": "36dcbe12fd1175058dcfae826d0b141be00cd48018aba178477754b71c55384e",
+      "expectedAfterSha256": "14aed08ab7f9e6f3b3f101a341d7f6f31e242e6b1152f125449b7184bc5afba1",
+      "roundtripExact": true
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/App.tsx",
+      "beforeSha256": "e773360e01f1b4851b8390cb8cf975e4cdcb04dbd9327aa21aac36ce9b52978e",
+      "expectedAfterSha256": "fda9b081e6e7fb34b6923c4fb081e5162ae7dbe998da2976e20d34e05579dd97",
+      "roundtripExact": true
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/api/client.ts",
+      "beforeSha256": "462686f57dabbbfb487309df49aa276224d1866b8b970248b0166d770f4d63cb",
+      "expectedAfterSha256": "8c108bee21a4e0b0835701b8dc4bc66071bf66cbb1f0fd6c6f730f3af3685f98",
+      "roundtripExact": true
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/api/errors.ts",
+      "beforeSha256": "177282665dd0ed07aeaa6242bd7bfb9b8e0561fd57e9971aba736517d6be65b5",
+      "expectedAfterSha256": "2bce4025f4d9af4f0d544d4ff192380359101969ca4980aa4e7d7abc6dd5a3cd",
+      "roundtripExact": true
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/api/types.ts",
+      "beforeSha256": "ee921f18e8b6b4a0b5b0e37e4739488254c1b0dc9b90871e1de28cd21d3969fa",
+      "expectedAfterSha256": "8fa8c90408b669aed70a72f74cbf853f08bd86fddfec37a02f9e323da2a394f8",
+      "roundtripExact": true
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/lib/network.ts",
+      "beforeSha256": "167d4741830756c229f6b492defa0a2d809e5f1bfc057daee54c5eaf9cf11319",
+      "expectedAfterSha256": "3b78b9a0452240c153aef85a3b505be5c4ef4ea2c6b4ffe396764386ca9a3e98",
+      "roundtripExact": true
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "beforeSha256": "66493b27c3dede73be383d786cf5342ed7770fad9a9bbbf982adac0e01b6056e",
+      "expectedAfterSha256": "123fd5af51f8ff2c900b359cd4e0695eb4c9511415fd0247689d1e1c27dda2da",
+      "roundtripExact": true
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "beforeSha256": "c9716c0cb1e719e2e3701dd494cf3265c4512cd544813a72180eca7624d8611b",
+      "expectedAfterSha256": "b2456ada71dd69cef7f43bf4ec25a30d8a40b7bb0234d8923bac4b9f42a3a087",
+      "roundtripExact": true
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "beforeSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e",
+      "expectedAfterSha256": "1756414ad9721b55f54b6587dbd108336b37cec88e86cd363cf9398b1df2e666",
+      "roundtripExact": true
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "beforeSha256": "4b834fa5ea7db1d9637a3126a7a96f7758be2f1650131411c4e69b3a91ac6f90",
+      "expectedAfterSha256": "931089f5f7f39782a47e67fb28dd4db5c102d0cdcfaf02b785e3ed3b674da095",
+      "roundtripExact": true
+    },
+    {
+      "path": "core/skills/_shared/catchup-self-recovery.md",
+      "beforeSha256": "47260927356224b244adab9dfe2318f3817c5b182ea69f3def67935281bee370",
+      "expectedAfterSha256": "f577b3eb9e4e85c6f26ab532558bb5b5bb85f4847640e0867336132fe99f6b52",
+      "roundtripExact": true
+    },
+    {
+      "path": "core/skills/_shared/citation-format.md",
+      "beforeSha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+      "expectedAfterSha256": "589e65ffeccaf45b3de4d1047eaec5face605265b05bbf462939c50677651fdd",
+      "roundtripExact": true
+    },
+    {
+      "path": "core/skills/_shared/executor-dispatch-fallback.md",
+      "beforeSha256": "1ddb25179a37b27b49feaaa52c8c8d7c367a9f522607a9caf7abedbe78ef1f29",
+      "expectedAfterSha256": "76fd746e7ce273e701faaaa9ff8af7c2b1130c378f8bc48b0b12724b519fb1a4",
+      "roundtripExact": true
+    },
+    {
+      "path": "core/skills/fgos-clarifying/SKILL.md",
+      "beforeSha256": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+      "expectedAfterSha256": "0a404dea2c5f640b85f5b841060740a2da63a439f7c4be924fbdfde6ce852cec",
+      "roundtripExact": true
+    },
+    {
+      "path": "core/skills/fgos-indexing/SKILL.md",
+      "beforeSha256": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+      "expectedAfterSha256": "359f85a6d35c81cd241dac79c74ce13dc162043eadb8d668bbf5dd2c7546aaf0",
+      "roundtripExact": true
+    },
+    {
+      "path": "core/skills/fgos-researching/SKILL.md",
+      "beforeSha256": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+      "expectedAfterSha256": "26a8d7e2f909f53fad478a98ba010cb85ef0de7d405516f1b01d6a7967e061dc",
+      "roundtripExact": true
+    },
+    {
+      "path": "core/task-specs/fgos-indexing.md",
+      "beforeSha256": "4a23450a73f61c2cc9bc63a5b7eee88eb44d07855a76a8d37c5943edc27e63fd",
+      "expectedAfterSha256": "9356db391c82d31a9a1edd4f390bf77770b619288f0f20f701f05e1ad38a1034",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/README.md",
+      "beforeSha256": "d8af6a844d56e11a1b54832dcb54b3ce84f915ee74b81c98386cc88f818eaa98",
+      "expectedAfterSha256": "c029726690503fe1a59d976eb2b9117b811126b3f2ae011cef300120cfabfad4",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/coexistence.md",
+      "beforeSha256": "287b6013a2416aa86fe16b6cd705d78dd57d4ca190f0b61971521c7506e525e4",
+      "expectedAfterSha256": "cea85eaa740e58d81f379e45758a7cb2986a3acf33d4bc99b72efb9fbe2ef0c4",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "beforeSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "expectedAfterSha256": "a25588dae948fd652926e1390c72d11912d88b6badd8980c5550ebd2875840b9",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/distillery/porting-log.md",
+      "beforeSha256": "31125ff7b60fb6d26d7e6118263352e0f30516eab6c0fd5891c5c6315814f805",
+      "expectedAfterSha256": "f40e274a8cedcbeae92e237063dd9c2aa2304852781b63218e3e5dddce554448",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/doc-governance.md",
+      "beforeSha256": "a2b0df6a5910c3d5e12ce7f9cd5db3f587095ff3c57f4d1978f933d308d2bfc7",
+      "expectedAfterSha256": "4e4de787f1ccc55d0cb4496ccc71b796002e6e52417add5ebd3ab50df8b40c01",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/assert-plan-evidence-current-tree-fallback.md",
+      "beforeSha256": "9ac6ea7c59eb18dcb291c2cd2386f5bbc0edec49e8d2f2b2b63967955317a6a0",
+      "expectedAfterSha256": "f2d9ee64819795274abe5888ea70f20b0e6c9069d3a06ca84437f8fede6a2bef",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/branch-content-mismatch-fgos-exclusion.md",
+      "beforeSha256": "4b60c91ab0897fb3f262c9563e9b387bda35fc4b7e6e288c55d7deaaff58ac35",
+      "expectedAfterSha256": "c66c19b147c7320cd92d088448f8c53f3c918cc0d6e27e3c1f29dd95463b3cf7",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/d3-goal-check-rationale-trace.md",
+      "beforeSha256": "791dff01958326399c04dd402fdf43f63a93b5359e5fdddac4d2f45be197a7ad",
+      "expectedAfterSha256": "ee289470cec00ef4e41df795bcc79a847c769051ea6b5dc742e9c0aa28391bb8",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/eventlog-sweep-checkpoint-redesign.md",
+      "beforeSha256": "0b2458b2d9fcd8e3f1ffe4dd55dcabec781a776dc677ffccbe42af61fc1fbe7d",
+      "expectedAfterSha256": "fa87afa13fdf2fd804cb68c5eaf1c3f429a9e9c50e76876b206272ad549aa685",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/events-jsonl-opportunistic-truncation-check.md",
+      "beforeSha256": "a100e178f0834551d357fc5a1c484dad56464016486f81361bf7ff4676047992",
+      "expectedAfterSha256": "941e2f588d9e1649217704435092181372bf8e5c2d563a6a7f51860b2f24f3ae",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md",
+      "beforeSha256": "16344f3f744ad817a02d72b05e3f9934313b403b4b737fbef4a6053df16ebf4b",
+      "expectedAfterSha256": "1ab22c2adb57edd28e112b9080826de952ac3a888cc30a2860ca554b1afb5f9a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/herdr-orchestrator-terminology-boundary.md",
+      "beforeSha256": "d7cdf87db715d14b410a48210814c1471c9f8c7f3d289899018b93805abd5dbb",
+      "expectedAfterSha256": "17b7cc54de8e71258023002b557cfaaba443b4da494bb86deae18e128cdb8950",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/herdr-spawn-adapter-fresh-pane.md",
+      "beforeSha256": "401803a81915681269a31491eb09abbb841ee58574e99199ec7e7bb330a573b5",
+      "expectedAfterSha256": "77f2d02ceecd7225051ece8eb88095fa12deeb569f193d7e2ca5c035302f3f16",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/main-checkout-reset-ancestor-commit-loss-guard.md",
+      "beforeSha256": "e3b23281624b9ba9f24bdafbcc6231394ee88ce50b4ec16e795063f527db096f",
+      "expectedAfterSha256": "7fd63798ab85d659aa7633444e6199a44a7611cdbd3f5f9ca1e7a7539185ffb6",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/mergedsha-missing-unreproduced-race.md",
+      "beforeSha256": "48468ee0d3997c19a36110a4bc5016c3b8e86d66d5cfc42ba51e024897f1b1fe",
+      "expectedAfterSha256": "8257e03b9135bd4a6d2580ffa81641214aa33c66899fd7d6e483c1cef1c99f0b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md",
+      "beforeSha256": "b4103283f59f112d7300767cdd238244a9f5f20a673f0ec710101e6ba34ff975",
+      "expectedAfterSha256": "5ec89165d186a64126a2c4da4eb8592b13bd0e274cae0b5295c73db7e2b00a85",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/return-approve-background-execution-guidance.md",
+      "beforeSha256": "97d4c97c2fe6cc8cd8cd1a0f1447372549f9a9fd18c1db6b3696c0294f2e27b8",
+      "expectedAfterSha256": "834c9f54131116ea4684159490b3d42c52d4392a11e82658bee87562ce6f350e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-design.md",
+      "beforeSha256": "dab6d6d6ce981510a7a006b163931436c14bf86fa91af81b493d484f38f9b07a",
+      "expectedAfterSha256": "5180b720e182169a170fb178e50c4c3a1b8c70b1003cd8ebb70dbe8d5c6550d6",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+      "beforeSha256": "636ef97b006cc877b95274704ec2c7ee29a69da82ffcd3e837be06767e8e10bd",
+      "expectedAfterSha256": "ae19cdff2c64ca02e30159f24c8509058ea419df655758323a9bbd9264c51435",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/explanation/worktree-manual-merge-fgos-blob-safety-net.md",
+      "beforeSha256": "97a644fa5a29da7929e98c485e2e445a03a0073ec38b54ce14b340237d14a858",
+      "expectedAfterSha256": "218e3424f95795c49695c87f9483ab05f9867fb49b0aaeede8c142065b89e03a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "beforeSha256": "2a906dc8d7a912d9c72c6cb494e95bfba958103153a0dadb57a07b1fbdecb1a2",
+      "expectedAfterSha256": "d618a5540e0a16327ca5a3d9ba4b2f20687923c6ec261b0a1e00138933320b30",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/how-to/configure-and-operate-agent-confinement.md",
+      "beforeSha256": "37e20cd8865be2066cc2d013ecbf871cc4210fc28c0f579f3b84ecb638c77f7e",
+      "expectedAfterSha256": "7439f0f97a7c19249c70a7e75aefbaca1e43684566e29c7e1194c9a6d6108a2a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-alternative-and-composite-reopen.md",
+      "beforeSha256": "71a122831e2a1c2e3c716fac30e6ac708b98c5151998abb5b9926a27bbfbbdd5",
+      "expectedAfterSha256": "77b435b67b70aa10707edb2e7bddd29b425884a35f8d9ad031db285094c27cb6",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-clarification-and-challenge.md",
+      "beforeSha256": "19e1487f1afbfb7cb272f7b659ff5e731ed8c17e1fa6c32de46d6d319f7ceadc",
+      "expectedAfterSha256": "e366f99e3e51390f6348b295183374d5a6cd2c6034e4937c8efb4c217301d75e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-clear-start.md",
+      "beforeSha256": "b255714e4fcadf04bb7fe48237b3563bbd60e0ec19ec22aa8de07ad82a04ced8",
+      "expectedAfterSha256": "1460bb022ba1f0b083a641d461755c88736dc678bc5d5a6026ab0bf466768fd0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-decision-request-and-resume.md",
+      "beforeSha256": "0046e27b51177c7d4b8b0c9fe54abbb89c7c7f1e9322f890e0b7d70bcb9e7d70",
+      "expectedAfterSha256": "6d2b9724bcc022d12df24c794d642d84e06ce3e5ce5b76067d2eb5296bcef08a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-final-decision-and-defer.md",
+      "beforeSha256": "2dd5e30d0e1d0857fe89aba1e841f54659592c5ae2f59af2b95584c23d4cdbc1",
+      "expectedAfterSha256": "6df9355c6e345d836ba4d8b1afe673a15d407bc5c9727d3640d0a6158582a1bf",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md",
+      "beforeSha256": "3a24d99141ef2e073181a87943c118f2df843f3a2bb227ac86536f5cf8fa08eb",
+      "expectedAfterSha256": "bd50ba6d4fe4e49cf665f2ed04b93433490c3db4492dbc13f3c79fa13cb4505a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-material-context-reopen.md",
+      "beforeSha256": "0255e7a9f986eae96b953cab6a1b3dc18caecfae15ddc071301a1e8a45866335",
+      "expectedAfterSha256": "f13bf9f071109c626946d2b8eba6f3b6373e3a3dc1f858aa5c0eea92ab448225",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-unclear-start.md",
+      "beforeSha256": "89fc17ee00a7ccc254a6d3c10d26a137894e51340b34671ba45ec55ab860ba49",
+      "expectedAfterSha256": "e2cef8809d54cb0552ad7ddeb6a42f333928dad0cab48af7c3bea303ab4da0e1",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/how-to/fix-bare-citation-findings.md",
+      "beforeSha256": "11d8cb55ff745f5cce515eb3617327fd396b4e25a0adbddb682ebbc32caf9961",
+      "expectedAfterSha256": "a32b04a88eb652018241b08107fb655787647214d5bb469b20e9b709d5e6be38",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/how-to/use-fgos-architecture-panel.md",
+      "beforeSha256": "9494cd9bb1854187bc6a54540394264d91ccdedc503d0187b7ea7f98f7f34c2a",
+      "expectedAfterSha256": "897fd2ea41580eb7797138399693e9d2994791db8fed3023e16a28c6392bacbb",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/io-contract.md",
+      "beforeSha256": "2b2bf2e11042787c34988a6fd6a2924fb1448e8cb6c241aa6974a3948313dc97",
+      "expectedAfterSha256": "ed6a1f5b250cd6aa36e3d4d88780d7d4a207cdb680ef44996bfb5eb93b9019d6",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+      "beforeSha256": "335f841c251e26b20e1d90df286f78893539447312917f348215b80691dcd221",
+      "expectedAfterSha256": "5d3f0767ce82753cda0333ef6954e8df2fc4557df6d79c172b931f888a5ec227",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+      "beforeSha256": "cd5a163ad56d54b8dbeb6adef4c66a46a3a117d94030ecd22059cfa76faacef5",
+      "expectedAfterSha256": "7347f5e592f169c2f8c2149112d763c842c25d361831ead59d9e10ef83922d4d",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md",
+      "beforeSha256": "cfc6a567001d8b5e428947fb961b7131e1762d7915ea89dfc36f4d4f3e316df8",
+      "expectedAfterSha256": "cb07537c422374cc024e317b2395a3d6ea946843782552fd6428511a7f4f647f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md",
+      "beforeSha256": "1313d1321b7d2a78eebbcb829bbc00e20722e195197e197be2a097aa1fd38105",
+      "expectedAfterSha256": "b7f436474e5b0f4d209a42e3bb883417fae5191f1fa395612d73c1d428e4111f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md",
+      "beforeSha256": "4d8e3db9eeec998c41754c26f58b1261129483b66c5a5e01e84ae287732d829c",
+      "expectedAfterSha256": "4a436e690f8a54b6093ff26b37222842f4ed87feba1489f38dd9710c224840d2",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/fgos-choke-point-survey-ranked-priority-table/fgos-choke-point-ranked-priority.md",
+      "beforeSha256": "f61d2f9593247a79448e68fbfa7ca6a2f493520b412c1d5d5e0ce8f9cec89a9d",
+      "expectedAfterSha256": "23513e7fba6d3b13beb0b34458f95fc0972891b7642d298c6888ed1077286a9e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+      "beforeSha256": "f75d9cae8528ae9133005c486ab199b3371240ce107f899285c537c68fdd68c0",
+      "expectedAfterSha256": "5e46cb7cd7ea06a1d6eabf94d46080a5d1ee088b6fd2e98052026f574ba4c394",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md",
+      "beforeSha256": "6dfccb72d3bb6bab46aa19363bf2f015fb8068246757fdde47430c4c5204ff62",
+      "expectedAfterSha256": "2f1128a3bc17c8a2d1ff1b36f6cec7e1ec5b21e92e280e3426fdc0df892e6a3c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+      "beforeSha256": "ad742609be038caf09f1539018617985e8005b0108b89ebeced77b4e038b6f1d",
+      "expectedAfterSha256": "7fc96d87570368135379cb50a691c5b9f2fc2d223972be56f19c88a55b0085d7",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+      "beforeSha256": "f2e595c0d9a9e0a28343550650724c837bb88b009453643b630c2cb1c03504c9",
+      "expectedAfterSha256": "d8207a11c39e5a7ed32c276c8ea1df4d1f094d95e21c8aba8a4abada3d56ca98",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling/fgos-slots-verb-output-fields.md",
+      "beforeSha256": "309d2306a7640fb9ed998ee566c1418e5876c66c111b291c9a9d1aecaa8e6ad0",
+      "expectedAfterSha256": "5da595462f4cec500d1dac1917f9186a19387ad90d15bd4c7f11424b59214aff",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+      "beforeSha256": "624096b072563c683d65524afdbc8ce9388ef7b397a53f1306ae66015e11d895",
+      "expectedAfterSha256": "dbb7a12d93bafe82bce1b8ba98af4f1d550718196590c79d7013c341d4454d8f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+      "beforeSha256": "842f0b17e2a079038d822d3c852129a770380d9cb89224c40e7818a093601784",
+      "expectedAfterSha256": "9432c10bae6cf804a5a181cef8a03a7eec5119dffe3a5a80badaf69d98b11484",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+      "beforeSha256": "e3ed833f548343d2890007ac979ef7733f1f507809d9c4a39fbeca4a0d8d820d",
+      "expectedAfterSha256": "8032b7429b7fae6c1557fbecd222710c84846abf57657bf9263b2916c4939aef",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
+      "beforeSha256": "1221fe9e42fc8e502336111d5aaeb32eb5cf6b9e7953d63e3e5a4a0355790f88",
+      "expectedAfterSha256": "0813318b86a0c5fccd264ba8e26be925f3128b3113450e3735f859e40dc24c21",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+      "beforeSha256": "0c5fb0a517eabc77270d2fdc9dbe9511b7161e580d4394d6927c8256fb209b82",
+      "expectedAfterSha256": "64a3dbb59820b8431604386ea4cfa0d89fcfe157ccf297ae41b05b23115830a0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md",
+      "beforeSha256": "0f4e629f27e87bec8f74454beadf73ebf3a05a886ba19e2588c5a05bdd66b925",
+      "expectedAfterSha256": "d4faffbcb5969b91f12468e3a2b70663c39a33450ba0dcbff4631b8dab1984fa",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+      "beforeSha256": "2f87936ff3b34e2b010a9ddafb4b71498b85d2a6c88ba1ec7b5141f2092d16ea",
+      "expectedAfterSha256": "465aece911e1af9def67d27c829dba5cdd5262ce23a315238eed1d5f6e159a6a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md",
+      "beforeSha256": "e77131726159bebaf17b9a38b9974931d90164889aca0b8292383ed356820194",
+      "expectedAfterSha256": "f20c1d81bc20417933899cb4588c8f3ee15b1744f0fbfab3e5400176e7b6eb6c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+      "beforeSha256": "f952ed43669de1f53ddd0de6a0638e58f509d9c7ecca381638999ddae0b34f18",
+      "expectedAfterSha256": "3f65674dd7a7cc104854ea2dc619a09d114fd364af83d2dd7731f289216e45c3",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md",
+      "beforeSha256": "ba9c6556e0b732dd6d568f6e23a31861a49359e631032c7817ca3ef3dbcfa739",
+      "expectedAfterSha256": "926bf9a3bd54e480f905cfc76f498aa5e62d39eca6a7bb73c90fe553f62b6d8a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+      "beforeSha256": "c4c6f331c0babff2a992795d0ddb79d8e8979a25eb73eaa04bd45a33dadb4508",
+      "expectedAfterSha256": "5cefa73715235530be42329b75776066320ddd95b7ac18cf0df426f804ae3dc8",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+      "beforeSha256": "2a5b3538928a48760ac7d12b69c1ac8f246ad18bb00b15f69c4cdd72655655eb",
+      "expectedAfterSha256": "53ecdba989272b3bbd6c53400893a4330a8575ac945c9f2c1f395899bc23b24f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md",
+      "beforeSha256": "07e7ae9b6c9cb82166a173ca7080c05d467ce3fc964f15449dd88adddfc92c75",
+      "expectedAfterSha256": "0d9e35c57c4c5b0c239d8e97f30f6d92486f69c7a701e103ca74ac19d63a9db5",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md",
+      "beforeSha256": "7314f45f7cd7ead7674a191cb4d14c5858ed42b3094fa989535551924d77be48",
+      "expectedAfterSha256": "e2303c46a5ec76e71fed81198d1085dc3ed76b51ba910275e17512690db9ec51",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md",
+      "beforeSha256": "a035697208d154d300edb351600eab8e461c2dc528957594c95b72004527af9d",
+      "expectedAfterSha256": "086241955f51d2e2d7696b8d5ce59a55f304ebb62de5785f8fb378f7d06efa9a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-declare-footprint-when-fgos-coding-planning-splits-an/declare-footprint-when-fgos-planning-splits-an-item.md",
+      "beforeSha256": "63ab10697f6f761084aadc066b46043b58f6e805e77be1e63efead0c070e302c",
+      "expectedAfterSha256": "ce535525ff37ea1081f10ad1fc6e40a9c1dc2e0ac0c2024efa137853c4d1ab10",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+      "beforeSha256": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+      "expectedAfterSha256": "878420ad11355fcc264307dc70c83efcaefb52450cd0969c118c3a9569e75b57",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md",
+      "beforeSha256": "1abca99e51bdc7f8500c688b549ddc831d30ae93cc9eeadb8d7d4afe7d0d38b9",
+      "expectedAfterSha256": "286dd2d8bd0318910dd4df5cb11ecdc19aeba65286979cc06a7bf3d89181a18c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
+      "beforeSha256": "9a6eb886b832172f4e059f000a99ca95139a5150115a25af568e93dd728c37d3",
+      "expectedAfterSha256": "16902778d19ca75257ac93b48686c4a8b72861f97da86d568bef0715fc381b3c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos/pass-a-caller-supplied-verdict-to-discover-or-decompose.md",
+      "beforeSha256": "b1acdcb28d00a15495ee01712089c9fb5a806c00a23970e536df96a232d7465a",
+      "expectedAfterSha256": "12fb21b996fc9d1e6c3555fd52d4389d0d7b8b0998d9d499a61b8175d8ce1967",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s/recognize-a-claude-code-hook-spawn-enoent-failure.md",
+      "beforeSha256": "018d70650e43c5581e5e29747232be1b514d5fbc13ad01e622d3f893ee54eeb3",
+      "expectedAfterSha256": "60d881e0781db8fc1117ad5a22f59837bc45b60d827bde6e25aca00b685134f8",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md",
+      "beforeSha256": "5acf88d76e1a437c85661672129003116298037972bcb18151e1d63e82141c0e",
+      "expectedAfterSha256": "17b325950625d65c2298dc70d988e5db80f2a0bfe1af00523eb56135af700c1a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+      "beforeSha256": "e552fb38bc9b1fbb415512b2ab0975703dfe8295621a89bb9a25e61efcda7144",
+      "expectedAfterSha256": "26c24b20a7e251e0d3bb9eab5ce8eff27edf376d8de8514ae9654a045af69f2e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md",
+      "beforeSha256": "34113d4abada8b419df858ebe4fe3507110a9294d3f42490a91493e9c16b18c2",
+      "expectedAfterSha256": "3c75bda7bda746668c5c55b6440ccefde31e53a38dd44c6b4612eeb68416ce08",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
+      "beforeSha256": "456db3126fffc12422cada04e46ad0e699cad632790361d7c14471c58ccc9965",
+      "expectedAfterSha256": "26d400f268150d34e2e28e026f6193d567a7a6560965ac3fe33f96171ef38d44",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+      "beforeSha256": "580077e82919d354ca2e905d5ee54e0c40f86fd1b745c3163a53384c5951ff2c",
+      "expectedAfterSha256": "6ba533b3c25af8536043e1197ded8678cdea6a606ee993df8bc0dc9f323498d8",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "beforeSha256": "7f647ad2b7018ed4f490179321407228cb13dd2a9176d2241e9218593d4c569a",
+      "expectedAfterSha256": "7d9a2c030a886071b17d1c49252787ef4c3d9b056cb549ebca477275d438ff6b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+      "beforeSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+      "expectedAfterSha256": "8dcc5be2e1173907405a9cb19e90f191b78e38faa9a7232549dc7d80bda359ea",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+      "beforeSha256": "88f14ab11fee895292e401b9a6df75cded6b493691012c173c589cd936ebbb04",
+      "expectedAfterSha256": "1ac4378efc3037d00f2b45b5e1e274dafa02a3460d0a93973bd4d41c884ffee3",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+      "beforeSha256": "1a8538b7cdea6dd66d14df178bef307bad333305eaae3a9a3893c0c96a662605",
+      "expectedAfterSha256": "50c214118304dad1b2cc15a731aa80c3c2634648a94f02c36f5565577b36bbea",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+      "beforeSha256": "ec9f6195763d768c6470a0b3751bf82f3043b5ddd6be7ff88401ed8d2ed4307a",
+      "expectedAfterSha256": "62910fce536446b40538ebb1a4dc99b107749a3a4fe5c35a19d6b89cae7574c2",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+      "beforeSha256": "627526f65f8b85949f2538f35c3fc9814959a4c958caac1a5b329372ad8062dd",
+      "expectedAfterSha256": "dd47b61b0fac845e59ca8bdf8b27a4602ed78733e31cc0c7e3bd9194acaf851c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+      "beforeSha256": "b1b62aed4f6eb7afe365aca1d66053643d33f659f67d61d719b8d021e42bb467",
+      "expectedAfterSha256": "0af933447736b2457277adde1945241d478d16cb00be30e596473be79dec163c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+      "beforeSha256": "460e526a3d5602d2a541b836a770a0a9609134cd5c1325c422f5d640ca05461b",
+      "expectedAfterSha256": "e756a3307776d98f7b205bd618c25d2581e312c1c60689952badfa2294e2c85a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
+      "beforeSha256": "abfe5ba54e0f8b9a9a10434f4d42da0290e03e7ff5a6ed8ce6d19611e8800ebf",
+      "expectedAfterSha256": "8992b40db0c3c61e419219e2f50833a09086189cf4244e2ff089c0508d71cbab",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md",
+      "beforeSha256": "f4b936f885ab8718273d76695bb31753337e4658d5a59b3a2ef78f3ef6e74018",
+      "expectedAfterSha256": "23a84bf58ce9b049c9fa0a85f6aba15713618ddc2eb086ca12fa89c39fe3d0ca",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+      "beforeSha256": "e3a689245637d27598a70e5d8c16e9b52da82bc20de08553f9a84d714b541944",
+      "expectedAfterSha256": "2587c64a0291168d77fa479d2477a73ac5218c98ee2f0689df21ca77c1ef0fab",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "beforeSha256": "ab941bc9e9b8b531ebb4a7691b35a40d0a10d1a78f891b1c2f625cbbb9f3ed20",
+      "expectedAfterSha256": "82e78c7389f30190792129bb9a0b94a13ea0261a4f6c83e6cdc7e60d2d3c54a3",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md",
+      "beforeSha256": "42c956d24e8cbfd593b2eb9a375b5d021ba7b3c3cd9e8d282d859ef0780820af",
+      "expectedAfterSha256": "847a13b38e4ef67a6478982e6bd5d61b1fa4474386bdb4030b176b980fc1594a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md",
+      "beforeSha256": "d3991c9270878746b3c5dc6d17936ad381bcb5f71adfb54faf5a11b18d3b81f3",
+      "expectedAfterSha256": "dc96a8e208dc45260275c7303db3093cd8a096e50b0fd8c6b0adcee1986e6d30",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-c/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md",
+      "beforeSha256": "0b34d05f9bd86fe47585a6730af2f79a25be7a4df010146f0aa17e5c45048aa1",
+      "expectedAfterSha256": "584c2e42f79d05d3e4954ff6bc175a884e3f6d70e94769a76a18cc49e91a0b82",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/sync-an-fgos-item-whose-fix-already-shipped-outside-the-norm/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md",
+      "beforeSha256": "d3a29cd51e566b3a8656bc13dc5e016be37494661778d8a172c7bae5d00ee472",
+      "expectedAfterSha256": "56da2bea4c6099b96f9e057e60c5e7fd737f91c4fe3c68bb74d1032f8786e7d6",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/test-suite-legibility-dedup-cleanup-before-after-numbers/test-suite-legibility-cleanup-numbers.md",
+      "beforeSha256": "9d4677368cca92eb069be6b028effa1bb484c678024a9ddfdba855303c82b0a9",
+      "expectedAfterSha256": "e0826d1af00e3f3f5d3e42d2ad0db806fcd03700f2f56fef084ae418b269d7ec",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/the-9-findings-from-the-2026-08-14-fable-code-review-audit-o/worktree-merge-lifecycle-audit-260814-findings.md",
+      "beforeSha256": "24042e18ae5b8c3ca71e5085814eb642accdf27e113898ce99e2687878700a1a",
+      "expectedAfterSha256": "8bf9583b3c3ce96b991e554cded95478b5f0cde6492f5788904e74017d216335",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md",
+      "beforeSha256": "eee0b18bdb5811771ab781465aefd624c246097749b8f8c723be70f026b39e25",
+      "expectedAfterSha256": "2dbf5ad2435f23c6527b63ed3ca18d67587e516a2cb4c1ec16a5f356d2dbb589",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/the-coding-classify-intake-executor-s-full-lifecycle-created/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md",
+      "beforeSha256": "25598d584fa2b67ca394edb7fa5efe80aae96ad73db26a4251131c1cbc715703",
+      "expectedAfterSha256": "1653202bcc98981d2cbff4b763874da443e0261c6415523e46663f9b62a8b9c9",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md",
+      "beforeSha256": "fba456b4197a31c6b68d82ecb2778d8215d4b560a6c6a4dce22b3b4726c3eb67",
+      "expectedAfterSha256": "0ece875aa2ec77b6f1794a1121f0bb53f842f2625d39f0594d84244ceb464987",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "beforeSha256": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "expectedAfterSha256": "3a93640bdb45966d0351f5ff2981fd056d63697faf4c0bb4ff9530f8d0c013c1",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "beforeSha256": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "expectedAfterSha256": "48d58b9f6f4dc74109ddebc2a9fe8440cc677a634d0a34672e728621cb88d42f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+      "beforeSha256": "f91baac1a8063f72d26ad09dc95d224aa3ee1378569995b04a789594a258fae4",
+      "expectedAfterSha256": "92b94501798de23b0321d30ee0fe3f9c1e0dd83fe175296dde0c6dfaaf5d699a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-a-leaf-claim-can-now-be-refused-and-why-status-done-alre/pick-leaf-fork-and-sibling-merge-guard.md",
+      "beforeSha256": "98e78fc45684528d3f05d9839739672b0c5644ac5cf22d413e3dad4a8a1558e5",
+      "expectedAfterSha256": "6873e2e4d4eee14365ae3e0aaad720fc39974a59b1d0d1ad5eaa998c07dcd7ac",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md",
+      "beforeSha256": "d90a8506653a79e1e3582962750aefd1067a78dbb6f2021bef0bbf3379a97ebc",
+      "expectedAfterSha256": "1750028074570c11cc0efe825157d24a394676dae50e4917d4ff9c162d181d87",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+      "beforeSha256": "2a198f439b177132df8da137c98088ba2e54e12447bd6991741b24a7352d532d",
+      "expectedAfterSha256": "917c441f6681aea486670e0a0c061e46d40f82ed85072aa9488520c5e86ba3c2",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md",
+      "beforeSha256": "b6667baa9a53693818408cbb76dfad39df4c0248f1e642617dfa08e057fef800",
+      "expectedAfterSha256": "4f1beed337373abece3afae70ad8d9cfaa0a2f055b713486bbe34e210a1edb59",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-a-work-branch-must-never-be-git-checkout-d-directly-on-t/direct-branch-checkout-on-main-checkout-instead-of-worktree.md",
+      "beforeSha256": "b5249681b2f77f04d4182b45a96a0fbe3c3815bbef5e4d7eb9f4c645e48f329e",
+      "expectedAfterSha256": "c93469814dc3fb76ad550179897a6647192bfe873a0151bf80ab6f0ad9a296ef",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-an-is-ancestor-of-main-verify-check-can-never-pass-throu/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md",
+      "beforeSha256": "25c9c71ad8e08fb4802dd4d08695cfcb5c6035f577a6aac89bbd6eb3a8baea98",
+      "expectedAfterSha256": "9004d20f4b43f7d1b4b211d91c89e0ce0a91248ee384eb054c4748f538a8548d",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md",
+      "beforeSha256": "22a1ddab689a956c84266ac29e4fdab14335c7855662c3ca8f231cf099ab28b0",
+      "expectedAfterSha256": "1fb1ecb17c48cbcf5febe3ba1fc98a38eec3877fe51ed20454364e3856464344",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md",
+      "beforeSha256": "1125cb274a451615e583b9607186cf6345e9297553907ea863eaa4b26a06772c",
+      "expectedAfterSha256": "6be7e52543d30243e9b27cae29cdf93aff5ee6a1383108fd6b0ed53b3780ee92",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-o/why-the-retrospective-content-gate-checked-the-wrong-fields.md",
+      "beforeSha256": "addb9073214616efb359f7f9d7a77c789dc3b71cb21c2a2fd7691fff2302a02c",
+      "expectedAfterSha256": "67c89ab03d19663ce370d46918aece628700aff21a71f245bb126f26b1576f62",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+      "beforeSha256": "1d419499c1f0fad727a3dded7ff5e1f73c92f50fef4c45a1c76013920233414a",
+      "expectedAfterSha256": "13bf4f1a8df8e9d1bf91b79304866ad710936f666d7f9d58c80fe6c15f766a3b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+      "beforeSha256": "b06349f25aa7eaf60e75331ba1d9f67eebc85e438f41f467e7b5dab15834363b",
+      "expectedAfterSha256": "3d9ac20c083ff0a46eb74fd3ac8482f9c80d4f629e8036cefc2f4c87c1f8bd8d",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s/context-md-enforcement-scope.md",
+      "beforeSha256": "15b709ea8f430507be6c62d3893548694ceb94621c6740f5997d1384ba8200b4",
+      "expectedAfterSha256": "a27fd73296183fb1946502b40e708f3618668b9b7a994eae026b08353a3bc3bf",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-decide-for-execute-for-impact-analysis-reported-unavaila/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md",
+      "beforeSha256": "03fc5d0b05633d7d730ddbcc730c209bacd17a23d46c592f7bc15166fbe40a60",
+      "expectedAfterSha256": "62cf1678a7b8d7a87e35c34d3d0abd5668c800a8dbd5b190a988ed6fdd49e6f3",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md",
+      "beforeSha256": "e9df4a30d1c6072041c8c7d8598380e5ab19e3e7cc5f943a31b02092c8037d23",
+      "expectedAfterSha256": "6e5a01d853df4bc3aacf55e9a12b8f84d05a3635a91f9696fe8804a751d5b936",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-dispatch-binding-moved-from-name-keying-to-needs-for-cap/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md",
+      "beforeSha256": "e56c40506ac92875f41cd7363169d4ca3bdb83545969641eac23be3a9db508b0",
+      "expectedAfterSha256": "32bd35f5875167132bd1b2cfdd344a3373ecf517d9e95138befc3268190b0884",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-execution-fan-out-reuses-computeschedule-not-selectwave/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md",
+      "beforeSha256": "af12b1df2aba62579085df863ddc19a40a7118fc12c2948809d0809b64a58b96",
+      "expectedAfterSha256": "e41ea83eeea901344c63202b05518badb100c0cf4d2cf9a1d1f0b3655713ec89",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md",
+      "beforeSha256": "321a6118452e014a53b98b14a305b8fac5612ef70ee98c657df9270a8af99c7e",
+      "expectedAfterSha256": "d4d4a779ebd6e5a7653dc35d8a064c9fb4a9dc5356858e6c8b0c125832c5ad02",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+      "beforeSha256": "45f94e96f9c10ce7394e99c65594d661b638692359bd09e174ddac002320381b",
+      "expectedAfterSha256": "d063cd8565c9b507890c39a1896db619cf360ee7f69707cb28f0b6fd8968804d",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-cleanup-next-keeps-exit-code-classification-instead/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md",
+      "beforeSha256": "87ff4e1dac4a63b231a2b27806806108d832db3df3e35de26f0a7279c6d9fc7f",
+      "expectedAfterSha256": "63d1d68eae8b4d1baa682e4fdf05598c0d662d11f699ac6987b398845193e8d1",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+      "beforeSha256": "d5e03cd0c0a9920b4d25234bee2b96c595fa0dde872ef09613dae15e9416e24d",
+      "expectedAfterSha256": "68ff6e94ba357d076b75bf65c516f0064108d76952c5fe63fb910ee599ce0b11",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+      "beforeSha256": "b8dbc8707f92e19c57b1adb1f23aac55a2dcf3e8aafb6f072833787b626e93a8",
+      "expectedAfterSha256": "764c60a0fb22e986c3b61d5202ac440805011fea57612ff5d4363536657136f1",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md",
+      "beforeSha256": "28d6d89b11c53f01910ec418862e496a7f240063cf3048f998124bf1c5f8b4b8",
+      "expectedAfterSha256": "b06b8a95c2016eb305f42f0fbd4b027b23041dcf404e050d682b76ae26ccb7d8",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-detects-post-land-drift-among-sibling-leaves-by-int/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md",
+      "beforeSha256": "6f17c1efb7f7db4b4ab921a803b4fb5939e6260c112fe0d109b5bfa7007a0131",
+      "expectedAfterSha256": "129589b82eaff3e5ae20ec1c00ab0a354ed32aff6821dd25ac2cfacf0f3b742f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-discover-could-overwrite-an-already-locked-verify-c/discovery-decompose-reporoot-verify-overwrite.md",
+      "beforeSha256": "15ec7e208391f609137d56e2397c668393ee99ae5b217c752bb5e12f5bf19a15",
+      "expectedAfterSha256": "9c5fa5345f1eb1524bfaf93649e496db079c136eedb491030d9be2b581ce4c88",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-discover-next-shrank-to-a-picker/why-discover-next-shrank-to-a-picker.md",
+      "beforeSha256": "4f44fe79fdd27c88e918c5a00926de537755881b4adb04c80859659a5385f793",
+      "expectedAfterSha256": "6a7d3244843ac1d2380815f353ca2bcb11cecc790290e9e9b893c52d4b76c645",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-dispatch-splits-into-gather-packets-with-a-second-e/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md",
+      "beforeSha256": "e7ec6d2ba18bc1cd41fa72215c03f98d58aa4040b840e5d5fb7414f6effe8964",
+      "expectedAfterSha256": "fff65c30a4649a6784b3412aa91937411ed4459c50490228a1c411cec18212c3",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolati/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md",
+      "beforeSha256": "e20b5bc070cf729ec3f95d9e2f704454b4b9b64db7f248e2c216c56d8b4c8ee7",
+      "expectedAfterSha256": "bba015909d8590eb1b1493f5034af8a3628297ad04a922ceb4ebf723af65fc18",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-fgos-runner-died-in-every-agent-shell/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md",
+      "beforeSha256": "2d88b59f205e349e60c687f0dd45d7ae7b452e0451f3f31cb68cc0bf877ff5d0",
+      "expectedAfterSha256": "731a5eb952d0793e10e51163c7717eb373b53fd3060e364934f89d0eee2c87ee",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+      "beforeSha256": "b29c111e501fee2d74c9d81cbf05fc0511951a0aa0e99abc4727053b42dcde69",
+      "expectedAfterSha256": "4473573e8373138d0132c1b753123bd344f25bf5c798cc60848867bbbafa0c1a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+      "beforeSha256": "c16bf530bba9255808133858f022e2e08b45c024a0590251967613af70627277",
+      "expectedAfterSha256": "6a4eb9d7c1e194b2e6ef6587782bc0a8ec491935d86f3c55a8ea7caf1c2dc234",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-keeps-growing-the-same-decision-logic-in-more-than/fgos-choke-point-pattern.md",
+      "beforeSha256": "b45738cfa7cdf2187249153b30dca5fec64309b573a7fb3e38fa90b976e27103",
+      "expectedAfterSha256": "f96d097a4310157bce06d4e7906d788ca23a42d7a34b5b2a4dc4bfaf8e0a036c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md",
+      "beforeSha256": "5719baf6bf9bd472947ca9ced5a3a0bbb8d914a219c19b2d4dd766f1b9a053ac",
+      "expectedAfterSha256": "10c85b847d452acef6fef272bc69871e27ca2c126e135459b18d23697c167310",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md",
+      "beforeSha256": "5bfdaefc98c510cb85ee63faa51239581a4564a797d5349eeece7a2c12ec4e9d",
+      "expectedAfterSha256": "7a50236b01c12f4a4628c8dd15e440c9f15249362828d6d20f7a01ca93e2de0e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+      "beforeSha256": "2f517cd1f7a16aa01de1d86b822497d94273f69e5e5f1f4635065dfe7e0dd376",
+      "expectedAfterSha256": "09c8653e95a31fe51416924b36a0c7dbabfd9080689e04733c2c572aed91576c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+      "beforeSha256": "83dd80030a6195067a4c59cdb578ac34e574d5475be42c19c3d1497a1eb7e7db",
+      "expectedAfterSha256": "b5462f05e051e13268a61339c5045949324f2e307a9b63a239b4b1f1737489ae",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+      "beforeSha256": "f469fa839ebf32362dc1c36c54214f7139c22eec424d801ad45bdbeb49be8435",
+      "expectedAfterSha256": "9553f5829e309e6b6346578803e9a461d5305298d02bb937ef8ef01713ab25eb",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+      "beforeSha256": "f477e051c28843a44890300e6bcac49b644364629ad7109c251e86e66be4ae33",
+      "expectedAfterSha256": "7f4a1321d440c2783606d4a6a68ca80be13cce960cb7e056149af1a68f62c724",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md",
+      "beforeSha256": "49e7dc8f39520448a9fa129f188ccfd490321252dfddcd1620d0488e1d4860b9",
+      "expectedAfterSha256": "fb91585c6492b1f653be22c4f679196be2bcf5c50495e06e9ef65f08c349974f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+      "beforeSha256": "8c1dd8db19f4bbe54ba90ab9ec4f16e69906b43c9894be87d5b35ec0babb1a84",
+      "expectedAfterSha256": "28b617a7b1958ee7c8c74624ec9bfd125c62b480f219f13c6da99d881fdbef73",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md",
+      "beforeSha256": "c5505f67234d9209bab7eb9af7bf61060cb7f187a1499e83b3f9609fb28a0146",
+      "expectedAfterSha256": "c728bc38e21c06def65a6f17234f843bc13d31f43642d7b96f274879722ac019",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+      "beforeSha256": "fe55f43e065c29fe3dc2a6cc3f1787ade4b4574322af20ae913f6726bcd195a7",
+      "expectedAfterSha256": "5bf8854f4232e6bd56a9868756685d96385ba1c9d32b7bb91b6d0631aff39454",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md",
+      "beforeSha256": "6a71703b2f1e64985d653e8fd82c7c2b8d52bede41f11a59171fd3786cb445a3",
+      "expectedAfterSha256": "5508e3681488cf04fb24d4ab91020f3685cad83088af17bae768f53c51213da0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md",
+      "beforeSha256": "2dd7698fbdc5aaaf83971dbac5bcab099f90763e65fc7bcbc19709adf09a7838",
+      "expectedAfterSha256": "a77b8cd5dc21a8f3b1b006dd032ec501342246b2b66b99299bc7d69d57c40397",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+      "beforeSha256": "062af6c9bf24067dd2c739af0ad913014dc068b95ea6165393a51e324a19522f",
+      "expectedAfterSha256": "bc67d84d57197fa87f7ff7a841a6c925f334c0b693efdfbedef223475c2b4cf0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
+      "beforeSha256": "d0c5864dab33c83d4e42cd966104952d1f29576dec4d4df738213e1954791c2e",
+      "expectedAfterSha256": "e7d13e38365ee1c9ba18f114a957ffaa5ec5a37caa7cd5b847fed40a4b26b73c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-intake-classification-moved-to-after-clarify-and-back-to/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md",
+      "beforeSha256": "83eb01b4ef6195790f0105fe4dff836662b17dd5847e1c2cd178bd0fc6cee7f5",
+      "expectedAfterSha256": "8cb84e302244493831e2042e0aa2e9d98e605a072ee4f5a9b086bb3f129a1811",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md",
+      "beforeSha256": "368825821224bbb384d4807b973c845707b291b5fc88c5873cf42a5281a845c0",
+      "expectedAfterSha256": "8a294dc7e7765cae119de45434bec405d956733dee70431859cd3244aa5d946c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
+      "beforeSha256": "c042758613c38d11a73235a5d4242d18421939ebcc8a41108d63c45fd07cce37",
+      "expectedAfterSha256": "583c113483f3a72c34fe279fc11668e51ef956278383cdf153777535c5d70c49",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md",
+      "beforeSha256": "0af5e2b9e32d366135284b452edde73f8fc1d1507e1beeb850d95b5b71d407e5",
+      "expectedAfterSha256": "b7b05379463825f5a32044bc3d2e671243338f6f04c07f29c692b234f475fb47",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md",
+      "beforeSha256": "33b6d7ac26f3b80d4c8155465603d063723095b689ed8b71a5298c6b413e92ad",
+      "expectedAfterSha256": "18a64bcc6a65137b1939b696e375106016fa83f9d1139997622ebfce82ab8755",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-mergetree-groups-by-parent-and-sorts-recursively-by-bloc/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md",
+      "beforeSha256": "accbc9b3b34449dc43362941baa186205becf51162cefc0639f293a786674acd",
+      "expectedAfterSha256": "4c4ece963bd327c1a05127ba1be1ca06ce4d0927e5b2f289f9338944459e4c51",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md",
+      "beforeSha256": "bd7b41fad86b31df2aeb779ed7d5278ce0fdb84d02ba2da6e9073b671fc9ffb4",
+      "expectedAfterSha256": "628da4f5b7f020fba905f42376b36907a58cd0e061decb71884b4b3e30c98854",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-resolveplan-s-decompose-verdict-no-longer-treats-the-pre/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md",
+      "beforeSha256": "fd41b1809659ad5b5e34a3ad2ebaf1ea86639c9bbf6f50e8ad7b2c09b9af8421",
+      "expectedAfterSha256": "459ede1c139353ef99628bd1337a99049a2207ad6ca2e10ebfa5af08fba9279c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-return-s-blocked-friction-hint-checks-real-output-not-th/why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match.md",
+      "beforeSha256": "b05caaea2c00d62457ecc702a1d9c04c4cac2aae07701f574271d5d52163d342",
+      "expectedAfterSha256": "ed76a4b9cb56954291c949f5594c1e30c8e6b12152d5c9065efde1b53215b6bc",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-runner-config-splits-capability-curated-vocab-executor-n/why-capability-executor-and-capacity-are-three-separate-concepts.md",
+      "beforeSha256": "17f3d9220d7e36c2dabf350e26eaf86c24dcaceaa55928bddd356bd65df837bb",
+      "expectedAfterSha256": "fc366c057553a0676907c51fcfc7c9fbada5d0977f215fede59fed22dd6a7d72",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+      "beforeSha256": "108ec9e58c3f720454a6949aad1a687f28d507e504cb416bec1d571ee8f0ab02",
+      "expectedAfterSha256": "528becbb14627aa8db66f37bede9b53e0d838b39977f207e8cf41acbd84934b5",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+      "beforeSha256": "9e4e9b80adf24affa29bd09ac8cee6e6f899341e9b5d7950abcd4140fad3aa44",
+      "expectedAfterSha256": "911208a36ffad173300b2a5bd074d9f62ff7065e070bdc7c9c53a5ee351a5975",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+      "beforeSha256": "c118ef423ecbfc5bd260709f010b5f977cfffc1c0812c8ff8fad17b28074d827",
+      "expectedAfterSha256": "24b06931454e35016b59b956caf640ca9ceba834cc41e64add2bed4cc803e527",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "beforeSha256": "7cf21351c63b388bb6d6fdba95f7351fc3fbd3c632de2b97f81aa7dd60878048",
+      "expectedAfterSha256": "48bcb1f41b139513dd40eaa6a0ef3cfcc583892ffa7f0f0f732e7a9a14f9cf9d",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+      "beforeSha256": "a66490ef5283c0e51ce78f5565ead3ce54cf7e7e0ebd283cd03c615b31be9544",
+      "expectedAfterSha256": "89a9c0ea03962c20b5807e1f827a27d265efd55332a84f84df5649ffe8ea3a85",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+      "beforeSha256": "7e181e8a4f754c4d33bfcae2f8e18cc93ea372eb878eca3fb532910c59677f76",
+      "expectedAfterSha256": "e599f1c5a9c72bf98914d5be09b1b29a857c24453376f27c5fb5537d93620e44",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+      "beforeSha256": "6140cc8ffe078af0f134362f60c032e633c413da36c96621fc1342fb9b743598",
+      "expectedAfterSha256": "3c57ed83d73a6c1658babb63b4e47d0091b92d3641ce97281012322b108bc33d",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+      "beforeSha256": "6e66d7b812d8b9ba0a748ac9c824d53e990dd442596a5558b74de2351068b8f9",
+      "expectedAfterSha256": "901dc69b1207b8820009bceadddf2a9d8535d0ef3eca90b3172a411b923ea9af",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+      "beforeSha256": "3dd951c1355ef5cdc335d12f57954edeb7e90628bb42e0ab311f6f5d9d4ef4e7",
+      "expectedAfterSha256": "e6858a7d7cfcbe1d0ffab4664986019ce24ddd049d73ee3a436332e4dcd57231",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+      "beforeSha256": "12c8cb390f839db3791eb37bf1765e96550549fb08490f9e50e8b6419e99268a",
+      "expectedAfterSha256": "efeeea281a4d2a9806a302b1a29048aa74b5af63036515229f84defcc3b5fc3d",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+      "beforeSha256": "e0a05376da5ee6e1c34334aec846766cf8d068bff87464b0b632b99cd7eca60b",
+      "expectedAfterSha256": "0cabfe0fb50c6b5d7d44e334f528e6eeb770c7c79b239aa208992ff021bb437a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+      "beforeSha256": "1cbc795929d012368ede09260f179a75576defb1c1c3a17c4f56ce2d1245ac81",
+      "expectedAfterSha256": "c6881239576fc734072bc74d766af41e3e76fa6c7b44774ae4210c4d23afe5cc",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+      "beforeSha256": "7bfa0d8af1bbbb8cbc48ffacedc710b7b879ae3b4a5b4611f383b115c2981623",
+      "expectedAfterSha256": "ee43a8e35d241da9cbcbed7c34a9f5a41647fcec2f6b3360667f1bd8570c2522",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md",
+      "beforeSha256": "76374ba65e53d2ac73b4a89bbdf995ec54d7b1ba6ba34445ccda83357547c666",
+      "expectedAfterSha256": "639866f0b115d9a4b742acabdcfbab9aa6d25088abf45909393421c6a0ffb01a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md",
+      "beforeSha256": "5ada81e933888a03e387baf8e614b5d4bca3b8307443241e7524ac687f66a080",
+      "expectedAfterSha256": "73d6a5d0710f3d85db7e428a39d2edf2cdc0723e988a7af5b2e5a0d5884f71ee",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md",
+      "beforeSha256": "76bc924026b31c1a8f8ac9e8521ccd2ec55f26ab493ce96516f21e6dc3a51bca",
+      "expectedAfterSha256": "2b8d063ede22a8cddd168608fb9ee4f05103aade9e8a6824002f027263e51cd0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+      "beforeSha256": "4fb03d17657b334ccdf5f3a8dea55357f8fc5964f6511de4819c6d94a3fd3e0b",
+      "expectedAfterSha256": "96f54797fdb2114c22309f6c5627a11106c346d1f47c2abfd2e6abbf330a9c34",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/work-item-priority-calculated-formula-and-intent-s-retiremen/priority-formula-and-intent-retirement.md",
+      "beforeSha256": "6eaf8a9eca523a4eab98549a28ab7c190b551d23414d0ff96c2b5e9e92c382b7",
+      "expectedAfterSha256": "757dab159025ea4a064eb82202496ee836086ed467e22ccc9f796eb7c64565b0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
+      "beforeSha256": "cf92920a8a721b0bba1b6dc080e89f7f103a65c175d333a5a64d5d0db9383033",
+      "expectedAfterSha256": "617d81e4473731daac7854a34d2185bc049067f9c9a5c214583595fa6d49746b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md",
+      "beforeSha256": "4d8a7fc2492d9336fbf69e578667db72cbe6200c428c51f950af77f747c2211a",
+      "expectedAfterSha256": "441a5b356b539cdea01b78af025db21a945fc14c2c91ea11877b2d851638d62e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/operator-runbook-herdr-cockpit.md",
+      "beforeSha256": "5c5b7d6c6d80c4822586376676176e58d3434536f774bea50e162b20990840da",
+      "expectedAfterSha256": "cab6950fe44f8ffe3c0bb98d24c6cbc1e45345fc5a0e2a981abea39403d74d03",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/README.md",
+      "beforeSha256": "1ced7aa146e2669d4ac346edba862422b5b4ee0af3fb86bbe4fea9b636d60ac0",
+      "expectedAfterSha256": "9ca32e20e043beb272269e36aedfe2ea9e243a2dd2d326ab00e729d7920fe01f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-confinement/README.md",
+      "beforeSha256": "2ee76f9364637f691e28941d445100fdda7dd8a7df8ba827c2dc51db90a2967d",
+      "expectedAfterSha256": "f2d663ae8769445c22899075dba37e979a4fc4b353ce8bcaa230376c417c3bcd",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "beforeSha256": "691e69db53290609dc673c1aebe15ad1c165f9d86541dbabdb6fbcd9d1d1a7ae",
+      "expectedAfterSha256": "8b39f0aa494a5d707d90f2e29b936d4860a420102d97b9197b9a32220ebaaaaa",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "beforeSha256": "5feffde597de5d2bd666fbaf06096f3e1bf0e1f3059f07144f560a33cf644290",
+      "expectedAfterSha256": "ed3796eb63f3410c7d9078bafb4eea76e35cbb8e5575682d5aaf3e5c44502125",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "beforeSha256": "bd26ff8474267ab4e565b56141bb25267f0d246a9b9207b60b5e22f2a1360580",
+      "expectedAfterSha256": "a0461fdd013283546e08313e7ab026f2c0a57ef324093fb7f7e3d7757e524801",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "beforeSha256": "51dc306ed3d1e37df50b86102fcef8e5deeb1ac7545f72e99747cd616ce5ac4d",
+      "expectedAfterSha256": "f8f583cd7673e030bf1b3ed10ba88a3fc3a5449f6714188e62ed949e876bb7bb",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/README.md",
+      "beforeSha256": "a0a5aa8e1899e97ef1f250c1c4365f9735709dd2e1f17a80a684f9acaf7c99f0",
+      "expectedAfterSha256": "60885e607c6c3b6e040309e562eed2584db44414046d774cb4ccf2e8b54afdcd",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/README.md",
+      "beforeSha256": "164d48cf0386988457af6447eb9a6cd5600765610f649b3ec179628ed8df98df",
+      "expectedAfterSha256": "e6c6a65381a24f312f6d9cbbdd1b6b0fae97030d45212405de55d697e2cad564",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "beforeSha256": "29a94c3bac47c039b65b9ab0879e5867de4035fe6962b27d33cf4957e9d4574d",
+      "expectedAfterSha256": "b8d8e073394e360e1bdaff70ff0d2f6491b6f50ac73ee95b79bf68425d11863b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+      "beforeSha256": "916fe71f475cad3e19f137283017d3c732912354051e5b526a2ee4fff744a346",
+      "expectedAfterSha256": "8aec02d8b8a486aa5d73af366f8aac6399d4c24c4a168111554f929eb05a5d17",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "beforeSha256": "848999421de92c2840c86b3cbe459d3fb58fce4b8d0a718557547eacebbe7614",
+      "expectedAfterSha256": "1dbdb43238e1231d76a56bf2a10c25a1ce23f668308b6549dd1c8d6bf67c11d0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "beforeSha256": "87959922ca6a7fd9ad225c802c95367734077b6df6b9cb92a8b9ae131204a9c6",
+      "expectedAfterSha256": "180fc45c04c5b1017028117c398f4b3d78d2e1c49fae5a70af81a0da84d92b68",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "beforeSha256": "726b5d36a7a0ee13be3b795cacf856be63394b0e4d42481ef1f1641a6d840967",
+      "expectedAfterSha256": "ea7493a137e1c4eddb2fc896fb5da955b99387e88fa0b5edc3bbd945b00729c2",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "beforeSha256": "a5b3d04dbc725ba2248ed07fd24144cc2e3ffd4031ae2fc23d6088d12f50581b",
+      "expectedAfterSha256": "41bb5136dc3e344797003f86a5c62c3ad6f7a1ac07e29d7bc9e7f40cd426736c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
+      "beforeSha256": "bb7d7f863fa4168f636b4e1fe9a6c914c06fdda3f2b39adfa3840189c1e69f90",
+      "expectedAfterSha256": "c61852683e54ac40bee894434116ee22923d067b6c87ce48f62c1011e9e88f3e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "beforeSha256": "9c1cf88b17b728fda5a6d18e1d8d57de2b719bb0f50d9ded28947ffda8b8c2e7",
+      "expectedAfterSha256": "011eabad4785b237a268fe39f454bddac907f7cc04d54d883ae3bed4a0360400",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+      "beforeSha256": "d7189aa5fcfd50500457ac1fab647dc687b58303153703a1c530fa63c38126f9",
+      "expectedAfterSha256": "e32135a4c91a58ca1deb8e55e9bc92605987a230c85c27feb3673d3a00b5b1b3",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/work-integration.md",
+      "beforeSha256": "12741378ece5a65b7d8c01bbb3e98eb568ab7ca2514018f08733700c0220c05d",
+      "expectedAfterSha256": "5b077ab762abb05dfcfa9128bafb5bb39b41544bec4647619bd8ab6f1d512a88",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "beforeSha256": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
+      "expectedAfterSha256": "b35cf993a51aee0f337651d2ede725c66a8a2f0195fbf635f26c0a09ce758e77",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+      "beforeSha256": "3e63f3cc25d8f0a1aa9e7638d8187406ad882796b1f03e9b7ec63d94841b65a3",
+      "expectedAfterSha256": "7235c833661a5266298ec4eb26296792b2f5226547c6c055f8255fd2f39848b8",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+      "beforeSha256": "9bc319cc98fc2be021eb34b207adff37cdf29a051e3da2b655c3b11880b3cfe0",
+      "expectedAfterSha256": "5e244a012817c2ad8f3eb9abd5f59486fc25db21c55e2db0fabdac7bf63e93ea",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+      "beforeSha256": "3cc1928aec230839162c8fdc2dc37c47bcd54eac67de4b50857f1ffa5a230653",
+      "expectedAfterSha256": "6bd0ac1d1a6fdb24770aac031b721f21f4ca51e0f8b246ad2395fa5040cd066e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+      "beforeSha256": "67e9ce7843b88e6ebe0b7688b0e00f1490bfaedf718c1e5853826a3f98eabe8e",
+      "expectedAfterSha256": "e79a415c94ef8cd2249a4eefaefc26ec49e1c641b225f85673b4fb29b832b306",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "beforeSha256": "36a638a0bcc156ac4aab3866514f3a875330fa0d6c5f609dcd989d5c21023bbd",
+      "expectedAfterSha256": "9b27161416aaeb694515ac0dd49b8def11fd427272aab384dc8a9722922a0d94",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "beforeSha256": "7304aaaffd81ebf4dd9ebc580f171330c03e0cb2596835e04b24e630a41e2cd6",
+      "expectedAfterSha256": "d06013803f872bcc2d986a827f4480da949a7f177a7bcaf0bfd834114644c005",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "beforeSha256": "3e3784c6d5b9f6be51f824483be037040395a263cfb26eadae4a1762dc44427b",
+      "expectedAfterSha256": "90dcc30bdfd7174af8ec8d545e860c9bd3a5ce1b43fe6ec6bb96e4eaa299f87f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/README.md",
+      "beforeSha256": "7de6f1e0a46de1715ad8d38b882ca52e82ab32485e9f5e7e5ae8dfe5f7c10977",
+      "expectedAfterSha256": "019ec3856700a5ae71317804c69501be47fc0c1b8f3caabdcbf7990b98ed1a36",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+      "beforeSha256": "92ab5eaaa4c71e0c608ca98f2af80223dcba72b71d2c8117b02382ae8f456ed8",
+      "expectedAfterSha256": "4c4f25a568d8778c7569b9a640ffe4c41f567cbddcb5b5480b03edc93b84c39e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+      "beforeSha256": "9b8fbd656ba0424b16dc4e036613faeaaac50280dc159c0c7dc39841d71ab7ba",
+      "expectedAfterSha256": "5f93dec2a85f35a76eb9659a61646a720ea25c4b9b688fda2b0fbb2c066a2cf5",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
+      "beforeSha256": "909c0b05f248fff0ad1ea243a00b7b07df13e6e7a51153be81755658f8a64530",
+      "expectedAfterSha256": "cb970a642d8dd6ad80e4dbb8582011931ab8d3caeca6e5b6ddfdefe7923d42f2",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+      "beforeSha256": "fcb4e76bb918cec17c8d833abf8104957909794f9475fc805e0b46eef92a35ee",
+      "expectedAfterSha256": "dab7e391c1c795dda7daa0527b1e133eab8aada5f5c53aa53ee88812180ad8fc",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+      "beforeSha256": "7322f48aae09a8f0474dff36976bf89d4e90c1a7cd0c27ac718311c68fb51476",
+      "expectedAfterSha256": "93888671daca0047507da487c8e7e9da03a91936ac6a15b4cdfb35b96f6472cd",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+      "beforeSha256": "44583d97aa123e556e59e1bf2df83c010bcd17943c7783b18008ce8c08815c56",
+      "expectedAfterSha256": "f923495d5ac388f2c5f9d78c0eee6fff7e0249e3f00f0b0f830d02cf616a5064",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+      "beforeSha256": "337a8434c51b1e72aa0944e01c9db3daae5da16ca2ccd1995e4decfa148a99e9",
+      "expectedAfterSha256": "4bb401b86d8afcd83cca58ecda5b38fd9a848d78540da4a35562197df9696096",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+      "beforeSha256": "05b1c7ceba3a89083d8fc1dd3565db2fcd27ce9ed1a588b5653a41bcb0369ba7",
+      "expectedAfterSha256": "5bbfbc23dd2c00ad89591f7016488a9e6d06fd07325d98ed4a8692a9c59b972a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md",
+      "beforeSha256": "cd4f9064ace300da4a752c04c3a091eba598dba0b8e1d2d9050383f77877b616",
+      "expectedAfterSha256": "510fc06539bb475482024fe57aecc8e4e1d20af2a6e5153e1463c0d4b258d0e8",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md",
+      "beforeSha256": "94d0bd5ebe83755e5a14422e455c20e6c9dab09f5ced70f0e6c34d46b105d317",
+      "expectedAfterSha256": "8cf32c896a0928997aaa565a1effbb8f411edc426964674544df7990bc919375",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+      "beforeSha256": "dd12830b9f191b0182b16daa4942bec55b41593d1cfe8061792ecca5f42d019f",
+      "expectedAfterSha256": "9784d2c6df28501e6de7ede76be254eaf568f68ceda9c561dc94c9f1e90b5fb0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
+      "beforeSha256": "138c4eefc7fdb7d702586d2951f11aeed7ae4ba1c0955bfd895922185c3e2d92",
+      "expectedAfterSha256": "6a134b9463c62643935e0e3567a55a4f6ccf69ffdbf0a16de96b6fb5409aed2c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+      "beforeSha256": "b18256aa248efdcb884ca4df66b25da2abc63b9d1c93a2e06a6d7dccfd52fc59",
+      "expectedAfterSha256": "67ead1a2f852622a39c4cd1135dbe26e14b0f2cf72c8a9c3f9e9f9abb53e8c2a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+      "beforeSha256": "c6cfad4c026309f70f772452d657dd1cb748929abb83dedfbdaa8f9afc6a9d50",
+      "expectedAfterSha256": "0e70736c3038f6914ea8262ec779f48d49565903b3444057e261dfe9624ec836",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+      "beforeSha256": "a1ae971fb4d7cf344269017c6679a28dc99dfe321946fce5bc565ef8e25a5f09",
+      "expectedAfterSha256": "d7a52134b8fba4be9d0232f6f125ee2d6242f97e2342cb920b9f5b3414ed9074",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+      "beforeSha256": "36e3264a2dc695a6ee00f89df32f1542624b5c4c01272597726df0e070b127d3",
+      "expectedAfterSha256": "223439d613b051dfdc551f310dc46e32853d2932e695753a63079912788a90a5",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md",
+      "beforeSha256": "11c25a2b3f26acd7d04b6debb29df9684fe53d61fa48dc13359fa50c86a8688d",
+      "expectedAfterSha256": "e7ab91314e0be49c1e78062520f684f9cf461e8696a93d0e0b5caf83be4379b2",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md",
+      "beforeSha256": "3a9a96dc3be9ea7d8818ced5870d9289ffa28299be93e5d19855a6ae3030111a",
+      "expectedAfterSha256": "62ca81f5ae695cdd34d9c1c87993dac80461de0da343732610445acc0d38fdb7",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+      "beforeSha256": "7b10274c9528f2ac3e304f3edb11c09ce9083979917e384a65a8a54156b04809",
+      "expectedAfterSha256": "0477ce4082be69e8ea576078c15b042fd8ab85715471a9954af3103a0bdf5a9b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
+      "beforeSha256": "8693fefc4020ecee41bd8e37384f37049cbc33e555952ae9a97090b4535b502b",
+      "expectedAfterSha256": "5d4df2d6767e4c2567f0ab2f11f9746b6dc1a1d86c442298403123750a7f6a3b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+      "beforeSha256": "268af8311d9e1f0dc91579d75ba43174395362e5f33346a3911524cb00229064",
+      "expectedAfterSha256": "a239bbd21e13d688ebddabe5326cca31136d7ae4e1cbe6e797fd76236a20ed02",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+      "beforeSha256": "e005edcfa74d8745286a261247ee5ab09193e34c90a3ef3cc3cd51a27e94378a",
+      "expectedAfterSha256": "04dca72480723638e1eed286f078e15fb54db8abaaedddcae6ea3bca977ab621",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+      "beforeSha256": "26ce4d27a2f8b90f65797587b7f43858197bb65966a9acba72e9dd090c5852d0",
+      "expectedAfterSha256": "e6b36b247e2094928b0c586ae95365e1830bec7617118f28637a457ad62d190a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+      "beforeSha256": "9b2060aaa38a81f3af5667dd0322a82b1236932cae1750901cbf9aa19510d365",
+      "expectedAfterSha256": "83a02cc44f86381107056151221bfa7296f6ba10443885573c387d8cb64df2e7",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+      "beforeSha256": "05d0d9904b1585e51ad9e68d08222dbccaeb17a6c33ae82ee586c5a8c5076a40",
+      "expectedAfterSha256": "370c5adbfe74e4a57d63ac434499b9893ab976c53ff649be1b0c00ee400a8fdc",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "beforeSha256": "641e53d699bed08b8bc1a2560d34782af56d6a6f06ffd223bf03651cb18bd89a",
+      "expectedAfterSha256": "1559fc59ad96366af06a7bf2e96970da9822edb2d6ae70eb29235c4df883dcb6",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
+      "beforeSha256": "9b6a2a82e9ef0f03b398b920806da34590518285669fe5035f6fe6370d899dfe",
+      "expectedAfterSha256": "a9d628e3d425e318c288c409803f2725ccf1ba76d28b1dff9a23786ff776f2cf",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+      "beforeSha256": "7cabdda6aa024a58c620dc0db7aba105f42e066df52cdece07a48e0e4b3944ce",
+      "expectedAfterSha256": "6ae60c60f6e6183947af61dddc97c9e9338a073fb39d6bfe06cb6d5c7abc5ae6",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "beforeSha256": "c120616f2ef08d3436082fce5723096abc10a8b0139fd05d4831c5f3b8d3e786",
+      "expectedAfterSha256": "42c7f65b97d5b21f1e4779e5bfe153d886078b2593b2eb7f0a784fe584759f8b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "beforeSha256": "378ddfb0b9ee7ac7fb1ae64bf78132657a62a215983ac81fea89b27b0144925a",
+      "expectedAfterSha256": "56bce512a970b87c6e63f7af23270ff706b01bde52e793320be9291c6b5f6c7c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+      "beforeSha256": "5993832e16b9f9c083c70ab559ded77ee40611699900a8501048956a8d673ee2",
+      "expectedAfterSha256": "45f73a19e134020e7353ba9493bd801c6f0aa3a165eaf8e30970c1e5d46b9071",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+      "beforeSha256": "5e24133ed6af0fd697eceeec9f89314343f53e1b9d4c9ee14b848f6e47c531e8",
+      "expectedAfterSha256": "d92258126d5a0dad79e868a86d70137bd392f77fa5b358b70e3dc3912162ca27",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+      "beforeSha256": "83b15457c3df4736e1f8599311713d7edc1845de2e15b9b6cc6348370d5d7cf3",
+      "expectedAfterSha256": "5e0a146bf2df9eb1d4874a1c2d71ffba494a1e6c0cdb65c580a86b3bb553e13d",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "beforeSha256": "e10f823de2e7971378e617bdd8eecc2a5603bb064dbbac994355f41d1693bc46",
+      "expectedAfterSha256": "6e8bb0d6bc1b87139673424f089fac2c2d136bbd2399cffa0f361fda1cf74f5b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+      "beforeSha256": "ece76b2f2c2e51502dad9fa950e3f04341651e5c12b17adb96197d7bff59b8d6",
+      "expectedAfterSha256": "0bcf5f8ee70e78ae3404bf57b74aed262acf29e1e1139526cb13205f5554c5a1",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+      "beforeSha256": "68caae1d33be3dc6f94375bdf3aa25e8aee90ce46b00975e3559f44224faa082",
+      "expectedAfterSha256": "5061275545278779ffde08f29f67c1e5b39c6eacc7d81c959ab4b5d4e0f07d95",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+      "beforeSha256": "5a4f9f9209d843b392693f6613243d8172cef807a8c86b719a8dbf9e4eaa4075",
+      "expectedAfterSha256": "684c220dee0aed1cc51693bf9695051a3e6c834955a2dab102c6797860ca1b2a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+      "beforeSha256": "2e4cfa172517ff749aa840bce13f2a687909242e409b6175c3c9d28285600c6b",
+      "expectedAfterSha256": "de56115e0e922c9b0bc2e3c31e83c6609cda3a037d4cc1e846135c4d10942c41",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+      "beforeSha256": "23b3f9740d69fccac393be7f9e5b81544b654f344220f421ca7d4878f47728bd",
+      "expectedAfterSha256": "c64089f3a25575eaa7c2f1648b2fbc968891417b005d258c46af8a424b49e6c1",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "beforeSha256": "024296d84c79542f793c408efc75e2c3089e682e31bd5518a35c997d24c46aeb",
+      "expectedAfterSha256": "a54d2a857819a9f5bd282e8ed89065b7dfe680d33525a12202db4e4cef0f4bb7",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+      "beforeSha256": "7d08a6824a122fe1eb19ae97f7e4d37395f900c4ac380bf42340e6952c1fb387",
+      "expectedAfterSha256": "cc160de09a084945eb76797aa7e46a67193c6ad39a733cc6c63ee6cf4426fae9",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+      "beforeSha256": "4bcc7cbff043ba85e5b41f4e14f9954966c861a0f8f39259fb0050f4431cbc5d",
+      "expectedAfterSha256": "b3312750494aa380915eccbe222246598f5a3c723acc1063e5535c37167858b3",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "beforeSha256": "8d1e5a682927463a5ef6fac777040a08d2389b78c697985327a0c8f7bbc30cd6",
+      "expectedAfterSha256": "77862223d128d889de58a3fe9e9730eaf3048e6451a46f073d73b1388dc40791",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+      "beforeSha256": "b6e18afd8dcc39f52877ea77a836cc45a5f5f7ccce937dc5c8863a913ab0f5bd",
+      "expectedAfterSha256": "5e20b40d89e2b00e612ac86d6079366676b2dd485d1c3a8fffd7e73f448b0fd2",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "beforeSha256": "de04beab895a45657097eae7dd8d2bcc8dd8ad888f5f661a44cf63a56ba97446",
+      "expectedAfterSha256": "7fc240dbd7cc8065933a288c13dcb399e4bbe6d3a1801eb601b53a9d35369945",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+      "beforeSha256": "641542f2f68685579c498d1b2ec067dc056e46ea0b44782fc019ec212f3d1873",
+      "expectedAfterSha256": "db7bed093174f2754459498a2b628aaf61e45d36def62c32111cbec59a64090f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+      "beforeSha256": "8dd0dca9b7fa9fe292617af44f7db4f83a841bc3a0e6b1394a0224e1bab6eb07",
+      "expectedAfterSha256": "607253d65f350983342df886c374871c094372886b4460a352cbfe9321481ee1",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+      "beforeSha256": "d272fe276db3a6b29828803f5b59caa32bc0ea4ba8039bfbce18edfcb66fdf31",
+      "expectedAfterSha256": "98f1d8f46a5502752a06daaec5f2519f35e8bfc9d3b9f74033cb61f9630fae8d",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+      "beforeSha256": "8114708dd784265bb50d7daf8093bb550bb4ff55f9bb49e1dd1b6a80cab2384c",
+      "expectedAfterSha256": "4b756744637824238f6e23434f532e85be83b22812314423f31ad8063187ac22",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+      "beforeSha256": "e44cdc1e389036e9013dac23a8eee07cc696ae1e577cd90682a08476a1b1ca6f",
+      "expectedAfterSha256": "007ab9ae86994320331c66333876084bae00d393c10ac6cad30255414e832a9e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+      "beforeSha256": "8b0629c39c72db62ea6bd1b7dc5bac2ee80436d5db7ee9ba72a078c56bb729a4",
+      "expectedAfterSha256": "049df5b664b01b44b29d0e10c19cf4cddfbc34259350a983ccc26be389ca6734",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
+      "beforeSha256": "7541a5f027caf273459b72b36fe635ebd7262db1a28a5dee4bf8fb8ac9b4df41",
+      "expectedAfterSha256": "03c0a60bf25bfb4a898519ecfdbd524a43d514d4dbe71cbb1c2ddc230a6ef35a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+      "beforeSha256": "ce7bbb19c2f0a3880c24cb983df45a69bcfbcd344ea053aaf5ef2f1a9f59a0f2",
+      "expectedAfterSha256": "3e706cc5a7c17403b6b9242dac571a665566b0c3cb2314a968b8e0db46c3ed1c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+      "beforeSha256": "2d42b9eae83cd0c19183ca7c50a0e9b3fc959b497750f88deb7a71579476ab0b",
+      "expectedAfterSha256": "e4c2f0a1917c64ab3b3a50418ee05e64487fe41f2832c8acea9dc7b9983766b9",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+      "beforeSha256": "150dc5f95a94a0e0addc9789bf196635ab90a26e1b61ecee33c128806850420c",
+      "expectedAfterSha256": "bfcd0377347d5d03f94fc4062cc5f403861aed4a3f58f56ab7812e281425dc9d",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "beforeSha256": "8a38625d069995729408e380fbb13b94a28c1fb7b048e3b4d43c7f6bc9044e64",
+      "expectedAfterSha256": "1256ae79ca95976d5ce87dc299ba83007211c7a1defd54871662473df45c412b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+      "beforeSha256": "68995fdfc911f40d52bedfb39bd05cf31d135e67a81bbd34f475a891193ce66e",
+      "expectedAfterSha256": "1b6a43a866956879aab9338b2b8b88f7986474c3a3d5d2b17e4e76f40a569b25",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+      "beforeSha256": "84b1b55b1864360075d21d32da2b9bba07a151aad393dcc11539239ee7501bc1",
+      "expectedAfterSha256": "940a056778f3221224668f3606aef5152d80df89224e84de83c2494e58802a87",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+      "beforeSha256": "a41b3d29e10acf28e75f0e1d2cecdfa5c65feac5c72dcff1906335b75c66daf8",
+      "expectedAfterSha256": "62876b286eff8a0a11ec50b154066c650bd53e6d84a5a4a782ba1f71563e2a81",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+      "beforeSha256": "1d49e4d8a239fd0a5cebda8b65be30b480f5733f48e55539e16874c9519a618b",
+      "expectedAfterSha256": "be2e48e5f10f60772d15752a8a01ebca3ad13851a8ddbce0f523db82b5b2dc12",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+      "beforeSha256": "fc65852d0612eaa6556520014e2a377976d1e691d2828fd5bc2deecc7c004ae3",
+      "expectedAfterSha256": "0ab75892804e596c8de94e807298b0bb71d16171e2601e723d52bcacffa9776f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/spec.md",
+      "beforeSha256": "5610ecb432d5458add306daed63d04b9baa590d2dbbc8d390fff40ab8c74fe7a",
+      "expectedAfterSha256": "965ed46008e3f8b14bd873d157b00f36b1c67077fe6dbe8aff495d7fec46f3aa",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+      "beforeSha256": "ae2eaf9f4e9dc5378b3666da02f0d400029f102ce0ed2d01a36907ceb967942f",
+      "expectedAfterSha256": "26a8b84dd41feb04f8207ae2a071452f06c5b3dc9124e675f2c35a4c28521358",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+      "beforeSha256": "79c603b606b3dc27b6bbd8637ebf8686e9fda2b884d036f9dec12df36aea8103",
+      "expectedAfterSha256": "e1cfb1171af12ed23ba2dd7b7abc8dafcaf7d428ac8d712249b542318e044cc9",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+      "beforeSha256": "5a27d9dab4ffd936948174f231ebeac8b95a55e03149189501cd1fcf127fe021",
+      "expectedAfterSha256": "3985918bf36270c1ca4e4fbaeb168c6fa3077cc0ccb51b169e68ea68a093113e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
+      "beforeSha256": "0bc5655a72cb5fb06754a2448a48cf57bcb66ed9a4d154ea8bb36fdbd1af9657",
+      "expectedAfterSha256": "9d3c37888666a92d269a6db6c68070462b88be42ef58af6970ba656721986a94",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+      "beforeSha256": "a63d2d508214c7d414bcac819a7ec415f6e1169291b28bf7a5520201ea937900",
+      "expectedAfterSha256": "c732ff8963521025a1eff74b2222afbe4b53153cdb2ec648794b336b9dbbfc73",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
+      "beforeSha256": "23b76d492c80579e73be3a44e96cdac73d75bef4ff4066bd5fa749300e336282",
+      "expectedAfterSha256": "2369d133933144212aab79c5e4931135e8a2d634ba97799d8c032186e05ead9b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
+      "beforeSha256": "420853736e8f1a7b8488a70ec3d2ee398b975867091ff4bc12e613590d6fbeb6",
+      "expectedAfterSha256": "48a5d09dad73a75610c2b93fc39d2f92db8ba5e17fa2713717c78ebc49a535f4",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+      "beforeSha256": "282210b38026e6b7b1349865798b5073558791ba9a918a51322057890e94d77e",
+      "expectedAfterSha256": "263ac612868c7bbc9707b5eb225c0320b5d4d975133ed70a38cc34fc5a1ed915",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
+      "beforeSha256": "4a5cbc0c2be348d6ed60be11afb1a1ed17c9300226c63bcb276a49d85015aa6b",
+      "expectedAfterSha256": "03fbf21c8586c906782e9428e5d2ed16990d4efecf130590add52734a419c252",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "beforeSha256": "a19434c03d3e6bc924f15dfb17578befc433b33814316b80c78dc22d7cfe92cb",
+      "expectedAfterSha256": "6b073c9814fc42feefad3ba104580ab487d47a039c2c180e2f94327cd776c4d9",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md",
+      "beforeSha256": "491d90a6755cdb6ef0f17b2befd8861c29cf101c87d7a9938ebf2721e133a9d6",
+      "expectedAfterSha256": "a48c2b3d0661ff128664a03c119d5576909af840e90d7dff95f128e4c30df05e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "beforeSha256": "9c8f5d8e2a55ddf88950fe4ca069cf8cdd46ef9213d77b9d8666ebbc813800f5",
+      "expectedAfterSha256": "41e547176da47762bada6453169933284a7aa5136909a26ff6874893e7853dfb",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md",
+      "beforeSha256": "faa90b316286f190e01a800ad9a2c27cd5d9e1aeb8d22adaebaaf727f62a09ea",
+      "expectedAfterSha256": "ee623d4ba97a577858570b169b293e624a4e4ea65508cf3318078159625a0b2c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+      "beforeSha256": "60a61d421faa9cd83d7625c3068aedb604a5edd02f78840c82cd445ba64e919e",
+      "expectedAfterSha256": "3e26afc1433d4b0946a2006f1850c9e632ce870a32ece2a7d9081a7bd6d12eef",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/README.md",
+      "beforeSha256": "bb30bd431390f4791b4f722434adecccb85b302f964f7b3c0e54fc8feb9cd953",
+      "expectedAfterSha256": "af26f713e5e44e7fa2380061ffbac93d944c37bba88608ab63e2367d489998e5",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "beforeSha256": "f5dd4ea468dbf1cfcee48ecc0aa9de20fa3925a8b134ec1d2a37f1a50d819827",
+      "expectedAfterSha256": "60198fab9e7730268a2522c27bbde8511ce0f90829f9798b8441911e2733a0b7",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "beforeSha256": "f2586e6b0be3aaa0b2c6530bb4961a8d4b80d33e55b40b02acb34e65eb5d7a27",
+      "expectedAfterSha256": "fe6bdb963fe71a4f6938de2dfe2a53f71edfb4de17d56c2282426b05f37476bf",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "beforeSha256": "aeb5be5b11a8b6144756c1578d122095e599b7781f46f89889bdcc1a7d52ab45",
+      "expectedAfterSha256": "a2fed175aa1b3d747ce06a19f4bb186294f69a51dcc98a8d4f225cca94676da5",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "beforeSha256": "e8f78ba9a72e660df02eaf498231ecedd51826ada7a9b8f02b5ea234ceb2da66",
+      "expectedAfterSha256": "f1fbdcae10c47566d693c8c7045ff6e9f2fd7d8e064ced193d574b4ef3ad2d80",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "beforeSha256": "87d1eb6b945b6344aa6841484bf3c3b58c69f74e3566f1e5184ce9b0e70a8be6",
+      "expectedAfterSha256": "f12c97003622474efa89c295eb9c1b78afc2e9ca93385ab5d15dec554c3aafd0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "beforeSha256": "3cccc8cff795fe5b589c19f8aed2e9bc23594ead0aa39009dba1be0eb52b37e6",
+      "expectedAfterSha256": "3c5bdbe47e33ba6bc56e78fe61891dfc358b11f1ba0051201d8c1ee4f48b95db",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/README.md",
+      "beforeSha256": "591ae7799242fc7c5c4f89383565f1c7eb1b37128c5f9e0f519263e08387f535",
+      "expectedAfterSha256": "ea73e19a3d86f005705030fe2911fa3e204562a9302eb3886b00407efb4e5134",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "beforeSha256": "4b5425c7104d77f69f4beaf6f00e96950042ce8a81efbedf148cd42c117d13fb",
+      "expectedAfterSha256": "69957d0149ef6c56325e6c07506d2c4e50381685b03eae7829b8babbb13d7506",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "beforeSha256": "6283f064d761fc87f746031a2d12da027c06bbea5be85e5a45365ed8d2df4088",
+      "expectedAfterSha256": "cf4d002267452ef8490bee4d5f93cfb0e924148bd3f225e92284225dae0d6565",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/spec.md",
+      "beforeSha256": "1306d4f34b42fb2f6eaf9aff1dfb894e300e989975ab0ba9a0842847f24d22c9",
+      "expectedAfterSha256": "28f21b37a4f4334cbe438ab89707e25cf313ce3929d284799addc69370f5f2b6",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/README.md",
+      "beforeSha256": "da761fbeb9673b7c71caae2d0b3ef9cad64bceebb50ff38581e34e7e7799c6f5",
+      "expectedAfterSha256": "77ea0422ab67a0dc5f0881f82b7b6b6f5f53782a7c41392e096d863bdc90eb71",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/vision.md",
+      "beforeSha256": "10489471593b367b403a34a84f003e3587016f6d51096e4a04eaad668094be8c",
+      "expectedAfterSha256": "107feba47bf2f21ca1d11af37db6fbe18b240713b80f43d5a12bfa30c17480e7",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/README.md",
+      "beforeSha256": "5c687417e9a05a64d35f66de12b46b4b462fef0c45f296e90ad17d5b19d42a09",
+      "expectedAfterSha256": "e967cd4dcb934a8dd078aee0152c522da80b747c1a6d9756b08ee1cd39f91424",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "beforeSha256": "f1d218d61037b623fd05d40247f36463cdd6461841278c4cc85c0c43a49c7803",
+      "expectedAfterSha256": "5e4a47d4e816918c456ee395f750649536f55f591645b4c42a55d6760c6cc270",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+      "beforeSha256": "6ae9d176df352daeec9b335040b7672706cf6f6719ae79fb5c2c9b85111faafb",
+      "expectedAfterSha256": "146cb749a7d6ca389d93903f75694f6e80b7570713693a4d0a5f7b2738c862ac",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+      "beforeSha256": "f1af5a4cf9705322fd21d12ce41e4fa9a0138ca9792e1c14b5f32606a1fb6318",
+      "expectedAfterSha256": "bb9ffab90d3d9bd3fdb7287852ac7c7b8fc1057de4af9ee06e613bc8ddcdc40b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-mailbox/spec.md",
+      "beforeSha256": "2b16fd4743bcaa63eaece85cf951a03ce18accca7527cbe9273a8195f389606a",
+      "expectedAfterSha256": "57ab8fd4b1a1872ec11fa03b69c82bcc17c5f8dd94cb115cdca6f6c1eb755c1a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/agent-protocol/spec.md",
+      "beforeSha256": "6bd368bab828957e2deded14d6f3bf8c571a8ff44eefa45e61f7eb30a506b0bd",
+      "expectedAfterSha256": "cb02896630a5df118f6a6103236f03053db85ee80961d11ef659e082ce4aaa8b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/architecture-map.md",
+      "beforeSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+      "expectedAfterSha256": "b85a0630399c9ed85c6d722f7cc6e4c44e14bdd9021182aeb616f86f7791046f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/claude-plugin/README.md",
+      "beforeSha256": "7eca6170bdd2a6b20530fbcaaa9b3bb0168eb443782b03eed9f693e25c4cd3be",
+      "expectedAfterSha256": "0b61566a785e807451dd7feb71225be899cd9939b4656c5250fc54364bf7df44",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/claude-plugin/spec.md",
+      "beforeSha256": "428f4043212d8b0fc7e635957f956db9be01549b6ddc9c9228cf5a79da8007bb",
+      "expectedAfterSha256": "44c49fe546ed3ce866b535050aba395a7f0f3a9af11fc297582837d4fa59820a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/coexistence/spec.md",
+      "beforeSha256": "954d7bc90bb7ee28a45c8f9c5a48fdb3fab119e06e0d902ffdfce438cb5b4d5f",
+      "expectedAfterSha256": "4076287bc4658b76618047a347bc32a9719200f7f4cedb6479291bdeb6686b8f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "beforeSha256": "ccab81b65e2cd9b92bc2b902caf3446fa95119890088a735dc314b107f7c78ca",
+      "expectedAfterSha256": "9b90e37c81498b4f9667d9f96e5e0c8c26241b26eefb8e016af17d9dd4f56d4c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/config/spec.md",
+      "beforeSha256": "99a0e0b2dcf4c231b424761e94f9c2f32e951834acc8e576505ae528307e9be3",
+      "expectedAfterSha256": "4ffb09e0ca4823579e9c3db0ed5c24b651041f9253262a7516be52536c45ab01",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/decision-citation-drift/README.md",
+      "beforeSha256": "6c18bebabf692771dee73392928a0522f63249286acf682932b624e0c7e04030",
+      "expectedAfterSha256": "efb7d9d754c37e0844ff2c533b8d6120ab830e90122de19bbb6ac1700fdbe3b8",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/distillery/README.md",
+      "beforeSha256": "4ac9209e28284f5d3e233fa87839405318a7496d862bec90ee184299e69b2ef7",
+      "expectedAfterSha256": "4b8a2da33cb219de999e4f1827a7e1016386b49e276c3fbbd7a98e0ffed43a78",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "beforeSha256": "001a90b4a3a001d513a0457394b4b8a69320ee2a4865b0b0561bd4d1da39a997",
+      "expectedAfterSha256": "d9481a0f3c9ad754864de88604e203ad2404498eaf7d59024d96421d134ba5b4",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/documentation/switchboard.md",
+      "beforeSha256": "f58542c47377976500986df9364802e7c4d58709467c93775dff1cb8fd2e9886",
+      "expectedAfterSha256": "089bd2ab3aa1337216cb7604899ddf71b8efa8f70fdba4d0add21b1022c9e0c1",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/event-store/spec.md",
+      "beforeSha256": "06d74072fd4ee70b2427e363b2f00300664b8580a2113e882930f29e0835fbe0",
+      "expectedAfterSha256": "b0d3da372952e6ac2ab3b5e616a31a3ee9d71c55db671117390a983b0ea2792d",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/git/spec.md",
+      "beforeSha256": "63856aff2b0d80be616388cd3059ccfbebcd096d9e55ec83b19cd3ec4a748d9e",
+      "expectedAfterSha256": "912e18c3c2bcfd85377abc4b492d64e9a4b64ced8727cdc272e1587fbbc28a76",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/governance.md",
+      "beforeSha256": "0e7d820925c594df12b2895a18158fdb91a2e2c5cf257f5d61463b3e9f7af536",
+      "expectedAfterSha256": "c57fb9a788e9b4ad00fe588d83a9a41e91dda463d27e700188fb7c7565496ee2",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/README.md",
+      "beforeSha256": "87a6a9af2251e06e320f06e9095009942f96889d3a045f54301d1f8750c5dc84",
+      "expectedAfterSha256": "cde1b8dbca8c60c70e6078b383943da95d6fc48bb0b43809361d270985d98515",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "beforeSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "expectedAfterSha256": "a25588dae948fd652926e1390c72d11912d88b6badd8980c5550ebd2875840b9",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+      "beforeSha256": "1e6946675c09f08237ac65c65c4525b822ca219cd2fae6fcb99c72f3d63d105e",
+      "expectedAfterSha256": "746bf7101dddc6c9fd8dba672ef67db23c1660435255d8a7c2fd629d544b17a0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "beforeSha256": "7b5fe48ff585963bfbfc903ac1aa840fa7db58a80a51d72d8cbf73008d9cff80",
+      "expectedAfterSha256": "a050353e97a05c4f6707fbe6c756bd94b57808e085f2c3761b42fde2282d00eb",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "beforeSha256": "b3b06ff39ad72d33773a888b5c42cae601de120bab6699ed4a912823a7a1543f",
+      "expectedAfterSha256": "6957b104f41bdb789a5208f0c2d8d6138a2e60bc1521476090ef6e02fe782446",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "beforeSha256": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621",
+      "expectedAfterSha256": "df3c2ae49a5827ef1a35dd7d3c7ebae87fc30616e5ee180e63160e84049186ae",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "beforeSha256": "40b8f3d8ed14f9b9e7f3cb1fcb663dcceefb9fee23f0ddeb5bca82512170da89",
+      "expectedAfterSha256": "df2d949b90a0e56bd7385cb32becfe8d22034d916e39fa0b7e7c268d32337837",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/identity/spec.md",
+      "beforeSha256": "c84d037198f648ff713e2d5e998a9b6f4a2b98ded36f84102ed7d9bfa8624fd0",
+      "expectedAfterSha256": "7c5672b66cc6496c901e014ae0e5bee564b30f77100d6b2f03c7c8eb785805df",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/migration-authoring-rules.md",
+      "beforeSha256": "7b7d5bd462e55d6ac9ee993bbbb12607e37c8de19cb004e9d8bd4b020c605163",
+      "expectedAfterSha256": "315e25fd29cb76c123f18fe03d2edd682253de770e497ace746f1d72e0ddebe2",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/observe/README.md",
+      "beforeSha256": "8bf9f34ce3e795b1576813c8fe80005ef003613c4d68a3b90fb9fb96054f3be5",
+      "expectedAfterSha256": "6139b4c5811c85499bc12162441251339eff55887b131548786fec5548b1c79f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/observe/decisions/observe-component-architecture.md",
+      "beforeSha256": "e9c67f18fb66c7ae9144db38da213de5adea71c258e95e6565c079f4e0ffd265",
+      "expectedAfterSha256": "caec728c0ec74ef0391ccb17db6ad5210d61665d51cc704fbb75099ff67c1a6c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/README.md",
+      "beforeSha256": "de511be6b465433d260a468633f29c6849756cc68f0998749145cf3864a0b525",
+      "expectedAfterSha256": "2fb3c8e6e5488f660d4adaa0a541e287bfb44134ffd241e196c61021d4bd04c0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+      "beforeSha256": "932f7e4e53e44601840a644dd9d1d155a380ce7a1aa81294f200dadbe096867f",
+      "expectedAfterSha256": "a3aeb8b56fa0923738e0c73db5baad15274656bb00a77b11e6d9defbc9cd78e1",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "beforeSha256": "2873f7a9a716621c2e9d44164f5a760fad473343ed817138f57a524954447511",
+      "expectedAfterSha256": "813ae57f22e56fe2520d8f2a738dc9a6fff28d582cac8002bfe5557ade9823e4",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+      "beforeSha256": "21b8491c94440d62f00035e4f1d90fda24212676466e41300b38d0a2f8053c35",
+      "expectedAfterSha256": "2ea132c12e95f67d908a4a0bfb6513c09ad8f9b5fb01281ac4716a80772aa79c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "beforeSha256": "770f949ac340a17c9d4236e6635ae679b872795e974c11d641b50c3029a4c977",
+      "expectedAfterSha256": "dfee7edd8a926ff1e64d0132770eedf243ccf3cbaf638d95c15b9fe72e8e28f5",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "beforeSha256": "b1b20b788fd8b881ef34b076d2ea8eaf89a070dbc7fdd0465beb48704ddefab1",
+      "expectedAfterSha256": "86b3d095ed4b47560d5427f5546cb1ecbe6942bc38b4bda513ad92749329c9be",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/platform-foundations.md",
+      "beforeSha256": "7bc5be11431ffc33c8bd636301eac20aa1128946bc6c45e8e43ea7dbab4e4aa0",
+      "expectedAfterSha256": "50e3b2b76a3946400c4f654cbefc6659420a894aad082a0e9a542d28fc182151",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/process/spec.md",
+      "beforeSha256": "1ed03ecc353df1b180802791cdb904904f6141347720339347377cb5b48236db",
+      "expectedAfterSha256": "fba913315219d7b4d5687fd9ae5086aafc7ba97e9e69046280b01e8d00d7a08f",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/proposals/documentation-system-unification.md",
+      "beforeSha256": "4fd8ed58e3b9e1267eb571a8dc5ede23b79324af0a1022634424da46f22b1197",
+      "expectedAfterSha256": "9c0996a829f277d01857fee49a82790489eed2b619ee7b5e41221664a749c7a4",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/run-supervisor/spec.md",
+      "beforeSha256": "91cb0302588801a989846109d6a7c9298c28b842709195618f7c22d02ef19011",
+      "expectedAfterSha256": "4ed3fd5c0449afc6280d80f1f63f28576579f8d49c7cbcde368dbb4fbb1307c1",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/README.md",
+      "beforeSha256": "c636d7cc4539adb8ef7ab50114f8aa200195ffce421a9192bb9a50addb1fb7dc",
+      "expectedAfterSha256": "526cb7d1c0d5e4cf82dc0f7a94462e69443ac9a9893d90425650feb604930561",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "beforeSha256": "cfc3f750f213f1259f778832ed67df308f7282e4ce6987f366b9fef199ee915a",
+      "expectedAfterSha256": "bea7a1057ff17f2a8e83e99769cac3771d1a512b022fd3405ba98e3c8d945109",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "beforeSha256": "c9087a371a17e3bff3e79e246374b54abfe903c18e3a5ecaa851fa769f634999",
+      "expectedAfterSha256": "06c442990c23e230417099d37bfdab8e94b7306ddcbfe40e7dfabe573480fbd0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "beforeSha256": "06cb6ef110523cce86ee1d23eea6b20fd153ce9be4b6653e5e1fa549d960a00e",
+      "expectedAfterSha256": "6f21dd4e8b5144d8d99bbce95d770f9e74254853ef627f01ac507266720a2300",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+      "beforeSha256": "80820f44da4ec857d93e5c81da5d4205795b4b62381160a14a042c94e01a320c",
+      "expectedAfterSha256": "3047785e72ee0d0c422b3e61ff1120c0c9b0ed117b9427332fb825126e80b5e6",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/contracts/routing-handoff.md",
+      "beforeSha256": "97b9a2cb6f1bc3acad1ec1a882b32660fda06538e008d66d57a2029cb0ae325d",
+      "expectedAfterSha256": "c065c6afe6815b91d18cfa38a9dbb39670b83abbef7818dc38fbc2128b54236c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "beforeSha256": "348fb00440ab449972706c129caffff1e7316a4156f70a7909e720425a412c46",
+      "expectedAfterSha256": "d8e336015a9afa856fc54fafa14ef1b6ae996069fb40049451322981972a03bc",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+      "beforeSha256": "5feaca6672d1a905c2c686a72444c66bd6a2109afa6f21f0a5f4f4b92ac9dbb7",
+      "expectedAfterSha256": "6f6740accbdbd5b2cd4c05e5860a7cbcd2fdc7f2738e6804e5ad2915d94cd291",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "beforeSha256": "e68528aa3987c7be6494fb02dcd8ce7372fece7e3c171780d489cac4accfc14b",
+      "expectedAfterSha256": "7bb0e16e1682d6433ca588f26d2f0510a3161f50dcb1b62075601142d3c9095e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/spec.md",
+      "beforeSha256": "db6d09b5d82fb60465fa46f4bef17be5d8d8e251bc05ddf30d3ad9f219802718",
+      "expectedAfterSha256": "3f87884f32ceb07841239274b7dc14370d315f0892a04b1e913cf9145c06fe21",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "beforeSha256": "b7f4e590dbb6b10579466a589e26c5dd161c43c0841a4cefe39bdf20a9caf501",
+      "expectedAfterSha256": "0de10bf53ae6557889da063d6aaa845828a987cee81579962aef1554f51c2aac",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+      "beforeSha256": "0487ede5df0d6595249f6d0ed08695d838ad4af153e8f9da348b8cfe5e4d0331",
+      "expectedAfterSha256": "89331e9b44f102598eb138f1bf8834683f10fb17e5b79b3c75ccc52511daa0ee",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+      "beforeSha256": "908ab50e89188b13254d00ef9e131cd40c675ac92a61d529e68b7f1d6d82abd9",
+      "expectedAfterSha256": "e747585fd8896819a3789881eb655123419342e592521c33a8022089a0c7e661",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "beforeSha256": "8a974e8880f101b835a5daf35dd261960f8f06b5016d051fb2b77ded21158646",
+      "expectedAfterSha256": "160c8fd78383bd9e138b73ae7c9b6860a595ea0519c99aa775a7d62ccc9d6a59",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+      "beforeSha256": "619385c230714647ef060afb7f8140d4747ac4b0ee67c289b0bf8bc9e1150491",
+      "expectedAfterSha256": "589f6f6bca1643c9f0e93e0193ebfae81d1ff4ab53e7759023b3525f178f5dc0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+      "beforeSha256": "6bec68a01a54dc4f38b332e709ca9d75d00495697d914239407fd6dddc227a87",
+      "expectedAfterSha256": "2d3164d88e2b6fb1d047d136fbeff18a577a5c7a3267ac4bfa7bdc0e9f5f585d",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+      "beforeSha256": "903d758e17bc17334daa6eb161ea88746efcf5056c96ab11106d7fc9b24bb543",
+      "expectedAfterSha256": "508e3c56b2614771b3f3ce87f761c13864094bb730203fcb69cdad5a24e3d357",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "beforeSha256": "40eb99dc193dcf7c81a39452ec9ca8255a4b0911df4cb7f969176a3606df7283",
+      "expectedAfterSha256": "5c7c2ba7b4be1c40333313ab87f0a64deadf6d7f9cac0ddc0f351df92411dcaf",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "beforeSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+      "expectedAfterSha256": "489086e5f1f5a48417c7b28b2aea56d4ffd8da9702b4c9ba02e2f709d470461b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/roadmap.md",
+      "beforeSha256": "b754ba350d11bb56d93912f42b3d1dec9fa2cef2d3e425fc0586f1a5f1517e8e",
+      "expectedAfterSha256": "30fcf044fbd7489c4d4f6504a76b6caf5378889bd59112e465ae28f546b9e33b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "beforeSha256": "50099b7a34e0f160bb9d5a8bb56527531ef747a31cca021302eae981d9e05a99",
+      "expectedAfterSha256": "513b529445112a817d0b14bcbc9bbe70a1f8bccbc6fdba06fd17285f0a44726c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+      "beforeSha256": "9ee4f29458ce8631cb9df0818b3d27ef17d715ea18f631248676e868ccd4f8c0",
+      "expectedAfterSha256": "ddb23e0d7a71cd447fb42a8a1fa466056516ce71a17ad81fe2d34b0b996f1a09",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "beforeSha256": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+      "expectedAfterSha256": "57f8efcf8b197ada08a831398c4072a56973dd9d182f35a681f9e33b88fdc9f4",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "beforeSha256": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e",
+      "expectedAfterSha256": "744679068b71590aaa87c5c47e93ba943df11639df2b58def6111f95d3a6d75a",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/system-architecture/history/component-boundary-source-carriage.md",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "d9cf0c435ca28f31f943b72a1965d0ac8714261999f8f6fbeab66899bb188960",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/system-overview/spec.md",
+      "beforeSha256": "a9cf64fb4b42aaefdff0b6e0a5fc0f875730f769acc4598ac29922a5cffe60bb",
+      "expectedAfterSha256": "12cbd3fa0df162a8eda9dc64a21d738d6e5194787dc745b5c349bc2c35f790c6",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/terminal-control/spec.md",
+      "beforeSha256": "c464ce042ccb9c29ff9471f3485f4c906ace06d848006e056494d0024c0bac94",
+      "expectedAfterSha256": "0cdb198c1e80c22c693979e374351f966db169225fab2288ffba6a5ae704b982",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "beforeSha256": "23ff53b38e19a4560db14acd42183d23e792c6228221e7d066fd053e51e4a988",
+      "expectedAfterSha256": "1e3b725e7796d03f64818aaf50b5537c786fc0cc180a960a388e36da793224c8",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "beforeSha256": "ebd9cab58f559b5052bfdc73328dd398d3b8940826eb1a49503bf71508a7bdbf",
+      "expectedAfterSha256": "8494e941ab5adabb832dd7ba3a96299a5633951e236f76817add46268a02a653",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "beforeSha256": "02a74857d6f7a0cd1f69e4ec38c54489d3b918e110764edb267306e250b4a6cf",
+      "expectedAfterSha256": "8d13accea134255752a905ca56674cbb7e27cdbc6884c35ddfaccdbbdc6594bf",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "beforeSha256": "56968d7d764d9519bd62f61a20b975dcd3a38407c092c55a684095ab97f87b81",
+      "expectedAfterSha256": "c18b9d25f689454a860f2509241906db3f12fd60ffa9bbd8eccfa0957eadd678",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "beforeSha256": "5942bed6b8819ac41f02afcf5d1a7978f30078c5e602a6e1fb9307669d82968a",
+      "expectedAfterSha256": "2ce7f67846e8ea2a444544628579aadf63a21899f309d08052d70c6e093b1aa5",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "beforeSha256": "66c29168cf76703b4d80e331b134233e2c6585a77a942cd0689eee6881e5deaa",
+      "expectedAfterSha256": "4fd6857ed776455b1f39598dd4611ea24c198a33f563fa2b50f9eac8d7da841b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "beforeSha256": "7d6b64b8f5572c88fd034272101c35f9f4824008bacbcae94f9bd72ef2b55cf9",
+      "expectedAfterSha256": "e5e083d3c879ab2328933af5f2952db104b52d0378a22cc0d4713297efb3efe6",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "beforeSha256": "4b3ffdbdb28fba7323c9361ac0b7f61646fc2f67a3a504dce7cbdddcdc59caf1",
+      "expectedAfterSha256": "9f7c588b8c6d71b67aafbb98bc02722ba7762ab8c9921b0e3805dcd8c2b5df73",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "beforeSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "expectedAfterSha256": "2d7b4eff950023981f927a9a5da65ce7498bc8f537b25720abcb6f0e10e1140e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "beforeSha256": "adadb49a002cad09d4df9541f9907cab8bb0a28655ac25eea7389c76e2636e1f",
+      "expectedAfterSha256": "129c4e48eed4c4bf6a4777e23de3f7c27ada226e4c1d6bea512c4850b7e04b3c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "beforeSha256": "ba00ae2b6fabb389308c763efe779c577d33532afee5bea1c693cba5517c2f04",
+      "expectedAfterSha256": "0964dd8c81320cbb536521502b5e0b1db71a480b4e5bcf332eefa66005a2e4c0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/ui-spec/spec.md",
+      "beforeSha256": "436782fa67de9576dd20c28c7f2b960a4a5c11316689afbd81ad7bdc0c6880d6",
+      "expectedAfterSha256": "2216f07ba34ee9de47bab6c73799ffd34c12d4ef32567ac412fa94d0e0b8a424",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/vision.md",
+      "beforeSha256": "682192b6df66b26feb445963d59a39ac3a366439923838e8904189056c91cb17",
+      "expectedAfterSha256": "dda0552476f7952311b4f55a245d037e805818e26de8019d060c8ee381cdf31e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/work-state/README.md",
+      "beforeSha256": "8d9967f96128ef6705ede2e3e74b617ad5884c7798c2a4e2f0214a1c00fdc22f",
+      "expectedAfterSha256": "859c7fdbb1c9b52adaca5f1a8bbe5129114d68fbf78129cbafe2fb350e33b400",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "beforeSha256": "edcde7411de5311e644cbde9eb86f4ef9b6c9f4e0e6d321407cfe8ef1730fe8a",
+      "expectedAfterSha256": "5d232c7121fbffc8b25876e8028030a8ecacb3335d3c4e3be239c7bd4896785b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "beforeSha256": "d434c42e3baae4705783125cfb2d91f34f66cb1573e36f8da6d72fb596dee2e7",
+      "expectedAfterSha256": "529e2175461b904b7bebdcd9232c0a72b501b3dc3baa070f26324ce17eb893c9",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/work-state/spec.md",
+      "beforeSha256": "8fad2d269f635ce4a00093500daeb8825e95765d65e133479da4821f7aa5238e",
+      "expectedAfterSha256": "12e6ceae00eda6b236fb620a5a0b9e97cec04996028d792f884c3f540d29b572",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/workflow/spec.md",
+      "beforeSha256": "0ce96d282b026df85d96aa20c42b3e934b3b3f739a13edcf0aee6905465e1d7c",
+      "expectedAfterSha256": "6f9b26430c16fa5f489c127d766a3bfc59ad28aef768094af18a355254a940ef",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/platform/yaml-document/spec.md",
+      "beforeSha256": "5761841f0f3b8f2d48193ab6f171184cfed6f92faa3a730a2c149c2dae364850",
+      "expectedAfterSha256": "714d27777d1f476405425875b41d6fecec143694d1bf6a311f7c535bbb8959d4",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/reading-map.md",
+      "beforeSha256": "6ba3c16e40a1d109eb242dbd2ab35ffc2138ca1e1882c4cdbda6a2a733c41bcb",
+      "expectedAfterSha256": "528c7a3e80706cb017f265d13039d08a671f25d5ec257a68dec489737d33ca13",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/reference/dispatch-module-boundaries.md",
+      "beforeSha256": "99cf0a339d63912ea095fe4bb2fcd5a5f18064f467029c3365f0d6ed8eb0dde9",
+      "expectedAfterSha256": "dfdef1310a4948e588015e8fe33ff5403399bf7550409dd73ca42b1e16292720",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/routing-handoff-contract.md",
+      "beforeSha256": "535dd0f61113aab54dcc9637c9f19ef5eb409a21fe515feddbae239a33ec1e81",
+      "expectedAfterSha256": "c2bd9304a4556360a9c7e6992a75a0869e4cfc564f312099ea6763e5afb82afd",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/transitional-switchboard.md",
+      "beforeSha256": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+      "expectedAfterSha256": "adb51802d2432ff699650b55f32efdd4974e1c8b6c9b8d4f0a4dea06737661e0",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "beforeSha256": "76af5d449a69613a2cd3871e5b898934f8b57db685d0d87d1cb4eb3375ff71d7",
+      "expectedAfterSha256": "29a4499514473bca5dbb35205e06612f6849a9f46d221b8bbfa4241c43b85268",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/ui-spec/20-domain-rules.md",
+      "beforeSha256": "cefbf0207b8492ffaffff1f23e13494e94f1343cd9ae4ae1fd82a187dc212e32",
+      "expectedAfterSha256": "d008d1d7bd9077128227e1807311e3a2c7be379e4e54857db5702aa4c3e54c54",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/ui-spec/30-states-and-errors.md",
+      "beforeSha256": "5fe51d275b13c958c865da6c8a0bf60142506e1c5c637829afa23e9b0579736e",
+      "expectedAfterSha256": "8e14f38de4549c16ec20078a3c6204e977faebc5d8571d3b6cc603bf3881e532",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/ui-spec/components/C01-item-card.md",
+      "beforeSha256": "3c31c82cef06bb6f819b4bf8a37fe8f7afa2991daff0a180f827f8b66641ab0a",
+      "expectedAfterSha256": "8bbad8c0e1ef2b1df77554255f6bb1fb6884f5f04b24a7ec0d6ef2fcf7c87b8b",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/ui-spec/generated/wireframe-v2.html",
+      "beforeSha256": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
+      "expectedAfterSha256": "50fcd1383578f0da35faba1f4b9fb12897de9cd2ede1ae21395de629d27deb06",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/ui-spec/modals/M01-answer-question.md",
+      "beforeSha256": "6c459c08d0ad35c362181fac748b68c765c60441597049e3e3c00c8485a61f23",
+      "expectedAfterSha256": "696d54160f6fd63b53b16bf344ce3421ec2bd9bc974de797d6768c8c9406e5d9",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/ui-spec/modals/M02-approve-merge.md",
+      "beforeSha256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8",
+      "expectedAfterSha256": "b4940eeb8316137a05fc19bd979eb7e7d7e39def1d257c44a9fd171199cbf258",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "beforeSha256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1",
+      "expectedAfterSha256": "345ee96e3ea2ebbccdc812bd99a01b4536d74c460b710818127b5eedd128c4d7",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/ui-spec/screens/S01-sign-in.md",
+      "beforeSha256": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff",
+      "expectedAfterSha256": "3960f85a7ea4c62db4041118c68af4768738e877695440a1b4e2da96bda4db5c",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/ui-spec/screens/S02-taskboard.md",
+      "beforeSha256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f",
+      "expectedAfterSha256": "3391d35939f34a36d97247cc3a7c60cdcc00d68936155f09120c27c10bb2a206",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/ui-spec/screens/S03-task-detail.md",
+      "beforeSha256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3",
+      "expectedAfterSha256": "0e8b14c54c64787ea27fc113c6f2c7e9128c4af014f150d13313a0747f3167f6",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "beforeSha256": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b",
+      "expectedAfterSha256": "8f5a358e2b67cfb6a95e0c9532578e0ace709e7a1612dbf0e6524cc93198d4bf",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/ui-spec/spec.config.yaml",
+      "beforeSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "expectedAfterSha256": "2d7b4eff950023981f927a9a5da65ce7498bc8f537b25720abcb6f0e10e1140e",
+      "roundtripExact": true
+    },
+    {
+      "path": "docs/user/README.md",
+      "beforeSha256": "29ea4aab53013f1f5f474ace8d2ec35566fc41c36a0d12b9f642e69320e3e8d6",
+      "expectedAfterSha256": "489c9cad33bdff8c5c9b5d8ae3372b9f304e4746e8007e350622bc94c0ff6481",
+      "roundtripExact": true
+    },
+    {
+      "path": "domains/coding/AGENTS.md",
+      "beforeSha256": "f0b4079e790b0c85f56be179670e2c8bf0026b8759e4db602a8006bef469a924",
+      "expectedAfterSha256": "c2403e052525e5767c4a437d9aef46cbc3cb2c493df349c3ac423991bbcd1128",
+      "roundtripExact": true
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "beforeSha256": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+      "expectedAfterSha256": "40655c4105eb9a9e81b3d1e4db9a2b7a68d110bdb0d55fe049fd6f911d14fb2e",
+      "roundtripExact": true
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "beforeSha256": "6b188d5ee25ba155e7988e694d7a0dafef07589cbdbd51b304d6c54449564042",
+      "expectedAfterSha256": "70f31f7c19e1b5de9c6314d12a30c7b6c3d748369224971a78fb104df8f406e0",
+      "roundtripExact": true
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "beforeSha256": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+      "expectedAfterSha256": "e2bed3b8d4f399bdfaf98bd507b8a7875866706564b4f301dc6a83f37964eda8",
+      "roundtripExact": true
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "beforeSha256": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "expectedAfterSha256": "6bb5b3300486467f8820ca60b0f90889e8d1d9f287e9b61031bbcb22ae7fdb02",
+      "roundtripExact": true
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "beforeSha256": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
+      "expectedAfterSha256": "e4c17844903280abcf34e24d6b41f7ce4dd16ba45a3a8cb346ab07196803d08c",
+      "roundtripExact": true
+    },
+    {
+      "path": "herdr-dashboard/src/pane_scan.rs",
+      "beforeSha256": "4e71fa33d2081c4e36bee7c0d90c5c85cbb7a203bce86117e9a43e408ad0ec10",
+      "expectedAfterSha256": "7770029a8c0c34d16d302e97ba999f80f3e55236ea8a52681f18a6d18d5c54b6",
+      "roundtripExact": true
+    },
+    {
+      "path": "packages/distribution/rust/src/manifest.rs",
+      "beforeSha256": "cc45d293313bf2de2b912293a52dc1f76214eb4c06b56b28f90ab52d640d274a",
+      "expectedAfterSha256": "fda86403e01f1488db764d7282ff87e49f5c0915fcd638543e520ff2b3dd1a8c",
+      "roundtripExact": true
+    },
+    {
+      "path": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "beforeSha256": "b25d732a432dbbfb144c23652cd48204cbf211b4389237dccd0ec46bbd24faf3",
+      "expectedAfterSha256": "b19ae1b2833e894b1d4b424b95a95aa2e3c94fe696943f78591761283b16b486",
+      "roundtripExact": true
+    },
+    {
+      "path": "plans/reports/phase-lead-261018-2025-controller-death-p06-doctor-docs-changelog.md",
+      "beforeSha256": "04321ac50fee6fd96b40efb45dd09a9d7499b6f222a38a4d245632092eef6f1d",
+      "expectedAfterSha256": "9b7e0ae2ada0823ba5138333560f4c0e2f52c9dd0b3dbfbc5bc04623c1b40c06",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/ak-cook-worker-contract.md",
+      "beforeSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "expectedAfterSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/capability-catalog.md",
+      "beforeSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "expectedAfterSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/catchup-self-recovery.md",
+      "beforeSha256": "575cbf6b4a7b1ab056895575b53848d8fcd0c8174f10c050c412a8e753552a4c",
+      "expectedAfterSha256": "5c28f38990c6f0fa4cd57d7fb8f0b8a4bbb9c53567e179e2b3a69a2328aa1a0f",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/citation-format.md",
+      "beforeSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+      "expectedAfterSha256": "a6c834b250d83fbf68c42a0b87a93c128cb7dfeb28d07904134bae32fc93afb2",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/coding-worker-contract.md",
+      "beforeSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+      "expectedAfterSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "beforeSha256": "be25f15a828a2558ef5ffa931f10002760133dca0db77399eb489a63ebde40c0",
+      "expectedAfterSha256": "b84b818a921c440ed327d5edb07cd3cdda8e3a81b51974856ab444f82819bdfb",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+      "beforeSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "expectedAfterSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "beforeSha256": "952474402b90ec3582ad8b55e1c5a03cfc98c11630c3b7c522bb244a235ed871",
+      "expectedAfterSha256": "3c804273d8e62b2700228e20e8846d4ee36e61851af4080775f924f169095d5e",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+      "beforeSha256": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
+      "expectedAfterSha256": "53d83811c8d2357e2b0ec3d7baa428e9350f41a1bbddb54a36d775c4c2bbb9f9",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+      "beforeSha256": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d",
+      "expectedAfterSha256": "d3f72471400100733dde1d67997578750201a1b9d925e940be8d0a2189b655da",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
+      "beforeSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+      "expectedAfterSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "beforeSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "expectedAfterSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "beforeSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "expectedAfterSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "beforeSha256": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2",
+      "expectedAfterSha256": "ea26b214e482b93ac34b3650a6c4ddfd7161618ceb317dbb849285bb8839a3bc",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+      "beforeSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+      "expectedAfterSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "beforeSha256": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+      "expectedAfterSha256": "5c09c38ed592fd2fd0e7cbca6d02934dc676c41dae311c5aba0f14861c5542cd",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "beforeSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "expectedAfterSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+      "beforeSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+      "expectedAfterSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+      "beforeSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "expectedAfterSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "beforeSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "expectedAfterSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "beforeSha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+      "expectedAfterSha256": "bf5fb8c3c1ddd09fcaed0774d2c24f906ba9125f74ee3e76d5d55ae9a4285674",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+      "beforeSha256": "2faa2da065e638c09210d0515d0550d13b26605afa018a496f0eb1819438ecf3",
+      "expectedAfterSha256": "af9e3de7c660b46169675422520102072e23cfd012626c1c8dbb7f31f6677c94",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+      "beforeSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "expectedAfterSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "beforeSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "expectedAfterSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "beforeSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "expectedAfterSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+      "beforeSha256": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
+      "expectedAfterSha256": "1405226ce6624ad9c57ea910b6952e6f0690406fa21ba67e99f54f50ddbf7a74",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-researching/SKILL.md",
+      "beforeSha256": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
+      "expectedAfterSha256": "81f94ec67b7cafe77a809e786b00f304c505a52cade46ec75a5be2b3ed996e93",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "beforeSha256": "b134815fe10d13c4351a4d5f11b5e18db796b086afacc2767a062c218f7c892d",
+      "expectedAfterSha256": "ef6af0cff4fa9743fe4b95fb705ae309a05b5bf93ac7370c3f699150ce6b67b4",
+      "roundtripExact": true
+    },
+    {
+      "path": "plugins/fgOS/skills/terminal/SKILL.md",
+      "beforeSha256": "d1a5e823f9dcf35128cc471b3e01a2e401e0d53c97bccb1a801b51df2435c9e3",
+      "expectedAfterSha256": "881ef7c2d1483b9d27917bab62710e4111e2d41f6c8c09255184b95255b3e943",
+      "roundtripExact": true
+    },
+    {
+      "path": "scripts/backfill-status-category.mjs",
+      "beforeSha256": "559976e36826b535131e2638e024186a051182339b8012b89b857efa4422582f",
+      "expectedAfterSha256": "a78293e79a32a039b199946b3864814fbd2f80b8eab0f86018b8e04e4367e98d",
+      "roundtripExact": true
+    },
+    {
+      "path": "scripts/check-decision-citation-drift.mjs",
+      "beforeSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+      "expectedAfterSha256": "414bbeb1ec669330158bae0f5b48a0f2573ca07a2e7b4b8821b417446a8212d9",
+      "roundtripExact": true
+    },
+    {
+      "path": "scripts/check-doc-candidate-status.mjs",
+      "beforeSha256": "f06732e0f838efe638a4df8372cd3d934e4b61dfcea0ec69cb129b94c556ab94",
+      "expectedAfterSha256": "5dce576d0bda2bb629f75e61337ce318f636de2a2f853e3a756352c6cef5b193",
+      "roundtripExact": true
+    },
+    {
+      "path": "scripts/herdr-cockpit.sh",
+      "beforeSha256": "486b87ae6e1ffd877971dd21b0fec7d375c8b83d0e83f1972cfa4b700720eddd",
+      "expectedAfterSha256": "4f5b3176b3aab743d5a8bab7199361474cddae81bb9a074261a034cb07b78c16",
+      "roundtripExact": true
+    },
+    {
+      "path": "scripts/next-doc-id.mjs",
+      "beforeSha256": "7e88c69cf6c78b4cce5240d3fcc34a1182fc963933435827a58974df5458bc9d",
+      "expectedAfterSha256": "b663871b3f35bae1613980ee7aa7cc24aaf282e75d0f80b503563759a2e9c8c7",
+      "roundtripExact": true
+    },
+    {
+      "path": "scripts/test-proof-inventory.mjs",
+      "beforeSha256": "61a54de2d57888dadb31138db836c569d5663046f4f835bf63061b43cbb77a35",
+      "expectedAfterSha256": "7b514348054c0c85cc3e3517c2184a7ab4d5eeb1b4f274a40673045d83c74422",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/cli/command-registry.mjs",
+      "beforeSha256": "43fccafb0c1e5f75ae8104c5ac035b93aa5d2c03089fc571c6f5bb8b2b2f6ea3",
+      "expectedAfterSha256": "94dc9cc3ac081221b895cacba18ae337bf9816bf2be3199088f969ceff9d36d4",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/intake/discovery.mjs",
+      "beforeSha256": "6da596afa6d305cd8431a7f79659c04449bfe7ecd793bc5600fd11cd2cff9c1b",
+      "expectedAfterSha256": "9a56d70dc35f4dadfbe83f2eaa89ddc693396f830b8a3dcba6d37fb9a322cd08",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/intake/plan.mjs",
+      "beforeSha256": "c3c72be35468420d9f42bcf23a0bdec9e48a11c1f4d8dd6bb4b9be09f4c60dc6",
+      "expectedAfterSha256": "65f7f73eb1d826d95278a096668f6a31662c654fdb48aa5b9090b3df9229999f",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/intake/verify-pattern-check.mjs",
+      "beforeSha256": "1cfe3feb6375b999c4b851f6e9ef8fce7b1fb1209a81c29dd0a043939cb69e0c",
+      "expectedAfterSha256": "227ec546c4461d268ce2413f3db9af76e4358c892d5e2225567a3c876c106ae6",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/runner/dispatch/assignment-runner.mjs",
+      "beforeSha256": "80ce926f792d2bb2d742603bdd138ec73cf170b8d8e7ec53546867e1bfef2933",
+      "expectedAfterSha256": "c244fa85c178f9617cc57572242491b083d828215e7a6edbcffdedc46c8396d1",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/runner/dispatch/confinement/authority.mjs",
+      "beforeSha256": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
+      "expectedAfterSha256": "acaecdaefaf9726185e4281ef8b356acbd45f14cd7fa7ea01459f4a2dd858389",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "beforeSha256": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
+      "expectedAfterSha256": "91e15d2902b8fa8fcf0087b69de714b6651f906713ebf2969b18e0644993d7cd",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/runner/dispatch/confinement/policies.mjs",
+      "beforeSha256": "8d7341c02c6f3d664030347d1047315a4ddbccfb2c264c49b8bea0d9b6d9f008",
+      "expectedAfterSha256": "f823c3997b82eabea91dc6343d1f8ae38a35de17f14ed1c1da1091712f9541a3",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/runner/dispatch/confinement/request.mjs",
+      "beforeSha256": "aba50726b489db9763742539c462cf269461943576472c71e84d2d7fe248f185",
+      "expectedAfterSha256": "bc482597e942044773334ccd6233db827f342fb77750a8d8229e04b8d3ab9964",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/runner/dispatch/herdr-round.mjs",
+      "beforeSha256": "dc6539e766b18759b1544ccc5b28984396376385a74443e5fe417ace06865400",
+      "expectedAfterSha256": "ac2fa580b58dc054c418afa6dbae1f9408cf3de06d15108daeb3befc6bfabe91",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/runner/dispatch/run-lock.mjs",
+      "beforeSha256": "6163eab9be0fa44f6ac4b80d800ddc6fc615a23d698b392df63f427e2356c53d",
+      "expectedAfterSha256": "38e76329cba15f560e3871c6dfae5054fad780d22107db8806d797343f3eeebc",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/runner/dispatch/transport.mjs",
+      "beforeSha256": "10e62b5eb4514e169bb1b96b4db4198ec21179797ddbe0f642a37b56372dc134",
+      "expectedAfterSha256": "acbd18297a320a42f344388607f8ef8ac02850cab10e93cd2c6898b67aac1cb4",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "beforeSha256": "6a84574a194e8ec9c05b9e59d228417e884f28a718ecfe2a8986a170107e58da",
+      "expectedAfterSha256": "03184762a6e2320ce627176cd2a53c8e33356a5178ecb9c1b53af4d04c9759b4",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+      "beforeSha256": "845861f6c8d55ab31e656fb6a54b6c3f6a51507fd02352de15146b7b08cd474a",
+      "expectedAfterSha256": "438fba1efc73fc1d2667bbbfb86349b1e10b7a38403a10149b6263ffa284bd40",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/runner/worktree.mjs",
+      "beforeSha256": "387c3bd8e74e4951cea295cfe0f9802bff5011fc849ee543e7f11101109c6788",
+      "expectedAfterSha256": "193773ec31567a8ecc55410abdc2354ba154bcca529d0704116303aff778ec12",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/setup/git-hooks.mjs",
+      "beforeSha256": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
+      "expectedAfterSha256": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "beforeSha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c",
+      "expectedAfterSha256": "864d4006973fdf2898434a72d7f5a7f1b66289779285fc7b6dfb76a6f39837e8",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/state/events-jsonl-truncation-guard.mjs",
+      "beforeSha256": "93bb6efa390d3e8a58b84399dc90c0b50298c96d6bc4876620deb37d08068965",
+      "expectedAfterSha256": "f55acd38eb47c59af127ce249591ba1e273bfd722820c6f7ac1951cdf8525d08",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/state/gate-bypass.mjs",
+      "beforeSha256": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
+      "expectedAfterSha256": "ef1631612d349cc5ff25ad10523a84585580905a0b24e2d59f356a480cce5280",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/state/priority-formula.mjs",
+      "beforeSha256": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
+      "expectedAfterSha256": "5ad341b4675045cf7872c796da7ba2b5fc8b3fa68382d7c021509c29619c38b7",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/state/replay.mjs",
+      "beforeSha256": "258dd5a97b47007efba895b45cac5fb000695cab25d6e4e68cb2925f99463032",
+      "expectedAfterSha256": "d562fa278f8cb1d9c24c65d53abd040d889e9f13421ed4a21ec08c41909fdcc0",
+      "roundtripExact": true
+    },
+    {
+      "path": "src/state/store.mjs",
+      "beforeSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
+      "expectedAfterSha256": "dab9d2421d59b17bd1610baa98e371ed376bc8ceee3dec316cbd04a45abe4f22",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/cli/fgos-merge.test.mjs",
+      "beforeSha256": "e6ecac9546eb9fea6188b88179883c7c1212c8048c5f0cc2e1347c1fd3cfed3d",
+      "expectedAfterSha256": "158da8685668a64f7487b27c01572061f4ab9b3291df7aa5b3470199d2524bfd",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/docs/decisions-corpus-retired.test.mjs",
+      "beforeSha256": "fd8b2e38773f33f71a6507876a7f5d2cc4bd1b61f9bbd8a4246e7f56a29b18b2",
+      "expectedAfterSha256": "ad75b5b8ed52d221fb8a6455f55182cefd8cd1ab36da4c5fc5613a0fcddd0c4d",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/intake/plan.test.mjs",
+      "beforeSha256": "420f8279615e5f2415ce61b8c6ff53a7e11863d9e737f4f16c1d6a68f044d062",
+      "expectedAfterSha256": "cd2bd513f7f80cbcf96d4980e43f41f2bf2d5d1d45d9689203a2a1478033a359",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/report/enduser-index.test.mjs",
+      "beforeSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+      "expectedAfterSha256": "641f6f72805a6edc85324ba37dffccccef5040033ed39fb1b7e698f542fe2552",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/report/helpers/docs-index-state-fixture.mjs",
+      "beforeSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
+      "expectedAfterSha256": "507b0450cb1a83190ff49a95be3bcae23eef7672d9ea0dcc7b7593dbc85d55c2",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/runner/dead-vocabulary-guard.test.mjs",
+      "beforeSha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+      "expectedAfterSha256": "c18c1b3d929ff87a489b6c38a332e003601e16b80d1f25eb71c0e56ad7cc15bc",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/runner/dispatch-executor-profile.test.mjs",
+      "beforeSha256": "692cb5fc0fb4752ce5f0830d353c4aaf5f62b776c790aa8fbf3b7a02f04c10d3",
+      "expectedAfterSha256": "03ec239425055ec84a72b252d24aa5d0e5af82eb89c2cf0c62cee3db0431a646",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/runner/dispatch-worker-home.test.mjs",
+      "beforeSha256": "af466a08f94b3daca86d4fce1e18d47b9973cc20ad10be78e9dea677df91d2e5",
+      "expectedAfterSha256": "e30afca410e50ee0cee2f4fc78c1cf8b818a43a6820a0895f959432ad8aced0c",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/runner/dispatch-worker-session.test.mjs",
+      "beforeSha256": "f06f180a05cafa1db849f75bf71c118368eb330a76fe3cb802b6ca9572635d5e",
+      "expectedAfterSha256": "19a919f34d8b422dd65eb7b1471249cad45dcbd9fcd3459d33f124bd4277e577",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/runner/merge.test.mjs",
+      "beforeSha256": "44e8822ee9addea2722d2921cddcfb5d2fa25f8f1a16cbd35dd81bdfce948308",
+      "expectedAfterSha256": "1f0d6a3df0595b28d255e8e6b08ae8603680b76b0ab7c59f64f822ced8bc43fb",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/runner/prompt-templates.test.mjs",
+      "beforeSha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f",
+      "expectedAfterSha256": "fdc6535c2608d1a8a1329f87595dcf50b50ea050d56e15a39821150f5ccb7abb",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/runner/worktree.test.mjs",
+      "beforeSha256": "f04c17f51ba77ccb4a5e86d34f23803dee8f84282e11541bd00c5104afb9cd0f",
+      "expectedAfterSha256": "4c107acf174418be06e74e6c21b98e3a9eef10415bd8fd79335beab68129ea88",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/scripts/check-decision-citation-drift.test.mjs",
+      "beforeSha256": "c1255ef2d4640f712fa8b973104f29f25cd3814cda6dcbbac7aeea6995a48af0",
+      "expectedAfterSha256": "3ab6164012aca71c12dc427781039b7e0c9b9254e6b37b602eb3249f68551a6e",
+      "roundtripExact": true
+    },
+    {
+      "path": "test/state/status-category.test.mjs",
+      "beforeSha256": "72b5ef557874f62cd46c9c3ceff229ee7a90520e642a5da5dc5e50989f7e1424",
+      "expectedAfterSha256": "f5f201cf30c7e7c40777d25e03dc672862e27db639686de68ae4893def5b9a93",
+      "roundtripExact": true
+    }
+  ],
+  "purePinFieldsVerified": 10,
+  "patchIdEquivalencesVerified": 12,
+  "negativeControls": [
+    "changed passage digest rejects judgment",
+    "missing row rejects judgment",
+    "changed record body rejects judgment",
+    "same source bytes at another commit retain their content-bound judgment"
+  ],
+  "independentAcceptance": false,
+  "scope": "Byte/provenance replay only; no owning product parity, semantic approval, final pin F or gate closure."
+}

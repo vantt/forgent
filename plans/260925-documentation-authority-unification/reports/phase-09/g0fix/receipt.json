@@ -2,8 +2,8 @@
   "status": "done; scoped author repairs complete; independent review pending",
   "summary": "docs(bindings): finish pilot rebind and verify all repaired bindings",
   "sourceCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
-  "continuationSourceCommit": "a27d85d0a",
-  "previousReceipt": "git:a27d85d0a:plans/260925-documentation-authority-unification/reports/phase-09/g0fix/receipt.json",
+  "continuationSourceCommit": "e7074223277e2879d6599f57656037f8efa31ee9",
+  "previousReceipt": "git:e7074223277e2879d6599f57656037f8efa31ee9:plans/260925-documentation-authority-unification/reports/phase-09/g0fix/receipt.json",
   "mutationScope": {
     "originalLedgerRecordEdits": "record-edits.json#/rows",
     "originalLedgerRecordEditCount": 134,
