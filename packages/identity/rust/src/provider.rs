@@ -3,7 +3,7 @@
 //! the hook path); `identity machine|session|project|resolve|list` read
 //! (`identity.read`); `identity machine --alias`, `identity project
 //! --init|--new`, `identity session --register|--drop-role`, `identity list --prune` and
-//! `identity pins --forget <machine-id>` and `identity mint <kind>` write (`identity.write`).
+//! `identity pins --forget <machine-id>`, `identity pins --confirm <machine-id> --fingerprint <fp>` and `identity mint <kind>` write (`identity.write`).
 
 use crate::current::{current_session, machine_info, os_pid_facts, session_info, set_alias};
 pub use crate::current::{MachineInfo, SessionInfo};
@@ -101,8 +101,20 @@ pub enum Verb {
     Project(ProjectAction),
     /// `mint <kind> [--release <number>]`: a new id, or a sequence number given back.
     Mint { kind: String, release: Option<u64> },
-    /// `pins [--forget <machine-id>]`: the pinned machine keys, or one pin removed.
-    Pins { forget: Option<String> },
+    /// `pins [--forget <machine-id> | --confirm <machine-id> --fingerprint <fp>]`.
+    Pins(PinsAction),
+}
+
+/// What `identity pins` does.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub enum PinsAction {
+    /// List the pinned machine keys.
+    #[default]
+    List,
+    /// `--forget`: remove one pin after a legitimate re-key.
+    Forget { machine_id: String },
+    /// `--confirm --fingerprint`: the owner compared the fingerprint; mark the pin confirmed.
+    Confirm { machine_id: String, fingerprint: String },
 }
 
 /// What `identity session` does.
@@ -149,13 +161,13 @@ impl IdentityRequest {
             | Verb::Session(SessionAction::Read)
             | Verb::Project(ProjectAction::Read)
             | Verb::Resolve { .. }
-            | Verb::Pins { forget: None }
+            | Verb::Pins(PinsAction::List)
             | Verb::List { prune: false, .. } => IDENTITY_READ_OPERATION_ID,
             Verb::Machine { alias: Some(_) }
             | Verb::Session(SessionAction::Register { .. } | SessionAction::DropRole { .. })
             | Verb::Project(_)
             | Verb::List { prune: true, .. }
-            | Verb::Pins { forget: Some(_) }
+            | Verb::Pins(PinsAction::Forget { .. } | PinsAction::Confirm { .. })
             | Verb::Mint { .. } => IDENTITY_WRITE_OPERATION_ID,
         }
     }
@@ -308,9 +320,12 @@ fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
                 .insert("keyFingerprint".into(), serde_json::json!(key_fingerprint));
             Ok(value)
         }
-        Verb::Pins { forget: None } => Ok(serde_json::json!({ "pins": pins::list(&root)? })),
-        Verb::Pins { forget: Some(machine_id) } => {
+        Verb::Pins(PinsAction::List) => Ok(serde_json::json!({ "pins": pins::list(&root)? })),
+        Verb::Pins(PinsAction::Forget { machine_id }) => {
             Ok(serde_json::json!({ "forgotten": pins::forget(&root, machine_id)? }))
+        }
+        Verb::Pins(PinsAction::Confirm { machine_id, fingerprint }) => {
+            Ok(serde_json::json!({ "confirmed": pins::confirm(&root, machine_id, fingerprint)? }))
         }
         Verb::Project(action) => {
             let dir = std::env::current_dir().map_err(|e| Refusal {

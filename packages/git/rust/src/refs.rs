@@ -1069,8 +1069,17 @@ impl GitDriver {
                 let target = match self.resolve_repo(Path::new(path), repo.trusted_main_root())? {
                     ResolveRepo::Repository(r) => r, _ => return Err(recovery("ref-checkout-missing")),
                 };
-                let custody = scope.handle("dispatch-cwd").ok_or_else(|| failure("checkout-custody-required"))?;
-                if custody.path() != custody_lock_path(repo,Path::new(path))? { return Err(failure("checkout-custody-mismatch")); }
+                // The dispatch-cwd lease is a unix lock file keyed by dev/ino/birthtime. Windows
+                // never reaches here (acquire_worktree_admin above refuses with
+                // `git-lockscope-unavailable-windows`, spec section 19 item 5); keep the refusal
+                // explicit so the custody check can never be skipped silently.
+                #[cfg(unix)]
+                {
+                    let custody = scope.handle("dispatch-cwd").ok_or_else(|| failure("checkout-custody-required"))?;
+                    if custody.path() != custody_lock_path(repo,Path::new(path))? { return Err(failure("checkout-custody-mismatch")); }
+                }
+                #[cfg(not(unix))]
+                require_lock_scope_platform()?;
                 if !self.status(&target,Untracked::All,Submodules::Configured, Ignored::Excluded, None,1)?.entries.is_empty() {
                     return Err(recovery("ref-checkout-recovery-required"));
                 }

@@ -84,7 +84,11 @@ test('pinned-machines row lists what the host reports and always passes', (t) =>
   fs.writeFileSync(path.join(state, 'identity', 'pins', 'peer-abc234'), JSON.stringify({
     v: 1, machineId: 'peer-abc234', publicKey: 'ssh-ed25519 AAAA', fingerprint: 'SHA256:abc', firstSeen: '2026-10-23T00:00:00.000Z',
   }));
-  assert.deepEqual(checkIdentityPinnedMachines(root, { hostBin: HOST }), { passed: true, message: '1 pinned: peer-abc234 SHA256:abc' });
+  assert.deepEqual(checkIdentityPinnedMachines(root, { hostBin: HOST }), { passed: true, message: '1 pinned (1 seen, not yet confirmed: peer-abc234): peer-abc234 SHA256:abc' });
+  fs.writeFileSync(path.join(state, 'identity', 'pins', 'peer-abc234'), JSON.stringify({
+    v: 1, machineId: 'peer-abc234', publicKey: 'ssh-ed25519 AAAA', fingerprint: 'SHA256:abc', firstSeen: '2026-10-23T00:00:00.000Z', state: 'confirmed', confirmedAt: '2026-10-24T00:00:00.000Z',
+  }));
+  assert.deepEqual(checkIdentityPinnedMachines(root, { hostBin: HOST }), { passed: true, message: '1 pinned (all confirmed): peer-abc234 SHA256:abc' });
 });
 
 test('fails when the machine id file is not a valid id', (t) => {

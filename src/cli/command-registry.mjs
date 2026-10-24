@@ -1006,7 +1006,7 @@ export const COMMAND_REGISTRY = [
   withSubcommands({
     name: 'identity',
     invoke: 'fgos identity [writer|machine|session|project|resolve|list|mint|pins]',
-    description: 'Read-only unless --alias, --init, --new, --register, --role, --drop-role, --forget, `list --prune` or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, PI_SESSION_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle, its alias and the fingerprint of its signing key; `pins` lists the machine keys this machine pinned the first time it saw them; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `session --register` puts this session in the local directory of this machine, `resolve <handle|lead:LANE>` names exactly one live session of it and `list` shows them; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
+    description: 'Read-only unless --alias, --init, --new, --register, --role, --drop-role, --forget, --confirm, `list --prune` or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, PI_SESSION_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle, its alias and the fingerprint of its signing key; `pins` lists the machine keys this machine pinned the first time it saw them, each `seen` or `confirmed`; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `session --register` puts this session in the local directory of this machine, `resolve <handle|lead:LANE>` names exactly one live session of it and `list` shows them; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
     subcommands: {
       writer: {
         description: 'Which writer the calling process is, as {id, source}. Same as bare `fgos identity`; the hook path reads it.',
@@ -1098,15 +1098,17 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos identity mint work --json', 'fgos identity mint d-adr --json', 'fgos identity mint d-adr --release 73'],
       },
       pins: {
-        description: 'The machine keys this machine pinned, as {pins: [{v, machineId, publicKey, fingerprint, firstSeen}]}: the first key seen for a machine id is remembered in user state (like SSH known_hosts) and a different key claimed for it is refused `machine-key-changed`. Compare the fingerprints across machines once. `--forget <machine-id>` removes one pin after a legitimate re-key and answers {forgotten: pin}; exit 65 [pin-not-found] or [invalid-machine-id].',
+        description: 'The machine keys this machine pinned, as {pins: [{v, machineId, publicKey, fingerprint, firstSeen, state, confirmedAt?}]} (`state` is `seen` or `confirmed`; `confirmedAt` only when confirmed): the first key seen for a machine id is remembered in user state (like SSH known_hosts) and a different key claimed for it is refused `machine-key-changed`. Compare the fingerprints across machines once, then `--confirm <machine-id> --fingerprint <SHA256:...>` marks the pin `confirmed` only when the pinned fingerprint equals the one given and answers {confirmed: pin} (confirming a confirmed pin is a no-op); exit 65 [pin-missing] or [fingerprint-mismatch]; consumers can require a confirmed pin. `--forget <machine-id>` removes one pin after a legitimate re-key and answers {forgotten: pin}; exit 65 [pin-not-found] or [invalid-machine-id].',
         parameters: {
           type: 'object',
           properties: {
             forget: { type: 'string', description: 'The machine id whose pin to remove.' },
+            confirm: { type: 'string', description: 'The machine id whose pin to mark confirmed; needs --fingerprint.' },
+            fingerprint: { type: 'string', description: 'The SHA256:... fingerprint you compared, required with --confirm.' },
           },
           required: [],
         },
-        examples: ['fgos identity pins --json', 'fgos identity pins --forget fg-server-abc234'],
+        examples: ['fgos identity pins --json', 'fgos identity pins --forget fg-server-abc234', 'fgos identity pins --confirm fg-server-abc234 --fingerprint SHA256:abc...'],
       },
     },
     examples: ['fgos identity', 'fgos identity machine --json', 'fgos identity session --json', 'fgos identity project --json', 'fgos identity list --json', 'fgos identity mint work --json'],

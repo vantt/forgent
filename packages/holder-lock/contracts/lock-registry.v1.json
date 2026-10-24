@@ -97,6 +97,15 @@
       "note": "v1 source: src/runner/dispatch/provider-capacity.mjs state lock"
     },
     {
+      "name": "identity-pins",
+      "kind": "mutex",
+      "scope": "machine",
+      "rank": 80,
+      "v3Path": "<lockRoot>/identity-pins.lock",
+      "owner": "identity",
+      "note": "serialises pins confirm against forget (packages/identity/rust/src/pins.rs)"
+    },
+    {
       "name": "dispatch-cwd",
       "kind": "lease",
       "scope": "repo",

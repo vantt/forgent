@@ -8,11 +8,11 @@ edition.workspace = true
 # runtime. Libraries that only read or mint ids (Event Store, the node addon)
 # depend with `default-features = false` and never pull it in.
 default = ["provider"]
-provider = ["directory", "dep:fgos-host-runtime", "dep:fgos-holder-lock"]
+provider = ["directory", "dep:fgos-host-runtime"]
 # The in-process doors over the local session directory (register the current
 # session, resolve a handle or role) need the Convention rules and the git
 # driver (project id), never the host runtime.
-directory = ["dep:fgos-convention", "dep:fgos-git"]
+directory = ["dep:fgos-convention", "dep:fgos-git", "dep:fgos-holder-lock"]
 
 [dependencies]
 fgos-durable-file = { path = "../../durable-file/rust" }

@@ -41,7 +41,7 @@ pub use mint::{claim_counter, claim_sequence, release_sequence, Claim, MAX_CLAIM
 #[cfg(feature = "directory")]
 pub use current::{current_session, machine_info, session_for, session_info, set_alias, CurrentSession, MachineInfo, SessionInfo};
 #[cfg(feature = "directory")]
-pub use pins::{Pin, Recorded};
+pub use pins::{Pin, PinState, Recorded};
 #[cfg(feature = "directory")]
 pub use signing::{sign, verify, Signature, Verified};
 #[cfg(feature = "directory")]
@@ -51,7 +51,7 @@ pub use project::{project_info, project_init, ProjectInfo, ProjectMinted};
 pub use refusal::{Candidate, Liveness, Refusal};
 #[cfg(feature = "provider")]
 pub use provider::{
-    IdentityProvider, IdentityRequest, ProjectAction, SessionAction, Verb, writer_answer,
+    IdentityProvider, IdentityRequest, PinsAction, ProjectAction, SessionAction, Verb, writer_answer,
     AVAILABLE_SUBCOMMANDS, IDENTITY_DESCRIPTOR, IDENTITY_OPERATION_ID, IDENTITY_READ_DESCRIPTOR,
     IDENTITY_READ_OPERATION_ID, IDENTITY_WRITE_DESCRIPTOR, IDENTITY_WRITE_OPERATION_ID,
 };

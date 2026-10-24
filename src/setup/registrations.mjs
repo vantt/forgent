@@ -6330,7 +6330,7 @@ registerCheck({
 
 registerCheck({
   id: 'identity-pinned-machines',
-  description: 'lists the machine keys this machine pinned the first time it saw each machine (informational, for the one-time fingerprint comparison across machines); `fgos identity pins --forget <machine-id>` accepts a re-key',
+  description: 'lists the machine keys this machine pinned the first time it saw each machine (informational, for the one-time fingerprint comparison across machines; names the pins still `seen`, not yet confirmed with `fgos identity pins --confirm <machine-id> --fingerprint <fp>`); `fgos identity pins --forget <machine-id>` accepts a re-key',
   check: (cwd) => checkIdentityPinnedMachines(cwd),
 });
 

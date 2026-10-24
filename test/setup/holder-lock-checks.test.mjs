@@ -139,7 +139,7 @@ test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowe
   fixLockDirs(root);
   const gateway = path.join(root, '.fgos', 'locks', 'gateway.lock');
   fs.writeFileSync(gateway, '');
-  assert.match(checkLockHolders(root).message, /^\d+ lock file\(s\) of 19 locks, 0 held, every holder a fgOS process or a borrowed child$/);
+  assert.match(checkLockHolders(root).message, /^\d+ lock file\(s\) of 20 locks, 0 held, every holder a fgOS process or a borrowed child$/);
 
   const foreign = await holdWithFlock(gateway, foreignEnv());
   const warned = checkLockHolders(root);
@@ -149,7 +149,7 @@ test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowe
 
   const borrowed = await holdWithFlock(gateway, foreignEnv({ FGOS_LOCK_FD: 'gateway:3' }));
   const clean = checkLockHolders(root);
-  assert.match(clean.message, /^\d+ lock file\(s\) of 19 locks, 1 held, every holder a fgOS process or a borrowed child$/, clean.message);
+  assert.match(clean.message, /^\d+ lock file\(s\) of 20 locks, 1 held, every holder a fgOS process or a borrowed child$/, clean.message);
   await stop(borrowed);
 
   // An attempt's monitor whose parent is the supervisor is a member; once the parent is gone it is named.
@@ -181,7 +181,7 @@ test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowe
   }
   const monitorCmdline = fs.readFileSync(`/proc/${monitorPid}/cmdline`, 'utf8').split('\0').filter(Boolean).join(' ');
   const member = checkLockHolders(root);
-  assert.match(member.message, /^\d+ lock file\(s\) of 19 locks, 1 held, every holder a fgOS process or a borrowed child$/, member.message);
+  assert.match(member.message, /^\d+ lock file\(s\) of 20 locks, 1 held, every holder a fgOS process or a borrowed child$/, member.message);
 
   process.kill(supervisor.pid, 'SIGKILL');
   const named = await (async () => {
