@@ -715,12 +715,12 @@ runner:
     "code:*":
       roles:
         red-team:
-          prefer: [xai]
+          prefer: [xai, claude, openai]
       tier: advanced
     "marketing:*":
       roles:
         red-team:
-          prefer: [claude]
+          prefer: [claude, openai]
   # @fgos:doc The model each family uses at each tier, by family then tier.
   # @fgos:doc Tier ladder, weakest first:
   # @fgos:doc nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote

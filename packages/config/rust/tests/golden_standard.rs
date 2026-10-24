@@ -73,11 +73,11 @@ fn standard_cases() {
 /// A project that configures nothing must work on a machine that holds only Claude or only Codex.
 /// A `prefer` list narrows the seat walk and never widens it (seat binding §6.3), so every producer
 /// pool of agent executors in the standard names both `claude` and `openai`, and every
-/// `tierFallback` tier names both families. Checker role pools (`roles.<role>.prefer`) are left
-/// out: a checker must differ in family from the producer, so one provider alone can never serve
-/// it whatever it lists.
+/// `tierFallback` tier names both families. Checker role pools (`roles.<role>.prefer`) are held to
+/// the same rule: at standard rigor a checker only has to differ from the producer, so a machine
+/// holding Claude and Codex seats one on each side.
 #[test]
-fn every_standard_producer_pool_can_be_served_by_claude_alone_or_openai_alone() {
+fn every_standard_agent_pool_names_both_claude_and_openai() {
     let (schemas, _) = Schemas::bundled().unwrap();
     let standard = Standard::bundled(&schemas).unwrap();
     let runner = &standard.value()["runner"];
@@ -102,7 +102,7 @@ fn every_standard_producer_pool_can_be_served_by_claude_alone_or_openai_alone() 
     let mut pools = 0;
     for (capability, entry) in runner["capabilities"].as_object().unwrap() {
         let mut lists = vec![(format!("{capability}.prefer"), &entry["prefer"])];
-        for group in ["seats", "personas"] {
+        for group in ["seats", "personas", "roles"] {
             for (key, scope) in entry[group].as_object().into_iter().flatten() {
                 lists.push((format!("{capability}.{group}.{key}.prefer"), &scope["prefer"]));
             }

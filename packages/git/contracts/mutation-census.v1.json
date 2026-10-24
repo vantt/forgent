@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "60b6aca3e26e58bdc721276613c590b85ee06531fd8e5d57ada0849277e3a800",
+  "payloadDigest": "c08588e3f70d9edce0204808cca555dc4075c42f30eff759b9f1c2389b61e7a3",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -224,12 +224,12 @@
     "packages/config/rust/tests/golden_init.rs": "cf9e5e46541cdf8b69f87923df691bf7e9f2368638e31055e5c52ae25564f108",
     "packages/config/rust/tests/golden_lint.rs": "998d9f358da34dd171e6b24642b04173be773d95ca689973efb8d15fc69ab02b",
     "packages/config/rust/tests/golden_meta.rs": "3ba3eb9dcb44bd5a6be43c32545aca479b6757c40bce4222da428e7f3afc91a7",
-    "packages/config/rust/tests/golden_migrate.rs": "2c9d8c3327d6fc1af21089b491f6116e3120720cdf7b62d7d220d47cd1427bc3",
+    "packages/config/rust/tests/golden_migrate.rs": "c128729739d71c3c3c316bd6c78374905403db50fea4bdfa6cd1d749ebfea7ae",
     "packages/config/rust/tests/golden_no_echo.rs": "b161c4b4c784d6558346ac927c25f57e395d10ca4237e53bf36a19a5814ca51f",
     "packages/config/rust/tests/golden_schema.rs": "bfb95ce662b2840b6ec2ee8e0c9edf66040b11cf220f0f7c888b987b18476e61",
     "packages/config/rust/tests/golden_scope.rs": "ebcf9054e332984689d13529f2cbf7c80600cd2272eebaad99cb0cd639084afb",
     "packages/config/rust/tests/golden_snapshot.rs": "c0ffb4ff5868173aa8aaab00789f92c6417658c8716a23b69fb351a2878586e7",
-    "packages/config/rust/tests/golden_standard.rs": "c51146086d09771ad46c49378e97e6a7dc290e359ca28a9ad1fd5be3e160959c",
+    "packages/config/rust/tests/golden_standard.rs": "15a7340523ecee5022b278f90e2867a2bf87f103c592c8fd8774c3106e8ebf0b",
     "packages/config/rust/tests/golden_validate.rs": "5a1555ccbbfb14dc1eeb906b3534bdb35c1d545182888836bf9ce0ca51a3188e",
     "packages/config/rust/tests/inspect_verbs.rs": "4f3ec6affc1ec318f53ba8336d5c9c460c59d437bebc5ebd5f462050aa66cb57",
     "packages/config/rust/tests/lock_rows.rs": "271a60b5f310401dbf8f4ea395f6a4c82a60628428c2549d3c16804d89737a41",
