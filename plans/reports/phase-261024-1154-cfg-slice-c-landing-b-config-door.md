@@ -154,4 +154,40 @@ Rerun (median ms; worst in the scratch log):
 
 Gates after the four commits: `cargo test -p fgos-config -p fgos-node-addon`, clippy `-D warnings`, `cargo fmt -p fgos-config --check` clean; suite-staged `config-door`, `facade`, `native-load`, `yaml`, `architecture`, `release-tree`, `native-addon`, `terminal-control-checks`: 102 pass, 0 fail, 1 skipped (pre-existing). Rust added vs baseline now +739 of the 870 ceiling (re-count before phase 16).
 
-Status: DONE_WITH_CONCERNS. Decisions 1 to 3 and 5 are implemented; two bounds still fail (first read, machine view) and are stopped on round 2 above.
+## G-C2 round 2: decisions implemented, full gate rerun, every bound holds (2026-10-24)
+
+Commit `ee9b0ace9` (`machine_cached` in `cache.rs`, +28 lines; the addon keeps the machine view in its own slot; one crate test). The trusted root still goes through the Git driver (decision 1: no `.git` probing). Rust added vs baseline: **+766 of 870**.
+
+**Marginal first read (decision 2):** a process whose Git work already ran (`inspectGit` first), then the first `readConfig` of one section, 20 runs, median (worst):
+
+| Project root | Git work in that process (not config) | first config read, marginal | bound (today 0.3 + 25) |
+|---|---|---|---|
+| plain directory (migrated file) | 67.8 | **20.5** (28.8) | 25.3 holds |
+| main checkout | 40.9 | **14.2** (34.0) | holds |
+| linked worktree | 33.4 | **19.6** (20.6) | holds |
+
+The marginal read is the bundle (2.7 ms), one `resolve_repo` for the trusted root (about 8 ms: every Git call in that process costs 8 to 11 ms, see the second-call column in the scratch log) and the first build with its section validators (4 to 7 ms). Absolute first read in a process that touches no Git, for the record: 30 (empty project), 32 to 47 ms (migrated, legacy), plus 13.4 ms addon load.
+
+**Full table, rerun (median ms, release, stripped):**
+
+| Row | Now | Bound | |
+|---|---|---|---|
+| marginal addon load of the config door | 5.3 | 12 | holds |
+| marginal first read after Git ran (plain / main / linked) | 20.5 / 14.2 / 19.6 | 25.3 | holds |
+| warm cached one-section read, migrated | 0.052 | 0.3 | holds |
+| warm read, no `runner.executor`, `claude` on `PATH` / not | 0.048 / 0.052 | 0.3 | holds |
+| machine view warm / project+machine pair | 0.017 / 0.068 | 0.3 | holds (was 3.9) |
+| trusted root warm, main / linked / plain | 0.030 / 0.041 / 0.046 | | memo works |
+| `runner` marshal | 0.385 | 3 | holds |
+| `fgos dispatch decide` today | 188 to 229 | +15 | not comparable until a reader moves (landing C re-measures end to end) |
+| absolute first read, no Git in the process (record) | 30 to 47 | | |
+
+Gates after `ee9b0ace9`: `cargo test -p fgos-config -p fgos-node-addon`, clippy `-D warnings` and fmt clean; suite-staged `config-door`, `facade`, `native-load`, `architecture`: 67 pass, 0 fail, 1 skipped (pre-existing).
+
+**Item for the GIT lane (decision 4; `packages/git` untouched here).** `GitDriver::resolve_repo` runs `read_repository_facts` (config and format reads through Git) on every call, about 8 ms per call in a process that has already done its floor probes, although the config door needs only the main checkout, which `resolve_topology` (private to the crate) derives from the filesystem alone. A public topology-only entry in the Git component (same trust checks, no facts) would remove that 8 ms from the first read of every project root and from any other caller that only needs the trusted root. The driver's cold start itself (`gitStart` 33 to 68 ms for the first call in a process, floor probes included) is paid by every Git user whether or not config is read; whether it can be done lazily is the GIT lane's call, and it is not part of the config marginal.
+
+Landing B is ready: nothing is activated, no reader moved, nothing deleted. Phase 09 is not started.
+
+Status: DONE
+Summary: Landing B (crate additions, addon `config` namespace, facade, cost gate) is committed on `cfg/slice-c-b` and every phase 08 bound holds on the marginal measures; phase 09 is not started.
+Concerns/Blockers: none open for B. `dispatch decide` cannot be compared until a reader moves; GIT-lane item noted above.
