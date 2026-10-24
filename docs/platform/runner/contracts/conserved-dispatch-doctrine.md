@@ -1,8 +1,20 @@
 # Conserved Dispatch And Session Contracts
 
+```txt
 Document type: Contract
+Audience: Runner maintainers, dispatch and session implementation agents, conservation reviewers
+Purpose: Preserve native-first dispatch, session merge isolation and operation-template contracts with their historical boundaries
+Design status: Candidate conservation; no new mechanism or authority-route change
+Last reviewed: 2026-10-24
+Related:
+- docs/platform/runner/spec.md
+- docs/platform/runner/decisions/h-36d872fbb0e5.md
+- docs/platform/seat-binding/spec.md
+```
+
 Owner: Runner
 Status: Candidate conservation; no new mechanism. The transitional authority route remains unchanged.
+Related links: [Runner spec](../spec.md), [Native-First Dispatch Doctrine](../decisions/h-36d872fbb0e5.md#0026--native-first-dispatch-doctrine-launcherroottaskcapacity), [Seat Binding](../../seat-binding/spec.md).
 
 ## Native-First Reasoning
 

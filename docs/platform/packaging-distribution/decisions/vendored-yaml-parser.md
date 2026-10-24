@@ -1,9 +1,20 @@
 # Vendored YAML Parser Maintenance
 
+```txt
 Document type: Historical decision pointer
+Audience: Packaging-distribution and YAML maintainers, implementation agents, conservation reviewers
+Purpose: Locate the superseded vendored-parser decision and the current native YAML maintenance contract
+Design status: Superseded historical decision pointer; candidate authority follows the transitional switchboard
+Last reviewed: 2026-10-24
+Related:
+- docs/platform/packaging-distribution/spec.md
+- docs/platform/yaml-document/spec.md
+```
+
 Owner: Packaging-distribution
 Status: Superseded by RUL108 on 2026-10-23; candidate authority follows the transitional switchboard.
 Source: `docs/specs/distribution.md`, 2026-10-16 decision and 2026-10-23 supersession.
+Related links: [Distribution decision history](../spec.md#lịch-sử-quyết-định), [YAML Document contract](../../yaml-document/spec.md).
 
 ## Upgrade And Advisory Procedure
 

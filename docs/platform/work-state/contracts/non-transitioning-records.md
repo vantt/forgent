@@ -1,8 +1,19 @@
 # Non-Transitioning Decision And Outcome Records
 
+```txt
 Document type: Contract
+Audience: Work-state and runner maintainers, record-producing implementation agents, conservation reviewers
+Purpose: Preserve decision and outcome record semantics without changing work-item status or workflow step
+Design status: Candidate conservation of existing record behavior; STR70a remains proposed, not implemented here
+Last reviewed: 2026-10-24
+Related:
+- docs/platform/work-state/spec.md
+- docs/platform/runner/spec.md
+```
+
 Owner: Work-state
 Status: Candidate conservation of existing two-verb precedent, not implementation of STR70a.
+Related links: [Work-state spec](../spec.md), [Runner spec](../../runner/spec.md).
 
 `decision` and `outcome` append durable records through the existing store without changing the work item status or workflow step. Engine bookkeeping is not the same as a design decision. This is the precedent the STR70a proposal cites; the proposal remains proposed and gains no new distillate/gate mechanism here.
 
