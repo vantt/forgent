@@ -152,7 +152,7 @@ def main():
     ap.add_argument('--out', type=pathlib.Path, default=HERE)
     ap.add_argument('--pin', default='HEAD', help='Commit whose tracked source blobs are proved')
     args = ap.parse_args()
-    assert args.out.resolve() == HERE or any(str(args.out.resolve()).startswith(p) for p in ['/tmp/fgos-work/w6-misc-sentence/'])
+    assert args.out.resolve() == HERE or any(str(args.out.resolve()).startswith(p) for p in ['/tmp/fgos-work/'])
     args.out.mkdir(parents=True, exist_ok=True)
     pin = git('rev-parse','--verify',args.pin+'^{commit}').decode().strip()
     matrix = json.loads((OLD/'step-07-consumer-cutover-matrix.json').read_text())

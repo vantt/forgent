@@ -54,10 +54,12 @@ def main():
     assert nav.count('fgos-coding-knowledge')==baseline.count('fgos-coding-knowledge')
     comparisons=[]
     outputs=['proof.json','retire-with-tree.json','judgments.json','history-wrapper-proposals.json']
+    # The G6 artifacts are pinned to the commit they record; replay them there, not at HEAD.
+    g6pin=json.loads((ROOT/G6/'proof.json').read_text())['sourceCommit']
     with tempfile.TemporaryDirectory(prefix='double-',dir=SCRATCH) as tmp:
         base=pathlib.Path(tmp);stdouts=[]
         for n in [1,2]:
-            stdouts.append(run(['python3','-B',str(G6/'proof.py'),'--pin',pin,'--out',str(base/str(n))]))
+            stdouts.append(run(['python3','-B',str(G6/'proof.py'),'--pin',g6pin,'--out',str(base/str(n))]))
         assert stdouts[0]==stdouts[1]
         for name in outputs:
             a=(base/'1'/name).read_bytes();b=(base/'2'/name).read_bytes()

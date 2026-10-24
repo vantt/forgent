@@ -58,3 +58,26 @@ Disk: the machine reached 97%; the Lead removed this session's reviewer scratch 
 | misc | 9 APPROVE / 2 REWORK: doctor split is 136 + 5, not 133 + 8; example framing must be line-scoped | `w5-misc-rework-brief.md` |
 | G4 wrapper | 6 APPROVE / 1 REWORK (High): `.call`, `Reflect.apply` and array-slot callers escape a declared wrapper | `w5-g4-escape-brief.md`. The pre-existing export-alias scan gap goes to the Git owner as an open item, not fixed here |
 | suite fix | 3 APPROVE / 1 REWORK | the B-class correction above |
+
+## L13-9 — Review push, rebind rulings and the Work cutover stop (Lead and owner, 2026-10-24 20:30)
+
+**Owner (20:0x, answer A to the decision question):** push a separate review branch `review/doc-git-one-door` to origin for HARDEN. It carries only the commits HARDEN must review: the declarations, the wrapper and escape fixes, and the hook. The push waits for WORK's "cutover xong" board line. No main landing, no cutover, no deletes.
+
+**Lead rulings under A42:**
+1. **Ownership rebinds.** The `misc-fix/rebind.py` preimage conflict is resolved in that phase-09 record tool, which now reads its preimages from its own pin. No embedded phase-06 checker changed (L13-3). 217 rows were applied (8e7c6ee93): 93 anchor-only rows keep their status; 124 content rows are pending re-review (A22, `rebind/rereview-claim-ids.json`).
+2. **Archive retention is direct links only.** The transitive closure would have kept 637 files / 281,770,653 B and was rejected; its evidence is `archive/link-closure.json`. Four direct ruling targets are kept (783,918 B).
+3. **Example framing is scoped to the sentence or table cell (afb5bb35c).** f00445, f08621, f08646 and f08700 keep `preserve-operand-reachability-unchanged`.
+4. **Two script fixes by the Lead in this commit:**
+   - `preserve-premise/proof.py` now accepts any `/tmp/fgos-work/` output directory, not only one Doer's scratch name.
+   - `misc-fix/verify.py` replays the G6 artifacts at the `sourceCommit` that `proof.json` records, not at HEAD. Proof that this is correct: `proof.py --pin 4178dcc6e` output is byte-equal to the committed `proof.json`.
+
+   `misc-fix/verify.py` now exits 0. The combined `preserve-premise/verify.py` still stops only on the G2 census pin; that is a final-pin item, and the review found 33 G2 Rust test locations that also need refreshing.
+5. **Check H.** Four contract docs lacked the fenced candidate header block (30ed2bbf4). H now has 0 findings.
+
+**Archive cold timing.** The Lead ran it unconfined, after SEAT agreed to the heavy IO (5c3b57347):
+- reduced tip: 2.93 s cold, 2.90 s median;
+- pre-freeze tree: 41.70 s cold, 12.44 s median.
+
+Both are under the 120 s Git driver deadline. `verify-design.py` exits 0 at its pin.
+
+**Work cutover stop.** WORK ordered every machine to stop Work writes at 15:00 (board line 14:00). DOC missed that line and launched Doer turns 688 and 689 at 15:01 and 15:08, then let them finish and launched no new turn. DOC's late "đã dừng" line is on origin/main at 7cd761949 (posted by SEAT). DOC launches no `fgos run`, pull or push until "cutover xong".
