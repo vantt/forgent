@@ -38,7 +38,7 @@ function headOf({ hooks, ws, hookEnv, toolEnv, write, shellPrefix }) {
     }
   });
   const run = async (command) => {
-    const capped = command.replace(/sleep (\d+)/, (_, n) => `sleep ${Math.min(Number(n), SLEEP_CAP)}`);
+    const capped = command.replace(/sleep (\d+)/g, (_, n) => `sleep ${Math.min(Number(n), SLEEP_CAP)}`);
     const output = await new Promise((resolve) => {
       let text = '';
       const child = spawn('sh', ['-c', capped], { env: toolEnv, cwd: ws });
@@ -124,7 +124,7 @@ async function claude(argv) {
   });
   server.listen(socket, () => fs.chmodSync(socket, 0o600));
   status('idle');
-  const commands = [...prompt.matchAll(/Run: (ls|sleep \d+)/g)].map((m) => m[1]);
+  const commands = [...prompt.matchAll(/Run: (ls|for i in 1 2 3; do sleep 15; done)/g)].map((m) => m[1]);
   await turn(prompt, commands);
   process.on('SIGTERM', () => {
     fs.rmSync(sessionFile, { force: true });
@@ -170,7 +170,7 @@ async function codex(argv) {
     head.fire('Stop', { session_id: thread, cwd: ws, hook_event_name: 'Stop', stop_hook_active: false, last_assistant_message: answer });
     write({ type: 'task_complete' }, 'event_msg');
   };
-  await turn(prompt, [...prompt.matchAll(/Run: (ls|sleep \d+)/g)].map((m) => m[1]));
+  await turn(prompt, [...prompt.matchAll(/Run: (ls|for i in 1 2 3; do sleep 15; done)/g)].map((m) => m[1]));
   const queue = path.join(home, 'stub-queue', `${thread}.jsonl`);
   let taken = 0;
   for (;;) {

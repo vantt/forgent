@@ -29,6 +29,8 @@ export const WATCH_MS = 60_000;
 /** The tick of an extension timer (pi, omp) and of the harness's own sampling. */
 export const TIMER_MS = 5_000;
 export const SAMPLE_MS = 250;
+/** The busy step of a busy probe: a 45 s loop (Claude Code 2.1.309 refuses a standalone `sleep 45`). */
+export const BUSY_STEP = 'for i in 1 2 3; do sleep 15; done';
 
 /**
  * The probes. `sessions` counts the interactive sessions each starts (W4 and W8 observe the
@@ -104,7 +106,7 @@ export function paneOf(probe, { dry = false } = {}) {
 
 /** The first prompt of a probe's session: one line (a pane's launch line is typed), one tool call to register, then a wait for the user. */
 export function firstPrompt(probe) {
-  const busy = probe.busy ? ' Then Run: sleep 45.' : '';
+  const busy = probe.busy ? ` Then Run: ${BUSY_STEP}` : '';
   return `Run: ls.${busy} Then reply READY and wait for the user. If you are later told you have mail, read it as told and reply with one line saying what it was.`;
 }
 
@@ -227,6 +229,26 @@ export function turnAfter(records, firedAt, text = NUDGE) {
   const reply = later.slice(later.indexOf(carrier) + 1).find(output);
   const carriedBy = [carrier.type, carrier.payload?.type ?? carrier.message?.role ?? carrier.attachment?.type ?? '', carrier.payload?.role ?? (typeof carrier.message?.content === 'string' ? 'prompt' : '')].filter(Boolean).join(':');
   return { started: Boolean(reply), carriedBy, repliedAt: reply ? timeOf(reply) : null, latencyMs: reply && timeOf(reply) !== null ? timeOf(reply) - firedAt : null };
+}
+
+/**
+ * Whether the busy step is running now: a tool call whose input holds `text` (Claude Code's
+ * `tool_use`, Codex's function, custom or shell call) whose output has not been recorded yet. The
+ * prompt that names the step does not count, nor a call that already returned (or was refused).
+ */
+export function busyStep(records, text = BUSY_STEP) {
+  const calls = [];
+  const done = new Set();
+  for (const r of records) {
+    for (const c of Array.isArray(r.message?.content) ? r.message.content : []) {
+      if (r.type === 'assistant' && c.type === 'tool_use' && JSON.stringify(c.input ?? '').includes(text)) calls.push(c.id);
+      if (r.type === 'user' && c.type === 'tool_result') done.add(c.tool_use_id);
+    }
+    const p = r.payload ?? {};
+    if (r.type === 'response_item' && ['function_call', 'custom_tool_call', 'local_shell_call'].includes(p.type) && JSON.stringify(p.input ?? p.arguments ?? p.action ?? '').includes(text)) calls.push(p.call_id);
+    if (r.type === 'response_item' && /_output$/.test(p.type ?? '')) done.add(p.call_id);
+  }
+  return calls.some((id) => !done.has(id));
 }
 
 /** A dialog on the pane's screen text: the held-message dialog, a permission or trust question. */

@@ -41,7 +41,7 @@ test('Claude Code\'s inbound setting is scoped to the probe\'s own settings file
   const prompting = wake.claudeArgs(wake.probeOf('W7'), { settings: '/p/s.json', noMcp: [] });
   assert.ok(!prompting.includes('--dangerously-skip-permissions'));
   assert.deepEqual(prompting.slice(prompting.indexOf('--permission-mode'), prompting.indexOf('--permission-mode') + 2), ['--permission-mode', 'default']);
-  assert.match(wake.firstPrompt(wake.probeOf('W3')), /Run: ls\. Then Run: sleep 45\./);
+  assert.match(wake.firstPrompt(wake.probeOf('W3')), /Run: ls\. Then Run: for i in 1 2 3; do sleep 15; done Then/);
   assert.doesNotMatch(wake.firstPrompt(wake.probeOf('W1')), /sleep/);
 });
 
@@ -123,4 +123,19 @@ test('a live run is a behaviour subcommand or a wake probe that starts real CLIs
   assert.equal(wake.liveRunOf([node, 'test/live/mailbox-wake-probe.live.mjs', 'run', 'W1', '--dry']), false);
   assert.equal(wake.liveRunOf([node, 'test/live/mailbox-behaviour.live.mjs', 'report', '--stage', 'A']), false);
   assert.equal(wake.liveRunOf(['/usr/bin/zsh', '-c', 'node test/live/mailbox-behaviour.live.mjs run-stage B']), false);
+});
+
+test('the busy step is running only while its tool call has no output: the prompt naming it, a refused call and a returned call are not busy', () => {
+  const step = wake.BUSY_STEP;
+  const prompt = { type: 'user', message: { role: 'user', content: `Run: ${step}` } };
+  const call = { type: 'assistant', message: { content: [{ type: 'tool_use', id: 't9', input: { command: step } }] } };
+  const result = { type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 't9', content: 'Blocked: standalone sleep' }] } };
+  assert.equal(wake.busyStep([prompt]), false, 'the prompt alone');
+  assert.equal(wake.busyStep([prompt, call]), true);
+  assert.equal(wake.busyStep([prompt, call, result]), false, 'returned or refused');
+  const codex = { type: 'response_item', payload: { type: 'function_call', call_id: 'c3', arguments: JSON.stringify({ cmd: step }) } };
+  const codexMsg = { type: 'response_item', payload: { type: 'message', role: 'user', content: [{ type: 'input_text', text: step }] } };
+  assert.equal(wake.busyStep([codexMsg]), false);
+  assert.equal(wake.busyStep([codexMsg, codex]), true);
+  assert.equal(wake.busyStep([codexMsg, codex, { type: 'response_item', payload: { type: 'function_call_output', call_id: 'c3' } }]), false);
 });

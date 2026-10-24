@@ -74,9 +74,24 @@ function route(op, request, herdrEnv) {
   }
 }
 
-/** Pids of live runs on this machine, other than this process, by their own argv. */
+/** This process and its ancestors (a wrapper such as `timeout` that started it is not another run). */
+function selfAndAncestors() {
+  const own = new Set();
+  for (let pid = process.pid; pid > 1 && !own.has(pid);) {
+    own.add(pid);
+    try {
+      pid = Number(fs.readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1].split(' ')[1]);
+    } catch {
+      break;
+    }
+  }
+  return own;
+}
+
+/** Pids of live runs on this machine, other than this process and its ancestors, by their own argv. */
 function liveRuns() {
-  return fs.readdirSync('/proc').filter((e) => /^\d+$/.test(e) && Number(e) !== process.pid).filter((e) => {
+  const own = selfAndAncestors();
+  return fs.readdirSync('/proc').filter((e) => /^\d+$/.test(e) && !own.has(Number(e))).filter((e) => {
     try {
       return wake.liveRunOf(fs.readFileSync(`/proc/${e}/cmdline`, 'utf8').split('\0').filter(Boolean));
     } catch {
@@ -245,9 +260,7 @@ function idleNow(probe, paths, last) {
 
 /** Whether the busy step (`sleep`) has started and not ended. */
 function sleeping(probe, paths) {
-  const records = runs.modelRecords(probe.cli, paths.home);
-  const started = records.some((r) => JSON.stringify(r).includes('sleep 45'));
-  return started && (probe.cli !== 'claude' || claudeStatus(paths.home) === 'busy');
+  return wake.busyStep(runs.modelRecords(probe.cli, paths.home), wake.BUSY_STEP);
 }
 
 // ---------------------------------------------------------------- run
