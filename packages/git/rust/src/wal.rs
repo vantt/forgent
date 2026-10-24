@@ -2465,6 +2465,11 @@ impl<F: FileSystem> Wal<F> {
                 if is_durable_temporary(&id) {
                     continue;
                 }
+                // A directory whose record zero was never installed bound no
+                // operation; listing it would send every reader to inspect it.
+                if !ledger && matches!(self.known_id(&id), Ok(false)) {
+                    continue;
+                }
                 if seen == bound {
                     result.complete = false;
                     return Ok(result);
@@ -2983,6 +2988,21 @@ mod tests {
             other => refused.push(format!("a scan over both directories: {other:?}")),
         }
         assert!(refused.is_empty(), "{refused:#?}");
+    }
+
+    #[test]
+    fn scan_lists_only_operations_whose_intent_was_recorded_so_every_entry_can_be_inspected() {
+        // A refused or interrupted begin can leave an empty operation directory.
+        let t = Temp::new();
+        let wal = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
+        attempted(&wal, "begun");
+        wal.operation("not-begun", true).unwrap();
+        let scan = wal.scan(10).unwrap();
+        let ids: Vec<_> = scan.entries.iter().map(|e| e.operation_id.as_str()).collect();
+        assert_eq!(ids, ["begun"]);
+        for entry in &scan.entries {
+            wal.inspect(&entry.operation_id).unwrap();
+        }
     }
 
     #[test]
