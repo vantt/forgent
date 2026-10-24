@@ -1,0 +1,32 @@
+{
+  "authoringCommit": "ad94156cf9c463018060f3ae32ff6a17c4874033",
+  "controls": [
+    {
+      "name": "corrupt-author-overlay",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\nreal = m['source']\ndef source(commit_arg, path):\n    return pathlib.Path('/tmp/fgos-work/w11-misc-pin/controls-ztozqxw1/author-shard.json').read_text() if commit_arg == commit and path == m['SHARD'] else real(commit_arg, path)\nwith patch.dict(g, source=source):\n    m['check'](pin)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 11, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 175, in check\n    assert json.loads(source(commit, SHARD))==shard\nAssertionError\n",
+      "expectedFailureObserved": true
+    },
+    {
+      "name": "drop-later-rebind-preimage",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import json, pathlib, runpy\nfrom unittest.mock import patch\nm = runpy.run_path('plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py')\ng = m['check'].__globals__\ncommit = m['author_commit']()\npin = json.loads(m['source'](commit, m['O']/'binding-refresh.json'))['sourceHead']\nreal = pathlib.Path.read_text\ndef read(path, *args, **kwargs):\n    return real(pathlib.Path('/tmp/fgos-work/w11-misc-pin/controls-ztozqxw1/later-record.json'), *args, **kwargs) if path == pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-09/import3/binding-refresh.json') else real(path, *args, **kwargs)\nwith patch.object(pathlib.Path, 'read_text', read):\n    m['check_live'](json.loads(m['source'](commit, m['SHARD'])), commit)\n"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 11, in <module>\n  File \"plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 162, in check_live\n    assert not missing, ('unaccounted misc-fix overlays', missing)\nAssertionError: ('unaccounted misc-fix overlays', [{'shard': 'plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json', 'pointer': '/bindingRefresh/14', 'binding': {'targetOwner': 'docs/reading-map.md', 'targetAnchor': 'unheaded-block-16', 'targetUnitDigest': '4adf4507972f828f2b6d0bea54e373b00d516415960520c0bf38d3fac20f25c0', 'targetAncestry': ['Documentation Reading Map', '5. Detailed Product And Source Map']}}])\n",
+      "expectedFailureObserved": true
+    }
+  ],
+  "scratchCopiesRemoved": true
+}
