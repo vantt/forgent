@@ -254,6 +254,27 @@ function stagedFgosDeletions(committingToplevel) {
     .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
 }
 
+// During a merge, a staged `.fgos` path whose index entry equals the incoming side's (absent on both,
+// or the same blob), where that side changed it since the merge base, is that side's own change carried in, not a write by this checkout: a branch cut
+// before the Event Store cutover that merges main takes main's retired shards and its fence this way.
+function fgosPathsOwnedByMergeHead(committingToplevel, paths) {
+  if (paths.length === 0) return new Set();
+  const git = (args) => execFileSync('git', args, { cwd: committingToplevel, encoding: 'utf8', maxBuffer: 1024 * 1024 * 64 });
+  const mergeHeadFile = path.resolve(committingToplevel, git(['rev-parse', '--git-path', 'MERGE_HEAD']).trim());
+  if (!fs.existsSync(mergeHeadFile)) return new Set();
+  const entries = (text, field) => new Map(text.split('\0').filter(Boolean).map((row) => {
+    const tab = row.indexOf('\t');
+    return [row.slice(tab + 1), row.slice(0, tab).split(' ')[field]];
+  }));
+  const index = entries(git(['ls-files', '-s', '-z', '--', '.fgos']), 1);
+  // The incoming side must have changed the path itself since the merge base: a path absent on
+  // both sides that this branch alone had and deleted by hand is not the incoming side's change.
+  const tree = (oid) => entries(git(['ls-tree', '-r', '-z', oid, '--', '.fgos']), 2);
+  const heads = fs.readFileSync(mergeHeadFile, 'utf8').split('\n').filter(Boolean)
+    .map((oid) => ({ head: tree(oid), base: tree(git(['merge-base', 'HEAD', oid]).trim()) }));
+  return new Set(paths.filter((p) => heads.some(({ head, base }) => head.get(p) === index.get(p) && head.get(p) !== base.get(p))));
+}
+
 // tsk-5pb -- any staged path under .fgos/ (Added, Modified, Deleted) on a
 // worker's fgw/* branch is forbidden. Git manual merge materialization can stage
 // a .fgos/* blob as Modified; worker branches must never commit changes under .fgos/.
@@ -595,13 +616,18 @@ async function main() {
     return;
   }
 
-  const fgosDeletions = stagedFgosDeletions(committingToplevel);
+  const carriedIn = (paths) => fgosPathsOwnedByMergeHead(committingToplevel, paths);
+  const stagedDeletions = stagedFgosDeletions(committingToplevel);
+  const carriedDeletions = carriedIn(stagedDeletions);
+  const fgosDeletions = stagedDeletions.filter((p) => !carriedDeletions.has(p));
   if (fgosDeletions.length > 0 && !scopedGrantAllows(committingToplevel)) {
     refuse(`commit refused: this commit stages a deletion under ".fgos/" (${fgosDeletions.join(', ')}) -- .fgos/ is fgOS's own runner state and must never be committed as deleted. A linked worktree never keeps a working-tree copy of .fgos/ by design (ADR0020); if you ran "git add -A" here, unstage these paths first (e.g. "git restore --staged .fgos").`);
     return;
   }
 
-  const fgosWorkerChanges = stagedFgosChangesOnWorkerBranch(committingToplevel);
+  const workerChanges = stagedFgosChangesOnWorkerBranch(committingToplevel);
+  const carriedChanges = carriedIn(workerChanges);
+  const fgosWorkerChanges = workerChanges.filter((p) => !carriedChanges.has(p));
   if (fgosWorkerChanges.length > 0) {
     refuse(`commit refused: this commit on a worker branch stages changes under ".fgos/" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);
     return;

@@ -4,6 +4,7 @@
 
 use crate::case_journal;
 use crate::contract::{Observation, ObservationSource, ObserveRequest, Window};
+use crate::metrics_cli::parse_flags;
 use crate::scorecard::{
     compute_case, compute_faults, compute_runs, compute_sessions, compute_tokens, compute_work,
     CommitsSection, ComplexitySection, LocBreakdown, Scorecard,
@@ -17,47 +18,13 @@ pub fn dispatch_harness(
     req: &ObserveRequest,
     sources: &[Box<dyn ObservationSource>],
 ) -> Result<serde_json::Value, String> {
-    let mut case_name = None;
-    let mut since = None;
-    let mut until = None;
-
-    let mut i = 0;
-    while i < req.args.len() {
-        let arg = &req.args[i];
-        if arg == "--case" {
-            if i + 1 >= req.args.len() {
-                return Err("missing value for --case".to_string());
-            }
-            case_name = Some(req.args[i + 1].clone());
-            i += 2;
-        } else if arg == "--since" {
-            if i + 1 >= req.args.len() {
-                return Err("missing value for --since".to_string());
-            }
-            since = Some(req.args[i + 1].clone());
-            i += 2;
-        } else if arg == "--until" {
-            if i + 1 >= req.args.len() {
-                return Err("missing value for --until".to_string());
-            }
-            until = Some(req.args[i + 1].clone());
-            i += 2;
-        } else if arg.starts_with("--dir") {
-            if arg == "--dir" {
-                i += 2;
-            } else {
-                i += 1;
-            }
-        } else {
-            return Err(format!("unexpected argument for metrics harness: {}", arg));
-        }
-    }
+    let flags = parse_flags("harness", &req.args, &["--case", "--since", "--until"], &[], false)?;
 
     let mut warnings = Vec::new();
 
     // 1. Resolve case window or timeframe window
-    let (case_window, window) = if let Some(cn) = case_name {
-        let cw = case_journal::find(&req.root, &cn)
+    let (case_window, window) = if let Some(cn) = flags.value("--case") {
+        let cw = case_journal::find(&req.root, cn)
             .ok_or_else(|| format!("case \"{}\" not found", cn))?;
         let w = Window {
             since: Some(cw.since.clone()),
@@ -65,7 +32,10 @@ pub fn dispatch_harness(
         };
         (Some(cw), w)
     } else {
-        let w = Window { since, until };
+        let w = Window {
+            since: flags.value("--since").map(str::to_owned),
+            until: flags.value("--until").map(str::to_owned),
+        };
         (None, w)
     };
 

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { assignmentDir, findRunDir, RunLookupError, listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../../src/runner/dispatch/assignment-layout.mjs';
+import { assignmentDir, findRunDir, RunLookupError, listAssignmentRuns, scanAssignmentLayout } from '../../src/runner/dispatch/assignment-layout.mjs';
 import { allRuns, inspectDispatchRuntime, withRunsCache } from '../../src/runner/dispatch/runtime-inspection.mjs';
 import { showRunUseCase, readRunSnapshot, DispatchObserveError } from '../../src/verbs/dispatch/show-run.mjs';
 import { watchRunUseCase } from '../../src/verbs/dispatch/watch.mjs';
@@ -45,10 +45,6 @@ test('shared layout fixture yields every safe directory candidate, never worker 
   assert.equal(scan.runDirsSeen, fixture.runDirsSeen);
   assert.deepEqual(scan.skipped, { symlink: fixture.skipped.symlink });
   assert.deepEqual(scan.runs.map(({ assignmentId, attempt }) => `${assignmentId}/runs/${attempt}`).sort(), fixture.entries.map((e) => `${e.assignmentId}/runs/${e.attempt}`).sort());
-  const eligible = projectRunEligibility(scan);
-  assert.deepEqual(eligible.runs.map((run) => run.runId).sort(), fixture.observedRunIds);
-  assert.deepEqual(eligible.skipped, fixture.skipped);
-  assert.equal(eligible.observed + Object.values(eligible.skipped).reduce((sum, count) => sum + count, 0), scan.runDirsSeen);
   assert.deepEqual([...listAssignmentRuns(fgosDir)], scan.runs);
   assert.equal(scan.runs.find((r) => r.assignmentId === 'without-assignment').hasAssignmentJson, false);
   assert.equal(findRunDir(fgosDir, fixture.planted.runId), null);
@@ -114,9 +110,6 @@ test('walk recognizes runs at the depth boundary and counts deeper barriers with
   assert.equal(scan.runs[0].assignmentId, id);
   assert.deepEqual(scan.skipped, { depth: 1 });
   assert.equal(scan.runDirsSeen, 2);
-  const eligible = projectRunEligibility(scan);
-  assert.equal(eligible.observed, 0);
-  assert.deepEqual(eligible.skipped, { depth: 1, 'missing-result': 1 });
   assert.equal(findRunDir(fgosDir, 'hidden'), null);
 });
 
@@ -196,93 +189,4 @@ test('lookup keeps metadata identity authoritative over a different result ident
   writeJson(path.join(dir, 'result.json'), { runId: 'result-id' });
   assert.equal(findRunDir(fgosDir, 'owner-id'), dir);
   assert.equal(findRunDir(fgosDir, 'result-id'), null);
-});
-
-test('eligibility uses actual settlement precedence and admits only valid RFC3339 instants', (t) => {
-  const { fgosDir, base } = temp(t);
-  const [resultSettled, resultTime, ownerSettled] = ['2026-10-05T13:00:00Z', '2026-10-05T12:00:00.250+07:00', '2026-10-05T11:00:00Z'];
-  const cases = [
-    ['settled', { settledAt: resultSettled, timestamp: resultTime }, { settledAt: ownerSettled }, resultSettled],
-    ['timestamp', { settledAt: ' ', timestamp: resultTime }, { settledAt: ownerSettled }, resultTime],
-    ['owner', { settledAt: null, timestamp: null }, { settledAt: ownerSettled }, ownerSettled],
-    ['started', {}, { startedAt: fixture.timestamp }, null],
-    ['created', {}, {}, null],
-    ['preserved', { timestamp: fixture.timestamp, runId: ' padded ' }, {}, fixture.timestamp],
-    // The first nonblank time is the declared one; an invalid value is not
-    // replaced by a later field, and it joins no time window.
-    ['garbage', { settledAt: 'garbage', timestamp: resultTime }, { settledAt: ownerSettled }, null],
-    ['padded-time', { timestamp: ' 2026-10-05T10:00:00Z ' }, {}, null],
-    ['owner-garbage', {}, { settledAt: 'yesterday' }, null],
-    ['leap-day', { timestamp: '2028-02-29T23:59:59Z' }, {}, '2028-02-29T23:59:59Z'],
-    ['not-leap', { timestamp: '2026-02-29T00:00:00Z' }, {}, null],
-    ['hour-24', { timestamp: '2026-10-05T24:00:00Z' }, {}, null],
-    ['bad-offset', { timestamp: '2026-10-05T10:00:00+24:00' }, {}, null],
-    ['no-zone', { timestamp: '2026-10-05T10:00:00' }, {}, null],
-    ['empty-fraction', { timestamp: '2026-10-05T10:00:00.Z' }, {}, null],
-    ['lower-case', { timestamp: '2026-10-05t10:00:00z' }, {}, '2026-10-05t10:00:00z'],
-  ];
-  for (const [id, result, run] of cases) {
-    const dir = path.join(base, id, 'runs', '01');
-    writeJson(path.join(base, id, 'assignment.json'), { createdAt: fixture.timestamp });
-    writeJson(path.join(dir, 'result.json'), { runId: id, ...result });
-    writeJson(path.join(dir, 'run.json'), run);
-  }
-  const eligible = projectRunEligibility(scanAssignmentLayout(fgosDir));
-  assert.deepEqual(eligible.runs.map(({ assignmentId, timestamp }) => [assignmentId, timestamp]), cases.filter(([, , , time]) => time).map(([id, , , time]) => [id, time]).sort());
-  assert.equal(eligible.runs.find((run) => run.assignmentId === 'preserved').runId, ' padded ');
-  assert.deepEqual(eligible.skipped, { 'no-timestamp': 2, 'invalid-timestamp': 8 });
-});
-
-test('eligibility classifies missing, invalid, nonregular and symlink results separately', (t) => {
-  const { fgosDir, base } = temp(t);
-  for (const id of ['missing', 'invalid', 'nonregular', 'linked', 'blank-id', 'blank-inline', 'inline', 'scalar']) {
-    fs.mkdirSync(path.join(base, id, 'runs', '01'), { recursive: true });
-  }
-  const resultPath = (id) => path.join(base, id, 'runs', '01', 'result.json');
-  fs.writeFileSync(resultPath('invalid'), '{invalid');
-  fs.mkdirSync(resultPath('nonregular'));
-  fs.symlinkSync(resultPath('invalid'), resultPath('linked'));
-  writeJson(resultPath('blank-id'), { runId: '  ', timestamp: fixture.timestamp });
-  writeJson(resultPath('blank-inline'), { unitRunId: '  ' });
-  writeJson(resultPath('inline'), { unitRunId: 'inline-id' });
-  writeJson(resultPath('scalar'), null);
-  const eligible = projectRunEligibility(scanAssignmentLayout(fgosDir));
-  assert.equal(eligible.observed, 0);
-  assert.deepEqual(eligible.skipped, { 'missing-result': 1, unparseable: 2, symlink: 1, 'no-run-id': 3, 'inline-record': 1 });
-  assert.equal(Object.values(eligible.skipped).reduce((sum, count) => sum + count, 0), eligible.runDirsSeen);
-});
-
-test('eligibility ignores nonregular owner metadata and reserves duplicate identity for eligible results', (t) => {
-  const { fgosDir, base } = temp(t);
-  for (const id of ['aaa-undated', 'bbb-valid', 'ccc-duplicate', 'invalid-owner', 'directory-owner', 'symlink-owner']) {
-    writeJson(path.join(base, id, 'runs', '01', 'result.json'), { runId: id.endsWith('owner') ? id : 'same', ...(id === 'bbb-valid' || id === 'ccc-duplicate' ? { timestamp: fixture.timestamp } : {}) });
-  }
-  fs.writeFileSync(path.join(base, 'invalid-owner/runs/01/run.json'), '{invalid');
-  fs.mkdirSync(path.join(base, 'directory-owner/runs/01/run.json'));
-  const owner = path.join(base, 'owner.json');
-  writeJson(owner, { settledAt: fixture.timestamp });
-  fs.symlinkSync(owner, path.join(base, 'symlink-owner/runs/01/run.json'));
-  const eligible = projectRunEligibility(scanAssignmentLayout(fgosDir));
-  assert.deepEqual(eligible.runs.map(({ assignmentId, runId }) => [assignmentId, runId]), [['bbb-valid', 'same']]);
-  assert.deepEqual(eligible.skipped, { 'no-timestamp': 4, 'duplicate-run-id': 1 });
-});
-
-test('eligibility preserves lexical component traversal when duplicate paths share a prefix', (t) => {
-  const { fgosDir, base } = temp(t);
-  for (const id of ['a-', 'a']) {
-    writeJson(path.join(base, id, 'runs', '01', 'result.json'), { runId: 'same', timestamp: fixture.timestamp });
-  }
-  const eligible = projectRunEligibility(scanAssignmentLayout(fgosDir));
-  assert.deepEqual(eligible.runs.map((run) => run.assignmentId), ['a']);
-  assert.deepEqual(eligible.skipped, { 'duplicate-run-id': 1 });
-});
-
-test('eligibility selects the same Unicode duplicate in UTF-8 component order', (t) => {
-  const { fgosDir, base } = temp(t);
-  for (const [name, timestamp] of [['\u{10000}', '2026-10-05T11:00:00Z'], ['\uE000', '2026-10-05T10:00:00Z']]) {
-    writeJson(path.join(base, name, 'runs', '01', 'result.json'), { runId: 'same', timestamp });
-  }
-  const eligible = projectRunEligibility(scanAssignmentLayout(fgosDir));
-  assert.deepEqual(eligible.runs.map(({ assignmentId, timestamp }) => [assignmentId, timestamp]), [['\uE000', '2026-10-05T10:00:00Z']]);
-  assert.deepEqual(eligible.skipped, { 'duplicate-run-id': 1 });
 });

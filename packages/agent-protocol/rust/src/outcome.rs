@@ -10,6 +10,17 @@ pub enum BlockedReason {
     UsageLimit,
 }
 
+impl BlockedReason {
+    /// The contract's `blocked.reason` wording.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            BlockedReason::TrustDialog => "trust-dialog",
+            BlockedReason::Login => "login",
+            BlockedReason::UsageLimit => "usage-limit",
+        }
+    }
+}
+
 /// How a `direct` run ended, named for the supervisor.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Outcome {
@@ -26,29 +37,18 @@ pub enum Outcome {
     },
 }
 
-/// What the supervisor wires to the agent's stdin at spawn.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum StdinPolicy {
-    /// Closed device: a CLI that probes piped stdin must not block on an open pipe.
-    NullDevice,
-    /// The brief file is attached as stdin.
-    BriefFile,
-}
-
 /// Whether new capture output counts for the idle timer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Activity {
     /// Nothing new, or only whitespace.
     Quiet,
-    /// Plain text grew.
+    /// Text grew, plain or a JSON event line.
     Output,
-    /// A JSON event line arrived (CLIs that stream events).
-    Event,
 }
 
 impl Activity {
     pub fn is_active(self) -> bool {
-        !matches!(self, Activity::Quiet)
+        self == Activity::Output
     }
 }
 

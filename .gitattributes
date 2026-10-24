@@ -7,13 +7,6 @@
 # sees them at all now — no union rule needed, and no new one needed for
 # whatever else lands in that bucket later.
 
-# tsk-1wk: tsk-3ve's per-writer sharded event log (.fgos/events/<writer-id>-
-# <openTs>.jsonl) is append-only exactly like the old single-file
-# .fgos/events.jsonl above, but wasn't covered by that same union-merge
-# rule — every session's own live shard hit the identical append-conflict
-# problem tsk-3wq/tsk-2xg already solved for the old layout.
-
-
 # Installers and shell scripts must be byte-identical on every checkout host:
 # the release publishes one copy and refuses a release whose copies differ, and
 # a CRLF install.sh does not run under sh.

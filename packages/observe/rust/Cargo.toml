@@ -5,6 +5,7 @@ edition.workspace = true
 
 [dependencies]
 fgos-host-runtime = { path = "../../host-runtime/rust" }
+fgos-durable-file = { path = "../../durable-file/rust" }
 fgos-git = { path = "../../git/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
 fgos-identity = { path = "../../identity/rust" }

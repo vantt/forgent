@@ -204,6 +204,22 @@ test('observe-host-resolvable verifies host binary status', () => {
   }
 });
 
+test('observe-host-resolvable fails when the host refuses to read the friction store', { skip: !process.env.FGOS_HOST_BIN }, () => {
+  const root = fs.mkdtempSync(path.join(tmpdir(), 'fgos-observe-probe-'));
+  try {
+    assert.equal(checkObserveHostResolvable(root).passed, true);
+    const frictionDir = path.join(root, '.fgos', 'observe', 'friction');
+    fs.mkdirSync(frictionDir, { recursive: true });
+    fs.writeFileSync(path.join(root, 'outside.jsonl'), '{}\n');
+    fs.symlinkSync(path.join(root, 'outside.jsonl'), path.join(frictionDir, 'planted.jsonl'));
+    const refused = checkObserveHostResolvable(root);
+    assert.equal(refused.passed, false);
+    assert.match(refused.message, /regular file/);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 function coverageData(runDirsSeen, recentRuns = 0) {
   return { layoutRule: 'v2', runDirsSeen, observed: runDirsSeen, skipped: {}, recentRuns };
 }
@@ -252,26 +268,6 @@ test('run coverage failure labels its sample paths as candidates, not as confirm
       result.message.endsWith(`sample candidates (not confirmed missing): ${path.join('.fgos', 'assignments', 'unit', 'panelist-1', '1', 'runs', '01')}`),
       result.message,
     );
-  } finally {
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test('run coverage independently detects admission mismatch even when directory totals agree', () => {
-  const cwd = mkTempDir();
-  try {
-    const runDir = path.join(cwd, '.fgos/assignments/stable/runs/01');
-    fs.mkdirSync(runDir, { recursive: true });
-    fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId: 'stable', timestamp: '2026-10-05T10:00:00Z' }));
-    fs.utimesSync(path.join(runDir, 'result.json'), 1, 1);
-    fs.utimesSync(runDir, 1, 1);
-    const hostSkipped = { ...coverageData(1), observed: 0, skipped: { 'no-timestamp': 1 } };
-    assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => hostSkipped }).passed, false);
-    fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId: 'stable' }));
-    fs.utimesSync(path.join(runDir, 'result.json'), 1, 1);
-    fs.utimesSync(runDir, 1, 1);
-    assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => coverageData(1) }).passed, false);
-    assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => hostSkipped }).passed, true);
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
   }

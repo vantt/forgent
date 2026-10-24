@@ -1,5 +1,5 @@
-//! Port the supervisor wires to an adapter: the `direct` mode reads a capture
-//! file tail, the terminal mode (terminal-control) sends keys and reads the screen.
+//! Port the supervisor wires to an adapter: the terminal mode (terminal-control)
+//! sends keys and reads the screen.
 
 /// Input for `send`; the contract's `io.send.input`.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -33,11 +33,6 @@ pub struct Inspection {
 
 pub trait AgentIo {
     fn send(&mut self, input: &SendInput) -> Result<(), IoError>;
-    /// New lines since the previous read.
-    fn read(&mut self) -> Result<Vec<String>, IoError>;
-    /// Monotonic counter that increments on anything the idle timer counts.
-    fn activity(&self) -> Option<u64>;
-
     /// The whole visible screen right now (terminal mode only).
     fn screen(&mut self) -> Result<String, IoError> {
         Err(IoError::Unsupported)

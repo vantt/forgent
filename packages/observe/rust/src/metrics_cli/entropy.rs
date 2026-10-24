@@ -6,7 +6,9 @@
 //! `.fgos/observe/snapshots/*.jsonl`.
 
 use crate::contract::{ObserveRequest, WorkObservationSource};
+use crate::metrics_cli::parse_flags;
 use crate::shard;
+use fgos_host_runtime::civil_time::parse_rfc3339_millis;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::path::Path;
@@ -99,33 +101,29 @@ pub fn calculate_entropy_score_and_parts(
     })
 }
 
-pub fn read_last_snapshot(root: &Path) -> Option<Value> {
-    let records = shard::read_all_json(root, "snapshots").ok()?;
-    records.into_iter().next_back()
+/// The most recent snapshot by instant; an unreadable store is an error, a bad
+/// line is named and skipped.
+pub fn read_last_snapshot(root: &Path) -> Result<Option<Value>, String> {
+    let store = shard::read_store(root, "snapshots", shard::UnsafeShard::Fail).map_err(|e| e.to_string())?;
+    shard::warn_skipped("snapshots", &store.invalid);
+    Ok(store
+        .records
+        .into_iter()
+        .filter_map(|record| {
+            let millis = record.value.get("ts").and_then(Value::as_str).and_then(parse_rfc3339_millis)?;
+            Some((millis, record.value))
+        })
+        .max_by_key(|(millis, _)| *millis)
+        .map(|(_, value)| value))
 }
 
 pub fn dispatch_entropy(
     req: &ObserveRequest,
-    work_source: Option<&dyn WorkObservationSource>,
+    work_source: &dyn WorkObservationSource,
 ) -> Result<Value, String> {
-    let mut i = 0;
-    while i < req.args.len() {
-        let arg = &req.args[i];
-        if arg == "--dir" {
-            i += 2;
-            continue;
-        } else if arg.starts_with("--dir=") {
-            i += 1;
-            continue;
-        } else {
-            return Err(format!("unexpected argument for metrics entropy: {}", arg));
-        }
-    }
-
-    let ws =
-        work_source.ok_or_else(|| "work source not available for metrics entropy".to_string())?;
-    let calc = calculate_entropy_score_and_parts(&req.root, ws)?;
-    let last_snap = read_last_snapshot(&req.root);
+    parse_flags("entropy", &req.args, &[], &[], false)?;
+    let calc = calculate_entropy_score_and_parts(&req.root, work_source)?;
+    let last_snap = read_last_snapshot(&req.root)?;
 
     let trend = if let Some(snap) = &last_snap {
         let prev_score = snap

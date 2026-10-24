@@ -1,6 +1,7 @@
 //! Run-layout coverage. The composition root injects the run owner's scanner.
 
 use crate::contract::ObserveRequest;
+use crate::metrics_cli::parse_flags;
 use serde_json::Value;
 use std::path::Path;
 
@@ -8,20 +9,7 @@ use std::path::Path;
 pub type CoverageScanner = fn(&Path) -> Result<Value, String>;
 
 pub fn dispatch_coverage(req: &ObserveRequest, scanner: CoverageScanner) -> Result<Value, String> {
-    let mut i = 0;
-    while i < req.args.len() {
-        let arg = &req.args[i];
-        if arg == "--dir" {
-            if i + 1 >= req.args.len() {
-                return Err("missing value for --dir".to_string());
-            }
-            i += 2;
-        } else if arg.starts_with("--dir=") {
-            i += 1;
-        } else {
-            return Err(format!("unexpected argument for metrics coverage: {}", arg));
-        }
-    }
+    parse_flags("coverage", &req.args, &[], &[], false)?;
     scanner(&req.root)
 }
 
@@ -29,6 +17,22 @@ pub fn dispatch_coverage(req: &ObserveRequest, scanner: CoverageScanner) -> Resu
 mod tests {
     use super::*;
     use serde_json::json;
+
+    struct ForbiddenWork;
+
+    impl crate::WorkObservationSource for ForbiddenWork {
+        fn read_outcomes_report(
+            &self,
+            _: &Path,
+            _: Option<&str>,
+        ) -> Result<crate::WorkOutcomesRecord, crate::SourceError> {
+            panic!("coverage must not read the work store")
+        }
+
+        fn read_entropy_signals(&self, _: &Path) -> Result<crate::WorkEntropySignalsRecord, crate::SourceError> {
+            panic!("coverage must not read the work store")
+        }
+    }
 
     struct ForbiddenSource;
 
@@ -75,7 +79,7 @@ mod tests {
         crate::metrics_cli::dispatch(
             &request(&[]),
             &sources,
-            None,
+            &ForbiddenWork,
             scanner,
             forbidden_summary_scanner,
         )

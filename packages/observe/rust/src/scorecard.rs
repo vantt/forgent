@@ -10,6 +10,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeMap, HashMap};
 
+/// The observation source whose `run.settled` records the runs section counts.
+pub const RUN_RESULT_SOURCE: &str = "run-result";
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct CaseSection {
     pub name: String,
@@ -143,10 +146,6 @@ pub struct Scorecard {
     pub faults: FaultsSection,
     pub warnings: Vec<String>,
 }
-fn parse_iso_secs(s: &str) -> Option<i64> {
-    parse_iso_prefix_secs(s)
-}
-
 fn now_unix_secs() -> i64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -158,7 +157,7 @@ fn now_unix_secs() -> i64 {
 pub fn compute_case(cw: &CaseWindow) -> (CaseSection, Vec<String>) {
     let mut warnings = Vec::new();
     let duration_min = if let (Some(until_str), since_str) = (&cw.until, &cw.since) {
-        if let (Some(t0), Some(t1)) = (parse_iso_secs(since_str), parse_iso_secs(until_str)) {
+        if let (Some(t0), Some(t1)) = (parse_iso_prefix_secs(since_str), parse_iso_prefix_secs(until_str)) {
             let diff_sec = (t1 - t0).max(0);
             let min = (diff_sec as f64) / 60.0;
             if min > 24.0 * 60.0 {
@@ -174,7 +173,7 @@ pub fn compute_case(cw: &CaseWindow) -> (CaseSection, Vec<String>) {
         }
     } else {
         // Still open
-        if let Some(t0) = parse_iso_secs(&cw.since) {
+        if let Some(t0) = parse_iso_prefix_secs(&cw.since) {
             let now = now_unix_secs();
             let min = ((now - t0).max(0) as f64) / 60.0;
             if min > 24.0 * 60.0 {
@@ -211,7 +210,7 @@ pub fn compute_runs(observations: &[Observation]) -> RunsSection {
     let mut by_role: BTreeMap<String, RunStatusBuckets> = BTreeMap::new();
 
     for obs in observations {
-        if obs.source != "run-result" || obs.kind != "run.settled" {
+        if obs.source != RUN_RESULT_SOURCE || obs.kind != "run.settled" {
             continue;
         }
         let executor = obs
@@ -233,71 +232,23 @@ pub fn compute_runs(observations: &[Observation]) -> RunsSection {
 
         let classification = obs.attrs.get("classification").and_then(|v| v.as_object());
 
-        let category = obs
-            .attrs
-            .get("category")
-            .and_then(|v| v.as_str())
-            .or_else(|| {
-                classification
-                    .and_then(|c| c.get("outcome"))
-                    .and_then(|o| o.get("category"))
-                    .and_then(|s| s.as_str())
-            });
+        let category = obs.attrs.get("category").and_then(|v| v.as_str());
         let verdict = classification
             .and_then(|c| c.get("assessment"))
             .and_then(|a| a.get("verdict"))
             .and_then(|v| v.as_str())
             .unwrap_or("");
 
-        // Helper to update bucket based on category (single path)
         let classify = |b: &mut RunStatusBuckets| {
             b.total += 1;
-            if let Some(cat) = category {
-                match cat {
-                    "ok" => b.ok += 1,
-                    "infra" | "corrupt" => b.exec_failed += 1,
-                    "policy" => b.policy_refused += 1,
-                    "blocked" => b.blocked += 1,
-                    "verdict" => {
-                        if verdict == "inconclusive" {
-                            b.inconclusive += 1;
-                        } else {
-                            b.verdict_fail += 1;
-                        }
-                    }
-                    _ => b.unclassified += 1,
-                }
-            } else if let Some(cls) = classification {
-                let exec_status = cls
-                    .get("execution")
-                    .and_then(|e| e.get("status"))
-                    .and_then(|s| s.as_str())
-                    .unwrap_or("unknown");
-                let policy_disp = cls
-                    .get("policy")
-                    .and_then(|p| p.get("disposition"))
-                    .and_then(|d| d.as_str())
-                    .unwrap_or("allow");
-
-                if exec_status != "completed" {
-                    b.exec_failed += 1;
-                } else if policy_disp == "refuse" {
-                    b.policy_refused += 1;
-                } else if policy_disp == "needs-input" {
-                    b.exec_failed += 1;
-                } else if verdict == "findings" {
-                    b.verdict_fail += 1;
-                } else if verdict == "blocked" {
-                    b.blocked += 1;
-                } else if verdict == "pass" || verdict == "not-applicable" {
-                    b.ok += 1;
-                } else if verdict == "inconclusive" {
-                    b.inconclusive += 1;
-                } else {
-                    b.unclassified += 1;
-                }
-            } else {
-                b.unclassified += 1;
+            match category {
+                Some("ok") => b.ok += 1,
+                Some("infra" | "corrupt") => b.exec_failed += 1,
+                Some("policy") => b.policy_refused += 1,
+                Some("blocked") => b.blocked += 1,
+                Some("verdict") if verdict == "inconclusive" => b.inconclusive += 1,
+                Some("verdict") => b.verdict_fail += 1,
+                _ => b.unclassified += 1,
             }
         };
 
@@ -391,7 +342,7 @@ pub fn compute_sessions(observations: &[Observation]) -> SessionsSection {
         // Duration: from first result-linked to last result-linked
         let mut rl_ts: Vec<i64> = result_linked_events
             .iter()
-            .filter_map(|e| parse_iso_secs(&e.ts))
+            .filter_map(|e| parse_iso_prefix_secs(&e.ts))
             .collect();
         rl_ts.sort_unstable();
         if let (Some(&first), Some(&last)) = (rl_ts.first(), rl_ts.last()) {
@@ -476,7 +427,7 @@ pub fn compute_tokens(observations: &[Observation]) -> TokensSection {
             {
                 sec.cache_read_input_tokens += c_read;
             }
-        } else if obs.source == "run-result" && obs.kind == "run.settled" {
+        } else if obs.source == RUN_RESULT_SOURCE && obs.kind == "run.settled" {
             // Token usage from RunResult for non-Claude executors
             if let Some(usage) = obs.attrs.get("usage").and_then(|v| v.as_object()) {
                 let usage_source = usage.get("source").and_then(|v| v.as_str());
@@ -640,7 +591,7 @@ pub fn compute_work(
             // #1: add -> delivered
             if let Some(dm) = delivered_move {
                 if let (Some(t_add), Some(t_del)) =
-                    (added_ts.and_then(parse_iso_secs), parse_iso_secs(&dm.ts))
+                    (added_ts.and_then(parse_iso_prefix_secs), parse_iso_prefix_secs(&dm.ts))
                 {
                     let diff_hours = ((t_del - t_add).max(0) as f64) / 3600.0;
                     add_to_delivered_hours.push(diff_hours);
@@ -681,7 +632,7 @@ pub fn compute_work(
                     });
                     if let Some(pd) = prev_doing {
                         if let (Some(t_start), Some(t_end)) =
-                            (parse_iso_secs(&pd.ts), parse_iso_secs(&m.ts))
+                            (parse_iso_prefix_secs(&pd.ts), parse_iso_prefix_secs(&m.ts))
                         {
                             let diff_hours = ((t_end - t_start).max(0) as f64) / 3600.0;
                             doing_to_approval_hours.push(diff_hours);
@@ -805,144 +756,27 @@ mod tests {
 
     #[test]
     fn test_compute_runs() {
-        let mut obs = Vec::new();
-        // 1. Ok run (verdict: pass)
-        obs.push(Observation {
+        let run = |id: &str, attrs: serde_json::Value| Observation {
             ts: "2026-09-01T00:00:00Z".to_string(),
             subject: Subject {
                 kind: SubjectKind::Run,
-                id: "r1".to_string(),
+                id: id.to_string(),
             },
             kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "claude",
-                "adapter": "herdr-spawn",
-                "role": "implementer",
-                "classification": {
-                    "execution": { "status": "completed" },
-                    "assessment": { "verdict": "pass" },
-                    "policy": { "disposition": "allow" }
-                }
-            }))
-            .unwrap(),
+            attrs: serde_json::from_value(attrs).unwrap(),
             source: "run-result",
-        });
-
-        // 2. Exec failed
-        obs.push(Observation {
-            ts: "2026-09-01T00:01:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: "r2".to_string(),
-            },
-            kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "claude",
-                "adapter": "herdr-spawn",
-                "classification": {
-                    "execution": { "status": "failed" },
-                    "assessment": { "verdict": "findings" },
-                    "policy": { "disposition": "allow" }
-                }
-            }))
-            .unwrap(),
-            source: "run-result",
-        });
-
-        // 3. Verdict fail
-        obs.push(Observation {
-            ts: "2026-09-01T00:02:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: "r3".to_string(),
-            },
-            kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "agy",
-                "classification": {
-                    "execution": { "status": "completed" },
-                    "assessment": { "verdict": "findings" },
-                    "policy": { "disposition": "allow" }
-                }
-            }))
-            .unwrap(),
-            source: "run-result",
-        });
-
-        // 4. Policy refused
-        obs.push(Observation {
-            ts: "2026-09-01T00:03:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: "r4".to_string(),
-            },
-            kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "agy",
-                "classification": {
-                    "execution": { "status": "completed" },
-                    "assessment": { "verdict": "pass" },
-                    "policy": { "disposition": "refuse" }
-                }
-            }))
-            .unwrap(),
-            source: "run-result",
-        });
-
-        // 5. Inconclusive
-        obs.push(Observation {
-            ts: "2026-09-01T00:04:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: "r5".to_string(),
-            },
-            kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "claude",
-                "classification": {
-                    "execution": { "status": "completed" },
-                    "assessment": { "verdict": "inconclusive" },
-                    "policy": { "disposition": "allow" }
-                }
-            }))
-            .unwrap(),
-            source: "run-result",
-        });
-
-        // 6. Blocked
-        obs.push(Observation {
-            ts: "2026-09-01T00:05:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: "r6".to_string(),
-            },
-            kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "claude",
-                "classification": {
-                    "execution": { "status": "completed" },
-                    "assessment": { "verdict": "blocked" },
-                    "policy": { "disposition": "allow" }
-                }
-            }))
-            .unwrap(),
-            source: "run-result",
-        });
-
-        // 7. Unclassified (no classification)
-        obs.push(Observation {
-            ts: "2026-09-01T00:06:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: "r7".to_string(),
-            },
-            kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "claude"
-            }))
-            .unwrap(),
-            source: "run-result",
-        });
+        };
+        let verdict = |verdict: &str| json!({ "assessment": { "verdict": verdict } });
+        let obs = vec![
+            run("r1", json!({ "executor": "claude", "adapter": "herdr-spawn", "role": "implementer", "category": "ok" })),
+            run("r2", json!({ "executor": "claude", "adapter": "herdr-spawn", "category": "infra" })),
+            run("r3", json!({ "executor": "agy", "category": "verdict", "classification": verdict("findings") })),
+            run("r4", json!({ "executor": "agy", "category": "policy" })),
+            run("r5", json!({ "executor": "claude", "category": "verdict", "classification": verdict("inconclusive") })),
+            run("r6", json!({ "executor": "claude", "category": "blocked" })),
+            // The producer always writes `category`; a record without one is unclassified.
+            run("r7", json!({ "executor": "claude", "classification": verdict("pass") })),
+        ];
 
         let runs = compute_runs(&obs);
         assert_eq!(runs.total, 7);
@@ -957,6 +791,8 @@ mod tests {
 
         assert_eq!(runs.by_executor.get("claude").unwrap().total, 5);
         assert_eq!(runs.by_executor.get("agy").unwrap().total, 2);
+        assert_eq!(runs.by_adapter.get("herdr-spawn").unwrap().total, 2);
+        assert_eq!(runs.by_role.get("implementer").unwrap().total, 1);
     }
 
     #[test]

@@ -1,7 +1,9 @@
 //! Discussion measurement consumes only owner-written `unit.settled` observations.
 
 use crate::contract::{Observation, ObserveRequest, UnitSummaryScanner, Window};
-use crate::time::{parse_timestamp_millis, ParsedWindow};
+use crate::metrics_cli::parse_flags;
+use crate::time::ParsedWindow;
+use fgos_host_runtime::civil_time::parse_rfc3339_millis;
 use serde_json::{json, Map, Value};
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -9,47 +11,24 @@ pub fn dispatch_discussions(
     req: &ObserveRequest,
     scanner: UnitSummaryScanner,
 ) -> Result<Value, String> {
-    let mut window = Window::default();
-    let mut by = "workflow".to_owned();
-    let mut i = 0;
-    while i < req.args.len() {
-        let arg = &req.args[i];
-        let (flag, inline) = arg
-            .split_once('=')
-            .map_or((arg.as_str(), None), |(flag, value)| (flag, Some(value)));
-        if !matches!(flag, "--since" | "--until" | "--by" | "--dir") {
-            return Err(format!(
-                "unexpected argument for metrics discussions: {arg}"
-            ));
-        }
-        let value = if let Some(value) = inline {
-            i += 1;
-            value
-        } else {
-            let value = req
-                .args
-                .get(i + 1)
-                .filter(|value| !value.starts_with("--"))
-                .ok_or_else(|| format!("missing value for {flag}"))?;
-            i += 2;
-            value.as_str()
-        };
-        if value.is_empty() {
-            return Err(format!("missing value for {flag}"));
-        }
-        match flag {
-            "--since" => window.since = Some(value.to_owned()),
-            "--until" => window.until = Some(value.to_owned()),
-            "--by" if matches!(value, "workflow" | "executor" | "persona") => by = value.to_owned(),
-            "--by" => {
-                return Err(format!(
-                    "invalid --by value \"{value}\". Allowed: workflow, executor, persona"
-                ))
-            }
-            "--dir" => {} // The native request already resolves the root.
-            _ => unreachable!(),
+    let flags = parse_flags("discussions", &req.args, &["--since", "--until", "--by"], &[], false)?;
+    for flag in ["--since", "--until", "--by"] {
+        if flags.value(flag).is_some_and(str::is_empty) {
+            return Err(format!("metrics discussions: missing value for {flag}"));
         }
     }
+    let window = Window {
+        since: flags.value("--since").map(str::to_owned),
+        until: flags.value("--until").map(str::to_owned),
+    };
+    let by = match flags.value("--by").unwrap_or("workflow") {
+        by @ ("workflow" | "executor" | "persona") => by.to_owned(),
+        other => {
+            return Err(format!(
+                "invalid --by value \"{other}\". Allowed: workflow, executor, persona"
+            ))
+        }
+    };
     let parsed_window = ParsedWindow::parse(&window)?;
     let scan = scanner(&req.root, &window).map_err(|err| err.to_string())?;
     let mut output = compute_discussions(&scan.observations, &by, &window, &parsed_window);
@@ -222,7 +201,7 @@ fn compute_discussions(
             if observation.source != "unit-summary" || observation.kind != "unit.settled" {
                 return None;
             }
-            let timestamp = parse_timestamp_millis(&observation.ts)?;
+            let timestamp = parse_rfc3339_millis(&observation.ts)?;
             parsed_window
                 .contains(timestamp)
                 .then_some((timestamp, observation))
@@ -315,8 +294,8 @@ fn compute_discussions(
 }
 
 fn duration_seconds(unit: &Map<String, Value>) -> Option<f64> {
-    let start = parse_timestamp_millis(unit["startedAt"].as_str()?)?;
-    let end = parse_timestamp_millis(unit["settledAt"].as_str()?)?;
+    let start = parse_rfc3339_millis(unit["startedAt"].as_str()?)?;
+    let end = parse_rfc3339_millis(unit["settledAt"].as_str()?)?;
     (end >= start).then_some((end - start) as f64 / 1000.0)
 }
 

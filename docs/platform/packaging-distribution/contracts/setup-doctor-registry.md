@@ -47,8 +47,9 @@ The registries are independent. A module may register only a check, only a fix, 
 
 Run coverage is checked by `observe-run-coverage`: the host's `metrics coverage`
 must report layout rule `v2` and valid observed/skipped accounting. Doctor
-independently compares both eligible unique results and candidate-directory/
-barrier counts against the Node production admission projection and layout scan.
+compares the host's candidate-directory/barrier count against the Node layout
+scan; it does not re-admit runs in Node (the shared run-layout fixture is the
+one proof of admission).
 Both read the main checkout store, including from a worktree. A candidate run
 directory changed in the last 60 seconds permits a bounded transient difference,
 even before a result exists; future mtimes are recent for clock skew. The host's
