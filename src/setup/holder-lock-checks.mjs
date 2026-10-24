@@ -217,6 +217,7 @@ const LOCK_FILES = {
   sessions: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'sessions.lock')),
   reconcile: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'reconcile.lock')),
   'repo-config': ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'repo-config.lock')),
+  'project-config': ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'project-config.lock')),
   activation: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'activation-v2.lock')),
   observe: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'observe.lock')),
   'dispatch-cwd': ({ fgosDir }) => filesIn(path.join(fgosDir, LOCKS_DIR), (name) => name.startsWith('dispatch-cwd--') && name.endsWith('.lock')),
@@ -226,6 +227,7 @@ const LOCK_FILES = {
   'full-suite': ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'full-suite.lock')) : []),
   'provider-state': ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'provider-state.lock')) : []),
   'identity-pins': ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'identity-pins.lock')) : []),
+  'global-config': ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'global-config.lock')) : []),
   'provider-account': ({ lockRoot }) => (lockRoot ? subdirs(path.join(lockRoot, 'provider-account')).flatMap((dir) => filesIn(dir, (name) => name.endsWith('.lock'))) : []),
 };
 

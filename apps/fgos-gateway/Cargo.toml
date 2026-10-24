@@ -44,6 +44,7 @@ rhai = { version = "1", features = ["serde"] }
 # (`docs/contracts/fgos-gateway-api-v1.yaml`) into a queryable operation list
 # instead of serving it as an opaque string the way `/contract` already does.
 fgos-yaml-doc = { path = "../../packages/yaml-doc/rust" }
+fgos-config = { path = "../../packages/config/rust" }
 # tsk-54y: CORS layer for `build_router` -- the web client (a separate
 # static bundle, D2 of docs/history/herdr-web-dashboard-plan-realignment/
 # CONTEXT.md) is not guaranteed to share origin with the gateway. Version
