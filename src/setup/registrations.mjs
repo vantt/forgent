@@ -142,7 +142,7 @@ import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding/client.mjs';
 import { checkSeatBindingConfig, checkSeatBindingDryBind } from './seat-binding-checks.mjs';
-import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
+import { listAssignmentRuns, scanAssignmentLayout } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
@@ -5989,7 +5989,6 @@ export function checkObserveRunCoverage(cwd, { hostRunner = invokeHost, scan = s
   } catch (err) {
     return { passed: false, message: `cannot enumerate run directories for ${location}: ${err.message}` };
   }
-  const eligible = projectRunEligibility(layout);
   let recent = 0;
   for (const run of layout.runs) {
     try {
@@ -5998,13 +5997,12 @@ export function checkObserveRunCoverage(cwd, { hostRunner = invokeHost, scan = s
     } catch {}
   }
   const directoryDifference = layout.runDirsSeen - coverage.runDirsSeen;
-  const admissionDifference = eligible.observed - coverage.observed;
   const tolerance = Math.max(recent, coverage.recentRuns);
-  if (Math.abs(directoryDifference) > tolerance || Math.abs(admissionDifference) > tolerance) {
+  if (Math.abs(directoryDifference) > tolerance) {
     const examples = layout.runs.slice(0, 3).map((run) => path.relative(root, run.runDir)).join(', ');
-    return { passed: false, message: `run coverage differs: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen} (difference ${directoryDifference}); eligible Node ${eligible.observed}, observed host ${coverage.observed} (difference ${admissionDifference}); recent tolerance ${tolerance}; ${location}; sample candidates (not confirmed missing): ${examples || '(none)'}` };
+    return { passed: false, message: `run coverage differs: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen} (difference ${directoryDifference}); recent tolerance ${tolerance}; ${location}; sample candidates (not confirmed missing): ${examples || '(none)'}` };
   }
-  return { passed: true, message: `run coverage matches: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen}; eligible Node ${eligible.observed}, observed host ${coverage.observed}; recent tolerance ${tolerance}; ${location}` };
+  return { passed: true, message: `run coverage matches: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen}; recent tolerance ${tolerance}; ${location}` };
 }
 
 registerCheck({

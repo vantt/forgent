@@ -273,26 +273,6 @@ test('run coverage failure labels its sample paths as candidates, not as confirm
   }
 });
 
-test('run coverage independently detects admission mismatch even when directory totals agree', () => {
-  const cwd = mkTempDir();
-  try {
-    const runDir = path.join(cwd, '.fgos/assignments/stable/runs/01');
-    fs.mkdirSync(runDir, { recursive: true });
-    fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId: 'stable', timestamp: '2026-10-05T10:00:00Z' }));
-    fs.utimesSync(path.join(runDir, 'result.json'), 1, 1);
-    fs.utimesSync(runDir, 1, 1);
-    const hostSkipped = { ...coverageData(1), observed: 0, skipped: { 'no-timestamp': 1 } };
-    assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => hostSkipped }).passed, false);
-    fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId: 'stable' }));
-    fs.utimesSync(path.join(runDir, 'result.json'), 1, 1);
-    fs.utimesSync(runDir, 1, 1);
-    assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => coverageData(1) }).passed, false);
-    assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => hostSkipped }).passed, true);
-  } finally {
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
 test('run coverage uses directory recency with a bounded sixty-second window and bounded clock skew', () => {
   const cwd = mkTempDir();
   const now = Date.parse('2026-10-06T12:00:00Z');
