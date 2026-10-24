@@ -1,0 +1,254 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.24
+   Compiling memchr v2.8.3
+   Compiling zmij v1.0.23
+   Compiling version_check v0.9.5
+   Compiling itoa v1.0.18
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling cfg-if v1.0.4
+   Compiling typenum v1.20.1
+   Compiling serde v1.0.229
+   Compiling libc v0.2.189
+   Compiling cpufeatures v0.2.17
+   Compiling thiserror v2.0.20
+   Compiling bitflags v2.13.2
+   Compiling rustix v1.1.4
+   Compiling arraydeque v0.5.1 (/home/vantt/projects/forgentX-p9-w1-d4/packages/yaml-doc/third-party/arraydeque-0.5.1)
+   Compiling pin-project-lite v0.2.17
+   Compiling linux-raw-sys v0.12.1
+   Compiling regex-syntax v0.8.11
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+   Compiling once_cell v1.21.4
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+   Compiling unicode-segmentation v1.13.3
+   Compiling generic-array v0.14.7
+   Compiling fgos-write-scope v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/git/write-scope)
+   Compiling libloading v0.8.9
+   Compiling semver v1.0.28
+   Compiling ryu-js v1.0.2
+   Compiling napi-build v2.2.4
+   Compiling napi-sys v2.4.0
+   Compiling aho-corasick v1.1.5
+   Compiling fgos-node-addon v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/git/node-addon)
+   Compiling convert_case v0.6.0
+   Compiling syn v3.0.5
+   Compiling syn v2.0.119
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+   Compiling fgos-durable-file v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/durable-file/rust)
+   Compiling regex-automata v0.4.18
+   Compiling fgos-process v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/process/rust)
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.20
+   Compiling tokio-macros v2.7.2
+   Compiling fgos-event-store v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/event-store/rust)
+   Compiling regex v1.13.1
+   Compiling tokio v1.53.1
+   Compiling fgos-holder-lock v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/holder-lock/rust)
+   Compiling napi-derive-backend v1.0.75
+   Compiling saphyr-parser v0.2.2 (/home/vantt/projects/forgentX-p9-w1-d4/packages/yaml-doc/third-party/saphyr-parser-0.2.2)
+   Compiling ctor v0.2.9
+   Compiling fgos-yaml-doc v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/yaml-doc/rust)
+   Compiling napi-derive v2.16.13
+   Compiling fgos-host-runtime v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/host-runtime/rust)
+   Compiling fgos-git v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/git/rust)
+   Compiling fgos-canonical-json v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/canonical-json/rust)
+   Compiling napi v2.16.17
+   Compiling fgos-convention v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/convention/rust)
+   Compiling fgos-identity v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/identity/rust)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 25.01s
+   Compiling serde_core v1.0.229
+   Compiling allocator-api2 v0.2.21
+   Compiling foldhash v0.2.0
+   Compiling equivalent v1.0.2
+   Compiling serde_json v1.0.151
+   Compiling serde v1.0.229
+   Compiling autocfg v1.5.1
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+   Compiling zerocopy v0.8.63
+   Compiling getrandom v0.3.4
+   Compiling ahash v0.8.12
+   Compiling regex-syntax v0.8.11
+   Compiling ref-cast v1.0.27
+   Compiling parking_lot_core v0.9.12
+   Compiling ref-cast-impl v1.0.27
+   Compiling aho-corasick v1.1.5
+   Compiling scopeguard v1.2.0
+   Compiling once_cell v1.21.4
+   Compiling smallvec v1.16.3
+   Compiling lock_api v0.4.14
+   Compiling syn v2.0.119
+   Compiling borrow-or-share v0.2.4
+   Compiling unicode-general-category v1.1.0
+   Compiling heck v0.5.0
+   Compiling jsonschema-value v0.60.0
+   Compiling bit-vec v0.8.0
+   Compiling crc32fast v1.5.1
+   Compiling tinyvec_macros v0.1.1
+   Compiling hashbrown v0.17.1
+   Compiling micromap v0.3.0
+   Compiling percent-encoding v2.3.2
+   Compiling num-traits v0.2.19
+   Compiling parking_lot v0.12.5
+   Compiling num-cmp v0.1.0
+   Compiling bit-set v0.8.0
+   Compiling bytecount v0.6.9
+   Compiling vsimd v0.8.0
+   Compiling simd-adler32 v0.3.10
+   Compiling outref v0.5.2
+   Compiling adler2 v2.0.1
+   Compiling tinyvec v1.13.2
+   Compiling miniz_oxide v0.9.1
+   Compiling filetime v0.2.29
+   Compiling xattr v1.6.1
+   Compiling data-encoding v2.11.1
+   Compiling semver v1.0.28
+   Compiling tar v0.4.46
+   Compiling uuid-simd v0.8.0
+   Compiling unicode-normalization v0.1.25
+   Compiling indexmap v2.14.2
+   Compiling flate2 v1.1.10
+   Compiling num-integer v0.1.47
+   Compiling num-complex v0.4.6
+   Compiling num-bigint v0.4.8
+   Compiling num-iter v0.1.46
+   Compiling regex-automata v0.4.18
+   Compiling jsonschema-regex v0.60.0
+   Compiling strum_macros v0.28.0
+   Compiling num-rational v0.4.2
+   Compiling num v0.4.3
+   Compiling fraction v0.17.0
+   Compiling fluent-uri v0.4.1
+   Compiling email_address v0.2.9
+   Compiling strum v0.28.0
+   Compiling fgos-process v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/process/rust)
+   Compiling fgos-yaml-doc v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/yaml-doc/rust)
+   Compiling fgos-canonical-json v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/canonical-json/rust)
+   Compiling fgos-agent-protocol v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/agent-protocol/rust)
+   Compiling fgos-holder-lock v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/holder-lock/rust)
+   Compiling fgos-host-runtime v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/host-runtime/rust)
+   Compiling fancy-regex v0.19.2
+   Compiling regex v1.13.1
+   Compiling referencing v0.60.0
+   Compiling fgos-git v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/git/rust)
+   Compiling fgos-terminal-control v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/terminal-control/rust)
+   Compiling jsonschema v0.60.0
+   Compiling fgos-convention v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/convention/rust)
+   Compiling fgos-seat-binding v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/seat-binding/rust)
+   Compiling fgos-identity v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/identity/rust)
+   Compiling fgos-distribution v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/distribution/rust)
+   Compiling fgos-observe v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/observe/rust)
+   Compiling fgos-config v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/config/rust)
+   Compiling fgos-run-supervisor v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/run-supervisor/rust)
+   Compiling fgos-run-result v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/run-result/rust)
+   Compiling fgos-work-state v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/packages/work-state/rust)
+   Compiling fgos v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d4/apps/fgos)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 24.60s
+file:///home/vantt/projects/forgentX-p9-w1-d4/src/native/door.mjs:48
+    if (loaded && loaded.file !== file) throw new Error(`git-addon-second-load: ${loaded.file} is loaded, ${file} refused`);
+                                              ^
+
+Error: git-addon-second-load: /home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/libexec/native/fgos.node is loaded, /home/vantt/projects/forgentX-p9-w1-d4/.fgos/runtime/git-addon/78bf08605a0e9590/fgos.node refused
+    at loadNativeAddon (file:///home/vantt/projects/forgentX-p9-w1-d4/src/native/door.mjs:48:47)
+    at loadNativeAddon (file:///home/vantt/projects/forgentX-p9-w1-d4/src/git/native.mjs:11:17)
+    at createGitInspect (file:///home/vantt/projects/forgentX-p9-w1-d4/src/git/inspect.mjs:12:18)
+    at file:///home/vantt/projects/forgentX-p9-w1-d4/scripts/lib/git-ports.mjs:29:25
+    at openPort (file:///home/vantt/projects/forgentX-p9-w1-d4/scripts/lib/git-ports.mjs:25:10)
+    at inspectRepo (file:///home/vantt/projects/forgentX-p9-w1-d4/scripts/lib/git-ports.mjs:29:10)
+    at openInspect (file:///home/vantt/projects/forgentX-p9-w1-d4/scripts/git-one-door-scan.mjs:2698:50)
+    at listFiles (file:///home/vantt/projects/forgentX-p9-w1-d4/scripts/git-one-door-scan.mjs:72:41)
+    at scan (file:///home/vantt/projects/forgentX-p9-w1-d4/scripts/git-one-door-scan.mjs:2554:24)
+    at main (file:///home/vantt/projects/forgentX-p9-w1-d4/scripts/git-one-door-scan.mjs:2698:18) {
+  code: 'git-addon-second-load'
+}
+
+Node.js v24.18.0

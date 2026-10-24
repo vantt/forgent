@@ -99,11 +99,21 @@ const WRAPPERS = [
     name: 'tooling wrapper', path: 'scripts/read.mjs',
     source: "import { execFileSync } from 'node:child_process';\nfunction git(root, args) { return execFileSync('git', args, { cwd: root }); }\ngit('.', ['ls-tree', 'HEAD']);\n",
     caller: (argv) => `git('.', ${argv});\n`,
+    escapingCallers: [
+      "git.call(null, '.', ['reset', '--hard', 'HEAD']);",
+      "Reflect.apply(git, null, ['.', ['reset', '--hard', 'HEAD']]);",
+      "const tbl = [git]; tbl[0]('.', ['reset', '--hard', 'HEAD']);",
+    ],
   },
   {
     name: 'callback wrapper', path: 'scripts/read.mjs',
     source: "import { spawnSync } from 'node:child_process';\nfunction runOrThrow(command, args, options) { return spawnSync(command, args, options); }\nexport function verify(root, deps = {}) {\n  const run = deps.run || ((command, args) => runOrThrow(command, args, { cwd: root }));\n  run('git', ['diff', '--check', 'base..end']);\n}\nverify('.');\n",
     caller: (argv) => `run('git', ${argv});\n`,
+    escapingCallers: [
+      "run.call(null, 'git', ['push', '--force', 'origin', 'HEAD']);",
+      "Reflect.apply(run, null, ['git', ['push', '--force', 'origin', 'HEAD']]);",
+      "const tbl = [run]; tbl[0]('git', ['push', '--force', 'origin', 'HEAD']);",
+    ],
     change: (source, call) => source.replace("  run('git', ['diff', '--check', 'base..end']);", `  run('git', ['diff', '--check', 'base..end']);\n  ${call}`),
   },
   {
@@ -111,6 +121,11 @@ const WRAPPERS = [
     source: "#!/usr/bin/env node\nimport { execFileSync } from 'node:child_process';\nimport { guard } from '../src/guard.mjs';\nfunction leaseGitRead(args) { return execFileSync('git', ['--no-replace-objects', ...args]); }\nguard({ git: leaseGitRead });\n",
     other: "export function guard({ git }) { return git(['ls-tree', 'HEAD']); }\n",
     caller: (argv) => `git(${argv});\n`,
+    escapingCallers: [
+      "git.call(null, ['update-ref', 'refs/heads/main', 'HEAD']);",
+      "Reflect.apply(git, null, [['update-ref', 'refs/heads/main', 'HEAD']]);",
+      "const tbl = [git]; tbl[0](['update-ref', 'refs/heads/main', 'HEAD']);",
+    ],
     changeOther: (source, call) => source.replace('return git(', `${call} return git(`),
     class: 'hook-read-context', verbs: ['ls-tree'],
   },
@@ -142,6 +157,21 @@ test('new or changed write callers cannot inherit any declared pass-through wrap
     const target = shape.other ? 'src/guard.mjs' : shape.path;
     f.write(target, (shape.other ?? shape.source).replace("'ls-tree'", "'reset'").replace("'diff', '--check'", "'push', '--force'"));
     assert.throws(() => scan({ root: f.root }), /stale or ambiguous Git declaration/, `${shape.name}: changed caller`);
+  }
+});
+
+// Ordinary caller fingerprints above cannot prove refusal when value flow reports an escape.
+test('call, Reflect.apply and array-slot callers refuse declared pass-through wrappers', async (t) => {
+  for (const shape of WRAPPERS) {
+    for (const call of shape.escapingCallers) {
+      await t.test(`${shape.name}: ${call}`, (t) => {
+        const f = wrapperFixture(t, shape);
+        f.declare([f.entry]);
+        assert.deepEqual(scan({ root: f.root }).sites, [], 'baseline declaration matches');
+        f.change(call);
+        assert.throws(() => scan({ root: f.root }), /invalid Git declaration: wrapper escapes/, 'an unresolved caller cannot inherit the declaration');
+      });
+    }
   }
 });
 

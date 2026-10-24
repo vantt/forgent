@@ -1506,6 +1506,7 @@
         "932a5e12ce7d2a6c1657d1ec6bd44fc5f5e218950f0641aa3e6a358351e4a831",
         "f20c3ad557799f9f4046f07bb1e51d16052d9410fcf3556deffd0e46d6053cf2"
       ],
+      "escapes": [],
       "class": "hook-read-context",
       "reason": "Owner L13-6 approves S1: the cold hook's leaseGitRead callback authenticates committed/staged lease authority for guardCommit and guardReferenceTransaction without loading the checkout addon; its callers only read Git facts.",
       "retireWhen": "The lease reader retires, or the Git owner supplies an approved cold-client door preserving hook authentication.",
@@ -1804,6 +1805,7 @@
       "callerDigests": [
         "b998668a76604c0e5f56267e0fffd5fb0dde0a836c17f766d364e77f3ca78da5"
       ],
+      "escapes": [],
       "class": "configured-binary",
       "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
       "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
@@ -1818,6 +1820,7 @@
       "callerDigests": [
         "b998668a76604c0e5f56267e0fffd5fb0dde0a836c17f766d364e77f3ca78da5"
       ],
+      "escapes": [],
       "class": "configured-binary",
       "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
       "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
@@ -2712,6 +2715,7 @@
       "callerDigests": [
         "9ba6d1524a3f9d0fc4b85b4955d2daf96c7dfd32410e2af89ecd8f819d6b0b8e"
       ],
+      "escapes": [],
       "class": "declared-tooling-exemption",
       "reason": "Owner L13-6 / L13-2: gitIndex needs live-index mode/blob/stage, including unborn repositories and index-only drift. Inspect trackedPaths supplies paths only; HEAD and filesystem bytes cannot preserve these integrity checks.",
       "retireWhen": "The relocation tool and its before/after proofs retire together, or Git exposes live-index metadata."
@@ -2792,6 +2796,7 @@
         "49d74c4fa2526e3f442469282813ae6a34e5dbba488267f6e6759f76e24ba1e2",
         "d3f16a0d461378bb8849283c9417a7300dfe35fd5188642e0dc5e09be057ce19"
       ],
+      "escapes": [],
       "class": "declared-tooling-exemption",
       "reason": "Owner L13-6 / L13-3: scope-binding diff --quiet is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
       "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
@@ -3171,6 +3176,7 @@
       "callerDigests": [
         "a4421f7f173e2b0cd4444d760c7a8fc7dfa44d3a3c848640f6242545ee7602c7"
       ],
+      "escapes": [],
       "class": "declared-tooling-exemption",
       "reason": "Owner L13-6 / L13-2: run('git', ['diff', '--check', ...]) reaches runOrThrow through a callback the scanner cannot resolve. Exact repository whitespace/conflict diagnostics have no equivalent Inspect validation; no check may be dropped.",
       "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git supplies equivalent diff validation."
@@ -3402,6 +3408,9 @@
       "family": "unresolved-binary",
       "siteId": "landRunnerItem:cc9889cc48b52606b9bc90ec69d9c7e3216188c53719a6b06f5243f78ef87115",
       "callerDigests": [],
+      "escapes": [
+        "passed to an unresolved callee (src/runner/merge.mjs:919)"
+      ],
       "class": "configured-binary",
       "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
       "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
@@ -3417,6 +3426,7 @@
         "4de7c2717184fdba8f7f1b017a6ce53a3d527978fe0ce8d184c95de99ac26969",
         "82473f253ab13fd30ad7b23b52a9f1823606077e200c1a67f4d0640ce58adbc7"
       ],
+      "escapes": [],
       "class": "configured-binary",
       "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
       "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
@@ -3433,6 +3443,7 @@
         "c1d61a7df27c8bb7eb3cd56b09c6f966ad9c3d7af4c5e5206c4f1d7d064c6a59",
         "fa545c9254fead58d86d5ede9ec00c29cc6478cb35a5e721511fe5a5ea5dc3ec"
       ],
+      "escapes": [],
       "class": "configured-binary",
       "reason": "Owner L13-6: worktreeSetup.commands is JSON project configuration, not product-selected Git; the existing consumer-command marker agrees with runtime classification but indexed configuration loses static provenance.",
       "retireWhen": "The scanner proves parsed-config provenance, or this setup-command consumer retires."

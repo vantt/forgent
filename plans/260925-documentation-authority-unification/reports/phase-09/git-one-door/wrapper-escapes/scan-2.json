@@ -1,0 +1,2574 @@
+{
+  "sites": [],
+  "families": {},
+  "classCounts": {
+    "standalone-skill-script": 3,
+    "hook-read-context": 23,
+    "configured-binary": 92,
+    "rust-test": 112,
+    "argv-runner": 13,
+    "production-sandbox-probe": 4,
+    "uncalled-wrapper": 20,
+    "git-driver": 1,
+    "declared-tooling-exemption": 19,
+    "sandbox-door": 2
+  },
+  "classes": [
+    {
+      "path": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 49,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".agents/skills/distill/scripts/distill.mjs:299",
+        ".agents/skills/distill/scripts/distill.mjs:301",
+        ".agents/skills/distill/scripts/distill.mjs:304",
+        ".agents/skills/distill/scripts/distill.mjs:307",
+        ".agents/skills/distill/scripts/distill.mjs:309",
+        ".agents/skills/distill/scripts/distill.mjs:313",
+        ".agents/skills/distill/scripts/distill.mjs:314",
+        ".agents/skills/distill/scripts/distill.mjs:346",
+        ".agents/skills/distill/scripts/distill.mjs:384",
+        ".agents/skills/distill/scripts/distill.mjs:388",
+        ".agents/skills/distill/scripts/distill.mjs:458"
+      ],
+      "class": "standalone-skill-script",
+      "skill": "distill"
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 48,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:52",
+        ".githooks/pre-commit:54",
+        ".githooks/pre-commit:59",
+        ".githooks/pre-commit:64",
+        ".githooks/pre-commit:69",
+        ".githooks/pre-commit:463",
+        ".githooks/pre-commit:465",
+        ".githooks/pre-commit:471",
+        ".githooks/pre-commit:474"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse",
+        "diff",
+        "diff",
+        "show",
+        "diff",
+        "ls-files",
+        "diff",
+        "cat-file",
+        "show"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 243,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:556"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 260,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:562"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "symbolic-ref read"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 270,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:562"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 290,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:595"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 291,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:595"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 296,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:595"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "symbolic-ref read"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 318,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:601"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "symbolic-ref read"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 330,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:601"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 359,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:601"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "show"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 360,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:601"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "show"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 378,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:544"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "ls-files"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 380,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:544"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "ls-tree"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 382,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:544"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 409,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:550"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "symbolic-ref read"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 417,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:550"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "reflog show"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 427,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:550"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 440,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:550"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "merge-base"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 456,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:52",
+        ".githooks/pre-commit:54",
+        ".githooks/pre-commit:59",
+        ".githooks/pre-commit:64",
+        ".githooks/pre-commit:69",
+        ".githooks/pre-commit:463",
+        ".githooks/pre-commit:465",
+        ".githooks/pre-commit:471",
+        ".githooks/pre-commit:474"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse",
+        "diff",
+        "diff",
+        "show",
+        "diff",
+        "ls-files",
+        "diff",
+        "cat-file",
+        "show"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 487,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:586"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 525,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:557"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "config --get"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 529,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 538,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "siteId": "leaseGitRead:90abf7f3892c18964a007d28726432916f3a7e606601ccbe23b87c8623e62463",
+      "callerDigests": [
+        "307e191fbe28ee61a44466b663cac0f1bfb9fe3cb871cefc98b9cefc87f0cb0f",
+        "3b5228841de568039de9635263347a2911a53ac8573de5a7fdbda8d81a2f4491",
+        "4440bc188380750bb59aa3cf7d6c771e66a76352b377c08cdf6232d681979101",
+        "447577fa871f99004e70acfc19f0cc424b4f19f0f747a8f0016bd2647eeccb40",
+        "614748b726f4f66ff14dd6fe3a39dce82bbf1cd5caf809ed679bb62ebe98b037",
+        "640435846d151c508d250164e9de895b3ebc0f22076d0db84bec3aa50c4944fc",
+        "77f7bf619bd6b111ec7537eed465d2a46abf30545f07aefbdcd7682c7d478215",
+        "85e53bf9f9938b49e76fbb8d2a3a206d1561eb0018a3bf4480a1bbc422ea7e71",
+        "932a5e12ce7d2a6c1657d1ec6bd44fc5f5e218950f0641aa3e6a358351e4a831",
+        "f20c3ad557799f9f4046f07bb1e51d16052d9410fcf3556deffd0e46d6053cf2"
+      ],
+      "escapes": [],
+      "class": "hook-read-context",
+      "reason": "Owner L13-6 approves S1: the cold hook's leaseGitRead callback authenticates committed/staged lease authority for guardCommit and guardReferenceTransaction without loading the checkout addon; its callers only read Git facts.",
+      "retireWhen": "The lease reader retires, or the Git owner supplies an approved cold-client door preserving hook authentication.",
+      "verbs": [
+        "cat-file",
+        "ls-tree",
+        "show-ref",
+        "diff",
+        "show",
+        "symbolic-ref read",
+        "rev-parse",
+        "diff-tree",
+        "rev-list"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 548,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:674"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 614,
+      "spawn": "mainLockVerdict -> .githooks/pre-commit:166",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 641,
+      "spawn": "identityData -> .githooks/pre-commit:118",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
+      "line": 66,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
+      "line": 76,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
+      "line": 302,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
+      "line": 345,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 108,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 129,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 190,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 220,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 296,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 335,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 397,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 431,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 467,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 523,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 571,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 629,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 662,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 718,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 777,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 831,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 912,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 989,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1071,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1148,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1198,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1496,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1538,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1599,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1640,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1672,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/internal_lock_routes.rs",
+      "line": 213,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/windows_borrow.rs",
+      "line": 104,
+      "spawn": "Command::new",
+      "binary": "? fgos()",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/windows_borrow.rs",
+      "line": 171,
+      "spawn": "Command::new",
+      "binary": "? fgos()",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/windows_lock_hold_route.rs",
+      "line": 53,
+      "spawn": "Command::new",
+      "binary": "powershell",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/windows_support/mod.rs",
+      "line": 143,
+      "spawn": "Command::new",
+      "binary": "? exe of start_with",
+      "class": "rust-test"
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "line": 3496,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "? readSharedConfig(dir)[key]",
+      "family": "unresolved-binary",
+      "siteId": "runVerb:5015bae31309f661fda9ed9e2e7c69052e479737c20a6d248620eaf23f8a9377",
+      "callerDigests": [
+        "b998668a76604c0e5f56267e0fffd5fb0dde0a836c17f766d364e77f3ca78da5"
+      ],
+      "escapes": [],
+      "class": "configured-binary",
+      "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "line": 3640,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "? readSharedConfig(dir)[key]",
+      "family": "unresolved-binary",
+      "siteId": "runVerb:7c4188212f1a46f409d6c6c8c060ac228b3e2bec876a988791dd2ed25b3ef2e7",
+      "callerDigests": [
+        "b998668a76604c0e5f56267e0fffd5fb0dde0a836c17f766d364e77f3ca78da5"
+      ],
+      "escapes": [],
+      "class": "configured-binary",
+      "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+    },
+    {
+      "path": "core/skills/distill/scripts/distill.mjs",
+      "line": 49,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "core/skills/distill/scripts/distill.mjs:299",
+        "core/skills/distill/scripts/distill.mjs:301",
+        "core/skills/distill/scripts/distill.mjs:304",
+        "core/skills/distill/scripts/distill.mjs:307",
+        "core/skills/distill/scripts/distill.mjs:309",
+        "core/skills/distill/scripts/distill.mjs:313",
+        "core/skills/distill/scripts/distill.mjs:314",
+        "core/skills/distill/scripts/distill.mjs:346",
+        "core/skills/distill/scripts/distill.mjs:384",
+        "core/skills/distill/scripts/distill.mjs:388",
+        "core/skills/distill/scripts/distill.mjs:458"
+      ],
+      "class": "standalone-skill-script",
+      "skill": "distill"
+    },
+    {
+      "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 74,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "core/skills/instruction-audit/scripts/instruction-audit.mjs:335"
+      ],
+      "class": "standalone-skill-script",
+      "skill": "instruction-audit"
+    },
+    {
+      "path": "herdr-dashboard/src/main.rs",
+      "line": 53,
+      "spawn": "Command::new <- herdr-dashboard/src/layout.rs:184",
+      "binary": "(env HERDR_BIN_PATH)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "herdr-dashboard/src/main.rs",
+      "line": 63,
+      "spawn": "Command::new <- herdr-dashboard/src/layout.rs:184",
+      "binary": "(env HERDR_BIN_PATH)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "herdr-dashboard/src/main.rs",
+      "line": 99,
+      "spawn": "Command::new <- herdr-dashboard/src/pick.rs:377",
+      "binary": "(env HERDR_BIN_PATH)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "herdr-dashboard/src/main.rs",
+      "line": 111,
+      "spawn": "Command::new <- herdr-dashboard/src/pane_scan.rs:178",
+      "binary": "(env HERDR_BIN_PATH)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/config/rust/tests/write_concurrency.rs",
+      "line": 243,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/distribution/rust/src/init.rs",
+      "line": 571,
+      "spawn": "Command::new",
+      "binary": "bin",
+      "class": "argv-runner",
+      "resolvedAt": "packages/distribution/rust/src/init.rs:1526"
+    },
+    {
+      "path": "packages/distribution/rust/src/init.rs",
+      "line": 571,
+      "spawn": "Command::new",
+      "binary": "fgos",
+      "class": "argv-runner",
+      "resolvedAt": "packages/distribution/rust/src/init.rs:1526"
+    },
+    {
+      "path": "packages/distribution/rust/src/init.rs",
+      "line": 1115,
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:146",
+      "binary": "git",
+      "class": "production-sandbox-probe",
+      "function": "run",
+      "repository": "self.repo.to_string_lossy().into_owned()"
+    },
+    {
+      "path": "packages/distribution/rust/src/init.rs",
+      "line": 2080,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/src/refs.rs",
+      "line": 119,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/common/mod.rs",
+      "line": 34,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/legacy_import.rs",
+      "line": 13,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/read_head_children.rs",
+      "line": 20,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/read_head_children.rs",
+      "line": 57,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/reader_review_regressions.rs",
+      "line": 312,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/reader_review_regressions.rs",
+      "line": 657,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/reader_support/mod.rs",
+      "line": 32,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/reader_support/mod.rs",
+      "line": 61,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/reader_support/mod.rs",
+      "line": 300,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/registry_identity_layout.rs",
+      "line": 15,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/seal_publication.rs",
+      "line": 267,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/seal_publication.rs",
+      "line": 382,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/seal_publication.rs",
+      "line": 732,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/seal_publication.rs",
+      "line": 901,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/sync_support/mod.rs",
+      "line": 23,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/node-addon/src/holder_lock.rs",
+      "line": 209,
+      "spawn": "Command::new <- packages/holder-lock/rust/src/semantics.rs:118",
+      "binary": "(uncalled two_process_probe)",
+      "class": "uncalled-wrapper"
+    },
+    {
+      "path": "packages/git/rust/src/driver.rs",
+      "line": 1214,
+      "spawn": "Command::new <- packages/process/rust/src/containment/windows.rs:86",
+      "binary": "? path.to_str() .map(str::to_owned) .ok_or_else(|| failure(\"non-utf8-authority-pat",
+      "class": "git-driver"
+    },
+    {
+      "path": "packages/git/rust/src/driver.rs",
+      "line": 2684,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/src/driver.rs",
+      "line": 2871,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/src/objects.rs",
+      "line": 168,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/src/wal.rs",
+      "line": 3085,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/src/worktree.rs",
+      "line": 1629,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/borrow_deadline.rs",
+      "line": 21,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/contracts.rs",
+      "line": 20,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/contracts.rs",
+      "line": 40,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/head_in_listing.rs",
+      "line": 16,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/head_in_listing.rs",
+      "line": 60,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/head_switch.rs",
+      "line": 7,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/head_switch.rs",
+      "line": 28,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/head_tree.rs",
+      "line": 5,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/inspect.rs",
+      "line": 5,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication_children.rs",
+      "line": 19,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication_children.rs",
+      "line": 79,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication.rs",
+      "line": 30,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication.rs",
+      "line": 44,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication.rs",
+      "line": 1126,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication.rs",
+      "line": 1384,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication.rs",
+      "line": 2333,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/recovery_matrix.rs",
+      "line": 491,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/recovery_matrix.rs",
+      "line": 506,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/refs_remote.rs",
+      "line": 23,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/refs_remote.rs",
+      "line": 369,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/safe_restore.rs",
+      "line": 80,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/safe_restore.rs",
+      "line": 1008,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/scoped_commit_sync.rs",
+      "line": 13,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/sequence.rs",
+      "line": 23,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/sequence.rs",
+      "line": 41,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/ssh_transport.rs",
+      "line": 38,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/support/land.rs",
+      "line": 10,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/worktree.rs",
+      "line": 27,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/worktree.rs",
+      "line": 215,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/worktree.rs",
+      "line": 480,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/holder-lock/rust/src/borrow_vectors.rs",
+      "line": 78,
+      "spawn": "Command::new",
+      "binary": "? git of git_plain",
+      "class": "production-sandbox-probe",
+      "function": "git_plain",
+      "repository": "repo"
+    },
+    {
+      "path": "packages/holder-lock/rust/src/borrow_vectors.rs",
+      "line": 417,
+      "spawn": "Command::new",
+      "binary": "? git of run",
+      "class": "production-sandbox-probe",
+      "function": "run",
+      "repository": "&dir"
+    },
+    {
+      "path": "packages/holder-lock/rust/src/route.rs",
+      "line": 315,
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:146",
+      "binary": "git",
+      "class": "production-sandbox-probe",
+      "function": "run",
+      "repository": "self.repo.to_string_lossy().into_owned()"
+    },
+    {
+      "path": "packages/holder-lock/rust/src/route/hold.rs",
+      "line": 193,
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:146",
+      "binary": "(parsed configuration (request .get(\"argv\") .and_then(Value::as_array) .ok_or(\"argv))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/holder-lock/rust/src/semantics.rs",
+      "line": 118,
+      "spawn": "Command::new",
+      "binary": "(self)",
+      "class": "argv-runner",
+      "resolvedAt": "packages/holder-lock/rust/src/port.rs:71"
+    },
+    {
+      "path": "packages/holder-lock/rust/tests/borrow_git.rs",
+      "line": 89,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/holder-lock/rust/tests/borrow_git.rs",
+      "line": 99,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/holder-lock/rust/tests/borrow_io.rs",
+      "line": 105,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/holder-lock/rust/tests/borrow_io.rs",
+      "line": 131,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/holder-lock/rust/tests/borrow_io.rs",
+      "line": 762,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/holder-lock/rust/tests/common/mod.rs",
+      "line": 116,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/host-runtime/rust/src/providers/external_process/adapter.rs",
+      "line": 176,
+      "spawn": "Command::new <- packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs:210",
+      "binary": "(uncalled for_fixture)",
+      "class": "uncalled-wrapper"
+    },
+    {
+      "path": "packages/identity/rust/tests/mint.rs",
+      "line": 26,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/identity/rust/tests/mint.rs",
+      "line": 311,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/identity/rust/tests/project.rs",
+      "line": 26,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
+      "line": 398,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
+      "line": 399,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
+      "line": 404,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
+      "line": 410,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
+      "line": 415,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
+      "line": 422,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 56,
+      "spawn": "Command::new",
+      "binary": "/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:36"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 56,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:36"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 56,
+      "spawn": "Command::new",
+      "binary": "/usr/local/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:36"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 149,
+      "spawn": "Command::new",
+      "binary": "/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:39"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 149,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:39"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 149,
+      "spawn": "Command::new",
+      "binary": "/usr/local/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:39"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 238,
+      "spawn": "Command::new",
+      "binary": "/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:39"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 238,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:39"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 238,
+      "spawn": "Command::new",
+      "binary": "/usr/local/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:39"
+    },
+    {
+      "path": "packages/process/rust/tests/containment_bwrap.rs",
+      "line": 70,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/gate.rs",
+      "line": 226,
+      "spawn": "Command::new <- packages/run-supervisor/rust/src/gate/unix.rs:526",
+      "binary": "(parsed configuration (text_of(&launch[\"command\"], \"launch.command\")))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/gate/unix.rs",
+      "line": 526,
+      "spawn": "Command::new <- packages/run-supervisor/rust/src/gate/unix.rs:526",
+      "binary": "(deserialized configuration (Config.command))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/steps.rs",
+      "line": 153,
+      "spawn": "Command::new <- packages/run-supervisor/rust/src/steps.rs:223",
+      "binary": "(parsed configuration (step[\"hostBin\"].as_str().ok_or_else(|| fail(\"step has no hos))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/supervise.rs",
+      "line": 416,
+      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:238",
+      "binary": "(parsed configuration (envelope[\"containment\"][\"bwrapPrefix\"].as_array().and_then(|))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/supervise/unix.rs",
+      "line": 184,
+      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:238",
+      "binary": "(parsed configuration (envelope[\"containment\"][\"bwrapPrefix\"].as_array().map(|items))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/supervise/unix.rs",
+      "line": 184,
+      "spawn": "Command::new <- packages/process/rust/src/containment/windows.rs:86",
+      "binary": "(parsed configuration (envelope[\"hostBin\"].as_str().ok_or(\"hostBin missing\")))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/supervise/windows.rs",
+      "line": 225,
+      "spawn": "Command::new <- packages/process/rust/src/containment/windows.rs:86",
+      "binary": "(parsed configuration (envelope[\"hostBin\"].as_str().ok_or(\"hostBin missing\")))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/terminal_slot.rs",
+      "line": 49,
+      "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:296",
+      "binary": "(env *)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/gate_pid1.rs",
+      "line": 238,
+      "spawn": "Command::new",
+      "binary": "? harness()",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/gate_terminal_socket.rs",
+      "line": 239,
+      "spawn": "Command::new",
+      "binary": "/bin/sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/portable/mod.rs",
+      "line": 176,
+      "spawn": "Command::new",
+      "binary": "? exe.parent().unwrap().parent().unwrap().join(\"examples\").join(format!(\"{name}{EX",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/portable/supervisor.rs",
+      "line": 172,
+      "spawn": "Command::new",
+      "binary": "? example(\"internal_harness\")",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/portable/supervisor.rs",
+      "line": 226,
+      "spawn": "Command::new",
+      "binary": "? example(\"internal_harness\")",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/supervise_guard.rs",
+      "line": 32,
+      "spawn": "Command::new",
+      "binary": "? internal_harness()",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs",
+      "line": 307,
+      "spawn": "Command::new",
+      "binary": "? internal_harness()",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/support/adopt_fixture.rs",
+      "line": 191,
+      "spawn": "Command::new",
+      "binary": "? internal_harness()",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/terminal-control/rust/src/driver/herdr.rs",
+      "line": 296,
+      "spawn": "Command::new",
+      "binary": "herdr",
+      "class": "argv-runner",
+      "resolvedAt": "packages/terminal-control/rust/src/driver/herdr.rs:52"
+    },
+    {
+      "path": "packages/terminal-control/rust/src/route.rs",
+      "line": 191,
+      "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:296",
+      "binary": "(parsed configuration (match envelope.get(\"herdrBin\") { None | Some(Value::Null) =>))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "line": 397,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/check-doc-inventory-gates.mjs:1249",
+        "scripts/check-doc-constitution.mjs:698"
+      ],
+      "siteId": "validateSourceUnitCoverage:a985982eb27efbdd1763c452a4780d2dab2de98793ded58807b6a0c724fbb2ec",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: ls-tree -l needs size-only blob metadata, mode and OID. Inspect listTree lacks size; reading every body through readObjects exceeds its 32 MiB bound or reads gigabytes just to learn sizes.",
+      "retireWhen": "Migration readers and their owning proofs/consumers retire after Phase 10, or Git exposes bounded object-size metadata."
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "line": 440,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/check-doc-inventory-gates.mjs:1248",
+        "scripts/check-doc-constitution.mjs:698"
+      ],
+      "siteId": "validateCommitBlobIntegrity:a985982eb27efbdd1763c452a4780d2dab2de98793ded58807b6a0c724fbb2ec",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: immutable blob-integrity validation needs size-only ls-tree -l metadata, mode and OID. Inspect listTree has no size and readObjects would read entire large artifacts solely for metadata.",
+      "retireWhen": "Migration readers and their owning proofs/consumers retire after Phase 10, or Git exposes bounded object-size metadata."
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "line": 1384,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/check-doc-inventory-gates.mjs:1438",
+        "scripts/check-doc-retirement.mjs:239"
+      ],
+      "siteId": "loadPreviousRegistries:15b3120da8596a3cce1e4f87d4c97fdd8b2cbb220755f3d21e4abdc6e950fed7",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: committed identity-registry JSON permits 1 GiB and can exceed Inspect's 32 MiB path/object ceiling; replacing it would narrow conservation checks.",
+      "retireWhen": "Committed-registry conservation and its proofs/consumers retire, or Git supplies an equivalent large-object reader."
+    },
+    {
+      "path": "scripts/check-evidence-relocation.mjs",
+      "line": 34,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/check-evidence-relocation.mjs:42"
+      ],
+      "siteId": "git:79ebd2a981c21db1c4937f2a653310053ab9285d4af4e4e2166c56e7660a36f2",
+      "callerDigests": [
+        "9ba6d1524a3f9d0fc4b85b4955d2daf96c7dfd32410e2af89ecd8f819d6b0b8e"
+      ],
+      "escapes": [],
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: gitIndex needs live-index mode/blob/stage, including unborn repositories and index-only drift. Inspect trackedPaths supplies paths only; HEAD and filesystem bytes cannot preserve these integrity checks.",
+      "retireWhen": "The relocation tool and its before/after proofs retire together, or Git exposes live-index metadata."
+    },
+    {
+      "path": "scripts/doc-alias-resolver.mjs",
+      "line": 147,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/doc-alias-resolver.mjs:112",
+        "scripts/doc-alias-resolver.mjs:213"
+      ],
+      "siteId": "readOldDocument:700c771104fc5ac3f19c796eca2e653e1a38fb9061c9cd33e28e08969f802002",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: the historical Markdown reader permits 64 MiB; Inspect stops at 32 MiB and has no ranged/streamed blob port. Lowering the allowance would narrow the resolver contract.",
+      "retireWhen": "The historical reader and migration/alias consumers retire, or Git supplies an equivalent bounded read."
+    },
+    {
+      "path": "scripts/event-store/power-loss-driver.mjs",
+      "line": 25,
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/event-store/power-loss-driver.mjs",
+      "line": 26,
+      "spawn": "openStore -> src/event-store/native.mjs:70",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/event-store/store-increment-worker.mjs",
+      "line": 12,
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/event-store/store-increment-worker.mjs",
+      "line": 15,
+      "spawn": "openStore -> src/event-store/native.mjs:70",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 56,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:1416",
+        "scripts/generate-doc-inventory.mjs:1475",
+        "scripts/generate-doc-inventory.mjs:1632",
+        "scripts/generate-doc-inventory.mjs:1675",
+        "scripts/generate-doc-inventory.mjs:1704"
+      ],
+      "siteId": "readBlobBufferAtCommit:75f7006a6d16ad26688b112f1750fae1106d557ca17ffd74e8c765e575e2a61d",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: immutable binary show is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; changing the generator invalidates phase-06 reproduction check B.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 166,
+      "spawn": "spawnSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:1661",
+        "scripts/generate-doc-inventory.mjs:1902"
+      ],
+      "siteId": "registryBindsToCommit:0edec6a84bd894fefd26324f8de4a213bb672be733a0c889cd32801a7c547acc",
+      "callerDigests": [
+        "49d74c4fa2526e3f442469282813ae6a34e5dbba488267f6e6759f76e24ba1e2",
+        "d3f16a0d461378bb8849283c9417a7300dfe35fd5188642e0dc5e09be057ce19"
+      ],
+      "escapes": [],
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: scope-binding diff --quiet is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 739,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:808",
+        "scripts/generate-doc-inventory.mjs:1666"
+      ],
+      "siteId": "listCommitEntries:79536f264fd406980cdb23ba68b0ca180c285aa47de32e83598ac705db685c23",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: sized tree enumeration is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 749,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "siteId": "listCommitPaths:5cabe3388545e9ecaac628cb5d7c0f72f1446b3583a54a8174033fa3a8845cd9",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: path enumeration is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 1222,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:1466",
+        "scripts/generate-doc-inventory.mjs:1625",
+        "scripts/generate-doc-inventory.mjs:1664"
+      ],
+      "siteId": "scanInScopeFiles:79536f264fd406980cdb23ba68b0ca180c285aa47de32e83598ac705db685c23",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: sized blob enumeration is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 1241,
+      "spawn": "spawnSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:1467",
+        "scripts/generate-doc-inventory.mjs:1626",
+        "scripts/generate-doc-inventory.mjs:1667"
+      ],
+      "siteId": "readCommitBlobMap:59301094edd07e7f82c4b121accc8d06f6c55c9777c1eca3bd010b8a7b0eb807",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: blob batching is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 1413,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:1945"
+      ],
+      "siteId": "carryForwardIdentityRegistry:0a943128baabe04ac45449896e2dd10fc55f15ef9dd5a1ca21237abd27c423d6",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: sized entry lookup is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "line": 63,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-shipped-path-inventory.mjs:360",
+        "scripts/generate-shipped-path-inventory.mjs:460",
+        "scripts/generate-shipped-path-inventory.mjs:542",
+        "scripts/generate-shipped-path-inventory.mjs:625",
+        "scripts/generate-shipped-path-inventory.mjs:831",
+        "scripts/generate-doc-inventory.mjs:1411",
+        "scripts/generate-doc-inventory.mjs:1457",
+        "scripts/generate-doc-inventory.mjs:1623",
+        "scripts/generate-doc-inventory.mjs:1658",
+        "scripts/generate-doc-inventory.mjs:1900"
+      ],
+      "siteId": "resolveCommitSha:67539c0c154f72f4f547c9c5483b8b9e149080c4e5dad0eb434251e200b52bdc",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: explicit commit resolution is byte-pinned reproduction evidence in blob 0f1cd7e1cee308772c0b56c37f3190333039cfb3; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "line": 78,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-shipped-path-inventory.mjs:361",
+        "scripts/generate-shipped-path-inventory.mjs:461",
+        "scripts/generate-shipped-path-inventory.mjs:544",
+        "scripts/generate-shipped-path-inventory.mjs:626"
+      ],
+      "siteId": "loadCommitTree:466434e47ec5f655be7a53b2e7c154107d75beb8f6db65c0a279c67323a688de",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: path enumeration is byte-pinned reproduction evidence in blob 0f1cd7e1cee308772c0b56c37f3190333039cfb3; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "line": 100,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-shipped-path-inventory.mjs:555",
+        "scripts/generate-doc-inventory.mjs:760",
+        "scripts/generate-doc-inventory.mjs:1017",
+        "scripts/generate-doc-inventory.mjs:1268"
+      ],
+      "siteId": "readBlobAtCommit:d9f8a50630af644e7b1c746bd04d04c8a47bb7daea80688b6ba5622a928a0821",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: immutable text show is byte-pinned reproduction evidence in blob 0f1cd7e1cee308772c0b56c37f3190333039cfb3; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/git-addon.mjs",
+      "line": 16,
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e1-power-cut.mjs",
+      "line": 108,
+      "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e1-power-cut.mjs",
+      "line": 143,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e1-power-cut.mjs",
+      "line": 214,
+      "spawn": "createGitRecovery -> src/git/recovery.mjs:7",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e1-power-cut.mjs",
+      "line": 293,
+      "spawn": "createGitRecovery -> src/git/recovery.mjs:7",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 104,
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 106,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 116,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 148,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 286,
+      "spawn": "typedOperationRows -> scripts/git/e3-bench.mjs:298",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 522,
+      "spawn": "checkoutInspect -> scripts/git/e3-bench.mjs:48",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 524,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 526,
+      "spawn": "typedOperationRows -> scripts/git/e3-bench.mjs:298",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 540,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 557,
+      "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 661,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 701,
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 714,
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 732,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:805",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 732,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:775",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 830,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:805",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 845,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 860,
+      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:830",
+      "binary": "(command-line arguments)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/p-space-resource.mjs",
+      "line": 61,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/p-space-resource.mjs",
+      "line": 96,
+      "spawn": "createGitRecovery -> src/git/recovery.mjs:7",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/herdr-cockpit-notify.mjs",
+      "line": 53,
+      "spawn": "spawnSync",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/lib/git-addon-stage.mjs",
+      "line": 100,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/lib/sandbox-git.mjs",
+      "line": 49,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "shell",
+      "class": "sandbox-door"
+    },
+    {
+      "path": "scripts/lib/sandbox-git.mjs",
+      "line": 57,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/git/e3-bench.mjs:443"
+      ],
+      "class": "sandbox-door"
+    },
+    {
+      "path": "scripts/verify-phase-01.mjs",
+      "line": 169,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/verify-phase-01.mjs:475"
+      ],
+      "siteId": "runPhase01Verification:00e89929f3077d6c9f80cb91c920432bdf17441b4abd7e3981315d2d05d3211e",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: receipt needs the exact commit tree OID from rev-parse <commit>^{tree}; Inspect has commit resolution and entry listings but no typed commit-tree identity fact. Parsing commit headers here would duplicate Git parsing.",
+      "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git exposes commit-tree identity."
+    },
+    {
+      "path": "scripts/verify-phase-01.mjs",
+      "line": 370,
+      "spawn": "spawnSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/verify-phase-01.mjs:475"
+      ],
+      "siteId": "runPhase01Verification:eede3be66bbe8d82286b441978c16627c0da6cd08a936ef4d0b019f319100117",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: exact git diff --check includes repository whitespace policy and conflict-marker diagnostics; Inspect diff/diffText does not validate this and a JS approximation would weaken the verifier.",
+      "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git supplies equivalent diff validation."
+    },
+    {
+      "path": "scripts/verify-phase-02.mjs",
+      "line": 127,
+      "spawn": "runOrThrow -> scripts/verify-phase-02.mjs:88",
+      "binary": "param command (no caller found for anonymous function)",
+      "family": "unresolved-binary",
+      "siteId": "verifyForbiddenPhase02Diff:b73042bb7fc8d417b359b18111600e3c5da4cb0a07f6fd3dbcad0ea07b5eb93b",
+      "callerDigests": [
+        "a4421f7f173e2b0cd4444d760c7a8fc7dfa44d3a3c848640f6242545ee7602c7"
+      ],
+      "escapes": [],
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: run('git', ['diff', '--check', ...]) reaches runOrThrow through a callback the scanner cannot resolve. Exact repository whitespace/conflict diagnostics have no equivalent Inspect validation; no check may be dropped.",
+      "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git supplies equivalent diff validation."
+    },
+    {
+      "path": "scripts/verify-phase-02.mjs",
+      "line": 157,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/verify-phase-02.mjs:367"
+      ],
+      "siteId": "runPhase02Verification:8b527625bcede9d16cf3d29172fbd2d31a6786f56297e07d33d15708552bf51a",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: receipt needs the exact commit tree OID from rev-parse <commit>^{tree}; Inspect has no typed commit-tree identity fact. Parsing commit headers here would duplicate Git parsing.",
+      "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git exposes commit-tree identity."
+    },
+    {
+      "path": "src/event-store/native.mjs",
+      "line": 170,
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
+      "binary": "param loaderOptions",
+      "class": "uncalled-wrapper",
+      "function": "decodeLegacyFiles"
+    },
+    {
+      "path": "src/event-store/native.mjs",
+      "line": 176,
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
+      "binary": "param loaderOptions",
+      "class": "uncalled-wrapper",
+      "function": "branchKey"
+    },
+    {
+      "path": "src/git/index.mjs",
+      "line": 10,
+      "spawn": "Command::new <- packages/holder-lock/rust/src/semantics.rs:118",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/git/index.mjs",
+      "line": 17,
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
+      "binary": "param loaderOptions",
+      "class": "uncalled-wrapper",
+      "function": "versions"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 282,
+      "spawn": "acquireHoldSync -> src/holder-lock/index.mjs:292",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 315,
+      "spawn": "acquireLoop -> src/holder-lock/index.mjs:338",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 645,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:141",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 669,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:141",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/run-supervisor/attempt-step.mjs",
+      "line": 72,
+      "spawn": "settleAttempt -> src/run-supervisor/steps/settle-attempt.mjs:196",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/run-supervisor/client.mjs",
+      "line": 38,
+      "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/assignment-runner.mjs",
+      "line": 1999,
+      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:383",
+      "binary": "(env FGOS_HERDR_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/assignment-runner.mjs",
+      "line": 2107,
+      "spawn": "startSupervisor -> src/run-supervisor/direct-launch.mjs:276",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/assignment-runner.mjs",
+      "line": 2181,
+      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:724",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/cli.mjs",
+      "line": 724,
+      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1142",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/authority.mjs",
+      "line": 823,
+      "spawn": "verifyRequiredProbe -> src/runner/dispatch/confinement/authority.mjs:168",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/authority.mjs",
+      "line": 1142,
+      "spawn": "cliSpawnAdapter -> src/runner/dispatch/transport.mjs:408",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/authority.mjs",
+      "line": 1142,
+      "spawn": "cliSpawnAdapter -> src/runner/dispatch/transport.mjs:408",
+      "binary": "param driver",
+      "class": "uncalled-wrapper",
+      "function": "registerBackendDriver"
+    },
+    {
+      "path": "src/runner/dispatch/worker-session-boot.mjs",
+      "line": 167,
+      "spawn": "spawnFn",
+      "binary": "(env FGOS_HERDR_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/execution/commit-unit-work.mjs",
+      "line": 29,
+      "spawn": "state -> src/runner/execution/commit-unit-work.mjs:27",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "changedPaths"
+    },
+    {
+      "path": "src/runner/execution/run.mjs",
+      "line": 1458,
+      "spawn": "runCommand -> src/runner/goal-check.mjs:61",
+      "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/execution/run.mjs",
+      "line": 1458,
+      "spawn": "runCommand -> src/runner/goal-check.mjs:61",
+      "binary": "(consumer verify command (unit?.verify))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/fanout-batch.mjs",
+      "line": 94,
+      "spawn": "execFileSync",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/github-adapter.mjs",
+      "line": 196,
+      "spawn": "viewGitHubPRStatus -> src/runner/github-adapter.mjs:145",
+      "binary": "param opts",
+      "class": "uncalled-wrapper",
+      "function": "mergeGitHubPR"
+    },
+    {
+      "path": "src/runner/github-adapter.mjs",
+      "line": 204,
+      "spawn": "gh -> src/runner/github-adapter.mjs:49",
+      "binary": "param opts",
+      "class": "uncalled-wrapper",
+      "function": "mergeGitHubPR"
+    },
+    {
+      "path": "src/runner/github-adapter.mjs",
+      "line": 209,
+      "spawn": "viewGitHubPRStatus -> src/runner/github-adapter.mjs:145",
+      "binary": "param opts",
+      "class": "uncalled-wrapper",
+      "function": "mergeGitHubPR"
+    },
+    {
+      "path": "src/runner/github-adapter.mjs",
+      "line": 215,
+      "spawn": "viewGitHubPRStatus -> src/runner/github-adapter.mjs:145",
+      "binary": "param opts",
+      "class": "uncalled-wrapper",
+      "function": "mergeGitHubPR"
+    },
+    {
+      "path": "src/runner/goal-check.mjs",
+      "line": 61,
+      "spawn": "runBorrowed",
+      "binary": "(env ComSpec)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/goal-check.mjs",
+      "line": 165,
+      "spawn": "runCommand -> src/runner/goal-check.mjs:61",
+      "binary": "(consumer verify command (item.verify))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "line": 958,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "? elements of section.commands",
+      "family": "unresolved-binary",
+      "siteId": "landRunnerItem:cc9889cc48b52606b9bc90ec69d9c7e3216188c53719a6b06f5243f78ef87115",
+      "callerDigests": [],
+      "escapes": [
+        "passed to an unresolved callee (src/runner/merge.mjs:919)"
+      ],
+      "class": "configured-binary",
+      "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "line": 992,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "? elements of section.commands",
+      "family": "unresolved-binary",
+      "siteId": "landRunnerItem:a7d2645a7b32b2cbd3ccc8248ee7b4e5b369da5845a9e8f02bf176709ac52b51",
+      "callerDigests": [
+        "4de7c2717184fdba8f7f1b017a6ce53a3d527978fe0ce8d184c95de99ac26969",
+        "82473f253ab13fd30ad7b23b52a9f1823606077e200c1a67f4d0640ce58adbc7"
+      ],
+      "escapes": [],
+      "class": "configured-binary",
+      "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+    },
+    {
+      "path": "src/runner/worktree.mjs",
+      "line": 146,
+      "spawn": "execFileSync",
+      "binary": "? readSharedConfig(dir)[key]",
+      "family": "unresolved-binary",
+      "siteId": "runWorktreeSetupCommands:248e44e1134e762a1a88f3d776215e3515492e402a14b26abdb11f281e78d2a1",
+      "callerDigests": [
+        "a57a1a129bac20c39cac3f800b21d3572b64cf1388f19e9266bb8f882ade9b05",
+        "c1d61a7df27c8bb7eb3cd56b09c6f966ad9c3d7af4c5e5206c4f1d7d064c6a59",
+        "fa545c9254fead58d86d5ede9ec00c29cc6478cb35a5e721511fe5a5ea5dc3ec"
+      ],
+      "escapes": [],
+      "class": "configured-binary",
+      "reason": "Owner L13-6: worktreeSetup.commands is JSON project configuration, not product-selected Git; the existing consumer-command marker agrees with runtime classification but indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this setup-command consumer retires."
+    },
+    {
+      "path": "src/seat-binding/client.mjs",
+      "line": 128,
+      "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/event-store-checks.mjs",
+      "line": 32,
+      "spawn": "checkEventStore -> src/setup/event-store-checks.mjs:56",
+      "binary": "param options",
+      "class": "uncalled-wrapper",
+      "function": "eventStoreDoctor"
+    },
+    {
+      "path": "src/setup/holder-lock-checks.mjs",
+      "line": 147,
+      "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/identity-checks.mjs",
+      "line": 39,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 3034,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_CLAUDE_COMMAND)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 3048,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_CLAUDE_COMMAND)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 3102,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_CLAUDE_COMMAND)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 3114,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_CLAUDE_COMMAND)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 5508,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1548",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 5555,
+      "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:703",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 5596,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1548",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 5603,
+      "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:522",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 5988,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 6239,
+      "spawn": "probeIdentity -> src/util/session-identity.mjs:55",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 6309,
+      "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:128",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/run-supervisor-checks.mjs",
+      "line": 90,
+      "spawn": "probeRoute -> src/setup/run-supervisor-checks.mjs:51",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/run-supervisor-checks.mjs",
+      "line": 112,
+      "spawn": "probeRoute -> src/setup/run-supervisor-checks.mjs:51",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/terminal-control/client.mjs",
+      "line": 117,
+      "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/terminal-control/client.mjs",
+      "line": 147,
+      "spawn": "spawn",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/util/host-bin.mjs",
+      "line": 94,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/verbs/events/export.mjs",
+      "line": 14,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "exportUseCase"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 147,
+      "spawn": "scanWorkspace -> src/verbs/events/migrate.mjs:103",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 161,
+      "spawn": "eventStoreFacts -> src/event-store/native.mjs:153",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "migrateUseCase"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 163,
+      "spawn": "checkStopped -> src/verbs/events/migrate.mjs:147",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "migrateUseCase"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 166,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "migrateUseCase"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 188,
+      "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "migrateUseCase"
+    },
+    {
+      "path": "src/verbs/events/rebuild.mjs",
+      "line": 8,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "rebuildStoreUseCase"
+    },
+    {
+      "path": "src/verbs/events/status.mjs",
+      "line": 3,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "statusUseCase"
+    },
+    {
+      "path": "src/verbs/events/sync.mjs",
+      "line": 3,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "syncUseCase"
+    }
+  ],
+  "outsideProduct": {
+    ".agentkit": 2,
+    ".claude-plugin": 1,
+    ".claude": 113,
+    ".fgos": 105,
+    ".gitattributes": 1,
+    ".github": 9,
+    ".gitignore": 1,
+    "AGENTS.md": 1,
+    "CHANGELOG.md": 1,
+    "CLAUDE.md": 1,
+    "Cargo.lock": 1,
+    "Cargo.toml": 1,
+    "archive": 757,
+    "clippy.toml": 1,
+    "components": 1,
+    "docs": 4334,
+    "dogfood-fixture": 16,
+    "examples": 8,
+    "install.sh": 1,
+    "package-lock.json": 1,
+    "packages": 216,
+    "plans": 9217,
+    "plugins": 100,
+    "rustfmt.toml": 1,
+    "test": 808,
+    "tools": 13
+  }
+}
