@@ -1,18 +1,7 @@
 {
   "contract": "documentation-record-archive.v2",
-  "status": "blocked-rework-link-closure-budget",
-  "pendingRework": {
-    "status": "blocked-budget-exceeded",
-    "inputCommit": "3c368e5201f4ab4a5a245f4c6caf896d64bfc0a8",
-    "closurePath": "plans/260925-documentation-authority-unification/reports/phase-09/archive/link-closure.json",
-    "sha256": "93be72ebb0f8b964eccdb38666c8045c29fe2bd842d0bbc473aaf447d3b4e893",
-    "addedFiles": 637,
-    "addedBytes": 281770653,
-    "budgetBytes": 50000000,
-    "applied": false,
-    "note": "Owner disposition required by w5-d5d-brief.md item 1. Existing sourceCommit/counts/audit assets remain historical; no replacement partition or new timing candidate was built."
-  },
-  "inputCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
+  "status": "candidate-local-design-not-cutover-approval",
+  "inputCommit": "d3efc70c5879d6b3a599cd9998615a46a73a82bd",
   "archiveRef": "refs/heads/archive/260925-records",
   "archiveCommit": null,
   "archiveRefPolicy": "create-only at approved F; archive snapshot includes source tree and generated audit assets; refuse a different existing target; publish only with cutover owner approval",
@@ -24,18 +13,18 @@
     "alreadyPruned": "prior-prune-recovery.json carries original blobs not present in archiveCommit tree; ancestors keep them reachable"
   },
   "counts": {
-    "planFiles": 6899,
-    "planBytes": 2897413094,
-    "archiveFiles": 6016,
-    "archiveBytes": 2265926393,
-    "retainFiles": 883,
-    "retainBytes": 631486701,
-    "standaloneReplayRetirements": 359,
+    "planFiles": 6918,
+    "planBytes": 2898953250,
+    "archiveFiles": 6026,
+    "archiveBytes": 2266111973,
+    "retainFiles": 892,
+    "retainBytes": 632841277,
+    "standaloneReplayRetirements": 361,
     "unresolvedLiveSources": 0,
-    "gateProgramsRetireAtFinalPin": 43,
+    "gateProgramsRetireAtFinalPin": 45,
     "reviewedTen": 10,
-    "temporaryGateFiles": 3283,
-    "temporaryGateBytes": 1299055408
+    "temporaryGateFiles": 3320,
+    "temporaryGateBytes": 1299486924
   },
   "sixRestoredInputs": [
     "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-accounting-01-345f15d95.json",
@@ -50,84 +39,98 @@
     "Retirement is a proposed cutover disposition, not independent acceptance or permission to disable current pre-flip gates.",
     "Current product inventory corpus is retained, so the ~0.2 GB aspirational tip is not claimed."
   ],
-  "sourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
+  "sourceCommit": "d3efc70c5879d6b3a599cd9998615a46a73a82bd",
   "archiveCommitNote": "Rehearsal records the augmented archive snapshot commit. At F install that approved id here before main landing.",
   "auditAssets": [
     {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/direct-links.json.gz",
+      "blobId": "80294b8297e50b6f909744997d364fdd1f74d41e",
+      "sha256": "ab11a6038d0bfda4c3ea15e155fb56e6340e781c803ae6dd99b9bb20d78ffb21",
+      "size": 14207,
+      "encoding": "gzip+utf8-json"
+    },
+    {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/external-references.json.gz",
-      "blobId": "8076826c7a649013855d389fd16cfad4f4470fa3",
-      "sha256": "4d380bc0c3cbdca5e3295019c0ba1fbaf90b970db0b14dc12d3ce27b64c6629b",
+      "blobId": "b339bc429eb3d64c31751e91491608dc3cb01352",
+      "sha256": "a92aee4cf9813dc033e9b07b4077ad3085b5cf2d4575d3fe688ec43359259f16",
       "size": 86814,
       "encoding": "gzip+utf8-json"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/gate-retention.json.gz",
-      "blobId": "e58d0cd700dfdec15f5c39fdbf67951e6246ed77",
-      "sha256": "e70863dd495223f3081773c14ef70c7dc4293664cebae4cacd540f806c691a42",
-      "size": 16302,
+      "blobId": "dc895d3d8f2a4361b95a1f93fb13c23987426742",
+      "sha256": "a5e3f46641efb2219c695f770b68e4e97ec3f210facf4fb1e1c1568d23a4317d",
+      "size": 16593,
       "encoding": "gzip+utf8-json"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/partition.json.gz",
-      "blobId": "fda1628be043ebe0eaddcfd10aff3cf692b6ffc3",
-      "sha256": "2475e27e112a658b98b415f9cf467ba36df45905680a835ea63a13d669138cb8",
-      "size": 530382,
+      "blobId": "528c7247b86bb992b024460066750f5a2928e6a1",
+      "sha256": "be5a3174270e303e52dc5f226abc263e05c86f599c0c3982431194e23ddfbafe",
+      "size": 534313,
       "encoding": "gzip+utf8-json"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/prior-prune-recovery.json.gz",
-      "blobId": "6d487db4ffabc43802063a5a329af42fa9dc9881",
-      "sha256": "170887c5b89326e5bd406a41d19c4cb197128aee3c13c1ebe40a9a059bbb49c3",
+      "blobId": "d60829431555dfa9530a4a4a55c82746e6a0cb1c",
+      "sha256": "4a10725f6a39bc40ac7cae976e08f11a830094a90f6b168f4d94b7472f7216f0",
       "size": 18261,
       "encoding": "gzip+utf8-json"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reader-patches--enumeration-review.json.gz",
-      "blobId": "e637e9be6b7a3f781ff25db21c8f53b41ec315f7",
-      "sha256": "6f744f8fb7e952c748f1e2ad6a3f32d279ecd9816971460cbe82cc5219713751",
-      "size": 578394,
+      "blobId": "a7e135738f64997dfa12c549c9a3f8e3fc4ea39c",
+      "sha256": "90d65d118853c4713dcc5a38304be36e39cd675ae8c1d24503f5044517efa2a7",
+      "size": 578630,
       "encoding": "gzip+utf8-json"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reader-patches--historical-replay-specs.json.gz",
-      "blobId": "cba47c55c4fba00612a38f070a14cb77a31c62f6",
-      "sha256": "7112e6e58e2001224ea54e1805e64657c441b709a1375329f5b76675c9d2b279",
-      "size": 6021,
+      "blobId": "41338f68405df1492f5ac5f35b0402bb36027dd5",
+      "sha256": "7c65e236bb0fe3ad6f27723d42491d30bca97d8dd176dda76b252b487ea11ed9",
+      "size": 6022,
       "encoding": "gzip+utf8-json"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reader-patches--prior-script-refs.json.gz",
-      "blobId": "b17fc4bdc96f22a8a51454e746149abee4f407f8",
-      "sha256": "b9712cb11797e43358272ba15a9e43f5ba6b94d2f939a421b7439e8e0e4e33e8",
-      "size": 35553,
+      "blobId": "4997bb50f12f5bfe2b8c7a6b778b3ca06ac48cd5",
+      "sha256": "219de7faf0f4aa38c643d410c90498ba5540b678afd8ab4930b093a7d18339cf",
+      "size": 35552,
       "encoding": "gzip+utf8-json"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reader-patches--reader-index.json.gz",
-      "blobId": "5aa881cfa1567ab0810b4b2c129612d92c430556",
-      "sha256": "c31624a3ea4598c5c61d06bbe68795ebf9fb8eadc70ebe1e6cafb522abe22e91",
-      "size": 381115,
+      "blobId": "3c6779cae58f022889233ba3920d4c62427f6190",
+      "sha256": "e6683ed1647a395d78ffcd67bf1331eccc6ac4a562745570fffc2cbd88c14e17",
+      "size": 381159,
       "encoding": "gzip+utf8-json"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reader-patches--standalone-retirement-specs.json.gz",
-      "blobId": "b07f62b162da8794b3c8fbc57c1173e8d961743e",
-      "sha256": "d81a4ac8042285e8f26eace9b6773f67bcb9f2e7aea7e47d4e95969ba3b6ecbf",
-      "size": 36847,
+      "blobId": "b0f756434ce4b52a673142360a0716545f730532",
+      "sha256": "33a82a3e45c538227fe816b5babf5b1363b6e56260ed5a26916c6686517fc0c6",
+      "size": 37086,
+      "encoding": "gzip+utf8-json"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/retained-archive-links.json.gz",
+      "blobId": "8a7a1a22cb738975b24f3bf5c934eaa89b41f4ff",
+      "sha256": "523d5ae8d028c9e83385f39a21fa245566b5b83a080795fa104a0f09e6524916",
+      "size": 9421,
       "encoding": "gzip+utf8-json"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/retained-set-corrections.json.gz",
-      "blobId": "c9f5fc3b0e6b9f292d3f12fd062fdec5cb46a7cc",
-      "sha256": "f27a3ab61099a27d897842d9291a744c52c895f64c142142e96a078d6545ae8e",
-      "size": 4800,
+      "blobId": "0161dccb829be433c274ec5fbc60f3298c8800b2",
+      "sha256": "6283729253df67e8d64105caa497dfcff4bfd4519617e5364d73e07b6adad2fb",
+      "size": 4857,
       "encoding": "gzip+utf8-json"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/scan-receipt.json.gz",
-      "blobId": "983c3ed4fd3d85a86cddb5f982565288704995f6",
-      "sha256": "4f518e83f67da352911239e33726b65ea53ca5f9532151f2b8756ab18051fdc0",
-      "size": 15265,
+      "blobId": "33afa95b14e601a683a4f1faca5685efc4fdda20",
+      "sha256": "9c2bc938b1d2ea445c366c25c524b15e720cc38595fa08bafdf26b7d95266b6f",
+      "size": 15262,
       "encoding": "gzip+utf8-json"
     }
   ],

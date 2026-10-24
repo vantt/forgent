@@ -1,47 +1,41 @@
-# Archive closure budget-stop receipt
+# Direct-link archive rework receipt
 
-**BLOCKED — the brief's explicit stop condition fired.** Source pin: `3c368e5201f4ab4a5a245f4c6caf896d64bfc0a8`. Authority: `w5-d5d-brief.md` item 1 and `reviews/w5-d5c-archive-review.{md,json}`. This is not a completed rehearsal or G8/F acceptance.
+**BLOCKED on external real-disk scratch permission, not on retention budget.** A42 (`../w5-d5e-brief.md`) replaces the rejected transitive rule. Source pin: `d3efc70c5879d6b3a599cd9998615a46a73a82bd`. The direct-link partition and custody checks pass structurally; no new rehearsal, Check A/link-finding parity, cold timing, cutover or G8/F acceptance is claimed.
 
-## Result and full list
+## Exact retention result
 
-`build-design.py` now follows Markdown links from kept declared rulings and navigation roots to a fixed point, with source/line reasons. It adds **637 files / 281,770,653 B**, or **5.64 times** the 50,000,000 B stop budget. The proposal was **not applied**. The complete list, pinned blob ids, SHA256, sizes, reasons, roots and edge locators are in `link-closure.json`; `manifest.json.pendingRework` binds that file by digest. No new partition replaced the historical one.
+The general one-hop rule in `build-design.py` adds exactly **4 files / 783,918 B**, below the 50,000,000 B guard. It recognizes already-kept ruling document types and existing navigation roots; it never follows target links or uses a filename hand list. `audit/direct-links.json.gz` carries the exact additions, roots, locators and before/after sets.
 
-| Retention state | Files | Bytes |
-|---|---:|---:|
-| Prior D5c validated partition (old pin `23f6eaccf`) | 883 | 631,486,701 |
-| Before closure at this task's pin | 888 | 632,057,359 |
-| Added by fixed-point closure | 637 | 281,770,653 |
-| Proposed after — **NOT applied** | 1,525 | 913,828,012 |
-| Applied closure delta | 0 | 0 |
-
-The five-file before-set difference is source evolution since D5c, not this worker's retention change. The general rule reuses the existing navigation/read roots and identifies ruling document types, not four filenames. Ruling roots: constitution, evidence-relocation policy and claim/disposition vocabulary; navigation roots: 102. Every descendant's links are followed, including evidence targets; nothing is selectively dropped to meet the budget.
-
-The four requested direct targets are in the proposal:
-
-| Target under the plan root | Bytes | Exact ruling locator |
+| Target under the plan root | Bytes | Ruling locator (reason prefix: `ruling link: `) |
 |---|---:|---|
 | `alias-table-and-resolver-contract.md` | 3,951 | `minimum-constitution.md:235` |
 | `cutover-write-lease-design.md` | 27,057 | `minimum-constitution.md:244`; `evidence-payload-relocation-policy.md:15` |
 | `reports/phase-06/same-path-binding-blocker.json` | 59,528 | `minimum-constitution.md:332` |
 | `reports/doc-inventory.md` | 693,382 | `evidence-payload-relocation-policy.md:96` |
-| Total direct targets | 783,918 | Reasons use `ruling link: <file>:<line>` |
+| **Added total** | **783,918** | **4 files** |
 
-The largest newly reached target is `reports/phase-06/checkpoint-10-source-population.json` (**71,398,693 B**), already above the whole budget. Other large examples are the proposals redesign rereview pack (**11,004,517 B**), sync627 all-shards consistency (**10,718,452 B**) and step10 accounting-02 Markdown (**10,125,116 B**). The report lists all 637, not only these examples.
+| Disposition at the same source pin | Before files | Before bytes | After files | After bytes |
+|---|---:|---:|---:|---:|
+| Retained | 888 | 632,057,359 | 892 | 632,841,277 |
+| Proposed archive | 6,030 | 2,266,895,891 | 6,026 | 2,266,111,973 |
+| Full plan partition (excluding archive records) | 6,918 | 2,898,953,250 | 6,918 | 2,898,953,250 |
 
-Recomputed retained-to-archived relative links at the current pin: **124 reader files / 1,029 links / 631 targets** before closure. The unapplied proposal would leave **1 reader / 3 links / 3 targets**. `design.md` states how to follow these through the approved archive ref and verify the recovered bytes. The working tree itself has not been pruned.
+`link-closure.json` remains byte-identical (SHA256 `93be72ebb0f8b964eccdb38666c8045c29fe2bd842d0bbc473aaf447d3b4e893`): the historical 637-file / 281,770,653 B closure explains why transitivity was rejected. The current direct-link audit binds it by digest; the old closure is not current policy. The previous 22 false basename reasons remain removed: 19 files archive, two retain for real navigation links, and `reports/doc-inventory.md` now retains for its direct ruling link.
 
-## Executed proof and stopped work
+After direct retention, **123 kept files / 1,025 relative link occurrences / 628 archived targets** remain, independently recomputed in `audit/retained-archive-links.json.gz` and the verifier. `design.md` explains normalization, approved archive-ref recovery and digest checks with an example `git show` command. These historical evidence links are not newly failing product candidate links; no fresh production link-parity result is available because rehearsal did not start.
 
-- `python3 -B .../archive/build-design.py --output-dir .../archive`: **exit 1, intentional budget stop**. Repeated builds produced the same counts. `audit/rebuild-d5d.log` is the final run. No archive refs/index were written.
-- `python3 -B .../archive/verify-design.py`: **exit 2, verified budget stop**, not the former exit-0 full custody/rehearsal pass. It independently traverses the reading graph and checks every added blob/SHA/size, exact set equality and before/proposed totals. See `verification.json`.
-- `rehearse.py` now refuses a budget-blocked manifest **before scratch creation**. Its invocation exits nonzero at this guard. No heavy clone, new test run, accounting simulation, timing variant or cache eviction was executed.
-- Deleted **only** `audit/attempt-1/rehearsal.bundle` (**1,788,526 B**); the rest of attempt-1 is unchanged. Kept the current `audit/rehearsal.bundle`.
-- Existing manifest partition/audit descriptors and historical rehearsal objects remain bound to their old pin. Rehearsal metadata explicitly disclaims cold acceptance; its old fresh-clone labels are not cold-cache evidence. No new Check A or link-parity pass is claimed. The reviewed prior candidate's A was green with no new H links; that does not validate this unapplied proposal.
+## Implementation and proof actually executed
 
-## Owner handoff
+- Builder: **exit 0**, refreshed `manifest.json` and compressed partition/reader/link audits at the current source pin. `audit/rebuild-d5e.log` records the run. No source Git write.
+- Verifier: **exit 2**, explicitly `blocked-rehearsal-not-current`, with `structuralCustodyVerified: true`. It checks the complete blob/size/SHA partition, exact one-hop additions/reasons, rejected-closure digest, all remaining link occurrences, 184 outside-plan joins, 619 navigation joins, six restored inputs, 279 reachable recovery blobs, 361 retirement specifications, 47 historical readers / 135 joins, and four rejection probes. It does **not** convert an old rehearsal bundle into a new pass. See `verification.json` and `audit/verify-d5e.log`.
+- Python syntax: all three modified scripts parse using `ast.parse`, without bytecode files.
+- Rehearsal: **exit 1 before clone/scratch creation**, recorded in `audit/rehearse-d5e.log`. Command: `TMPDIR=/var/tmp python3 -B <archive>/rehearse.py --scratch /tmp/fgos-work/w5-d5e-cold --release-path /home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8`.
+- No new Check A, B/H/I, test parity, worktree timing or cache residency observation was produced. The historical `rehearsal.json` evidence remains bound to `23f6eaccf5eb195a8f50e5788d38f386a901b6d2`, clearly marked historical with the new attempt/blocker metadata. Its previously reviewed A pass and old warm timings do not prove this pin.
 
-**Decision needed:** the requested transitive rule retains 281.77 MB more, exceeding the approved stop budget. Either authorize the full listed closure (approximately +282 MB on the reduced tip, then rebuild and measure), or revise which navigation/ruling graph must remain directly navigable (design/review work; archive-ref links remain necessary). Recommendation: review the complete graph/list before changing the budget; do not silently keep only the four cheap targets. The answer governs retention only, not F approval or publication. No owner question or lifecycle state was written through fgOS.
+## Cold-run code and environmental blocker
 
-After that disposition, implement and prove the remaining cold-residency and external-scratch changes, then rerun builder/rehearsal/verifier and full A/link parity. These steps are **deferred**, not claimed complete. No new scratch was created, so no scratch cleanup is outstanding. `/tmp` here is tmpfs; future timing needs a real-disk `$TMPDIR` outside the repository.
+`rehearse.py` now places physical scratch outside the tree at `$TMPDIR/fgos-work/<fresh-name>` (default `/tmp/fgos-work`), with any logical `/tmp` alias also external. It removes its scratch on normal/error exit after creation, runs timing variants sequentially, and never recreates `archive/.scratch`. Before each variant's first add it enumerates every timing-clone `.git/objects` file, records per-file `fincore` pages/bytes, flushes and evicts each with `os.posix_fadvise(fd, 0, 0, os.POSIX_FADV_DONTNEED)`, then records residency again. It records residency before/after all three adds and labels by measured state, not ordinal position. Unproven eviction labels run 1 `first run, warm page cache` and requires owner `drop_caches` cold evidence at F. The verifier checks the recorded arithmetic and labels if a current rehearsal exists. **These new runtime paths are not exercised by this blocked attempt.**
 
-Only `archive/**` was changed. No source Git writes, pair accounting, product/test edits, fgOS CLI, `.fgos`/secret access, lifecycle calls, leases, publication, landing, npm test or `scripts/run-tests.mjs`. Impact-analysis: degraded/unqueried under the no-fgOS-CLI brief; direct history/source review only. Cargo suite and browser/service preview were not run for this stopped records task. `needsWrites=[]`; no out-of-scope change is needed to report this blocker.
+`/var/tmp` is on ext4, but sandbox `mkdir /var/tmp/fgos-work` fails with **errno 30, Read-only file system**. `/tmp` is tmpfs (7.7 GiB); it is not a real-disk cold-timing substitute, and the existing rehearsal free-space guard requires more than 20 GiB. No bypass, in-tree fallback, lowered guard, fake residency or old timing substitution was used. No scratch was created, so no cleanup remains. To finish, rerun in a permission frame with writable external real-disk scratch, at least the existing space guard, and the same scoped archive output; then run both variants and the full verifier. No additional repository write scope is required (`needsWrites=[]`).
+
+`audit/attempt-1/rehearsal.bundle` stays deleted; the other attempt-1 records and current historical bundle are unchanged. No pair accounting, product/test edit, source Git write, fgOS CLI, `.fgos`/secret read, lifecycle verb, publication or landing. The runner owns committing. Impact-analysis is degraded/unqueried under the no-fgOS-CLI brief; direct source/history review only. npm test and `scripts/run-tests.mjs` are prohibited; Cargo and browser/service preview were not run for this records task.

@@ -263,9 +263,9 @@ def main():
                     keep(dst, 'retained plan reader: ' + src + '#' + witness['field'] + ':' + str(witness['line']) + ' ' + witness['text']); changed = True
                 if dst in sources and dst not in live:
                     live.add(dst); changed = True
-    # Navigation and kept rulings form a reading graph, not just one-hop links.
+    # A42: retain DIRECT links from the existing kept rulings/navigation roots.
     # Infer ruling roots from their declared document type, never a filename list.
-    # Do not apply any part of the closure if the brief's 50 MB budget is exceeded.
+    # Do not promote targets to roots or overwrite the rejected fixed-point report.
     ruling = set()
     for path in sorted(protected):
         if not path.endswith('.md'): continue
@@ -279,11 +279,9 @@ def main():
     closure_refs = []
     reached = set()
     pending = [(p, label) for label, roots_set in [('ruling', ruling), ('navigation', navigation)] for p in sorted(roots_set)]
-    visited = set()
     while pending:
         path, label = pending.pop()
-        if (path, label) in visited: continue
-        visited.add((path, label)); reached.add(path)
+        reached.add(path)
         if path not in link_edges:
             links = []
             text = (root / path).read_bytes().decode('utf8', errors='replace')
@@ -298,14 +296,14 @@ def main():
             link_edges[path] = links
         for row in link_edges[path]:
             target = row['targetPath']
-            reason = ('ruling link: ' if label == 'ruling' else 'navigation closure link: ') + path + ':' + str(row['line'])
+            reason = ('ruling link: ' if label == 'ruling' else 'navigation direct link: ') + path + ':' + str(row['line'])
             closure_reasons[target].add(reason)
             closure_refs.append({**row, 'rootKind': label})
-            pending.append((target, label))
+            reached.add(target)
     added = reached - protected
     closure_bytes = sum(files[p]['size'] for p in added)
     closure = {'inputCommit': pin, 'status': 'blocked-budget-exceeded' if closure_bytes > 50000000 else 'within-budget',
-        'policy': 'Fixed point of relative Markdown links from kept declared Specification/Policy/Governance/Contract/Decision documents and navigation roots; descendants inherit root kind. No size-based pruning of the closure.',
+        'policy': 'A42: one hop of relative Markdown links from already-kept declared Specification/Policy/Governance/Contract/Decision documents and navigation roots. Targets are not traversed.',
         'budgetBytes': 50000000, 'rulingRoots': sorted(ruling), 'navigationRoots': sorted(navigation),
         'beforeRetainedPaths': sorted(protected),
         'before': {'retainFiles': len(protected), 'retainBytes': sum(files[p]['size'] for p in protected)},
@@ -313,14 +311,15 @@ def main():
         'addedFiles': len(added), 'addedBytes': closure_bytes,
         'added': [{**files[p], 'reasons': sorted(closure_reasons[p])} for p in sorted(added)],
         'references': closure_refs}
-    # Plain JSON is also the complete list to hand to the owner if stopped.
-    (out / 'link-closure.json').write_text(json.dumps(closure, ensure_ascii=False, indent=2) + '\n')
+    rejected = (root / A / 'link-closure.json').read_bytes()
+    closure['rejectedTransitiveClosure'] = {'path': A + 'link-closure.json',
+        'sha256': hashlib.sha256(rejected).hexdigest(), 'status': 'historical-budget-stop-not-current-policy'}
+    emit('direct-links.json', closure)
     if closure_bytes > closure['budgetBytes']:
         print(json.dumps({k: v for k, v in closure.items() if k not in ('added', 'references', 'rulingRoots', 'navigationRoots', 'beforeRetainedPaths')}), flush=True)
-        raise SystemExit('Link closure exceeds 50 MB: stopped without replacing manifest/audits or retaining proposed files; see link-closure.json')
+        raise SystemExit('Direct links exceed 50 MB: stopped without replacing manifest or retaining proposed files; see audit/direct-links.json.gz')
     for path in reached:
         for reason in closure_reasons[path]: keep(path, reason)
-    emit('link-closure.json', closure)
     emit('external-references.json', external_audit)
     # Join the old scriptRefs conservatively for non-plan reader roots. Fixture
     # strings are intentionally over-retained, rather than mistaken for new scope.
@@ -360,6 +359,21 @@ def main():
         retired |= new
     moving |= retired
     protected -= retired
+    remaining_links = []
+    for path in sorted(protected):
+        text = (root / path).read_bytes().decode('utf8', errors='replace')
+        if '\0' in text: continue
+        for number, line in enumerate(text.splitlines(), 1):
+            for match in link_pattern.finditer(line):
+                value = match[1].split('#')[0].split('?')[0]
+                if not value or re.match(r'^[a-z][a-z0-9+.-]*:', value, re.I): continue
+                target = posixpath.normpath(posixpath.join(posixpath.dirname(path), value))
+                if target in moving:
+                    remaining_links.append({'readerPath': path, 'line': number, 'targetPath': target})
+    emit('retained-archive-links.json', {'inputCommit': pin,
+        'method': 'Source-relative Markdown link occurrences in all kept files; only existing archived plan targets',
+        'readerFiles': len({r['readerPath'] for r in remaining_links}), 'links': len(remaining_links),
+        'targetFiles': len({r['targetPath'] for r in remaining_links}), 'references': remaining_links})
     # Full partition, no deletion of a retained test or product module.
     assert moving.isdisjoint(protected) and moving | protected == set(files)
     assert not retired & live
@@ -476,11 +490,11 @@ def main():
     corrections = []
     for row in false_rows:
         path = row['path']
-        assert path in moving or any(s.startswith(('plan navigation link:', 'outside-plan path/link:', 'ruling link:', 'navigation closure link:')) for s in reasons[path])
+        assert path in moving or any(s.startswith(('plan navigation link:', 'outside-plan path/link:', 'ruling link:', 'navigation direct link:')) for s in reasons[path])
         corrections.append({'path': path, 'previousSize': row['size'], 'previousFalseReasons': row['reasons'],
-            'disposition': 'archive' if path in moving else 'retain-required-navigation-link',
+            'disposition': 'archive' if path in moving else 'retain-required-link',
             'currentReasons': sorted(reasons[path]) if path in protected else [],
-            'note': 'Basename-only reader removed; exact navigation link takes precedence under the brief' if path in protected else 'No current tip input: unrelated basename / fixture output / comment / help / mismatching template'})
+            'note': 'Basename-only reader removed; exact navigation or direct ruling link takes precedence under the brief' if path in protected else 'No current tip input: unrelated basename / fixture output / comment / help / mismatching template'})
     prior_moving = {r['path'] for r in previous['records']}
     emit('retained-set-corrections.json', {'inputCommit':pin,'reviewedRows':22,'reviewedBytes':23297481,
         'rows':corrections,'formerlyArchivedOutsideReferences':[r for r in external_refs if r['targetPath'] in prior_moving]})

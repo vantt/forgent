@@ -1,13 +1,17 @@
 {
-  "evidenceStatus": "historical-D5c-only; D5d blocked before rehearsal",
+  "evidenceStatus": "historical-D5c-only; A42 direct retention verified structurally, new rehearsal blocked by external scratch permissions",
   "pendingRework": {
-    "status": "blocked-budget-exceeded",
-    "inputCommit": "3c368e5201f4ab4a5a245f4c6caf896d64bfc0a8",
-    "addedFiles": 637,
-    "addedBytes": 281770653,
+    "status": "blocked-external-real-disk-scratch",
+    "inputCommit": "d3efc70c5879d6b3a599cd9998615a46a73a82bd",
+    "addedFiles": 4,
+    "addedBytes": 783918,
     "newTimingRuns": 0,
     "coldEvidenceAccepted": false,
-    "correction": "The runs below are unchanged historical evidence, not a D5d rerun. Their old cold-fallback labels do not establish cold residency; the review identified a warm page cache. Owner disposition of the 50 MB stop is required before new cache-eviction, external-scratch and timing work."
+    "attemptExit": 1,
+    "attemptLog": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/rehearse-d5e.log",
+    "attemptCommand": "TMPDIR=/var/tmp python3 -B plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearse.py --scratch /tmp/fgos-work/w5-d5e-cold --release-path /home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8",
+    "blocker": "Sandbox refuses mkdir /var/tmp/fgos-work with OSError errno 30 (Read-only file system). /tmp is tmpfs, not a real-disk replacement. No clone or scratch was created.",
+    "correction": "The runs below remain historical evidence at their original sourceCommit. Their old cold-fallback labels do not establish cold residency. A42 resolved the closure budget; external real-disk scratch write permission is now needed to run both variants, revalidate full Check A/link parity, and obtain current rehearsal custody. No owner drop_caches fallback run or cold acceptance is claimed."
   },
   "sourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
   "archiveRef": "refs/heads/archive/260925-records",

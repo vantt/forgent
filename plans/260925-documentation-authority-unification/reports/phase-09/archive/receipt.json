@@ -1,66 +1,65 @@
 {
-  "status": "blocked-budget-exceeded",
-  "sourceCommit": "3c368e5201f4ab4a5a245f4c6caf896d64bfc0a8",
-  "authority": "w5-d5d-brief.md item 1",
+  "status": "blocked-external-real-disk-scratch",
+  "sourceCommit": "d3efc70c5879d6b3a599cd9998615a46a73a82bd",
+  "authority": "A42 / w5-d5e-brief.md",
   "scope": "plans/260925-documentation-authority-unification/reports/phase-09/archive/**",
   "needsWrites": [],
   "gateAccepted": false,
-  "closure": {
-    "path": "link-closure.json",
-    "sha256": "93be72ebb0f8b964eccdb38666c8045c29fe2bd842d0bbc473aaf447d3b4e893",
+  "directLinks": {
+    "asset": "audit/direct-links.json.gz",
+    "policy": "one hop from already-kept ruling and navigation roots; do not traverse targets",
     "budgetBytes": 50000000,
-    "rulingRoots": 3,
-    "navigationRoots": 102,
-    "historicalD5c": {"retainFiles": 883, "retainBytes": 631486701},
-    "before": {"retainFiles": 888, "retainBytes": 632057359},
-    "addedFiles": 637,
-    "addedBytes": 281770653,
-    "proposedAfter": {"retainFiles": 1525, "retainBytes": 913828012},
-    "appliedFiles": 0,
-    "appliedBytes": 0,
-    "directRulingTargets": 4,
-    "directRulingTargetBytes": 783918,
-    "largestAddedPath": "reports/phase-06/checkpoint-10-source-population.json",
-    "largestAddedBytes": 71398693
+    "before": {"retainFiles": 888, "retainBytes": 632057359, "archiveFiles": 6030, "archiveBytes": 2266895891},
+    "after": {"retainFiles": 892, "retainBytes": 632841277, "archiveFiles": 6026, "archiveBytes": 2266111973},
+    "addedFiles": 4,
+    "addedBytes": 783918,
+    "added": [
+      {"path": "alias-table-and-resolver-contract.md", "bytes": 3951, "rulingLocators": ["minimum-constitution.md:235"]},
+      {"path": "cutover-write-lease-design.md", "bytes": 27057, "rulingLocators": ["minimum-constitution.md:244", "evidence-payload-relocation-policy.md:15"]},
+      {"path": "reports/phase-06/same-path-binding-blocker.json", "bytes": 59528, "rulingLocators": ["minimum-constitution.md:332"]},
+      {"path": "reports/doc-inventory.md", "bytes": 693382, "rulingLocators": ["evidence-payload-relocation-policy.md:96"]}
+    ]
   },
-  "retainedToArchivedLinks": {
-    "before": {"readerFiles": 124, "links": 1029, "targetFiles": 631},
-    "proposedAfterNotApplied": {"readerFiles": 1, "links": 3, "targetFiles": 3},
-    "method": "Source-relative Markdown links to existing non-archive plan files at sourceCommit; occurrences counted, not unique source-line-target tuples"
+  "rejectedTransitiveClosure": {
+    "path": "link-closure.json",
+    "unchanged": true,
+    "sha256": "93be72ebb0f8b964eccdb38666c8045c29fe2bd842d0bbc473aaf447d3b4e893",
+    "historicalAddedFiles": 637,
+    "historicalAddedBytes": 281770653
   },
+  "retainedToArchivedLinks": {"readerFiles": 123, "links": 1025, "targetFiles": 628, "asset": "audit/retained-archive-links.json.gz"},
   "proofs": {
-    "builderExit": 1,
-    "builderStopIntentional": true,
+    "builderExit": 0,
+    "builderLog": "audit/rebuild-d5e.log",
     "verifierExit": 2,
-    "verifierMeaning": "independent closure/digest/budget stop proof; not completed archive custody or rehearsal",
-    "rehearsalGuardExit": 1,
-    "rehearsalRerun": false,
+    "verifierStatus": "blocked-rehearsal-not-current",
+    "structuralCustodyVerified": true,
+    "verifierLog": "audit/verify-d5e.log",
+    "pythonSyntaxParsed": true,
+    "rehearsalAttemptExit": 1,
+    "rehearsalAttemptLog": "audit/rehearse-d5e.log",
+    "rehearsalRerunCompleted": false,
     "newTimingRuns": 0,
     "coldCacheEvidence": false,
     "checkARevalidated": false,
     "newLinkParityRevalidated": false
   },
-  "deleted": {"path": "audit/attempt-1/rehearsal.bundle", "bytes": 1788526},
-  "attempt1OtherFilesUnchanged": true,
-  "historicalManifestAndRehearsalSourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
-  "historicalColdClaimRejected": true,
-  "deferred": [
-    "Owner disposition of the complete over-budget closure",
-    "External real-disk scratch migration",
-    "Measured posix_fadvise cache eviction and cold/warm classification",
-    "Sequential reduced/pre-freeze timing runs and cleanup",
-    "Fresh candidate full A and link-finding parity",
-    "Final full custody/rehearsal verification"
-  ],
-  "sourceGuards": {
-    "sourceGitWrites": false,
-    "sourcePairAccounting": false,
-    "fgosCli": false,
-    "lifecycle": false,
-    "productOrTestsEdited": false,
-    "newScratchCreated": false,
-    "publicationOrLease": false
+  "coldRunImplementation": {
+    "externalScratch": true,
+    "perObjectFsyncAndPosixFadvise": true,
+    "fincoreBeforeAndAfterEviction": true,
+    "residencyBeforeAndAfterEachAdd": true,
+    "labelsFromMeasuredResidency": true,
+    "warmFallbackRequiresOwnerColdRun": true,
+    "runtimeExercised": false
   },
+  "blocker": "Sandbox denies mkdir /var/tmp/fgos-work with errno 30 (Read-only file system). /tmp is tmpfs, not external real-disk scratch. Re-run with writable external real-disk scratch and the existing >20 GiB free-space guard; no repository scope expansion is needed.",
+  "attempt1BundleAbsent": true,
+  "attempt1OtherFilesUnchanged": true,
+  "historicalRehearsalSourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
+  "historicalColdClaimRejected": true,
+  "deferred": ["Both real-disk timing variants and measured eviction", "Current full A/B/H/I and link/test parity", "Current rehearsal bundle and full custody verification"],
+  "sourceGuards": {"sourceGitWrites": false, "sourcePairAccounting": false, "fgosCli": false, "lifecycle": false, "productOrTestsEdited": false, "newScratchCreated": false, "publicationOrLease": false},
   "impactAnalysis": "degraded/unqueried: no-fgOS-CLI brief; direct source/history review",
   "unrun": ["npm test and scripts/run-tests.mjs prohibited", "Cargo workspace suite", "browser/service preview"]
 }

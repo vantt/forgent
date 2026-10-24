@@ -1,20 +1,54 @@
 {
-  "inputCommit": "3c368e5201f4ab4a5a245f4c6caf896d64bfc0a8",
-  "status": "blocked-budget-exceeded",
+  "inputCommit": "d3efc70c5879d6b3a599cd9998615a46a73a82bd",
   "exit": 2,
-  "closureFixedPointAndDigestsVerified": true,
-  "addedFiles": 637,
-  "addedBytes": 281770653,
-  "budgetBytes": 50000000,
-  "before": {
-    "retainFiles": 888,
-    "retainBytes": 632057359
-  },
-  "proposedAfter": {
-    "retainFiles": 1525,
-    "retainBytes": 913828012
-  },
-  "rehearsalRerun": false,
+  "status": "blocked-rehearsal-not-current",
+  "structuralCustodyVerified": true,
   "checkARevalidated": false,
-  "limits": "Stop condition verified; no new retained-set, cold timing, or cutover pass. Historical manifest assets/rehearsal remain bound to their old pin."
+  "rehearsalSourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
+  "partitionFiles": 6918,
+  "movingFiles": 6026,
+  "retainedFiles": 892,
+  "retirementSpecs": 361,
+  "gatePrograms": 45,
+  "reviewedTen": 10,
+  "historicalReaderFiles": 47,
+  "historicalJoins": 135,
+  "priorScriptRefOccurrences": 2918,
+  "externalReferenceJoinsVerified": 184,
+  "navigationReferenceJoinsVerified": 619,
+  "falseBasenameRowsReviewed": 22,
+  "falseBasenameRowsArchived": 19,
+  "falseBasenameRowsNowRequiredByLinks": 3,
+  "directLinkAddedFiles": 4,
+  "directLinkAddedBytes": 783918,
+  "rejectedTransitiveClosureDigestVerified": true,
+  "retainedToArchivedLinks": {
+    "readerFiles": 123,
+    "links": 1025,
+    "targetFiles": 628
+  },
+  "sixRestoredInputsRetained": true,
+  "alreadyPrunedRecoveryBlobsVerified": 279,
+  "negativeProbes": [
+    {
+      "probe": "wrong digest",
+      "rejected": true
+    },
+    {
+      "probe": "wrong object",
+      "rejected": true
+    },
+    {
+      "probe": "unsafe path",
+      "rejected": true
+    },
+    {
+      "probe": "self-owning retired proof",
+      "rejected": true
+    }
+  ],
+  "mainManifestBytes": 7924,
+  "auditCompressedBytes": 1738177,
+  "rehearsalCustody": null,
+  "limits": "Pin-bounded custody and conservative static reader closure; not independent semantics, arbitrary reachability, F approval or a product-suite pass."
 }

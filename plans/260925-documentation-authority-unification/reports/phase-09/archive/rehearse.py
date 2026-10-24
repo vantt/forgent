@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Disposable-clone archive rehearsal. Never writes source Git/state.
-The physical scratch must be inside archive/.scratch, accessed via /tmp/fgos-work
-so real-disk timings and existing frozen external-output guards both apply.
+Physical scratch is external ($TMPDIR/fgos-work or /tmp/fgos-work); a logical
+/tmp path preserves frozen output guards without putting crash debris in Git.
 """
-import argparse, gzip, hashlib, json, os, pathlib, re, shutil, statistics, subprocess, time
+import argparse, atexit, gzip, hashlib, json, os, pathlib, re, shutil, statistics, subprocess, time
 
 P = 'plans/260925-documentation-authority-unification/'
 A = P + 'reports/phase-09/archive/'
@@ -36,14 +36,17 @@ def main():
     if opts.rebuild:
         subprocess.run(['python3', '-B', str(output / 'build-design.py'), '--output-dir', str(output)], cwd=source, check=True)
     manifest = json.loads((output / 'manifest.json').read_text())
-    if manifest.get('pendingRework', {}).get('status') == 'blocked-budget-exceeded':
-        raise SystemExit('Rehearsal stopped: link closure exceeds 50 MB; owner disposition required before scratch or timing')
     assert not scratch.exists() and not scratch.is_symlink(), 'use a fresh scratch name'
-    physical = output / '.scratch' / scratch.name
+    physical = pathlib.Path(os.environ.get('TMPDIR', '/tmp')).resolve() / 'fgos-work' / scratch.name
+    assert not physical.is_relative_to(source), 'physical scratch must be outside the source tree'
     physical.mkdir(parents=True)
-    scratch.parent.mkdir(parents=True, exist_ok=True)
-    scratch.symlink_to(physical, target_is_directory=True)
-    assert scratch.resolve().is_relative_to(output / '.scratch'), 'physical writes must stay inside scoped scratch'
+    if physical != scratch:
+        scratch.parent.mkdir(parents=True, exist_ok=True)
+        scratch.symlink_to(physical, target_is_directory=True)
+    def cleanup():
+        shutil.rmtree(physical)
+        if scratch.is_symlink(): scratch.unlink()
+    atexit.register(cleanup)
     clone = scratch / 'repo'
     assert not clone.exists()
     assert shutil.disk_usage(scratch).free > 20 * 1024**3
@@ -60,10 +63,6 @@ def main():
     for key, name in [('HOME', 'home'), ('FGOS_STATE_ROOT', 'state'), ('TMPDIR', 'tmp'), ('TMP', 'tmp'), ('TEMP', 'tmp')]:
         dest = scratch / name; dest.mkdir(mode=0o700, exist_ok=True); dest.chmod(0o700)
         env[key] = str(dest)
-    # A physical scratch beneath this ESM repository inherits its package type.
-    # /tmp fixtures normally have no such parent. Restore that ordinary fixture
-    # boundary so an unchanged extensionless CommonJS npm stub remains CommonJS.
-    (scratch / 'tmp/package.json').write_text('{"type":"commonjs"}\n')
     env.update(GIT_AUTHOR_NAME='Archive rehearsal fixture', GIT_AUTHOR_EMAIL='archive@example.invalid',
         GIT_COMMITTER_NAME='Archive rehearsal fixture', GIT_COMMITTER_EMAIL='archive@example.invalid')
     def cmd(args, *, cwd=None, data=None, check=True, timeout=600):
@@ -265,24 +264,57 @@ console.log(JSON.stringify({scope:'production links-resolve evaluator only; unre
             meta, path = row.split('\t', 1); size = meta.split()[3]
             if size != '-': sizes.append((path, int(size)))
         timings = []
-        # Cache eviction is not permitted in this worker. The brief explicitly
-        # accepts the first add in a fresh clone as the cold-run fallback.
         cold_clone = scratch / (name + '-fresh-clone')
         cmd(['git', '-c', 'core.hooksPath=/dev/null', 'clone', '--no-hardlinks', '--no-checkout', str(clone), str(cold_clone)], cwd=scratch)
+        object_files = sorted(p for p in (cold_clone / '.git/objects').rglob('*') if p.is_file())
+        assert object_files and all(not p.is_symlink() for p in object_files)
+        def residency():
+            rows = []
+            for offset in range(0, len(object_files), 128):
+                cp = cmd(['fincore', '--json', '--bytes', '--output', 'PAGES,SIZE,FILE,RES',
+                    *map(str, object_files[offset:offset + 128])], cwd=scratch)
+                rows.extend(json.loads(cp.stdout)['fincore'])
+            assert len(rows) == len(object_files)
+            return {'files': len(rows), 'bytes': sum(int(r['size']) for r in rows),
+                'residentPages': sum(int(r['pages']) for r in rows),
+                'residentBytes': sum(int(r['res']) for r in rows), 'fileResidency': rows}
+        before_eviction = residency()
+        eviction_errors = []
+        for path in object_files:
+            try:
+                with path.open('rb') as stream:
+                    # DONTNEED may leave dirty pages: flush this clone's files first.
+                    os.fsync(stream.fileno())
+                    os.posix_fadvise(stream.fileno(), 0, 0, os.POSIX_FADV_DONTNEED)
+            except OSError as error:
+                eviction_errors.append({'path': str(path), 'error': str(error)})
+        after_eviction = residency()
+        eviction_proven = (before_eviction['residentPages'] > 0 and after_eviction['residentPages'] == 0
+            and not eviction_errors)
         for i in range(1, 4):
+            before_add = residency()
             wt = scratch / (name + '-' + str(i)); assert not wt.exists()
             start = time.perf_counter()
             cp = cmd(['git', '-c', 'core.hooksPath=/dev/null', 'worktree', 'add', '--detach', str(wt), oid], cwd=cold_clone)
             seconds = time.perf_counter() - start
             assert git('-C', str(wt), 'rev-parse', 'HEAD').decode().strip() == oid
-            timings.append({'run': i, 'seconds': seconds, 'exit': cp.returncode,
-                'cache': 'cold fallback: first worktree add in fresh no-hardlinks/no-checkout clone' if i == 1 else 'warm',
+            after_add = residency()
+            cache = 'cold' if eviction_proven and before_add['residentPages'] == 0 else 'warm'
+            if i == 1 and cache != 'cold': cache = 'first run, warm page cache'
+            timings.append({'run': i, 'seconds': seconds, 'exit': cp.returncode, 'cache': cache,
+                'residencyBefore': before_add, 'residencyAfter': after_add,
                 'timingRepo': str(cold_clone)})
+            print(json.dumps({'variant': name, 'run': i, 'seconds': seconds, 'cache': cache,
+                'residentPagesBefore': before_add['residentPages'], 'residentPagesAfter': after_add['residentPages']}), flush=True)
             cmd(['git', '-c', 'core.hooksPath=/dev/null', 'worktree', 'remove', str(wt)], cwd=cold_clone)
         shutil.rmtree(cold_clone)
         variants.append({'variant': name, 'commit': oid, 'files': len(sizes), 'tipBytes': sum(n for p, n in sizes),
             'planFiles': sum(p.startswith(P) for p, n in sizes), 'planBytes': sum(n for p, n in sizes if p.startswith(P)),
             'archiveTipBytes': sum(n for p, n in sizes if p.startswith(A)), 'runs': timings,
+            'eviction': {'method': 'fsync then os.posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED) for every .git/objects file',
+                'residencyBefore': before_eviction, 'residencyAfter': after_eviction,
+                'errors': eviction_errors, 'proven': eviction_proven},
+            'ownerDropCachesColdRunRequired': not (eviction_proven and timings[0]['cache'] == 'cold'),
             'medianSeconds': statistics.median(r['seconds'] for r in timings)})
     # Preserve just the new objects/trees/refs as a thin, local evidence bundle;
     # source history is a declared prerequisite, never copied into the tip.
@@ -295,8 +327,9 @@ console.log(JSON.stringify({scope:'production links-resolve evaluator only; unre
     result = {'sourceCommit': pin, 'archiveRef': manifest['archiveRef'], 'archiveCommit': archive,
         'removalCommit': removed, 'accountedCandidate': candidate, 'preFreezeCandidate': with_gates,
         'filesystemStat': filesystem, 'findmnt': findmnt, 'physicalScratch': str(scratch.resolve()),
-        'logicalScratch': str(scratch), 'warmCache': False,
-        'coldMethod': 'drop_caches not writable/permitted; first add in a fresh --no-hardlinks --no-checkout clone per variant (brief-authorized fallback, not physical cache eviction)', 'variants': variants,
+        'logicalScratch': str(scratch),
+        'coldMethod': 'Per-file fsync + POSIX_FADV_DONTNEED; fincore bytes/pages before and after eviction and every add; cold iff eviction proven and pre-add residency zero',
+        'ownerDropCachesColdRunRequired': any(v['ownerDropCachesColdRunRequired'] for v in variants), 'variants': variants,
         'bundle': {'path': A + 'audit/rehearsal.bundle', 'size': bundle.stat().st_size,
             'sha256': hashlib.sha256(bundle.read_bytes()).hexdigest(), 'prerequisiteCommit': pin, 'verifyExit': 0},
         'gatePrograms': len(gates['programs']), 'reviewedTen': gates['reviewedTen'],
@@ -312,8 +345,7 @@ console.log(JSON.stringify({scope:'production links-resolve evaluator only; unre
     print(json.dumps({k: v for k, v in result.items() if k not in ('tests', 'linkChecks', 'reviewedTen', 'measuredMainArtifacts')}, ensure_ascii=False), flush=True)
     if opts.rebuild:
         subprocess.run(['python3', '-B', str(output / 'verify-design.py')], cwd=source, check=True)
-    shutil.rmtree(physical)
-    scratch.unlink()
-    physical.parent.rmdir()
+    cleanup()
+    atexit.unregister(cleanup)
 
 if __name__ == '__main__': main()
