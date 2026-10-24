@@ -122,3 +122,12 @@ Sent to the owner in Vietnamese; summary:
 
 - Q1–Q4 above, and 04a's Q3.
 - WORK's choice on RT2 (confirmation path or keep-id).
+
+## WORK's decisions on the proposals (2026-10-25 01:20, `forgent-cd`)
+
+1. **RT2:** keep the store id on a move, as the spec says; no confirmation path. A move is accepted while the store's recorded id and machine id still match. Only a changed machine id is refused, by name. The spec's shared-machine-id advice comes out of the spec, which WORK prefers, unless it gets a real verb. **WORK implements**, with tests for `mv` and for a changed machine id.
+2. **Due sync of read verbs moves to the detached child:** accepted. The read result never waits on it. No data-loss window, because events are durable locally before any sync. The publication delay is at most the child's runtime, about 120 s on a slow remote, as today but off the reader's path. **HARDEN may implement it; WORK reviews.**
+3. **S-1 (drop two of three fsyncs per append):** not WORK's to accept. The owner chose "fsync unchanged" on 2026-10-23 (option c), and TEST's standing condition is that each dropped fsync cites its durability-contract line and passes a crash case. It becomes an **owner question once its evidence exists**: the induction argument plus a run of `scripts/event-store/power-loss-driver.mjs` on the reduced set. The saving is about 8 ms per append. HARDEN gathers the evidence before asking.
+4. **Hot lock:** WORK does not agree that the store does not need it, because the state lock also keeps the fold, the cache and the own-stream precondition coherent. The cheaper lever is the ~20 ms rewrite of the 8.5 MB view under the lock: write the cache after release, behind a revision check. HARDEN brings that as a proposal with release-build numbers, and WORK reviews it before anything else in the lock moves.
+
+WORK recorded D4–D7, D13 and D14 on H33 (`f6382cdaf`). **Ordering:** the stray-shard import-legacy must land and run on fg-server and design-lap before D4 and D6 remove the import path.
