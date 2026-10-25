@@ -6830,5 +6830,24 @@
       "historicalSourceAnchor": "unheaded-block-108",
       "historicalSourceUnitDigest": "5ad9c97f20aa0e6f61669617556fca877509f5f250d714cd0ce1527588631ed1"
     }
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "unheaded-block-17",
+    "sourceUnitDigest": "45ccc7989661f3fd7109d1e585b79ebbdf1223d00279819149037540bdc2ab2a",
+    "status": "current-complete-unit-present",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "unheaded-block-98",
+        "targetUnitDigest": "45ccc7989661f3fd7109d1e585b79ebbdf1223d00279819149037540bdc2ab2a"
+      }
+    ],
+    "comparisonRecipe": "Exact current legacy/target whole-unit digest parity; complete paragraph retained.",
+    "accounting": {
+      "sourceAdditionCommit": "f06b30fa3f9cad5f3f437acf6101f28605f634ce",
+      "rationale": "Terminal setup loses a row and a fix: later source addition previously absent from the parity census. No source rewrite or approval claimed.",
+      "reviewStatus": "pending"
+    }
   }
 ]

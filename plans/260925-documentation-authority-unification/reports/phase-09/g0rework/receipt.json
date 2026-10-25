@@ -1,4 +1,87 @@
 {
+  "liveParityRework": {
+    "status": "scoped-live-parity-proofs-passed-audit-partial",
+    "inputHead": "93dfed0ae6c0791b701d56999b78b71c113c9196",
+    "inputHeadRef": "live-parity-proof.json#/inputHead",
+    "witnessPin": "f534aeaea59ebdc39613aab02c109dbd30fd36b8",
+    "before": {
+      "sourceParityRows": 345,
+      "headingRows": 91,
+      "staleSourceHeadingDigests": 4,
+      "staleDirectBlockMembershipLists": 5,
+      "staleTargetHeadingLocatorsOrDigests": 8,
+      "currentDirectSectionBlocks": 321,
+      "uncoveredCurrentSectionBlocks": 1,
+      "pointerPatches": 24,
+      "livePointerPatchDrift": 2,
+      "explicitFinalPinPatchDuties": 0,
+      "currentLedgerSuccessorAssertions": 1208
+    },
+    "after": {
+      "sourceParityRows": 346,
+      "originalSourceParityRowsByteUnchanged": 345,
+      "headingRows": 91,
+      "headingRowsChangedWithFullPreviousRowHistory": 12,
+      "headingRowsUnchanged": 79,
+      "staleSourceHeadingDigests": 0,
+      "staleDirectBlockMembershipLists": 0,
+      "staleTargetHeadingLocatorsOrDigests": 0,
+      "currentDirectSectionBlocks": 321,
+      "uncoveredCurrentSectionBlocks": 0,
+      "pointerPatches": 24,
+      "livePointerPatchDrift": 2,
+      "unlistedLivePointerPatchDrift": 0,
+      "explicitFinalPinPatchDuties": 2,
+      "currentLedgerSuccessorAssertions": 1208
+    },
+    "refreshedSourceHeadingAnchors": ["data-dictionary", "setup", "business-rules", "lịch-sử-quyết-định"],
+    "additionalHeadingRepairs": "Live checks also require five direct-block membership lists and eight target-heading locators/digests to refresh. These overlap the four source digest repairs: twelve rows total, none dropped, full previousParityRow retained, all pending.",
+    "newSourceParityRow": {
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-17",
+      "sourceUnitDigest": "45ccc7989661f3fd7109d1e585b79ebbdf1223d00279819149037540bdc2ab2a",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-98",
+      "sourceAdditionCommit": "f06b30fa3f9cad5f3f437acf6101f28605f634ce",
+      "qualification": "Exact whole-paragraph conservation; not a source rewrite or review acceptance. The original 21 rewrite proofs remain intact."
+    },
+    "finalPinDutyList": "../carries/final-pin-duties.json",
+    "finalPinDuties": [
+      {"path": "bin/fgos.mjs", "reason": "main changed after authoring; recompose at the final main import"},
+      {"path": "docs/backlog.md", "reason": "main changed after authoring; recompose at the final main import"}
+    ],
+    "proofs": [
+      {"command": "node plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs", "exit": 0},
+      {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py", "exit": 0, "status": "partial", "ok": false, "fullAuditPassed": false},
+      {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py --check", "exit": 0},
+      {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py --check --pin HEAD", "exit": 0},
+      {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py", "exit": 0, "plumbing": "Only checks.json output sink redirected to an exit-cleaned tempfile; unchanged owning assertions, original report bytes preserved."},
+      {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py --check", "exit": 0},
+      {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g0rework/test-live-parity.py", "exit": 0, "negativeProbeExits": [1, 1, 1, 1, 1]},
+      {"command": "git diff --check", "exit": 0}
+    ],
+    "earlierAttempts": [
+      {"command": "node plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs", "exit": 1, "reason": "Expected red: new live check exposed stale ReleaseManifest target heading."},
+      {"command": "python3 -B (scoped runpy author wrapper for g0rework/refresh-carries.py)", "exit": 1, "reason": "Write guard initially omitted permitted tempfile scratch; no repository outputs written."},
+      {"command": "python3 -B (scoped runpy author wrapper for g0rework/refresh-carries.py)", "exit": 0, "reason": "Scratch admitted; only the two changed carries JSON files written, identical ledger output not rewritten."},
+      {"command": "node plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs", "exit": 0, "reason": "Green after regeneration, before the final complete proof replay."}
+    ],
+    "proofRef": "live-parity-proof.json",
+    "nativeAddonsBlocked": "Inherited NODE_OPTIONS=--no-addons for all Node processes; existing verifier and negative probes also install throwing process.dlopen guards.",
+    "allFiveRequiredCommandsExitZero": true,
+    "fullAuditPassed": false,
+    "notRun": "Only checks.mjs in the two phase-06 manifests, because native staging/loading is forbidden; no audit-report.py invocation.",
+    "scratchBefore": [],
+    "scratchAfter": [],
+    "miscChecksOriginalBytesPreserved": true,
+    "patchPacketsUnchanged": true,
+    "ledgersAndSourceDocsUnchanged": true,
+    "impactAnalysis": "degraded: CLI forbidden and no live MCP provider available",
+    "componentBoundaryChange": false,
+    "historicalCacheSafetyException": "Unchanged and unadjudicated; this turn neither accepts nor erases it.",
+    "noAuthorityOrCutoverAcceptance": true,
+    "needsWrites": []
+  },
   "parityRework": {
     "status": "scoped-record-proofs-passed-audit-partial",
     "inputHead": "9c8d2ce063813bcf9df2d5cbe552da2655da17bc",

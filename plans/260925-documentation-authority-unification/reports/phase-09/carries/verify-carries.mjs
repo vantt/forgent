@@ -145,8 +145,8 @@ for(const r of parity){
   assert.ok(matches[0].text.includes('Source checkouts support explicit `dev:<rev>` activation'));
  }
 }
-// The 91 heading/direct-block lineage witnesses are the original census, not
-// a claim that later source additions have passed final-pin conservation.
+// Preserve the original heading/direct-block census at the authoring pin.
+// The same contract is also checked against live rows and working-tree bytes.
 const currentParity=parity;
 historical=true;cache.clear();
 const originalParity=json(`${plan}/reports/phase-09/carries/source-parity.json`);
@@ -158,9 +158,40 @@ for(const h of sourceHeadings){
  for(const anchor of members)assert.ok(originalParity.some(p=>p.sourcePath===h.sourcePath&&p.sourceAnchor===anchor),'direct section block accounted at authoring pin');
 }
 historical=false;cache.clear();
+const liveHeadings=json(`${plan}/reports/phase-09/carries/source-heading-parity.json`);
+let liveSectionBlocks=0;
+for(const sourcePath of new Set([...sourceHeadings,...liveHeadings].map(h=>h.sourcePath))){
+ assert.deepEqual(liveHeadings.filter(h=>h.sourcePath===sourcePath).map(h=>h.sourceAnchor),units(sourcePath).filter(u=>u.unitKind==='heading').map(u=>u.anchor),'live heading census: '+sourcePath);
+}
+for(const h of liveHeadings){
+ const us=units(h.sourcePath),s=us.find(u=>u.unitKind==='heading'&&u.anchor===h.sourceAnchor&&u.textDigest===h.sourceUnitDigest);
+ assert.ok(s,'live source heading: '+h.sourcePath+'#'+h.sourceAnchor);
+ assert.equal(s.title,h.title);assert.equal(s.level,h.sourceLevel);assert.equal(s.sectionPayloadDigest,h.sourceDirectPayloadDigest);
+ const members=[];for(const u of us.slice(us.indexOf(s)+1)){if(u.unitKind==='heading')break;members.push(u);}
+ assert.deepEqual(members.map(u=>u.anchor),h.directSourceBlocks,'live direct section membership: '+h.sourcePath+'#'+h.sourceAnchor);
+ assert.ok(h.targets.length);
+ for(const t of h.targets){const u=units(t.path).find(u=>u.unitKind==='heading'&&u.anchor===t.anchor&&u.textDigest===t.targetUnitDigest);assert.ok(u,'live target heading: '+t.path+'#'+t.anchor);assert.equal(u.title,h.title);assert.equal(u.level,t.level);assert.equal(u.sectionPayloadDigest,t.directPayloadDigest);}
+ for(const u of members){assert.ok(currentParity.some(p=>p.sourcePath===h.sourcePath&&p.sourceAnchor===u.anchor&&p.sourceUnitDigest===u.textDigest),'live direct section block unaccounted: '+h.sourcePath+'#'+u.anchor);liveSectionBlocks++;}
+}
+// A path-scoped duty is disclosure, not a rebased patch or permission to apply.
+// Collect all live drift before failing, so a new drift cannot hide other paths.
+const livePacket=json(`${plan}/reports/phase-09/carries/pointer-patches.json`);
+const finalPinDuties=json(`${plan}/reports/phase-09/carries/final-pin-duties.json`);
+assert.equal(finalPinDuties.version,1);assert.ok(Array.isArray(finalPinDuties.pointerPatchDrift));
+const dutyPaths=new Set();
+for(const d of finalPinDuties.pointerPatchDrift){
+ assert.equal(typeof d.path,'string');assert.ok(d.reason?.trim());assert.ok(!dutyPaths.has(d.path),'duplicate final-pin duty: '+d.path);dutyPaths.add(d.path);
+ assert.equal(livePacket.patches.filter(p=>p.path===d.path&&p.applied===false).length,1,'duty must name one unapplied patch');
+}
+const livePointerPatchDrift=livePacket.patches.filter(p=>p.applied===false).flatMap(p=>{
+ const file=path.resolve(root,p.path),actual=fs.existsSync(file)?hash(fs.readFileSync(file)):null;
+ return actual===p.beforeSha256?[]:[{path:p.path,beforeSha256:p.beforeSha256,liveSha256:actual,finalPinDuty:finalPinDuties.pointerPatchDrift.find(d=>d.path===p.path)??null}];
+});
+if(livePointerPatchDrift.some(d=>!d.finalPinDuty))console.error(JSON.stringify({livePointerPatchDrift}));
+assert.deepEqual(livePointerPatchDrift.filter(d=>!d.finalPinDuty).map(d=>d.path),[],'unlisted live pointer-patch drift; all drift: '+livePointerPatchDrift.map(d=>d.path).join(', '));
 const foundation=read('docs/platform/platform-foundations.md');
 const expectedLaw=read('test/docs/rul104-law.txt').trim();assert.equal(foundation.match(/^- \*\*RUL104 \(tốt hơn, không to hơn\)\.\*\* (.+)$/m)?.[1],expectedLaw);
 for(const id of ['0035','0054','0062'])assert.match(foundation,new RegExp('^### '+id+' —','m'));
 assert.match(read('docs/platform/work-state/decisions/retired-decision-history.md'),/^### 0032 — Multi-role Team Harness/m);
 for(const p of ['docs/platform/platform-foundations.md','docs/platform/work-state/decisions/retired-decision-history.md'])assert.equal((read(p).match(/^## Lịch sử quyết định retired từ docs\/decisions\/ \(tsk-1lv-4\)$/gm)??[]).length,1);
-console.log(JSON.stringify({status:'pass',claims:44,candidateUnits:shard.unitCarries.length,refreshedDecisions:refresh.rows.length,droppedClaims:17,pointerFiles:packet.patches.length,currentSourceUnits:currentParity.length,historicalHeadingWitnesses:sourceHeadings.length,witnessPin,currentLedgerSuccessors:currentBindings,sourceParityQualification:'Current rows require exact source anchor/digest and normalized full-source inclusion at a named current target. Split/adapted rows also check target digests; explicit zero-fuzz adaptations are not false equality. Heading census, placement and unapplied patch witnesses replay at witnessPin; final-pin coverage/patch recomposition is not certified.',reviewStatus:'pending; no gate accepted'},null,2));
+console.log(JSON.stringify({status:'pass',claims:44,candidateUnits:shard.unitCarries.length,refreshedDecisions:refresh.rows.length,droppedClaims:17,pointerFiles:packet.patches.length,currentSourceUnits:currentParity.length,historicalHeadingWitnesses:sourceHeadings.length,liveHeadingRows:liveHeadings.length,liveSectionBlocks,livePointerPatchDrift,finalPinDuties,witnessPin,currentLedgerSuccessors:currentBindings,sourceParityQualification:'Current rows require exact source anchor/digest and normalized full-source inclusion at a named current target. Split/adapted rows also check target digests; explicit zero-fuzz adaptations are not false equality. Original heading census, placement and unapplied patch witnesses replay at witnessPin. Live heading census, direct-section block coverage and pointer-patch drift also check working-tree bytes; only explicitly listed final-pin duties permit drift. Patch recomposition and authority/cutover acceptance are not certified.',reviewStatus:'pending; no gate accepted'},null,2));

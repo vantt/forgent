@@ -1,8 +1,59 @@
 # G0 content rework receipt
 
-**Current rework: scoped record proofs complete; verification is partial, not a green full audit.**
+**Current live-parity rework: scoped proofs pass; verification remains partial only for the two native-dependent `checks.mjs` recipes. No full-audit or cutover acceptance.**
 
-## Current source-parity rework
+## Live heading, section-block and pointer-patch parity
+
+Input HEAD: `93dfed0ae`. The original witness-pin checks at `f534aeaea` are unchanged. The permanent carries checker now additionally reads the working tree for the complete heading census, ordered direct-section membership, full source-block parity coverage and unapplied pointer-patch preimage drift.
+
+| Count | Before | After |
+| --- | ---: | ---: |
+| Source parity rows | 345 | 346 |
+| Existing source parity rows retained byte-for-byte | 345 | 345 |
+| Heading census rows (none dropped) | 91 | 91 |
+| Stale source-heading digests | 4 | 0 |
+| Stale direct-block membership lists | 5 | 0 |
+| Stale target-heading locators/digests | 8 | 0 |
+| Current direct section blocks without parity rows | 1 of 321 | 0 of 321 |
+| Unapplied pointer patches / live drift | 24 / 2 | 24 / 2 |
+| Explicitly listed final-pin patch duties | 0 | 2 |
+| Current ledger successor assertions | 1,208 | 1,208 |
+
+The four source digest repairs are `distribution.md#data-dictionary`, `#setup`, `#business-rules` and `#lịch-sử-quyết-định`. The terminal paragraph insertion also moves four later sections' block ordinals; the history section's membership grows by one. Live target checking exposes eight target-heading refreshes (one duplicate heading ordinal disappeared). These overlap: **12 heading rows changed**, each retaining its complete old row in `accounting.previousParityRow`, its old anchor/digest and authoring pin; all remain pending. The other 79 heading rows are unchanged.
+
+The sole appended source parity row is `docs/specs/distribution.md#unheaded-block-17`, “Terminal setup loses a row and a fix” (`45ccc798`), conserved exactly at `docs/platform/packaging-distribution/spec.md#unheaded-block-98`. Its addition commit is recorded, not invented as a rewrite claim. The original 345 rows and original 21 rewrite proofs remain intact. `refresh-carries.py --check` deterministically regenerates both current parity files through the existing dual extractors. No ledger, source document or patch packet changed.
+
+### Explicit final-pin duties
+
+Machine-readable owner: [`../carries/final-pin-duties.json`](../carries/final-pin-duties.json). The checker emits every drifted unapplied patch with both hashes and its duty, then fails if any drift lacks a listed duty. A duty neither rebases nor applies a patch.
+
+| Path | Reason (literal) |
+| --- | --- |
+| `bin/fgos.mjs` | main changed after authoring; recompose at the final main import |
+| `docs/backlog.md` | main changed after authoring; recompose at the final main import |
+
+### Commands and outcomes
+
+All commands run from the repo root; `R=plans/260925-documentation-authority-unification/reports/phase-09`. Every Node process inherits `NODE_OPTIONS=--no-addons`; the existing verifier and negative probes additionally install throwing `process.dlopen` guards. Python always uses `python3 -B`.
+
+| Command | Exit / qualification |
+| --- | --- |
+| `node "$R/carries/verify-carries.mjs"` | 0; historical witnesses plus 346 current rows, 91 live headings, 321 live section blocks; two disclosed drift paths |
+| `python3 -B "$R/g0rework/verify.py"` | 0; `status: partial`, `ok: false`, `fullAuditPassed: false`; only both `checks.mjs` recipes not run |
+| `python3 -B "$R/rebind/rebind.py" --check` | 0; drift 0 |
+| `python3 -B "$R/g9/sweep.py" --check --pin HEAD` | 0; 574 records, 546 bodies, no judgment, chain, drift or body-replay errors |
+| `python3 -B "$R/misc-fix/verify.py"` via output-only wrapper | 0; unchanged owning assertions; only `checks.json` sink redirected to disposable scratch because its directory is not writable; original file hash unchanged |
+| `python3 -B "$R/g0rework/refresh-carries.py" --check` | 0; exact deterministic replay, including historical ledger output unchanged |
+| `python3 -B "$R/g0rework/test-live-parity.py"` | 0; five real-checker falsification probes each correctly exit 1 |
+| `git diff --check` | 0 |
+
+The five probes cover stale live source headings, an uncovered section block, a newly added heading outside the census, a third unlisted patch drift (all three drift paths must be emitted), and known drift with the duty list removed. They overlay only reads through a disposable preload; no checkout bytes or historical Git witnesses are altered.
+
+Earlier proof/authoring attempts in this turn: the newly live carries checker first exited **1** on the stale ReleaseManifest target heading (expected red); after regeneration it exited **0**. The scoped `refresh-carries.py` author wrapper first exited **1** because its write guard initially omitted permitted tempfile scratch; it wrote no repository output. After admitting disposable scratch, it exited **0**, writing only the two changed carries JSON files; identical ledger output was not rewritten. These are setup/diagnostic attempts, not hidden passing proofs.
+
+Evidence: [`live-parity-proof.json`](live-parity-proof.json) records every final proof command/argv/exit, complete nested verifier commands, negative probe exits, output hashes, both live drift hashes and before/after scratch snapshots (`[]` / `[]`). The misc report retains its original bytes; no restoration or out-of-scope write was needed. Scratch was confined to exit-cleaned `tempfile` directories; nothing new remains under `/tmp/fgos-work`. No fgOS CLI, Git write, native addon load, forbidden audit driver, full suite, pair accounting or preview service ran. `impact-analysis: degraded` under the no-CLI/no-MCP boundary. No component-boundary change. No review approval, authority promotion or final-main-import acceptance is claimed; the historical cache exception below is neither erased nor adjudicated.
+
+## Previous source-parity rework (historical)
 
 At `9c8d2ce063813bcf9df2d5cbe552da2655da17bc`:
 

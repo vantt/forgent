@@ -181,7 +181,15 @@ def main():
                         assert current[k] == before[k], (i, k)
                     assert current['status'] == ('accounted-current-source-adaptation' if i == 249 else before['status'])
         report['assertions']['parityBase'] = parity_base
-        appended = parity[len(parity_old):]
+        # The original 21 rewrite-accounted additions retain their exact
+        # historical proof; the later terminal paragraph is a distinct append.
+        assert len(parity) == 346
+        appended = parity[len(parity_old):345]
+        live_additions = parity[345:]
+        assert len(live_additions) == 1
+        assert (live_additions[0]['sourcePath'], live_additions[0]['sourceAnchor']) == (
+            'docs/specs/distribution.md', 'unheaded-block-17')
+        report['assertions']['laterSourceParityRowsAdded'] = len(live_additions)
         assert len(appended) == 21
         assert collections.Counter(r['sourcePath'] for r in appended) == {
             'docs/specs/confinement-authority.md': 19, 'docs/specs/work-state.md': 2}

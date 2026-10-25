@@ -1,0 +1,719 @@
+{
+  "inputHead": "93dfed0ae6c0791b701d56999b78b71c113c9196",
+  "nativeAddons": "blocked for every Node process by inherited NODE_OPTIONS=--no-addons; g0 verifier and probes also install throwing process.dlopen guards",
+  "commands": [
+    {
+      "command": "node plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs",
+      "argv": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+      ],
+      "exit": 0,
+      "stdoutSha256": "c8106e77dd2b88201c7ce74970dc0489c933a8cb1470836ff9582bd988449486",
+      "stderr": "",
+      "result": {
+        "status": "pass",
+        "claims": 44,
+        "candidateUnits": 1009,
+        "refreshedDecisions": 121,
+        "droppedClaims": 17,
+        "pointerFiles": 24,
+        "currentSourceUnits": 346,
+        "historicalHeadingWitnesses": 91,
+        "liveHeadingRows": 91,
+        "liveSectionBlocks": 321,
+        "livePointerPatchDrift": [
+          {
+            "path": "bin/fgos.mjs",
+            "beforeSha256": "4ad9ed0cb07518ae19774ddcf058d78484b53de25b850ae641b7b53011010d5f",
+            "liveSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e",
+            "finalPinDuty": {
+              "path": "bin/fgos.mjs",
+              "reason": "main changed after authoring; recompose at the final main import"
+            }
+          },
+          {
+            "path": "docs/backlog.md",
+            "beforeSha256": "344552da9931e8c5ca9f946e49e0a25c40ff42b61dbf6d99c73310d5e14b7c33",
+            "liveSha256": "d0fb356de66a0bdfffac2f9835678bd4001d68779003c381e34a4f2bc9e49306",
+            "finalPinDuty": {
+              "path": "docs/backlog.md",
+              "reason": "main changed after authoring; recompose at the final main import"
+            }
+          }
+        ],
+        "finalPinDuties": {
+          "version": 1,
+          "pointerPatchDrift": [
+            {
+              "path": "bin/fgos.mjs",
+              "reason": "main changed after authoring; recompose at the final main import"
+            },
+            {
+              "path": "docs/backlog.md",
+              "reason": "main changed after authoring; recompose at the final main import"
+            }
+          ]
+        },
+        "witnessPin": "f534aeaea59ebdc39613aab02c109dbd30fd36b8",
+        "currentLedgerSuccessors": {
+          "status": "pass",
+          "origins": 1208,
+          "currentBindings": 1208
+        },
+        "sourceParityQualification": "Current rows require exact source anchor/digest and normalized full-source inclusion at a named current target. Split/adapted rows also check target digests; explicit zero-fuzz adaptations are not false equality. Original heading census, placement and unapplied patch witnesses replay at witnessPin. Live heading census, direct-section block coverage and pointer-patch drift also check working-tree bytes; only explicitly listed final-pin duties permit drift. Patch recomposition and authority/cutover acceptance are not certified.",
+        "reviewStatus": "pending; no gate accepted"
+      }
+    },
+    {
+      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py"
+      ],
+      "exit": 0,
+      "stdoutSha256": "9b4a94cbb6228b480ba478da887e146b558bec66ec6374af44f8c1678d130508",
+      "stderr": "",
+      "result": {
+        "head": "93dfed0ae6c0791b701d56999b78b71c113c9196",
+        "commands": [
+          {
+            "label": "rebind/rebind.py --check",
+            "argv": [
+              "python3",
+              "-B",
+              "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+              "--check"
+            ],
+            "exit": 0,
+            "stdout": "{\n  \"drift\": 0,\n  \"rows\": []\n}\n",
+            "stderr": ""
+          },
+          {
+            "label": "carries accounting deterministic replay",
+            "argv": [
+              "python3",
+              "-B",
+              "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py",
+              "--check"
+            ],
+            "exit": 0,
+            "stdout": "{\"status\": \"pass\", \"mode\": \"check\", \"parityRows\": 346, \"liveHeadingRows\": 91, \"refreshedParityRows\": 35, \"targetOnlyParityRows\": 62, \"refreshedCandidateBindings\": 25}\n",
+            "stderr": ""
+          },
+          {
+            "label": "carries/verify-carries.mjs",
+            "argv": [
+              "node",
+              "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+            ],
+            "exit": 0,
+            "stdout": "{\n  \"status\": \"pass\",\n  \"claims\": 44,\n  \"candidateUnits\": 1009,\n  \"refreshedDecisions\": 121,\n  \"droppedClaims\": 17,\n  \"pointerFiles\": 24,\n  \"currentSourceUnits\": 346,\n  \"historicalHeadingWitnesses\": 91,\n  \"liveHeadingRows\": 91,\n  \"liveSectionBlocks\": 321,\n  \"livePointerPatchDrift\": [\n    {\n      \"path\": \"bin/fgos.mjs\",\n      \"beforeSha256\": \"4ad9ed0cb07518ae19774ddcf058d78484b53de25b850ae641b7b53011010d5f\",\n      \"liveSha256\": \"1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e\",\n      \"finalPinDuty\": {\n        \"path\": \"bin/fgos.mjs\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    },\n    {\n      \"path\": \"docs/backlog.md\",\n      \"beforeSha256\": \"344552da9931e8c5ca9f946e49e0a25c40ff42b61dbf6d99c73310d5e14b7c33\",\n      \"liveSha256\": \"d0fb356de66a0bdfffac2f9835678bd4001d68779003c381e34a4f2bc9e49306\",\n      \"finalPinDuty\": {\n        \"path\": \"docs/backlog.md\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    }\n  ],\n  \"finalPinDuties\": {\n    \"version\": 1,\n    \"pointerPatchDrift\": [\n      {\n        \"path\": \"bin/fgos.mjs\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      },\n      {\n        \"path\": \"docs/backlog.md\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    ]\n  },\n  \"witnessPin\": \"f534aeaea59ebdc39613aab02c109dbd30fd36b8\",\n  \"currentLedgerSuccessors\": {\n    \"status\": \"pass\",\n    \"origins\": 1208,\n    \"currentBindings\": 1208\n  },\n  \"sourceParityQualification\": \"Current rows require exact source anchor/digest and normalized full-source inclusion at a named current target. Split/adapted rows also check target digests; explicit zero-fuzz adaptations are not false equality. Original heading census, placement and unapplied patch witnesses replay at witnessPin. Live heading census, direct-section block coverage and pointer-patch drift also check working-tree bytes; only explicitly listed final-pin duties permit drift. Patch recomposition and authority/cutover acceptance are not certified.\",\n  \"reviewStatus\": \"pending; no gate accepted\"\n}\n",
+            "stderr": ""
+          },
+          {
+            "label": "misc-fix/verify.py (only checks.json output sink redirected)",
+            "argv": [
+              "python3",
+              "-B",
+              "/tmp/fgos-work/g0rework-verify-1f3qzspy/misc-verify.py"
+            ],
+            "exit": 0,
+            "stdout": "{\"byteIdenticalArtifacts\": 4, \"counts\": {\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 137, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 623, \"preserve-operand-reachability-unchanged\": 1394, \"preserve-source-confirmed-history\": 2926, \"repoint-proposal\": 6}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}, \"doctorCheckSplit\": {\"literal\": 136, \"loopIds\": [\"git-worktree-recovery\", \"git-component-compatible\", \"git-repository-config\", \"git-operation-journal\", \"git-native-locks\"], \"loopRegistered\": 5}, \"registrations\": {\"Check\": 141, \"Fix\": 32}, \"status\": \"scoped-replay-passed-not-gate-acceptance\"}\n",
+            "stderr": ""
+          },
+          {
+            "label": "step10-round5/ownership.mjs",
+            "argv": [
+              "node",
+              "/tmp/fgos-work/g0rework-verify-1f3qzspy/step10-round5/ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/g0rework-verify-1f3qzspy/step10-round5"
+            ],
+            "exit": 0,
+            "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 0 }\n",
+            "stderr": ""
+          },
+          {
+            "label": "step10-round5/audit-ownership.mjs",
+            "argv": [
+              "node",
+              "/tmp/fgos-work/g0rework-verify-1f3qzspy/step10-round5/audit-ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/g0rework-verify-1f3qzspy/step10-round5"
+            ],
+            "exit": 0,
+            "stdout": "{\n  collisions: 272,\n  newGapGroups: 31,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+            "stderr": ""
+          },
+          {
+            "label": "step10-sync4d/ownership.mjs",
+            "argv": [
+              "node",
+              "/tmp/fgos-work/g0rework-verify-1f3qzspy/step10-sync4d/ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/g0rework-verify-1f3qzspy/step10-sync4d"
+            ],
+            "exit": 0,
+            "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 0 }\n",
+            "stderr": ""
+          },
+          {
+            "label": "step10-sync4d/audit-ownership.mjs",
+            "argv": [
+              "node",
+              "/tmp/fgos-work/g0rework-verify-1f3qzspy/step10-sync4d/audit-ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/g0rework-verify-1f3qzspy/step10-sync4d"
+            ],
+            "exit": 0,
+            "stdout": "{\n  collisions: 272,\n  newGapGroups: 31,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+            "stderr": ""
+          },
+          {
+            "label": "legacy docs ratchet",
+            "argv": [
+              "node",
+              "scripts/check-legacy-docs-ratchet.mjs"
+            ],
+            "exit": 0,
+            "stdout": "check-legacy-docs-ratchet: clean (997 legacy files checked; 28 accounted edit(s), 3 accounted new file(s)).\n",
+            "stderr": ""
+          },
+          {
+            "label": "whitespace",
+            "argv": [
+              "git",
+              "diff",
+              "--check"
+            ],
+            "exit": 0,
+            "stdout": "",
+            "stderr": ""
+          }
+        ],
+        "assertions": {
+          "rebindLeavesNoScratch": true,
+          "miscChecksUnchangedSha256": "faa095f14d65005355089b65d4896ba06e96776413a8ec4d33b138d4fb939fe4",
+          "ownershipPassed": true,
+          "clauseSpecificSourceLists": 2,
+          "addVerbFileCountRationale": true,
+          "touchedBindingHashes": 127,
+          "refreshedRationales": 124,
+          "supersedeRedecisions": 3,
+          "retiredStaleOverlayPointers": 3,
+          "parityBase": "568a11f21f442190ef86e25cf5d2303df7fc0f3d",
+          "laterSourceParityRowsAdded": 1,
+          "currentTargetsAndAncestries": 127,
+          "exactChangedLineDiffs": 3,
+          "legacyRewriteDigests": 21,
+          "parityPriorEntriesUnchanged": 248,
+          "parityPriorSourceEntriesRefreshed": 14,
+          "parityPriorTargetOnlyRefreshed": 62,
+          "residualFileHashUnchanged": true
+        },
+        "noNativeAddonLoaded": true,
+        "miscReplay": {
+          "status": "scoped-replay-passed-not-gate-acceptance",
+          "sourceCommit": "93dfed0ae6c0791b701d56999b78b71c113c9196",
+          "g6SourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+          "miscAuthoringCommit": "ad94156cf9c463018060f3ae32ff6a17c4874033",
+          "sourcePinScope": "Misc authoring recipe, ledger and docs at the last commit writing misc-fix/binding-refresh.json, with its recorded sourceHead preimages; live overlay custody and registry census at HEAD. G6 replay and owning assertions at proof.json sourceCommit.",
+          "combinedVerifierResult": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verification.json",
+          "commands": [
+            {
+              "argv": [
+                "git",
+                "rev-parse",
+                "HEAD"
+              ],
+              "exit": 0,
+              "stdout": "93dfed0ae6c0791b701d56999b78b71c113c9196\n",
+              "stderr": ""
+            },
+            {
+              "argv": [
+                "python3",
+                "-B",
+                "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py",
+                "--check"
+              ],
+              "exit": 0,
+              "stdout": "{\"changedRows\": 27, \"contentChangedRows\": 21, \"effectiveBindingsChecked\": 283, \"sourceHead\": \"23f6eaccf5eb195a8f50e5788d38f386a901b6d2\"}\n",
+              "stderr": ""
+            },
+            {
+              "argv": [
+                "node",
+                "/tmp/fgos-work/misc-verify-t1t5qe05/registry.mjs"
+              ],
+              "exit": 0,
+              "stdout": "{\"Check\":141,\"Fix\":32}\n",
+              "stderr": ""
+            },
+            {
+              "argv": [
+                "git",
+                "cat-file",
+                "-t",
+                "ad94156cf9c463018060f3ae32ff6a17c4874033:docs/platform/yaml-document/spec.md"
+              ],
+              "exit": 0,
+              "stdout": "blob\n",
+              "stderr": ""
+            },
+            {
+              "argv": [
+                "git",
+                "cat-file",
+                "-t",
+                "ad94156cf9c463018060f3ae32ff6a17c4874033:docs/platform/config/spec.md"
+              ],
+              "exit": 0,
+              "stdout": "blob\n",
+              "stderr": ""
+            },
+            {
+              "argv": [
+                "git",
+                "show",
+                "23f6eaccf5eb195a8f50e5788d38f386a901b6d2:docs/reading-map.md"
+              ],
+              "exit": 0,
+              "stdout": "# Documentation Reading Map\n\n```txt\nDocument type: Reading map\nAudience: Human reviewer, maintainer, implementer, agent\nPurpose: Tell readers what to read first by purpose\nDesign status: Accepted\nImplementation: Partial\nProvenance: Promoted from documentation-system redesign\nWriter type: Human + agent coauthor\nCanonical for: Documentation entry routing\nUse this when: You need to decide which fgOS docs to read first\nDo not use this for: Documentation governance or complete file inventory\nLast reviewed: 2026-09-25\nRelated:\n- `docs/doc-governance.md`\n- `docs/transitional-switchboard.md`\n- `docs/platform/README.md`\n- `docs/specs/reading-map.md`\n```\n\nThis map provides reader routes and the merged detailed product/source map in\n[section 5](#5-detailed-product-and-source-map). The legacy source remains\nretained for provenance until consumer cutover.\n\n## 1. Start Here\n\n| Need | Read |\n|---|---|\n| Understand documentation rules | [doc-governance.md](doc-governance.md) |\n| Resolve authority during transition | [transitional-switchboard.md](transitional-switchboard.md) |\n| Understand platform-wide docs | [platform/README.md](platform/README.md) |\n| Understand packaging, install, activation, setup, and doctor | [platform/packaging-distribution/README.md](platform/packaging-distribution/README.md) |\n| Understand the detailed product/source map | [Section 5](#5-detailed-product-and-source-map) |\n| Shape a new multi-round design | Create or update a discussion scratchpad |\n| Understand an area | `docs/platform/<area>/README.md`, or current legacy `docs/specs/<area>.md` during migration |\n\n## 2. Reader Journeys\n\n### 2.1. New Human Reviewer\n\n1. `docs/README.md`\n2. `docs/platform/README.md`\n3. The relevant `docs/platform/<area>/README.md`\n4. `spec.md`\n5. Architecture, contracts, decisions, and verification as linked by the area\n   README.\n\n### 2.2. Implementer Or Agent\n\n1. `docs/doc-governance.md`\n2. `docs/platform/README.md`\n3. Area README.\n4. Area `spec.md`.\n5. Relevant contracts.\n6. Verification expectations.\n\n### 2.3. Architecture Shaping\n\n1. Area README and current spec.\n2. Related platform anchors such as `vision.md`, `platform-foundations.md`,\n   `architecture-map.md`, and `component-boundary.md`.\n3. Existing architecture and decisions.\n4. Discussion scratchpad for active shaping.\n5. Promotion into canonical docs after review.\n\n### 2.4. User-facing Documentation\n\nUse Diataxis-style user docs:\n\n```txt\ndocs/user/tutorials/\ndocs/user/how-to/\ndocs/user/reference/\ndocs/user/explanation/\n```\n\nDuring migration, the existing roots remain active:\n\n```txt\ndocs/tutorials/\ndocs/how-to/\ndocs/reference/\ndocs/explanation/\n```\n\n## 3. Transitional Note\n\nThe target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover.\n\n## 4. Related Files\n\n| Relationship | File |\n|---|---|\n| governs documentation system | [doc-governance.md](doc-governance.md) |\n| operative transitional switchboard | [transitional-switchboard.md](transitional-switchboard.md) |\n| platform portal | [platform/README.md](platform/README.md) |\n| merged detailed product/source map | [Section 5](#5-detailed-product-and-source-map) |\n| verified transitional authority snapshot | [current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) |\n| full-horizon documentation-system proposal | [platform/proposals/documentation-system-unification.md](platform/proposals/documentation-system-unification.md) |\n| preserved future documentation intents | [platform/intent-preservation-ledger.md](platform/intent-preservation-ledger.md) |\n\n## 5. Detailed Product And Source Map\n\nMerged from the retained legacy product/source map, `docs/specs/reading-map.md`.\nThe retained transition banner in section 3 is not replaced by the dated source\nbanner, whose authorization counts are historical. The how-to directory and README\nroutes above retain their routing role; their complete source entries below\nreconcile the detailed descriptions. Labelled truth corrections identify known\nstale claims and current evidence. Historical paths are identified explicitly\nwhere no current file exists. The retained legacy map remains a provenance\npointer until consumer cutover; it is not the reader's detailed-map destination.\n\n- `docs/platform-foundations.md` — văn bản gốc 10 luật nền platform (L1–L10); spec: docs/specs/platform-foundations.md\n- `docs/backlog.md` — product backlog (PBI rows, scribing-owned)\n- `docs/architecture-map.md` — bản chuẩn kiến trúc (v0.2, record ADR0010 (bản đồ kiến trúc là bản chuẩn)): 5 tầng + 2 lớp phủ, sổ component + sổ contract (CTR001–CTR009), nghi thức thẻ-căn-cước-trước-code\n- `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI STR14-STR18\n- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration.\n- `docs/distribution-vision.md` — tầm nhìn nền tảng lịch sử: cài đặt/setup/doctor ổn định + tái dùng được (không cần clone, global/project không xung đột — project ghi đè global, doctor/setup tự fix hạ tầng + merge config thiếu, module mới tự đăng ký năng lực config, CI như một phần của setup); đã được promote/supersede từng phần vào `docs/platform/packaging-distribution/vision.md`.\n- `docs/specs/` — state layer: area spec + system-overview + bản đồ này\n- `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy\n- `docs/io-contract.md` — hợp đồng giao tiếp VÀO/RA của cửa CLI + bề mặt stdout `fgos-runner` (str46-io-contract): danh tính `writer`/`role`, envelope `fgos.v1` + ngoại lệ có lý do, exit-code một nguồn, sổ verb (`touchesState`/`externalEffect`/`paginated`/`multiValueFormat`), version token, ranh giới ngoài (STR38/STR48/STR83)\n- `docs/coexistence.md` — doctrine chạy cạnh một harness agent khác (record ADR0009 (chống giao thoa lúc cài — fgOS khi cài không giao thoa tiến trình với harness khác)): lãnh địa, một-nhạc-trưởng-mỗi-phiên, nhường-nhịn lúc `init`, manifest `.fgos/coexistence.json`, Known Gaps chưa flip; `src/install/coexist.mjs` — cài đặt detection + manifest (read-only, không đè)\n- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md\n- `scripts/fgos-shell-integration.sh` — dev checkout shell helper (STR87 first slice): hàm `fgos`/`fgos-runner` tự resolve root qua `git rev-parse --git-common-dir` (worktree-safe), source từ shell profile của contributor, không cài đặt gì; test: `test/scripts/fgos-shell-integration.test.mjs`; spec: docs/specs/distribution.md §Dev checkout shell helpers\n- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor\n- `docs/decisions/` — hồ sơ quyết định dài hạn cho người ngoài (decision records); từ str64-backfill, mỗi record còn mang đầu-mô-tả OKF-style (loại/tiêu đề/nhãn/thời điểm/móc-liên-kết-nguồn, xem `frontmatter.mjs` dòng dưới) và được `fgos docs-index` công nhận là vị trí thay thế của ngăn `explanation` (R10, spec: docs/specs/enduser-docs-index.md) — thân ADR không đổi, chỉ thêm đầu-mô-tả; lưu ý `orchestrator` là pinned term đã đổi nghĩa giữa chừng (0026→0028 nghĩa cũ \"launcher\", 0029 nghĩa mới \"tầng hợp thành T0\"; xem chuỗi quyết định tại `docs/decisions/index.md` dòng 28-32)\n- `scripts/check-decision-citation-drift.mjs` + `test/scripts/check-decision-citation-drift.test.mjs` — quét `docs/backlog.md` + `docs/specs/*.md` tìm dòng còn trích một quyết định đã bị supersede mà không nhắc quyết định thay thế trên cùng dòng (STR72 CoS clause 2, PBI p-2d71dfc3); chỉ phát hiện, không tự sửa; spec: docs/specs/decision-citation-drift.md\n- `scripts/check-decision-codes.mjs` + `test/scripts/check-decision-codes.test.mjs` — quét `test/**/*.test.mjs` tìm tên test còn nhúng mã quyết định nội bộ (str##/D#/RUL##/STR##/tsk-xxx) thay vì mô tả bất biến bằng lời thường (review-audit-self-decision.md mục Stable Code Artifacts); chặn (ratchet) chỉ vi phạm MỚI so với `scripts/check-decision-codes.baseline.json` đã chốt, không chặn ngược nợ cũ; `npm test` tự chạy qua glob `test/**/*.test.mjs`, không hook riêng\n- `docs/id-systems-audit.md` — audit + quyết định hình dạng mọi hệ id/mã đang sống trong hệ thống (work.id/kind/Story/ADR/Rule/Contract phía fgOS; D-hex/D-local/cell-id/feature-slug/severity phía bee) — nguồn cho `work.id`'s `tsk-<hash>` và các migration STR53-STR58 (tất cả đã `done`); boundary appendix: `docs/architecture-map.md` Phụ lục B\n- `bin/fgos.mjs` — CLI một cửa của work-state; chạy `node bin/fgos.mjs <verb>`; gồm verb `edit` — sửa đè các trường (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent — str7-str8-priority-intent) trên một item đã có, cùng cửa ghi CTR002 như `add`/`move`; gồm verb `take`/`return` — cửa pull giao–nhận việc cho tác nhân ngoài runner; gồm verb `pick` — cửa pull GỘP `take` + dựng workspace (`createWorktree`), role cố định `session`, không cờ `--role` (theo str83-fgos-slash-commands); gồm verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, một cổng cho mọi đề xuất `awaiting-approval`, nay leaf-vs-root-aware (con nhập vào nhánh của gốc, gốc nhập vào cây chính); `review`/`approve` nay chấp nhận thêm `--github [--pr <n>]` — vận chuyển thay thế CÙNG cổng duyệt qua GitHub thay vì diff/merge cục bộ (chỉ nguồn runner, theo github-adapter, spec: docs/specs/runner.md); gồm verb `catchup` — đồng bộ lại một việc đỗ vì gãy nhập/trôi tích hợp (spec: docs/specs/runner.md); gồm verb `session` (`start`/`end`/`list`) — vòng đời phiên checkout đa-phiên tùy chọn, mỗi phiên một worktree detached-HEAD cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink (spec: docs/specs/runner.md); spec: docs/specs/work-state.md\n- `src/state/` — lõi work-state: events (nhật ký; `appendEvent` nay chạy trong mutex nóng `state` (`withStateTx`, `src/state/hot-lock.mjs`) — xem spec Work-State RUL10 (tiền đề có ngưỡng — một người ghi tại một thời điểm; multi-agent ghi đồng thời qua mutex nóng `state`)), work (schema — STATUSES + STAGES + field `parent` lineage + field `domain`), fsm (bảng chuyển status + CAS), stage (bảng chuyển stage + CAS, chiều vĩ mô song song fsm; cạnh chuyển-stage tra theo domain của item — `coding`: `discovery → exploring → planning → executing`, trong đó phán-quyết `clear` ở `discovery` bỏ qua `exploring` để sang thẳng `planning` còn `unclear` đi qua `exploring`; tên `decompose` vẫn còn nhưng chỉ là bí danh legacy chỉ-để-rút-cạn (không việc MỚI nào vào được nữa); `synthetic`: một stage, không cạnh nào), domains (sổ đăng ký domain — stage list + step-mapping base-workflow + cạnh-chuyển mỗi domain; `coding` + ba domain minh họa/thử-nghiệm `synthetic` (đúng một stage), `triage`, `fixture-marketing`; base-workflow-model STR18, hoàn tất S1+S2), replay (fold), frontier (truy vấn sẵn-sàng — lọc theo status, stage domain-aware, VÀ lineage qua `parent`), dep-graph (dò chu trình trên `deps` — bất biến phi-chu-trình tại cửa ghi, per work-graph-intelligence S1), store (chủ ghi duy nhất + readRawEvents), envelope (phong bì output CTR001, `wrapEnvelope` — nay bọc MỌI verb ở một cửa in trong `bin/fgos.mjs main()`, STR37; spec: docs/specs/work-state.md §envelope)\n- `src/cli/command-registry.mjs` — sổ verb máy-đọc của CLI (STR37, kernel, thuần dữ liệu): `SCHEMA_VERSION` + `COMMAND_REGISTRY` (mọi verb với `{name, invoke, description, parameters, examples, access read|mutation, deprecated}`); `bin/fgos.mjs` `--help [--json]` và `<verb> [<sub>] --help [--json]` sinh sổ từ đây; verb có sub-verb mang `subcommands`, `HELP_SELECTORS` (`--help`, `-h`) thành route của Rust host qua `scripts/export-command-selectors.mjs`; test chống-lệch `test/cli/fgos-manifest.test.mjs`, `test/cli/subcommand-flag-drift.test.mjs` (cờ handler ↔ schema sub-verb), `test/cli/fgos-verb-help-json.test.mjs`, `test/rust-host/help-routes.test.mjs` (qua host thật); spec: docs/specs/work-state.md §sổ verb\n- `src/intake/classify.mjs` — logic thuần của `fgos submit`: deriveTitle, classify (tier/kind/risk cơ học), không còn sinh id (id work item `tsk-<10 base32>` đến từ cửa mint Identity `src/util/identity-mint.mjs`)\n- `src/intake/discovery.mjs` — context-discovery của stage `discovery` (stage đầu tiên của domain `coding`): `resolveDiscovery` (đọc-phán-ghi, dùng chung bởi verb `discover` và vòng tự hành) ĐÒI phán-quyết do người gọi cấp — judge lồng `judgeDiscovery` đã rút; phán-quyết `clear` chuyển item sang stage `planning`, `unclear` sang `exploring`\n- `src/intake/plan.mjs` — phán chia-việc của stage `planning`: `resolvePlan` (đọc-phán-ghi, dùng chung bởi verb `plan` và vòng tự hành khi item ở stage `planning`, hoặc ở bí danh legacy `decompose`) ĐÒI phán-quyết do người gọi cấp — judge lồng `judgeDecompose` đã rút, cùng lý do `judgeDiscovery` rút; sinh con qua lineage `parent`, không qua `deps`\n- `domains/coding/AGENTS.md` `## fgOS Workflow` + `.claude/skills/` (`.agents/skills/` mirror byte-identical) — lớp hướng dẫn P50: entry skill (`fgos-routing`) + skill giai đoạn (`fgos-coding-discovering`/`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`/`fgos-coding-knowledge`) trỏ một phiên tự mở tới đúng skill theo `stage` của item; từ str89-fgos-domain-skills, tra cứu này domain-pluggable — đọc trường `domain` + `stage` của item rồi tra qua `skillForStep`/`getDomain` (`src/state/domain-registry.mjs`), không còn giả định ngầm domain `coding`; `fgos-routing` nay có hàng khoá theo **status** `retrospective → fgos-coding-knowledge` (skill tổng hợp cấp nhãn Diataxis + soạn tài liệu người-dùng-cuối) — stage `compound-learn` đã rút, việc tổng hợp nó từng canh nay là việc của status `retrospective`; skill ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify) đã rút (tsk-6ar) — `/fgOS:submit` bước 6 (`plugins/fgOS/skills/submit/SKILL.md`) nay tự chạy clarify+classify trong cùng phiên sống, cùng việc mà skill đó từng làm nhưng trên bản mô tả SẠCH hơn; spec: docs/specs/work-state.md §RUL60 (hành vi), docs/specs/runner.md (lớp hướng dẫn) **Truth correction:** src/state/domain-registry.mjs:193,240; core/skills/fgos-routing/SKILL.md:124-136.\n- `plugins/fgOS/` (`.claude-plugin/plugin.json` + `skills/<verb>/SKILL.md`) — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 36 wrapper không có tiền tố fgos- trong 55 thư mục skill; `_shared` không có SKILL.md và không phải wrapper; `check` không có wrapper. Mỗi wrapper giữ hướng dẫn cửa gọi của riêng nó; spec: docs/specs/fgos-plugin.md **Truth correction:** `find plugins/fgOS/skills -mindepth 2 -maxdepth 2 -name SKILL.md` gives 54 files, of which 18 have the fgos- prefix and 36 do not; 55 directories include `_shared` without SKILL.md (enumerated at SYNC 59b9b7087).\n- `apps/fgos-gateway/` + `apps/fgos-gateway/web/` — fgos gateway (REST, MCP, bundle web dashboard nhúng sẵn; vòng đời `fgos gateway`) và bề mặt web dashboard: client trình duyệt ĐỘC LẬP (không phải code máy chủ trong gateway, theo tsk-7l9 + decision 0014); `herdr-dashboard/` là plugin herdr (TUI trong pane), `packages/herdr-fgos-common/rust` là adapter CLI fgos dùng chung của cả hai, gọi API REST/RPC của gateway từ ngoài; ba màn đọc (taskboard, task-detail, câu hỏi cần trả lời — phủ cả kênh `ask` lẫn `gate-approve`) cộng các hành động ghi đi qua verb một-cửa-ghi của fgOS (`answer`/`approve`/`add`/`edit`/`move`), không có đường ghi thứ hai; bật mặc định, port 8788, token bắt buộc; spec: docs/specs/herdr-web-dashboard.md (lớp UI/wireframe: docs/reference/herdr-web-dashboard-layout.md)\n- `docs/how-to/`, `docs/tutorials/`, `docs/reference/`, `docs/explanation/` — tài liệu NGƯỜI-DÙNG-CUỐI theo bốn quadrant Diataxis (audience-facing, khác `docs/specs/` là BA-reference nội bộ); sinh bởi kỹ năng `fgos-coding-knowledge` ở status `retrospective` (grow-or-create một tài liệu SỐNG mỗi đường dẫn: gom mọi capture qua `fgos doc-sources` rồi tích luỹ không mất, ngăn Diataxis là trục cấu trúc duy nhất — write-side, spec: docs/specs/enduser-docs-authoring.md), quadrant khớp `docType` capture; `docs/explanation/` từ str64-backfill còn có 6 tài liệu chưng cất từ critical-patterns.md (learnings vận hành bee thật sự thuộc tiến trình hình thành fgOS); chỉ mục đọc-theo-tag máy-đọc-được: `docs/enduser-docs-index.json` (sinh bởi verb `fgos docs-index` / kỹ năng `fgos-indexing`, thay cho việc liệt-kê-tay từng tài liệu — supersedes con trỏ văn xuôi cũ, theo compound-learn-enduser-docs; ngăn `explanation` còn quét thêm `docs/decisions/` làm vị trí thay thế, theo str64-backfill); spec read-side: docs/specs/enduser-docs-index.md\n- `src/runner/` + `bin/fgos-runner.mjs` — vòng tự hành (loop/dispatch/worktree/recovery/anti-loop/write-queue/root-affinity); `loop.mjs`'s `runWatch` + `write-queue.mjs`'s `onCommit` — chế độ `--watch` bền, tín hiệu-cơ-học + nghỉ dự phòng, ghép `runOnce` không đổi làm hộp đen (str7-str8-priority-intent, spec: docs/specs/runner.md §RUL53 (`--watch` — vòng cầm-giao bền, dừng chỉ khi có tín hiệu tường minh)); loop giao việc theo mẻ song song có giới hạn hai tầng (cấu hình `parallel` trong `.fgos/config.json`'s `runner` section, theo tsk-5vf), giữ quyền-sở-hữu-gốc trong một lượt chạy, quét làm-rõ rồi quét chia-việc trước mọi dispatch thi công; gặt-lại bỏ qua claim của cửa pull (`claimRole` human/session); `dispatch.mjs`'s executor là port có tên CTR009 v2 (`EXECUTOR_ADAPTERS`, per-tier qua config's `executors`, STR41), `ensureRunnerConfigForDir` tự sinh cấu hình mặc định tại `.fgos/config.json` khi vắng mặt (không áp dụng cho `--config` tường minh, str76-runner-bootstrap; tsk-5hv xoá hẳn fallback về file flat legacy cũ); worker của loop và fan-out chạy như một Unit run qua `runUnit` (`work-dispatch.mjs`'s `spawnWorker`), `fgos-runner` không còn `--config` (spec: docs/specs/runner.md §RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)) và prompt worker được tách sang `prompt-templates.mjs` + `prompt-templates/*.txt` (chọn template qua bảng cơ học kind/tier/domain, substitution `{placeholder}` thuần, log dispatch kèm tên+hash template, STR49); `goal-check.mjs` — hàm goal-check dùng chung giữa vòng tự hành và verb `return`; `write-queue.mjs` — cửa ghi tuần tự giữ một-người-ghi dưới song song; `root-affinity.mjs` — quyền-sở-hữu-gốc, giữ mọi con của một gốc chung một chủ trong một lượt chạy; `resolveRepoRoot` nay còn xác nhận HEAD repo resolve được trước khi runner claim bất kỳ item nào (fail-fast, str86-runner-headless-git D ecfd0d1a); config: `.fgos/config.json`'s `runner` section (tự sinh khi vắng mặt tại đường mặc định, nguồn config duy nhất kể từ tsk-5hv); spec: docs/specs/runner.md\n- `docs/specs/confinement-authority.md` + `src/runner/dispatch/confinement/` — Agent Confinement Authority: runtime one-door confinement enforcement (`executeThroughConfinement`), machine backend registry `~/.fgos/confinement-backends.json`, local `bwrap` v1 driver with 8 falsification probes, required fail-closed checks, attestation storage (`confinement-attestation.v1`), herdr convergence with shared `evaluateBypassPairing`, setup defaults and doctor checks; spec: docs/specs/confinement-authority.md Pane herdr confine cho agent không phải claude (codex/agy/pi): công thức private-home + account inventory + lịch sử các commit đã đi qua (và vì sao từng bị quên) ở §13.1.\n- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer\n- `src/workflow/` (`definition.mjs`, `guide-schema.mjs`, `loader.mjs`, `runner.mjs` = Playbook proposer, `units-source.mjs`; case model: `case-projection.mjs` pure fold, `case-admission.mjs` admission predicate, `case-admission-port.mjs` port implementation, `case-bindings.mjs` worktree bindings, `case-runtime.mjs` reservation/settle/gate-answer files, `case-frame.mjs` nested frame, `case-lock.mjs` `advance` hold, `case-start.mjs`, `case-verbs.mjs` start/status/answer/resume/close, `case-close.mjs`; `unit-handoff.mjs`, `ref-digests.mjs`, `store.mjs` ledger) + `src/runner/execution/case-admission-port.mjs` (port contract owned by the Execution Core) + `core/workflows/*.yaml` — Workflow engine: guide + case ledger, admission, human gates, Playbook proposer; `units-source.mjs` dịch units file của `fgos workflow start --units` thành Workflow tạm (RUL89 (workflow start --units)); spec: `docs/specs/runner.md`\n- `docs/platform/workflow/spec.md` — candidate holder for `docs/specs/workflow.md`: Workflow là guide + case ledger (D-ADR0070), agent chọn thứ tự, harness admit activity, milestone gắn subject, khung được duyệt, authority fail-closed; supersede một phần runner 0048 §2 và 0049 §4. Source approval is not a migration promotion.\n- `docs/platform/seat-binding/spec.md` — candidate holder for `docs/specs/seat-binding.md` (implemented 2026-10-21; D-ADR0072): executor/model/effort/tier/account và fallback của ghế agent. Tier khai trực tiếp, project thắng, `maxTier` hạ hiển thị, erratum §17; crate `packages/seat-binding/rust`, route `fgos internal seat-binding`, client `src/seat-binding/client.mjs`, facade `src/runner/execution/bind.mjs`, seat resolver/ledger/legacy reader, provider-capacity lease, tier-ladder comment và doctor `src/setup/seat-binding-checks.mjs`.\n- `src/runner/execution/` (`unit.mjs`, `bind.mjs`, `run.mjs`, `patterns/`) — Execution Core (Request-to-Run P1/P2/P4): Unit (hợp đồng dữ liệu duy nhất), `bind()` (chọn executor 5 mức), `fgos run` (cửa chạy mới, herdr mặc định), CollaborationPattern (`solo`, `reviewed`, `panel` + presets `consult`, `research-fan-out`, `rfc`, `code-change`); `src/runner/dispatch/write-scope.mjs` — matcher duy nhất của phạm vi ghi Unit (RUL84 (one write-scope matcher)), dùng cho runner commit, settlement và Workflow; spec: `docs/specs/runner.md`\n- `docs/architect/agent-coordination/` — thiết kế agent-coordination lịch sử (đã thu hồi ở P4 per D-0050, thay bằng Workflow runner và Execution Core); `README.md` là portal ghi nhận chuyển tiếp; `contracts/` lưu giữ hợp đồng lịch sử (`coordination-session.md`, `flow-definition.md`).\n- `docs/architect/host-invocation-routing/` — kiến trúc định tuyến và host runtime Rust (5 tệp: `host-invocation-provider-routing.md` — hợp đồng kernel canonical OperationRequest/ProviderOutcome, pure Router, InvocationService; `legacy-cli-transition.md` — chiến lược exec payload Node với parity harness và descriptor command-routes; `external-provider-protocol.md` — giao thức external provider R2; `node-to-rust-component-migration.md` — lộ trình chuyển dịch component từ Node sang Rust; `rust-cli-and-proof-components-plan.md` — kế hoạch triển khai Rust CLI host và proof components); spec: docs/specs/distribution.md\n- `src/runner/merge.mjs` — cơ chế cổng duyệt PR nội bộ (`classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`), dùng bởi `bin/fgos.mjs` verb `review`/`approve`/`reject`, nay tham số hóa được nhánh đích (cây chính hoặc nhánh của gốc — cây nhánh tích hợp); `catchup` (bin/fgos.mjs) dùng lại cùng cơ chế git cho cả tầng con→gốc lẫn gốc→cây chính; `isMainWorktree` (STR44) — chặn cấu trúc (không dựa sổ đăng ký session) xác nhận `cwd` LÀ worktree chính trước khi `approve` merge/verify, bắt cả worktree tay không đăng ký qua `fgos session start` — cùng `detectTrunk` nay ở `src/runner/worktree.mjs` (theo tsk-49i), không còn ở file này; spec: docs/specs/runner.md\n- `src/verbs/<domain>/<verb>.mjs` — tầng use-case của CLI (theo tsk-49i): logic nghiệp vụ của một verb, chữ ký thống nhất `<verb>UseCase(ctx, options)` — `ctx` là thứ adapter tính từ môi trường (`{dir, cwd?, repoRoot?}`, use-case KHÔNG BAO GIỜ tự đọc `process.cwd()`/`process.env`/argv), `options` là flag đã parse; trả đúng payload `fgos.v1` (bọc envelope + map exit-code vẫn ở `bin/fgos.mjs`), refusal vẫn `throw StoreError`. Cụm đầu tiên: `src/verbs/merge/` (`merge`/`approve`/`review`/`sync-root`/`catchup`/`reject`/`promote-to-component`) — `bin/fgos.mjs` cho 7 verb này nay chỉ parse args, tính `repoRoot` theo chính sách RIÊNG của từng verb, gọi một hàm use-case. Không ngụ ý migrate 7 file use-case-rank sẵn có (`runner/loop.mjs`, `intake/*`, `setup/*`, `state/cursor.mjs`); spec: docs/specs/runner.md\n- `src/report/item-trace.mjs` — trace outcome/friction của MỘT item, đọc thuần trên view (`collectOutcomeEntry`/`collectFrictionData`/`collectReviewTrace`); dùng chung bởi `review` (use-case) và `check`/`show`/`doc-sources`/`evolve` (`bin/fgos.mjs`); spec: docs/specs/runner.md\n- `src/runner/github-adapter.mjs` — vận chuyển GitHub thuần cho cổng duyệt PR nội bộ (`createGitHubPR`/`viewGitHubPRStatus`/`mergeGitHubPR`/`classifyGhFailure`, shell ra `gh` CLI thật, layer infra), dùng bởi `bin/fgos.mjs` verb `review`/`approve --github`; spec: docs/specs/runner.md\n- `src/runner/worker-log.mjs` — cửa ghi DUY NHẤT cho bản ghi output cục bộ của trợ lý (`.fgos/logs/<id>.log`, git-ignored): `appendWorkerLog` — khối kết-cục cuối, gọi bởi `loop.mjs` sau mỗi lượt dispatch; `appendWorkerLogChunk` — live tee từng chunk stdout/stderr khi đến (STR39), gọi bởi `dispatch.mjs`'s `spawnWorker` qua `opts.onChunk`; spec: docs/specs/runner.md\n- `src/runner/session.mjs` — vòng đời phiên checkout đa-phiên tùy chọn (fgos-multi-session-checkout, STR35): `createSession`/`endSession`/`listSessions`/`reclaimOrphanedSessions`, worktree detached-HEAD mỗi phiên (`git worktree add --detach`), `.fgos` symlink dùng chung (KHÔNG BAO GIỜ sao chép), sổ `.fgos/sessions.json` canh bởi kernel mutex `.fgos/locks/sessions.lock` riêng (holder-lock); dùng bởi `bin/fgos.mjs` verb `session`; spec: docs/specs/runner.md\n- `packages/observe/rust/src/metrics_cli/entropy.rs` — tín hiệu entropy-trend + đếm compounding (thuần, đọc trên view work-state), surfaced qua `fgos metrics entropy`; spec: docs/specs/runner.md\n- `src/report/enduser-index.mjs` — bộ sinh CHỈ MỤC đọc-theo-tag tài liệu người-dùng-cuối (biến đổi dữ liệu, không tự thực hiện I/O; ghi chú mirror entropy trong source là lịch sử, `src/report/entropy.mjs` không còn): `QUADRANTS`, bảng nguồn-sự-thật `QUADRANT_META` (quadrant→{purpose,audience}), `QUADRANT_DIR_ALIASES` (quadrant→vị trí thay thế trên đĩa, theo str64-backfill; hiện `explanation`→`['decisions']`), `findSourceCaptureId` (gom một, cho chỉ mục), `findSourceCaptureIds` (gom mọi capture của một đường dẫn, cho `doc-sources`), `buildEnduserIndex`; I/O + verb `fgos docs-index` (quét cả thư mục chính lẫn `QUADRANT_DIR_ALIASES`, ghi manifest `docs/enduser-docs-index.json`) và verb `fgos doc-sources <docPath>` (gom nguồn của một đường dẫn) sống ở `bin/fgos.mjs`, cả hai quyền `read`; vận hành chỉ mục: kỹ năng `fgos-indexing`; spec: docs/specs/enduser-docs-index.md **Truth correction:** src/report/enduser-index.mjs:1-17; packages/observe/rust/src/metrics_cli/entropy.rs:1.\n- `src/report/frontmatter.mjs` — bộ đọc/ghi đầu-mô-tả OKF-style của mỗi tài liệu người-dùng-cuối (thuần, không I/O, không phụ thuộc thư viện ngoài — theo str64-backfill): `parseFrontmatter`/`renderFrontmatter` (loại/tiêu đề/nhãn/thời điểm/móc-liên-kết-nguồn); tách biệt với bộ sinh chỉ mục — đầu-mô-tả là bản sao ghi-lúc-soạn, KHÔNG phải nguồn thẩm quyền của linkage; spec: docs/specs/enduser-docs-index.md\n- Historical `src/evolve/candidates.mjs` — path not present at this commit; `src/report/entropy.mjs`, `listUnsettledFrictionsByWork` và verb `fgos evolve` cũng không còn. Tín hiệu entropy hiện ở `packages/observe/rust/src/metrics_cli/entropy.rs`, qua `fgos metrics entropy`; không có cửa candidate ranking được mô tả ở câu cũ. **Truth correction:** src/cli/command-registry.mjs:98,204-207; packages/observe/rust/src/metrics_cli/entropy.rs:1; src/evolve/iron-law.mjs:1 (only current src/evolve file; full src/bin/packages symbol search has no old ranking symbol).\n- `src/state/impact.mjs` — backlog-triage impact ranking (STR21, cửa 2 của triage — tách bạch khỏi STR14 intake-triage): thuần, xếp hạng item CHƯA `done` theo `blocks` (số item khác chưa `done` liệt kê nó trong `deps`); surfaced qua `fgos triage`; spec: docs/specs/work-state.md\n- `src/state/awaiting-context.mjs` — neo gốc cho cổng chờ-người (str61-chat-context-continuity): thuần, đọc trên view work-state, tính `{parent, changedSinceAsk?}` cho một item `awaiting-human` có `parent` mỗi lần đọc (không lưu trữ); surfaced qua `fgos list`'s khóa cộng thêm `awaitingContext`; spec: docs/specs/work-state.md §RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm)\n- `src/intake/risk-keywords.mjs` — nguồn duy nhất của `HEAVY_KEYWORDS` (self-improve loop STR13 Slice 2, kernel layer, dùng chung giữa `classify.mjs` và `iron-law.mjs`); spec: docs/specs/runner.md\n- `src/evolve/iron-law.mjs` — Iron Law risk classifier cho vòng tự cải thiện (self-improve loop, STR13 Slice 2): thuần, đã được gọi qua `src/runner/iron-law-gate.mjs` (import và gọi `classifyIronLaw`); spec: docs/specs/runner.md **Truth correction:** src/evolve/iron-law.mjs:64; src/runner/iron-law-gate.mjs:20,59.\n- `docs/platform/identity/spec.md` — spec thành phần Identity (mục 7a = writer id của process cục bộ; trước đây Session Identity): nguồn duy nhất trả lời \"writer của process này là ai\" (`{id, source}`); source: `packages/identity/rust` (verb native `fgos identity`), contracts + vector dùng chung: `packages/identity/contracts/`; Node chỉ gọi qua facade `src/util/session-identity.mjs` (bốn export; đọc trong process qua namespace `sessionIdentity` của addon, cửa `src/native/door.mjs`, không exec, cache nhỏ theo env; `probeIdentity` chạy `fgos identity` cho doctor, tìm binary: `src/util/host-bin-path.mjs`). Nửa launcher (§5a): writer id của attempt `att-<attemptId>`, scrub env ở gate, lineage `FGOS_PARENT_WRITER_ID`, giới hạn codex dưới daemon.\n- `docs/platform/agent-mailbox/spec.md` — spec thành phần Agent Mailbox (phạm vi lát đầu đã ký G0 ngày 2026-10-20; chưa có mã): giao một tin vào phiên agent đang sống trên một máy, cùng dự án (Claude Code, Codex, agy qua hook; người nhận là head khởi động độc lập, không phải Unit attempt), báo cáo giao nhận trung thực, tin của agent khác không bao giờ mang quyền của người dùng; kế hoạch là thang kiểm chứng V1–V7; source (dự kiến): `packages/mailbox`\n- `docs/platform/terminal-control/spec.md` — spec thành phần Terminal Control: nguồn duy nhất trả lời \"key này chạy ở pane nào\" trên terminal multiplexer (cổng trên theo key, driver herdr khai báo khả năng, layout đo thật + policy cắm được, luật gom tab); source: `packages/terminal-control/rust`, contracts: `packages/terminal-control/contracts/`; Node chỉ gọi qua route nội bộ `fgos internal terminal-control` (`src/terminal-control/client.mjs` client mỏng, `src/terminal-control/config.mjs` mục `terminal.*`); doctor/setup: `src/setup/terminal-control-checks.mjs` (hai dòng `terminal-control` và `terminal-allocations`, không có fix `terminal-dir`: store tự tạo thư mục); migration Node đã xong. Key của một lần chạy agent là attempt id; supervisor gọi in-process theo key (§12).\n- `docs/platform/git/spec.md` — spec thành phần Git (foundation): một authority cho mọi thao tác repository qua các port có kiểu (Inspect, Refs, Worktree, ScopedCommit, Sync, Land, SafeRestore, RepositoryConfig, Remote, Recovery, Publication), file WAL dưới git common dir là authority phục hồi duy nhất (§10), một cửa remote cho Remote, Publication và bộ đếm sequence (§3), cửa kích hoạt C5 và sáu dòng doctor Git (§12), vector bằng chứng §15/§19; source: `packages/git/rust` (crate `fgos-git`), addon N-API kết hợp `packages/git/node-addon` (link cả `fgos-event-store`), facade Node `src/git/` (không có cổng `git(args)` công khai), contracts: `packages/git/contracts/`; script bằng chứng: `scripts/git/` (E1 `e1-power-cut.*`, E3 `e3-bench.mjs`, P-SPACE/P-RESOURCE `p-space*.{sh,mjs}`, P-RELEASE `p-release-checks.sh`)\n- `docs/platform/yaml-document/spec.md` — spec thành phần YAML Document (L0 leaf, owner ký 2026-10-22; crate Rust `packages/yaml-doc/rust`, các consumer Rust và cửa Node đã xong; js-yaml đã xoá, RUL108 (every YAML parse goes through the native door) thay RUL101 (every YAML parse goes through one vendored js-yaml)): một authority cho đọc/sửa/merge YAML giữ nguyên byte không đụng tới, hai profile parse (`strict-config`, `tool`), comment là text có vị trí kèm chặn injection, merge primitive nhận luật từ caller; source dự kiến `packages/yaml-doc/rust` (crate `fgos-yaml-doc`), Node qua namespace `yaml` của native door sau facade `src/util/yaml.mjs` (thay js-yaml vendored, đã supersede RUL101 (every YAML parse goes through one vendored js-yaml)); bằng chứng: `plans/reports/spike-261022-0017-yaml-config-gate-evidence.md`\n- `docs/platform/config/spec.md` — spec thành phần Config (L1, owner ký 2026-10-22; crate Rust `packages/config/rust`, schema `core/config-schema/` và bộ chuẩn `core/config-standard/` đã xong, chưa nối vào caller nào): file nào là config và thứ tự project > global > bộ chuẩn read-only đi kèm release (file config chỉ chứa phần khác chuẩn; account pools và gateway token ở `~/.fgos/private/`, ẩn với worker bị confine), schema là dữ liệu do chủ section ship ở `core/config-schema/`, snapshot có provenance, ba cửa ghi và transaction một file (lock `project-config`/`global-config`), grammar comment `@fgos:doc`/`@fgos:why` bắt buộc với mọi người ghi, doctor checks, migrate JSON→YAML; source dự kiến `packages/config/rust` (crate `fgos-config`), Node qua namespace `config` của native door thay `src/config/` và mọi reader đọc thẳng; kiểm kê hiện trạng: `plans/reports/research-261021-2221-config-access-inventory.md`\n- `docs/platform/holder-lock/spec.md` — spec thành phần Holder-lock (L1): kernel lock trên open file description sau một cổng trung lập OS (`acquire`/`release`/`run_borrowed`/`probe`/`holders`/`guarantee`), mức bảo đảm theo driver (Linux/macOS/Windows `kernel` — Windows qua `LockFileEx` + job có tên, §8.1; fs mạng `none`), luật description, luật miền của holder trước (`predecessor.json`, chờ kill cố định 2000 ms), `LockScope` ném ngay khi sai thứ tự, một state root (`FGOS_STATE_ROOT`, hoặc cổng in-process khi không có pin), lịch sử cutover dừng-toàn-bộ (§12), ba check doctor `lock-kernel-semantics`/`lock-borrow-vectors`/`lock-holders` + fix `lock-dirs` (thân ở `src/setup/holder-lock-checks.mjs`); cây chính một cửa + mượn lock qua description (§14), `worktree-admin` (§16), `fgos lock fence` (§17), cutover hai lock repo (gộp vào §12); source: `packages/holder-lock/rust` (crate `fgos-holder-lock`, cổng `holderLock` trong addon, route nội bộ `fgos internal lock-fd|lock-hold|quiesce-scan|lock-borrow-vectors`), facade Node `src/holder-lock/` (caller không bao giờ thấy fd; kênh checkout `node bin/fgos.mjs` không được hỗ trợ cho verb lock), contracts + registry lock + vector: `packages/holder-lock/contracts/`\n- `docs/platform/event-store/spec.md` — spec thành phần Event Store (nền): envelope v4 + registry stream, open log theo stream dưới `<git-common-dir>/fgos/events` (khoá `event-append`/`event-seal`), seal lên `refs/fgos/events/<machine-id>` qua cổng Publication của Git, reader (coverage, thứ tự nhân quả, cursor), sync, verb `fgos events`; trạng thái: dormant trên main, store đã chứng minh, chưa có consumer (Work cutover thuộc làn WORK); source: `packages/event-store/rust` (crate `fgos-event-store`), facade Node `src/event-store/` trên addon N-API gộp với `fgos-git`, verb `src/verbs/events/`, thân check doctor/fix `src/setup/event-store-checks.mjs` + `src/setup/event-store-fixes.mjs` (chưa đăng ký); contracts + vector + registry consumer: `packages/event-store/contracts/`; test: `packages/event-store/rust/tests/`, `test/event-store/` (topology: `topologies.test.mjs`); script: `scripts/event-store/` (bench `v-spawn-bench.mjs`, mất điện `power-loss.sh`)\n- `src/state/hot-lock.mjs` — mutex nóng `state` / `porting-events` của state store: `withStateTx` (bản ghi `.fgos/locks/<resource>.hot`, dọn holder chết dưới kernel lock `<resource>.reclaim.lock`, vùng găng đồng bộ, subprocess và lấy lại mutex ném ngay); thay `events.lock`, `runtime/claims.lock`, `porting/events.lock`; spec: docs/platform/holder-lock/spec.md §15, contract `packages/holder-lock/contracts/hot-lock.v1.json`; check doctor `lock-holders` (bản ghi nóng, `src/setup/holder-lock-checks.mjs`); bản ghi và phán quyết holder đi qua cửa process-facts (`judgeHotRecord`), mọi nền tảng; trên Windows thời điểm tạo process của holder được đọc in-process qua cửa `src/native/door.mjs`\n- `src/runner/repo-locks.mjs` — một cửa cho ba khoá repo của runner qua facade holder-lock (`withMainCheckout` trao `mainHandle`, merge slot theo ref đích, `worktree-admin` quanh `git worktree add`): kernel lock, không TTL, không nhận diện theo pid, hook git mượn khoá qua description (`FGOS_LOCK_FD`); checkpoint `.fgos` là adapter tháo rời nhận handle; thay `src/runner/main-checkout-lock.mjs`; spec: docs/platform/holder-lock/spec.md §14, §16–§18, docs/specs/runner.md\n- `docs/platform/process/spec.md` — spec thành phần Process Facts & Control (L0): bảng phán `judge(tuple) → alive|dead|unknown` (zombie = dead, thiếu pid = unknown, PID namespace theo anchor), gửi signal theo identity, spawn với ánh xạ fd tường minh, primitive miền `domain_is_empty`/`domain_kill_all`, quét quiescence; source: `packages/process/rust` (crate `fgos-process`, một driver mỗi OS), Node chỉ qua cửa in-process `src/native/door.mjs` (client mỏng `src/runner/dispatch/process-identity.mjs`, sáu export, không đọc `/proc`, không `process.kill`); contracts: `packages/process/contracts/`\n- `docs/platform/component-boundary.md` hàng **Durable file (L0)** và **Canonical JSON (L0)** — spec của hai crate lá cho tới khi có file spec riêng: ghi file bền (`replaceDurably`/`installOnce`, lỗi nói bước và hiệu ứng đã xảy ra, trùng lặp có chủ ý của các helper không fsync trong Rust) và byte canonical RFC 8785 (`canonicalJson`, các ngoại lệ có lý do); source: `packages/durable-file/rust`, `packages/canonical-json/rust` (vector: `packages/canonical-json/contracts/vectors/`); Node chỉ qua cửa `src/native/door.mjs`\n- `docs/platform/run-supervisor/spec.md` — spec thành phần Run Supervisor (L4): mỗi attempt một supervisor Rust (`fgos internal supervise`) và một gate (`fgos internal gate`, pid 1 của PID namespace trên Linux) là gốc process của agent trong miền chứa chứng minh được rỗng; envelope v3 + digest, kênh GO, receipt và receipt từng bước (`settle-attempt`, `finalize-home`), cửa adopt (`fgos internal adopt`) và ma trận phục hồi, bảng lỗi theo từng bên chết, chính sách \"supervisor chết → agent chạy tiếp, adopt settle\", bốn route `fgos internal supervise|gate|adopt|attempt-step --protocol 1` và `--probe`, tám check doctor (`process-containment`, `runtime-socket-dir`, `run-attempts-stuck`, `run-supervisor-route`, `gate-kill-grace`, `cancel-wait`, `legacy-attempts-stuck`, `units-awaiting-resume`), khoá `dispatch.gateKillGraceMs` và `dispatch.cancelWaitMs`, mục \"Controller chết\" (§9.1: Ctrl-C → cancel, unit chờ `--resume`, resume qua adopt, tự resume hoãn có tên), thư mục socket runtime (kèm socket attempt mồ côi); hai cách khởi động `direct` và `terminal` (§5.3: socket attempt, `SCM_RIGHTS`, tty foreground, nhánh mồ côi, `carrier-lost`, `release-slot`, thời gian mù của pane). Nguồn: `packages/run-supervisor/rust`, `src/run-supervisor/`\n- `docs/platform/agent-protocol/spec.md` — spec thành phần Agent protocol (L3): adapter thuần theo CLI × cách khởi động (claude, codex, agy, pi, omp × `direct` và `terminal`; §5.1: bảng chờ/gõ/xác nhận/thoát của adapter pane), cổng IO, kết quả có tên (`completed`, `blocked(login|trust-dialog|usage-limit)`, `needs-human`, `exited`); quyết định argv từ cấu hình executor (`resolveExecutorCommand`), stdin theo CLI (codex luôn null), nguồn hoạt động cho idle. Nguồn: `packages/agent-protocol/rust`\n- `docs/specs/observe.md` — spec thành phần Observe (đo lường `fgos metrics` và ghi nhận `fgos friction` trọn sang Rust); source: `packages/observe/rust`, contracts: `packages/observe/contracts/`, store `.fgos/observe/`. `metrics discussions` đọc summary do Node Execution ghi (`src/runner/execution/unit-summary.mjs`, `packages/run-result/contracts/unit-summary.read.v2.json`), `metrics eval` ghi journal `.fgos/observe/evals/`. Rubric: `docs/reference/discussion-quality-rubric.md`; cách so sánh mù: `docs/how-to/compare-discussion-setups-with-metrics-eval.md`.\n- `test/` — node:test suite (`npm test`; cỡ suite không ghi ở đây — dòng `suite: <files> files, <n> test() calls, <s> wall (baseline …)` so với `test/suite-baseline.json`, clone thân test mới làm suite fail, cảnh báo luật admission; `scripts/test-proof-inventory.mjs --duplicates`, `--write-baseline [--wall-seconds <s>]` trong cùng commit đổi cỡ suite có chủ đích): smoke + state + cli + runner + report + e2e (rebuild-determinism, runner-loop — gồm kịch bản cửa pull S2-pull + con fork từ tip nhánh gốc, pr-gate — 4 kịch bản trọn vòng review/approve/reject, dispatch song song thật với cửa sổ chồng-lấn đo được); benchmark lịch sử ngoài suite (F4): `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` — path not present at this commit; không có benchmark hiện hành ở đường dẫn này **Truth correction:** package.json:28 (scripts.test); git ls-tree e7393ea3c docs/history/phase-3-compound-learning (no entries).\n- `scripts/run-test-canary.mjs` (`npm run test:canary -- <file...>`) + `scripts/test-select.mjs` (`npm run test:related -- --explain`, plus `test:related:shadow` for evidence-gathering; manifest: `test/test-ownership.mjs`) — additive fast test-feedback doors, `npm test` unchanged/authoritative either way; how-to: `docs/how-to/use-fast-test-feedback-commands.md`; plan: `archive/plans/260920-immediate-test-feedback-reduction/plan.md` **Truth correction:** archive/plans/260920-immediate-test-feedback-reduction/plan.md:5.\n- `.fgos/events.jsonl` — nhật ký sự kiện work-state (truth, committed); `.fgos/state.json` là view gitignored; `.fgos/logs/<id>.log` — bản ghi output cục bộ của trợ lý theo từng việc, gitignored (spec: docs/specs/runner.md)\n- `AGENTS.md`, `CLAUDE.md` — doctrine layer nạp mọi phiên agent (bản sản phẩm — thuần forgent)\n",
+              "stderr": ""
+            },
+            {
+              "argv": [
+                "python3",
+                "-B",
+                "/tmp/fgos-work/misc-verify-t1t5qe05/proof.py",
+                "--pin",
+                "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+                "--out",
+                "/tmp/fgos-work/misc-verify-t1t5qe05/double-xh0p3cmz/1"
+              ],
+              "exit": 0,
+              "stdout": "{\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 137, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 623, \"preserve-operand-reachability-unchanged\": 1394, \"preserve-source-confirmed-history\": 2926, \"repoint-proposal\": 6}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}\n",
+              "stderr": ""
+            },
+            {
+              "argv": [
+                "python3",
+                "-B",
+                "/tmp/fgos-work/misc-verify-t1t5qe05/proof.py",
+                "--pin",
+                "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+                "--out",
+                "/tmp/fgos-work/misc-verify-t1t5qe05/double-xh0p3cmz/2"
+              ],
+              "exit": 0,
+              "stdout": "{\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 137, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 623, \"preserve-operand-reachability-unchanged\": 1394, \"preserve-source-confirmed-history\": 2926, \"repoint-proposal\": 6}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}\n",
+              "stderr": ""
+            },
+            {
+              "argv": [
+                "python3",
+                "-B",
+                "/tmp/fgos-work/misc-verify-t1t5qe05/g6-owning-assertions.py"
+              ],
+              "exit": 0,
+              "stdout": "owning G6 assertions passed\n",
+              "stderr": ""
+            },
+            {
+              "argv": [
+                "git",
+                "diff",
+                "--check"
+              ],
+              "exit": 0,
+              "stdout": "",
+              "stderr": ""
+            }
+          ],
+          "comparisons": [
+            {
+              "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.json",
+              "sha256": "b8b32effba8c44a995891818fb73968c68811e34af7a4255338a2e790a76fa0c",
+              "bytes": 16215952,
+              "runsByteIdentical": true,
+              "deliveredBytesEqual": true
+            },
+            {
+              "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/retire-with-tree.json",
+              "sha256": "b2389689addadac32646858af08734227f1a5c4d365f642d44cc6ff8b263a126",
+              "bytes": 18404,
+              "runsByteIdentical": true,
+              "deliveredBytesEqual": true
+            },
+            {
+              "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/judgments.json",
+              "sha256": "679e550c715322a2aa3232864b36c1c90bb2e7fdf9e7a4ffba9b119bb47e7d65",
+              "bytes": 1339446,
+              "runsByteIdentical": true,
+              "deliveredBytesEqual": true
+            },
+            {
+              "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/history-wrapper-proposals.json",
+              "sha256": "f47a97ceaa9fefe9f39b9f0618145ead70d85055a56c4a10e7139118a0ac76e2",
+              "bytes": 254745,
+              "runsByteIdentical": true,
+              "deliveredBytesEqual": true
+            }
+          ],
+          "counts": {
+            "byResult": {
+              "judgment-preserve-with-dated-note": 163,
+              "park-current-passage-unbound": 137,
+              "park-source-absent": 2,
+              "park-source-removed-by-cutover": 162,
+              "park-unconfirmed-preserve-premise": 623,
+              "preserve-operand-reachability-unchanged": 1394,
+              "preserve-source-confirmed-history": 2926,
+              "repoint-proposal": 6
+            },
+            "byStage": {
+              "step-03": 4804,
+              "step-04": 609
+            },
+            "excludedRetireWithTree": 38,
+            "finalBatchPopulation": {
+              "step-03": 130,
+              "step-04": 33
+            },
+            "recordBatches": 136,
+            "total": 5413
+          },
+          "registrations": {
+            "Check": 141,
+            "Fix": 32
+          },
+          "doctorCheckSplit": {
+            "literal": 136,
+            "loopRegistered": 5,
+            "loopIds": [
+              "git-worktree-recovery",
+              "git-component-compatible",
+              "git-repository-config",
+              "git-operation-journal",
+              "git-native-locks"
+            ]
+          },
+          "changedExampleRows": [
+            "f00167",
+            "f08807",
+            "f07822",
+            "f08072",
+            "f08073"
+          ],
+          "selfLinkProposalsRemoved": [
+            "f07697",
+            "f08033",
+            "f08047"
+          ],
+          "noReadinessClaim": true,
+          "independentReview": "pending",
+          "notRun": [
+            "npm test / scripts/run-tests.mjs / cargo workspace suite (forbidden or outside scoped record work)",
+            "fgos CLI, impact query, setup/doctor, lifecycle verbs (forbidden)",
+            "gate-register rejoin and pair accounting (final-pin Lead custody)",
+            "markdown preview (Lead custody; no extra service/state writes)"
+          ]
+        },
+        "ownershipAudits": [
+          {
+            "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+            "commands": [
+              {
+                "script": "ownership.mjs",
+                "exit": 0
+              },
+              {
+                "script": "audit-ownership.mjs",
+                "exit": 0
+              }
+            ],
+            "failingRows": [],
+            "ownership": {
+              "noNewDoubleOwnership": true,
+              "nativePlatformTargetIdentityDuplicates": 0,
+              "newActiveSourcePairCollisions": []
+            },
+            "checksOk": null,
+            "checksStatus": "not-run",
+            "checksReason": "checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment."
+          },
+          {
+            "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+            "commands": [
+              {
+                "script": "ownership.mjs",
+                "exit": 0
+              },
+              {
+                "script": "audit-ownership.mjs",
+                "exit": 0
+              }
+            ],
+            "failingRows": [],
+            "ownership": {
+              "noNewDoubleOwnership": true,
+              "nativePlatformTargetIdentityDuplicates": 0,
+              "newActiveSourcePairCollisions": []
+            },
+            "checksOk": null,
+            "checksStatus": "not-run",
+            "checksReason": "checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment."
+          }
+        ],
+        "fullAuditPassed": false,
+        "nativeDependentChecksNotRun": [
+          {
+            "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+            "script": "checks.mjs",
+            "reason": "checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment."
+          },
+          {
+            "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+            "script": "checks.mjs",
+            "reason": "checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment."
+          }
+        ],
+        "recordProofsPassed": true,
+        "status": "partial",
+        "ok": false
+      }
+    },
+    {
+      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py --check",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutSha256": "c01fbb55bedbe9f15319c6a1c8b2e0e67a3995a56aa1ca85f07b97cdb00f81c4",
+      "stderr": "",
+      "result": {
+        "drift": 0,
+        "rows": []
+      }
+    },
+    {
+      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py --check --pin HEAD",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+        "--check",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdoutSha256": "cc971995b336f8daf911090ecbccc8eaecc3c44b9c3622c5cabdb7d8d65e74e7",
+      "stderr": "",
+      "result": {
+        "pin": "93dfed0ae6c0791b701d56999b78b71c113c9196",
+        "memberships": {
+          "changed518/step-03": 10,
+          "changed518/step-04": 30,
+          "changed518/step-05": 478,
+          "overlaps144/step3": 10,
+          "overlaps144/step4": 9,
+          "overlaps144/step5": 125,
+          "w0deferred22/step3": 11,
+          "w0deferred22/step4": 4,
+          "w0deferred22/step5": 7
+        },
+        "uniqueRecords": 574,
+        "classificationCounts": {
+          "unchanged": 55,
+          "moved": 89,
+          "changed": 352,
+          "absent": 78
+        },
+        "passageCounts": {
+          "unchanged": 3576,
+          "moved": 13040,
+          "changed": 3583,
+          "absent": 995
+        },
+        "judgmentErrors": [],
+        "scope": "Interim only; not final pin F, semantic acceptance, parity, or gate approval.",
+        "specSweep": {
+          "drifted": [],
+          "predecessorChainMismatches": [],
+          "bodyReplayMismatches": [],
+          "unrecognizedEffectivePaths": [],
+          "recompositionErrors": [],
+          "files": 546
+        }
+      }
+    },
+    {
+      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py",
+      "argv": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/live-parity-misc-v4see7y2/misc.py"
+      ],
+      "exit": 0,
+      "stdoutSha256": "ce0b56db3637fe154f9ee2aebf106faf50095d9c0cc5bcad916eee3dc953360a",
+      "stderr": "",
+      "scope": "Unchanged owning script; only checks.json report sink redirected to a disposable tempfile because misc-fix/** is not writable.",
+      "result": {
+        "byteIdenticalArtifacts": 4,
+        "counts": {
+          "byResult": {
+            "judgment-preserve-with-dated-note": 163,
+            "park-current-passage-unbound": 137,
+            "park-source-absent": 2,
+            "park-source-removed-by-cutover": 162,
+            "park-unconfirmed-preserve-premise": 623,
+            "preserve-operand-reachability-unchanged": 1394,
+            "preserve-source-confirmed-history": 2926,
+            "repoint-proposal": 6
+          },
+          "byStage": {
+            "step-03": 4804,
+            "step-04": 609
+          },
+          "excludedRetireWithTree": 38,
+          "finalBatchPopulation": {
+            "step-03": 130,
+            "step-04": 33
+          },
+          "recordBatches": 136,
+          "total": 5413
+        },
+        "doctorCheckSplit": {
+          "literal": 136,
+          "loopIds": [
+            "git-worktree-recovery",
+            "git-component-compatible",
+            "git-repository-config",
+            "git-operation-journal",
+            "git-native-locks"
+          ],
+          "loopRegistered": 5
+        },
+        "registrations": {
+          "Check": 141,
+          "Fix": 32
+        },
+        "status": "scoped-replay-passed-not-gate-acceptance"
+      }
+    },
+    {
+      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py --check",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutSha256": "9de515d28aed5879e94045524394ed36485098ee9afb1141ed04b7197e01af84",
+      "stderr": "",
+      "result": {
+        "status": "pass",
+        "mode": "check",
+        "parityRows": 346,
+        "liveHeadingRows": 91,
+        "refreshedParityRows": 35,
+        "targetOnlyParityRows": 62,
+        "refreshedCandidateBindings": 25
+      }
+    },
+    {
+      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g0rework/test-live-parity.py",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/test-live-parity.py"
+      ],
+      "exit": 0,
+      "stdoutSha256": "18a98f7591423269d08f05ed41ec9185fd5650a05e3847a901e152d8e48368a5",
+      "stderr": "",
+      "result": {
+        "status": "pass",
+        "probes": [
+          {
+            "behavior": "stale live heading is refused",
+            "command": [
+              "node",
+              "--require",
+              "/tmp/fgos-work/live-parity-probes-r1e7nc97/overlay.cjs",
+              "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+            ],
+            "exit": 1,
+            "expected": "nonzero",
+            "diagnostic": "live source heading: docs/specs/distribution.md#data-dictionary"
+          },
+          {
+            "behavior": "uncovered current section block is refused",
+            "command": [
+              "node",
+              "--require",
+              "/tmp/fgos-work/live-parity-probes-r1e7nc97/overlay.cjs",
+              "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+            ],
+            "exit": 1,
+            "expected": "nonzero",
+            "diagnostic": "live direct section block unaccounted: docs/specs/distribution.md#unheaded-block-17"
+          },
+          {
+            "behavior": "new live heading outside the census is refused",
+            "command": [
+              "node",
+              "--require",
+              "/tmp/fgos-work/live-parity-probes-r1e7nc97/overlay.cjs",
+              "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+            ],
+            "exit": 1,
+            "expected": "nonzero",
+            "diagnostic": "live heading census: docs/specs/distribution.md"
+          },
+          {
+            "behavior": "unlisted patch drift is refused and all drift paths are named",
+            "command": [
+              "node",
+              "--require",
+              "/tmp/fgos-work/live-parity-probes-r1e7nc97/overlay.cjs",
+              "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+            ],
+            "exit": 1,
+            "expected": "nonzero",
+            "diagnostic": "unlisted live pointer-patch drift"
+          },
+          {
+            "behavior": "known drift without explicit duties is refused",
+            "command": [
+              "node",
+              "--require",
+              "/tmp/fgos-work/live-parity-probes-r1e7nc97/overlay.cjs",
+              "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+            ],
+            "exit": 1,
+            "expected": "nonzero",
+            "diagnostic": "unlisted live pointer-patch drift"
+          }
+        ]
+      }
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "miscChecksUnchangedSha256": "faa095f14d65005355089b65d4896ba06e96776413a8ec4d33b138d4fb939fe4",
+  "scratchBefore": [],
+  "scratchAfter": [],
+  "allCommandsExitZero": true,
+  "fullAuditPassed": false
+}
