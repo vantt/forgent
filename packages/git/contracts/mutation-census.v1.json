@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "252db7831d8d011fce84805f28aec27d7dd20722b295cea9f5bbb48ef8eea501",
+  "payloadDigest": "d69b92a3cc72f89af3b6c4f814bb3a5cf1f78a4b4edf4152e98573f87fa6db54",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -281,7 +281,7 @@
     "packages/event-store/rust/src/export.rs": "1fc749a9d0c86066caa0a9b75a735fd82fdc0132e7ad8aafad12f39305d367f2",
     "packages/event-store/rust/src/fence.rs": "4e3d66a595506f17e4ca550678290654add6a2d2d4ccc127bc23425a528d69a6",
     "packages/event-store/rust/src/fsio.rs": "a55012db39b1173ced4bb544de964b88e8f3db194927e5e6405100201a3ccdd8",
-    "packages/event-store/rust/src/identity.rs": "b1d86f0d5d7688acd0c95a9a5a5cbaaa962de821bc9ef08178bb21e270d253b1",
+    "packages/event-store/rust/src/identity.rs": "2d74d1ed7ad5d5e5eed918cc750aee9323fa13c33efa2257f5e9575a373ce8dc",
     "packages/event-store/rust/src/layout.rs": "5d5b80442d2ee1bb353613bbe91bb8fe78fb0961bd8f3b4343c342aacc939337",
     "packages/event-store/rust/src/legacy.rs": "acd6ea10650e7f962a3f008ba313e3f9c48fb761a96ed40d575839c3cdc68e83",
     "packages/event-store/rust/src/legacy_import.rs": "9e7f614a5e7a4d69f286a585f0dee9a3366dcb235a9466f9c9906803fb125eb1",

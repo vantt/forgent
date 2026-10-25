@@ -126,7 +126,7 @@ impl StoreIdentity {
         // lives; the recorded path is where it was created. A copy has a new inode and must never reuse the store id.
         if identity.common_dir_dev_ino != dev_ino(&layout.common_dir)? {
             return Err(moved(format!(
-                "{} is a copy of the clone that created this store (created at {}); a copy cannot reuse its store id, use a fresh clone",
+                "{} is a copy of the clone that created this store (created at {}), or was moved to another filesystem; it cannot reuse that store id, use a fresh clone",
                 layout.common_dir.display(),
                 identity.common_dir
             )));
