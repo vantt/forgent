@@ -116,7 +116,7 @@ test('a resumed run re-binds a seat that did not pass from the current config an
   assert.equal(reviewer[1].configHash, record.configSnapshot.hash);
 
   // The seat that passed is not run again and keeps its binding.
-  assert.deepEqual(attemptsOf(fx.repoRoot, resumed, 'producer/1').map(({ configHash, ...a }) => a), producerBefore);
+  assert.deepEqual(attemptsOf(fx.repoRoot, resumed, 'producer/1'), producerBefore);
   assert.deepEqual(runDirs(fx, resumed, 'producer', '1'), ['01']);
 });
 

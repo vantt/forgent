@@ -867,7 +867,8 @@ async function runUnitBody(options, scope) {
     .map(([key]) => key));
   const history = () => {
     const pending = pendingCommitKeys();
-    return readUnitRunHistory(unitDir).filter((h) => !pending.has(`${h.seat}/${h.round ?? 1}`));
+    // A seat about to be bound again on this resume is no result the pattern may stand on.
+    return readUnitRunHistory(unitDir).filter((h) => !pending.has(`${h.seat}/${h.round ?? 1}`) && !rebindKeys.has(`${h.seat}/${h.round ?? 1}`));
   };
 
   // Which executors filled which seat; `independentOf` seat ids resolve through it (see seat-ledger.mjs).
@@ -882,14 +883,18 @@ async function runUnitBody(options, scope) {
   // adopt result is still pending; a seat whose last attempt ended without a pass is bound again
   // from the current config as a new attempt.
   if (!unitRecord.bindings || typeof unitRecord.bindings !== 'object') unitRecord.bindings = {};
-  const rebindsOnResume = (attempts) => {
-    const last = attempts.at(-1);
-    return options.resumeUnitRunId !== undefined && last?.outcome !== undefined && last.outcome !== 'pass'
-      && !commitPending(last, unitRecord.worktree, mainRoot, scope.custody);
-  };
-  for (const attempts of Object.values(unitRecord.bindings)) {
+  // Read once, before this resume changes any attempt: the seats whose last attempt ended without a pass
+  // and has no commit or adopt result pending. A seat with no recorded outcome is adopted, never bound again.
+  const rebindKeys = new Set(Object.entries(unitRecord.bindings)
+    .filter(([, attempts]) => {
+      const last = attempts.at(-1);
+      return options.resumeUnitRunId !== undefined && last?.outcome !== undefined && last.outcome !== 'pass'
+        && !commitPending(last, unitRecord.worktree, mainRoot, scope.custody);
+    })
+    .map(([key]) => key));
+  for (const [key, attempts] of Object.entries(unitRecord.bindings)) {
     // A seat about to be bound again no longer holds the executor of its failed attempt.
-    if (rebindsOnResume(attempts)) continue;
+    if (rebindKeys.has(key)) continue;
     for (const attempt of attempts) seatLedger.note(attempt.seat, attempt.binding?.executor);
   }
   // Pools whose login failed in this unit and that a seat then walked away from: no later fallback
@@ -1075,7 +1080,7 @@ async function runUnitBody(options, scope) {
     const key = `${seatId}/${round}`;
     const recorded = unitRecord.bindings[key] ?? [];
     // A resumed seat whose last attempt did not pass is bound again, as the attempt after the last one.
-    const rebinding = recorded.length > 0 && rebindsOnResume(recorded);
+    const rebinding = rebindKeys.delete(key);
     let attemptNo = rebinding ? recorded.length : recorded.length > 0 ? recorded.length - 1 : 0;
     // Ledger read, bind and publish are one queued step: seats started together bind one after the other
     // in the order they were listed, each seeing the executors its earlier siblings were just given, even

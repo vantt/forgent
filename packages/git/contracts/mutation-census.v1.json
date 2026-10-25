@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b4474a623228f6d76976636677054b91430c7b48e323825838f720de6b495b42",
+  "payloadDigest": "02cf4250b0ac17001462e691753544fff05fdad80b15d38a50fa6a1338085985",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1044,7 +1044,7 @@
     "src/runner/execution/patterns/reviewed.mjs": "8e4a020e172d1dbb7195b66f0d4572fc8881d463a32405e556e9e52954e37a06",
     "src/runner/execution/patterns/role-tasks.mjs": "6df89972192146084a969ed83d56acdd25969f9eff8fa4f1a71c1a4f103bf3e9",
     "src/runner/execution/patterns/solo.mjs": "709db6262995af3a6dde9f6c6be4180ea99d01f0a8a9b2b84690382118495694",
-    "src/runner/execution/run.mjs": "2450cbca2aafbd52ffeaa84978e0e0a1633690b91d59cd11fbbe5a709555dc16",
+    "src/runner/execution/run.mjs": "9e89d78a2049638019f8e745fc834ba1d8a88e08bca92ba50cf0d1532d9c0d3c",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "6a0b9671a9ceb020be1e74d306ea2e277cb324244faf391e85feff10ee7d2eaf",
     "src/runner/execution/seat-resolver.mjs": "8206be2209610ff6db64419503175f2291ccf7b9e7e0cc5c0aeee577bf0dadf5",
@@ -3381,14 +3381,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1426,
+      "line": 1431,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1426,
+      "line": 1431,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"
