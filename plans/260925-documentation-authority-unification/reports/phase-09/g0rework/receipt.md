@@ -1,6 +1,90 @@
 # G0 content rework receipt
 
-## Current ownership-drift accounting — blocked by the frozen reader contract
+## Current authorized ownership-reader repair — scoped proofs passed
+
+Input HEAD: `c7b413de2`. Implements [L13-27](../owner-answers.md) through the existing rebind door, without rewriting ledger history. Evidence: [ownership-reader-proof.json](ownership-reader-proof.json). The earlier blocked receipts below remain historical, not current verdicts; their old script hashes still describe their recorded HEADs.
+
+Both live ownership/audit pairs now exit **0**. Each census preserves the same **23 raw binding diagnostics**, in the same order as `ownership-drift-proof.json`: **7 superseded origins + 16 identical-unit groups**, accounted **23**, unaccounted **0**. Native target duplicates remain **0**, introduced active pairs **0**. Historical replay uses the verifier's existing authoring pin `5a3f7580a012da011fc09ce88cff89bbea2b9008`; both pairs exit **0**, raw drift **0**. This is scoped proof success, not full audit/approval: native-dependent `checks.mjs` is still not run; verifier `status: partial`, `ok: false`, `fullAuditPassed: false`, `recordProofsPassed: true`.
+
+### One owning judgment, unchanged raw diagnostics
+
+Prior art reused: `594fe4194`'s existing group-aware `matches()` and exact supersession traversal, plus `98d71bef2`'s mandatory live audit execution and historical-input replay. The missing interface was authenticated group claim IDs in the check output, not a new matching mechanism.
+
+`rebind.py --check` now exposes `authenticatedIdenticalUnitGroups` with file, pointer, claim ID and binding, only after its unchanged matcher validates **every** member. Superseded-origin entries add their claim ID and original binding alongside the already authenticated effective binding. The JavaScript reader calls that command and joins its authenticated entries by exact file/claim/old-binding identity; it does not implement group or successor matching. Check exit **1** retains usable diagnostics for other claims, but the offending claim is never accounted; command errors or malformed output fail closed.
+
+The raw predicate and `targetDigestDrift` rows are unchanged. Added `accountedTargetDigestDrift` and `unaccountedTargetDigestDrift` are a complete partition of that list. The audit's only change is to require no **unaccounted** drift rather than no raw drift; both duplicate/pair checks remain intact. All other manifest fields and embedded recipes, especially `checks.mjs` and its exception list, are byte-identical. The verifier consumes this reader partition instead of independently re-judging its raw rows; it still requires both real live audit exits and `noNewDoubleOwnership: true`. Its separate exact-record predicate continues to own the 127 overlay assertions.
+
+### Current embedded script hashes
+
+SHA-256 over each embedded source's UTF-8 bytes; also emitted by `verify.py` and recorded in the new proof. Historical receipts are not repinned or rewritten.
+
+| Manifest | Script | SHA-256 |
+| --- | --- | --- |
+| round5 | `ownership.mjs` | `22f475f8bfe371ec715eb7fbabc18963f409578a8caf318184a70e7647da045f` |
+| round5 | `audit-ownership.mjs` | `384f81cdfb34c6ed214fd62438134118f30a51c1b90e102ee79ecac1ca213e33` |
+| sync4d | `ownership.mjs` | `e0f7e53f5acb5176294e10456c5fa6955cf3d6f31a9946440699d952b2a7a345` |
+| sync4d | `audit-ownership.mjs` | `c00a47df2e7fb9bd44734edac52b706df24552d120969468db7b866d35da72ac` |
+
+Both extractor/library hashes are unchanged: round5 `083795c90eac1d5601fedc2261390f15668fceed68a3053777960fea9a927dc3`; sync4d `48e153938d145bd41986b47ba816d4506db1a90c664170ee08e17bc60341ba41`.
+
+### Commands and actual exits
+
+All commands run from the repo root. `R=plans/260925-documentation-authority-unification/reports/phase-09`, `T` is the verifier's disposable tempfile under `/tmp/fgos-work/`, `D=$T/<manifest-stem>`. All Python invocations use `python3 -B`. Node has `NODE_OPTIONS=--no-addons`, with `CLAUDE_CODE_SESSION_ID` unset; the verifier additionally installs its existing throwing addon guard. Exact argv/exits and output hashes are in the proof.
+
+| Required command | Exit / result |
+| --- | --- |
+| `python3 -B "$R/g0rework/verify.py"` | **0**; all 15 nested commands below exit 0, 127 authoring and live target/ancestry assertions pass |
+| `python3 -B "$R/g0rework/refresh-carries.py" --check` | **0**; 346 parity rows, 91 live heading rows |
+| `python3 -B "$R/rebind/rebind.py" --check` | **0**; unresolved 0, authenticated origins 7, authenticated groups 16 |
+| `python3 -B "$R/g0join/join.py" --pin HEAD` | **0**; 1,929 effective rows approved by existing reviews; missing/stale/mismatched/unresolved 0; no verdict authored here |
+| `python3 -B "$R/g0rework/test-accounting.py"` | **0**; existing 12 predicate controls plus the two copied-input boundary controls below |
+| `python3 -B "$R/rebind/test_rebind.py"` | **0**; existing three owning matcher/supersession tests |
+| `git diff --check` | **0** |
+
+All 15 nested verifier commands, in order:
+
+| Command | Exit |
+| --- | --- |
+| `python3 -B "$R/rebind/rebind.py" --check` | 0 |
+| `python3 -B "$R/g0rework/refresh-carries.py" --check` | 0 |
+| `node "$R/carries/verify-carries.mjs"` | 0 |
+| `python3 -B "$T/misc-verify.py"` (existing output-only sink redirection, not an input override) | 0 |
+| `python3 -B "$R/g0rework/test-accounting.py"` | 0 |
+| round5 `node --require "$T/authoring-inputs.cjs" "$D/ownership.mjs" --output-dir "$D"` | 0 |
+| round5 `node --require "$T/authoring-inputs.cjs" "$D/audit-ownership.mjs" --output-dir "$D"` | 0 |
+| round5 `node "$D/ownership.mjs" --output-dir "$D"` (live, no input preload) | 0 |
+| round5 `node "$D/audit-ownership.mjs" --output-dir "$D"` (live) | 0 |
+| sync4d `node --require "$T/authoring-inputs.cjs" "$D/ownership.mjs" --output-dir "$D"` | 0 |
+| sync4d `node --require "$T/authoring-inputs.cjs" "$D/audit-ownership.mjs" --output-dir "$D"` | 0 |
+| sync4d `node "$D/ownership.mjs" --output-dir "$D"` (live, no input preload) | 0 |
+| sync4d `node "$D/audit-ownership.mjs" --output-dir "$D"` (live) | 0 |
+| `node scripts/check-legacy-docs-ratchet.mjs` | 0 |
+| `git diff --check` | 0 |
+
+### Negative controls: actual copied inputs, not mocked matching
+
+Extended the existing `test-accounting.py` owning proof. Each case copies the decision shards, checker, shared binding traversal, adapter, registry and manifests into a `tempfile.TemporaryDirectory` under `/tmp/fgos-work/`; unchanged documents/modules are read-only references. Only copied JSON is mutated, with the actual Python check and both embedded JavaScript pairs run from that fixture root. The new boundary cases observe the reader/check integration; they do not duplicate the existing matcher's per-field cases.
+
+- **Stale digest without successor:** `s4-packaging-distribution-successors.json#/registryGaps/22`, `claim_40aafcee52b22eda087c5f85eacb9392`. Replace only its digest with 64 zeros after confirming it has no effective successor and originally matches live bytes. Both readers retain 24 raw rows, account 23, and leave precisely this one unaccounted.
+- **One non-matching group member:** `s9-runner-01.json#/registryGaps/2`, `claim_004b47fc284721eff96cfa890f85aac0`. Replace only the last member's digest with 64 zeros, keeping the common digest and other seven members unchanged. Both readers retain 23 raw rows, account 22, and leave precisely this group unaccounted. The checker does not publish its claim in either authenticated list.
+
+Each case executes all five commands below (ten child command results total, including six expected failures). `C` is its copied fixture root, `D=$C/<manifest-stem>`:
+
+| Fixture command (each case) | Expected and actual exit |
+| --- | --- |
+| `python3 -B "$C/$R/rebind/rebind.py" --check` (fixture cwd; relative path in exact argv) | **1** |
+| round5 `node "$D/ownership.mjs" --output-dir "$D"` | **0** |
+| round5 `node "$D/audit-ownership.mjs" --output-dir "$D"` | **1**; `assert(current.noNewDoubleOwnership)` |
+| sync4d `node "$D/ownership.mjs" --output-dir "$D"` | **0** |
+| sync4d `node "$D/audit-ownership.mjs" --output-dir "$D"` | **1**; same assertion |
+
+Both cases preserve zero native duplicates and zero introduced active pairs. The harness exits **0** only after observing the required failures. No assertion or exception list is waived to achieve green.
+
+Safety: **17,707 protected tracked files** outside the exact writable scope fingerprint identically before/after proofs; `.fgos/` is excluded without reading it. Only the authorized two manifest reader pairs, rebind check output, verifier, its owning proof and `g0rework` evidence/receipt change. No docs, ledger, registry, review, pair accounting, Git write, fgOS CLI, native addon, forbidden audit driver or product/full-suite test ran. `impact-analysis: degraded` because no MCP is available and fgOS CLI is prohibited; direct callers and history were checked. Markdown preview is not started because extra service/state writes are forbidden. Final `python3 -B` stdin validation exits **0** (Python ASTs, evidence JSON, exact script hashes, all required/nested exits and expected negative failures); final `git diff --check` exits **0**. All owned scratch was removed and `/tmp/fgos-work/` is empty, recorded as `scratchRemoved: true` and `scratchRemaining: []` in the proof.
+
+Operational attempts are not passing proofs: initial tempfile preparation exited **1** because the permitted scratch parent did not exist; it was created and preparation retried. The first verifier capture hit its **300-second tool deadline** before returning a verifier exit; its orphaned scratch was removed. The complete serial retry ran in **330.7 seconds**, exited **0**, and supplied the evidence above. No failed or timed-out attempt is counted as a successful replay.
+
+## Historical ownership-drift accounting — blocked by the frozen reader contract
 
 Input HEAD: `95432dbd807991c76a8cef383c50674da9f0e2e7`. **All 23 diagnostics are explained; the requested all-green proof set is impossible within the exact writable scope.** Both live ownership censuses exit **0** and emit the same 23 rows; both unchanged live audit scripts exit **1** at `assert(current.noNewDoubleOwnership)`. The verifier now propagates those failures instead of treating a passing authoring-pin replay as live audit success.
 

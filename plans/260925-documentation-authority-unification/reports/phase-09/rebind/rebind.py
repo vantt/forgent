@@ -197,14 +197,20 @@ def main():
             ef, ep, current = effective(file, pointer, row, docs, links)
             units = cat.get(current['targetOwner'], {}).get('units', [])
             if (ef, ep) != (file, pointer) and matches(current, units):
-                superseded.append(dict(file=file, pointer=pointer,
+                superseded.append(dict(file=file, pointer=pointer, claimId=row['claimId'],
+                                       originBinding=payload(row),
                                        effectiveFile=ef, effectivePointer=ep,
                                        binding=payload(current)))
             else:
                 unresolved.append((file, pointer, row))
+        groups = [dict(file=f, pointer=p, claimId=r['claimId'], binding=payload(r))
+                  for f, p, r in rows if r.get('targetAnchor') is None and
+                  r.get('successorGroup') and
+                  matches(r, cat.get(r['targetOwner'], {}).get('units', []))]
         print(json.dumps(dict(drift=len(unresolved), rows=[dict(file=f, pointer=p,
               claimId=r['claimId'], before=payload(r), effectiveFile=effective(f,p,r,docs,links)[0])
-              for f,p,r in unresolved], authenticatedSupersededOrigins=superseded),
+              for f,p,r in unresolved], authenticatedSupersededOrigins=superseded,
+              authenticatedIdenticalUnitGroups=groups),
               ensure_ascii=False, indent=2))
         return int(bool(unresolved))
     histories = {file: history(file, [r for _, _, r in drift if r['targetOwner'] == file])

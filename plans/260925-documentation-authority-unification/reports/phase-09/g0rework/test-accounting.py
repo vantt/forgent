@@ -7,9 +7,12 @@ Run from the repository root with python3 -B; extractors own disposable scratch.
 """
 import copy
 import json
+import os
 from pathlib import Path
 import runpy
+import shutil
 import subprocess
+import tempfile
 
 
 HERE = Path('plans/260925-documentation-authority-unification/reports/phase-09/g0rework')
@@ -63,7 +66,88 @@ def main():
         results.append(dict(behavior='unrecorded new live digest is refused', refused=True))
     else:
         raise AssertionError('unrecorded new live digest was accepted')
-    print(json.dumps(dict(status='pass', controls=results), indent=2))
+    # The predicate controls above own exact-record acceptance. These boundary
+    # controls uniquely prove both embedded readers refuse real unaccounted rows
+    # through the Python check door, with all fixture mutations confined to /tmp.
+    root = Path.cwd()
+    plan = HERE.parents[2]
+    docs = rebind['documents']()
+    links = rebind['supersessions'](docs)
+    direct = rebind['direct_rows'](docs)
+    stale = next((f, p, r) for f, p, r in direct
+                 if r.get('targetAnchor') and r.get('targetUnitDigest') and
+                 rebind['effective'](f, p, r, docs, links)[:2] == (f, p) and
+                 rebind['matches'](r, catalog.get(r['targetOwner'], {}).get('units', [])))
+    group = next((f, p, r) for f, p, r in direct if r.get('successorGroup') and
+                 rebind['effective'](f, p, r, docs, links)[:2] == (f, p))
+    env = dict(os.environ, NODE_OPTIONS='--no-addons', PYTHONDONTWRITEBYTECODE='1')
+    env.pop('CLAUDE_CODE_SESSION_ID', None)
+    with tempfile.TemporaryDirectory(prefix='ownership-controls-', dir='/tmp/fgos-work') as name:
+        for label, (file, pointer, row) in [('stale digest without successor', stale),
+                                          ('one non-matching group member', group)]:
+            fixture = Path(name) / ('stale' if row is stale[2] else 'group')
+            fixture.mkdir()
+            # All mutable inputs and the checker are copies. Unmodified source
+            # modules and document bytes are read-only references, not fixtures.
+            for folder in ('docs', 'scripts'):
+                (fixture / folder).symlink_to(root / folder, target_is_directory=True)
+            for folder in ('ledger/decisions', 'pilot/decisions'):
+                shutil.copytree(plan / folder, fixture / plan / folder)
+            for relative in [plan / 'reports/phase-09/rebind/rebind.py',
+                             plan / 'reports/phase-09/ledgerfix/bindings.py',
+                             plan / 'reports/phase-09/g0fix/extract-units.mjs',
+                             plan / 'reports/phase-06/working-identity-registry.json',
+                             plan / 'reports/phase-06/step10-sync287-target-ownership.json',
+                             plan / 'reports/phase-06/step10-round5-target-ownership.json',
+                             *[plan / 'reports/phase-06' / (s + '-reproduction.json')
+                               for s in ('step10-round5', 'step10-sync4d')]]:
+                dest = fixture / relative
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(relative, dest)
+            changed = copy.deepcopy(docs[file])
+            mutant = rebind['at'](changed, pointer)
+            if row is stale[2]:
+                mutant['targetUnitDigest'] = '0' * 64
+            else:
+                mutant['successorGroup']['members'][-1]['unitDigest'] = '0' * 64
+            (fixture / file).write_text(json.dumps(changed, ensure_ascii=False, indent=2) + '\n')
+            commands = []
+            def run(argv):
+                proc = subprocess.run(argv, cwd=fixture, env=env, text=True, capture_output=True)
+                commands.append(dict(argv=argv, exit=proc.returncode,
+                                     stdout=proc.stdout, stderr=proc.stderr))
+                return proc
+            checked = run(['python3', '-B', str(plan / 'reports/phase-09/rebind/rebind.py'), '--check'])
+            assert checked.returncode == 1, checked.stderr
+            result = json.loads(checked.stdout)
+            assert any(r['file'] == file and r['pointer'] == pointer for r in result['rows'])
+            assert not any(r['file'] == file and r['pointer'] == pointer for key in
+                           ('authenticatedSupersededOrigins', 'authenticatedIdenticalUnitGroups')
+                           for r in result[key])
+            audits = []
+            for stem, key, library in [('step10-round5', 'scripts', 'step10-sync287-lib.mjs'),
+                                       ('step10-sync4d', 'readOnlyScripts', 'lib.mjs')]:
+                scripts = json.loads((fixture / plan / 'reports/phase-06' /
+                                      (stem + '-reproduction.json')).read_text())[key]
+                output = fixture / stem
+                output.mkdir()
+                for script in (library, 'ownership.mjs', 'audit-ownership.mjs'):
+                    (output / script).write_text(scripts[script])
+                own = run(['node', str(output / 'ownership.mjs'), '--output-dir', str(output)])
+                audit = run(['node', str(output / 'audit-ownership.mjs'), '--output-dir', str(output)])
+                assert own.returncode == 0, own.stderr
+                assert audit.returncode == 1 and 'assert(current.noNewDoubleOwnership)' in audit.stderr, audit.stderr
+                census = json.loads((output / (stem + '-target-ownership.json')).read_text())
+                assert census['noNewDoubleOwnership'] is False
+                assert [r['claimId'] for r in census['unaccountedTargetDigestDrift']] == [row['claimId']]
+                assert any(r['claimId'] == row['claimId'] for r in census['targetDigestDrift'])
+                assert census['nativePlatformTargetIdentityDuplicates'] == 0
+                assert census['newActiveSourcePairCollisions'] == []
+                audits.append(dict(manifest=stem, raw=len(census['targetDigestDrift']),
+                                   accounted=len(census['accountedTargetDigestDrift']), unaccounted=1))
+            results.append(dict(behavior=label, refused=True, file=file, pointer=pointer,
+                                claimId=row['claimId'], audits=audits, commands=commands))
+    print(json.dumps(dict(status='pass', controls=results, scratchRemoved=True), indent=2))
 
 
 if __name__ == '__main__':

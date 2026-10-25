@@ -5,8 +5,9 @@ Run from the repo root with python3 -B. Prints JSON, writes no repository file.
 Authoring assertions replay at the receipt's authoring commit. Live target drift
 must have an exact old/new recorded rebind; the shared rebind check owns current
 ledger correctness. Both frozen ownership/audit pairs must also pass against live
-inputs; historical replay and accounted diagnostics never waive a live failure.
-Frozen ownership recipes/extractors are unchanged. The misc
+inputs; historical replay never waives a live failure. The ownership reader
+keeps raw diagnostics and delegates accounting to rebind.py --check (L13-27).
+The embedded extractors remain unchanged. The misc
 verifier's sole repository report sink is redirected before the write, since its path is not in
 this assignment's writable list. The original checks.json is never rewritten.
 Only the embedded ownership recipes run, never phase-08/audit-report.py.
@@ -141,7 +142,7 @@ def main():
 
         run('live rebind accounting negative controls', ['python3', '-B', str(HERE / 'test-accounting.py')])
 
-        # Pin only input reads, never the frozen recipe, imports or output sink.
+        # Pin only input reads, never the recipe, imports or output sink.
         # git show supplies immutable bytes without a checkout or Git write.
         pinned = tmp / 'authoring-inputs.cjs'
         pinned.write_text("const fs=require('node:fs'),path=require('node:path'),{execFileSync:exec}=require('node:child_process');\n"
@@ -164,7 +165,7 @@ def main():
                       if r.get('targetOwner') and r.get('targetUnitDigest')}
         live_catalog = rebind['extract'](dict(paths=sorted(live_paths)))['catalog']
 
-        # Reuse the frozen ownership recipes verbatim, without invoking the
+        # Reuse the embedded ownership recipes verbatim, without invoking the
         # prohibited audit driver or even materializing native-dependent checks.
         report['ownershipAudits'] = []
         for stem, key in [('step10-round5', 'scripts'), ('step10-sync4d', 'readOnlyScripts')]:
@@ -175,6 +176,8 @@ def main():
             library = 'step10-sync287-lib.mjs' if stem == 'step10-round5' else 'lib.mjs'
             for name in [library, 'ownership.mjs', 'audit-ownership.mjs']:
                 (dest / name).write_text(scripts[name])
+            script_hashes = {name: hashlib.sha256(scripts[name].encode()).hexdigest()
+                             for name in [library, 'ownership.mjs', 'audit-ownership.mjs']}
             outcomes = []
             for name in ['ownership.mjs', 'audit-ownership.mjs']:
                 proc = run(stem + '/' + name + ' (authoring pin)',
@@ -190,12 +193,15 @@ def main():
                            ['node', str(dest / name), '--output-dir', str(dest)])
                 live_outcomes.append(dict(script=name, exit=proc.returncode))
             live = json.loads((dest / (stem + '-target-ownership.json')).read_text())
-            accounted = [dict(row=row, rebind=account_target(row, live_catalog, records, rebind['matches']))
-                         for row in live['targetDigestDrift']]
+            accounted = live['accountedTargetDigestDrift']
+            unaccounted = live['unaccountedTargetDigestDrift']
+            assert collections.Counter(map(json.dumps, live['targetDigestDrift'])) == collections.Counter(
+                map(json.dumps, accounted + unaccounted)), ('drift partition', stem)
             report.setdefault('liveOwnershipTargets', []).append(dict(manifest=str(manifest),
-                rawDrift=live['targetDigestDrift'], accounted=accounted, unaccounted=[]))
-            report['ownershipAudits'].append(dict(manifest=str(manifest), commands=outcomes,
-                liveCommands=live_outcomes, liveFailingRows=live['targetDigestDrift'],
+                rawDrift=live['targetDigestDrift'], accounted=accounted, unaccounted=unaccounted))
+            report['ownershipAudits'].append(dict(manifest=str(manifest), scriptHashes=script_hashes,
+                commands=outcomes, liveCommands=live_outcomes, liveRawDrift=live['targetDigestDrift'],
+                liveFailingRows=unaccounted,
                 liveOwnership={k: live.get(k) for k in [
                     'noNewDoubleOwnership', 'nativePlatformTargetIdentityDuplicates', 'newActiveSourcePairCollisions']},
                 failingRows=own['targetDigestDrift'], ownership={k: own.get(k) for k in [
@@ -204,6 +210,7 @@ def main():
                 checksReason='checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment.'))
         report['assertions']['liveOwnershipPassed'] = all(
             all(c['exit'] == 0 for c in m['liveCommands']) and not m['liveFailingRows']
+            and m['liveOwnership']['noNewDoubleOwnership'] is True
             for m in report['ownershipAudits'])
         report['assertions']['ownershipPassed'] = report['assertions']['liveOwnershipPassed'] and all(
             c['exit'] == 0 for m in report['ownershipAudits'] for c in m['commands'])

@@ -1,0 +1,1633 @@
+{
+  "head": "c7b413de2f38794eb9e91175f8488c5b56a54ab4",
+  "authoringPin": "5a3f7580a012da011fc09ce88cff89bbea2b9008",
+  "evidenceReduction": "Full verifier stdout hashed as UTF-8; long nested stdout replaced by its SHA-256 and byte count. Raw bindings retain file, collection, claim id and full target binding, in original order; repetitive row rationale/review metadata omitted here only, never from reader output. Historical evidence is retained at its original HEAD, not rewritten with new script hashes.",
+  "requiredCommands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py"
+      ],
+      "exit": 0,
+      "seconds": 330.6849410533905,
+      "stdoutSha256": "d0c6757f01f095e80d3fbcde6dd26f85e9425508528d0efa3f51bef52d1b2337",
+      "stdoutBytes": 7716119,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py",
+        "--check"
+      ],
+      "exit": 0,
+      "seconds": 3.481549024581909,
+      "stdoutSha256": "9de515d28aed5879e94045524394ed36485098ee9afb1141ed04b7197e01af84",
+      "stdout": "{\"status\": \"pass\", \"mode\": \"check\", \"parityRows\": 346, \"liveHeadingRows\": 91, \"refreshedParityRows\": 35, \"targetOnlyParityRows\": 62, \"refreshedCandidateBindings\": 25}\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutSha256": "a291390e1442285d59703b8abe4700d7a0be403b72bfc8521f8f4eff66db576e",
+      "stdoutBytes": 25910,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0join/join.py",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 0,
+      "seconds": 22.66796875,
+      "stdoutSha256": "de595022cb7f610ff9e2bb925ff5be8055dcf40b5c45d736534a414e3bf1d691",
+      "stdoutBytes": 4011545,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    }
+  ],
+  "nestedVerifierCommands": [
+    {
+      "label": "rebind/rebind.py --check",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutSha256": "a291390e1442285d59703b8abe4700d7a0be403b72bfc8521f8f4eff66db576e",
+      "stdoutBytes": 25910,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "carries accounting deterministic replay",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutSha256": "9de515d28aed5879e94045524394ed36485098ee9afb1141ed04b7197e01af84",
+      "stdout": "{\"status\": \"pass\", \"mode\": \"check\", \"parityRows\": 346, \"liveHeadingRows\": 91, \"refreshedParityRows\": 35, \"targetOnlyParityRows\": 62, \"refreshedCandidateBindings\": 25}\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "carries/verify-carries.mjs",
+      "argv": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+      ],
+      "exit": 0,
+      "stdoutSha256": "c8106e77dd2b88201c7ce74970dc0489c933a8cb1470836ff9582bd988449486",
+      "stdout": "{\n  \"status\": \"pass\",\n  \"claims\": 44,\n  \"candidateUnits\": 1009,\n  \"refreshedDecisions\": 121,\n  \"droppedClaims\": 17,\n  \"pointerFiles\": 24,\n  \"currentSourceUnits\": 346,\n  \"historicalHeadingWitnesses\": 91,\n  \"liveHeadingRows\": 91,\n  \"liveSectionBlocks\": 321,\n  \"livePointerPatchDrift\": [\n    {\n      \"path\": \"bin/fgos.mjs\",\n      \"beforeSha256\": \"4ad9ed0cb07518ae19774ddcf058d78484b53de25b850ae641b7b53011010d5f\",\n      \"liveSha256\": \"1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e\",\n      \"finalPinDuty\": {\n        \"path\": \"bin/fgos.mjs\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    },\n    {\n      \"path\": \"docs/backlog.md\",\n      \"beforeSha256\": \"344552da9931e8c5ca9f946e49e0a25c40ff42b61dbf6d99c73310d5e14b7c33\",\n      \"liveSha256\": \"d0fb356de66a0bdfffac2f9835678bd4001d68779003c381e34a4f2bc9e49306\",\n      \"finalPinDuty\": {\n        \"path\": \"docs/backlog.md\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    }\n  ],\n  \"finalPinDuties\": {\n    \"version\": 1,\n    \"pointerPatchDrift\": [\n      {\n        \"path\": \"bin/fgos.mjs\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      },\n      {\n        \"path\": \"docs/backlog.md\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    ]\n  },\n  \"witnessPin\": \"f534aeaea59ebdc39613aab02c109dbd30fd36b8\",\n  \"currentLedgerSuccessors\": {\n    \"status\": \"pass\",\n    \"origins\": 1208,\n    \"currentBindings\": 1208\n  },\n  \"sourceParityQualification\": \"Current rows require exact source anchor/digest and normalized full-source inclusion at a named current target. Split/adapted rows also check target digests; explicit zero-fuzz adaptations are not false equality. Original heading census, placement and unapplied patch witnesses replay at witnessPin. Live heading census, direct-section block coverage and pointer-patch drift also check working-tree bytes; only explicitly listed final-pin duties permit drift. Patch recomposition and authority/cutover acceptance are not certified.\",\n  \"reviewStatus\": \"pending; no gate accepted\"\n}\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "misc-fix/verify.py (only checks.json output sink redirected)",
+      "argv": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/misc-verify.py"
+      ],
+      "exit": 0,
+      "stdoutSha256": "ce0b56db3637fe154f9ee2aebf106faf50095d9c0cc5bcad916eee3dc953360a",
+      "stdout": "{\"byteIdenticalArtifacts\": 4, \"counts\": {\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 137, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 623, \"preserve-operand-reachability-unchanged\": 1394, \"preserve-source-confirmed-history\": 2926, \"repoint-proposal\": 6}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}, \"doctorCheckSplit\": {\"literal\": 136, \"loopIds\": [\"git-worktree-recovery\", \"git-component-compatible\", \"git-repository-config\", \"git-operation-journal\", \"git-native-locks\"], \"loopRegistered\": 5}, \"registrations\": {\"Check\": 141, \"Fix\": 32}, \"status\": \"scoped-replay-passed-not-gate-acceptance\"}\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "live rebind accounting negative controls",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/test-accounting.py"
+      ],
+      "exit": 0,
+      "stdoutSha256": "2fe5152c6b040668e41cda23501e19bd6e83497ac2c6021637b86fc7ddb9bb2f",
+      "stdoutBytes": 64174,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "step10-round5/ownership.mjs (authoring pin)",
+      "argv": [
+        "node",
+        "--require",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/authoring-inputs.cjs",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-round5/ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-round5"
+      ],
+      "exit": 0,
+      "stdoutSha256": "c68f654c46027069a8b248e93498b50c75fb4ecd6f689a66e41cf2eb42b68233",
+      "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 0 }\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "step10-round5/audit-ownership.mjs (authoring pin)",
+      "argv": [
+        "node",
+        "--require",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/authoring-inputs.cjs",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-round5/audit-ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-round5"
+      ],
+      "exit": 0,
+      "stdoutSha256": "9c43cbfcb67641910e5d71ac5ee841108d6249d7d6a960b586761db05ee4d5e4",
+      "stdout": "{\n  collisions: 272,\n  newGapGroups: 31,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "step10-round5/ownership.mjs (live targets)",
+      "argv": [
+        "node",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-round5/ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-round5"
+      ],
+      "exit": 0,
+      "stdoutSha256": "45cd3ae7644d82d6d80895a46bec928b5baa30ae10f134cf385f3c1dc353df28",
+      "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 23 }\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "step10-round5/audit-ownership.mjs (live targets)",
+      "argv": [
+        "node",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-round5/audit-ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-round5"
+      ],
+      "exit": 0,
+      "stdoutSha256": "fb346f73f50c40bbc9d79c7d7c61ffca027624932d4e1c1d7d65f2aad80ef253",
+      "stdout": "{\n  collisions: 272,\n  newGapGroups: 31,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 23,\n  ok: true\n}\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "step10-sync4d/ownership.mjs (authoring pin)",
+      "argv": [
+        "node",
+        "--require",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/authoring-inputs.cjs",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-sync4d/ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-sync4d"
+      ],
+      "exit": 0,
+      "stdoutSha256": "c68f654c46027069a8b248e93498b50c75fb4ecd6f689a66e41cf2eb42b68233",
+      "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 0 }\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "step10-sync4d/audit-ownership.mjs (authoring pin)",
+      "argv": [
+        "node",
+        "--require",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/authoring-inputs.cjs",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-sync4d/audit-ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-sync4d"
+      ],
+      "exit": 0,
+      "stdoutSha256": "9c43cbfcb67641910e5d71ac5ee841108d6249d7d6a960b586761db05ee4d5e4",
+      "stdout": "{\n  collisions: 272,\n  newGapGroups: 31,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "step10-sync4d/ownership.mjs (live targets)",
+      "argv": [
+        "node",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-sync4d/ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-sync4d"
+      ],
+      "exit": 0,
+      "stdoutSha256": "45cd3ae7644d82d6d80895a46bec928b5baa30ae10f134cf385f3c1dc353df28",
+      "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 23 }\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "step10-sync4d/audit-ownership.mjs (live targets)",
+      "argv": [
+        "node",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-sync4d/audit-ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/g0rework-verify-k2w8xgvq/step10-sync4d"
+      ],
+      "exit": 0,
+      "stdoutSha256": "fb346f73f50c40bbc9d79c7d7c61ffca027624932d4e1c1d7d65f2aad80ef253",
+      "stdout": "{\n  collisions: 272,\n  newGapGroups: 31,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 23,\n  ok: true\n}\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "legacy docs ratchet",
+      "argv": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exit": 0,
+      "stdoutSha256": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319",
+      "stdout": "check-legacy-docs-ratchet: clean (997 legacy files checked; 28 accounted edit(s), 3 accounted new file(s)).\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "label": "whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    }
+  ],
+  "existingRebindTests": {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/rebind/test_rebind.py"
+    ],
+    "exit": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "",
+    "stderrSha256": "199ba496f288116d36c62f29346d4fbf0bd75745a1c893abfcbdaa4c6d5b1033",
+    "stderr": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.002s\n\nOK\n"
+  },
+  "ownershipAudits": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "scriptHashes": {
+        "step10-sync287-lib.mjs": "083795c90eac1d5601fedc2261390f15668fceed68a3053777960fea9a927dc3",
+        "ownership.mjs": "22f475f8bfe371ec715eb7fbabc18963f409578a8caf318184a70e7647da045f",
+        "audit-ownership.mjs": "384f81cdfb34c6ed214fd62438134118f30a51c1b90e102ee79ecac1ca213e33"
+      },
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        }
+      ],
+      "liveCommands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        }
+      ],
+      "liveFailingRows": [],
+      "liveOwnership": {
+        "noNewDoubleOwnership": true,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      },
+      "failingRows": [],
+      "ownership": {
+        "noNewDoubleOwnership": true,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      },
+      "checksOk": null,
+      "checksStatus": "not-run",
+      "checksReason": "checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment.",
+      "liveRawDrift": [
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+          "collection": "claims",
+          "claimId": "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+          "targetOwner": "docs/platform/work-state/spec.md",
+          "targetAnchor": "3-work-item-data-dictionary",
+          "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+          "collection": "claims",
+          "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+          "targetOwner": "docs/platform/work-state/spec.md",
+          "targetAnchor": "unheaded-block-4",
+          "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+          "collection": "claims",
+          "claimId": "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
+          "targetOwner": "docs/platform/work-state/spec.md",
+          "targetAnchor": "6-domain-model",
+          "targetUnitDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+          "collection": "claims",
+          "claimId": "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
+          "targetOwner": "docs/platform/work-state/spec.md",
+          "targetAnchor": "unheaded-block-54",
+          "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+          "collection": "claims",
+          "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+          "targetOwner": "docs/platform/work-state/spec.md",
+          "targetAnchor": "11-business-rules",
+          "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+          "collection": "claims",
+          "claimId": "claim_96e947d6daf7dd7612cc711be8e3e22e",
+          "targetOwner": "docs/platform/component-boundary.md",
+          "targetAnchor": "9-hexagonal-architecture-view",
+          "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+          "collection": "claims",
+          "claimId": "claim_4e86e8414c4e3b780e81f77255853447",
+          "targetOwner": "docs/platform/component-boundary.md",
+          "targetAnchor": "unheaded-block-70",
+          "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_69311391fbb9b1cf924197e6063e5cad",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_cad110bd532badff055f69c0a236644a",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_33c41de79cf4a52288035a9656c09735",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        }
+      ],
+      "accountedClaimIds": [
+        "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+        "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+        "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
+        "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
+        "claim_477a30f4902261e390c34ab888145dcd",
+        "claim_96e947d6daf7dd7612cc711be8e3e22e",
+        "claim_4e86e8414c4e3b780e81f77255853447",
+        "claim_004b47fc284721eff96cfa890f85aac0",
+        "claim_69311391fbb9b1cf924197e6063e5cad",
+        "claim_c1d4ad0697013185af2572dd0a944024",
+        "claim_79fd838ebf7eb7bbaa72efa619535671",
+        "claim_99f595d515a3a60d4796192d78e67eae",
+        "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+        "claim_b3960a6316827da8f49bc10a9221b4c5",
+        "claim_2afd573c3c2205adb49a698535fbf864",
+        "claim_298fc2ef185e234bd4b65f047f70ecec",
+        "claim_09dd63bd1aaf9b4b6078de434144efb0",
+        "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+        "claim_cad110bd532badff055f69c0a236644a",
+        "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+        "claim_b2afbadf035b6374ed73289b388f5d20",
+        "claim_33c41de79cf4a52288035a9656c09735",
+        "claim_fa95d7f496a850ef197d25f18ad6f760"
+      ],
+      "rawBindingDiagnosticsUnchanged": true
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "scriptHashes": {
+        "lib.mjs": "48e153938d145bd41986b47ba816d4506db1a90c664170ee08e17bc60341ba41",
+        "ownership.mjs": "e0f7e53f5acb5176294e10456c5fa6955cf3d6f31a9946440699d952b2a7a345",
+        "audit-ownership.mjs": "c00a47df2e7fb9bd44734edac52b706df24552d120969468db7b866d35da72ac"
+      },
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        }
+      ],
+      "liveCommands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        }
+      ],
+      "liveFailingRows": [],
+      "liveOwnership": {
+        "noNewDoubleOwnership": true,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      },
+      "failingRows": [],
+      "ownership": {
+        "noNewDoubleOwnership": true,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      },
+      "checksOk": null,
+      "checksStatus": "not-run",
+      "checksReason": "checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment.",
+      "liveRawDrift": [
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+          "collection": "claims",
+          "claimId": "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+          "targetOwner": "docs/platform/work-state/spec.md",
+          "targetAnchor": "3-work-item-data-dictionary",
+          "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+          "collection": "claims",
+          "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+          "targetOwner": "docs/platform/work-state/spec.md",
+          "targetAnchor": "unheaded-block-4",
+          "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+          "collection": "claims",
+          "claimId": "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
+          "targetOwner": "docs/platform/work-state/spec.md",
+          "targetAnchor": "6-domain-model",
+          "targetUnitDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+          "collection": "claims",
+          "claimId": "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
+          "targetOwner": "docs/platform/work-state/spec.md",
+          "targetAnchor": "unheaded-block-54",
+          "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+          "collection": "claims",
+          "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+          "targetOwner": "docs/platform/work-state/spec.md",
+          "targetAnchor": "11-business-rules",
+          "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+          "collection": "claims",
+          "claimId": "claim_96e947d6daf7dd7612cc711be8e3e22e",
+          "targetOwner": "docs/platform/component-boundary.md",
+          "targetAnchor": "9-hexagonal-architecture-view",
+          "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+          "collection": "claims",
+          "claimId": "claim_4e86e8414c4e3b780e81f77255853447",
+          "targetOwner": "docs/platform/component-boundary.md",
+          "targetAnchor": "unheaded-block-70",
+          "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_69311391fbb9b1cf924197e6063e5cad",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_cad110bd532badff055f69c0a236644a",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_33c41de79cf4a52288035a9656c09735",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "collection": "registryGaps",
+          "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": null,
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        }
+      ],
+      "accountedClaimIds": [
+        "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+        "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+        "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
+        "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
+        "claim_477a30f4902261e390c34ab888145dcd",
+        "claim_96e947d6daf7dd7612cc711be8e3e22e",
+        "claim_4e86e8414c4e3b780e81f77255853447",
+        "claim_004b47fc284721eff96cfa890f85aac0",
+        "claim_69311391fbb9b1cf924197e6063e5cad",
+        "claim_c1d4ad0697013185af2572dd0a944024",
+        "claim_79fd838ebf7eb7bbaa72efa619535671",
+        "claim_99f595d515a3a60d4796192d78e67eae",
+        "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+        "claim_b3960a6316827da8f49bc10a9221b4c5",
+        "claim_2afd573c3c2205adb49a698535fbf864",
+        "claim_298fc2ef185e234bd4b65f047f70ecec",
+        "claim_09dd63bd1aaf9b4b6078de434144efb0",
+        "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+        "claim_cad110bd532badff055f69c0a236644a",
+        "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+        "claim_b2afbadf035b6374ed73289b388f5d20",
+        "claim_33c41de79cf4a52288035a9656c09735",
+        "claim_fa95d7f496a850ef197d25f18ad6f760"
+      ],
+      "rawBindingDiagnosticsUnchanged": true
+    }
+  ],
+  "authenticatedSupersededOrigins": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "pointer": "/claims/57",
+      "claimId": "claim_96e947d6daf7dd7612cc711be8e3e22e",
+      "originBinding": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory"
+        ]
+      },
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "effectivePointer": "/bindingRefresh/604",
+      "binding": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "pointer": "/claims/64",
+      "claimId": "claim_4e86e8414c4e3b780e81f77255853447",
+      "originBinding": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "effectivePointer": "/bindingRefresh/611",
+      "binding": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/0",
+      "claimId": "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+      "originBinding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "3-work-item-data-dictionary",
+        "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+        "targetAncestry": [
+          "Work State Specification",
+          "3. Work Item Data Dictionary"
+        ]
+      },
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/49",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "3-work-item-data-dictionary",
+        "targetUnitDigest": "38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b",
+        "targetAncestry": [
+          "Work State Specification",
+          "3. Work Item Data Dictionary"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/1",
+      "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+      "originBinding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
+        "targetAncestry": [
+          "Work State Specification",
+          "3. Work Item Data Dictionary"
+        ]
+      },
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/50",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817",
+        "targetAncestry": [
+          "Work State Specification",
+          "3. Work Item Data Dictionary"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/55",
+      "claimId": "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
+      "originBinding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "6-domain-model",
+        "targetUnitDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
+        "targetAncestry": [
+          "Work State Specification"
+        ]
+      },
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/127",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "6-domain-model",
+        "targetUnitDigest": "6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603",
+        "targetAncestry": [
+          "Work State Specification",
+          "6. Domain Model"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/65",
+      "claimId": "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
+      "originBinding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-54",
+        "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+        "targetAncestry": [
+          "Work State Specification",
+          "6. Domain Model"
+        ]
+      },
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/128",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-54",
+        "targetUnitDigest": "c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7",
+        "targetAncestry": [
+          "Work State Specification",
+          "6. Domain Model"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/7",
+      "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+      "originBinding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "11-business-rules",
+        "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc",
+        "targetAncestry": [
+          "Work State Specification",
+          "11. Business Rules"
+        ]
+      },
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/117",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "11-business-rules",
+        "targetUnitDigest": "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41",
+        "targetAncestry": [
+          "Work State Specification",
+          "11. Business Rules"
+        ]
+      }
+    }
+  ],
+  "authenticatedIdenticalUnitGroups": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/2",
+      "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/4",
+      "claimId": "claim_69311391fbb9b1cf924197e6063e5cad",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/5",
+      "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/6",
+      "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/7",
+      "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/8",
+      "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/9",
+      "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/10",
+      "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/11",
+      "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/12",
+      "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/13",
+      "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/14",
+      "claimId": "claim_cad110bd532badff055f69c0a236644a",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/15",
+      "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/16",
+      "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/17",
+      "claimId": "claim_33c41de79cf4a52288035a9656c09735",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/18",
+      "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
+      "binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null,
+        "successorGroupMemberDigests": [
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+        ]
+      }
+    }
+  ],
+  "negativeControls": {
+    "status": "pass",
+    "controls": [
+      {
+        "behavior": "g0-direct-rebindings.json: exact recorded transition and unchanged live target pass"
+      },
+      {
+        "behavior": "g0-rework-rebindings.json: exact recorded transition and unchanged live target pass"
+      },
+      {
+        "behavior": "unaccounted drift is refused",
+        "expected": "AssertionError",
+        "refused": true
+      },
+      {
+        "behavior": "before wrong targetOwner is refused",
+        "expected": "AssertionError",
+        "refused": true
+      },
+      {
+        "behavior": "before wrong targetAnchor is refused",
+        "expected": "AssertionError",
+        "refused": true
+      },
+      {
+        "behavior": "before wrong targetUnitDigest is refused",
+        "expected": "AssertionError",
+        "refused": true
+      },
+      {
+        "behavior": "after wrong targetOwner is refused",
+        "expected": "AssertionError",
+        "refused": true
+      },
+      {
+        "behavior": "after wrong targetAnchor is refused",
+        "expected": "AssertionError",
+        "refused": true
+      },
+      {
+        "behavior": "after wrong targetUnitDigest is refused",
+        "expected": "AssertionError",
+        "refused": true
+      },
+      {
+        "behavior": "before digest prefix is refused",
+        "expected": "AssertionError",
+        "refused": true
+      },
+      {
+        "behavior": "after digest prefix is refused",
+        "expected": "AssertionError",
+        "refused": true
+      },
+      {
+        "behavior": "unrecorded new live digest is refused",
+        "refused": true
+      },
+      {
+        "behavior": "stale digest without successor",
+        "refused": true,
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+        "pointer": "/registryGaps/22",
+        "claimId": "claim_40aafcee52b22eda087c5f85eacb9392",
+        "audits": [
+          {
+            "manifest": "step10-round5",
+            "raw": 24,
+            "accounted": 23,
+            "unaccounted": 1
+          },
+          {
+            "manifest": "step10-sync4d",
+            "raw": 24,
+            "accounted": 23,
+            "unaccounted": 1
+          }
+        ],
+        "commands": [
+          {
+            "argv": [
+              "python3",
+              "-B",
+              "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+              "--check"
+            ],
+            "exit": 1,
+            "stdout": "{\n  \"drift\": 1,\n  \"rows\": [\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json\",\n      \"pointer\": \"/registryGaps/22\",\n      \"claimId\": \"claim_40aafcee52b22eda087c5f85eacb9392\",\n      \"before\": {\n        \"targetOwner\": \"docs/platform/runner/subcomponents/h-6979005beaf7/spec.md\",\n        \"targetAnchor\": \"unheaded-block-36\",\n        \"targetUnitDigest\": \"0000000000000000000000000000000000000000000000000000000000000000\",\n        \"targetAncestry\": [\n          \"Added in candidate: Runner Business Rules\",\n          \"Business Rules\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json\"\n    }\n  ],\n  \"authenticatedSupersededOrigins\": [\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json\",\n      \"pointer\": \"/claims/57\",\n      \"claimId\": \"claim_96e947d6daf7dd7612cc711be8e3e22e\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/component-boundary.md\",\n        \"targetAnchor\": \"9-hexagonal-architecture-view\",\n        \"targetUnitDigest\": \"c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6\",\n        \"targetAncestry\": [\n          \"Component Boundary\",\n          \"Added in candidate: component-boundary-advisory source carriage\",\n          \"fgOS Component Boundary Advisory\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json\",\n      \"effectivePointer\": \"/bindingRefresh/604\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/component-boundary.md\",\n        \"targetAnchor\": \"9-hexagonal-architecture-view\",\n        \"targetUnitDigest\": \"19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200\",\n        \"targetAncestry\": [\n          \"Component Boundary\",\n          \"Added in candidate: component-boundary-advisory source carriage\",\n          \"fgOS Component Boundary Advisory\",\n          \"9. Hexagonal Architecture View\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json\",\n      \"pointer\": \"/claims/64\",\n      \"claimId\": \"claim_4e86e8414c4e3b780e81f77255853447\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/component-boundary.md\",\n        \"targetAnchor\": \"unheaded-block-70\",\n        \"targetUnitDigest\": \"913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a\",\n        \"targetAncestry\": [\n          \"Component Boundary\",\n          \"Added in candidate: component-boundary-advisory source carriage\",\n          \"fgOS Component Boundary Advisory\",\n          \"9. Hexagonal Architecture View\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json\",\n      \"effectivePointer\": \"/bindingRefresh/611\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/component-boundary.md\",\n        \"targetAnchor\": \"unheaded-block-70\",\n        \"targetUnitDigest\": \"5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5\",\n        \"targetAncestry\": [\n          \"Component Boundary\",\n          \"Added in candidate: component-boundary-advisory source carriage\",\n          \"fgOS Component Boundary Advisory\",\n          \"9. Hexagonal Architecture View\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json\",\n      \"pointer\": \"/claims/0\",\n      \"claimId\": \"claim_4333c7a8ff0e32c7b69dc10ed113f25b\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"3-work-item-data-dictionary\",\n        \"targetUnitDigest\": \"c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"3. Work Item Data Dictionary\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json\",\n      \"effectivePointer\": \"/bindingRefresh/49\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"3-work-item-data-dictionary\",\n        \"targetUnitDigest\": \"38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"3. Work Item Data Dictionary\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json\",\n      \"pointer\": \"/claims/1\",\n      \"claimId\": \"claim_5ba6768e5c4f7d93e77ccceda19d0103\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"unheaded-block-4\",\n        \"targetUnitDigest\": \"fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"3. Work Item Data Dictionary\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json\",\n      \"effectivePointer\": \"/bindingRefresh/50\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"unheaded-block-4\",\n        \"targetUnitDigest\": \"697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"3. Work Item Data Dictionary\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json\",\n      \"pointer\": \"/claims/55\",\n      \"claimId\": \"claim_79b8aa6e1e59ca0593c2e3f1a409a459\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"6-domain-model\",\n        \"targetUnitDigest\": \"4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77\",\n        \"targetAncestry\": [\n          \"Work State Specification\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json\",\n      \"effectivePointer\": \"/bindingRefresh/127\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"6-domain-model\",\n        \"targetUnitDigest\": \"6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"6. Domain Model\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json\",\n      \"pointer\": \"/claims/65\",\n      \"claimId\": \"claim_5430b3f4676f8ecc0c94b8f0680f45c6\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"unheaded-block-54\",\n        \"targetUnitDigest\": \"fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"6. Domain Model\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json\",\n      \"effectivePointer\": \"/bindingRefresh/128\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"unheaded-block-54\",\n        \"targetUnitDigest\": \"c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"6. Domain Model\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json\",\n      \"pointer\": \"/claims/7\",\n      \"claimId\": \"claim_477a30f4902261e390c34ab888145dcd\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"11-business-rules\",\n        \"targetUnitDigest\": \"6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"11. Business Rules\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json\",\n      \"effectivePointer\": \"/bindingRefresh/117\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"11-business-rules\",\n        \"targetUnitDigest\": \"0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"11. Business Rules\"\n        ]\n      }\n    }\n  ],\n  \"authenticatedIdenticalUnitGroups\": [\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/2\",\n      \"claimId\": \"claim_004b47fc284721eff96cfa890f85aac0\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/4\",\n      \"claimId\": \"claim_69311391fbb9b1cf924197e6063e5cad\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/5\",\n      \"claimId\": \"claim_c1d4ad0697013185af2572dd0a944024\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/6\",\n      \"claimId\": \"claim_79fd838ebf7eb7bbaa72efa619535671\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/7\",\n      \"claimId\": \"claim_99f595d515a3a60d4796192d78e67eae\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/8\",\n      \"claimId\": \"claim_0f9aa9f49945a45860e3e3c2d1e880bd\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/9\",\n      \"claimId\": \"claim_b3960a6316827da8f49bc10a9221b4c5\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/10\",\n      \"claimId\": \"claim_2afd573c3c2205adb49a698535fbf864\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/11\",\n      \"claimId\": \"claim_298fc2ef185e234bd4b65f047f70ecec\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/12\",\n      \"claimId\": \"claim_09dd63bd1aaf9b4b6078de434144efb0\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/13\",\n      \"claimId\": \"claim_3c1dfb5d442b11bec14ecd32e309c1dd\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/14\",\n      \"claimId\": \"claim_cad110bd532badff055f69c0a236644a\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/15\",\n      \"claimId\": \"claim_d3cb0eccd8b39c08a3ec7af9b4b14d18\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/16\",\n      \"claimId\": \"claim_b2afbadf035b6374ed73289b388f5d20\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/17\",\n      \"claimId\": \"claim_33c41de79cf4a52288035a9656c09735\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/18\",\n      \"claimId\": \"claim_fa95d7f496a850ef197d25f18ad6f760\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    }\n  ]\n}\n",
+            "stderr": ""
+          },
+          {
+            "argv": [
+              "node",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/stale/step10-round5/ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/stale/step10-round5"
+            ],
+            "exit": 0,
+            "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 24 }\n",
+            "stderr": ""
+          },
+          {
+            "argv": [
+              "node",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/stale/step10-round5/audit-ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/stale/step10-round5"
+            ],
+            "exit": 1,
+            "stdout": "",
+            "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(current.noNewDoubleOwnership)\n\n    at file:///tmp/fgos-work/ownership-controls-6dps31z6/stale/step10-round5/audit-ownership.mjs:8:56 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n"
+          },
+          {
+            "argv": [
+              "node",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/stale/step10-sync4d/ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/stale/step10-sync4d"
+            ],
+            "exit": 0,
+            "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 24 }\n",
+            "stderr": ""
+          },
+          {
+            "argv": [
+              "node",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/stale/step10-sync4d/audit-ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/stale/step10-sync4d"
+            ],
+            "exit": 1,
+            "stdout": "",
+            "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(current.noNewDoubleOwnership)\n\n    at file:///tmp/fgos-work/ownership-controls-6dps31z6/stale/step10-sync4d/audit-ownership.mjs:8:56 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n"
+          }
+        ]
+      },
+      {
+        "behavior": "one non-matching group member",
+        "refused": true,
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/2",
+        "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
+        "audits": [
+          {
+            "manifest": "step10-round5",
+            "raw": 23,
+            "accounted": 22,
+            "unaccounted": 1
+          },
+          {
+            "manifest": "step10-sync4d",
+            "raw": 23,
+            "accounted": 22,
+            "unaccounted": 1
+          }
+        ],
+        "commands": [
+          {
+            "argv": [
+              "python3",
+              "-B",
+              "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+              "--check"
+            ],
+            "exit": 1,
+            "stdout": "{\n  \"drift\": 1,\n  \"rows\": [\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/2\",\n      \"claimId\": \"claim_004b47fc284721eff96cfa890f85aac0\",\n      \"before\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"0000000000000000000000000000000000000000000000000000000000000000\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\"\n    }\n  ],\n  \"authenticatedSupersededOrigins\": [\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json\",\n      \"pointer\": \"/claims/57\",\n      \"claimId\": \"claim_96e947d6daf7dd7612cc711be8e3e22e\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/component-boundary.md\",\n        \"targetAnchor\": \"9-hexagonal-architecture-view\",\n        \"targetUnitDigest\": \"c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6\",\n        \"targetAncestry\": [\n          \"Component Boundary\",\n          \"Added in candidate: component-boundary-advisory source carriage\",\n          \"fgOS Component Boundary Advisory\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json\",\n      \"effectivePointer\": \"/bindingRefresh/604\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/component-boundary.md\",\n        \"targetAnchor\": \"9-hexagonal-architecture-view\",\n        \"targetUnitDigest\": \"19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200\",\n        \"targetAncestry\": [\n          \"Component Boundary\",\n          \"Added in candidate: component-boundary-advisory source carriage\",\n          \"fgOS Component Boundary Advisory\",\n          \"9. Hexagonal Architecture View\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json\",\n      \"pointer\": \"/claims/64\",\n      \"claimId\": \"claim_4e86e8414c4e3b780e81f77255853447\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/component-boundary.md\",\n        \"targetAnchor\": \"unheaded-block-70\",\n        \"targetUnitDigest\": \"913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a\",\n        \"targetAncestry\": [\n          \"Component Boundary\",\n          \"Added in candidate: component-boundary-advisory source carriage\",\n          \"fgOS Component Boundary Advisory\",\n          \"9. Hexagonal Architecture View\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json\",\n      \"effectivePointer\": \"/bindingRefresh/611\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/component-boundary.md\",\n        \"targetAnchor\": \"unheaded-block-70\",\n        \"targetUnitDigest\": \"5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5\",\n        \"targetAncestry\": [\n          \"Component Boundary\",\n          \"Added in candidate: component-boundary-advisory source carriage\",\n          \"fgOS Component Boundary Advisory\",\n          \"9. Hexagonal Architecture View\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json\",\n      \"pointer\": \"/claims/0\",\n      \"claimId\": \"claim_4333c7a8ff0e32c7b69dc10ed113f25b\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"3-work-item-data-dictionary\",\n        \"targetUnitDigest\": \"c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"3. Work Item Data Dictionary\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json\",\n      \"effectivePointer\": \"/bindingRefresh/49\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"3-work-item-data-dictionary\",\n        \"targetUnitDigest\": \"38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"3. Work Item Data Dictionary\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json\",\n      \"pointer\": \"/claims/1\",\n      \"claimId\": \"claim_5ba6768e5c4f7d93e77ccceda19d0103\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"unheaded-block-4\",\n        \"targetUnitDigest\": \"fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"3. Work Item Data Dictionary\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json\",\n      \"effectivePointer\": \"/bindingRefresh/50\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"unheaded-block-4\",\n        \"targetUnitDigest\": \"697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"3. Work Item Data Dictionary\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json\",\n      \"pointer\": \"/claims/55\",\n      \"claimId\": \"claim_79b8aa6e1e59ca0593c2e3f1a409a459\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"6-domain-model\",\n        \"targetUnitDigest\": \"4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77\",\n        \"targetAncestry\": [\n          \"Work State Specification\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json\",\n      \"effectivePointer\": \"/bindingRefresh/127\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"6-domain-model\",\n        \"targetUnitDigest\": \"6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"6. Domain Model\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json\",\n      \"pointer\": \"/claims/65\",\n      \"claimId\": \"claim_5430b3f4676f8ecc0c94b8f0680f45c6\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"unheaded-block-54\",\n        \"targetUnitDigest\": \"fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"6. Domain Model\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json\",\n      \"effectivePointer\": \"/bindingRefresh/128\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"unheaded-block-54\",\n        \"targetUnitDigest\": \"c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"6. Domain Model\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json\",\n      \"pointer\": \"/claims/7\",\n      \"claimId\": \"claim_477a30f4902261e390c34ab888145dcd\",\n      \"originBinding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"11-business-rules\",\n        \"targetUnitDigest\": \"6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"11. Business Rules\"\n        ]\n      },\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json\",\n      \"effectivePointer\": \"/bindingRefresh/117\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"11-business-rules\",\n        \"targetUnitDigest\": \"0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"11. Business Rules\"\n        ]\n      }\n    }\n  ],\n  \"authenticatedIdenticalUnitGroups\": [\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/4\",\n      \"claimId\": \"claim_69311391fbb9b1cf924197e6063e5cad\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/5\",\n      \"claimId\": \"claim_c1d4ad0697013185af2572dd0a944024\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/6\",\n      \"claimId\": \"claim_79fd838ebf7eb7bbaa72efa619535671\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/7\",\n      \"claimId\": \"claim_99f595d515a3a60d4796192d78e67eae\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/8\",\n      \"claimId\": \"claim_0f9aa9f49945a45860e3e3c2d1e880bd\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/9\",\n      \"claimId\": \"claim_b3960a6316827da8f49bc10a9221b4c5\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/10\",\n      \"claimId\": \"claim_2afd573c3c2205adb49a698535fbf864\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/11\",\n      \"claimId\": \"claim_298fc2ef185e234bd4b65f047f70ecec\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/12\",\n      \"claimId\": \"claim_09dd63bd1aaf9b4b6078de434144efb0\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/13\",\n      \"claimId\": \"claim_3c1dfb5d442b11bec14ecd32e309c1dd\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/14\",\n      \"claimId\": \"claim_cad110bd532badff055f69c0a236644a\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/15\",\n      \"claimId\": \"claim_d3cb0eccd8b39c08a3ec7af9b4b14d18\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/16\",\n      \"claimId\": \"claim_b2afbadf035b6374ed73289b388f5d20\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/17\",\n      \"claimId\": \"claim_33c41de79cf4a52288035a9656c09735\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    },\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json\",\n      \"pointer\": \"/registryGaps/18\",\n      \"claimId\": \"claim_fa95d7f496a850ef197d25f18ad6f760\",\n      \"binding\": {\n        \"targetOwner\": \"docs/specs/runner.md\",\n        \"targetAnchor\": null,\n        \"targetUnitDigest\": \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n        \"targetAncestry\": null,\n        \"successorGroupMemberDigests\": [\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\",\n          \"95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104\"\n        ]\n      }\n    }\n  ]\n}\n",
+            "stderr": ""
+          },
+          {
+            "argv": [
+              "node",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/group/step10-round5/ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/group/step10-round5"
+            ],
+            "exit": 0,
+            "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 23 }\n",
+            "stderr": ""
+          },
+          {
+            "argv": [
+              "node",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/group/step10-round5/audit-ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/group/step10-round5"
+            ],
+            "exit": 1,
+            "stdout": "",
+            "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(current.noNewDoubleOwnership)\n\n    at file:///tmp/fgos-work/ownership-controls-6dps31z6/group/step10-round5/audit-ownership.mjs:8:56 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n"
+          },
+          {
+            "argv": [
+              "node",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/group/step10-sync4d/ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/group/step10-sync4d"
+            ],
+            "exit": 0,
+            "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 23 }\n",
+            "stderr": ""
+          },
+          {
+            "argv": [
+              "node",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/group/step10-sync4d/audit-ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/ownership-controls-6dps31z6/group/step10-sync4d"
+            ],
+            "exit": 1,
+            "stdout": "",
+            "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(current.noNewDoubleOwnership)\n\n    at file:///tmp/fgos-work/ownership-controls-6dps31z6/group/step10-sync4d/audit-ownership.mjs:8:56 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n"
+          }
+        ]
+      }
+    ],
+    "scratchRemoved": true
+  },
+  "assertions": {
+    "rebindLeavesNoScratch": true,
+    "miscChecksUnchangedSha256": "faa095f14d65005355089b65d4896ba06e96776413a8ec4d33b138d4fb939fe4",
+    "liveOwnershipPassed": true,
+    "ownershipPassed": true,
+    "clauseSpecificSourceLists": 2,
+    "addVerbFileCountRationale": true,
+    "touchedBindingHashes": 127,
+    "refreshedRationales": 124,
+    "supersedeRedecisions": 3,
+    "retiredStaleOverlayPointers": 3,
+    "parityBase": "568a11f21f442190ef86e25cf5d2303df7fc0f3d",
+    "laterSourceParityRowsAdded": 1,
+    "liveTargetsAndAncestries": 127,
+    "authoringTargetsAndAncestries": 127,
+    "exactChangedLineDiffs": 3,
+    "legacyRewriteDigests": 21,
+    "parityPriorEntriesUnchanged": 248,
+    "parityPriorSourceEntriesRefreshed": 14,
+    "parityPriorTargetOnlyRefreshed": 62,
+    "residualFileHashUnchanged": true
+  },
+  "recordProofsPassed": true,
+  "fullAuditPassed": false,
+  "fullAuditStatus": "partial",
+  "fullAuditOk": false,
+  "join": {
+    "counts": {
+      "aggregateOnly": 56,
+      "approved": 1929,
+      "effectiveRows": 1929,
+      "frozenChangedBindings": 257,
+      "invalidBindings": 0,
+      "mismatched": 0,
+      "missing": 0,
+      "obligations": 2187,
+      "openRework": 0,
+      "perRowVerdicts": 2695,
+      "reviewFiles": 78,
+      "stale": 0,
+      "unresolved": 0
+    },
+    "pin": "c7b413de2f38794eb9e91175f8488c5b56a54ab4",
+    "status": "passed"
+  },
+  "safety": {
+    "protectedTrackedFiles": 17707,
+    "protectedBytesUnchanged": true,
+    "excludesFgosWithoutReading": true,
+    "manifests": [
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "onlyOwnershipPairChanged": true,
+        "rawDriftPredicateUnchanged": true,
+        "checksMjsUnchanged": true,
+        "checksMjsSha256": "f2039f37885b56686e92677d30c3ef2803530d88e9b6dac985ddf31958e59eb4"
+      },
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "onlyOwnershipPairChanged": true,
+        "rawDriftPredicateUnchanged": true,
+        "checksMjsUnchanged": true,
+        "checksMjsSha256": "7d481ea8e5cf8974a92e37e128b6885b7040210ab4b43c8ad5b76ea0493d03b3"
+      }
+    ],
+    "changedPaths": [
+      "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/ownership-reader-proof.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/receipt.md",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/test-accounting.py",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py",
+      "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py"
+    ],
+    "impactAnalysis": "degraded: no MCP; fgOS capability CLI forbidden",
+    "noGitWrites": true,
+    "noProductTests": true,
+    "noNativeAddonLoaded": true,
+    "whitespaceExit": 0,
+    "scratchCleanup": "All own evidence-capture, verifier, rebind and control tempfiles removed; /tmp/fgos-work empty after final validation.",
+    "scratchRemoved": true,
+    "scratchRemaining": []
+  },
+  "preliminaryAttempts": [
+    {
+      "command": "python3 -B: initial tempfile preparation",
+      "exit": 1,
+      "reason": "/tmp/fgos-work did not exist; created allowed scratch parent and retried before any proof ran"
+    },
+    {
+      "command": "python3 -B g0rework/verify.py through capture harness",
+      "result": "harness timeout at 300 seconds; no verifier exit captured",
+      "reason": "Tool deadline canceled the first replay; its orphaned tempfile removed before complete serial rerun",
+      "successfulRetrySeconds": 330.6849410533905
+    }
+  ]
+}
