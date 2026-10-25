@@ -40,7 +40,9 @@ import { CODEX_FEATURES_OFF, writeCodexConfig } from '../../scripts/lib/mailbox-
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const MODULE = path.join(REPO, 'scripts', 'lib', 'mailbox-live-confined.mjs');
 const STUB = path.join(REPO, 'test', 'live', 'mailbox-behaviour-stub.mjs');
-const HOME = os.homedir();
+// The real machine's home, where this checkout, the login stores and the planted secret live: the
+// test process's own HOME is an empty one (process-tmp-root.mjs), which the mask must not be aimed at.
+const HOME = os.userInfo().homedir;
 
 function hasWorkingBwrap(binary = '/usr/bin/bwrap') {
   if (os.platform() !== 'linux') return false;
@@ -97,7 +99,7 @@ function world() {
   fs.writeFileSync(planted, 'PLANTED\n');
   const sibling = path.join(base, 'run-sibling');
   fs.mkdirSync(sibling, { recursive: true });
-  const masks = maskPlan({ allow: ALLOW() });
+  const masks = maskPlan({ home: HOME, allow: ALLOW() });
   return { base, release, loginHome, login, secret, planted, sibling, masks };
 }
 
@@ -492,7 +494,7 @@ test('a confined Codex run lists no MCP server and has its connectors off, and t
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'mbx-mcp-'));
   const loginHome = makeFixtureDir('mbx-mcp-login-');
   fs.writeFileSync(path.join(loginHome, 'auth.json'), '{"tokens":{"access_token":"SCRATCH-NOT-A-TOKEN"}}');
-  const masks = maskPlan({ allow: ALLOW() });
+  const masks = maskPlan({ home: HOME, allow: ALLOW() });
   const codex = path.join(release, 'bin', 'codex');
   const zeroModel = async (runId, args, config) => {
     const prepared = prepareConfinedRun({ base, runId, command: codex, args, env: baseEnv(), masks, login: { cli: 'codex', home: loginHome } });
@@ -541,7 +543,7 @@ test('a confined pi or omp run cannot read the real account stores, starts from 
   const install = piOmpInstall();
   if (!install) return t.skip('pi and omp are not installed');
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'mbx-piomp-'));
-  const masks = maskPlan({ allow: [...install.allow, path.dirname(path.dirname(process.execPath))] });
+  const masks = maskPlan({ home: HOME, allow: [...install.allow, path.dirname(path.dirname(process.execPath))] });
   // Every account store of both CLIs, by the real paths the owner's accounts use.
   const stores = Object.fromEntries([
     ...['.pi/accounts', '.omp/profiles'].flatMap((dir) => (fs.existsSync(path.join(HOME, dir)) ? fs.readdirSync(path.join(HOME, dir)).map((a) => [`${dir}/${a}`, path.join(HOME, dir, a)]) : [])),
