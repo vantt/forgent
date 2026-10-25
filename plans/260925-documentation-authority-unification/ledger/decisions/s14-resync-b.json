@@ -11982,13 +11982,42 @@
       ],
       "targetAnchor": "9-hexagonal-architecture-view",
       "targetOwner": "docs/platform/component-boundary.md",
-      "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
-      "bindingSha256": "cd973d0c7558f9c44fcf94309b9130b6dd29f7cf4a11826484ca474121fb5bbd",
+      "targetUnitDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+      "bindingSha256": "3520d49be4de33bb403197654c3fd2d7757427362a90a4d4b71dd379c538d098",
       "disposition": {
         "kind": "equivalent-current-content",
         "reason": "Full source text is already present; only heading depth, link destinations or whitespace differ. Heading payload units are accounted separately."
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reason": " L13-25.1: restore the fenced-code literal to source bytes (not a navigable link); rebind through rebind.py extract/history/locate/binding. Only this code-literal restoration changes content; independent re-review pending.",
+      "priorReview": {
+        "g0FollowupBefore": {
+          "sourcePath": "docs/architect/component-boundary/component-boundary-advisory.md",
+          "sourceAnchor": "9-hexagonal-architecture-view",
+          "sourceUnitDigest": "fdf071494f5b3e8e4f6a0e21fe9eed5d5c3ee9dea294c1ba4b81099acea3a0fe",
+          "sourceAncestry": [
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "sourceContent": "## 9. Hexagonal Architecture View",
+          "unitKind": "heading",
+          "targetAncestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "targetAnchor": "9-hexagonal-architecture-view",
+          "targetOwner": "docs/platform/component-boundary.md",
+          "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+          "bindingSha256": "cd973d0c7558f9c44fcf94309b9130b6dd29f7cf4a11826484ca474121fb5bbd",
+          "disposition": {
+            "kind": "equivalent-current-content",
+            "reason": "Full source text is already present; only heading depth, link destinations or whitespace differ. Heading payload units are accounted separately."
+          },
+          "reviewStatus": "pending"
+        }
+      }
     },
     {
       "sourcePath": "docs/architect/component-boundary/component-boundary-advisory.md",
@@ -12008,13 +12037,42 @@
       ],
       "targetAnchor": "unheaded-block-70",
       "targetOwner": "docs/platform/component-boundary.md",
-      "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
-      "bindingSha256": "ccd6ff96b3104258b16b231f52766d76d99d09dd4d4c9c7111e1466580844605",
+      "targetUnitDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+      "bindingSha256": "4e53ac516889e8fda19cd8bea133bf97283a8d5c326d097f1e52a301c49afe84",
       "disposition": {
         "kind": "equivalent-current-content",
         "reason": "Full source text is already present; only heading depth, link destinations or whitespace differ. Heading payload units are accounted separately."
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reason": " L13-25.1: restore the fenced-code literal to source bytes (not a navigable link); rebind through rebind.py extract/history/locate/binding. Only this code-literal restoration changes content; independent re-review pending.",
+      "priorReview": {
+        "g0FollowupBefore": {
+          "sourcePath": "docs/architect/component-boundary/component-boundary-advisory.md",
+          "sourceAnchor": "unheaded-block-55",
+          "sourceUnitDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+          "sourceAncestry": [
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "sourceContent": "```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispatch And Execution Engine:\n  DispatchResolverPort   (superseded in naming by DispatchRuntimePort,\n                          [Component Authority Boundary Map §13](../proposals/component-authority-boundary-map.md#13-draft-ports);\n                          same candidate facade, not two live ports)\n  RunStorePort\n  ExecutorAdapterPort\n\nRun Result Evaluator:\n  EvidenceCollectorPort\n  ResultNormalizerPort\n  ArtifactStorePort\n\nDomain Components And Extension Layer:\n  DefinitionLoaderPort\n  DomainHarnessPort\n  ProtocolPackagePort\n  PolicyProviderPort\n  EvidencePolicyPort\n\nHost And Surface Layer:\n  VisibilityPort\n  CommandSurfacePort\n  ApiSurfacePort\n\nShared infrastructure:\n  ClockPort\n  IdGeneratorPort\n  FilesystemPort\n```",
+          "unitKind": "unheaded-block",
+          "targetAncestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "targetAnchor": "unheaded-block-70",
+          "targetOwner": "docs/platform/component-boundary.md",
+          "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+          "bindingSha256": "ccd6ff96b3104258b16b231f52766d76d99d09dd4d4c9c7111e1466580844605",
+          "disposition": {
+            "kind": "equivalent-current-content",
+            "reason": "Full source text is already present; only heading depth, link destinations or whitespace differ. Heading payload units are accounted separately."
+          },
+          "reviewStatus": "pending"
+        }
+      }
     },
     {
       "sourcePath": "docs/architect/component-boundary/component-boundary-advisory.md",
@@ -14147,13 +14205,42 @@
       ],
       "targetAnchor": "unheaded-block-80",
       "targetOwner": "docs/platform/workflow/spec.md",
-      "targetUnitDigest": "7b148fab8e33506041484e3e1fa03f815577aac4d78a86272fa97e8481c0ec8b",
-      "bindingSha256": "98343e191828ab6a92b667142851acb3ec918add42158559c5fb119e363dee3f",
+      "targetUnitDigest": "1abf5d8f0829bf67f641cea7997ea93ce7c97ed85bc1185c0be88ffbcab569af",
+      "bindingSha256": "a113a3ae938b05c1ddc1906c1bbed9596c7d3a2200c4fd0b6f92a18934873a9a",
       "disposition": {
         "kind": "equivalent-current-content",
         "reason": "Full source text is already present; only heading depth, link destinations or whitespace differ. Heading payload units are accounted separately."
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reason": " L13-25.1: restore the fenced-code literal to source bytes (not a navigable link); rebind through rebind.py extract/history/locate/binding. Only this code-literal restoration changes content; independent re-review pending.",
+      "priorReview": {
+        "g0FollowupBefore": {
+          "sourcePath": "docs/specs/workflow.md",
+          "sourceAnchor": "unheaded-block-78",
+          "sourceUnitDigest": "1abf5d8f0829bf67f641cea7997ea93ce7c97ed85bc1185c0be88ffbcab569af",
+          "sourceAncestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "sourceContent": "**Sau** (phác thảo):\n\n```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # subject: văn bản yêu cầu\n  - id: positions-settled  # subject: ba report panelist\n  - id: verdict-settled    # subject: report synthesizer\nactivities:\n  - id: deliberate\n    entry: [request-received]\n    produces: [positions-settled, verdict-settled]\n    unit:                  # giữ nguyên template hôm nay\n      capability: delphi:propose\n      pattern: panel\n      blind: true\n      contextRefs: [core/agents/council-assumptions.yaml, core/agents/council-ship-maintain.yaml, core/agents/council-feedback-loops.yaml]\n      seats: [member-1, member-2, member-3, synthesizer]   # ghế khai tường minh, role producer ×3 + synthesizer ([seat-binding.md](seat-binding.md) mục 7.1)\n      params: { roleTasks: { member-1: ..., member-2: ..., member-3: ..., synthesizer: ... } }   # khoá theo ghế\nmust:\n  - id: independent-positions\n    guard: independence-blind      # đóng gói một Unit panel với ghế blind là bắt buộc\n    subject: positions-settled\n    reason: một ghế đã đọc ý kiến ghế khác thì không còn là một lăng kính độc lập\nclosure: [verdict-settled]\nframeDefaults: { dispatches: 1, mutatingDispatches: 0, seatLaunchesPerDispatch: 4, fallbackPerSeat: 2 }\n```",
+          "unitKind": "unheaded-block",
+          "targetAncestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "targetAnchor": "unheaded-block-80",
+          "targetOwner": "docs/platform/workflow/spec.md",
+          "targetUnitDigest": "7b148fab8e33506041484e3e1fa03f815577aac4d78a86272fa97e8481c0ec8b",
+          "bindingSha256": "98343e191828ab6a92b667142851acb3ec918add42158559c5fb119e363dee3f",
+          "disposition": {
+            "kind": "equivalent-current-content",
+            "reason": "Full source text is already present; only heading depth, link destinations or whitespace differ. Heading payload units are accounted separately."
+          },
+          "reviewStatus": "pending"
+        }
+      }
     },
     {
       "sourcePath": "docs/specs/workflow.md",
@@ -14398,16 +14485,16 @@
         "bindingSha256": "0dc5159b21dc53fea55f4ca63c6e5d05c88281573d5523801d7609530d617993"
       },
       "targetAncestry": [
-        "0002 — Mô hình việc phẳng",
-        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption"
+        "Platform Foundations",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
       ],
-      "targetAnchor": "0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption",
-      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "targetUnitDigest": "f617f1c06417c2f7984c2c37a8b6d06c85bdc662faa1bb373adac1858eb519d8",
-      "bindingSha256": "8ef7e89155f83c0a385269c971ebfeef8a702b1310c1eaceacc0a0d487d02afc",
+      "targetAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+      "bindingSha256": "0dc5159b21dc53fea55f4ca63c6e5d05c88281573d5523801d7609530d617993",
       "preimageContentSha256": "6878d16b7457809b91344e2aabc6d97d2cca7f2a51d3ca7f1ef9dde58b07735c",
       "matchScore": 3,
-      "reason": "Explicit drop of the erroneous platform-foundations retired-history heading: the reference-004047 reader reads only runner and work-state, not foundation. Correct this alias to the Work 0032 Team Harness topic already named by conservedClaims/7/bindings/2; it is not an additional source claim. Runner 0032 Iron Law remains in bindings/3. Both collision topics remain present; no test/path migration or assertion deletion is authorized.",
+      "reason": "Explicit drop of the erroneous reference-004047 foundation binding 0: its reader reads runner and work-state, not platform-foundations. The target fields retain only the authenticated dropped-locus witness; no content is carried here and no Work 0032 alias is asserted. Work 0032 Team Harness remains owned once by s11-preflip-carries.json /conservedClaims/7/bindings/2, and Runner 0032 Iron Law by bindings/3. No test/path migration or assertion deletion is authorized. Independent review of this drop is pending.",
       "reviewStatus": "pending",
       "priorReview": {
         "g0ReworkBefore": {
@@ -14431,10 +14518,58 @@
           "matchScore": 3,
           "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
           "reviewStatus": "pending"
+        },
+        "g0FollowupBefore": {
+          "supersedesBinding": {
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+            "pointer": "/conservedClaims/7/bindings/0",
+            "targetOwner": "docs/platform/platform-foundations.md",
+            "targetAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+            "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+            "bindingSha256": "0dc5159b21dc53fea55f4ca63c6e5d05c88281573d5523801d7609530d617993"
+          },
+          "targetAncestry": [
+            "0002 — Mô hình việc phẳng",
+            "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption"
+          ],
+          "targetAnchor": "0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption",
+          "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "targetUnitDigest": "f617f1c06417c2f7984c2c37a8b6d06c85bdc662faa1bb373adac1858eb519d8",
+          "bindingSha256": "8ef7e89155f83c0a385269c971ebfeef8a702b1310c1eaceacc0a0d487d02afc",
+          "preimageContentSha256": "6878d16b7457809b91344e2aabc6d97d2cca7f2a51d3ca7f1ef9dde58b07735c",
+          "matchScore": 3,
+          "reason": "Explicit drop of the erroneous platform-foundations retired-history heading: the reference-004047 reader reads only runner and work-state, not foundation. Correct this alias to the Work 0032 Team Harness topic already named by conservedClaims/7/bindings/2; it is not an additional source claim. Runner 0032 Iron Law remains in bindings/3. Both collision topics remain present; no test/path migration or assertion deletion is authorized.",
+          "reviewStatus": "pending",
+          "priorReview": {
+            "g0ReworkBefore": {
+              "supersedesBinding": {
+                "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+                "pointer": "/conservedClaims/7/bindings/0",
+                "targetOwner": "docs/platform/platform-foundations.md",
+                "targetAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+                "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+                "bindingSha256": "0dc5159b21dc53fea55f4ca63c6e5d05c88281573d5523801d7609530d617993"
+              },
+              "targetAncestry": [
+                "Platform Foundations",
+                "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+              ],
+              "targetAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+              "targetOwner": "docs/platform/platform-foundations.md",
+              "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+              "bindingSha256": "0dc5159b21dc53fea55f4ca63c6e5d05c88281573d5523801d7609530d617993",
+              "preimageContentSha256": "6878d16b7457809b91344e2aabc6d97d2cca7f2a51d3ca7f1ef9dde58b07735c",
+              "matchScore": 3,
+              "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
+              "reviewStatus": "pending"
+            }
+          },
+          "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+          "disposition": "supersede"
         }
       },
       "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
-      "disposition": "supersede"
+      "disposition": "drop"
     },
     {
       "supersedesBinding": {
@@ -22824,12 +22959,37 @@
       ],
       "targetAnchor": "101-coreworkflowscouncil-liteyaml",
       "targetOwner": "docs/platform/workflow/spec.md",
-      "targetUnitDigest": "0775fc5663e690dbc50d4efac799bba82a3c9344fea018204fbf137828dc2b30",
-      "bindingSha256": "0b08d2fdd4f879521c2d0bd3073e2c39cb13239228c69e7ba115fed305f2fb6b",
+      "targetUnitDigest": "63681a9476ea8ec336db4883b5930b9c19c84ee4f8be18bbc19c5f14bd349da4",
+      "bindingSha256": "371977f0d64fc2b6034f067047361f6d0dde4b99f4002738e52df303a5f1510c",
       "preimageContentSha256": "c3a38d44225b4331210600b05229abfa3aa2d5721b4306cd7b9a7e36501630f7",
       "matchScore": 3,
-      "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement. L13-25.1: restore the fenced-code literal to source bytes (not a navigable link); rebind through rebind.py extract/history/locate/binding. Only this code-literal restoration changes content; independent re-review pending.",
+      "reviewStatus": "pending",
+      "priorReview": {
+        "g0FollowupBefore": {
+          "supersedesBinding": {
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+            "pointer": "/unitCarries/196",
+            "targetOwner": "docs/platform/workflow/spec.md",
+            "targetAnchor": "101-coreworkflowscouncil-liteyaml",
+            "targetUnitDigest": "0775fc5663e690dbc50d4efac799bba82a3c9344fea018204fbf137828dc2b30",
+            "bindingSha256": "0b08d2fdd4f879521c2d0bd3073e2c39cb13239228c69e7ba115fed305f2fb6b"
+          },
+          "targetAncestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "targetAnchor": "101-coreworkflowscouncil-liteyaml",
+          "targetOwner": "docs/platform/workflow/spec.md",
+          "targetUnitDigest": "0775fc5663e690dbc50d4efac799bba82a3c9344fea018204fbf137828dc2b30",
+          "bindingSha256": "0b08d2fdd4f879521c2d0bd3073e2c39cb13239228c69e7ba115fed305f2fb6b",
+          "preimageContentSha256": "c3a38d44225b4331210600b05229abfa3aa2d5721b4306cd7b9a7e36501630f7",
+          "matchScore": 3,
+          "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
+          "reviewStatus": "pending"
+        }
+      }
     },
     {
       "supersedesBinding": {
@@ -22870,12 +23030,37 @@
       ],
       "targetAnchor": "unheaded-block-80",
       "targetOwner": "docs/platform/workflow/spec.md",
-      "targetUnitDigest": "7b148fab8e33506041484e3e1fa03f815577aac4d78a86272fa97e8481c0ec8b",
-      "bindingSha256": "98343e191828ab6a92b667142851acb3ec918add42158559c5fb119e363dee3f",
+      "targetUnitDigest": "1abf5d8f0829bf67f641cea7997ea93ce7c97ed85bc1185c0be88ffbcab569af",
+      "bindingSha256": "a113a3ae938b05c1ddc1906c1bbed9596c7d3a2200c4fd0b6f92a18934873a9a",
       "preimageContentSha256": "7b148fab8e33506041484e3e1fa03f815577aac4d78a86272fa97e8481c0ec8b",
       "matchScore": 3,
-      "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement. L13-25.1: restore the fenced-code literal to source bytes (not a navigable link); rebind through rebind.py extract/history/locate/binding. Only this code-literal restoration changes content; independent re-review pending.",
+      "reviewStatus": "pending",
+      "priorReview": {
+        "g0FollowupBefore": {
+          "supersedesBinding": {
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+            "pointer": "/unitCarries/198",
+            "targetOwner": "docs/platform/workflow/spec.md",
+            "targetAnchor": "unheaded-block-79",
+            "targetUnitDigest": "7b148fab8e33506041484e3e1fa03f815577aac4d78a86272fa97e8481c0ec8b",
+            "bindingSha256": "4efabb1d17b524ba856420ac5b65cf3cb3a84162e6ab82d9b53d6110fbdaa432"
+          },
+          "targetAncestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "targetAnchor": "unheaded-block-80",
+          "targetOwner": "docs/platform/workflow/spec.md",
+          "targetUnitDigest": "7b148fab8e33506041484e3e1fa03f815577aac4d78a86272fa97e8481c0ec8b",
+          "bindingSha256": "98343e191828ab6a92b667142851acb3ec918add42158559c5fb119e363dee3f",
+          "preimageContentSha256": "7b148fab8e33506041484e3e1fa03f815577aac4d78a86272fa97e8481c0ec8b",
+          "matchScore": 3,
+          "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
+          "reviewStatus": "pending"
+        }
+      }
     },
     {
       "supersedesBinding": {
@@ -28214,12 +28399,38 @@
       ],
       "targetAnchor": "9-hexagonal-architecture-view",
       "targetOwner": "docs/platform/component-boundary.md",
-      "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
-      "bindingSha256": "cd973d0c7558f9c44fcf94309b9130b6dd29f7cf4a11826484ca474121fb5bbd",
+      "targetUnitDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+      "bindingSha256": "3520d49be4de33bb403197654c3fd2d7757427362a90a4d4b71dd379c538d098",
       "preimageContentSha256": "d81c4f9afdde51ccc9d94794acff9cddf8bea0494cb11c72da6add9dc04f19d0",
       "matchScore": 3,
-      "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement. L13-25.1: restore the fenced-code literal to source bytes (not a navigable link); rebind through rebind.py extract/history/locate/binding. Only this code-literal restoration changes content; independent re-review pending.",
+      "reviewStatus": "pending",
+      "priorReview": {
+        "g0FollowupBefore": {
+          "supersedesBinding": {
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "pointer": "/claims/57",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "9-hexagonal-architecture-view",
+            "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+            "bindingSha256": null
+          },
+          "targetAncestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "targetAnchor": "9-hexagonal-architecture-view",
+          "targetOwner": "docs/platform/component-boundary.md",
+          "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+          "bindingSha256": "cd973d0c7558f9c44fcf94309b9130b6dd29f7cf4a11826484ca474121fb5bbd",
+          "preimageContentSha256": "d81c4f9afdde51ccc9d94794acff9cddf8bea0494cb11c72da6add9dc04f19d0",
+          "matchScore": 3,
+          "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
+          "reviewStatus": "pending"
+        }
+      }
     },
     {
       "supersedesBinding": {
@@ -28382,12 +28593,38 @@
       ],
       "targetAnchor": "unheaded-block-70",
       "targetOwner": "docs/platform/component-boundary.md",
-      "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
-      "bindingSha256": "ccd6ff96b3104258b16b231f52766d76d99d09dd4d4c9c7111e1466580844605",
+      "targetUnitDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+      "bindingSha256": "4e53ac516889e8fda19cd8bea133bf97283a8d5c326d097f1e52a301c49afe84",
       "preimageContentSha256": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
       "matchScore": 3,
-      "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement. L13-25.1: restore the fenced-code literal to source bytes (not a navigable link); rebind through rebind.py extract/history/locate/binding. Only this code-literal restoration changes content; independent re-review pending.",
+      "reviewStatus": "pending",
+      "priorReview": {
+        "g0FollowupBefore": {
+          "supersedesBinding": {
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "pointer": "/claims/64",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "unheaded-block-70",
+            "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+            "bindingSha256": null
+          },
+          "targetAncestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "targetAnchor": "unheaded-block-70",
+          "targetOwner": "docs/platform/component-boundary.md",
+          "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+          "bindingSha256": "ccd6ff96b3104258b16b231f52766d76d99d09dd4d4c9c7111e1466580844605",
+          "preimageContentSha256": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+          "matchScore": 3,
+          "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
+          "reviewStatus": "pending"
+        }
+      }
     },
     {
       "supersedesBinding": {

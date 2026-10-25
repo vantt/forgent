@@ -1,0 +1,55 @@
+{
+  "drift": 0,
+  "rows": [],
+  "authenticatedSupersededOrigins": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "pointer": "/claims/57",
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "effectivePointer": "/bindingRefresh/604",
+      "binding": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "pointer": "/claims/64",
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "effectivePointer": "/bindingRefresh/611",
+      "binding": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/7",
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/117",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "11-business-rules",
+        "targetUnitDigest": "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41",
+        "targetAncestry": [
+          "Work State Specification",
+          "11. Business Rules"
+        ]
+      }
+    }
+  ]
+}

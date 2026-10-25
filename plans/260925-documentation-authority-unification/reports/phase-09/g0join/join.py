@@ -19,7 +19,7 @@ ROOT = HERE.parents[4]
 P = pathlib.PurePosixPath('plans/260925-documentation-authority-unification')
 BASE = P / 'reports/phase-09'
 sys.path.insert(0, str(HERE.parent / 'ledgerfix'))
-from bindings import at, digest, effective, payload, rows, supersessions
+from bindings import KEYS, at, digest, effective, payload, rows, supersessions
 
 
 def git(*args):
@@ -52,6 +52,83 @@ def claim_ids(docs, file, pointer):
         if not pointer:
             return result
         pointer = pointer.rpartition('/')[0]
+
+
+# Fingerprint v1: compact sorted UTF-8 JSON + LF, SHA256. Snapshot/reviewer
+# metadata is excluded; reviewStatus is a decision field (resetting it matters).
+DECISION_KEYS = set(KEYS) | {'disposition', 'rationale', 'reason', 'changedClauses',
+                 'reviewStatus', 'bindingSha256', 'bindings', 'additionalBindings',
+                 'successorGroup', 'successorGroupMemberDigests'}
+
+
+def decision_fields(row):
+    if isinstance(row, list):
+        return [decision_fields(child) for child in row]
+    if not isinstance(row, dict):
+        return row
+    return {key: (decision_fields(value) if key in ('bindings', 'additionalBindings') else value)
+            for key, value in row.items() if key in DECISION_KEYS or key.startswith('supersedes')}
+
+
+def row_fingerprint(doc, pointer):
+    # Nested bindings inherit the enclosing claim's decision, not a sibling's.
+    context = []
+    while True:
+        value = at(doc, pointer)
+        if isinstance(value, dict):
+            fields = decision_fields(value)
+            if context:  # sibling bindings are not this row's decision
+                fields.pop('bindings', None)
+                fields.pop('additionalBindings', None)
+            context.append(fields)
+        if not pointer:
+            break
+        pointer = pointer.rpartition('/')[0]
+    raw = json.dumps(context, ensure_ascii=False, sort_keys=True, separators=(',', ':')) + '\n'
+    return hashlib.sha256(raw.encode()).hexdigest()
+
+
+def decision_commits(pin, docs):
+    """Find each row's latest decision edit, not merely its shard's last edit.
+
+    Follow a matching parent at merges, not a linear log's interleaved branch
+    versions. Parent rewriting skips commits unrelated to this shard. If several
+    parents already have the exact decision, use the first (Git blame semantics).
+    Stop at the first real edit, including a revert to an older decision value.
+    """
+    result = {}
+    for file, doc in sorted(docs.items()):
+        history = [line.split() for line in git('rev-list', '--parents', '--topo-order',
+                   '--full-history', '--simplify-merges', pin, '--', file).decode().splitlines()]
+        if not history:
+            raise ValueError(f'cannot find decision history: {file}')
+        parents = {commit: ancestors for commit, *ancestors in history}
+        blobs, fingerprints = {}, {}
+        def fingerprint_at(commit, pointer):
+            key = (commit, pointer)
+            if key not in fingerprints:
+                if commit not in blobs:
+                    proc = subprocess.run(['git', '-C', str(ROOT), 'show', f'{commit}:{file}'],
+                                          capture_output=True)
+                    blobs[commit] = json.loads(proc.stdout) if proc.returncode == 0 else {}
+                try:
+                    fingerprints[key] = row_fingerprint(blobs[commit], pointer)
+                except (KeyError, IndexError, TypeError):
+                    fingerprints[key] = None
+            return fingerprints[key]
+        for pointer, _ in rows(doc):
+            expected = row_fingerprint(doc, pointer)
+            commit = history[0][0]
+            if fingerprint_at(commit, pointer) != expected:
+                raise ValueError(f'cannot find decision preimage: {file}#{pointer}')
+            while True:
+                matching = [parent for parent in parents[commit]
+                            if fingerprint_at(parent, pointer) == expected]
+                if not matching:
+                    result[file, pointer] = commit
+                    break
+                commit = matching[0]
+    return result
 
 
 def obligations(register, docs, baseline):
@@ -116,7 +193,7 @@ def relevant(review, group):
 def judge(group, reviews, later):
     row = group['row']
     binding, target = row.get('bindingSha256'), row.get('targetUnitDigest')
-    complete, mismatches, reworks = [], [], []
+    complete, mismatches, reworks, stale = [], [], [], []
     for review in reviews:
         value = review['value']
         if not relevant(value, group):
@@ -125,11 +202,18 @@ def judge(group, reviews, later):
         ref = {k: v for k, v in review.items() if k != 'value'}
         ref.update(verdict=value['verdict'], bindingSha256=value.get('bindingSha256'),
                    targetUnitDigest=value.get('targetUnitDigest'))
-        if exact and value['verdict'] == 'APPROVE' and review['unique']:
+        fingerprint_match = value.get('rowFingerprint') == group['rowFingerprint']
+        fresh = fingerprint_match or (group['decisionCommit'] == review['reviewCommit'] or
+                                      later(group['decisionCommit'], review['reviewCommit']))
+        ref.update(rowFingerprint=value.get('rowFingerprint'), fresh=fresh,
+                   freshnessBasis='rowFingerprint' if fingerprint_match else 'git-ancestry')
+        if not fresh:
+            stale.append(ref)
+        if exact and fresh and value['verdict'] == 'APPROVE' and review['unique']:
             complete.append(ref)
         elif not exact or not review['unique']:
             mismatches.append(ref)
-        if value['verdict'] == 'REWORK' and value.get('bindingSha256') == binding:
+        if fresh and value['verdict'] == 'REWORK' and value.get('bindingSha256') == binding:
             # A missing target digest is not proof of a different/retired REWORK.
             if value.get('targetUnitDigest') in (None, target):
                 reworks.append(ref)
@@ -141,12 +225,13 @@ def judge(group, reviews, later):
     if not target:
         errors.append('effective-target-digest-missing')
     if not complete:
-        errors.append('mismatched' if mismatches else 'missing')
+        errors.append('stale' if stale else 'mismatched' if mismatches else 'missing')
     if open_rework:
         errors.append('open-REWORK')
     return dict(file=group['file'], pointer=group['pointer'], ids=sorted(group['ids']),
                 bindingSha256=binding, targetUnitDigest=target,
-                targetOwner=row.get('targetOwner'), targetAnchor=row.get('targetAnchor'),
+                rowFingerprint=group['rowFingerprint'], decisionCommit=group['decisionCommit'],
+                staleVerdicts=stale, targetOwner=row.get('targetOwner'), targetAnchor=row.get('targetAnchor'),
                 origins=group['origins'], approvals=complete, openRework=open_rework,
                 mismatchedVerdicts=mismatches, errors=errors)
 
@@ -164,6 +249,10 @@ def build(pin):
     register = read(P / 'reports/phase-08/step-08-preflip-gates.json')
     docs = documents_at(pin)
     groups, errors = resolve(register, docs, documents_at(register['sourceCommit']))
+    changed = decision_commits(pin, docs)
+    for (file, pointer), group in groups.items():
+        group.update(rowFingerprint=row_fingerprint(docs[file], pointer),
+                     decisionCommit=changed[file, pointer])
     reviews, aggregate, review_files = [], [], []
     paths = git('ls-tree', '-r', '--name-only', pin, str(BASE / 'reviews')).decode().splitlines()
     for path in paths:
@@ -202,14 +291,15 @@ def build(pin):
                   effectiveRows=len(joined), approved=sum(not r['errors'] for r in joined),
                   missing=sum('missing' in r['errors'] for r in joined),
                   mismatched=sum('mismatched' in r['errors'] for r in joined),
+                  stale=sum('stale' in r['errors'] for r in joined),
                   openRework=sum(bool(r['openRework']) for r in joined),
                   invalidBindings=sum(any(e.startswith('effective-') for e in r['errors']) for r in joined),
                   unresolved=len(errors), reviewFiles=len(review_files),
                   perRowVerdicts=len(reviews), aggregateOnly=len(aggregate))
     failed = bool(errors or any(r['errors'] for r in joined))
-    return dict(contract='g0-verdict-join.v1', pin=pin, frozenSourcePin=register['sourceCommit'],
+    return dict(contract='g0-verdict-join.v2', pin=pin, frozenSourcePin=register['sourceCommit'],
                 status='gaps' if failed else 'passed', exit=1 if failed else 0,
-                method='Committed blobs only; changedBindings plus all explicit supersessions/bindingRefresh/rebindReason rows and in-place payload changes since frozen source; exact lineage, no author reviewStatus inheritance or prose-to-verdict expansion. Matching two stored digests is not a live target-content audit.',
+                method='Committed blobs only; changedBindings plus all explicit supersessions/bindingRefresh/rebindReason rows and in-place payload changes since frozen source; exact lineage; decision changes include disposition, rationale/reason, changedClauses, reviewStatus, supersedes links and bindings (including enclosing claim decisions). Verdicts require descendant review-file commit or matching rowFingerprint (SHA256 of compact sorted UTF-8 decision context JSON plus LF); no author reviewStatus inheritance or prose-to-verdict expansion. The obligation population is unchanged; freshness rejects stale verdicts rather than inventing obligations for previously unreviewed rows. Matching two stored digests is not a live target-content audit.',
                 counts=counts, aggregateOnly=aggregate, unresolved=errors, rows=joined,
                 inputs=sorted(inputs.values(), key=lambda r: (r['pin'], r['path'])))
 

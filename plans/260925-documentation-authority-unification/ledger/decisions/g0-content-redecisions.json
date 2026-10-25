@@ -3783,7 +3783,7 @@
       "claimKind": "contract",
       "disposition": "move",
       "authoredBy": "fgos-run_unit-run-17928787018826",
-      "rationale": "Supersede obsolete overlay plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/574; current decision is plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/20. Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Only link destinations changed (legacy ../../specs/* paths to platform paths, enduser specs to knowledge-registry anchors); every register row, role and boundary text is unchanged; heading depth ## to ####. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+      "rationale": "Supersede overlay plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/20; the current decision is this row, plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/125. Earlier s14/s15 predecessors remain in this continuous chain. Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Only link destinations changed (legacy ../../specs/* paths to platform paths, enduser specs to knowledge-registry anchors); every register row, role and boundary text is unchanged; heading depth ## to ####. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
       "targetUnitDigest": "539e4336c8f12cd426751dbf3dd0fba533a0767d7f654edc1881aed4a559ea26",
       "targetAncestry": [
         "Component Boundary",
@@ -3829,6 +3829,63 @@
             "targetUnitDigest": "539e4336c8f12cd426751dbf3dd0fba533a0767d7f654edc1881aed4a559ea26",
             "bindingSha256": "4c43c2fb546005229ad28e9b6881ac1737afee4c90a7ca5f4afd51b91ff7adf4"
           }
+        },
+        "g0FollowupBefore": {
+          "claimId": "claim_ae69ca82e388b03292f8c25fe9c998c0",
+          "sourceUnitDigest": "2cf73fb7faa401dafde89b07119f4a5181bbe92232d67b936ecc5c068f602384",
+          "targetOwner": "docs/platform/component-boundary.md",
+          "targetAnchor": "5-high-level-component-authority-register",
+          "claimKind": "contract",
+          "disposition": "move",
+          "authoredBy": "fgos-run_unit-run-17928787018826",
+          "rationale": "Supersede obsolete overlay plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/574; current decision is plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/20. Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Only link destinations changed (legacy ../../specs/* paths to platform paths, enduser specs to knowledge-registry anchors); every register row, role and boundary text is unchanged; heading depth ## to ####. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+          "targetUnitDigest": "539e4336c8f12cd426751dbf3dd0fba533a0767d7f654edc1881aed4a559ea26",
+          "targetAncestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "5. High-Level Component Authority Register"
+          ],
+          "bindingSha256": "4c43c2fb546005229ad28e9b6881ac1737afee4c90a7ca5f4afd51b91ff7adf4",
+          "reviewStatus": "pending",
+          "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+          "supersedesBinding": {
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "pointer": "/bindingRefresh/20",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "5-high-level-component-authority-register",
+            "targetUnitDigest": "539e4336c8f12cd426751dbf3dd0fba533a0767d7f654edc1881aed4a559ea26",
+            "bindingSha256": "4c43c2fb546005229ad28e9b6881ac1737afee4c90a7ca5f4afd51b91ff7adf4"
+          },
+          "priorReview": {
+            "g0ReworkBefore": {
+              "claimId": "claim_ae69ca82e388b03292f8c25fe9c998c0",
+              "sourceUnitDigest": "2cf73fb7faa401dafde89b07119f4a5181bbe92232d67b936ecc5c068f602384",
+              "targetOwner": "docs/platform/component-boundary.md",
+              "targetAnchor": "5-high-level-component-authority-register",
+              "claimKind": "contract",
+              "disposition": "move",
+              "authoredBy": "fgos-run_unit-run-17928787018826",
+              "rationale": "Supersede obsolete overlay plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/574; current decision is plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/20. Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Only link destinations changed (legacy ../../specs/* paths to platform paths, enduser specs to knowledge-registry anchors); every register row, role and boundary text is unchanged; heading depth ## to ####. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+              "targetUnitDigest": "539e4336c8f12cd426751dbf3dd0fba533a0767d7f654edc1881aed4a559ea26",
+              "targetAncestry": [
+                "Component Boundary",
+                "Added in candidate: component-boundary-advisory source carriage",
+                "fgOS Component Boundary Advisory",
+                "5. High-Level Component Authority Register"
+              ],
+              "bindingSha256": "4c43c2fb546005229ad28e9b6881ac1737afee4c90a7ca5f4afd51b91ff7adf4",
+              "reviewStatus": "pending",
+              "reviewNote": "Independent review of this exact re-decision/rationale required; no approval inherited.",
+              "supersedesBinding": {
+                "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s15-navigation-review-fixes.json",
+                "pointer": "/bindingRefresh/3",
+                "targetAnchor": "5-high-level-component-authority-register",
+                "targetUnitDigest": "539e4336c8f12cd426751dbf3dd0fba533a0767d7f654edc1881aed4a559ea26",
+                "bindingSha256": "4c43c2fb546005229ad28e9b6881ac1737afee4c90a7ca5f4afd51b91ff7adf4"
+              }
+            }
+          }
         }
       }
     },
@@ -3840,7 +3897,7 @@
       "claimKind": "contract",
       "disposition": "move",
       "authoredBy": "fgos-run_unit-run-17928787018826",
-      "rationale": "Supersede obsolete overlay plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/577; current decision is plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/21. Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Only link destinations changed in the authority register table; every row, role and boundary text is unchanged. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+      "rationale": "Supersede overlay plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/21; the current decision is this row, plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/126. Earlier s14/s15 predecessors remain in this continuous chain. Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Only link destinations changed in the authority register table; every row, role and boundary text is unchanged. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
       "targetUnitDigest": "5f4a17570b16c371d6e0e17c52b6f72acdd363faa4ed92c9c3fc125c446915ba",
       "targetAncestry": [
         "Component Boundary",
@@ -3885,6 +3942,63 @@
             "targetAnchor": "unheaded-block-40",
             "targetUnitDigest": "5f4a17570b16c371d6e0e17c52b6f72acdd363faa4ed92c9c3fc125c446915ba",
             "bindingSha256": "38de637ff86cdcabe8f4c90c65e27557ec6bf5056508758ac961ec9f7d6137aa"
+          }
+        },
+        "g0FollowupBefore": {
+          "claimId": "claim_ab73231bdd37667748e73f92da406a7b",
+          "sourceUnitDigest": "9819ff097e5460c144503f4feb1ee09463529060b03882c2deafe01fb9ebe148",
+          "targetOwner": "docs/platform/component-boundary.md",
+          "targetAnchor": "unheaded-block-40",
+          "claimKind": "contract",
+          "disposition": "move",
+          "authoredBy": "fgos-run_unit-run-17928787018826",
+          "rationale": "Supersede obsolete overlay plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/577; current decision is plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/21. Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Only link destinations changed in the authority register table; every row, role and boundary text is unchanged. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+          "targetUnitDigest": "5f4a17570b16c371d6e0e17c52b6f72acdd363faa4ed92c9c3fc125c446915ba",
+          "targetAncestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "5. High-Level Component Authority Register"
+          ],
+          "bindingSha256": "38de637ff86cdcabe8f4c90c65e27557ec6bf5056508758ac961ec9f7d6137aa",
+          "reviewStatus": "pending",
+          "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+          "supersedesBinding": {
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "pointer": "/bindingRefresh/21",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "unheaded-block-40",
+            "targetUnitDigest": "5f4a17570b16c371d6e0e17c52b6f72acdd363faa4ed92c9c3fc125c446915ba",
+            "bindingSha256": "38de637ff86cdcabe8f4c90c65e27557ec6bf5056508758ac961ec9f7d6137aa"
+          },
+          "priorReview": {
+            "g0ReworkBefore": {
+              "claimId": "claim_ab73231bdd37667748e73f92da406a7b",
+              "sourceUnitDigest": "9819ff097e5460c144503f4feb1ee09463529060b03882c2deafe01fb9ebe148",
+              "targetOwner": "docs/platform/component-boundary.md",
+              "targetAnchor": "unheaded-block-40",
+              "claimKind": "contract",
+              "disposition": "move",
+              "authoredBy": "fgos-run_unit-run-17928787018826",
+              "rationale": "Supersede obsolete overlay plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/577; current decision is plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/21. Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Only link destinations changed in the authority register table; every row, role and boundary text is unchanged. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+              "targetUnitDigest": "5f4a17570b16c371d6e0e17c52b6f72acdd363faa4ed92c9c3fc125c446915ba",
+              "targetAncestry": [
+                "Component Boundary",
+                "Added in candidate: component-boundary-advisory source carriage",
+                "fgOS Component Boundary Advisory",
+                "5. High-Level Component Authority Register"
+              ],
+              "bindingSha256": "38de637ff86cdcabe8f4c90c65e27557ec6bf5056508758ac961ec9f7d6137aa",
+              "reviewStatus": "pending",
+              "reviewNote": "Independent review of this exact re-decision/rationale required; no approval inherited.",
+              "supersedesBinding": {
+                "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s15-navigation-review-fixes.json",
+                "pointer": "/bindingRefresh/4",
+                "targetAnchor": "unheaded-block-40",
+                "targetUnitDigest": "5f4a17570b16c371d6e0e17c52b6f72acdd363faa4ed92c9c3fc125c446915ba",
+                "bindingSha256": "38de637ff86cdcabe8f4c90c65e27557ec6bf5056508758ac961ec9f7d6137aa"
+              }
+            }
           }
         }
       }

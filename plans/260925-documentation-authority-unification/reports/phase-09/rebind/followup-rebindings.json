@@ -1,0 +1,1286 @@
+{
+  "inputHead": "0d200a3cd799c21688b8574646a6baae71300d27",
+  "rebindings": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/unitCarries/487",
+      "before": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "beforeCommit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+      "beforeWitness": {
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "9. Hexagonal Architecture View",
+          "anchor": "9-hexagonal-architecture-view",
+          "githubAnchor": "9-hexagonal-architecture-view",
+          "stableAnchor": "h-cd89d7810d01",
+          "startLine": 485,
+          "endLine": 485,
+          "textDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+          "sample": "9. Hexagonal Architecture View",
+          "sectionPayloadDigest": "54c4fd53ba1e4ea3424d8c910f6249d9a7039f8b914100b00758b97c5419159d",
+          "followingBlockDigest": "54e18a3af732fb59e7231c7192c3fe8667a4d705cc22e073d4b68b414e938f60",
+          "identityFingerprint": "bf237f3bcff748a49f994d62c97e48fb94efe882481b3c2567cc8434ad3a6662",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory"
+          ],
+          "text": "#### 9. Hexagonal Architecture View",
+          "sectionText": "#### 9. Hexagonal Architecture View\n\nThe system model should stay independent from concrete storage, transport,\nexecutor, and UI choices.\n\nCore model candidates, grouped by owning component:\n\n```txt\nWork Lifecycle Engine:\n  Work\n  Work identity/status/stage/claim/context/document state\n\nAgent Coordination Engine:\n  CoordinationSession\n  AdhocTask\n  Assignment\n  Synthesis\n\nDispatch And Execution Engine:\n  DispatchPlan\n  Run\n\nRun Result Evaluator:\n  RunResult\n  Evidence\n  ArtifactRef\n\nDomain Components And Extension Layer:\n  FlowDefinition normalized model\n  PolicyPatch\n  TaskSpec / Skill references\n  domain workflow definitions\n```\n\nThis replaces the flatter mental model:\n\n```txt\nCoordinationSession\nAdhocTask\nAssignment\nDispatchPlan\nRun\nRunResult\nEvidence\nSynthesis\nPolicyPatch\nFlowDefinition normalized model\n```\n\nPort candidates, grouped by owning component:\n\n```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispatch And Execution Engine:\n  DispatchResolverPort   (superseded in naming by DispatchRuntimePort,\n                          [Component Authority Boundary Map §13](../architect/proposals/component-authority-boundary-map.md#13-draft-ports);\n                          same candidate facade, not two live ports)\n  RunStorePort\n  ExecutorAdapterPort\n\nRun Result Evaluator:\n  EvidenceCollectorPort\n  ResultNormalizerPort\n  ArtifactStorePort\n\nDomain Components And Extension Layer:\n  DefinitionLoaderPort\n  DomainHarnessPort\n  ProtocolPackagePort\n  PolicyProviderPort\n  EvidencePolicyPort\n\nHost And Surface Layer:\n  VisibilityPort\n  CommandSurfacePort\n  ApiSurfacePort\n\nShared infrastructure:\n  ClockPort\n  IdGeneratorPort\n  FilesystemPort\n```\n\nAdapter candidates:\n\n```txt\nYAML Workflow loader\nWorkflow definition loader\ncoding-domain harness\nCLI spawn adapter\nHerdr spawn adapter\nMCP adapter\nAPI adapter\nlocal .fgos file store\nGit evidence collector\ntest command evidence collector\nWork engine verb adapter\n```\n\nThis split makes replacement easier. For example, dispatch governance,\nFlowDefinition validation, session DAG scheduling, Run supervision, or evidence\ncollection could move to Rust without requiring protocol packages or Skills to\nmove with them."
+        },
+        "previous": {
+          "anchor": "unheaded-block-63",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 63",
+          "textDigest": "0fbb26b5b55ac7b4a59c5822c3a1d8b7d79929464f29ff7217e322b46e2b7d63",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "8. Internal Boundary Map"
+          ],
+          "startLine": 467,
+          "endLine": 483,
+          "sample": "| Boundary | Type | Likely component | Owns | Must not own |\n|---|---|---|---|---|\n| Work Lifecycle | Bounded context + authority boundary | Work Lifecycle Engine | Work identity, "
+        },
+        "next": {
+          "anchor": "unheaded-block-64",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 64",
+          "textDigest": "54e18a3af732fb59e7231c7192c3fe8667a4d705cc22e073d4b68b414e938f60",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "startLine": 487,
+          "endLine": 488,
+          "sample": "The system model should stay independent from concrete storage, transport,\nexecutor, and UI choices."
+        }
+      },
+      "afterWitness": {
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "9. Hexagonal Architecture View",
+          "anchor": "9-hexagonal-architecture-view",
+          "githubAnchor": "9-hexagonal-architecture-view",
+          "stableAnchor": "h-cd89d7810d01",
+          "startLine": 485,
+          "endLine": 485,
+          "textDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+          "sample": "9. Hexagonal Architecture View",
+          "sectionPayloadDigest": "522206db4d5f028589bd95cf8c94e91d845864a0ece067a1adc3a421cc6e2792",
+          "followingBlockDigest": "54e18a3af732fb59e7231c7192c3fe8667a4d705cc22e073d4b68b414e938f60",
+          "identityFingerprint": "0308698c36ebaea7ae4bdc986d73c3136417d71f2159d2aac0c314e0b6f9a8c2",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory"
+          ],
+          "text": "#### 9. Hexagonal Architecture View",
+          "sectionText": "#### 9. Hexagonal Architecture View\n\nThe system model should stay independent from concrete storage, transport,\nexecutor, and UI choices.\n\nCore model candidates, grouped by owning component:\n\n```txt\nWork Lifecycle Engine:\n  Work\n  Work identity/status/stage/claim/context/document state\n\nAgent Coordination Engine:\n  CoordinationSession\n  AdhocTask\n  Assignment\n  Synthesis\n\nDispatch And Execution Engine:\n  DispatchPlan\n  Run\n\nRun Result Evaluator:\n  RunResult\n  Evidence\n  ArtifactRef\n\nDomain Components And Extension Layer:\n  FlowDefinition normalized model\n  PolicyPatch\n  TaskSpec / Skill references\n  domain workflow definitions\n```\n\nThis replaces the flatter mental model:\n\n```txt\nCoordinationSession\nAdhocTask\nAssignment\nDispatchPlan\nRun\nRunResult\nEvidence\nSynthesis\nPolicyPatch\nFlowDefinition normalized model\n```\n\nPort candidates, grouped by owning component:\n\n```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispatch And Execution Engine:\n  DispatchResolverPort   (superseded in naming by DispatchRuntimePort,\n                          [Component Authority Boundary Map §13](../proposals/component-authority-boundary-map.md#13-draft-ports);\n                          same candidate facade, not two live ports)\n  RunStorePort\n  ExecutorAdapterPort\n\nRun Result Evaluator:\n  EvidenceCollectorPort\n  ResultNormalizerPort\n  ArtifactStorePort\n\nDomain Components And Extension Layer:\n  DefinitionLoaderPort\n  DomainHarnessPort\n  ProtocolPackagePort\n  PolicyProviderPort\n  EvidencePolicyPort\n\nHost And Surface Layer:\n  VisibilityPort\n  CommandSurfacePort\n  ApiSurfacePort\n\nShared infrastructure:\n  ClockPort\n  IdGeneratorPort\n  FilesystemPort\n```\n\nAdapter candidates:\n\n```txt\nYAML Workflow loader\nWorkflow definition loader\ncoding-domain harness\nCLI spawn adapter\nHerdr spawn adapter\nMCP adapter\nAPI adapter\nlocal .fgos file store\nGit evidence collector\ntest command evidence collector\nWork engine verb adapter\n```\n\nThis split makes replacement easier. For example, dispatch governance,\nFlowDefinition validation, session DAG scheduling, Run supervision, or evidence\ncollection could move to Rust without requiring protocol packages or Skills to\nmove with them."
+        },
+        "previous": {
+          "anchor": "unheaded-block-63",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 63",
+          "textDigest": "0fbb26b5b55ac7b4a59c5822c3a1d8b7d79929464f29ff7217e322b46e2b7d63",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "8. Internal Boundary Map"
+          ],
+          "startLine": 467,
+          "endLine": 483,
+          "sample": "| Boundary | Type | Likely component | Owns | Must not own |\n|---|---|---|---|---|\n| Work Lifecycle | Bounded context + authority boundary | Work Lifecycle Engine | Work identity, "
+        },
+        "next": {
+          "anchor": "unheaded-block-64",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 64",
+          "textDigest": "54e18a3af732fb59e7231c7192c3fe8667a4d705cc22e073d4b68b414e938f60",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "startLine": 487,
+          "endLine": 488,
+          "sample": "The system model should stay independent from concrete storage, transport,\nexecutor, and UI choices."
+        }
+      },
+      "method": "replacement bounded by unchanged complete units"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/unitCarries/488",
+      "before": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "beforeCommit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+      "beforeWitness": {
+        "selected": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-70",
+          "githubAnchor": "unheaded-block-70",
+          "stableAnchor": "unheaded-block-70",
+          "title": "Unheaded block 70",
+          "startLine": 536,
+          "endLine": 575,
+          "textDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+          "sample": "```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispat",
+          "identityFingerprint": "41a9354d5d75e50b917a9c1038c3a8b09ae84f1489c752cf9ccead80b1df2d2c",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "text": "```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispatch And Execution Engine:\n  DispatchResolverPort   (superseded in naming by DispatchRuntimePort,\n                          [Component Authority Boundary Map §13](../architect/proposals/component-authority-boundary-map.md#13-draft-ports);\n                          same candidate facade, not two live ports)\n  RunStorePort\n  ExecutorAdapterPort\n\nRun Result Evaluator:\n  EvidenceCollectorPort\n  ResultNormalizerPort\n  ArtifactStorePort\n\nDomain Components And Extension Layer:\n  DefinitionLoaderPort\n  DomainHarnessPort\n  ProtocolPackagePort\n  PolicyProviderPort\n  EvidencePolicyPort\n\nHost And Surface Layer:\n  VisibilityPort\n  CommandSurfacePort\n  ApiSurfacePort\n\nShared infrastructure:\n  ClockPort\n  IdGeneratorPort\n  FilesystemPort\n```"
+        },
+        "previous": {
+          "anchor": "unheaded-block-69",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 69",
+          "textDigest": "4e0b5f718a485d654aca0f25e351dd175e0feb157a018259b84607dcc770056f",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "startLine": 534,
+          "endLine": 534,
+          "sample": "Port candidates, grouped by owning component:"
+        },
+        "next": {
+          "anchor": "unheaded-block-71",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 71",
+          "textDigest": "4ec428faf114de8efaf929a047d5f3333d593ef04df57c8d583981b77bdc68c4",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "startLine": 577,
+          "endLine": 591,
+          "sample": "Adapter candidates:\n\n```txt\nYAML Workflow loader\nWorkflow definition loader\ncoding-domain harness\nCLI spawn adapter\nHerdr spawn adapter\nMCP adapter\nAPI adapter\nlocal .fgos file sto"
+        }
+      },
+      "afterWitness": {
+        "selected": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-70",
+          "githubAnchor": "unheaded-block-70",
+          "stableAnchor": "unheaded-block-70",
+          "title": "Unheaded block 70",
+          "startLine": 536,
+          "endLine": 575,
+          "textDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+          "sample": "```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispat",
+          "identityFingerprint": "5c4b54317fa9c2a3cdcaa8ab1ec58d45802da6810ae477157a322dea5d7ea5e6",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "text": "```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispatch And Execution Engine:\n  DispatchResolverPort   (superseded in naming by DispatchRuntimePort,\n                          [Component Authority Boundary Map §13](../proposals/component-authority-boundary-map.md#13-draft-ports);\n                          same candidate facade, not two live ports)\n  RunStorePort\n  ExecutorAdapterPort\n\nRun Result Evaluator:\n  EvidenceCollectorPort\n  ResultNormalizerPort\n  ArtifactStorePort\n\nDomain Components And Extension Layer:\n  DefinitionLoaderPort\n  DomainHarnessPort\n  ProtocolPackagePort\n  PolicyProviderPort\n  EvidencePolicyPort\n\nHost And Surface Layer:\n  VisibilityPort\n  CommandSurfacePort\n  ApiSurfacePort\n\nShared infrastructure:\n  ClockPort\n  IdGeneratorPort\n  FilesystemPort\n```"
+        },
+        "previous": {
+          "anchor": "unheaded-block-69",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 69",
+          "textDigest": "4e0b5f718a485d654aca0f25e351dd175e0feb157a018259b84607dcc770056f",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "startLine": 534,
+          "endLine": 534,
+          "sample": "Port candidates, grouped by owning component:"
+        },
+        "next": {
+          "anchor": "unheaded-block-71",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 71",
+          "textDigest": "4ec428faf114de8efaf929a047d5f3333d593ef04df57c8d583981b77bdc68c4",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "startLine": 577,
+          "endLine": 591,
+          "sample": "Adapter candidates:\n\n```txt\nYAML Workflow loader\nWorkflow definition loader\ncoding-domain harness\nCLI spawn adapter\nHerdr spawn adapter\nMCP adapter\nAPI adapter\nlocal .fgos file sto"
+        }
+      },
+      "method": "replacement bounded by unchanged complete units"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/unitCarries/574",
+      "before": {
+        "targetOwner": "docs/platform/workflow/spec.md",
+        "targetAnchor": "unheaded-block-80",
+        "targetUnitDigest": "7b148fab8e33506041484e3e1fa03f815577aac4d78a86272fa97e8481c0ec8b",
+        "targetAncestry": [
+          "Spec: Workflow (guide, case, admission)",
+          "10. Ví dụ minh hoạ trước → sau",
+          "10.1 `core/workflows/council-lite.yaml`"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/workflow/spec.md",
+        "targetAnchor": "unheaded-block-80",
+        "targetUnitDigest": "1abf5d8f0829bf67f641cea7997ea93ce7c97ed85bc1185c0be88ffbcab569af",
+        "targetAncestry": [
+          "Spec: Workflow (guide, case, admission)",
+          "10. Ví dụ minh hoạ trước → sau",
+          "10.1 `core/workflows/council-lite.yaml`"
+        ]
+      },
+      "beforeCommit": "d9bedf229c9eaeb02d83713d0b636889f61b2af4",
+      "beforeWitness": {
+        "selected": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-80",
+          "githubAnchor": "unheaded-block-80",
+          "stableAnchor": "unheaded-block-80",
+          "title": "Unheaded block 80",
+          "startLine": 402,
+          "endLine": 429,
+          "textDigest": "7b148fab8e33506041484e3e1fa03f815577aac4d78a86272fa97e8481c0ec8b",
+          "sample": "**Sau** (phác thảo):\n\n```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # sub",
+          "identityFingerprint": "b4602dfc9dc057f8b57037e733a8f25ab8917d5005aab54012a68945b0fc7833",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "text": "**Sau** (phác thảo):\n\n```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # subject: văn bản yêu cầu\n  - id: positions-settled  # subject: ba report panelist\n  - id: verdict-settled    # subject: report synthesizer\nactivities:\n  - id: deliberate\n    entry: [request-received]\n    produces: [positions-settled, verdict-settled]\n    unit:                  # giữ nguyên template hôm nay\n      capability: delphi:propose\n      pattern: panel\n      blind: true\n      contextRefs: [core/agents/council-assumptions.yaml, core/agents/council-ship-maintain.yaml, core/agents/council-feedback-loops.yaml]\n      seats: [member-1, member-2, member-3, synthesizer]   # ghế khai tường minh, role producer ×3 + synthesizer ([seat-binding.md](../seat-binding/spec.md) mục 7.1)\n      params: { roleTasks: { member-1: ..., member-2: ..., member-3: ..., synthesizer: ... } }   # khoá theo ghế\nmust:\n  - id: independent-positions\n    guard: independence-blind      # đóng gói một Unit panel với ghế blind là bắt buộc\n    subject: positions-settled\n    reason: một ghế đã đọc ý kiến ghế khác thì không còn là một lăng kính độc lập\nclosure: [verdict-settled]\nframeDefaults: { dispatches: 1, mutatingDispatches: 0, seatLaunchesPerDispatch: 4, fallbackPerSeat: 2 }\n```"
+        },
+        "previous": {
+          "anchor": "unheaded-block-79",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 79",
+          "textDigest": "47eaf2048e33fc9f177011886118fbbb5618663b558e00c0fe58891ef9659a13",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "startLine": 400,
+          "endLine": 400,
+          "sample": "**Trước** (47 dòng): một step `discussion`, một unit `deliberate` (`capability: delphi:propose`, `pattern: panel`, `blind: true`, ba roleTask panelist + synthesizer, contextRefs tớ"
+        },
+        "next": {
+          "anchor": "unheaded-block-81",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 81",
+          "textDigest": "f6dfc9315d80b54675a01102aae59a554e75de0c1a6876514d162b25d9874ba1",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "startLine": 431,
+          "endLine": 431,
+          "sample": "**Một run sau thay đổi:** `workflow start council-lite` mở playbook case; Playbook proposer giữ `advance`, đề xuất `deliberate`; admission giữ 1 dispatch và trần 4 × 2 = 8 seat lau"
+        }
+      },
+      "afterWitness": {
+        "selected": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-80",
+          "githubAnchor": "unheaded-block-80",
+          "stableAnchor": "unheaded-block-80",
+          "title": "Unheaded block 80",
+          "startLine": 402,
+          "endLine": 429,
+          "textDigest": "1abf5d8f0829bf67f641cea7997ea93ce7c97ed85bc1185c0be88ffbcab569af",
+          "sample": "**Sau** (phác thảo):\n\n```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # sub",
+          "identityFingerprint": "d1c40bb8173ab7899aa6a84e333023d0a0d0fc9d01ace235f55dadb8938ea1f5",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "text": "**Sau** (phác thảo):\n\n```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # subject: văn bản yêu cầu\n  - id: positions-settled  # subject: ba report panelist\n  - id: verdict-settled    # subject: report synthesizer\nactivities:\n  - id: deliberate\n    entry: [request-received]\n    produces: [positions-settled, verdict-settled]\n    unit:                  # giữ nguyên template hôm nay\n      capability: delphi:propose\n      pattern: panel\n      blind: true\n      contextRefs: [core/agents/council-assumptions.yaml, core/agents/council-ship-maintain.yaml, core/agents/council-feedback-loops.yaml]\n      seats: [member-1, member-2, member-3, synthesizer]   # ghế khai tường minh, role producer ×3 + synthesizer ([seat-binding.md](seat-binding.md) mục 7.1)\n      params: { roleTasks: { member-1: ..., member-2: ..., member-3: ..., synthesizer: ... } }   # khoá theo ghế\nmust:\n  - id: independent-positions\n    guard: independence-blind      # đóng gói một Unit panel với ghế blind là bắt buộc\n    subject: positions-settled\n    reason: một ghế đã đọc ý kiến ghế khác thì không còn là một lăng kính độc lập\nclosure: [verdict-settled]\nframeDefaults: { dispatches: 1, mutatingDispatches: 0, seatLaunchesPerDispatch: 4, fallbackPerSeat: 2 }\n```"
+        },
+        "previous": {
+          "anchor": "unheaded-block-79",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 79",
+          "textDigest": "47eaf2048e33fc9f177011886118fbbb5618663b558e00c0fe58891ef9659a13",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "startLine": 400,
+          "endLine": 400,
+          "sample": "**Trước** (47 dòng): một step `discussion`, một unit `deliberate` (`capability: delphi:propose`, `pattern: panel`, `blind: true`, ba roleTask panelist + synthesizer, contextRefs tớ"
+        },
+        "next": {
+          "anchor": "unheaded-block-81",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 81",
+          "textDigest": "f6dfc9315d80b54675a01102aae59a554e75de0c1a6876514d162b25d9874ba1",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "startLine": 431,
+          "endLine": 431,
+          "sample": "**Một run sau thay đổi:** `workflow start council-lite` mở playbook case; Playbook proposer giữ `advance`, đề xuất `deliberate`; admission giữ 1 dispatch và trần 4 × 2 = 8 seat lau"
+        }
+      },
+      "method": "replacement bounded by unchanged complete units"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/bindingRefresh/374",
+      "before": {
+        "targetOwner": "docs/platform/workflow/spec.md",
+        "targetAnchor": "101-coreworkflowscouncil-liteyaml",
+        "targetUnitDigest": "0775fc5663e690dbc50d4efac799bba82a3c9344fea018204fbf137828dc2b30",
+        "targetAncestry": [
+          "Spec: Workflow (guide, case, admission)",
+          "10. Ví dụ minh hoạ trước → sau",
+          "10.1 `core/workflows/council-lite.yaml`"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/workflow/spec.md",
+        "targetAnchor": "101-coreworkflowscouncil-liteyaml",
+        "targetUnitDigest": "63681a9476ea8ec336db4883b5930b9c19c84ee4f8be18bbc19c5f14bd349da4",
+        "targetAncestry": [
+          "Spec: Workflow (guide, case, admission)",
+          "10. Ví dụ minh hoạ trước → sau",
+          "10.1 `core/workflows/council-lite.yaml`"
+        ]
+      },
+      "beforeCommit": "d9bedf229c9eaeb02d83713d0b636889f61b2af4",
+      "beforeWitness": {
+        "selected": {
+          "unitKind": "heading",
+          "level": 3,
+          "title": "10.1 `core/workflows/council-lite.yaml`",
+          "anchor": "101-coreworkflowscouncil-liteyaml",
+          "githubAnchor": "101-coreworkflowscouncil-liteyaml",
+          "stableAnchor": "h-02e4fd4fd961",
+          "startLine": 398,
+          "endLine": 398,
+          "textDigest": "0775fc5663e690dbc50d4efac799bba82a3c9344fea018204fbf137828dc2b30",
+          "sample": "10.1 `core/workflows/council-lite.yaml`",
+          "sectionPayloadDigest": "833b33b720e628083a43fb915ab0d15ab37e8544ab77704caac18fdfe80186ad",
+          "followingBlockDigest": "47eaf2048e33fc9f177011886118fbbb5618663b558e00c0fe58891ef9659a13",
+          "identityFingerprint": "0e68ab300333484200e78772690bc483b15691599b55e54197873a462dd874c7",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau"
+          ],
+          "text": "### 10.1 `core/workflows/council-lite.yaml`",
+          "sectionText": "### 10.1 `core/workflows/council-lite.yaml`\n\n**Trước** (47 dòng): một step `discussion`, một unit `deliberate` (`capability: delphi:propose`, `pattern: panel`, `blind: true`, ba roleTask panelist + synthesizer, contextRefs tới ba file posture). Vòng DAG chờ Unit, ghi `workflow.complete`. Thứ tự \"ý kiến blind trước tổng hợp\" nằm trong pattern panel; không gì trong run nói *vì sao*.\n\n**Sau** (phác thảo):\n\n```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # subject: văn bản yêu cầu\n  - id: positions-settled  # subject: ba report panelist\n  - id: verdict-settled    # subject: report synthesizer\nactivities:\n  - id: deliberate\n    entry: [request-received]\n    produces: [positions-settled, verdict-settled]\n    unit:                  # giữ nguyên template hôm nay\n      capability: delphi:propose\n      pattern: panel\n      blind: true\n      contextRefs: [core/agents/council-assumptions.yaml, core/agents/council-ship-maintain.yaml, core/agents/council-feedback-loops.yaml]\n      seats: [member-1, member-2, member-3, synthesizer]   # ghế khai tường minh, role producer ×3 + synthesizer ([seat-binding.md](../seat-binding/spec.md) mục 7.1)\n      params: { roleTasks: { member-1: ..., member-2: ..., member-3: ..., synthesizer: ... } }   # khoá theo ghế\nmust:\n  - id: independent-positions\n    guard: independence-blind      # đóng gói một Unit panel với ghế blind là bắt buộc\n    subject: positions-settled\n    reason: một ghế đã đọc ý kiến ghế khác thì không còn là một lăng kính độc lập\nclosure: [verdict-settled]\nframeDefaults: { dispatches: 1, mutatingDispatches: 0, seatLaunchesPerDispatch: 4, fallbackPerSeat: 2 }\n```\n\n**Một run sau thay đổi:** `workflow start council-lite` mở playbook case; Playbook proposer giữ `advance`, đề xuất `deliberate`; admission giữ 1 dispatch và trần 4 × 2 = 8 seat launch giao cho Unit; Execution Core chạy đúng Unit panel đó; settle ghi receipt, số launch đã dùng, `positions-settled` và `verdict-settled` achieved với digest report; close thành công; proposer nhả `advance`.\n\n**Khác biệt quan sát được:** status hiện milestone kèm digest; run **không thể** tái tạo bằng ba `fgos run` tuần tự cộng lời thứ tư đọc chúng, vì `independence-blind` biến Unit panel đóng gói thành dạng duy nhất được admit; câu trả lời gate thứ hai không thay câu đã tiêu; khung từ chối dispatch ghi file. **Không đổi:** template, file posture, roleTask, ghế blind, start tách rời, cách giữ `advance`, ý nghĩa tám run đã lưu."
+        },
+        "previous": {
+          "anchor": "unheaded-block-78",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 78",
+          "textDigest": "04c0630cfd01aadcbd381839232f971dd7a7ba13813f63b7576a6e5ff603b616",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau"
+          ],
+          "startLine": 396,
+          "endLine": 396,
+          "sample": "> **Tên trường trong các phác thảo chỉ để minh hoạ. Spec không khoá bố cục YAML.** Điều được khoá là hành vi quan sát được mô tả sau mỗi phác thảo."
+        },
+        "next": {
+          "anchor": "unheaded-block-79",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 79",
+          "textDigest": "47eaf2048e33fc9f177011886118fbbb5618663b558e00c0fe58891ef9659a13",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "startLine": 400,
+          "endLine": 400,
+          "sample": "**Trước** (47 dòng): một step `discussion`, một unit `deliberate` (`capability: delphi:propose`, `pattern: panel`, `blind: true`, ba roleTask panelist + synthesizer, contextRefs tớ"
+        }
+      },
+      "afterWitness": {
+        "selected": {
+          "unitKind": "heading",
+          "level": 3,
+          "title": "10.1 `core/workflows/council-lite.yaml`",
+          "anchor": "101-coreworkflowscouncil-liteyaml",
+          "githubAnchor": "101-coreworkflowscouncil-liteyaml",
+          "stableAnchor": "h-02e4fd4fd961",
+          "startLine": 398,
+          "endLine": 398,
+          "textDigest": "63681a9476ea8ec336db4883b5930b9c19c84ee4f8be18bbc19c5f14bd349da4",
+          "sample": "10.1 `core/workflows/council-lite.yaml`",
+          "sectionPayloadDigest": "e3dd9cf0273a26efa8f7aef16909681f29cb88686b114a3d4f945776fee33bbf",
+          "followingBlockDigest": "47eaf2048e33fc9f177011886118fbbb5618663b558e00c0fe58891ef9659a13",
+          "identityFingerprint": "85549d5ee69b228bc798a132e5cabdfdd143b8d9d98ca16af6f8e63a7430df72",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau"
+          ],
+          "text": "### 10.1 `core/workflows/council-lite.yaml`",
+          "sectionText": "### 10.1 `core/workflows/council-lite.yaml`\n\n**Trước** (47 dòng): một step `discussion`, một unit `deliberate` (`capability: delphi:propose`, `pattern: panel`, `blind: true`, ba roleTask panelist + synthesizer, contextRefs tới ba file posture). Vòng DAG chờ Unit, ghi `workflow.complete`. Thứ tự \"ý kiến blind trước tổng hợp\" nằm trong pattern panel; không gì trong run nói *vì sao*.\n\n**Sau** (phác thảo):\n\n```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # subject: văn bản yêu cầu\n  - id: positions-settled  # subject: ba report panelist\n  - id: verdict-settled    # subject: report synthesizer\nactivities:\n  - id: deliberate\n    entry: [request-received]\n    produces: [positions-settled, verdict-settled]\n    unit:                  # giữ nguyên template hôm nay\n      capability: delphi:propose\n      pattern: panel\n      blind: true\n      contextRefs: [core/agents/council-assumptions.yaml, core/agents/council-ship-maintain.yaml, core/agents/council-feedback-loops.yaml]\n      seats: [member-1, member-2, member-3, synthesizer]   # ghế khai tường minh, role producer ×3 + synthesizer ([seat-binding.md](seat-binding.md) mục 7.1)\n      params: { roleTasks: { member-1: ..., member-2: ..., member-3: ..., synthesizer: ... } }   # khoá theo ghế\nmust:\n  - id: independent-positions\n    guard: independence-blind      # đóng gói một Unit panel với ghế blind là bắt buộc\n    subject: positions-settled\n    reason: một ghế đã đọc ý kiến ghế khác thì không còn là một lăng kính độc lập\nclosure: [verdict-settled]\nframeDefaults: { dispatches: 1, mutatingDispatches: 0, seatLaunchesPerDispatch: 4, fallbackPerSeat: 2 }\n```\n\n**Một run sau thay đổi:** `workflow start council-lite` mở playbook case; Playbook proposer giữ `advance`, đề xuất `deliberate`; admission giữ 1 dispatch và trần 4 × 2 = 8 seat launch giao cho Unit; Execution Core chạy đúng Unit panel đó; settle ghi receipt, số launch đã dùng, `positions-settled` và `verdict-settled` achieved với digest report; close thành công; proposer nhả `advance`.\n\n**Khác biệt quan sát được:** status hiện milestone kèm digest; run **không thể** tái tạo bằng ba `fgos run` tuần tự cộng lời thứ tư đọc chúng, vì `independence-blind` biến Unit panel đóng gói thành dạng duy nhất được admit; câu trả lời gate thứ hai không thay câu đã tiêu; khung từ chối dispatch ghi file. **Không đổi:** template, file posture, roleTask, ghế blind, start tách rời, cách giữ `advance`, ý nghĩa tám run đã lưu."
+        },
+        "previous": {
+          "anchor": "unheaded-block-78",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 78",
+          "textDigest": "04c0630cfd01aadcbd381839232f971dd7a7ba13813f63b7576a6e5ff603b616",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau"
+          ],
+          "startLine": 396,
+          "endLine": 396,
+          "sample": "> **Tên trường trong các phác thảo chỉ để minh hoạ. Spec không khoá bố cục YAML.** Điều được khoá là hành vi quan sát được mô tả sau mỗi phác thảo."
+        },
+        "next": {
+          "anchor": "unheaded-block-79",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 79",
+          "textDigest": "47eaf2048e33fc9f177011886118fbbb5618663b558e00c0fe58891ef9659a13",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "startLine": 400,
+          "endLine": 400,
+          "sample": "**Trước** (47 dòng): một step `discussion`, một unit `deliberate` (`capability: delphi:propose`, `pattern: panel`, `blind: true`, ba roleTask panelist + synthesizer, contextRefs tớ"
+        }
+      },
+      "method": "replacement bounded by unchanged complete units"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/bindingRefresh/376",
+      "before": {
+        "targetOwner": "docs/platform/workflow/spec.md",
+        "targetAnchor": "unheaded-block-80",
+        "targetUnitDigest": "7b148fab8e33506041484e3e1fa03f815577aac4d78a86272fa97e8481c0ec8b",
+        "targetAncestry": [
+          "Spec: Workflow (guide, case, admission)",
+          "10. Ví dụ minh hoạ trước → sau",
+          "10.1 `core/workflows/council-lite.yaml`"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/workflow/spec.md",
+        "targetAnchor": "unheaded-block-80",
+        "targetUnitDigest": "1abf5d8f0829bf67f641cea7997ea93ce7c97ed85bc1185c0be88ffbcab569af",
+        "targetAncestry": [
+          "Spec: Workflow (guide, case, admission)",
+          "10. Ví dụ minh hoạ trước → sau",
+          "10.1 `core/workflows/council-lite.yaml`"
+        ]
+      },
+      "beforeCommit": "d9bedf229c9eaeb02d83713d0b636889f61b2af4",
+      "beforeWitness": {
+        "selected": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-80",
+          "githubAnchor": "unheaded-block-80",
+          "stableAnchor": "unheaded-block-80",
+          "title": "Unheaded block 80",
+          "startLine": 402,
+          "endLine": 429,
+          "textDigest": "7b148fab8e33506041484e3e1fa03f815577aac4d78a86272fa97e8481c0ec8b",
+          "sample": "**Sau** (phác thảo):\n\n```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # sub",
+          "identityFingerprint": "b4602dfc9dc057f8b57037e733a8f25ab8917d5005aab54012a68945b0fc7833",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "text": "**Sau** (phác thảo):\n\n```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # subject: văn bản yêu cầu\n  - id: positions-settled  # subject: ba report panelist\n  - id: verdict-settled    # subject: report synthesizer\nactivities:\n  - id: deliberate\n    entry: [request-received]\n    produces: [positions-settled, verdict-settled]\n    unit:                  # giữ nguyên template hôm nay\n      capability: delphi:propose\n      pattern: panel\n      blind: true\n      contextRefs: [core/agents/council-assumptions.yaml, core/agents/council-ship-maintain.yaml, core/agents/council-feedback-loops.yaml]\n      seats: [member-1, member-2, member-3, synthesizer]   # ghế khai tường minh, role producer ×3 + synthesizer ([seat-binding.md](../seat-binding/spec.md) mục 7.1)\n      params: { roleTasks: { member-1: ..., member-2: ..., member-3: ..., synthesizer: ... } }   # khoá theo ghế\nmust:\n  - id: independent-positions\n    guard: independence-blind      # đóng gói một Unit panel với ghế blind là bắt buộc\n    subject: positions-settled\n    reason: một ghế đã đọc ý kiến ghế khác thì không còn là một lăng kính độc lập\nclosure: [verdict-settled]\nframeDefaults: { dispatches: 1, mutatingDispatches: 0, seatLaunchesPerDispatch: 4, fallbackPerSeat: 2 }\n```"
+        },
+        "previous": {
+          "anchor": "unheaded-block-79",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 79",
+          "textDigest": "47eaf2048e33fc9f177011886118fbbb5618663b558e00c0fe58891ef9659a13",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "startLine": 400,
+          "endLine": 400,
+          "sample": "**Trước** (47 dòng): một step `discussion`, một unit `deliberate` (`capability: delphi:propose`, `pattern: panel`, `blind: true`, ba roleTask panelist + synthesizer, contextRefs tớ"
+        },
+        "next": {
+          "anchor": "unheaded-block-81",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 81",
+          "textDigest": "f6dfc9315d80b54675a01102aae59a554e75de0c1a6876514d162b25d9874ba1",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "startLine": 431,
+          "endLine": 431,
+          "sample": "**Một run sau thay đổi:** `workflow start council-lite` mở playbook case; Playbook proposer giữ `advance`, đề xuất `deliberate`; admission giữ 1 dispatch và trần 4 × 2 = 8 seat lau"
+        }
+      },
+      "afterWitness": {
+        "selected": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-80",
+          "githubAnchor": "unheaded-block-80",
+          "stableAnchor": "unheaded-block-80",
+          "title": "Unheaded block 80",
+          "startLine": 402,
+          "endLine": 429,
+          "textDigest": "1abf5d8f0829bf67f641cea7997ea93ce7c97ed85bc1185c0be88ffbcab569af",
+          "sample": "**Sau** (phác thảo):\n\n```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # sub",
+          "identityFingerprint": "d1c40bb8173ab7899aa6a84e333023d0a0d0fc9d01ace235f55dadb8938ea1f5",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "text": "**Sau** (phác thảo):\n\n```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # subject: văn bản yêu cầu\n  - id: positions-settled  # subject: ba report panelist\n  - id: verdict-settled    # subject: report synthesizer\nactivities:\n  - id: deliberate\n    entry: [request-received]\n    produces: [positions-settled, verdict-settled]\n    unit:                  # giữ nguyên template hôm nay\n      capability: delphi:propose\n      pattern: panel\n      blind: true\n      contextRefs: [core/agents/council-assumptions.yaml, core/agents/council-ship-maintain.yaml, core/agents/council-feedback-loops.yaml]\n      seats: [member-1, member-2, member-3, synthesizer]   # ghế khai tường minh, role producer ×3 + synthesizer ([seat-binding.md](seat-binding.md) mục 7.1)\n      params: { roleTasks: { member-1: ..., member-2: ..., member-3: ..., synthesizer: ... } }   # khoá theo ghế\nmust:\n  - id: independent-positions\n    guard: independence-blind      # đóng gói một Unit panel với ghế blind là bắt buộc\n    subject: positions-settled\n    reason: một ghế đã đọc ý kiến ghế khác thì không còn là một lăng kính độc lập\nclosure: [verdict-settled]\nframeDefaults: { dispatches: 1, mutatingDispatches: 0, seatLaunchesPerDispatch: 4, fallbackPerSeat: 2 }\n```"
+        },
+        "previous": {
+          "anchor": "unheaded-block-79",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 79",
+          "textDigest": "47eaf2048e33fc9f177011886118fbbb5618663b558e00c0fe58891ef9659a13",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "startLine": 400,
+          "endLine": 400,
+          "sample": "**Trước** (47 dòng): một step `discussion`, một unit `deliberate` (`capability: delphi:propose`, `pattern: panel`, `blind: true`, ba roleTask panelist + synthesizer, contextRefs tớ"
+        },
+        "next": {
+          "anchor": "unheaded-block-81",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 81",
+          "textDigest": "f6dfc9315d80b54675a01102aae59a554e75de0c1a6876514d162b25d9874ba1",
+          "ancestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "10. Ví dụ minh hoạ trước → sau",
+            "10.1 `core/workflows/council-lite.yaml`"
+          ],
+          "startLine": 431,
+          "endLine": 431,
+          "sample": "**Một run sau thay đổi:** `workflow start council-lite` mở playbook case; Playbook proposer giữ `advance`, đề xuất `deliberate`; admission giữ 1 dispatch và trần 4 × 2 = 8 seat lau"
+        }
+      },
+      "method": "replacement bounded by unchanged complete units"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/bindingRefresh/604",
+      "before": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "beforeCommit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+      "beforeWitness": {
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "9. Hexagonal Architecture View",
+          "anchor": "9-hexagonal-architecture-view",
+          "githubAnchor": "9-hexagonal-architecture-view",
+          "stableAnchor": "h-cd89d7810d01",
+          "startLine": 485,
+          "endLine": 485,
+          "textDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+          "sample": "9. Hexagonal Architecture View",
+          "sectionPayloadDigest": "54c4fd53ba1e4ea3424d8c910f6249d9a7039f8b914100b00758b97c5419159d",
+          "followingBlockDigest": "54e18a3af732fb59e7231c7192c3fe8667a4d705cc22e073d4b68b414e938f60",
+          "identityFingerprint": "bf237f3bcff748a49f994d62c97e48fb94efe882481b3c2567cc8434ad3a6662",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory"
+          ],
+          "text": "#### 9. Hexagonal Architecture View",
+          "sectionText": "#### 9. Hexagonal Architecture View\n\nThe system model should stay independent from concrete storage, transport,\nexecutor, and UI choices.\n\nCore model candidates, grouped by owning component:\n\n```txt\nWork Lifecycle Engine:\n  Work\n  Work identity/status/stage/claim/context/document state\n\nAgent Coordination Engine:\n  CoordinationSession\n  AdhocTask\n  Assignment\n  Synthesis\n\nDispatch And Execution Engine:\n  DispatchPlan\n  Run\n\nRun Result Evaluator:\n  RunResult\n  Evidence\n  ArtifactRef\n\nDomain Components And Extension Layer:\n  FlowDefinition normalized model\n  PolicyPatch\n  TaskSpec / Skill references\n  domain workflow definitions\n```\n\nThis replaces the flatter mental model:\n\n```txt\nCoordinationSession\nAdhocTask\nAssignment\nDispatchPlan\nRun\nRunResult\nEvidence\nSynthesis\nPolicyPatch\nFlowDefinition normalized model\n```\n\nPort candidates, grouped by owning component:\n\n```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispatch And Execution Engine:\n  DispatchResolverPort   (superseded in naming by DispatchRuntimePort,\n                          [Component Authority Boundary Map §13](../architect/proposals/component-authority-boundary-map.md#13-draft-ports);\n                          same candidate facade, not two live ports)\n  RunStorePort\n  ExecutorAdapterPort\n\nRun Result Evaluator:\n  EvidenceCollectorPort\n  ResultNormalizerPort\n  ArtifactStorePort\n\nDomain Components And Extension Layer:\n  DefinitionLoaderPort\n  DomainHarnessPort\n  ProtocolPackagePort\n  PolicyProviderPort\n  EvidencePolicyPort\n\nHost And Surface Layer:\n  VisibilityPort\n  CommandSurfacePort\n  ApiSurfacePort\n\nShared infrastructure:\n  ClockPort\n  IdGeneratorPort\n  FilesystemPort\n```\n\nAdapter candidates:\n\n```txt\nYAML Workflow loader\nWorkflow definition loader\ncoding-domain harness\nCLI spawn adapter\nHerdr spawn adapter\nMCP adapter\nAPI adapter\nlocal .fgos file store\nGit evidence collector\ntest command evidence collector\nWork engine verb adapter\n```\n\nThis split makes replacement easier. For example, dispatch governance,\nFlowDefinition validation, session DAG scheduling, Run supervision, or evidence\ncollection could move to Rust without requiring protocol packages or Skills to\nmove with them."
+        },
+        "previous": {
+          "anchor": "unheaded-block-63",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 63",
+          "textDigest": "0fbb26b5b55ac7b4a59c5822c3a1d8b7d79929464f29ff7217e322b46e2b7d63",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "8. Internal Boundary Map"
+          ],
+          "startLine": 467,
+          "endLine": 483,
+          "sample": "| Boundary | Type | Likely component | Owns | Must not own |\n|---|---|---|---|---|\n| Work Lifecycle | Bounded context + authority boundary | Work Lifecycle Engine | Work identity, "
+        },
+        "next": {
+          "anchor": "unheaded-block-64",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 64",
+          "textDigest": "54e18a3af732fb59e7231c7192c3fe8667a4d705cc22e073d4b68b414e938f60",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "startLine": 487,
+          "endLine": 488,
+          "sample": "The system model should stay independent from concrete storage, transport,\nexecutor, and UI choices."
+        }
+      },
+      "afterWitness": {
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "9. Hexagonal Architecture View",
+          "anchor": "9-hexagonal-architecture-view",
+          "githubAnchor": "9-hexagonal-architecture-view",
+          "stableAnchor": "h-cd89d7810d01",
+          "startLine": 485,
+          "endLine": 485,
+          "textDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+          "sample": "9. Hexagonal Architecture View",
+          "sectionPayloadDigest": "522206db4d5f028589bd95cf8c94e91d845864a0ece067a1adc3a421cc6e2792",
+          "followingBlockDigest": "54e18a3af732fb59e7231c7192c3fe8667a4d705cc22e073d4b68b414e938f60",
+          "identityFingerprint": "0308698c36ebaea7ae4bdc986d73c3136417d71f2159d2aac0c314e0b6f9a8c2",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory"
+          ],
+          "text": "#### 9. Hexagonal Architecture View",
+          "sectionText": "#### 9. Hexagonal Architecture View\n\nThe system model should stay independent from concrete storage, transport,\nexecutor, and UI choices.\n\nCore model candidates, grouped by owning component:\n\n```txt\nWork Lifecycle Engine:\n  Work\n  Work identity/status/stage/claim/context/document state\n\nAgent Coordination Engine:\n  CoordinationSession\n  AdhocTask\n  Assignment\n  Synthesis\n\nDispatch And Execution Engine:\n  DispatchPlan\n  Run\n\nRun Result Evaluator:\n  RunResult\n  Evidence\n  ArtifactRef\n\nDomain Components And Extension Layer:\n  FlowDefinition normalized model\n  PolicyPatch\n  TaskSpec / Skill references\n  domain workflow definitions\n```\n\nThis replaces the flatter mental model:\n\n```txt\nCoordinationSession\nAdhocTask\nAssignment\nDispatchPlan\nRun\nRunResult\nEvidence\nSynthesis\nPolicyPatch\nFlowDefinition normalized model\n```\n\nPort candidates, grouped by owning component:\n\n```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispatch And Execution Engine:\n  DispatchResolverPort   (superseded in naming by DispatchRuntimePort,\n                          [Component Authority Boundary Map §13](../proposals/component-authority-boundary-map.md#13-draft-ports);\n                          same candidate facade, not two live ports)\n  RunStorePort\n  ExecutorAdapterPort\n\nRun Result Evaluator:\n  EvidenceCollectorPort\n  ResultNormalizerPort\n  ArtifactStorePort\n\nDomain Components And Extension Layer:\n  DefinitionLoaderPort\n  DomainHarnessPort\n  ProtocolPackagePort\n  PolicyProviderPort\n  EvidencePolicyPort\n\nHost And Surface Layer:\n  VisibilityPort\n  CommandSurfacePort\n  ApiSurfacePort\n\nShared infrastructure:\n  ClockPort\n  IdGeneratorPort\n  FilesystemPort\n```\n\nAdapter candidates:\n\n```txt\nYAML Workflow loader\nWorkflow definition loader\ncoding-domain harness\nCLI spawn adapter\nHerdr spawn adapter\nMCP adapter\nAPI adapter\nlocal .fgos file store\nGit evidence collector\ntest command evidence collector\nWork engine verb adapter\n```\n\nThis split makes replacement easier. For example, dispatch governance,\nFlowDefinition validation, session DAG scheduling, Run supervision, or evidence\ncollection could move to Rust without requiring protocol packages or Skills to\nmove with them."
+        },
+        "previous": {
+          "anchor": "unheaded-block-63",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 63",
+          "textDigest": "0fbb26b5b55ac7b4a59c5822c3a1d8b7d79929464f29ff7217e322b46e2b7d63",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "8. Internal Boundary Map"
+          ],
+          "startLine": 467,
+          "endLine": 483,
+          "sample": "| Boundary | Type | Likely component | Owns | Must not own |\n|---|---|---|---|---|\n| Work Lifecycle | Bounded context + authority boundary | Work Lifecycle Engine | Work identity, "
+        },
+        "next": {
+          "anchor": "unheaded-block-64",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 64",
+          "textDigest": "54e18a3af732fb59e7231c7192c3fe8667a4d705cc22e073d4b68b414e938f60",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "startLine": 487,
+          "endLine": 488,
+          "sample": "The system model should stay independent from concrete storage, transport,\nexecutor, and UI choices."
+        }
+      },
+      "method": "replacement bounded by unchanged complete units"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/bindingRefresh/611",
+      "before": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "beforeCommit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+      "beforeWitness": {
+        "selected": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-70",
+          "githubAnchor": "unheaded-block-70",
+          "stableAnchor": "unheaded-block-70",
+          "title": "Unheaded block 70",
+          "startLine": 536,
+          "endLine": 575,
+          "textDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+          "sample": "```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispat",
+          "identityFingerprint": "41a9354d5d75e50b917a9c1038c3a8b09ae84f1489c752cf9ccead80b1df2d2c",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "text": "```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispatch And Execution Engine:\n  DispatchResolverPort   (superseded in naming by DispatchRuntimePort,\n                          [Component Authority Boundary Map §13](../architect/proposals/component-authority-boundary-map.md#13-draft-ports);\n                          same candidate facade, not two live ports)\n  RunStorePort\n  ExecutorAdapterPort\n\nRun Result Evaluator:\n  EvidenceCollectorPort\n  ResultNormalizerPort\n  ArtifactStorePort\n\nDomain Components And Extension Layer:\n  DefinitionLoaderPort\n  DomainHarnessPort\n  ProtocolPackagePort\n  PolicyProviderPort\n  EvidencePolicyPort\n\nHost And Surface Layer:\n  VisibilityPort\n  CommandSurfacePort\n  ApiSurfacePort\n\nShared infrastructure:\n  ClockPort\n  IdGeneratorPort\n  FilesystemPort\n```"
+        },
+        "previous": {
+          "anchor": "unheaded-block-69",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 69",
+          "textDigest": "4e0b5f718a485d654aca0f25e351dd175e0feb157a018259b84607dcc770056f",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "startLine": 534,
+          "endLine": 534,
+          "sample": "Port candidates, grouped by owning component:"
+        },
+        "next": {
+          "anchor": "unheaded-block-71",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 71",
+          "textDigest": "4ec428faf114de8efaf929a047d5f3333d593ef04df57c8d583981b77bdc68c4",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "startLine": 577,
+          "endLine": 591,
+          "sample": "Adapter candidates:\n\n```txt\nYAML Workflow loader\nWorkflow definition loader\ncoding-domain harness\nCLI spawn adapter\nHerdr spawn adapter\nMCP adapter\nAPI adapter\nlocal .fgos file sto"
+        }
+      },
+      "afterWitness": {
+        "selected": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-70",
+          "githubAnchor": "unheaded-block-70",
+          "stableAnchor": "unheaded-block-70",
+          "title": "Unheaded block 70",
+          "startLine": 536,
+          "endLine": 575,
+          "textDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+          "sample": "```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispat",
+          "identityFingerprint": "5c4b54317fa9c2a3cdcaa8ab1ec58d45802da6810ae477157a322dea5d7ea5e6",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "text": "```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispatch And Execution Engine:\n  DispatchResolverPort   (superseded in naming by DispatchRuntimePort,\n                          [Component Authority Boundary Map §13](../proposals/component-authority-boundary-map.md#13-draft-ports);\n                          same candidate facade, not two live ports)\n  RunStorePort\n  ExecutorAdapterPort\n\nRun Result Evaluator:\n  EvidenceCollectorPort\n  ResultNormalizerPort\n  ArtifactStorePort\n\nDomain Components And Extension Layer:\n  DefinitionLoaderPort\n  DomainHarnessPort\n  ProtocolPackagePort\n  PolicyProviderPort\n  EvidencePolicyPort\n\nHost And Surface Layer:\n  VisibilityPort\n  CommandSurfacePort\n  ApiSurfacePort\n\nShared infrastructure:\n  ClockPort\n  IdGeneratorPort\n  FilesystemPort\n```"
+        },
+        "previous": {
+          "anchor": "unheaded-block-69",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 69",
+          "textDigest": "4e0b5f718a485d654aca0f25e351dd175e0feb157a018259b84607dcc770056f",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "startLine": 534,
+          "endLine": 534,
+          "sample": "Port candidates, grouped by owning component:"
+        },
+        "next": {
+          "anchor": "unheaded-block-71",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 71",
+          "textDigest": "4ec428faf114de8efaf929a047d5f3333d593ef04df57c8d583981b77bdc68c4",
+          "ancestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "9. Hexagonal Architecture View"
+          ],
+          "startLine": 577,
+          "endLine": 591,
+          "sample": "Adapter candidates:\n\n```txt\nYAML Workflow loader\nWorkflow definition loader\ncoding-domain harness\nCLI spawn adapter\nHerdr spawn adapter\nMCP adapter\nAPI adapter\nlocal .fgos file sto"
+        }
+      },
+      "method": "replacement bounded by unchanged complete units"
+    }
+  ],
+  "changedRows": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/125",
+      "before": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "5-high-level-component-authority-register",
+        "targetUnitDigest": "539e4336c8f12cd426751dbf3dd0fba533a0767d7f654edc1881aed4a559ea26",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "5. High-Level Component Authority Register"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "5-high-level-component-authority-register",
+        "targetUnitDigest": "539e4336c8f12cd426751dbf3dd0fba533a0767d7f654edc1881aed4a559ea26",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "5. High-Level Component Authority Register"
+        ]
+      },
+      "disposition": "move",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/126",
+      "before": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-40",
+        "targetUnitDigest": "5f4a17570b16c371d6e0e17c52b6f72acdd363faa4ed92c9c3fc125c446915ba",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "5. High-Level Component Authority Register"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-40",
+        "targetUnitDigest": "5f4a17570b16c371d6e0e17c52b6f72acdd363faa4ed92c9c3fc125c446915ba",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "5. High-Level Component Authority Register"
+        ]
+      },
+      "disposition": "move",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/unitCarries/487",
+      "before": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "disposition": {
+        "kind": "equivalent-current-content",
+        "reason": "Full source text is already present; only heading depth, link destinations or whitespace differ. Heading payload units are accounted separately."
+      },
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/unitCarries/488",
+      "before": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "disposition": {
+        "kind": "equivalent-current-content",
+        "reason": "Full source text is already present; only heading depth, link destinations or whitespace differ. Heading payload units are accounted separately."
+      },
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/unitCarries/574",
+      "before": {
+        "targetOwner": "docs/platform/workflow/spec.md",
+        "targetAnchor": "unheaded-block-80",
+        "targetUnitDigest": "7b148fab8e33506041484e3e1fa03f815577aac4d78a86272fa97e8481c0ec8b",
+        "targetAncestry": [
+          "Spec: Workflow (guide, case, admission)",
+          "10. Ví dụ minh hoạ trước → sau",
+          "10.1 `core/workflows/council-lite.yaml`"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/workflow/spec.md",
+        "targetAnchor": "unheaded-block-80",
+        "targetUnitDigest": "1abf5d8f0829bf67f641cea7997ea93ce7c97ed85bc1185c0be88ffbcab569af",
+        "targetAncestry": [
+          "Spec: Workflow (guide, case, admission)",
+          "10. Ví dụ minh hoạ trước → sau",
+          "10.1 `core/workflows/council-lite.yaml`"
+        ]
+      },
+      "disposition": {
+        "kind": "equivalent-current-content",
+        "reason": "Full source text is already present; only heading depth, link destinations or whitespace differ. Heading payload units are accounted separately."
+      },
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/bindingRefresh/8",
+      "before": {
+        "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+        "targetAnchor": "0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption",
+        "targetUnitDigest": "f617f1c06417c2f7984c2c37a8b6d06c85bdc662faa1bb373adac1858eb519d8",
+        "targetAncestry": [
+          "0002 — Mô hình việc phẳng",
+          "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/platform-foundations.md",
+        "targetAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+        "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+        "targetAncestry": [
+          "Platform Foundations",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+        ]
+      },
+      "disposition": "drop",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/bindingRefresh/374",
+      "before": {
+        "targetOwner": "docs/platform/workflow/spec.md",
+        "targetAnchor": "101-coreworkflowscouncil-liteyaml",
+        "targetUnitDigest": "0775fc5663e690dbc50d4efac799bba82a3c9344fea018204fbf137828dc2b30",
+        "targetAncestry": [
+          "Spec: Workflow (guide, case, admission)",
+          "10. Ví dụ minh hoạ trước → sau",
+          "10.1 `core/workflows/council-lite.yaml`"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/workflow/spec.md",
+        "targetAnchor": "101-coreworkflowscouncil-liteyaml",
+        "targetUnitDigest": "63681a9476ea8ec336db4883b5930b9c19c84ee4f8be18bbc19c5f14bd349da4",
+        "targetAncestry": [
+          "Spec: Workflow (guide, case, admission)",
+          "10. Ví dụ minh hoạ trước → sau",
+          "10.1 `core/workflows/council-lite.yaml`"
+        ]
+      },
+      "disposition": null,
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/bindingRefresh/376",
+      "before": {
+        "targetOwner": "docs/platform/workflow/spec.md",
+        "targetAnchor": "unheaded-block-80",
+        "targetUnitDigest": "7b148fab8e33506041484e3e1fa03f815577aac4d78a86272fa97e8481c0ec8b",
+        "targetAncestry": [
+          "Spec: Workflow (guide, case, admission)",
+          "10. Ví dụ minh hoạ trước → sau",
+          "10.1 `core/workflows/council-lite.yaml`"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/workflow/spec.md",
+        "targetAnchor": "unheaded-block-80",
+        "targetUnitDigest": "1abf5d8f0829bf67f641cea7997ea93ce7c97ed85bc1185c0be88ffbcab569af",
+        "targetAncestry": [
+          "Spec: Workflow (guide, case, admission)",
+          "10. Ví dụ minh hoạ trước → sau",
+          "10.1 `core/workflows/council-lite.yaml`"
+        ]
+      },
+      "disposition": null,
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/bindingRefresh/604",
+      "before": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "disposition": null,
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/bindingRefresh/611",
+      "before": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      },
+      "disposition": null,
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+      "pointer": "/registryGaps/0",
+      "before": {
+        "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "83c4ce05b5d6a9b14dccd5a2365bec12ee589a80b555dec26a5a7275106b45ec",
+        "targetAncestry": [
+          "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "Từ vựng dispatch hiện hành",
+          "Bảng đối chiếu từ vựng dispatch"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "83c4ce05b5d6a9b14dccd5a2365bec12ee589a80b555dec26a5a7275106b45ec",
+        "targetAncestry": [
+          "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "Từ vựng dispatch hiện hành",
+          "Bảng đối chiếu từ vựng dispatch"
+        ]
+      },
+      "disposition": "supersede",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+      "pointer": "/registryGaps/1",
+      "before": {
+        "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "40414b50fe1dc4e6f041fd0fde8ca68afb2519c25ce3de0d798ba58b59bfc491",
+        "targetAncestry": [
+          "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "Từ vựng dispatch hiện hành",
+          "Bảng đối chiếu từ vựng dispatch"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "40414b50fe1dc4e6f041fd0fde8ca68afb2519c25ce3de0d798ba58b59bfc491",
+        "targetAncestry": [
+          "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "Từ vựng dispatch hiện hành",
+          "Bảng đối chiếu từ vựng dispatch"
+        ]
+      },
+      "disposition": "supersede",
+      "reviewStatus": "pending"
+    }
+  ],
+  "residualRows": [
+    {
+      "index": 0,
+      "before": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "targetAnchor": "unheaded-block-36",
+        "targetUnitDigest": "299c5b49c98df16010e0ac6cfc38a3a77e93bc6b628337f2ee0685a1b7d64269",
+        "targetAncestry": [
+          "Added in candidate: Runner Business Rules",
+          "Business Rules"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "targetAnchor": "unheaded-block-36",
+        "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+        "targetAncestry": [
+          "Added in candidate: Runner Business Rules",
+          "Business Rules"
+        ]
+      },
+      "residualTextUnchanged": true
+    },
+    {
+      "index": 1,
+      "before": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "targetAnchor": "unheaded-block-36",
+        "targetUnitDigest": "299c5b49c98df16010e0ac6cfc38a3a77e93bc6b628337f2ee0685a1b7d64269",
+        "targetAncestry": [
+          "Added in candidate: Runner Business Rules",
+          "Business Rules"
+        ]
+      },
+      "after": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "targetAnchor": "unheaded-block-36",
+        "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+        "targetAncestry": [
+          "Added in candidate: Runner Business Rules",
+          "Business Rules"
+        ]
+      },
+      "residualTextUnchanged": true
+    }
+  ]
+}
