@@ -2949,7 +2949,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
 
 
-    // `events sync|status|export|migrate` and `rebuild` are the Event Store's verbs; each use case owns its
+    // `events sync|status|export|migrate|import-legacy` and `rebuild` are the Event Store's verbs; each use case owns its
     // own validation and refusals. The Event Store is Linux-only, so every one of them refuses elsewhere.
     case 'events': {
       const sub = positional[0];
@@ -2974,7 +2974,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const { migrateUseCase } = await import('../src/verbs/events/migrate.mjs');
         return migrateUseCase({ ...ctx, writer: String(resolveWriterIdentity(dir).id) }, { baseline: flags.baseline, check: flags.check });
       }
-      throw new StoreError('validation', 'events requires sync|status|seal|export|migrate');
+      if (sub === 'import-legacy') {
+        const { importLegacyUseCase } = await import('../src/verbs/events/import-legacy.mjs');
+        return importLegacyUseCase(ctx, { file: flags.file, check: flags.check });
+      }
+      throw new StoreError('validation', 'events requires sync|status|seal|export|migrate|import-legacy');
     }
 
     case 'rebuild': {

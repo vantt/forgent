@@ -116,12 +116,20 @@ impl StoreIdentity {
         {
             return Err(invalid("malformed store identity"));
         }
-        if !valid_machine_id(machine)
-            || identity.machine_id != machine
-            || Path::new(&identity.common_dir) != layout.common_dir
-            || identity.common_dir_dev_ino != dev_ino(&layout.common_dir)?
-        {
-            return Err(moved("machine or Git common-directory identity changed; explicit move confirmation required"));
+        if !valid_machine_id(machine) || identity.machine_id != machine {
+            return Err(moved(format!(
+                "this store belongs to machine {}, not {machine}: fgos.machineId changed after the store was created; restore it, or use a fresh clone for the new id",
+                identity.machine_id
+            )));
+        }
+        // A moved clone keeps the inode of its common directory, so the store keeps its id wherever the clone now
+        // lives; the recorded path is where it was created. A copy has a new inode and must never reuse the store id.
+        if identity.common_dir_dev_ino != dev_ino(&layout.common_dir)? {
+            return Err(moved(format!(
+                "{} is a copy of the clone that created this store (created at {}), or was moved to another filesystem; it cannot reuse that store id, use a fresh clone",
+                layout.common_dir.display(),
+                identity.common_dir
+            )));
         }
         Ok(identity)
     }
