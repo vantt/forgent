@@ -1,179 +1,234 @@
-# Parked premise judgments — shard 1
+# Parked premise judgments — shard 1 rework
 
-**Pin:** `c94545de5b45873cb2eb419f10124283fd730a2e` (HEAD at turn start).
-**Status:** judgments authored and mechanically checked; independent review pending.
-No gate acceptance, authority flip, source edit or inherited Step 5 proof is claimed.
+**Evidence pin:** `c94545de5b45873cb2eb419f10124283fd730a2e` (unchanged).
+**F-chain check HEAD:** `c58f2b230e14e73db42cb8ccc965ef8967bb085a`.
+**Status: blocked on two checker representation gaps; not mechanically accepted.**
+The row repairs are prepared, not applied to consumers. No independent approval,
+gate closure, source deletion, authority flip or cutover readiness is claimed.
 
-Read first: [task brief](../../w22-g6-park-judgments-brief.md),
-[W22 review](../../reviews/w22-register-met-local-review.md),
-[W8 park review](../../reviews/w8-g6-parks-review.md),
-[W9 fix review](../../reviews/w9-g6-fix-review.md),
-[receipt](../receipt.md), and [L13-10/L13-20](../../owner-answers.md).
+Read first: [rework brief](../../w25-shard-rework-brief.md),
+[W23 review](../../reviews/w23-g6-shard-1-review.md),
+[per-row verdicts](../../reviews/w23-g6-shard-1-review.json),
+[L13-21](../../owner-answers.md), and the
+[chain-check report and Lead correction](chain-check.md).
+The starting findings are in [chain-check-c804a3213.json](chain-check-c804a3213.json).
 
-## Result
+## Counts before and after
 
-| Input kind | Preserve confirmed | Repoint | Successor bound | Retire with source | Owned park | Total |
-|---|---:|---:|---:|---:|---:|---:|
-| Unconfirmed preserve premise | 118 | 37 | 0 | 0 | 0 | 155 |
-| Source removed by cutover | 0 | 0 | 108 | 0 | 0 | 108 |
-| Source absent | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **118** | **37** | **108** | **0** | **0** | **263** |
+| Measure | Before | After |
+|---|---:|---:|
+| Assigned rows, each exactly once | 263 | 263 |
+| Preserve confirmed | 118 | 101 |
+| Repoint | 37 | 54 |
+| Successor bound | 108 | 108 |
+| Owned park / retire with source | 0 / 0 | 0 / 0 |
+| Active file patches | 19 | 25 |
+| Rows carrying active patches | 37 | 37 |
+| `alreadyComposed` rows, without parallel patches | 0 | 17 |
 
-**Owned parks: none. Needs flip date: none.** All 263 assigned IDs occur exactly once.
-The 137 unbound-passage parks are outside this shard and remain outside this judgment.
+There are **39 changed rows**: all 34 W23 REWORKs, the four AGENTS context
+conflicts, and one stale-chain dependency note. The remaining 224 judgments and
+all original source/proof bindings are unchanged. Ten redundant file patches
+were removed; 16 banner file patches were added. The review prose says 11
+redundant files, but its enumerated duplicate rows occupy ten distinct files.
 
-[shard-1.json](shard-1.json) contains every individual disposition, explanation,
-source-unit quotation, surrounding evidence and current file/unit SHA-256. Each row
-also binds its original proof row by digest and repeats the full start pin. Successors
-name actual conserved units and section paths, with their current digests and an exact
-`oldPath`/move ID in `step-05-cutover-move-set.json`, itself digest-bound. A physical
-move destination alone was not treated as semantic proof.
+The baseline checker run at the check HEAD gave exit 1: 16 unresolved duplicates,
+five row conflicts and 15 stale chain entries globally (36 unresolved).
+For shard-1 files alone this is 16 + 5 + one stale entry = **22 unresolved**.
+These agree with the corrected starting report's shard-1 findings.
 
-## Groups and shared causes
+After repair, unmodified checker validation stops with
+`invalidShard: patch preimage: AGENTS.md`, plus the same 15 global stale entries
+(exit 1, 16 unresolved). It does **not** inspect the repaired rows after rejecting
+the shard. A separate call to its existing `inspect_rows` exposes the second
+representation gap: `invalidAlreadyComposed` on f00183; it validates 16 other
+markers and all 25 forward/reverse patch roundtrips. This is not a green checker
+result and does not satisfy the brief's stale-only acceptance condition.
 
-Exact group membership is the `group` field on each individual JSON row. These groups
-partition all 263 rows; their explanations do not replace the per-row evidence.
+## Every changed row and its reason
 
-| Group | Rows | Explanation |
-|---|---:|---|
-| `generic-scaffold` | 3 | f00093/f00097/f00098 are the reusable ui-spec skill's generic `generate`/`init --output docs/ui-spec` scaffold. The tool coordinate belongs to the target project being scaffolded, not fgOS's current documentation authority. The skill's actual command/structure lines are quoted. |
-| `source-provenance` | 3 | f00101 cites the tsk-49r/D1 suite origin; f00446 cites the merge-standardization design; f00477 explicitly describes an **OLDER** convention. Keep those source identities, not as current reader entry points. |
-| `live-authority-citations` | 37 | These really cite maintained rules, schemas, navigation or required update destinations. They get mapped successors and prepared retargets, not historical labels. See the patch table below. |
-| `native-file-contract` | 13 | Native artifact/containment conventions, distillery output templates, retained generated artifacts and a built executable are filesystem operands, not authority documents. They remain live, not historicized. Details below distinguish the cases. |
-| `dated-backlog-investigation` | 2 | f00577/f00579 occur in STR70b's explicitly dated 2026-07-21 investigation of rejected alternatives. The old law coordinates identify what that investigation examined. |
-| `dated-learning-comparison` | 7 | f00936/f00940/f00942 have dated/source-pinned deep-dive framing; f01004/f01005/f01007/f01008 have dated scan, correction or rejection cells. Their operands identify the compared sources at that time. |
-| `upstream-coordinates` | 6 | f00945 belongs to the **beehive** subsection, not fgOS's state instructions. f01096/f01097/f01100/f01103/f01104 belong to the bee inventory whose opening identifies `upstreams/bee/skills/`. The apparent commands are upstream rules being inventoried. |
-| `completed-change-or-capture` | 63 | Original task scope, completed repairs, observed drift, quoted learning and captured output. Each row quotes its actual passage and local framing, including past-tense markers; no blanket explanation/history-folder rule is used. Frontmatter describing an old cleanup is distinguished from live glossary frontmatter f03205, which is repointed. |
-| `retired-dispatch-door` | 15 | The shared banner explicitly dates the removal to 2026-10-14 and says the account below is kept as history. Its runner-spec operand identifies the removal decision; current execution already points to `fgos run`/Workflow in the banner. |
-| `captured-proof` | 6 | f03301–f03306 identify the throwaway proof or a real test-output record. Their framing is quoted; none is treated as a current route into the retired coordination engine. |
-| `carried-portal` | 7 | `docs/README.md` claims survive in `docs/platform/documentation/operations/portals/docs-portal.md`, including rebased navigation and explicitly fenced source metadata. |
-| `carried-architecture` | 38 | `docs/architecture-map.md` claims survive in `docs/platform/architecture-map.md`: registries, version changes, ID boundaries and retired-decision narratives. Changed relative links are bound to the actual carried paragraphs, not assumed byte-identical. |
-| `carried-coexistence` | 2 | The mapped coexistence spec retains the external-workshop canary provenance and backlog pointer. The absent workshop canary is not invented as an in-repository file. |
-| `carried-gateway-contract` | 8 | The mapped CTR010 YAML retains the exact OpenAPI claims. Sections are named as YAML key paths, not misread comment headings. This does not certify runtime reader parity or settle every embedded legacy citation. |
-| `carried-distribution-history` | 13 | The old vision and its comparison with the old distribution spec survive in the mapped packaging-distribution **History** holder, not as newly promoted setup behavior. |
-| `carried-governance` | 8 | Placement, source provenance and navigation survive in `docs/platform/governance.md`, with changed relative URLs explicitly bound. Source metadata does not confer candidate authority. |
-| `carried-lifecycle-learning` | 2 | The knowledge successor retains the dated learning-source block, including original workshop coordinates. |
-| `carried-rollup-capture` | 3 | The knowledge successor retains the original capture and its old `docPath` identity. Moving the document does not rewrite what the historical capture said. |
-| `carried-id-audit` | 26 | The mapped documentation **History** holder retains the audit claims, original coordinates and dates. Deleting the old filename does not delete that evidence. |
-| `carried-cli-contract` | 1 | The mapped CLI I/O contract retains the reference-list claim. Its current unit is bound independently of the removed source location. |
+### Existing F-chain retargets — remove duplicate patches
 
-### Live native paths are not being called history
+Every row below remains `repoint`, names the effective entry in
+`alreadyComposed`, and carries no `patch` property. Its original successor and
+source evidence remain bound, except f00477 gains its appropriate successor.
 
-- f00166: `<root>/docs/history/` is the gateway's containment boundary.
-- f00430/f00433: native Iron-Law/research artifacts described by the CLI comments.
-- f00475/f00479: feature-local `CONTEXT.md` identity in the citation convention.
-- f00507/f00511: the research skill/task-spec's accumulating output contract.
-- f00497: parameterized native distillery output, not a reader-authority target.
-- f03300: generated UI output; the UI portal expressly retains the five generated
-  files with `regenerate-from-source`. It does **not** certify a candidate compiler root.
-- f03361–f03364: `./target/release/fgctl` is produced by the adjacent `cargo build`
-  and runs from the repository cwd. It is not `docs/how-to/target/...`.
-
-The move-set inspection found **zero** source paths under `docs/history/`,
-`docs/distillery/` or `docs/ui-spec/generated/`. This corroborates the literal-path
-judgments; mere reachability was not used as historical evidence. No runtime or
-writer-parity proof is inherited from these semantic judgments. L13-10's warning
-against historicizing live conventions is preserved.
-
-### Why no retire-with-source rows?
-
-Every one of this shard's 108 removed-source claims has an actual conserved unit in
-its mapped holder. Even historical metadata and captures survive there. Retiring
-them merely because their old source filenames disappear would discard demonstrable
-carriage. `successor-bound` here is a conservation judgment, not a claim that all
-embedded navigation has already been composed or that a candidate is authoritative.
-
-## Prepared retargets — not applied
-
-The existing `prepared-patches.json` format is reused: `file`, `rowIds`,
-`status: prepared-not-applied`, source/proposed SHA-256, exact line replacements and
-unified diff. Each row embeds its file's same co-composed patch. The checker rejects
-inconsistent sibling patches. There are **19 distinct file patches / 37 rows**.
-
-| Consumer | Rows | Successor |
+| Row | Effective chain entry | Reason |
 |---|---|---|
-| `AGENTS.md` | f00102/f00106/f00117/f00118 | Platform foundations and runner handoff contract |
-| `apps/fgos-gateway/Cargo.toml` | f00148 | Mapped CTR010 YAML |
-| `apps/fgos-gateway/src/gateway.rs` | f00156/f00158/f00161/f00162/f00163 | CTR010 API, default port and error sections |
-| `apps/fgos-gateway/src/mcp.rs` | f00175 | CTR010 `/contract` |
-| `apps/fgos-gateway/web/src/App.tsx` | f00177 | Mapped S01 |
-| `apps/fgos-gateway/web/src/api/client.ts` | f00178 | CTR010 paths |
-| `apps/fgos-gateway/web/src/api/types.ts` | f00181 | CTR010 schemas |
-| `apps/fgos-gateway/web/src/lib/network.ts` | f00183 | CTR010 document; preserve the no-`bind` observation |
-| `apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx` | f00185 | Mapped S04 |
-| `apps/fgos-gateway/web/src/screens/TaskDetail.tsx` | f00187/f00189 | Mapped S03/M03 |
-| `apps/fgos-gateway/web/src/screens/Taskboard.tsx` | f00191/f00193 | Mapped S02/M03 |
-| `core/skills/_shared/citation-format.md` | f00478 | Mapped audit §5 (locked D-local citation rule); the **OLDER** example f00477 stays literal |
-| `docs/architecture-manifest.json` | f00527 | Mapped architecture holder |
-| `docs/backlog.md` | f00582/f00583/f00592 | Mapped coexistence doctrine/Known Gaps and mission-boundary narrative |
-| `docs/explanation/herdr-orchestrator-terminology-boundary.md` | f03205 | Full mapped coordination proposal §5.1, not the old `docs/architect` alias |
-| `docs/generated/README.md` | f03297 | Mapped governance principles |
-| `docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md` | f03573/f03576/f03577/f03579/f03580/f03582 | CLI I/O purpose, version tokens, write door, identity and reasoned exceptions |
-| `docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md` | f03619/f03621/f03622 | Mapped UI overview, **both** explicit F01/F02 operation holders, and states/errors catalogue |
-| `docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md` | f03716 | Mapped operator-runbook Hard rule |
+| f00148 | `w2:predecessor:apps/fgos-gateway/Cargo.toml` | The chain already retargets the bound CTR010 citation. |
+| f00156 | `file:apps/fgos-gateway/src/gateway.rs` | The chain already retargets the API header citation. |
+| f00158 | `file:apps/fgos-gateway/src/gateway.rs` | The chain already retargets the default-port citation. |
+| f00161 | `file:apps/fgos-gateway/src/gateway.rs` | The chain already retargets the error-category citation. |
+| f00162 | `file:apps/fgos-gateway/src/gateway.rs` | The chain already retargets the ErrorEnvelope citation. |
+| f00163 | `file:apps/fgos-gateway/src/gateway.rs` | The chain already retargets the client-error guidance citation. |
+| f00175 | `w2:predecessor:apps/fgos-gateway/src/mcp.rs` | The chain already retargets the MCP contract citation. |
+| f00177 | `file:apps/fgos-gateway/web/src/App.tsx` | The chain already retargets S01. |
+| f00178 | `file:apps/fgos-gateway/web/src/api/client.ts` | The chain already retargets the typed-client contract citation. |
+| f00181 | `file:apps/fgos-gateway/web/src/api/types.ts` | The chain already retargets the mirrored-schema citation. |
+| f00183 | `file:apps/fgos-gateway/web/src/lib/network.ts` | The chain joins the split contract path while rewrapping the header; a second patch is wrong. See checker gap below. |
+| f00187 | `file:apps/fgos-gateway/web/src/screens/TaskDetail.tsx` | The chain already retargets S03. |
+| f00189 | `file:apps/fgos-gateway/web/src/screens/TaskDetail.tsx` | The chain already retargets M03. |
+| f00191 | `file:apps/fgos-gateway/web/src/screens/Taskboard.tsx` | The chain already retargets S02. |
+| f00193 | `file:apps/fgos-gateway/web/src/screens/Taskboard.tsx` | The chain already retargets M03. |
+| f00477 | `file:core/skills/_shared/citation-format.md` | Change preserve to repoint: “OLDER” describes the rule, not a reason to break its locator. Bind the actual area-suffix inventory at the mapped audit, lines 50–61; do not reinstate that obsolete rule. |
+| f00478 | `file:core/skills/_shared/citation-format.md` | The chain already retargets the mapped audit's D-local citation rule. |
 
-f00582/f00583 change two occurrences on the same PBI line in one replacement.
-Split comment paths in f00183/f00185 remain syntactically valid comments. No
-implementation statement, command argument, runtime compiler root, generated skill,
-authority metadata or product behavior is changed in the checkout. Other shards'
-patches and the existing F composition chain must still be composed together later;
-these 19 patches are deliberately pinned preimages, not a claim of conflict-free F application.
+### Rebase the AGENTS patch on the strict chain result
 
-## Checker and evidence contract
+| Row | Reason |
+|---|---|
+| f00102 | Keep the approved foundations-map retarget; replace the patch's conflicting pre-chain context with exact F-chain context. |
+| f00106 | Keep the approved handoff-contract retarget in the reading list; share that same rebased file patch. |
+| f00117 | Keep the approved handoff-contract retarget in DoD question 3; share that same rebased file patch. |
+| f00118 | Keep the approved foundations-law retarget in DoD question 4; share that same rebased file patch. |
 
-Run from the repository root:
+All four rows carry one identical post-chain patch with explicit `base` metadata.
+The effective predecessor is `file:AGENTS.md`; the chain is strict, not diagnostic.
+The four replacement ordinals remain 8, 13, 60 and 63. Only the four requested
+citation paths change; the surrounding chain's navigation and doctrine edits
+remain intact. Exact `patch --batch --fuzz=0 -p1 --forward` then `--reverse`
+succeeds with no offsets or fuzz and restores the complete chain result.
 
-```sh
-python3 -B plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard_1.py --shard 1
-```
+- Actual chain preimage SHA-256: `53e9bdde5d98a51b6eaca164b4f36c096fc7d98fadc2d7e08965092517a51935`.
+- Prepared postimage SHA-256: `8635c80bbede10bab467f161d359ed4305e7846ca89edf5b0199d78bc216a8f8`.
+- The original pin preimage digest is retained only as `base.pinSourceSha256`,
+  not falsely asserted as the rebased patch's source digest.
 
-`check_shard_1.py` is distinct because the three shards are authored concurrently.
-It accepts `--shard`; a later turn can consolidate the checkers. It verifies:
+### Removed-door / Updated banners — live decision locators
 
-1. Exact coverage, no duplicates, input-file and original proof-row digests, kinds and full pins.
-2. Every evidence quotation's real line range, exact text, raw-file SHA-256 and exact
-   UTF-8 unit SHA-256 against Git blobs at the pin; it additionally rejects live file drift.
-3. Actual successor units/section evidence and exact move-set membership/digests,
-   including both F01 and F02 for f03621.
-4. One co-composed patch per file, exact preimage/replacement/postimage bytes and row coverage.
-5. **Real** `patch --batch --fuzz=0 --no-backup-if-mismatch -p1 --forward`, then
-   `--reverse`, in a `TemporaryDirectory` under `/tmp/fgos-work/`. Any offset, fuzz,
-   reject, backup or wrong resulting bytes fails. Each temporary directory is removed.
+Each row changes preserve to repoint under L13-21.2. Its new patch replaces only
+`docs/specs/runner.md` with `docs/platform/runner/decisions/h-36d872fbb0e5.md`.
+The successor evidence binds the complete decision 0062, lines 1722–1741 at the
+unchanged evidence pin, with move-set id `step10-runner-0002`. Dates, historical
+accounts, replacement commands and surrounding prose stay unchanged.
 
-SHA-256 conventions: file digests cover raw complete file bytes; unit digests cover
-exact `text` with LF separators and **no implied trailing newline**. Original proof-row
-digests use sorted-key, compact, UTF-8 JSON (`ensure_ascii=False`).
+| Row | Consumer / reason |
+|---|---|
+| f03127 | `dispatch-activation-and-handoff-redesign.md`: the present-tense Removed door banner needs a surviving decision locator. |
+| f03134 | `dispatch-execute-concurrency-guard.md`: same live banner locator, not historical source identity. |
+| f03136 | `dispatch-execute-lost-uncommitted-paths-warning.md`: same live banner locator. |
+| f03139 | `dispatch-execute-prompt-file-flag.md`: same live banner locator. |
+| f03143 | `dispatch-execute-repo-root-cwd-separation.md`: same live banner locator. |
+| f03144 | `dispatch-execute-unsignaled-outcome.md`: same live banner locator. |
+| f03170 | `executor-dispatch-manual-log-gap-and-step-b5-fix.md`: same live banner locator. |
+| f03171 | `fanout-batch-background-execution-and-orphan-recovery.md`: same live banner locator. |
+| f03177 | `fanout-execute-consolidation.md`: same live banner locator. |
+| f03178 | `fgos-fanout-out-of-process-dispatch.md`: same live banner locator. |
+| f03202 | `glm-openrouter-executor.md`: same live banner locator. |
+| f03210 | `herdr-spawn-adapter-fresh-pane.md`: same live banner locator. |
+| f03219 | `main-checkout-lock-scope-audit.md`: same live banner locator. |
+| f03250 | `root-resolution-two-call-split-propagation.md`: same live banner locator. |
+| f03294 | `worktree-isolation-existing-path-hazard.md`: same live banner locator. |
+| f03352 | `handle-worktree-guard-refusal-of-compound-dispatch-command.md`: the Updated note is current guidance, so its decision locator must survive too. |
 
-## Commands, exits and limits
+The first 15 consumers are under `docs/explanation/`; f03352 is under
+`docs/how-to/`. Each row's JSON contains its complete path and bound evidence.
+All 16 patches roundtrip against their actual F-chain results without fuzz.
 
-All Python invocations used `python3 -B`. No product suite or native addon ran.
+### Rationale and stale dependency
 
-| Command / invocation | Exit | Result |
-|---|---:|---|
-| `git rev-parse HEAD`; `git status --short` at start | 0 / 0 | Full pin above; clean initial tree |
-| `git log -5 --oneline -S'check_shard' -- plans/260925-documentation-authority-unification/reports/phase-09` | 0 | Prior-art search; no existing shard checker to reuse |
-| `git log -3 --oneline -S'prepared-not-applied' -- plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise` | 0 | Existing prepared-patch mechanism; reused its data format, not a new product mechanism |
-| Python stdin inspections of IDs/proof, row contexts, normalized operands, move-set entries and successor conservation | 0 throughout | 263 IDs; 155 unconfirmed + 108 removed; all current source units bind; every original current-line locator lies inside its quoted unit |
-| Python stdin authoring and subsequent full data regeneration for whole-paragraph/section-path bindings | 0 / 0 | Only `shard-1.json` generated; no source patch applied |
-| Checker, initial attempt | 1 | `/tmp/fgos-work/` did not exist on this worker; corrected checker to create the permitted scratch parent before `TemporaryDirectory` |
-| Checker after correction and after binding refinement | 0 / 0 | Exact 263-row coverage; 19 patches, 38 forward/reverse applications per run |
-| Python stdin negative controls using checker functions and an in-memory substituted document | 0 | **12/12 rejected:** bad evidence text/unit digest/file digest/line/path; nonexistent move ID; wrong patch postimage; genuinely nonreplaying patch; missing row; duplicate row; wrong kind; wrong pin |
-| Two final checker subprocesses, stdout/stderr compared in memory | 0 / 0 | Byte-identical output; counts 118/37/108, 19 patches, 38 applications each |
-| `git diff --check` | 0 | No whitespace findings |
-| `git status --short` | 0 | Only the three allowed shard artifacts are authored |
+| Row | Reason |
+|---|---|
+| f03404 | Keep `preserve-confirmed`, regroup as `native-file-contract`: this is a live Related pointer, not a completed-change capture. All five tracked `docs/how-to/coordination-examples/group-thinking-*.json` files survive unchanged. |
+| f03442 | Keep the approved successor binding; add a note that `file:docs/io-contract.md` is stale. Its diagnostic chain reconstruction does not approve that entry or invalidate the independently pin-bound References passage. A separate turn owns the rebase. |
 
-The negative patch control actually substitutes a nonexistent deleted preimage line
-and executes `patch`; it is not a test-only success/skip branch. Coverage controls
-substitute JSON only in memory and do not edit the delivered file.
+## Blocking checker gaps — no waiver
 
-The checker is a mechanical integrity/replay proof, **not** an independent semantic
-review. The 263 judgments still require the exhaustive reviewer turn L13-20 names.
-Only the three authorized artifact paths are written. No pair accounting, Git write,
-fgOS CLI/lifecycle, `.fgos` workspace access, service start, docs/product edit, test
-suite, source deletion or cutover occurs. The required assignment acknowledgments
-and completion claims are written only to the designated external outbox.
+1. **Post-chain patch schema (AGENTS).** `validate_shard` always compares
+   `patch.sourceSha256` to `blob(document.pin, file)` and generates the expected
+   unified diff from that bare blob. L13-21.1 instead requires a conflicting
+   patch to be rebased on the F-chain result. Those are different bytes. The
+   rebased patch is correct and directly replayable, but the unmodified checker
+   rejects it as `patch preimage: AGENTS.md`. Keeping the old digest would lie;
+   keeping the old patch would preserve the known chain conflict.
+2. **Wrapped old operand (f00183).** The correct effective entry is
+   `file:apps/fgos-gateway/web/src/lib/network.ts`. Its old hunk contains
+   `docs/contracts/` followed by newline/comment prefix and
+   `fgos-gateway-api-v1.yaml`. Its new hunk contains the full literal successor.
+   The marker validator demands the normalized contiguous old path be a literal
+   substring of the old hunk (`any(p in old and p not in new ...)`). That cannot
+   hold for this split spelling. The exact original bound lines and strict entry
+   witness the retarget; a separate normalization check confirms it. The existing
+   checker finding is retained as unresolved, not silently overridden.
 
-Impact-analysis: **degraded/unqueried** — the brief prohibits the fgOS CLI and this
-worker exposes no GitNexus tool. No existing product symbol is edited. Markdown
-preview is deferred to Lead rather than starting an additional service or writing
-outside the declared scope.
+The only needed out-of-scope repair is
+`plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard.py`.
+It needs to validate a declared strict-chain patch base and recognize the bound
+split-path marker while preserving exact-entry/no-parallel-patch checks. This
+turn does not edit that file, change proof inputs, weaken checks or invent a
+success status. The required stale-only checker result is **blocked** until the
+checker owner repairs these two gaps and reruns it.
+
+## Deferred stale chain entries
+
+The checker emits all 15 global stale predecessors even for `--shard 1`.
+Each entry id is `file:<path>` below. All remain unresolved and untouched.
+Only `docs/io-contract.md` touches a shard-1 source file (f03442, noted above).
+
+- `.githooks/pre-commit`
+- `docs/io-contract.md`
+- `docs/platform/agent-confinement/contracts/confinement-authority-v1.md`
+- `docs/platform/agent-confinement/decisions/confinement-authority-decisions.md`
+- `docs/platform/agent-confinement/history/rollout-and-settled-facts.md`
+- `docs/platform/agent-coordination/decisions/README.md`
+- `docs/platform/runner/architecture/h-69197b459754.md`
+- `docs/platform/runner/architecture/h-7af1f0242611.md`
+- `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`
+- `docs/reading-map.md`
+- `plugins/fgOS/skills/terminal/SKILL.md`
+- `src/runner/dispatch/assignment-runner.mjs`
+- `src/runner/dispatch/confinement/policies.mjs`
+- `src/runner/dispatch/herdr-round.mjs`
+- `test/runner/dispatch-worker-session.test.mjs`
+
+## Verification, reuse and scope
+
+- Reused the consolidated checker's `check_span`, `replay_chain`,
+  `inspect_rows` and `patch_roundtrip`, and its existing composition replayer.
+  Read-only history attributes `alreadyComposed`/bare-pin validation to
+  `926000dbd`; the successor-source correction is `c58f2b230`.
+- The unmodified checker `main()` was invoked before and after with
+  `sys.argv = [check_shard_path, '--shard', '1']`. It normally writes a new
+  `chain-check-<HEAD>.json`, outside this task's exact writable list. A narrowly
+  matched `Path.write_text` output-sink wrapper captured only that report in
+  memory. No validation, finding, exit status or checker source was changed.
+  The literal CLI invocation is deferred because its report write is forbidden.
+- Baseline exit: 1 (36 global unresolved). After repair exit: 1
+  (`invalidShard: patch preimage: AGENTS.md` + 15 stale entries). No report file
+  was created outside the scope.
+- Separate data checks: exact 263-id coverage; original proof/id digests and
+  row bindings; **963 evidence/successor spans** verified by the existing
+  `check_span`; successor move-set identities/digests; consistent sibling
+  patches, exact replacements and postimage hashes. AGENTS uses its declared
+  strict-chain base; the other patches retain valid pin bases and also replay
+  on the chain. These checks passed but do not replace official acceptance.
+- Existing `inspect_rows`: **25/25 file patches, 50/50 forward/reverse
+  applications**, exact restored chain bytes, no offsets or fuzz; 16 resolved
+  markers, one unresolved f00183 marker representation gap. A separate exact
+  old-hunk/split-comment normalization witness confirms f00183's actual retarget
+  without marking the checker's finding resolved.
+- The first exploratory data-check invocation stopped on the expected f00183
+  marker failure. The subsequent diagnostic explicitly preserved and reported
+  that failure; no green claim was manufactured.
+- No shard-1 source file is under `docs/platform/`. Thus none of the lineage
+  code-span rows or L13-21.5's candidate live-pointer files belongs to this
+  shard. Candidate bytes quoted inside successor evidence are not editable
+  source rows here. `packages/yaml-doc` mentions are excluded: no such shard-1
+  source row, and they are package coordinates, not moved authority operands.
+- L13-21.3's shard-3 history-convention parks are untouched. No pair accounting,
+  other shard, chain, register, ledger or consumer file is edited.
+- All workspace-analysis and replay Python invocations use `python3 -B`;
+  all replay scratch is auto-cleaned
+  `tempfile` directories under `/tmp/fgos-work/`. No git write, fgos CLI,
+  native addon, product test, service start or prohibited audit script runs.
+- Only `shard-1.json` and this file are changed in the workspace. Required
+  acknowledgment/report/result files use the external assignment outbox.
+  Markdown preview is deferred to Lead rather than creating another artifact
+  or starting a service outside scope.
+- Impact-analysis: **degraded/unqueried** (fgos CLI forbidden; no impact tool
+  exposed). No product symbol or implementation is changed.
+
+Checker SHA-256, unchanged:
+`99eae741b0ce9343ca7f0b31de3d634960fab1551070815fb49ab9c04af81d95`.
+Judgment JSON SHA-256:
+`e71e00d8bd85e85bdab94a18ef49b50afddb9c8cee71d68ed49541356e5e0f2f`.
