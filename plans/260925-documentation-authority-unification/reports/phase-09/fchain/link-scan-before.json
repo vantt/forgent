@@ -6308,5 +6308,20 @@
     "pinFiles": 411,
     "createdFiles": 24,
     "method": "Coordinate-preserving legacy relativeLinkTargets regex with normalized directory existence: reproduces 411 pin-file + 24 F-created-file failures. Of 435 source occurrences, 398 are literal under matched fence semantics and 37 are live relative routes. An initial scratch JS comparison counted 36 existing directories incorrectly because of trailing slashes; it is not used as evidence."
+  },
+  "rework": {
+    "population": 2701,
+    "fileAnchorFindings": 12,
+    "relatedMoved": 11,
+    "emptyMovedDirectory": 1,
+    "labelFindings": 80,
+    "findings": 92,
+    "originalMetadataFindingCounts": {
+      "missing-file": 1,
+      "moved-target": 11,
+      "stale-label": 64
+    },
+    "sourceCommit": "8c79219f4a696a1de1310e75ec24d59f80be8eef",
+    "note": "Corrected post-F tree and complete successor metadata; prior before-scan remains historical, not a current zero-findings claim."
   }
 }

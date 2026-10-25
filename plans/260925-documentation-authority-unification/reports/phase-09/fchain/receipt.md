@@ -1,4 +1,149 @@
-# Whole-population link guard — records-only receipt
+# Link guard rework — current records-only receipt
+
+Authority: [rework brief](../w36-link-guard-rework-brief.md), L13-4.1,
+L13-26.2 and L13-28; [review](../reviews/w35-link-guard-review.json).
+Replay pin: `8c79219f4a696a1de1310e75ec24d59f80be8eef` (turn-start HEAD).
+**All five required proofs exit 0; no source application, decision change,
+semantic approval, lease, gate closure or cutover authorization.**
+
+## Corrected population and fixes
+
+`tree()` now computes `(pin paths | composed states) - moving paths`. All **21**
+edited move-set sources stay absent, even when F prepares bytes for them. The
+same subtraction also removes the old `docs/contracts/` directory when its only
+child, the edited gateway YAML, moves. The former zero-Related claim was false:
+the reviewed final state still had **11** Related move-source findings. The
+corrected rework census is **11 → 0**, not the earlier claimed **67 → 0**.
+The earlier initial 67 counted only what the flawed tree reported; it was not
+an authenticated count of every Related entry into the move set.
+
+| Measure | Reviewed state before rework | After rework |
+| --- | ---: | ---: |
+| Platform Markdown files | 628 | 628 |
+| Local clickable/Related destinations | 2,701 | 2,705 |
+| Related entries into moved sources | 11 | 0 |
+| Missing old directory link | 1 | 0 |
+| Stale retarget labels, with complete successor evidence | 80 | 0 |
+| All `linkGuard` findings, with that evidence | 92 | 0 |
+| Link-record rows / final owning patches | 285 / 82 | 377 / 88 |
+| Composed files / executed proposals / existing composition links | 594 / 223 / 20 | 595 / 229 / 20 |
+| Owning controls | 21 | 25 |
+
+The six cross-file Related entries now agree with their clickable counterparts:
+three governance template references, two switchboard references, and the mailbox
+handoff reference. Five self-source entries follow rule 2.3 and use their matching
+source-title anchors. Seven of these eleven lines already belonged to premise
+patches: those **same owners** were extended, and the link record names them via
+`composedBy`; there is no competing second patch on a preserved line. The other
+four have coordinate-bound replacements in the single final file patch. The
+empty contracts directory link follows its sole moved child's successor parent.
+
+All **16** former rule-2.2 rows were rechecked against the move set, all L12/L13
+owner rulings, the G5 survivor `docs/reading-map.md`, and the new platform area
+specs. Each row records those sources and their hashes in `source.successorChecks`.
+Four have successors and are no longer literal:
+
+- `related:36` → Seat Binding spec and its extractor-listed section 5.1 anchor,
+  per L13-4.1 (corroborated by the G5 map and the new spec's Source header).
+- `link:18` → the retained master-coordinator prompt, evidenced by its move/alias
+  and restored current manual-convention header, not the retired engine snapshot.
+- `link:19` → the same deliberation-memory plan under `archive/plans/`, per the
+  archival relocation in `22e54f834`.
+- `related:73` → the archived knowledge-registry plan; its surviving old-directory
+  README explicitly names that successor and the archival commit.
+
+`related:64` is now correctly rule 2.3: the carrier names both foundation sources,
+but has no matching source-title anchor for this operand. **11** true rule-2.2
+rows remain literal: four external machine-absolute citations, six code/test
+artifacts deleted with the retired engine in `2180b4e72`, and the absent privacy
+hook citation. A different modern mechanism is not an evidenced file successor.
+No literal fence body was retargeted.
+
+Rule 2.4 is applied across the complete composed retarget population, including
+links changed by earlier F owners and the late Seat Binding/Workflow successors,
+not just the eleven labels sampled by the earlier review. **80** additional labels
+are repaired (79 filename/path operands and one directory label), plus the label
+on the repaired empty-directory route. Descriptive labels are unchanged; mixed
+labels retain their `§13.1`, `§14` and `mục 14` locators. The new owning guard uses
+move destinations and the existing retarget record as successor evidence, checks
+actual final labels, and caches pinned file bytes instead of spawning Git once
+per link. Equal basenames at a new location are not false positives. With only
+the old incomplete successor metadata the corrected guard finds 64 stale labels;
+the complete successor evidence exposes 80, which are all repaired.
+
+| Owning rule | Current rows |
+| --- | ---: |
+| L13-28.2.1 — evidenced successor | 207 |
+| L13-28.2.2 — no successor, literal | 11 |
+| L13-28.2.3 — self-source | 70 |
+| L13-28.2.4 — additional label repair | 80 |
+| L13-28.4 — existing lineage owner link | 3 |
+| L13-28.5 — gateway references | 6 |
+| **Total** | **377** |
+
+## Proof and remaining final-F duties
+
+[link-validation.json](link-validation.json) authenticates **88** exact forward /
+rollback roundtrips, every coordinate stage and basis hash, all **10** earlier-owner
+links, **20,297** unchanged Markdown literal regions outside Related operands,
+787 unchanged judgments/frozen evidence, and all 158 unchanged G9 decisions. It
+reconstructs the reviewed state from pinned records using the existing `compose()`
+and `apply_diff` doors, not saved scratch bytes. `row125ReviewCheckpoint` and the
+final patch-24 postimage remain unchanged by this rework.
+
+With `P=plans/260925-documentation-authority-unification/reports/phase-09`,
+`NODE_OPTIONS=--no-addons`, and Python always `-B`:
+
+| Command | Exit / result |
+| --- | --- |
+| `python3 -B $P/fchain/check.py --pin HEAD` | **0**; 595 files, 229 proposals, 20 existing links, zero findings |
+| `python3 -B $P/fchain/controls.py` | **0**; 25 controls |
+| `python3 -B $P/preserve-premise/park-judgments/check_shard.py --all` | **0**; 787 rows, 0 unresolved, 24 existing duplicate markers |
+| `python3 -B $P/g9/check_phase9_decisions.py` | **0**; 158 entries, 595 shared-chain files, 12 gateway readers |
+| `node $P/carries/verify-carries.mjs` | **0**; 44 claims, 1,208 bindings; the two existing final-pin duties remain |
+| `python3 -B -c <rework.validationSource in link-commands.json>` | **0**; complete roundtrip, population, row/owner and conservation checks |
+| `git diff --check` | **0** |
+
+The new clickable and Related probes each target `docs/doc-governance.md`, which
+F edits and removes. **Each real compose invocation raises exactly one finding,
+`linkGuard: moved-target`, and no unrelated conflict.** The stale-label control
+also raises exactly one finding; its valid filename and descriptive-label peers
+pass. A separate used-reference-label probe does the same, including a valid
+label before the stale one on the same definition and an unused moved definition.
+The existing record/manifest disagreement control now runs separately, so it
+cannot mask a link-control failure.
+
+The 398 legacy-regex occurrences comprise **394 inside fences and 4 inside
+multi-line inline code spans** in `P00.1.md`, not 398 fenced occurrences. None is
+a clickable link. `link-retargets.json.finalFDuties` now records machine-readable
+open duties for cutover-guard agreement and final-F patch delta review:
+
+- Guard 3 must agree with this witness's fence/code-span and extractor-anchor
+  semantics, source removal and label rules; no old regex false positives.
+- The three previously changed proposals **f06461, f06591, f07205** need final-F
+  delta review. Their actual storage is **shard 2**, not shard 3 as the brief's
+  shorthand says; shard 3 only had f07667's stale-dependency cleanup. No shard-3
+  bytes change in this rework.
+- The newly extended existing proposals **f06504, f06697, f06699, f06700, f06702,
+  f06790/f06791/f06794/f06799, f06823** (seven owning files, ten row copies) also
+  need final-F delta review. Prior approvals do not transfer to changed hashes.
+
+[link-commands.json](link-commands.json) retains complete current argv/output/exits
+and self-contained validation source under `rework`; older proof entries stay
+historical. Preliminary author/parser diagnostics and one timed-out aggregate
+controls attempt are disclosed there, not counted as passing proofs. `check.json`
+is retained because real source/owner/after-image data changed, not just volatile
+fields. The untracked `chain-check-8c79219f4.json` is removed. Scratch is confined
+to a disposable tempfile directory under `/tmp/fgos-work/` and removed at handback.
+No docs, ledger, review, product file, private state, fgOS CLI, git write, native
+addon, product test, forbidden audit or pair-accounting command was touched.
+Impact-analysis: **degraded**, under the no-CLI/no-MCP boundary; static callers are
+F, premise/G9 wiring and owning controls, not a certified complete blast radius.
+No preview service is started under this records-only write boundary.
+
+---
+
+# Previous whole-population link guard receipt (historical; corrected above)
 
 Authority: L13-24, L13-26 and L13-28; [brief](../w34-link-guard-brief.md),
 [w33 review](../reviews/w33-link-retargets-review.json). Turn-start and replay pin:
@@ -17,7 +162,7 @@ directories must exist there; anchors come directly from the unit extractor via
 | Measure | Before | After |
 | --- | ---: | ---: |
 | Local clickable/Related destinations examined | 2,722 | 2,701 |
-| Related entries pointing into the move set | 67 | 0 |
+| Related guard findings at the reviewed final state (corrected tree; current rework counts) | 11 | 0 |
 | Other missing Related destinations | 2 | 0 |
 | Missing clickable file destinations | 41 | 0 |
 | Missing clickable anchors | 7 | 0 |
@@ -29,7 +174,7 @@ directories must exist there; anchors come directly from the unit extractor via
 
 The w33 legacy-regex population is reproduced exactly: **411** failures in pin
 files and **24** in F-created files, **435** total. Of those source occurrences,
-**398 are inside literal fences**, and **37 are live relative routes** (13 in pin
+**394 are inside literal fences and 4 inside multi-line inline code spans**, and **37 are live relative routes** (13 in pin
 files, all 24 in created files). The 398 literal occurrences remain byte-for-byte
 unchanged, as required by the brief; they are text, not exempted live links. The
 41 missing clickable files comprise those 37 routes plus four machine-absolute
@@ -61,7 +206,8 @@ only new-file patch selectors follow them.
 | L13-28.5 — additional gateway references | 6 |
 | Total | **285** |
 
-Rule 2.4 additionally fixes **10** old-path labels; the eleventh reviewed label
+The previous turn applied rule 2.4 to only **10** old-path labels (incomplete;
+the current rework repairs 80 more labels); the eleventh reviewed label
 is in the one original self-link made literal. All **24** w33 self-links are
 accounted: **23** point to the matching original-source title anchor, **1** has no
 matching anchor and becomes a code span. Related self-references use the same
@@ -82,7 +228,8 @@ are not converted back into live authority claims.
   before the same exact code-span operand, so Related readers do not mistake
   literal provenance for a route. The new record links those owners and carries
   no second delta for those lines. Their judgments, paths and frozen evidence
-  are unchanged. Both preserve obligations still pass.
+  are unchanged. Both preserve obligations still pass. These three changed
+  proposals require final-F delta review, as recorded in the current receipt.
 - **Carriage creation:** its existing `w8:gap05:history` chain is explicitly
   co-composed through the existing exact-base `composesChain` edge. This uses
   the established single final owning patch, not a new replay/overlap waiver.

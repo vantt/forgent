@@ -698,6 +698,37 @@
         "w8:gap05:history"
       ],
       "reason": "L13-24 exact co-composition: the selected carriage creation is one guarded base chain, not an independent second final owner; adjust only its relocated physical link routes in the single final patch."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/82": {
+      "composesChain": [
+        "w8:status-complete:docs/platform/documentation/switchboard.md"
+      ],
+      "reason": "L13-28 exact base-chain co-composition into the single final owning file patch; later independent same-line owners remain forbidden."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/83": {
+      "composesChain": [
+        "w8:convention:area-holder-table",
+        "w8:status-units:docs/platform/governance.md"
+      ],
+      "reason": "L13-28 exact base-chain co-composition into the single final owning file patch; later independent same-line owners remain forbidden."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/84": {
+      "composesChain": [
+        "status-units:docs/platform/migration-authoring-rules.md"
+      ],
+      "reason": "L13-28 exact base-chain co-composition into the single final owning file patch; later independent same-line owners remain forbidden."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/85": {
+      "composesChain": [
+        "rebased:recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md"
+      ],
+      "reason": "L13-28 exact base-chain co-composition into the single final owning file patch; later independent same-line owners remain forbidden."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/87": {
+      "composesChain": [
+        "rebased:w8:hunk-park:workflow-holder"
+      ],
+      "reason": "L13-28 exact base-chain co-composition into the single final owning file patch; later independent same-line owners remain forbidden."
     }
   }
 }

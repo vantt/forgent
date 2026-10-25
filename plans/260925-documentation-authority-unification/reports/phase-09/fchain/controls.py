@@ -114,11 +114,10 @@ def main():
     anchor_patch.update(path=anchor_file, rowIds=['injected-anchor'], forwardDiff=anchor_patch.pop('diff'))
     record['patches'].append(anchor_patch)
     record['rows'].append(dict(id='injected-anchor', file=anchor_file, ruling='L13-28'))
-    additions = copy.deepcopy(c.load(c.PHASE / 'g9/f-composition-additions.json'))
-    additions['patches'][0]['composedBy'] = ['bogus-record-edge']
     original_load = c.load
     with patch.object(c, 'load', side_effect=lambda path: record if path == record_path else original_load(path)):
-        report, _ = c.compose(pin, additions=additions)
+        report, _ = c.compose(pin)
+    assert all(f['kind'] == 'linkGuard' for f in report['findings']), report['findings']
     test('injected clickable link into a moved path fails the F door', report['findings'], 'linkGuard')
     assert any(f['kind'] == 'linkGuard' and f['file'] == injected_file and f['reason'] == 'moved-target' for f in report['findings'])
     anchor_findings = [f for f in report['findings'] if f['kind'] == 'linkGuard' and f['file'] == anchor_file]
@@ -129,7 +128,42 @@ def main():
          [f for f in anchor_findings if f['reason'] == 'missing-anchor'], 'linkGuard')
     results.append(dict(case='Related metadata is checked even in its txt header fence', passed=True))
     assert report['exit'] == 1
-    assert any(f.get('reason') == 'record and manifest composedBy disagree' for f in report['findings'])
+
+    # Each new regression has one isolated cause and exactly one finding. The
+    # real composed source is edited by F, so an overlay must not resurrect it.
+    for name, text, reason in [
+        ('clickable link into an edited move-set source', '[gov](../doc-governance.md)\n', 'moved-target'),
+        ('Related entry into an edited move-set source', '# Probe\n\n```txt\nRelated:\n- docs/doc-governance.md\n```\n', 'moved-target'),
+        ('old filename label on an earlier retarget', '[doc-governance.md](governance.md)\n[governance.md](governance.md)\n[documentation rules](governance.md)\n', 'stale-label'),
+        ('old filename reference label on an earlier retarget', '[documentation rules][gov] [doc-governance.md][gov]\n[gov]: governance.md\n[unused]: ../doc-governance.md\n', 'stale-label'),
+    ]:
+        probe_file = 'docs/platform/isolated-link-control.md'
+        probe = entry('isolated-link', '', text)
+        probe['diff'] = probe['diff'].replace('sample.md', probe_file)
+        probe.update(path=probe_file, rowIds=['isolated-link'], forwardDiff=probe.pop('diff'))
+        isolated = copy.deepcopy(original_load(record_path))
+        isolated['patches'].append(probe)
+        isolated['rows'].append(dict(id='isolated-link', file=probe_file, ruling='L13-28'))
+        with patch.object(c, 'load', side_effect=lambda path: isolated if path == record_path else original_load(path)):
+            rejected, states = c.compose(pin)
+        assert rejected['exit'] == 1 and len(rejected['findings']) == 1, (name, rejected['findings'])
+        finding = rejected['findings'][0]
+        assert finding['kind'] == 'linkGuard' and finding['file'] == probe_file and finding['reason'] == reason, finding
+        assert 'docs/doc-governance.md' in states, 'probe must exercise an edited move-set source'
+        test(name, rejected['findings'], 'linkGuard')
+    # Same filename at the new location is not stale; mixed labels retain their
+    # descriptive/section text when only the path operand changes.
+    assert not links.stale_label('workflow/spec.md', '../specs/workflow.md', 'workflow/spec.md')
+    assert not links.stale_label('spec.md', '../old/spec.md', '../new/spec.md')
+    assert links.stale_label('workflow.md §14', '../specs/workflow.md', 'workflow/spec.md#section')
+    assert links.stale_label('../old/spec.md', '../old/spec.md', '../new/spec.md')
+    assert not links.stale_label('runtime workflow overview', '../specs/workflow.md', 'workflow/spec.md')
+
+    additions = copy.deepcopy(c.load(c.PHASE / 'g9/f-composition-additions.json'))
+    additions['patches'][0]['composedBy'] = ['bogus-record-edge']
+    disagreement, _ = c.compose(pin, additions=additions)
+    assert disagreement['exit'] == 1
+    assert any(f.get('reason') == 'record and manifest composedBy disagree' for f in disagreement['findings'])
     results.append(dict(case='record composedBy cannot silently override the manifest', passed=True))
 
     # W25 regression: plans evidence changed/deleted after pin. No real record

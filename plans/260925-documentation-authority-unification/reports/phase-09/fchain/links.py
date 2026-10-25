@@ -80,15 +80,16 @@ def clickable(text):
         group = 1 if m[1] is not None else 2
         occupied.append(m.span())
         yield dict(start=m.start(), end=m.end(), targetStart=m.start(group), targetEnd=m.end(group), target=text[m.start(group):m.end(group)])
-    used = set()
+    used = {}
     for m in re.finditer(r'(?<!\\)\[([^\]\n]+)\](?:\[([^\]\n]*)\])?', masked):
         if any(a <= m.start() < b for a, b in occupied + definition_spans):
             continue
         key = ' '.join((m[2] or m[1]).split()).casefold()
-        if key in definitions and key not in used:
-            used.add(key)
-            definition, group = definitions[key]
-            yield dict(start=definition.start(), end=definition.end(), targetStart=definition.start(group), targetEnd=definition.end(group), target=text[definition.start(group):definition.end(group)], reference=key)
+        if key in definitions:
+            used.setdefault(key, []).append(text[m.start(1):m.end(1)])
+    for key, labels in used.items():
+        definition, group = definitions[key]
+        yield dict(start=definition.start(), end=definition.end(), targetStart=definition.start(group), targetEnd=definition.end(group), target=text[definition.start(group):definition.end(group)], reference=key, referenceLabels=labels)
     for m in re.finditer(r'<[A-Za-z][\w:-]*\b[^>]*?\bhref\s*=\s*(["\'])(.*?)\1[^>]*>|<((?:\.?\.?/|/|docs/)[^<>\s]+)>', masked, re.I):
         if any(a <= m.start() < b for a, b in occupied + definition_spans) or re.fullmatch(r'</[A-Za-z][\w:-]*\s*>', m[0]):
             continue  # Neither a nested <destination> nor an HTML closing tag is an autolink.
@@ -133,7 +134,7 @@ def tree(pin, states, shard, root):
     """Post-F files only: pin objects, minus moves/removals, plus composed bytes."""
     paths = set(subprocess.check_output(['git', '--no-optional-locks', 'ls-tree', '-r', '--name-only', pin], cwd=root, text=True).splitlines())
     moving = {r['oldPath']: r for r in shard.load(shard.P8 / 'step-05-cutover-move-set.json')['paths']}
-    paths = (paths - set(moving)) | set(states)
+    paths = (paths | set(states)) - set(moving)
     cache = {file: state['text'] for file, state in states.items()}
     def read(file):
         if file not in cache:
@@ -183,5 +184,42 @@ def population(pin, states, shard, root):
     return links
 
 
-def scan(pin, states, shard, root):
-    return [dict(kind='linkGuard', **link) for link in population(pin, states, shard, root) if 'reason' in link]
+def stale_label(label, old_target, new_target):
+    """Rule 2.4: descriptive labels survive, old file/path labels do not."""
+    old_name = posixpath.basename(urlsplit(old_target).path)
+    new_name = posixpath.basename(urlsplit(new_target).path)
+    if old_name and old_name != new_name and re.search(r'(?<![\w.-])' + re.escape(old_name) + r'(?![\w.-])', label):
+        return True
+    # Equal basenames can still hide a stale directory/path label.
+    value = label.strip().strip('`')
+    return '/' in value and value == old_target and value != new_target
+
+
+def scan(pin, states, shard, root, retargets=None):
+    links = population(pin, states, shard, root)
+    findings = [dict(kind='linkGuard', **link) for link in links if 'reason' in link]
+    # Include earlier F retargets, not only patches owned by this record.
+    by_path = {}
+    moving = shard.load(shard.P8 / 'step-05-cutover-move-set.json')['paths']
+    for move in moving:
+        for successor in move.get('moves', []):
+            if successor.get('to'):
+                by_path.setdefault(successor['to'], set()).add(move['oldPath'])
+    for row in (retargets or {}).get('rows', []):
+        if row.get('newPath') and row.get('newTarget'):
+            by_path.setdefault(row['newPath'], set()).update([row['oldPath'], row['oldTarget']])
+    texts = {file: state['text'] for file, state in states.items()}
+    for link in links:
+        if link.get('related') or link['oldPath'] not in by_path:
+            continue
+        if link['file'] not in texts:
+            texts[link['file']] = (shard.blob(pin, link['file']) or b'').decode()
+        text = texts[link['file']]
+        inline = re.match(r'\[([^\]]*)\]\(', text[link['start']:link['end']])
+        labels = [inline[1]] if inline else link.get('referenceLabels', [])
+        stale = next(((label, old) for label in labels for old in sorted(by_path[link['oldPath']])
+                      if label.strip().strip('`') not in {link['target'], link['oldPath']} and
+                      stale_label(label, old, link['target'])), None)
+        if stale:
+            findings.append(dict(kind='linkGuard', **link, reason='stale-label', oldTarget=stale[1], label=stale[0]))
+    return findings

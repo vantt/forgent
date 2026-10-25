@@ -115,12 +115,6 @@
       "rejectedBy": "linkGuard",
       "findings": [
         {
-          "kind": "conflict",
-          "file": "bin/fgos.mjs",
-          "patch": "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/0",
-          "reason": "record and manifest composedBy disagree"
-        },
-        {
           "kind": "linkGuard",
           "start": 272,
           "end": 305,
@@ -214,6 +208,92 @@
       "passed": true
     },
     {
+      "case": "clickable link into an edited move-set source",
+      "rejectedBy": "linkGuard",
+      "findings": [
+        {
+          "kind": "linkGuard",
+          "start": 0,
+          "end": 27,
+          "targetStart": 6,
+          "targetEnd": 26,
+          "target": "../doc-governance.md",
+          "file": "docs/platform/isolated-link-control.md",
+          "line": 1,
+          "oldPath": "docs/doc-governance.md",
+          "fragment": "",
+          "reason": "moved-target"
+        }
+      ]
+    },
+    {
+      "case": "Related entry into an edited move-set source",
+      "rejectedBy": "linkGuard",
+      "findings": [
+        {
+          "kind": "linkGuard",
+          "start": 27,
+          "end": 49,
+          "targetStart": 27,
+          "targetEnd": 49,
+          "target": "docs/doc-governance.md",
+          "related": true,
+          "file": "docs/platform/isolated-link-control.md",
+          "line": 5,
+          "oldPath": "docs/doc-governance.md",
+          "fragment": "",
+          "reason": "moved-target"
+        }
+      ]
+    },
+    {
+      "case": "old filename label on an earlier retarget",
+      "rejectedBy": "linkGuard",
+      "findings": [
+        {
+          "kind": "linkGuard",
+          "start": 0,
+          "end": 34,
+          "targetStart": 20,
+          "targetEnd": 33,
+          "target": "governance.md",
+          "file": "docs/platform/isolated-link-control.md",
+          "line": 1,
+          "oldPath": "docs/platform/governance.md",
+          "fragment": "",
+          "reason": "stale-label",
+          "oldTarget": "docs/doc-governance.md",
+          "label": "doc-governance.md"
+        }
+      ]
+    },
+    {
+      "case": "old filename reference label on an earlier retarget",
+      "rejectedBy": "linkGuard",
+      "findings": [
+        {
+          "kind": "linkGuard",
+          "start": 52,
+          "end": 72,
+          "targetStart": 59,
+          "targetEnd": 72,
+          "target": "governance.md",
+          "reference": "gov",
+          "referenceLabels": [
+            "documentation rules",
+            "doc-governance.md"
+          ],
+          "file": "docs/platform/isolated-link-control.md",
+          "line": 2,
+          "oldPath": "docs/platform/governance.md",
+          "fragment": "",
+          "reason": "stale-label",
+          "oldTarget": "docs/doc-governance.md",
+          "label": "doc-governance.md"
+        }
+      ]
+    },
+    {
       "case": "record composedBy cannot silently override the manifest",
       "passed": true
     },
@@ -242,6 +322,6 @@
       "passed": true
     }
   ],
-  "count": 21,
+  "count": 25,
   "reuse": "Real apply_one with compose.apply_diff; real G9 scan_gateway with immutable Git fixture replies."
 }

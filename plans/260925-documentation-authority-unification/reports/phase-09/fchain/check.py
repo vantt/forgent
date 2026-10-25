@@ -361,7 +361,7 @@ def compose(pin, manifest=None, additions=None):
                 if not shard.preserved_line_survives(expected_line, states[file]['text']):
                     findings.append(dict(kind='sameLinesTwice', file=file, patch='preserve:' + row['rowId'], reason='preserved occurrence changed'))
                     break
-    findings.extend(link_reader.scan(pin, states, shard, ROOT))
+    findings.extend(link_reader.scan(pin, states, shard, ROOT, load(HERE / 'link-retargets.json')))
     files = [dict(file=file, afterSha256=sha(state['text']), steps=[
         {k: v for k, v in trace.items() if k not in {'before', 'after'}} for trace in state['trace']]) for file, state in sorted(states.items())]
     report = dict(contract='fchain-check.v1', sourceCommit=pin, exit=int(bool(findings)),

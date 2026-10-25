@@ -7686,19 +7686,19 @@
           "f06504"
         ],
         "sourceSha256": "4076287bc4658b76618047a347bc32a9719200f7f4cedb6479291bdeb6686b8f",
-        "proposedSha256": "4ee4d1a2016688398035ee1358387a5484558ae74dd6448d5aedff7dd90f7b4f",
+        "proposedSha256": "b0bf09e8db90528054334145b89985f60256fd858516391fc7037c08818c01e5",
         "replacements": [
           {
             "line": 17,
             "sourceLine": 17,
             "before": "docs/coexistence.md",
-            "after": "`docs/coexistence.md`",
+            "after": "docs/platform/coexistence/spec.md#coexistence",
             "ownerRowIds": [
               "f06504"
             ]
           }
         ],
-        "patch": "--- a/docs/platform/coexistence/spec.md\n+++ b/docs/platform/coexistence/spec.md\n@@ -14,7 +14,7 @@\n Do not use this for: Current canonical authority or proof of implemented behavior\n Last reviewed: 2026-10-14\n Related:\n-- docs/coexistence.md\n+- `docs/coexistence.md`\n Supersedes: None; candidate only\n Superseded by: None\n ```\n",
+        "patch": "--- a/docs/platform/coexistence/spec.md\n+++ b/docs/platform/coexistence/spec.md\n@@ -14,7 +14,7 @@\n Do not use this for: Current canonical authority or proof of implemented behavior\n Last reviewed: 2026-10-14\n Related:\n-- docs/coexistence.md\n+- docs/platform/coexistence/spec.md#coexistence\n Supersedes: None; candidate only\n Superseded by: None\n ```\n",
         "chainEntryIds": [
           "file:docs/platform/coexistence/spec.md",
           "w8:gloss:docs/platform/coexistence/spec.md"
@@ -8888,19 +8888,19 @@
           "f06697"
         ],
         "sourceSha256": "500c3ac7b8fd82ffeaa106ca32aa26680533b858efdad70fadd7d3c8e3e6f7f6",
-        "proposedSha256": "05abfa7e773e521cff8e32e25f26fd97aebdbfc9e0a38085d787cab5041c1830",
+        "proposedSha256": "20035094006f8871c4a6b334f72b4cd7abf03d0523b4cca2cc2ddf2feb10f51b",
         "replacements": [
           {
             "line": 18,
             "sourceLine": 18,
             "before": "docs/doc-governance.md",
-            "after": "`docs/doc-governance.md`",
+            "after": "docs/platform/governance.md",
             "ownerRowIds": [
               "f06697"
             ]
           }
         ],
-        "patch": "--- a/docs/platform/documentation/history/templates/architecture.md\n+++ b/docs/platform/documentation/history/templates/architecture.md\n@@ -15,7 +15,7 @@\n Last reviewed: 2026-10-14\n Related:\n - docs/templates/architecture.md\n-- docs/doc-governance.md\n+- `docs/doc-governance.md`\n Supersedes: None; candidate only\n Superseded by: None\n ```\n"
+        "patch": "--- a/docs/platform/documentation/history/templates/architecture.md\n+++ b/docs/platform/documentation/history/templates/architecture.md\n@@ -15,7 +15,7 @@\n Last reviewed: 2026-10-14\n Related:\n - docs/templates/architecture.md\n-- docs/doc-governance.md\n+- docs/platform/governance.md\n Supersedes: None; candidate only\n Superseded by: None\n ```\n"
       }
     },
     {
@@ -9015,19 +9015,19 @@
           "f06699"
         ],
         "sourceSha256": "24a1a1b9a6dd2b7c4fbda242eeeffbfa6471040bc30010589d47199e870ef035",
-        "proposedSha256": "754c42e38b035ba334ed8b17e356d64204260a0fcdf2be52a19bb5aff2ffe7e2",
+        "proposedSha256": "0631ab7f16a8994725a4e694d5df1896b9abef988c416e11c7b03a48949a55f2",
         "replacements": [
           {
             "line": 18,
             "sourceLine": 18,
             "before": "docs/doc-governance.md",
-            "after": "`docs/doc-governance.md`",
+            "after": "docs/platform/governance.md",
             "ownerRowIds": [
               "f06699"
             ]
           }
         ],
-        "patch": "--- a/docs/platform/documentation/history/templates/area-readme.md\n+++ b/docs/platform/documentation/history/templates/area-readme.md\n@@ -15,7 +15,7 @@\n Last reviewed: 2026-10-14\n Related:\n - docs/templates/area-readme.md\n-- docs/doc-governance.md\n+- `docs/doc-governance.md`\n Supersedes: None; candidate only\n Superseded by: None\n ```\n"
+        "patch": "--- a/docs/platform/documentation/history/templates/area-readme.md\n+++ b/docs/platform/documentation/history/templates/area-readme.md\n@@ -15,7 +15,7 @@\n Last reviewed: 2026-10-14\n Related:\n - docs/templates/area-readme.md\n-- docs/doc-governance.md\n+- docs/platform/governance.md\n Supersedes: None; candidate only\n Superseded by: None\n ```\n"
       }
     },
     {
@@ -9091,19 +9091,19 @@
           "f06700"
         ],
         "sourceSha256": "6cd3b2bd82763b02bcba0eaaa7eaa3da4c7e263a15f34947930c3d4bb39e80d6",
-        "proposedSha256": "893215c80ee91366f6b35b6c1aeb6579be9a2bb2523f79d662cdaf1ec8503180",
+        "proposedSha256": "1dec0e6aae71519c0f69392e2c7b17bfc3afdd16ee9d989265eaf50189b15ad0",
         "replacements": [
           {
             "line": 18,
             "sourceLine": 18,
             "before": "docs/doc-governance.md",
-            "after": "`docs/doc-governance.md`",
+            "after": "docs/platform/governance.md",
             "ownerRowIds": [
               "f06700"
             ]
           }
         ],
-        "patch": "--- a/docs/platform/documentation/history/templates/contract.md\n+++ b/docs/platform/documentation/history/templates/contract.md\n@@ -15,7 +15,7 @@\n Last reviewed: 2026-10-14\n Related:\n - docs/templates/contract.md\n-- docs/doc-governance.md\n+- `docs/doc-governance.md`\n Supersedes: None; candidate only\n Superseded by: None\n ```\n"
+        "patch": "--- a/docs/platform/documentation/history/templates/contract.md\n+++ b/docs/platform/documentation/history/templates/contract.md\n@@ -15,7 +15,7 @@\n Last reviewed: 2026-10-14\n Related:\n - docs/templates/contract.md\n-- docs/doc-governance.md\n+- docs/platform/governance.md\n Supersedes: None; candidate only\n Superseded by: None\n ```\n"
       }
     },
     {
@@ -9167,19 +9167,19 @@
           "f06702"
         ],
         "sourceSha256": "d9481a0f3c9ad754864de88604e203ad2404498eaf7d59024d96421d134ba5b4",
-        "proposedSha256": "46628697960c8caa3894ca4f403ce0e4d6caa5bad9d82995efca61ba88bf8e30",
+        "proposedSha256": "6dcf97468e98cea4cffec6638ccb7e78dc8c524cce05661bf02029155390a898",
         "replacements": [
           {
             "line": 17,
             "sourceLine": 17,
             "before": "docs/README.md",
-            "after": "`docs/README.md`",
+            "after": "docs/platform/documentation/operations/portals/docs-portal.md#fgos-documentation",
             "ownerRowIds": [
               "f06702"
             ]
           }
         ],
-        "patch": "--- a/docs/platform/documentation/operations/portals/docs-portal.md\n+++ b/docs/platform/documentation/operations/portals/docs-portal.md\n@@ -14,7 +14,7 @@\n Do not use this for: Current canonical authority or proof of implemented behavior\n Last reviewed: 2026-10-14\n Related:\n-- docs/README.md\n+- `docs/README.md`\n Supersedes: None; candidate only\n Superseded by: None\n ```\n",
+        "patch": "--- a/docs/platform/documentation/operations/portals/docs-portal.md\n+++ b/docs/platform/documentation/operations/portals/docs-portal.md\n@@ -14,7 +14,7 @@\n Do not use this for: Current canonical authority or proof of implemented behavior\n Last reviewed: 2026-10-14\n Related:\n-- docs/README.md\n+- docs/platform/documentation/operations/portals/docs-portal.md#fgos-documentation\n Supersedes: None; candidate only\n Superseded by: None\n ```\n",
         "chainEntryIds": [
           "status-units:docs/platform/documentation/operations/portals/docs-portal.md"
         ],
@@ -9673,13 +9673,13 @@
           "f06799"
         ],
         "sourceSha256": "c57fb9a788e9b4ad00fe588d83a9a41e91dda463d27e700188fb7c7565496ee2",
-        "proposedSha256": "f94035c40dc1293c89f302e2efbd10cc6467f704affcecd9fef6c42d630277a9",
+        "proposedSha256": "cee3102fa845e5e96a7572a290d50c8b003a57b40495b1f3668629ac9fbe8ff5",
         "replacements": [
           {
             "line": 17,
             "sourceLine": 17,
             "before": "docs/doc-governance.md",
-            "after": "`docs/doc-governance.md`",
+            "after": "docs/platform/governance.md#documentation-governance",
             "ownerRowIds": [
               "f06794"
             ]
@@ -9744,7 +9744,7 @@
             ]
           }
         ],
-        "patch": "--- a/docs/platform/governance.md\n+++ b/docs/platform/governance.md\n@@ -14,7 +14,7 @@\n Do not use this for: Replacing the current legacy governance authority or certifying implementation\n Last reviewed: 2026-10-14\n Related:\n-- docs/doc-governance.md\n+- `docs/doc-governance.md`\n - docs/reading-map.md\n - docs/platform/README.md\n Supersedes: None; candidate only\n@@ -47,13 +47,11 @@\n \n ```txt\n docs/\n-  README.md\n-  doc-governance.md\n   reading-map.md\n-  templates/\n \n   platform/\n     README.md\n+    governance.md\n     vision.md\n     intent-preservation-ledger.md\n     platform-foundations.md\n@@ -63,6 +61,12 @@\n     decisions/\n     verification/\n     history/\n+    documentation/\n+      operations/\n+        portals/\n+          docs-portal.md\n+      history/\n+        templates/\n \n     <area>/\n       README.md\n@@ -475,7 +479,7 @@\n | operative transitional switchboard | [transitional-switchboard.md](documentation/switchboard.md) |\n | migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n | platform portal | [platform/README.md](README.md) |\n-| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |\n+| source design discussion | `architect/documentation-system-design.md` (`../architect/documentation-system-design.md`) |\n \n ## Source Metadata (Added in candidate)\n \n",
+        "patch": "--- a/docs/platform/governance.md\n+++ b/docs/platform/governance.md\n@@ -14,7 +14,7 @@\n Do not use this for: Replacing the current legacy governance authority or certifying implementation\n Last reviewed: 2026-10-14\n Related:\n-- docs/doc-governance.md\n+- docs/platform/governance.md#documentation-governance\n - docs/reading-map.md\n - docs/platform/README.md\n Supersedes: None; candidate only\n@@ -47,13 +47,11 @@\n \n ```txt\n docs/\n-  README.md\n-  doc-governance.md\n   reading-map.md\n-  templates/\n \n   platform/\n     README.md\n+    governance.md\n     vision.md\n     intent-preservation-ledger.md\n     platform-foundations.md\n@@ -63,6 +61,12 @@\n     decisions/\n     verification/\n     history/\n+    documentation/\n+      operations/\n+        portals/\n+          docs-portal.md\n+      history/\n+        templates/\n \n     <area>/\n       README.md\n@@ -475,7 +479,7 @@\n | operative transitional switchboard | [transitional-switchboard.md](documentation/switchboard.md) |\n | migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n | platform portal | [platform/README.md](README.md) |\n-| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |\n+| source design discussion | `architect/documentation-system-design.md` (`../architect/documentation-system-design.md`) |\n \n ## Source Metadata (Added in candidate)\n \n",
         "chainEntryIds": [
           "w8:convention:area-holder-table",
           "w8:status-units:docs/platform/governance.md"
@@ -9857,13 +9857,13 @@
           "f06799"
         ],
         "sourceSha256": "c57fb9a788e9b4ad00fe588d83a9a41e91dda463d27e700188fb7c7565496ee2",
-        "proposedSha256": "f94035c40dc1293c89f302e2efbd10cc6467f704affcecd9fef6c42d630277a9",
+        "proposedSha256": "cee3102fa845e5e96a7572a290d50c8b003a57b40495b1f3668629ac9fbe8ff5",
         "replacements": [
           {
             "line": 17,
             "sourceLine": 17,
             "before": "docs/doc-governance.md",
-            "after": "`docs/doc-governance.md`",
+            "after": "docs/platform/governance.md#documentation-governance",
             "ownerRowIds": [
               "f06794"
             ]
@@ -9928,7 +9928,7 @@
             ]
           }
         ],
-        "patch": "--- a/docs/platform/governance.md\n+++ b/docs/platform/governance.md\n@@ -14,7 +14,7 @@\n Do not use this for: Replacing the current legacy governance authority or certifying implementation\n Last reviewed: 2026-10-14\n Related:\n-- docs/doc-governance.md\n+- `docs/doc-governance.md`\n - docs/reading-map.md\n - docs/platform/README.md\n Supersedes: None; candidate only\n@@ -47,13 +47,11 @@\n \n ```txt\n docs/\n-  README.md\n-  doc-governance.md\n   reading-map.md\n-  templates/\n \n   platform/\n     README.md\n+    governance.md\n     vision.md\n     intent-preservation-ledger.md\n     platform-foundations.md\n@@ -63,6 +61,12 @@\n     decisions/\n     verification/\n     history/\n+    documentation/\n+      operations/\n+        portals/\n+          docs-portal.md\n+      history/\n+        templates/\n \n     <area>/\n       README.md\n@@ -475,7 +479,7 @@\n | operative transitional switchboard | [transitional-switchboard.md](documentation/switchboard.md) |\n | migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n | platform portal | [platform/README.md](README.md) |\n-| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |\n+| source design discussion | `architect/documentation-system-design.md` (`../architect/documentation-system-design.md`) |\n \n ## Source Metadata (Added in candidate)\n \n",
+        "patch": "--- a/docs/platform/governance.md\n+++ b/docs/platform/governance.md\n@@ -14,7 +14,7 @@\n Do not use this for: Replacing the current legacy governance authority or certifying implementation\n Last reviewed: 2026-10-14\n Related:\n-- docs/doc-governance.md\n+- docs/platform/governance.md#documentation-governance\n - docs/reading-map.md\n - docs/platform/README.md\n Supersedes: None; candidate only\n@@ -47,13 +47,11 @@\n \n ```txt\n docs/\n-  README.md\n-  doc-governance.md\n   reading-map.md\n-  templates/\n \n   platform/\n     README.md\n+    governance.md\n     vision.md\n     intent-preservation-ledger.md\n     platform-foundations.md\n@@ -63,6 +61,12 @@\n     decisions/\n     verification/\n     history/\n+    documentation/\n+      operations/\n+        portals/\n+          docs-portal.md\n+      history/\n+        templates/\n \n     <area>/\n       README.md\n@@ -475,7 +479,7 @@\n | operative transitional switchboard | [transitional-switchboard.md](documentation/switchboard.md) |\n | migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n | platform portal | [platform/README.md](README.md) |\n-| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |\n+| source design discussion | `architect/documentation-system-design.md` (`../architect/documentation-system-design.md`) |\n \n ## Source Metadata (Added in candidate)\n \n",
         "chainEntryIds": [
           "w8:convention:area-holder-table",
           "w8:status-units:docs/platform/governance.md"
@@ -10011,13 +10011,13 @@
           "f06799"
         ],
         "sourceSha256": "c57fb9a788e9b4ad00fe588d83a9a41e91dda463d27e700188fb7c7565496ee2",
-        "proposedSha256": "f94035c40dc1293c89f302e2efbd10cc6467f704affcecd9fef6c42d630277a9",
+        "proposedSha256": "cee3102fa845e5e96a7572a290d50c8b003a57b40495b1f3668629ac9fbe8ff5",
         "replacements": [
           {
             "line": 17,
             "sourceLine": 17,
             "before": "docs/doc-governance.md",
-            "after": "`docs/doc-governance.md`",
+            "after": "docs/platform/governance.md#documentation-governance",
             "ownerRowIds": [
               "f06794"
             ]
@@ -10082,7 +10082,7 @@
             ]
           }
         ],
-        "patch": "--- a/docs/platform/governance.md\n+++ b/docs/platform/governance.md\n@@ -14,7 +14,7 @@\n Do not use this for: Replacing the current legacy governance authority or certifying implementation\n Last reviewed: 2026-10-14\n Related:\n-- docs/doc-governance.md\n+- `docs/doc-governance.md`\n - docs/reading-map.md\n - docs/platform/README.md\n Supersedes: None; candidate only\n@@ -47,13 +47,11 @@\n \n ```txt\n docs/\n-  README.md\n-  doc-governance.md\n   reading-map.md\n-  templates/\n \n   platform/\n     README.md\n+    governance.md\n     vision.md\n     intent-preservation-ledger.md\n     platform-foundations.md\n@@ -63,6 +61,12 @@\n     decisions/\n     verification/\n     history/\n+    documentation/\n+      operations/\n+        portals/\n+          docs-portal.md\n+      history/\n+        templates/\n \n     <area>/\n       README.md\n@@ -475,7 +479,7 @@\n | operative transitional switchboard | [transitional-switchboard.md](documentation/switchboard.md) |\n | migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n | platform portal | [platform/README.md](README.md) |\n-| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |\n+| source design discussion | `architect/documentation-system-design.md` (`../architect/documentation-system-design.md`) |\n \n ## Source Metadata (Added in candidate)\n \n",
+        "patch": "--- a/docs/platform/governance.md\n+++ b/docs/platform/governance.md\n@@ -14,7 +14,7 @@\n Do not use this for: Replacing the current legacy governance authority or certifying implementation\n Last reviewed: 2026-10-14\n Related:\n-- docs/doc-governance.md\n+- docs/platform/governance.md#documentation-governance\n - docs/reading-map.md\n - docs/platform/README.md\n Supersedes: None; candidate only\n@@ -47,13 +47,11 @@\n \n ```txt\n docs/\n-  README.md\n-  doc-governance.md\n   reading-map.md\n-  templates/\n \n   platform/\n     README.md\n+    governance.md\n     vision.md\n     intent-preservation-ledger.md\n     platform-foundations.md\n@@ -63,6 +61,12 @@\n     decisions/\n     verification/\n     history/\n+    documentation/\n+      operations/\n+        portals/\n+          docs-portal.md\n+      history/\n+        templates/\n \n     <area>/\n       README.md\n@@ -475,7 +479,7 @@\n | operative transitional switchboard | [transitional-switchboard.md](documentation/switchboard.md) |\n | migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n | platform portal | [platform/README.md](README.md) |\n-| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |\n+| source design discussion | `architect/documentation-system-design.md` (`../architect/documentation-system-design.md`) |\n \n ## Source Metadata (Added in candidate)\n \n",
         "chainEntryIds": [
           "w8:convention:area-holder-table",
           "w8:status-units:docs/platform/governance.md"
@@ -10165,13 +10165,13 @@
           "f06799"
         ],
         "sourceSha256": "c57fb9a788e9b4ad00fe588d83a9a41e91dda463d27e700188fb7c7565496ee2",
-        "proposedSha256": "f94035c40dc1293c89f302e2efbd10cc6467f704affcecd9fef6c42d630277a9",
+        "proposedSha256": "cee3102fa845e5e96a7572a290d50c8b003a57b40495b1f3668629ac9fbe8ff5",
         "replacements": [
           {
             "line": 17,
             "sourceLine": 17,
             "before": "docs/doc-governance.md",
-            "after": "`docs/doc-governance.md`",
+            "after": "docs/platform/governance.md#documentation-governance",
             "ownerRowIds": [
               "f06794"
             ]
@@ -10236,7 +10236,7 @@
             ]
           }
         ],
-        "patch": "--- a/docs/platform/governance.md\n+++ b/docs/platform/governance.md\n@@ -14,7 +14,7 @@\n Do not use this for: Replacing the current legacy governance authority or certifying implementation\n Last reviewed: 2026-10-14\n Related:\n-- docs/doc-governance.md\n+- `docs/doc-governance.md`\n - docs/reading-map.md\n - docs/platform/README.md\n Supersedes: None; candidate only\n@@ -47,13 +47,11 @@\n \n ```txt\n docs/\n-  README.md\n-  doc-governance.md\n   reading-map.md\n-  templates/\n \n   platform/\n     README.md\n+    governance.md\n     vision.md\n     intent-preservation-ledger.md\n     platform-foundations.md\n@@ -63,6 +61,12 @@\n     decisions/\n     verification/\n     history/\n+    documentation/\n+      operations/\n+        portals/\n+          docs-portal.md\n+      history/\n+        templates/\n \n     <area>/\n       README.md\n@@ -475,7 +479,7 @@\n | operative transitional switchboard | [transitional-switchboard.md](documentation/switchboard.md) |\n | migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n | platform portal | [platform/README.md](README.md) |\n-| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |\n+| source design discussion | `architect/documentation-system-design.md` (`../architect/documentation-system-design.md`) |\n \n ## Source Metadata (Added in candidate)\n \n",
+        "patch": "--- a/docs/platform/governance.md\n+++ b/docs/platform/governance.md\n@@ -14,7 +14,7 @@\n Do not use this for: Replacing the current legacy governance authority or certifying implementation\n Last reviewed: 2026-10-14\n Related:\n-- docs/doc-governance.md\n+- docs/platform/governance.md#documentation-governance\n - docs/reading-map.md\n - docs/platform/README.md\n Supersedes: None; candidate only\n@@ -47,13 +47,11 @@\n \n ```txt\n docs/\n-  README.md\n-  doc-governance.md\n   reading-map.md\n-  templates/\n \n   platform/\n     README.md\n+    governance.md\n     vision.md\n     intent-preservation-ledger.md\n     platform-foundations.md\n@@ -63,6 +61,12 @@\n     decisions/\n     verification/\n     history/\n+    documentation/\n+      operations/\n+        portals/\n+          docs-portal.md\n+      history/\n+        templates/\n \n     <area>/\n       README.md\n@@ -475,7 +479,7 @@\n | operative transitional switchboard | [transitional-switchboard.md](documentation/switchboard.md) |\n | migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n | platform portal | [platform/README.md](README.md) |\n-| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |\n+| source design discussion | `architect/documentation-system-design.md` (`../architect/documentation-system-design.md`) |\n \n ## Source Metadata (Added in candidate)\n \n",
         "chainEntryIds": [
           "w8:convention:area-holder-table",
           "w8:status-units:docs/platform/governance.md"
@@ -10740,19 +10740,19 @@
           "f06823"
         ],
         "sourceSha256": "746bf7101dddc6c9fd8dba672ef67db23c1660435255d8a7c2fd629d544b17a0",
-        "proposedSha256": "284c55256b446411032c1f2d1d391700843110a8eb1156a9b560177602957cb4",
+        "proposedSha256": "96eba5511fbcb665646855cf063ce6b92594acec962f4ffb800308c76d0b152d",
         "replacements": [
           {
             "line": 17,
             "sourceLine": 17,
             "before": "docs/operator-runbook-herdr-cockpit.md",
-            "after": "`docs/operator-runbook-herdr-cockpit.md`",
+            "after": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md#operator-runbook-herdr-cockpit",
             "ownerRowIds": [
               "f06823"
             ]
           }
         ],
-        "patch": "--- a/docs/platform/herdr-web-dashboard/operations/operator-runbook.md\n+++ b/docs/platform/herdr-web-dashboard/operations/operator-runbook.md\n@@ -14,7 +14,7 @@\n Do not use this for: Current canonical authority or proof of implemented behavior\n Last reviewed: 2026-10-14\n Related:\n-- docs/operator-runbook-herdr-cockpit.md\n+- `docs/operator-runbook-herdr-cockpit.md`\n Supersedes: None; candidate only\n Superseded by: None\n ```\n",
+        "patch": "--- a/docs/platform/herdr-web-dashboard/operations/operator-runbook.md\n+++ b/docs/platform/herdr-web-dashboard/operations/operator-runbook.md\n@@ -14,7 +14,7 @@\n Do not use this for: Current canonical authority or proof of implemented behavior\n Last reviewed: 2026-10-14\n Related:\n-- docs/operator-runbook-herdr-cockpit.md\n+- docs/platform/herdr-web-dashboard/operations/operator-runbook.md#operator-runbook-herdr-cockpit\n Supersedes: None; candidate only\n Superseded by: None\n ```\n",
         "chainEntryIds": [
           "file:docs/platform/herdr-web-dashboard/operations/operator-runbook.md"
         ],
