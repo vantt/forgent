@@ -1,139 +1,215 @@
-# Premise judgments checked against the F chain
+# Premise patches: one guarded chain contract
 
-Pin: `56b3c3ebffddca273154e482e581591113c394da` (HEAD when checked).
-Authority: `../../owner-answers.md`, L13-21.1; task: `../../w24-chain-checker-brief.md`.
+Checked checkout: `b005d4eba8d89a28f4b7cbd66f75354708aeb23c`.
+Frozen judgment/evidence pin: `c94545de5b45873cb2eb419f10124283fd730a2e`.
+Authority: [L13-21](../../owner-answers.md), [chain-contract brief](../../w26-chain-contract-brief.md).
+
+**Mechanical proof passes; no semantic approval, authority flip, source application,
+lease, gate closure, or cutover readiness is claimed.** All 787 judgments and
+original evidence/successor bindings are unchanged. Only their executable patch
+representation and two superseded chain-marker IDs change.
 
 ## Reproduce
 
+From the repository root, always with `python3 -B`:
+
 ```sh
+python3 -B plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard_controls.py
 python3 -B plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard.py --all
 ```
 
-**Expected exit: 1.** This turn builds the checker, not the row/chain repairs.
-Findings: [chain-check-56b3c3ebf.json](chain-check-56b3c3ebf.json).
-Checker controls and review cross-check: [chain-check-controls.json](chain-check-controls.json).
-`--shard 1`, `--shard 2` and `--shard 3` also work; `--all` was run last to leave the complete pinned report.
+Both exit **0**. `--shard 1`, `--shard 2`, and `--shard 3` also exit 0;
+[actual command results](chain-command-results.json) retain all four invocations,
+with `--all` last. The checker writes
+[chain-check-b005d4eba.json](chain-check-b005d4eba.json), including input hashes,
+every effective chain step, proposal roundtrips and every row check.
 
-## Counts
+## Before and after
 
-All **787 rows** cover their ids exactly; their evidence spans, file/unit digests,
-proof bindings and prepared-patch pre/post-images validate. Three former
-checkers are removed; one checker understands their three span encodings.
+The baseline was the **actual unmodified checker on this checkout**, after the
+three shard reworks, not the older pre-rework totals. Its `--all` exited 1:
+37 unresolved = 2 invalidShard + 16 conflictsWithChain + 2 invalidAlreadyComposed
++ 2 successorOfSurvivingSource + 15 staleChainEntry. One duplicate was resolved.
+Shards 1 and 2 stopped at validation, so that baseline did **not** inspect all
+787 rows. Do not interpret its missing row findings as passing rows.
 
-| Shard | Rows | File patches | duplicateOfChain | conflictsWithChain | repointOfSurvivingPath | staleChainEntry touching shard files | Unresolved |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| 1 | 263 | 19 | 16 | 5 | 53 | 1 | 75 |
-| 2 | 263 | 16 | 4 | 12 | 6 | 0 | 22 |
-| 3 | 261 | 39 | 3 | 16 | 26 | 6 | 51 |
-| Unique findings across the whole chain | 787 | 74 | 23 | 33 | 85 | 15 | 156 |
+| Measure | Before | After |
+|---|---:|---:|
+| Invalid shards | 2 | 0 |
+| Stale effective chain entries | 15 | 0 |
+| Unresolved findings | 37 | 0 |
+| Resolved exact chain markers | 1 reached | 24 |
+| Strict chain file results | 450 / 465 | 465 / 465 |
+| Checker exit | 1 | 0 |
 
-Eight stale entries touch no shard source file, so the final row is not the sum
-of the shard rows. A file patch is replayed once per shard, not once per row;
-findings identify its affected rows. Exact forward/reverse success on the chain:
-8/19, 12/16 and 32/39 file patches respectively. Duplicate patches are expected
-to fail forward replay; their failures remain in `patchReplays`, but are classified
-duplicate-first, not counted a second time as conflicts. Offsets are allowed;
-fuzz is zero, and reverse must restore the exact chain bytes.
+| Shard | Rows | Pin-basis patches | Chain-basis patches | Holder patches (included) | Resolved markers | Unresolved |
+|---|---:|---:|---:|---:|---:|---:|
+| 1 | 263 | 20 | 5 | 0 | 17 | 0 |
+| 2 | 263 | 27 | 15 | 0 | 4 | 0 |
+| 3 | 261 | 10 | 26 | 2 | 3 | 0 |
+| Total | 787 | 57 | 46 | 2 | 24 | 0 |
 
-Of the 85 operand findings, **83 are successor-bound and two are repoints**
-(`f07667`, `f08668`). The requested rule checks operands even on successor-bound
-rows; this is not a semantic rejection of carrying a passage from a removed
-source. An operand already absent before cutover also fails the removal trigger;
-it is distinguished by `beforePresent: false` in the finding. Directory/glob
-operands are expanded against the pin: a directory whose files all move is not
-misreported as surviving (including the contracts directory and `docs/specs/*`).
+All **103 distinct file proposals** replay forward and reverse with
+`patch --batch --fuzz=0 -p1`, restoring exact preimage bytes (206 executions).
+Offsets remain permitted; fuzz is zero. A shared file proposal executes once,
+not once per attached row. None is applied to the checkout.
 
-## Replay reuse and limits
+## `premise-patch.v1`
 
-Prior art: the three shard checkers only checked bare-pin patches (introduced in
-`8313bfa5e`, `b677076c0`, `42893a825`); L13-21.1 at this HEAD explicitly replaces
-that gap. No old chain replay was removed or recreated here.
+All three documents declare `patchContract: "premise-patch.v1"`. The only
+executable proposal is `rows[].patch`; copies for a file must be identical and
+`rowIds` must equal its attached rows. There is no `chainRebases`,
+`successorPatches`, `base.kind`, or parallel rollback/proposal door.
 
-- Reused `composition/compose.py`'s `apply_diff` and `baseline`, which in turn
-  uses `phase-08/step-07-assemble.py`'s `hunk_edits`/`locate_edit`. The module is
-  imported without invoking its assembly/output door. Chain patches are applied
-  and rolled back in temporary directories only.
-- Inventoried all **423** predecessor records and all **122** composition specs.
-  The packet's own `selectionRule` selects **404** predecessors plus **93**
-  composition entries (`effectiveSpecIds`, then `finalPinFSpecIds`); **19**
-  predecessors are replaced by current-byte composition roots, and **29**
-  composition records are historical alternatives/generator evidence, not an
-  executable second door. Their ids/replacements are in the JSON inventory.
-- Simulated **465 files**, with 450 strict chain results. The **15** stale
-  predecessor findings remain unresolved. For 14, the existing exact-passage
-  `baseline` reconstruction supplies diagnostic bytes to expose downstream
-  duplicates; it never transfers the stale entry's approval. The reading-map
-  predecessor cannot be reconstructed unambiguously and remains failed. Each
-  file records actual step hashes and whether its result is diagnostic.
-- Reachability uses `proof.json`'s `physicalMoves` and
-  `additionalStep6Removals`, exactly as `proof.py` does. The move-set input digest
-  must still match the physical proof; directories/globs use tracked members.
-- `alreadyComposed` must name an effective entry that changes this bound
-  occurrence to its named successor, with an exact chain and no parallel patch.
-  A valid marker leaves a resolved duplicate finding. Unknown/wrong-file markers,
-  parallel patches and stale-entry waivers fail. No shard rows were edited here.
+Common patch fields:
 
-## Cross-check against all three reviews
+- `file`, `status: "prepared-not-applied"`, `rowIds`, `basis`;
+- `sourceSha256`, `proposedSha256`, `patch` (unified diff with exact a/b headers);
+- `replacements[]`: `line` is the patch-base ordinal, `sourceLine` is the frozen
+  evidence ordinal, `before`, `after`, and explicit `ownerRowIds` bind it to rows.
+  The pin→base line diff independently checks the two ordinals' correspondence;
+  unequal replacement blocks cannot silently guess a line rebind. Each owner
+  needs a replacement within its original source span. Coherent tree
+  context outside that span is separately pin-bound in `contextEvidence`; this
+  does not expand the judgment or invent a row.
 
-All **19 named duplicate rows** are detected, with the responsible chain id:
+### Pin basis
 
-- Shard 1: `f00148 f00156 f00158 f00161 f00162 f00163 f00175 f00177 f00178 f00181 f00183 f00187 f00189 f00191 f00193 f00478`.
-- Shard 3: `f08496 f08634 f08665`. The last two are explicitly diagnostic
-  duplicates and also have unresolved `staleChainEntry` findings.
+`basis: "pin"` means the proposal is generated from the frozen pin. Its
+`sourceSha256`, replacement-derived postimage, exact unified diff and headers
+must match. It has no chain guard or holder fields. The chain must leave the
+proposal's region usable: the same diff must still replay both ways, without
+fuzz, on the actual chain result. An unrelated chain retarget is not permission
+to rewrite this bound occurrence.
 
-All **18 named chain-conflict rows** are detected:
+### Chain basis
 
-- Shard 1: `f00102 f00106 f00117 f00118` (AGENTS context), plus `f00477`
-  (a preserved occurrence already rewritten by the chain).
-- Shard 3: `f07380 f07398 f07697 f07698 f07701 f08012 f08013 f08021 f08024 f08033 f08044 f08046 f08047`.
+`basis: "chain"` adds:
 
-**Classification exception:** the review also describes `f00183` as a patch
-conflict after line rewrapping. It is reported as `duplicateOfChain`, not a second
-`conflictsWithChain`: the exact new path is already in the chain output. The
-failed forward patch is still recorded. The roadmap patch applies with an offset
-at fuzz zero, as the review observed, and is not a chain conflict.
+- `chainEntryIds`: the complete ordered list of effective steps for this file;
+- `chainResultSha256`: the expected exact chain result, also equal to
+  `sourceSha256`.
 
-Additional detections include four duplicate gateway-yaml rows in shard 2,
-seven other shard-2 patch conflicts, and preserved occurrences changed by the
-chain (including the three runner gloss rows noted in review 3).
+The checker first reconstructs the actual F chain from current tracked bytes.
+It refuses missing/reordered entry IDs, stale/diagnostic chains or a wrong result
+hash. Replacement reconstruction and diff equality use **that chain result**,
+not the frozen evidence pin; actual forward/reverse replay is still required.
+The row's source evidence and `sourceLine` remain pin-bound.
 
-### Review issues not reported as mechanical chain conflicts
+### Successor holder
 
-These remain the next judgment/composition turn's work, not silently accepted:
+A successor-bound row may use the same chain-basis patch contract with
+`holder: {file, sections, evidence}`. Its patch file must equal both the named
+holder and the row's successor file; the row's successor section must be listed
+and present in the chain result. Holder evidence spans are independently checked
+against the frozen pin. The two proposals are Identity's Related/§7a writer
+pointers and Workflow's §18 Pointers law link. They are not patches against the
+removed source, nor unnamed future work.
 
-| Review rows/issues | Why this checker does not label them a chain conflict |
-|---|---|
-| 18 removed-door banners (16 in shard 1; `f04047`, `f04287` in shard 2) | Still preserve rows with no prepared patch and no chain edit to their occurrence; deciding that current framing is a locator is a semantic judgment. |
-| `f03404` | Wrong historical rationale for a surviving live pointer; no byte conflict. |
-| `f06461` | Self-referencing destination is semantically wrong, but the old operand moves and its patch replays. |
-| `f06790`, `f06791` | Broken placement-tree meaning, not a GNU patch conflict; no tree-language interpretation is added. |
-| `f06920`, `f06933` | Unowned live destination inside a preserved passage; there is no row patch or chain change to collide. |
-| 36 `docs/history/` owned parks | Remain owned parks, not repoints; the already-settled keep decision still needs recording by their owner. |
-| `f07871` | Narrowing a directory to one successor file is a semantic breadth defect; the directory really is removed and the patch applies. |
-| `f07886`, `f07889` | Rewriting historical process claims is a semantic defect; `docs/specs/*` really does disappear, and the roadmap patch applies. |
-| Lineage links, pre-existing broken links, uncovered successor pointers | Post-cutover link/semantic checks and authoring duties, not evidence of a prepared patch colliding with the chain. |
+Shard 3's five former bare-pin replacement proofs now live in
+`frozenPinEvidence`. They retain file/row IDs, original pre/post digests and
+replacement evidence, **but no executable diff**. The checker verifies their
+pin custody and rejects executable fields there. Its old post-chain side doors
+are removed.
 
-`f07667` and `f08668` *are* reported as `repointOfSurvivingPath`, matching the
-reviews' missing-cutover-trigger objections. The checker does not claim to prove
-that any replacement is merely a pointer-token change or that all live links
-are covered.
+### Markers, absence and preservation
 
-## Verification and scope
+- `alreadyComposed` names one exact effective entry for this file, proves the
+  bound old operand → named successor in that entry, requires a strict chain,
+  and permits no row patch. For f00183, normalization joins only a slash-ended
+  newline/comment continuation; arbitrary words are not concatenated. A missing
+  continuation, wrong successor/file/entry or parallel patch is rejected.
+- Source presence is independently recorded as `already-absent`,
+  `removed-by-cutover`, or `surviving`. The two Identity source rows were already
+  absent at the pin; they are not counted as cutover removals. A surviving source
+  still fails a successor binding. Repoints still require an actual cutover
+  operand move/removal, not a pre-existing broken path. Directory/glob membership
+  continues to use tracked files and the physical move proof.
+- Preservation checks the row's bound operand lines, not another reference in
+  the same evidence paragraph. An exact line or insertion-only gloss with every
+  old path-token multiplicity intact is harmless. A removed/changed path,
+  path-prefix extension, or lost preserved prose still conflicts. The three
+  runner gloss rows therefore pass without becoming false retarget markers.
 
-- 37 checker-control cases passed: all three schemas, missing/duplicate rows,
-  forged spans/digests/diffs, exact roundtrip/context rejection, rewrapped
-  duplicates, directory/glob removal, valid/invalid `alreadyComposed`, and review
-  coverage. These are checker-only assertions, not product tests.
-- Each `--shard N` and final `--all`: exit 1, structured findings, no traceback.
-- `git diff --check`: exit 0. No git writes/staging, fgOS CLI, native addons,
-  product tests, pair accounting, row edits, docs edits or ledger edits.
-- Impact-analysis: degraded; the brief forbids the fgOS capability-query CLI and
-  this session exposes no impact-analysis tool. No blast-radius claim is made.
-- Scratch is confined to auto-cleaned tempfile directories under `/tmp/fgos-work/`.
+## Fifteen stale roots, one existing supersession door
 
-This is diagnostic evidence, not row acceptance, permission to apply the patches,
-final-pin parity, gate closure or cutover readiness.
+[chain-rebases.json](chain-rebases.json) enumerates every rebase and its hashes.
+The **423 phase-08 predecessor values are untouched**. All **122 existing
+composition values**, including historical alternatives, also remain unchanged.
+Fifteen current-byte roots were appended to `composition/patch-specs.json` using
+its existing `recomposed-predecessor:<file>` and `replaces: file:<file>` convention,
+and selected through the existing `effectiveSpecIds` list. This is rebasing the
+old entries through their existing supersession mechanism, not modifying frozen
+history or creating a second chain. The superseded phase-08 records no longer
+execute; the checker still inventories them.
 
-## Lead correction (L13-21.1 scope)
+There are now 389 selected original predecessors, 34 named replacement roots,
+94 effective composition specs, 14 deferred F specs, and 29 non-executable
+historical/generator records. Selection semantics are unchanged. Historical
+approval does not transfer; the new roots still require G9 delta review.
 
-The brief applied the "operand must be removed or moved" rule to successor-bound rows too. A successor binding answers a different question: its *source file* is removed at cutover, while its operands may survive. The Lead changed `check_shard.py`. A successor-bound row is now checked for a removed source (`successorOfSurvivingSource`), and only repoint and `alreadyComposed` rows keep the operand rule. Rerun at c804a3213 ([chain-check-c804a3213.json](chain-check-c804a3213.json)): 75 unresolved findings, of which 33 conflictsWithChain, 23 duplicateOfChain, 15 staleChainEntry, 2 repointOfSurvivingPath and 2 successorOfSurvivingSource. The 83 earlier successor-bound operand findings were false positives of that rule.
+Fourteen roots reuse `compose.baseline` and Step 7's exact hunk locator. The
+reading-map root needed per-primary-key-line path substitution: its session-lock
+paragraph had independently changed. That rebase retains all current prose and
+every authored target, including distinct destinations for repeated runner paths
+and their anchors. No old paragraph is restored. The removed/added path-token
+multisets (anchors included) equal the old entries for **all 15** roots.
+
+The terminal and assignment-runner markers now name their effective replacement
+IDs; their retarget decisions are unchanged. No phase-08 record edit was needed.
+
+## Controls and independent replay
+
+| Proof | Exit | Evidence |
+|---|---:|---|
+| Owning checker-only controls, 69 cases | 0 | [chain-contract-controls.json](chain-contract-controls.json) |
+| Phase-08 `step-07-assemble.py:patch_roundtrip`, all 423 original roots or named replacements | 0 | [phase-08-root-replay.json](phase-08-root-replay.json) |
+| Existing W13 independent composition replay, including F and generator evidence; 89 files / 251 patch invocations | 0 | [composition-full-replay.json](composition-full-replay.json) |
+| Consolidated checker `--all`, 465 strict file chains / 103 proposals | 0 | [chain-check-b005d4eba.json](chain-check-b005d4eba.json) |
+
+The old **37 control results are retained unchanged** in
+[chain-check-controls.json](chain-check-controls.json); their behaviours now have
+a runnable owner in `check_shard_controls.py`. Former expected-red CLI and review
+outcomes remain historical witnesses; the fixed corpus must now pass, while
+malformed CLI input still fails. Added controls reject both basis forgeries,
+chain hash/ordering/strictness errors, parallel/frozen executable representations,
+wrong holder file/section/evidence, split-path marker forgeries, false source
+absence, lost preserved references/prose, missing rebase roots, and forged chain
+postimages/rollbacks. No production bypass or weaker test assertion was added.
+
+The W13 script is read from
+`composition/w13-replay-recipes.json:scripts/independent-replay.py`; only its
+hardcoded scratch root is relocated into an auto-cleaned tempfile. All replay
+logic and packet inputs are unchanged. Phase-08 proof additionally verifies
+identical original composition values, all 15 retarget deltas and all 787
+unchanged judgment/evidence records.
+
+**Pre-existing historical verifier limitation, not hidden:** the older
+`composition/verify-effective.py` exits 1 both before and after this change,
+with the identical missing `component-boundary-source-carriage.md` error. That
+script unconditionally reads a file the already-existing packet explicitly
+requires to be absent. It does not reach the added entries. The current W13
+independent recipe understands absent sources and passes without bypassing any
+assertion. [legacy-replay-limit.json](legacy-replay-limit.json) records both real
+failures. This task does not change an out-of-scope historical verifier or claim
+that it passed.
+
+## Historical reports and scope
+
+[chain-check-56b3c3ebf.json](chain-check-56b3c3ebf.json) preserves the original
+pre-rework findings. [chain-check-c804a3213.json](chain-check-c804a3213.json)
+preserves the Lead's correction: successor bindings check source removal,
+not removal of every operand. Its 75 unresolved findings were 33 conflicts,
+23 duplicates, 15 stale entries, 2 invalid repoints and 2 absent-source false
+positives. These are historical reports, not current acceptance.
+
+The shard Markdown files retain their earlier rework narratives, explicitly
+labelled historical, and point here for the current contract/result.
+
+Only authorized records/checker files changed. No judgment decision, consumer,
+docs/, ledger, register, other script, pair accounting, Git write, fgOS CLI,
+addon, product test, or service was touched. `git diff --check` exits 0.
+Impact-analysis is degraded/unqueried: the brief forbids its CLI and no impact
+tool is exposed. Scratch uses auto-cleaned tempfile directories under
+`/tmp/fgos-work/`. Markdown preview is deferred rather than starting a service
+or writing outside this task's exact scope.

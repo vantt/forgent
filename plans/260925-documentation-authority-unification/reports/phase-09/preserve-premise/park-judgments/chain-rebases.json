@@ -1,0 +1,112 @@
+{
+  "sourceCommit": "b005d4eba8d89a28f4b7cbd66f75354708aeb23c",
+  "authority": "L13-21.1; w26-chain-contract-brief",
+  "history": "All 423 phase-08 predecessor values and all 122 old composition values retained unchanged. Fifteen appended roots use the existing replaces supersession field; only effective roots execute.",
+  "entries": [
+    {
+      "file": ".githooks/pre-commit",
+      "chainEntryId": "recomposed-predecessor:.githooks/pre-commit",
+      "replaces": "file:.githooks/pre-commit",
+      "beforeSha256": "c92f7d0e1a3358e395a3bdaffbc05dcead2fd4acc8e94bbc0a0d237a183b72f6",
+      "afterSha256": "a3516350464a3788bedbd68aa71e27c6ff0cd0591e8ea0e9e2b6e02547ef1921"
+    },
+    {
+      "file": "docs/io-contract.md",
+      "chainEntryId": "recomposed-predecessor:docs/io-contract.md",
+      "replaces": "file:docs/io-contract.md",
+      "beforeSha256": "2b2bf2e11042787c34988a6fd6a2924fb1448e8cb6c241aa6974a3948313dc97",
+      "afterSha256": "ed6a1f5b250cd6aa36e3d4d88780d7d4a207cdb680ef44996bfb5eb93b9019d6"
+    },
+    {
+      "file": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "chainEntryId": "recomposed-predecessor:docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "replaces": "file:docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "beforeSha256": "691e69db53290609dc673c1aebe15ad1c165f9d86541dbabdb6fbcd9d1d1a7ae",
+      "afterSha256": "8b39f0aa494a5d707d90f2e29b936d4860a420102d97b9197b9a32220ebaaaaa"
+    },
+    {
+      "file": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "chainEntryId": "recomposed-predecessor:docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "replaces": "file:docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "beforeSha256": "8a9fb141177b482648240bbcc30385c68a43d86737e3004b85b299b2309b6677",
+      "afterSha256": "694b9ed080264efcec56180f2155bf9e40c5b838948384ad6d1e3ac5c924a010"
+    },
+    {
+      "file": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "chainEntryId": "recomposed-predecessor:docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "replaces": "file:docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "beforeSha256": "07c52fe3fa4533cb6c07414b639cf8e7eb4ea8d888c912d2e557cc6231a6279f",
+      "afterSha256": "7de0b75c90f6564d28b3c8c81ac05f216899392d55b29c634814e60fb6fbf49f"
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/README.md",
+      "chainEntryId": "recomposed-predecessor:docs/platform/agent-coordination/decisions/README.md",
+      "replaces": "file:docs/platform/agent-coordination/decisions/README.md",
+      "beforeSha256": "7de6f1e0a46de1715ad8d38b882ca52e82ab32485e9f5e7e5ae8dfe5f7c10977",
+      "afterSha256": "019ec3856700a5ae71317804c69501be47fc0c1b8f3caabdcbf7990b98ed1a36"
+    },
+    {
+      "file": "docs/platform/runner/architecture/h-69197b459754.md",
+      "chainEntryId": "recomposed-predecessor:docs/platform/runner/architecture/h-69197b459754.md",
+      "replaces": "file:docs/platform/runner/architecture/h-69197b459754.md",
+      "beforeSha256": "cfc3f750f213f1259f778832ed67df308f7282e4ce6987f366b9fef199ee915a",
+      "afterSha256": "bea7a1057ff17f2a8e83e99769cac3771d1a512b022fd3405ba98e3c8d945109"
+    },
+    {
+      "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "chainEntryId": "recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md",
+      "replaces": "file:docs/platform/runner/architecture/h-7af1f0242611.md",
+      "beforeSha256": "c9087a371a17e3bff3e79e246374b54abfe903c18e3a5ecaa851fa769f634999",
+      "afterSha256": "06c442990c23e230417099d37bfdab8e94b7306ddcbfe40e7dfabe573480fbd0"
+    },
+    {
+      "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "chainEntryId": "recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "replaces": "file:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "beforeSha256": "8a974e8880f101b835a5daf35dd261960f8f06b5016d051fb2b77ded21158646",
+      "afterSha256": "160c8fd78383bd9e138b73ae7c9b6860a595ea0519c99aa775a7d62ccc9d6a59"
+    },
+    {
+      "file": "docs/reading-map.md",
+      "chainEntryId": "recomposed-predecessor:docs/reading-map.md",
+      "replaces": "file:docs/reading-map.md",
+      "beforeSha256": "632405906a2b4e1b6671a8ec16e87501e0c14f2b386c0610b8925dc0ff257002",
+      "afterSha256": "787546838c40e89ab1f4a08b403556b53a33a21422e7436784497809984e5bf5"
+    },
+    {
+      "file": "plugins/fgOS/skills/terminal/SKILL.md",
+      "chainEntryId": "recomposed-predecessor:plugins/fgOS/skills/terminal/SKILL.md",
+      "replaces": "file:plugins/fgOS/skills/terminal/SKILL.md",
+      "beforeSha256": "d1a5e823f9dcf35128cc471b3e01a2e401e0d53c97bccb1a801b51df2435c9e3",
+      "afterSha256": "881ef7c2d1483b9d27917bab62710e4111e2d41f6c8c09255184b95255b3e943"
+    },
+    {
+      "file": "src/runner/dispatch/assignment-runner.mjs",
+      "chainEntryId": "recomposed-predecessor:src/runner/dispatch/assignment-runner.mjs",
+      "replaces": "file:src/runner/dispatch/assignment-runner.mjs",
+      "beforeSha256": "80ce926f792d2bb2d742603bdd138ec73cf170b8d8e7ec53546867e1bfef2933",
+      "afterSha256": "c244fa85c178f9617cc57572242491b083d828215e7a6edbcffdedc46c8396d1"
+    },
+    {
+      "file": "src/runner/dispatch/confinement/policies.mjs",
+      "chainEntryId": "recomposed-predecessor:src/runner/dispatch/confinement/policies.mjs",
+      "replaces": "file:src/runner/dispatch/confinement/policies.mjs",
+      "beforeSha256": "8d7341c02c6f3d664030347d1047315a4ddbccfb2c264c49b8bea0d9b6d9f008",
+      "afterSha256": "f823c3997b82eabea91dc6343d1f8ae38a35de17f14ed1c1da1091712f9541a3"
+    },
+    {
+      "file": "src/runner/dispatch/herdr-round.mjs",
+      "chainEntryId": "recomposed-predecessor:src/runner/dispatch/herdr-round.mjs",
+      "replaces": "file:src/runner/dispatch/herdr-round.mjs",
+      "beforeSha256": "dc6539e766b18759b1544ccc5b28984396376385a74443e5fe417ace06865400",
+      "afterSha256": "ac2fa580b58dc054c418afa6dbae1f9408cf3de06d15108daeb3befc6bfabe91"
+    },
+    {
+      "file": "test/runner/dispatch-worker-session.test.mjs",
+      "chainEntryId": "recomposed-predecessor:test/runner/dispatch-worker-session.test.mjs",
+      "replaces": "file:test/runner/dispatch-worker-session.test.mjs",
+      "beforeSha256": "f06f180a05cafa1db849f75bf71c118368eb330a76fe3cb802b6ca9572635d5e",
+      "afterSha256": "19a919f34d8b422dd65eb7b1471249cad45dcbd9fcd3459d33f124bd4277e577"
+    }
+  ]
+}

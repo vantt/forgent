@@ -1,6 +1,15 @@
 # Shard 2 — rework against the F chain
 
-**Status: blocked on checker support, not accepted.** All seven review REWORKs have prepared fixes, but the required checker does not accept F-chain patch preimages. No source patch has been applied; no authority, gate closure or cutover-readiness claim is made.
+**Current status: mechanical chain proof passes; independent acceptance still pending.**
+All proposals now use `premise-patch.v1`. See [current contract and proof](chain-check.md)
+and [chain-check-b005d4eba.json](chain-check-b005d4eba.json): 263 rows, 42 file proposals,
+4 exact chain markers, zero unresolved findings. No judgment or original evidence changed.
+No source patch has been applied; no authority, gate closure or cutover readiness is claimed.
+
+**Historical rework narrative below:** its checker blockers, `base.kind` representation
+and command results describe the earlier checker, not the current JSON schema or
+verification result. The coherent tree edits now carry separately pin-bound context
+in the common patch contract. Old report snippets are not a second verification door.
 
 - Evidence pin remains `c94545de5b45873cb2eb419f10124283fd730a2e`.
 - F-chain replay pin: `c58f2b230e14e73db42cb8ccc965ef8967bb085a`.

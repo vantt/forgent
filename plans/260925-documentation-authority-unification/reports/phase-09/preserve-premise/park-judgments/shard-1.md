@@ -2,7 +2,15 @@
 
 **Evidence pin:** `c94545de5b45873cb2eb419f10124283fd730a2e` (unchanged).
 **F-chain check HEAD:** `c58f2b230e14e73db42cb8ccc965ef8967bb085a`.
-**Status: blocked on two checker representation gaps; not mechanically accepted.**
+**Current status: mechanical chain proof passes; independent acceptance still pending.**
+All proposals now use `premise-patch.v1`. See [current contract and proof](chain-check.md)
+and [chain-check-b005d4eba.json](chain-check-b005d4eba.json): 263 rows, 25 file proposals,
+17 exact chain markers, zero unresolved findings. No judgment or original evidence changed.
+
+**Historical rework narrative below:** its blockers, `base` representation, stale-entry
+inventory and command results describe the earlier unmodified checker, not the current
+JSON schema or verification result. The current checker supersedes those limitations;
+no gate closure or semantic acceptance is implied.
 The row repairs are prepared, not applied to consumers. No independent approval,
 gate closure, source deletion, authority flip or cutover readiness is claimed.
 

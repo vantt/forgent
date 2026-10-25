@@ -79,8 +79,45 @@ def check_span(pin, span):
     require(sha(text) == span[key], 'span digest: ' + file)
 
 
-def validate_shard(number):
+def replacement_result(before, replacements, number):
+    lines = before.splitlines(keepends=True); seen = set()
+    for replacement in replacements:
+        n = replacement['line']; old = replacement['before']; new = replacement['after']
+        require(type(n) is int and 1 <= n <= len(lines) and
+                (number == 3 or n not in seen), 'replacement bounds')
+        seen.add(n)
+        require(old and old != new and lines[n - 1].count(old) == 1, 'replacement preimage')
+        lines[n - 1] = lines[n - 1].replace(old, new)
+    return ''.join(lines)
+
+
+def patch_basis(patch, pin, states):
+    file = safe_path(patch['file'])
+    require(not any(k in patch for k in ['base', 'chainPin', 'rollbackDiff']), 'parallel patch contract')
+    require(patch['basis'] in {'pin', 'chain'}, 'unknown patch basis')
+    if patch['basis'] == 'pin':
+        require('holder' not in patch and 'chainEntryIds' not in patch and
+                'chainResultSha256' not in patch, 'ambiguous pin basis')
+        raw = blob(pin, file)
+        require(raw is not None, 'pin patch source absent')
+        before = raw.decode()
+    else:
+        state = states.get(file)
+        require(state is not None and state['strict'], 'non-strict chain basis: ' + file)
+        require(patch['chainEntryIds'] == [t['chainEntryId'] for t in state['trace']],
+                'chain entry basis: ' + file)
+        before = state['text']
+        require(patch['chainResultSha256'] == sha(before), 'chain result digest: ' + file)
+    require(patch['status'] == 'prepared-not-applied' and sha(before) == patch['sourceSha256'],
+            'patch preimage: ' + file)
+    return before
+
+
+def validate_shard(number, states):
     document = load(HERE / f'shard-{number}.json')
+    require(document['patchContract'] == 'premise-patch.v1' and
+            not any(k in document for k in ['chainRebases', 'successorPatches', 'postChainReplay']),
+            'one patch contract required')
     pin = document['pin']
     require(re.fullmatch('[0-9a-f]{40}', pin), 'full shard pin required')
     ids_raw = (HERE / f'shard-{number}-ids.json').read_bytes()
@@ -139,29 +176,75 @@ def validate_shard(number):
             require(row.get('patch') or row.get('alreadyComposed'), rid + ': missing patch/chain reference')
         if 'patch' in row:
             patch = row['patch']; file = safe_path(patch['file'])
-            require(rid in patch['rowIds'] and file == original['file'], rid + ': patch identity')
+            require(rid in patch['rowIds'], rid + ': patch identity')
+            if 'holder' in patch:
+                holder = patch['holder']; successor = row['successor']
+                require(row['disposition'] == 'successor-bound' and patch['basis'] == 'chain' and
+                        file == holder['file'] == successor.get('file', successor.get('path')) and
+                        successor['section'] in holder['sections'], rid + ': successor holder identity/section')
+                require(holder['evidence'], rid + ': holder evidence required')
+                for span in holder['evidence']:
+                    require(span.get('file', span.get('path')) == file, 'holder evidence file')
+                    check_span(pin, span)
+            else:
+                require(file == original['file'], rid + ': patch identity')
             require(patches.setdefault(file, patch) == patch, 'same-file patches not composed')
     for file, patch in patches.items():
         require(Counter(patch['rowIds']) == Counter(r['rowId'] for r in rows
                 if r.get('patch', {}).get('file') == file), 'patch group coverage')
-        before = blob(pin, file)
-        require(patch['status'] == 'prepared-not-applied' and sha(before) == patch['sourceSha256'],
-                'patch preimage: ' + file)
-        lines = before.decode().splitlines(keepends=True); seen = set()
+        before = patch_basis(patch, pin, states)
+        require(set(patch['rowIds']) == {rid for r in patch['replacements'] for rid in r['ownerRowIds']},
+                'replacement owner coverage')
+        for span in patch.get('contextEvidence', []):
+            require(span.get('file', span.get('path')) == file, 'patch context evidence file')
+            check_span(pin, span)
+        # Bind the two ordinals through the actual pin -> base diff, not an
+        # owner-supplied label. Unequal replacement blocks have no unique line
+        # correspondence and require an explicit evidence rebind instead.
+        source_lines = blob(pin, file).decode().splitlines()
+        line_rebindings = {}
+        for tag, a, z, b, y in difflib.SequenceMatcher(
+                None, source_lines, before.splitlines(), autojunk=False).get_opcodes():
+            if tag in {'equal', 'replace'} and z - a == y - b:
+                line_rebindings.update((i + 1, b + i - a + 1) for i in range(a, z))
         for replacement in patch['replacements']:
-            n = replacement['line']; old = replacement['before']; new = replacement['after']
-            require(type(n) is int and 1 <= n <= len(lines) and
-                    (number == 3 or n not in seen), 'replacement bounds')
-            seen.add(n)
-            require(old and old != new and lines[n - 1].count(old) == 1, 'replacement preimage')
-            lines[n - 1] = lines[n - 1].replace(old, new)
-        after = ''.join(lines)
+            owners = replacement['ownerRowIds']; source_line = replacement['sourceLine']
+            require(owners and len(set(owners)) == len(owners) and
+                    set(owners) <= set(patch['rowIds']), 'replacement owners')
+            for rid in owners:
+                row = next(r for r in rows if r['rowId'] == rid)
+                if 'holder' in patch:
+                    spans = patch['holder']['evidence']
+                else:
+                    source = row.get('source') or next(e for e in row['evidence'] if e.get('role') == 'source-unit')
+                    spans = [source] + patch.get('contextEvidence', [])
+                    require(any(rid in r['ownerRowIds'] and
+                            source.get('lineStart', source.get('startLine', 0)) <= r['sourceLine'] <=
+                            source.get('lineEnd', source.get('endLine', -1)) for r in patch['replacements']),
+                            rid + ': patch misses bound source')
+                require(type(source_line) is int and any(
+                        s.get('lineStart', s.get('startLine', 0)) <= source_line <=
+                        s.get('lineEnd', s.get('endLine', -1)) for s in spans), rid + ': source ordinal binding')
+                require(line_rebindings.get(source_line) == replacement['line'], rid + ': pin-to-base line binding')
+        if 'holder' in patch:
+            require(patch['holder']['sections'] and all(
+                    section in before.splitlines() for section in patch['holder']['sections']), 'holder section absent')
+        after = replacement_result(before, patch['replacements'], number)
         require(sha(after) == patch['proposedSha256'], 'patch postimage: ' + file)
-        expected_diff = ''.join(difflib.unified_diff(before.decode().splitlines(True),
+        expected_diff = ''.join(difflib.unified_diff(before.splitlines(True),
                 after.splitlines(True), fromfile='a/' + file, tofile='b/' + file))
         require(patch['patch'] == expected_diff, 'patch differs from declared replacements: ' + file)
         headers = [s for s in patch['patch'].splitlines() if s.startswith(('--- ', '+++ '))]
         require(headers == [f'--- a/{file}', f'+++ b/{file}'], 'patch headers')
+    for evidence in document.get('frozenPinEvidence', []):
+        require(set(evidence) == {'file', 'rowIds', 'sourceSha256', 'proposedSha256', 'replacements'},
+                'frozen evidence must not be an executable patch')
+        require(evidence['file'] in patches and evidence['rowIds'] == patches[evidence['file']]['rowIds'],
+                'orphan frozen evidence')
+        raw = blob(pin, evidence['file'])
+        require(sha(raw) == evidence['sourceSha256'] and sha(replacement_result(
+                raw.decode(), evidence['replacements'], number)) == evidence['proposedSha256'],
+                'frozen pin evidence digest')
     return document, proof, patches
 
 
@@ -300,6 +383,25 @@ def cutover_removes(path, moving, tracked):
     return bool(members) and all(p in moving for p in members)
 
 
+def preserved_line_survives(line, text):
+    """Accept an exact line or insertion-only gloss, never a lost path operand."""
+    if line in text.splitlines():
+        return True
+    paths = Counter(PATH_TOKEN.findall(line))
+    for candidate in text.splitlines():
+        if paths and any(Counter(PATH_TOKEN.findall(candidate))[p] != count for p, count in paths.items()):
+            continue
+        edits = difflib.SequenceMatcher(None, line, candidate, autojunk=False).get_opcodes()
+        if all(tag in {'equal', 'insert'} for tag, *_ in edits):
+            return True
+    return False
+
+
+def unwrap_comment_path(text):
+    # Join only a slash-ended path continuation, not arbitrary prose or tokens.
+    return re.sub(r'(?<=/)\n[ \t]*(?://[ \t]*)?', '', text)
+
+
 def inspect_rows(number, document, proof, patches, states, replayer, moving, tracked):
     findings = []; patch_results = {}; checks = []
     for file, patch in patches.items():
@@ -310,38 +412,46 @@ def inspect_rows(number, document, proof, patches, states, replayer, moving, tra
         state = states.get(file); marker = row.get('alreadyComposed'); duplicate_ids = []
         occurrence_lines = original['currentLines']
         if number == 2:
-            occurrence_lines = list(range(row['source']['startLine'], row['source']['endLine'] + 1))
+            # The evidence span can contain several independent references. Bind
+            # this row's literal operand lines, not every line of the paragraph.
+            source = row['source']; lines = blob(document['pin'], file).decode().splitlines()
+            bound = [n for n in range(source['startLine'], source['endLine'] + 1)
+                     if any(o['path'] in lines[n - 1] for o in original['normalizedOperands'])]
+            occurrence_lines = bound or occurrence_lines
         patch = row.get('patch')
         if patch:
-            text = state['text'] if state else blob(document['pin'], file).decode()
-            replacements = [r for r in patch['replacements'] if r['line'] in occurrence_lines]
+            target = patch['file']; patch_state = states.get(target)
+            text = patch_state['text'] if patch_state else blob(document['pin'], target).decode()
+            replacements = [r for r in patch['replacements'] if rid in r['ownerRowIds']]
             require(replacements, rid + ': patch misses bound occurrence')
-            if state and contains_post(text, replacements):
-                duplicate_ids = [t['chainEntryId'] for t in state['trace']
+            if patch_state and contains_post(text, replacements):
+                duplicate_ids = [t['chainEntryId'] for t in patch_state['trace']
                                  if contains_post(t['after'], replacements) and not contains_post(t['before'], replacements)]
             if duplicate_ids:
                 findings.append(finding('duplicateOfChain', file, rowId=rid, shard=number,
                                         chainEntryId=duplicate_ids[-1], diagnostic=not state['strict'],
                                         replacements=replacements))
-            elif not patch_results[file]['ok']:
-                findings.append(finding('conflictsWithChain', file, rowId=rid, shard=number,
-                                        diagnostic=bool(state and not state['strict']), replay=patch_results[file]))
+            elif not patch_results[target]['ok']:
+                findings.append(finding('conflictsWithChain', target, rowId=rid, shard=number,
+                                        diagnostic=bool(patch_state and not patch_state['strict']), replay=patch_results[target]))
         elif row['disposition'] == 'preserve-confirmed' and state:
             # A preserved occurrence already rewritten by the chain is not a
             # context-only conflict: inspect its actual occurrence lines only.
             lines = blob(document['pin'], file).decode().splitlines()
             for n in occurrence_lines:
                 line = lines[n - 1]
-                if line and line not in state['text']:
+                if line and not preserved_line_survives(line, state['text']):
                     owners = [t['chainEntryId'] for t in state['trace'] if line in t['before'] and line not in t['after']]
                     if owners:
                         findings.append(finding('conflictsWithChain', file, rowId=rid, shard=number,
                                                 chainEntryId=owners[-1], reason='preserved occurrence changed by chain', line=n))
                         break
+        source_presence = ('already-absent' if blob(document['pin'], file) is None else
+                           'removed-by-cutover' if cutover_removes(file, moving, tracked) else 'surviving')
         if row['disposition'] == 'successor-bound':
-            # A successor binding answers "the source file is removed at cutover";
-            # its operands may legitimately survive, so check the source instead.
-            if not cutover_removes(file, moving, tracked):
+            # An already-absent source is distinct from a cutover removal. Both
+            # can bind a surviving claim; only a surviving source is an error.
+            if source_presence == 'surviving':
                 findings.append(finding('successorOfSurvivingSource', file, rowId=rid, shard=number,
                                         reason='source file survives the cutover; a successor binding is not needed'))
         elif row['disposition'] == 'repoint' or marker:
@@ -367,7 +477,8 @@ def inspect_rows(number, document, proof, patches, states, replayer, moving, tra
                 destination = successor.get('file', successor.get('path'))
                 valid = any(destination and destination in new and
                             any(line and line in old for line in bound) and
-                            any(p in old and p not in new for p in operands) and
+                            any(p in unwrap_comment_path(old) and p not in unwrap_comment_path(new)
+                                for p in operands) and
                             new.strip() in state['text']
                             for old, new, _, _, _ in edits)
             if not valid:
@@ -377,9 +488,13 @@ def inspect_rows(number, document, proof, patches, states, replayer, moving, tra
                 findings.append(dict(kind='duplicateOfChain', file=file, rowId=rid, shard=number,
                                      chainEntryId=marker, resolved=True, resolvedBy=marker,
                                      reason='exact bound retarget verified; no parallel row patch'))
-        checks.append(dict(rowId=rid, file=file, disposition=row['disposition'], alreadyComposed=marker))
+        checks.append(dict(rowId=rid, file=file, disposition=row['disposition'],
+                           sourcePresence=source_presence, alreadyComposed=marker))
     return dict(shard=number, pin=document['pin'], rows=len(document['rows']),
-                preparedPatches=len(patches), patchReplays=patch_results, checks=checks), findings
+                preparedPatches=len(patches), patchBases=dict(Counter(p['basis'] for p in patches.values())),
+                successorHolderPatches=sum('holder' in p for p in patches.values()),
+                sourcePresenceCounts=dict(Counter(r['sourcePresence'] for r in checks)),
+                patchReplays=patch_results, checks=checks), findings
 
 
 def main():
@@ -391,14 +506,14 @@ def main():
     pin = subprocess.check_output(['git', '--no-optional-locks', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     numbers = [1, 2, 3] if args.all else [args.shard]
     findings = []; summaries = []
+    replayer = load_replayer()
+    states, chain_findings, inventory = replay_chain(pin, replayer)
     validated = {}
     for number in numbers:
         try:
-            validated[number] = validate_shard(number)
+            validated[number] = validate_shard(number, states)
         except (ValueError, KeyError, TypeError, StopIteration) as error:
             findings.append(dict(kind='invalidShard', shard=number, resolved=False, error=str(error)))
-    replayer = load_replayer()
-    states, chain_findings, inventory = replay_chain(pin, replayer)
     findings.extend(chain_findings)
     physical_proof = load(HERE.parent / 'proof.json')
     move_bytes = (P8 / 'step-05-cutover-move-set.json').read_bytes()
@@ -424,7 +539,7 @@ def main():
                   reuse='composition/compose.py apply_diff + baseline; phase-08 step-07-assemble.py hunk_edits + locate_edit',
                   impactAnalysis='degraded: task forbids fgOS CLI; no impact-analysis tools exposed',
                   inputs={str(path.relative_to(ROOT)): sha(path.read_bytes()) for path in
-                          [P8 / 'step-07-composed-patches.json', PHASE / 'composition/patch-specs.json',
+                          [Path(__file__), P8 / 'step-07-composed-patches.json', PHASE / 'composition/patch-specs.json',
                            PHASE / 'composition/compose.py', P8 / 'step-07-assemble.py',
                            HERE.parent / 'proof.json', P8 / 'step-05-cutover-move-set.json'] +
                           [HERE / f'shard-{n}{suffix}.json' for n in numbers for suffix in ['', '-ids']]},

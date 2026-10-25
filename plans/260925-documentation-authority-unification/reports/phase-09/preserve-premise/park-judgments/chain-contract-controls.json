@@ -1,0 +1,288 @@
+{
+  "sourceCommit": "b005d4eba8d89a28f4b7cbd66f75354708aeb23c",
+  "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard_controls.py",
+  "exit": 0,
+  "passed": 69,
+  "failed": 0,
+  "checks": [
+    {
+      "case": "all shard bindings, digests, coverage and patch pre/post-images validate",
+      "passed": true
+    },
+    {
+      "case": "shard 1 rejects missing row",
+      "passed": true
+    },
+    {
+      "case": "shard 1 rejects duplicate row",
+      "passed": true
+    },
+    {
+      "case": "shard 1 rejects forged span text",
+      "passed": true
+    },
+    {
+      "case": "shard 1 rejects forged file digest",
+      "passed": true
+    },
+    {
+      "case": "shard 1 rejects diff inconsistent with declared replacements",
+      "passed": true
+    },
+    {
+      "case": "shard 2 rejects missing row",
+      "passed": true
+    },
+    {
+      "case": "shard 2 rejects duplicate row",
+      "passed": true
+    },
+    {
+      "case": "shard 2 rejects forged span text",
+      "passed": true
+    },
+    {
+      "case": "shard 2 rejects forged file digest",
+      "passed": true
+    },
+    {
+      "case": "shard 2 rejects diff inconsistent with declared replacements",
+      "passed": true
+    },
+    {
+      "case": "shard 3 rejects missing row",
+      "passed": true
+    },
+    {
+      "case": "shard 3 rejects duplicate row",
+      "passed": true
+    },
+    {
+      "case": "shard 3 rejects forged span text",
+      "passed": true
+    },
+    {
+      "case": "shard 3 rejects forged file digest",
+      "passed": true
+    },
+    {
+      "case": "shard 3 rejects diff inconsistent with declared replacements",
+      "passed": true
+    },
+    {
+      "case": "clean row patch applies forward and reverses exactly",
+      "passed": true
+    },
+    {
+      "case": "changed neighbour fails at fuzz zero",
+      "passed": true
+    },
+    {
+      "case": "rewrapped path post-image is duplicate",
+      "passed": true
+    },
+    {
+      "case": "old token retained is not a duplicate",
+      "passed": true
+    },
+    {
+      "case": "unrelated prose cannot prove duplicate",
+      "passed": true
+    },
+    {
+      "case": "removed directory and wildcard are recognized",
+      "passed": true
+    },
+    {
+      "case": "partly retained directory is not removed",
+      "passed": true
+    },
+    {
+      "case": "already absent operand is not a cutover removal",
+      "passed": true
+    },
+    {
+      "case": "shard 1 real row/chain inspection is green",
+      "passed": true
+    },
+    {
+      "case": "shard 2 real row/chain inspection is green",
+      "passed": true
+    },
+    {
+      "case": "shard 3 real row/chain inspection is green",
+      "passed": true
+    },
+    {
+      "case": "duplicate attributed to exact chain entry",
+      "passed": true
+    },
+    {
+      "case": "valid alreadyComposed with patch removed resolves duplicate",
+      "passed": true
+    },
+    {
+      "case": "unknown alreadyComposed is refused",
+      "passed": true
+    },
+    {
+      "case": "alreadyComposed cannot leave parallel patch",
+      "passed": true
+    },
+    {
+      "case": "alreadyComposed cannot waive stale chain input",
+      "passed": true
+    },
+    {
+      "case": "wrong-file alreadyComposed is refused",
+      "passed": true
+    },
+    {
+      "case": "wrapped alreadyComposed matches the full retarget",
+      "passed": true
+    },
+    {
+      "case": "wrapped old operand cannot lose its continuation",
+      "passed": true
+    },
+    {
+      "case": "a different successor is not a valid retarget",
+      "passed": true
+    },
+    {
+      "case": "preserved occurrence changed by chain is a conflict",
+      "passed": true
+    },
+    {
+      "case": "harmless gloss is insertion-only and retains all preserved references",
+      "passed": true
+    },
+    {
+      "case": "gloss cannot replace a preserved reference",
+      "passed": true
+    },
+    {
+      "case": "a preserved path cannot become a longer different path",
+      "passed": true
+    },
+    {
+      "case": "gloss cannot remove preserved prose",
+      "passed": true
+    },
+    {
+      "case": "--1 exits 1 with invalid-input findings, no traceback",
+      "passed": true
+    },
+    {
+      "case": "--2 exits 1 with invalid-input findings, no traceback",
+      "passed": true
+    },
+    {
+      "case": "--3 exits 1 with invalid-input findings, no traceback",
+      "passed": true
+    },
+    {
+      "case": "--all exits 1 with invalid-input findings, no traceback",
+      "passed": true
+    },
+    {
+      "case": "all review-named duplicateOfChain rows remain detected after repair",
+      "passed": true
+    },
+    {
+      "case": "all review-named original conflicts retain their historical detection proof",
+      "passed": true
+    },
+    {
+      "case": "all review-named conflicts now have guarded replayable repairs or markers",
+      "passed": true
+    },
+    {
+      "case": "pin basis refuses a forged preimage",
+      "passed": true
+    },
+    {
+      "case": "chain basis refuses a forged preimage",
+      "passed": true
+    },
+    {
+      "case": "wrong chain result hash",
+      "passed": true
+    },
+    {
+      "case": "missing chain predecessor",
+      "passed": true
+    },
+    {
+      "case": "reordered chain predecessors",
+      "passed": true
+    },
+    {
+      "case": "unknown basis",
+      "passed": true
+    },
+    {
+      "case": "chain basis refuses diagnostic-only bytes",
+      "passed": true
+    },
+    {
+      "case": "parallel legacy patch representation is refused",
+      "passed": true
+    },
+    {
+      "case": "frozen pin evidence cannot carry another executable diff",
+      "passed": true
+    },
+    {
+      "case": "wrong successor holder file",
+      "passed": true
+    },
+    {
+      "case": "wrong successor holder section",
+      "passed": true
+    },
+    {
+      "case": "forged successor holder evidence",
+      "passed": true
+    },
+    {
+      "case": "pin-basis successor proposal",
+      "passed": true
+    },
+    {
+      "case": "replacement outside source evidence",
+      "passed": true
+    },
+    {
+      "case": "already-absent source is separate from a cutover removal",
+      "passed": true
+    },
+    {
+      "case": "existing source cannot claim absence",
+      "passed": true
+    },
+    {
+      "case": "a surviving source still rejects an unnecessary successor binding",
+      "passed": true
+    },
+    {
+      "case": "an in-span ordinal cannot be relabelled to a different base line",
+      "passed": true
+    },
+    {
+      "case": "an omitted rebased root exposes its stale predecessor",
+      "passed": true
+    },
+    {
+      "case": "a forged chain postimage is rejected",
+      "passed": true
+    },
+    {
+      "case": "a forged chain rollback is rejected",
+      "passed": true
+    }
+  ],
+  "predecessorControlRecord": "chain-check-controls.json (37 controls, retained unchanged)",
+  "legacyExpectation": "The old expected-red CLI/review outcomes are preserved by historical reports; current rows are repaired. Negative CLI inputs must still fail.",
+  "limits": "Checker-only controls; no product tests, consumer mutation, authority approval, or gate closure."
+}

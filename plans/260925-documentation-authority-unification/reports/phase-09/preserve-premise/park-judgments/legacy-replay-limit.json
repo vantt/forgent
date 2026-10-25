@@ -1,0 +1,18 @@
+{
+  "script": "plans/260925-documentation-authority-unification/reports/phase-09/composition/verify-effective.py",
+  "runs": [
+    {
+      "selection": "before",
+      "exit": 1,
+      "error": "[Errno 2] No such file or directory: '/home/vantt/projects/forgentX-p9-w1-d1/docs/platform/system-architecture/history/component-boundary-source-carriage.md'"
+    },
+    {
+      "selection": "after",
+      "exit": 1,
+      "error": "[Errno 2] No such file or directory: '/home/vantt/projects/forgentX-p9-w1-d1/docs/platform/system-architecture/history/component-boundary-source-carriage.md'"
+    }
+  ],
+  "preExisting": true,
+  "reason": "This older verifier unconditionally reads a file which the existing packet requires to be absent. The latest w13 independent recipe handles absence explicitly and passes unchanged; no legacy checker assertion or source bytes were bypassed.",
+  "owningReplay": "composition-full-replay.json"
+}
