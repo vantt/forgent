@@ -135,11 +135,15 @@ function stageDoorManifest(childEnv) {
  *   caller names one: doctor and setup in a fixture would otherwise run the
  *   real `claude` CLI, reach the network and change the real user's plugin
  *   registrations; a test that probes the claude rows sets its own;
+ * - no inherited HERDR_* (nor FGOS_HERDR_BIN): herdr exports them into every
+ *   pane, so a suite started from an agent's pane would see a live herdr
+ *   session, run every Unit through the real herdr server (real panes, polled
+ *   reads) and take ~10x as long; a test that means herdr sets its own;
  * - on darwin, TMPDIR/TMP/TEMP resolved through realpath (/var -> /private/var).
  */
 export function buildTestEnv(env = process.env) {
-  const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, ...rest } = env;
-  const childEnv = { ...rest };
+  const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, FGOS_HERDR_BIN: _herdrBin, ...rest } = env;
+  const childEnv = Object.fromEntries(Object.entries(rest).filter(([key]) => !key.startsWith('HERDR_')));
   childEnv.FGOS_CLAUDE_COMMAND ||= '/nonexistent/fgos-test-claude-binary';
   if (process.platform === 'darwin') {
     const tempRoot = env.TMPDIR || os.tmpdir();

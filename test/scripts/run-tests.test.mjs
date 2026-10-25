@@ -351,6 +351,12 @@ test('buildTestEnv drops an inherited NODE_TEST_CONTEXT so a nested node --test 
   assert.equal(env.KEEP, 'yes');
 });
 
+test('buildTestEnv drops the herdr session of the pane that started the suite, so no test drives the real herdr server', () => {
+  const env = buildTestEnv({ PATH: '/usr/bin', HERDR_ENV: '1', HERDR_SOCKET_PATH: '/run/herdr.sock', HERDR_PANE_ID: 'w1:p1', FGOS_HERDR_BIN: '/usr/bin/herdr', KEEP: 'yes' });
+  assert.deepEqual(Object.keys(env).filter((key) => key.includes('HERDR')), []);
+  assert.equal(env.KEEP, 'yes');
+});
+
 test('buildTestEnv points the claude CLI at a missing binary unless the caller names one, so no test reaches the real claude', () => {
   assert.equal(buildTestEnv({ PATH: '/usr/bin' }).FGOS_CLAUDE_COMMAND, '/nonexistent/fgos-test-claude-binary');
   assert.equal(buildTestEnv({ PATH: '/usr/bin', FGOS_CLAUDE_COMMAND: '/fixture/claude' }).FGOS_CLAUDE_COMMAND, '/fixture/claude');
