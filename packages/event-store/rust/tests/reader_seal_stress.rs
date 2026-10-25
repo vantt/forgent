@@ -1,3 +1,4 @@
+#![cfg(target_os = "linux")]
 //! Long qualification uses real repos, locks, Publication and file boundaries.
 mod common;
 mod reader_support;

@@ -1,3 +1,4 @@
+#![cfg(target_os = "linux")]
 mod common;
 use common::{batch, inputs, Repo};
 use fgos_event_store::{

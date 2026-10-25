@@ -1,3 +1,4 @@
+#![cfg(target_os = "linux")]
 use fgos_event_store::{
     envelope::Scope,
     identity::{machine_id, StoreIdentity},

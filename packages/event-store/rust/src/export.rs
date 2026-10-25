@@ -42,12 +42,15 @@ fn destination(out: &Path) -> Result<(), Error> {
         }
         parent = p.parent();
     }
-    let mut builder = fs::DirBuilder::new();
     #[cfg(unix)]
-    {
+    let builder = {
         use std::os::unix::fs::DirBuilderExt;
+        let mut builder = fs::DirBuilder::new();
         builder.mode(0o700);
-    }
+        builder
+    };
+    #[cfg(not(unix))]
+    let builder = fs::DirBuilder::new();
     builder.create(out).map_err(io)?;
     Ok(())
 }

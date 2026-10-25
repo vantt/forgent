@@ -59,8 +59,8 @@ pub struct EventStore {
     registry: Registry,
     machine: String,
     resolved: (Arc<GitDriver>, Arc<RepoHandle>),
-    /// Legacy-migration admission: asked once, by the first write or the
-    /// pre-gate `admit_writes`, never by a read.
+    /// Legacy-migration admission: asked by the first write or the pre-gate
+    /// `admit_writes`, never by a read, and kept once the answer is settled.
     write_refusal: OnceLock<Option<String>>,
     publication_remote: String,
     /// What this store's last complete read answered; see `ReadMemo`.
@@ -76,8 +76,8 @@ struct Input {
 }
 #[napi]
 impl EventStore {
-    /// Settle write admission outside the Work gate. It never refuses by
-    /// itself: the refusal is raised by the write that needs it.
+    /// Settle write admission outside the Work gate. A refusal is raised by
+    /// the write that needs it; only a failure that may clear is raised here.
     #[napi]
     pub fn admit_writes(&self, held_ranks: Vec<u32>, hot_lock_depth: u32) -> Result<()> {
         self.context(&held_ranks, hot_lock_depth)?;
@@ -243,6 +243,12 @@ fn stream_ids(streams: &[String]) -> Result<Vec<StreamId>> {
         .map(|s| StreamId::parse(s).map_err(error))
         .collect()
 }
+/// A missing pinned legacy ref is not settled: `fgos events sync` fetches it
+/// while a long-lived process keeps running. A required migration is, because
+/// it runs with every writer stopped.
+fn is_settled_refusal(code: fgos_event_store::errors::ErrorCode) -> bool {
+    matches!(code, fgos_event_store::errors::ErrorCode::EventStoreMigrationRequired)
+}
 impl EventStore {
     /// The reason writes are refused, or `None`. The answer is asked of Git
     /// once per store, and Git is never asked inside the Work gate (rank 60):
@@ -256,14 +262,20 @@ impl EventStore {
             return Err(error("event-store-admission-required"));
         }
         let (driver, repo) = &self.resolved;
-        let asked = fgos_event_store::legacy_import::write_readiness(
+        match fgos_event_store::legacy_import::write_readiness(
             driver,
             repo,
             &self.publication_remote,
-        )
-        .err()
-        .map(|e| e.to_string());
-        Ok(self.write_refusal.get_or_init(|| asked).as_deref())
+        ) {
+            Ok(()) => Ok(self.write_refusal.get_or_init(|| None).as_deref()),
+            Err(e) if is_settled_refusal(e.code) => {
+                let asked = Some(e.to_string());
+                Ok(self.write_refusal.get_or_init(|| asked).as_deref())
+            }
+            // Any other failure may clear (a fetch, a Git or I/O error), so it is
+            // returned to this write and the next write asks again.
+            Err(e) => Err(error(e)),
+        }
     }
     fn context(&self, ranks: &[u32], depth: u32) -> Result<(&GitDriver, &RepoHandle, &str)> {
         available()?;

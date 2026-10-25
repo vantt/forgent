@@ -10,11 +10,11 @@ use fgos_event_store::{
 use fgos_git::*;
 use reader_support::*;
 use std::{collections::BTreeSet, fs};
-fn read_project(
+fn try_read(
     f: &Fixture,
     cursor: &Cursor,
     folded: &[fgos_event_store::envelope::Envelope],
-) -> fgos_event_store::read::ReadResult {
+) -> std::result::Result<fgos_event_store::read::ReadResult, fgos_event_store::errors::Error> {
     read(
         &f.driver,
         &f.repo,
@@ -27,7 +27,28 @@ fn read_project(
             project: true,
         },
     )
-    .unwrap()
+}
+fn read_project(
+    f: &Fixture,
+    cursor: &Cursor,
+    folded: &[fgos_event_store::envelope::Envelope],
+) -> fgos_event_store::read::ReadResult {
+    try_read(f, cursor, folded).unwrap()
+}
+/// Mirror `oid` as a foreign ref of the machine `suffix` by writing the loose
+/// ref file. The publication door cannot plant this: its fetch only maps
+/// `refs/fgos/events/*`, and the remote is this repository, so the source ref
+/// would stay behind as a bad ref of this machine (and the door refuses an
+/// invalid machine name or deleting an events ref). A file write adds no Git
+/// spawn.
+fn plant_foreign_mirror(f: &Fixture, suffix: &str, oid: &Oid) {
+    let path = f
+        .layout
+        .common_dir
+        .join("refs/fgos/remotes/origin/events")
+        .join(suffix);
+    fs::create_dir_all(path.parent().unwrap()).unwrap();
+    fs::write(path, format!("{}\n", oid.as_str())).unwrap();
 }
 #[test]
 fn identical_overlap_recovers_receipt_without_requiring_segment_deletion() {
@@ -703,4 +724,88 @@ fn reserved_legacy_mirror_is_not_a_phantom_event_tip() {
     assert!(result.events.is_empty());
     assert!(result.sequence.is_empty());
     assert!(result.legacy.is_empty());
+}
+
+/// A clone that has never stored an event has no `.git/fgos/events` yet. The
+/// history is then empty; today `own_bounds` lists the missing root and the
+/// read fails with an I/O error. No other test reads without the root: every
+/// fixture creates it first.
+#[test]
+fn read_without_a_store_root_is_empty_history() {
+    let f = Fixture::new();
+    fs::remove_dir_all(&f.layout.root).unwrap();
+    let result = try_read(&f, &Cursor::default(), &[]).unwrap_or_else(|error| {
+        panic!("a clone with no store root has no history yet, but the read failed: {error}")
+    });
+    assert!(result.events.is_empty());
+    assert!(result.sequence.is_empty());
+}
+
+/// One foreign mirror that fails its own checks must not take every read down
+/// with it (sync already skips such a mirror with a warning). Existing tests
+/// only cover a bad ref of the reader's own machine
+/// (`spliced_ancestor_machine_and_scope_are_refused` owns that it stays fatal).
+fn bad_foreign_mirror_is_skipped(
+    bad_name: &str,
+    bad_commit: impl Fn(&PublicationPort<'_>, &Fixture) -> Oid,
+) {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let (good, bad) = {
+        let p = f.port(&mut h, "refs/fgos/events/test-aa");
+        (
+            seal(&p, &f.repo, vec![], &[event('b', 1, 1)], "test-bb"),
+            bad_commit(&p, &f),
+        )
+    };
+    drop(h);
+    plant_foreign_mirror(&f, "test-bb", &good);
+    plant_foreign_mirror(&f, bad_name, &bad);
+    let result = try_read(&f, &Cursor::default(), &[]).unwrap_or_else(|error| {
+        panic!("one bad foreign mirror ({bad_name}) failed the whole read: {error}")
+    });
+    assert_eq!(
+        result.sequence.len(),
+        1,
+        "the other machine's events are still read"
+    );
+}
+#[test]
+fn foreign_mirror_with_an_invalid_machine_name_is_skipped_not_fatal() {
+    bad_foreign_mirror_is_skipped("EVIL", |p, f| {
+        seal(p, &f.repo, vec![], &[event('c', 1, 1)], "test-cc")
+    });
+}
+#[test]
+fn foreign_mirror_whose_header_names_another_machine_is_skipped_not_fatal() {
+    bad_foreign_mirror_is_skipped("test-cc", |p, f| {
+        seal(p, &f.repo, vec![], &[event('c', 1, 1)], "test-dd")
+    });
+}
+/// 32 MiB is the per-blob cap of the reader; one byte over trips it.
+#[test]
+fn foreign_mirror_with_an_oversized_segment_is_skipped_not_fatal() {
+    bad_foreign_mirror_is_skipped("test-cc", |p, f| {
+        let big = vec![b'x'; 32 * 1024 * 1024 + 1];
+        let header = fgos_event_store::envelope::Seal::Seal {
+            v: 1,
+            machine_id: "test-cc".into(),
+            origin: "c".repeat(32),
+            stream: "project".into(),
+            scope: Scope::Project,
+            first_seq: 1,
+            last_seq: 1,
+            count: 1,
+            sha256: fgos_event_store::envelope::sha256(&big),
+        };
+        commit(
+            p,
+            &f.repo,
+            vec![],
+            vec![
+                (b"events.jsonl", big),
+                (b"seal.json", header.canonical_line().unwrap()),
+            ],
+        )
+    });
 }
