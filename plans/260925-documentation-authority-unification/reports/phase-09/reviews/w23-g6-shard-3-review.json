@@ -1,0 +1,1621 @@
+{
+ "review": "w23-g6-shard-3",
+ "target": "preserve-premise/park-judgments/shard-3.{json,md} at 42893a825",
+ "pin": "c94545de5b45873cb2eb419f10124283fd730a2e",
+ "counts": {
+  "APPROVE": 217,
+  "REWORK": 44
+ },
+ "items": [
+  {
+   "rowId": "f07229",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-vision.md:17 — '- docs/distribution-vision.md'; successor docs/platform/packaging-distribution/history/distribution-vision.md:41-53 (## 1. Vì sao)"
+  },
+  {
+   "rowId": "f07230",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-vision.md:37 — 'hiện có: `docs/specs/distribution.md` (area: distribution) và'"
+  },
+  {
+   "rowId": "f07231",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-vision.md:38 — '`docs/coexistence.md` (doctrine chạy cạnh harness khác). Một số điểm dưới đây'"
+  },
+  {
+   "rowId": "f07233",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-vision.md:148 — '`docs/specs/distribution.md` Edge Cases Settled) và chỉ cần document rõ'"
+  },
+  {
+   "rowId": "f07282",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/reports/track-closeout.md:169 — 'git log --all --oneline -- docs/architect/packaging-distribution/migration-map.md docs/architect/packaging-distribution/rewrite-plan.md'"
+  },
+  {
+   "rowId": "f07283",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/reports/track-closeout.md:169 — 'git log --all --oneline -- docs/architect/packaging-distribution/migration-map.md docs/architect/packaging-distribution/rewrite-plan.md'"
+  },
+  {
+   "rowId": "f07284",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/reports/track-closeout.md:173 — '`docs/architect/packaging-distribution/**` files and recorded absent/no-history'"
+  },
+  {
+   "rowId": "f07285",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/reports/track-closeout.md:275 — 'docs/architect/packaging-distribution/README.md'"
+  },
+  {
+   "rowId": "f07286",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/reports/track-closeout.md:276 — 'docs/architect/packaging-distribution/future-constraints.md'"
+  },
+  {
+   "rowId": "f07287",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/reports/track-closeout.md:277 — 'docs/architect/packaging-distribution/history/distribution-baseline.md'"
+  },
+  {
+   "rowId": "f07288",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/reports/track-closeout.md:278 — 'docs/architect/packaging-distribution/runtime-identity-and-activation.md'"
+  },
+  {
+   "rowId": "f07289",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/reports/track-closeout.md:279 — 'docs/architect/packaging-distribution/scope-map.md'"
+  },
+  {
+   "rowId": "f07290",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/reports/track-closeout.md:280 — 'docs/architect/packaging-distribution/workspace-runtime-model.md'"
+  },
+  {
+   "rowId": "f07293",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/packaging-distribution/spec.md:17 — '- docs/distribution-vision.md'; successor docs/platform/packaging-distribution/history/distribution-vision.md:41-53 (## 1. Vì sao)"
+  },
+  {
+   "rowId": "f07325",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/verification/source-preservation-audit.md:116 — '`migration-map.md` and `rewrite-plan.md` were earlier audit placeholders, not'"
+  },
+  {
+   "rowId": "f07326",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/verification/source-preservation-audit.md:116 — '`migration-map.md` and `rewrite-plan.md` were earlier audit placeholders, not'"
+  },
+  {
+   "rowId": "f07355",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/verification/source-preservation-audit.md:56 — '`docs/architect/packaging-distribution/migration-map.md` and'"
+  },
+  {
+   "rowId": "f07356",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/verification/source-preservation-audit.md:57 — '`docs/architect/packaging-distribution/rewrite-plan.md` as sources. P9 removed'"
+  },
+  {
+   "rowId": "f07369",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/verification/source-preservation-audit.md:109 — '| `docs/architect/packaging-distribution/README.md` | Historical redirect to `docs/platform/packaging-distribution/README.md`. |'"
+  },
+  {
+   "rowId": "f07370",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/verification/source-preservation-audit.md:110 — '| `docs/architect/packaging-distribution/scope-map.md` | Historical redirect to the promoted area boundary and this audit. |'"
+  },
+  {
+   "rowId": "f07371",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/verification/source-preservation-audit.md:111 — '| `docs/architect/packaging-distribution/runtime-identity-and-activation.md` | Historical redirect to promoted runtime architecture and V1 contracts. |'"
+  },
+  {
+   "rowId": "f07372",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/verification/source-preservation-audit.md:112 — '| `docs/architect/packaging-distribution/future-constraints.md` | Historical redirect to promoted future-constraints architecture. |'"
+  },
+  {
+   "rowId": "f07373",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/verification/source-preservation-audit.md:113 — '| `docs/architect/packaging-distribution/workspace-runtime-model.md` | Historical redirect to workspace topology and promoted packaging-distribution runtime doc'"
+  },
+  {
+   "rowId": "f07374",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/verification/source-preservation-audit.md:114 — '| `docs/architect/packaging-distribution/history/distribution-baseline.md` | Historical source ledger; active condensed history remains in `docs/platform/packag'"
+  },
+  {
+   "rowId": "f07376",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/packaging-distribution/vision.md:17 — '- docs/distribution-vision.md'; successor docs/platform/packaging-distribution/history/distribution-vision.md:41-53 (## 1. Vì sao)"
+  },
+  {
+   "rowId": "f07377",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: dated closeout/audit/redirect inventory or history-carrier text records the old source coordinate; it does not route readers to it as current authority.",
+   "evidence": "docs/platform/packaging-distribution/vision.md:95 — 'The source document `docs/distribution-vision.md` recorded several things as not yet implemented on 2026-08-01. Some are now done or partially done:'"
+  },
+  {
+   "rowId": "f07380",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly. Note (non-blocking): this file's shard patch fails at --fuzz=0 after the existing F chain (phase-08 step-07 or composition specs edit neighbouring context lines; the chain leaves this row's own line unchanged), so the composition turn must rebase it.",
+   "evidence": "docs/platform/platform-foundations.md:16 — '- docs/platform-foundations.md'; successor docs/platform/platform-foundations.md:86-94 (## Luật nền platform forgent (Phase 0 — compound-learning stack))"
+  },
+  {
+   "rowId": "f07398",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse). Note (non-blocking): this file's shard patch fails at --fuzz=0 after the existing F chain (phase-08 step-07 or composition specs edit neighbouring context lines; the chain leaves this row's own line unchanged), so the composition turn must rebase it.",
+   "evidence": "docs/platform/platform-foundations.md:80 — '| Full law text | `docs/platform-foundations.md` |'; successor docs/platform/platform-foundations.md:86-94 (## Luật nền platform forgent (Phase 0 — compound-learning stack))"
+  },
+  {
+   "rowId": "f07406",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path is a literal example (hypothetical path, migration payload, traversal string or wireframe data), not a reader destination.",
+   "evidence": "docs/platform/platform-foundations.md:122 — 'đâu\"; luôn phản ánh hiện tại. (vd: `docs/distillery/sources/*.md`, state.json)'"
+  },
+  {
+   "rowId": "f07407",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/platform/platform-foundations.md:261 — '`docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (round 2,'"
+  },
+  {
+   "rowId": "f07532",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse). Note (non-blocking): the other Related entries in this file are relative ('../../reading-map.md', '../README.md'); the retarget uses repo-root form. Consider '../governance.md' when composing.",
+   "evidence": "docs/platform/proposals/documentation-system-unification.md:16 — '- `../../doc-governance.md`'; successor docs/platform/governance.md:28-40 (## 1. Principles)"
+  },
+  {
+   "rowId": "f07574",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path is a literal example (hypothetical path, migration payload, traversal string or wireframe data), not a reader destination.",
+   "evidence": "docs/platform/proposals/knowledge-registry-redesign.md:319 — 'This closes the rollout window where the corpus has been migrated but an old writer still self-names a fresh path. Even if a legacy writer commits `docs/explana'"
+  },
+  {
+   "rowId": "f07575",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path is a literal example (hypothetical path, migration payload, traversal string or wireframe data), not a reader destination.",
+   "evidence": "docs/platform/proposals/knowledge-registry-redesign.md:455 — 'oldPath: docs/explanation/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md'"
+  },
+  {
+   "rowId": "f07576",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path is a literal example (hypothetical path, migration payload, traversal string or wireframe data), not a reader destination.",
+   "evidence": "docs/platform/proposals/knowledge-registry-redesign.md:472 — 'currentPath: docs/explanation/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md'"
+  },
+  {
+   "rowId": "f07577",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path is a literal example (hypothetical path, migration payload, traversal string or wireframe data), not a reader destination.",
+   "evidence": "docs/platform/proposals/knowledge-registry-redesign.md:560 — '- a legacy writer that self-names `docs/explanation/new-random.md` and commits it still fails attestation because the path is not a registry current path.'"
+  },
+  {
+   "rowId": "f07656",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/README.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. This is Added in candidate navigation only; no component or authority change. Known stale ca'"
+  },
+  {
+   "rowId": "f07660",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/architecture/h-69197b459754.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07667",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint not triggered and patch rewrites verbatim carried text. Re-judge as preserve-confirmed (or a pure 'Added in candidate' marker without changing source words).",
+   "evidence": "docs/platform/runner/architecture/h-69197b459754.md:189 — '`docs/how-to/coordination-examples/*.json`; how-to:'; successor docs/platform/agent-coordination/README.md:24-36 (## Current Execution). proof.json: operand docs/how-to/coordination-examples/*.json removedByMoveOrStep6=false; every coordination-examples/run-a-coordination-session.md operand has afterPresent=true, and sibling f07668 (same paragraph, line 190) is preserve-operand-reachability-unchanged. The brief allows repoint only when the operand changes or is removed at cutover. The same file's line 23 note says 'Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus ... text verbatim'. The patch replaces source words at L177 ('**CLI.** Verb thật' -> '**Historical CLI (retired engine; ...)** Former verbs'): a truth correction, not a cutover pointer change."
+  },
+  {
+   "rowId": "f07671",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/architecture/h-7af1f0242611.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07672",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/architecture/h-7af1f0242611.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07686",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/architecture/h-7af1f0242611.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07690",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/architecture/h-e53a3a9829a8.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07693",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07697",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly. Note (non-blocking): this file's shard patch fails at --fuzz=0 after the existing F chain (phase-08 step-07 or composition specs edit neighbouring context lines; the chain leaves this row's own line unchanged), so the composition turn must rebase it.",
+   "evidence": "docs/platform/runner/contracts/routing-handoff.md:17 — '- docs/routing-handoff-contract.md'; successor docs/platform/runner/contracts/routing-handoff.md:75-83 (## Ranh giới tin cậy)"
+  },
+  {
+   "rowId": "f07698",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse). Note (non-blocking): this file's shard patch fails at --fuzz=0 after the existing F chain (phase-08 step-07 or composition specs edit neighbouring context lines; the chain leaves this row's own line unchanged), so the composition turn must rebase it.",
+   "evidence": "docs/platform/runner/contracts/routing-handoff.md:23 — '2, epic E3). Theo luật routing-theo-audience (`docs/platform-foundations.md`'; successor docs/platform/platform-foundations.md:195-203 (### L4 — Routing model theo audience của từng interface)"
+  },
+  {
+   "rowId": "f07701",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse). Note (non-blocking): this file's shard patch fails at --fuzz=0 after the existing F chain (phase-08 step-07 or composition specs edit neighbouring context lines; the chain leaves this row's own line unchanged), so the composition turn must rebase it.",
+   "evidence": "docs/platform/runner/contracts/routing-handoff.md:112 — '(same-user trust invariant) · `docs/platform-foundations.md` L4 (`14ebeea9`)'; successor docs/platform/platform-foundations.md:195-203 (### L4 — Routing model theo audience của từng interface)"
+  },
+  {
+   "rowId": "f07782",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/operations/h-51f5cd7279fd.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07785",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/platform/runner/operations/h-51f5cd7279fd.md:330 — '`docs/history/pr-lifecycle/reports/validation-s1-gate.md`); **conflict**'"
+  },
+  {
+   "rowId": "f07786",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority. Note (non-blocking): the composition gloss spec w8:gloss:docs/platform/runner/spec.md inserts text into this bound line. The operand survives and the judgment holds, but the line digest changes at F.",
+   "evidence": "docs/platform/runner/spec.md:30 — '> Added in candidate: Metadata and map-based placement scaffolding. The area introduction follows the frozen map into architecture/h-e53a3a9829a8.md. Known stal'"
+  },
+  {
+   "rowId": "f07789",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority. Note (non-blocking): the composition gloss spec w8:gloss:docs/platform/runner/spec.md inserts text into this bound line. The operand survives and the judgment holds, but the line digest changes at F.",
+   "evidence": "docs/platform/runner/spec.md:30 — '> Added in candidate: Metadata and map-based placement scaffolding. The area introduction follows the frozen map into architecture/h-e53a3a9829a8.md. Known stal'"
+  },
+  {
+   "rowId": "f07790",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority. Note (non-blocking): the composition gloss spec w8:gloss:docs/platform/runner/spec.md inserts text into this bound line. The operand survives and the judgment holds, but the line digest changes at F.",
+   "evidence": "docs/platform/runner/spec.md:30 — '> Added in candidate: Metadata and map-based placement scaffolding. The area introduction follows the frozen map into architecture/h-e53a3a9829a8.md. Known stal'"
+  },
+  {
+   "rowId": "f07802",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07805",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07810",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md:54 — '- ~~**`return` không nhận ra hoàn tất của một `fgw/<id>` sinh ra từ lượt `take`/`pick` ĐẦU TIÊN (không phải tái claim một item `blocked`).**~~ RUL30 (cửa người-'"
+  },
+  {
+   "rowId": "f07811",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md:55 — '- **`fgos-runner` không có cách tự-scope vào một thư mục/dự án con — luôn resolve repo root qua `git rev-parse --show-toplevel` từ `cwd`, không cờ/biến môi trườ'"
+  },
+  {
+   "rowId": "f07813",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07816",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07819",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md:46 — '- **RUL60 (`return` mang thêm khuyến nghị frozen-judge — advisory, không bao giờ chặn, per STR63).** Ngay khi `check.passed` (cả hai nhánh nguồn: branch-source '"
+  },
+  {
+   "rowId": "f07833",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07836",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07839",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07842",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md:23 — '> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried se'"
+  },
+  {
+   "rowId": "f07848",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md:71 — '- `docs/history/p50-workflow-induct/reports/p50-workflow-induct-6.md` — bằng chứng vận hành thật đầy đủ của case-study (lịch sử verb từng lệnh, kèm phát hiện lồ'"
+  },
+  {
+   "rowId": "f07849",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md:72 — '- `docs/routing-handoff-contract.md` — hợp đồng handoff + ranh giới tin cậy'; successor docs/platform/runner/contracts/routing-handoff.md:75-83 (## Ranh giới tin cậy)"
+  },
+  {
+   "rowId": "f07851",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md:77 — '- Test: `test/runner/*` (gồm `test/runner/merge.test.mjs` — unit `classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`; `test/runner/write-queue'"
+  },
+  {
+   "rowId": "f07852",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: 9fdaac9ba (ancestor of pin) merged Session Identity into Identity section 7a; the successor header/section still carries the writer/io-contract relationship. Note (non-blocking): the successor Related line identity/spec.md:22 still names docs/io-contract.md (removed at cutover) and has no proof.json row; confirm another F duty owns it.",
+   "evidence": "docs/platform/session-identity/spec.md (absent at pin) — ''; successor docs/platform/identity/spec.md:22-30 (# Identity Component Specification)"
+  },
+  {
+   "rowId": "f07854",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: 9fdaac9ba (ancestor of pin) merged Session Identity into Identity section 7a; the successor header/section still carries the writer/io-contract relationship. Note (non-blocking): identity/spec.md:159 still links ../../io-contract.md (removed at cutover) and has no proof.json row; confirm another F duty owns it.",
+   "evidence": "docs/platform/session-identity/spec.md (absent at pin) — ''; successor docs/platform/identity/spec.md:159-167 (## 7a. Local session (writer id))"
+  },
+  {
+   "rowId": "f07871",
+   "verdict": "REWORK",
+   "severity": "low",
+   "summary": "Retarget narrows a directory of historical contracts to one file. Point at the directory docs/platform/agent-coordination/history/retired-engine/files/contracts/ (or its README.md), then regenerate the composed roadmap.md patch.",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md:52 — '| Agent Coordination / Execution Core | `agent-coordination/`, `proposals/step-09-group-thinking-substrate.md` | Post-P4, the coordination engine is retired in '; successor docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md:25-37 (## Literal Snapshot). roadmap.md:52 says 'Historical contracts are preserved in `agent-coordination/contracts/`' (plural, directory; operand docs/architect/agent-coordination/contracts). The patch replaces it with .../retired-engine/files/contracts/coordination-session.md only. At the pin that directory holds README.md, assignment-run-runresult.md, coordination-session.md, flow-definition.md and workflow-stage-operation.md."
+  },
+  {
+   "rowId": "f07872",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md:52 — '| Agent Coordination / Execution Core | `agent-coordination/`, `proposals/step-09-group-thinking-substrate.md` | Post-P4, the coordination engine is retired in '; successor docs/platform/agent-coordination/README.md:24-36 (## Current Execution)"
+  },
+  {
+   "rowId": "f07873",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md:52 — '| Agent Coordination / Execution Core | `agent-coordination/`, `proposals/step-09-group-thinking-substrate.md` | Post-P4, the coordination engine is retired in '; successor docs/platform/proposals/step-09-group-thinking-substrate.md:94-106 (## 1. Why This Step Exists)"
+  },
+  {
+   "rowId": "f07874",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md:53 — '| Coding Domain / Step 10 | `proposals/step-10-coding-domain-adoption.md`, `domainization/`, coding-domain specs/history outside this folder | Make the existing'; successor docs/platform/proposals/step-10-coding-domain-adoption.md:62-74 (## 1. How To Read This Draft)"
+  },
+  {
+   "rowId": "f07875",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md:53 — '| Coding Domain / Step 10 | `proposals/step-10-coding-domain-adoption.md`, `domainization/`, coding-domain specs/history outside this folder | Make the existing'; successor docs/platform/domainization/architecture/domainization.md:34-46 (## 1. Purpose)"
+  },
+  {
+   "rowId": "f07876",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md:55 — '| Component Boundary | `component-boundary/`, `proposals/component-authority-boundary-map.md` | Keep high-level component responsibilities and authority boundar'; successor docs/platform/component-boundary.md:26-38 (## 1. Purpose)"
+  },
+  {
+   "rowId": "f07877",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md:55 — '| Component Boundary | `component-boundary/`, `proposals/component-authority-boundary-map.md` | Keep high-level component responsibilities and authority boundar'; successor docs/platform/proposals/component-authority-boundary-map.md:34-46 (## 1. Status And Reading Rule)"
+  },
+  {
+   "rowId": "f07878",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md:56 — '| Host Invocation / fgOS CLI | `host-invocation-routing/` | Define how CLI, remote, gateway, chat, MCP, and future hosts enter one semantic operation path and s'; successor docs/platform/host-invocation-routing/README.md:37-49 (## 1. Purpose And Audience)"
+  },
+  {
+   "rowId": "f07879",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md:57 — '| Node To Rust Migration | `host-invocation-routing/node-to-rust-component-migration.md`, `host-invocation-routing/rust-cli-and-proof-components-plan.md` | Move'; successor docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md:24-36 (## 1. Selected Direction)"
+  },
+  {
+   "rowId": "f07880",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md:57 — '| Node To Rust Migration | `host-invocation-routing/node-to-rust-component-migration.md`, `host-invocation-routing/rust-cli-and-proof-components-plan.md` | Move'; successor docs/platform/host-invocation-routing/roadmap.md:23-35 (## 1. Current Baseline)"
+  },
+  {
+   "rowId": "f07881",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md:58 — '| Packaging And Distribution | `packaging-distribution/` | Design correct install, runtime identity, activation, payload records, `fgctl`, local `fgos`, and wor'; successor docs/platform/packaging-distribution/README.md:34-46 (## 1. Purpose And Audience)"
+  },
+  {
+   "rowId": "f07886",
+   "verdict": "REWORK",
+   "severity": "low",
+   "summary": "Dated roadmap phase row (P12) of the retired docs/specs generation regime; the repoint makes it claim the platform area specs are 'Regenerated', which contradicts the shard's own f07889 premise. Re-judge as preserve-confirmed, consistent with sibling f07869.",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md:155 — '| P12: Spec consolidation | Move settled architecture back into generated specs. | Spec source changes through owning workflow. | Regenerated `docs/specs/*` and'; successor docs/platform/README.md:39-47 (## 2. Area Registry). Same-file siblings were already confirmed as source history: f07869 (roadmap.md:151, the P8 row of the same phase table) and f07888 (roadmap.md:275, 'For now, new architecture writing stays under docs/architect/', the first sentence of the same section 9) are preserve-source-confirmed-history in proof.json. The roadmap header says 'Original source metadata, dates, design limits and historic claims below are provenance, not fresh review' and the body says 'Last reviewed: 2026-09-04'. Patch L155: '`docs/specs/*`' -> 'the area specs reached through `docs/platform/README.md`' within 'Regenerated ... and changelog/backlog alignment'."
+  },
+  {
+   "rowId": "f07889",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Transplants a dated pre-cutover process rule onto the platform specs and edits its claim. Re-judge as preserve-confirmed (section 9 is source history), consistent with sibling f07888.",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md:277 — '`docs/specs/*` is treated as generated/curated state. It should not be edited'; successor docs/platform/README.md:39-47 (## 2. Area Registry). Same-file siblings were already confirmed as source history: f07869 (roadmap.md:151, the P8 row of the same phase table) and f07888 (roadmap.md:275, 'For now, new architecture writing stays under docs/architect/', the first sentence of the same section 9) are preserve-source-confirmed-history in proof.json. The roadmap header says 'Original source metadata, dates, design limits and historic claims below are provenance, not fresh review' and the body says 'Last reviewed: 2026-09-04'. Patch L277 rewrites '`docs/specs/*` is treated as generated/curated state. It should not be edited' to 'Area specs reached through `docs/platform/README.md` are curated state. They should not be edited'. That drops 'generated', creates a new live editing rule for platform specs, and leaves L278-280 ('update the generated source ... regenerate/check the spec projection') and the preserved L275 inconsistent."
+  },
+  {
+   "rowId": "f07935",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/platform/system-overview/spec.md:6 — 'Purpose: Preserve the complete system-overview.md source at its frozen-map candidate owner'"
+  },
+  {
+   "rowId": "f07950",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/ui-spec/README.md:17 — '- docs/ui-spec/00-overview.md'; successor docs/platform/ui-spec/spec.md:44-56 (## Surface index)"
+  },
+  {
+   "rowId": "f07953",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/architecture/components/C01-item-card.md:29 — '- docs/ui-spec/components/C01-item-card.md'; successor docs/platform/ui-spec/architecture/components/C01-item-card.md:37-49 (## Purpose)"
+  },
+  {
+   "rowId": "f07957",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md:29 — '- docs/ui-spec/modals/M01-answer-question.md'; successor docs/platform/ui-spec/architecture/modals/M01-answer-question.md:37-49 (## Purpose)"
+  },
+  {
+   "rowId": "f07960",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md:29 — '- docs/ui-spec/modals/M02-approve-merge.md'; successor docs/platform/ui-spec/architecture/modals/M02-approve-merge.md:37-49 (## Purpose)"
+  },
+  {
+   "rowId": "f07963",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md:29 — '- docs/ui-spec/modals/M03-add-edit-item.md'; successor docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md:37-49 (## Purpose)"
+  },
+  {
+   "rowId": "f07966",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md:29 — '- docs/ui-spec/screens/S01-sign-in.md'; successor docs/platform/ui-spec/architecture/screens/S01-sign-in.md:37-49 (## Purpose)"
+  },
+  {
+   "rowId": "f07969",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md:29 — '- docs/ui-spec/screens/S02-taskboard.md'; successor docs/platform/ui-spec/architecture/screens/S02-taskboard.md:37-49 (## Purpose)"
+  },
+  {
+   "rowId": "f07973",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md:29 — '- docs/ui-spec/screens/S03-task-detail.md'; successor docs/platform/ui-spec/architecture/screens/S03-task-detail.md:37-49 (## Purpose)"
+  },
+  {
+   "rowId": "f07975",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path is a literal example (hypothetical path, migration payload, traversal string or wireframe data), not a reader destination.",
+   "evidence": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md:86 — '│  docsRef: docs/history/tsk-4id ↗           │                          │'"
+  },
+  {
+   "rowId": "f07976",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md:121 — '`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/'; successor docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:706-714 (WorkItem:)"
+  },
+  {
+   "rowId": "f07978",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md:29 — '- docs/ui-spec/screens/S04-questions-needing-answer.md'; successor docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md:37-49 (## Purpose)"
+  },
+  {
+   "rowId": "f07982",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/ui-spec/architecture/spec.config.yaml.md:17 — '- docs/ui-spec/spec.config.yaml'; successor docs/platform/ui-spec/architecture/spec.config.yaml:1-13 (# UI Spec configuration — herdr web dashboard)"
+  },
+  {
+   "rowId": "f07984",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/contracts/15-system-events.md:24 — '- docs/ui-spec/15-system-events.md'; successor docs/platform/ui-spec/contracts/15-system-events.md:8-20 (# System events)"
+  },
+  {
+   "rowId": "f07985",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/ui-spec/contracts/15-system-events.md:38 — '(`docs/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a'; successor docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:479-487 (/state/digest:)"
+  },
+  {
+   "rowId": "f07987",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/contracts/20-domain-rules.md:24 — '- docs/ui-spec/20-domain-rules.md'; successor docs/platform/ui-spec/contracts/20-domain-rules.md:8-20 (# Domain rules)"
+  },
+  {
+   "rowId": "f07990",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/contracts/30-states-and-errors.md:17 — '- docs/ui-spec/30-states-and-errors.md'; successor docs/platform/ui-spec/contracts/30-states-and-errors.md:27-39 (## States)"
+  },
+  {
+   "rowId": "f07993",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/ui-spec/history/schema/surface-contract.schema.json.md:17 — '- docs/ui-spec/schema/surface-contract.schema.json'; successor docs/platform/ui-spec/history/schema/surface-contract.schema.json:1-13 ({)"
+  },
+  {
+   "rowId": "f07995",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md:29 — '- docs/ui-spec/flows/F01-answer-a-parked-question.md'; successor docs/platform/ui-spec/operations/F01-answer-a-parked-question.md:37-49 (## Purpose)"
+  },
+  {
+   "rowId": "f07997",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/operations/F02-approve-a-merge.md:29 — '- docs/ui-spec/flows/F02-approve-a-merge.md'; successor docs/platform/ui-spec/operations/F02-approve-a-merge.md:37-49 (## Purpose)"
+  },
+  {
+   "rowId": "f07999",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/ui-spec/spec.md:25 — '- docs/ui-spec/00-overview.md'; successor docs/platform/ui-spec/spec.md:44-56 (## Surface index)"
+  },
+  {
+   "rowId": "f08007",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/vision.md:16 — '- docs/work-item-lifecycle-vision.md'; successor docs/platform/vision.md:28-40 (## 1. Purpose)"
+  },
+  {
+   "rowId": "f08008",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/vision.md:17 — '- docs/platform-foundations.md'; successor docs/platform/platform-foundations.md:86-94 (## Luật nền platform forgent (Phase 0 — compound-learning stack))"
+  },
+  {
+   "rowId": "f08012",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse). Note (non-blocking): this file's shard patch fails at --fuzz=0 after the existing F chain (phase-08 step-07 or composition specs edit neighbouring context lines; the chain leaves this row's own line unchanged), so the composition turn must rebase it.",
+   "evidence": "docs/platform/work-state/README.md:17 — '- docs/io-contract.md'; successor docs/platform/work-state/contracts/cli-io-contract.md:26-34 (## 1. Purpose And Scope)"
+  },
+  {
+   "rowId": "f08013",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse). Note (non-blocking): this file's shard patch fails at --fuzz=0 after the existing F chain (phase-08 step-07 or composition specs edit neighbouring context lines; the chain leaves this row's own line unchanged), so the composition turn must rebase it.",
+   "evidence": "docs/platform/work-state/README.md:18 — '- docs/work-item-lifecycle-vision.md'; successor docs/platform/vision.md:28-40 (## 1. Purpose)"
+  },
+  {
+   "rowId": "f08021",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse). Note (non-blocking): this file's shard patch fails at --fuzz=0 after the existing F chain (phase-08 step-07 or composition specs edit neighbouring context lines; the chain leaves this row's own line unchanged), so the composition turn must rebase it.",
+   "evidence": "docs/platform/work-state/README.md:64 — 'A third retained source, [docs/work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md), is not covered by this candidate area. It belongs to the pla'; successor docs/platform/vision.md:28-40 (## 1. Purpose)"
+  },
+  {
+   "rowId": "f08024",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse). Note (non-blocking): this file's shard patch fails at --fuzz=0 after the existing F chain (phase-08 step-07 or composition specs edit neighbouring context lines; the chain leaves this row's own line unchanged), so the composition turn must rebase it.",
+   "evidence": "docs/platform/work-state/README.md:77 — '| retained source for the platform vision candidate | [../../work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md) |'; successor docs/platform/vision.md:28-40 (## 1. Purpose)"
+  },
+  {
+   "rowId": "f08027",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/work-state/architecture/implementation-pointers.md:50 — '- `docs/coexistence.md` — doctrine đầy đủ record ADR0009 (lãnh địa, một-nhạc-trưởng-mỗi-phiên, nhường-nhịn, manifest schema, Known Gaps)'; successor docs/platform/coexistence/spec.md:29-41 (## Lãnh địa (territory))"
+  },
+  {
+   "rowId": "f08031",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/work-state/architecture/implementation-pointers.md:58 — '- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)'; successor docs/platform/work-state/spec.md:27-39 (## 1. Purpose And Scope)"
+  },
+  {
+   "rowId": "f08033",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly. Note (non-blocking): this file's shard patch fails at --fuzz=0 after the existing F chain (phase-08 step-07 or composition specs edit neighbouring context lines; the chain leaves this row's own line unchanged), so the composition turn must rebase it.",
+   "evidence": "docs/platform/work-state/contracts/cli-io-contract.md:15 — '- docs/io-contract.md'; successor docs/platform/work-state/contracts/cli-io-contract.md:26-34 (## 1. Purpose And Scope)"
+  },
+  {
+   "rowId": "f08044",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse). Note (non-blocking): this file's shard patch fails at --fuzz=0 after the existing F chain (phase-08 step-07 or composition specs edit neighbouring context lines; the chain leaves this row's own line unchanged), so the composition turn must rebase it.",
+   "evidence": "docs/platform/work-state/contracts/cli-io-contract.md:439 — 'stdout runner) · `docs/architecture-map.md` CTR001/CTR003/CTR004 (sổ đăng'; successor docs/platform/architecture-map.md:25-37 (## 1. Purpose)"
+  },
+  {
+   "rowId": "f08046",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly. Note (non-blocking): this file's shard patch fails at --fuzz=0 after the existing F chain (phase-08 step-07 or composition specs edit neighbouring context lines; the chain leaves this row's own line unchanged), so the composition turn must rebase it.",
+   "evidence": "docs/platform/work-state/contracts/cli-io-contract.md:448 — '- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)'; successor docs/platform/work-state/spec.md:27-39 (## 1. Purpose And Scope)"
+  },
+  {
+   "rowId": "f08047",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly. Note (non-blocking): this file's shard patch fails at --fuzz=0 after the existing F chain (phase-08 step-07 or composition specs edit neighbouring context lines; the chain leaves this row's own line unchanged), so the composition turn must rebase it.",
+   "evidence": "docs/platform/work-state/contracts/cli-io-contract.md:449 — '- [Legacy source: docs/io-contract.md](../../../io-contract.md)'; successor docs/platform/work-state/contracts/cli-io-contract.md:26-34 (## 1. Purpose And Scope)"
+  },
+  {
+   "rowId": "f08050",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/platform/work-state/decisions/retired-decision-history.md:319 — '- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record 0012,'"
+  },
+  {
+   "rowId": "f08051",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/platform/work-state/decisions/retired-decision-history.md:429 — '`RUL11 (tiến hóa schema)` (`docs/specs/work-state.md:886`, D-ID `feed7428`) cấm tường minh: \"Nhật ký'"
+  },
+  {
+   "rowId": "f08057",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/platform/work-state/decisions/retired-decision-history.md:621 — 'luật L3, `docs/platform-foundations.md`):'"
+  },
+  {
+   "rowId": "f08058",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/platform/work-state/decisions/retired-decision-history.md:734 — '| `docs/reference/triage-table-columns.md:18` | Bảng cột hiển thị CLI liệt kê CHỈ 7 status cũ (`todo`/`doing`/`blocked`/`awaiting-human`/`awaiting-approval`/`do'"
+  },
+  {
+   "rowId": "f08067",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint (label) approved: the legacy pointer maps back to this same carrier (ledger place-verbatim); the patch labels it as non-navigational provenance instead of a self-link; replays exactly.",
+   "evidence": "docs/platform/work-state/history/multi-role-harness-distill-record.md:92 — '- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)'; successor docs/platform/work-state/spec.md:27-39 (## 1. Purpose And Scope)"
+  },
+  {
+   "rowId": "f08069",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/work-state/spec.md:16 — '- docs/io-contract.md'; successor docs/platform/work-state/contracts/cli-io-contract.md:26-34 (## 1. Purpose And Scope)"
+  },
+  {
+   "rowId": "f08074",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path is a literal example (hypothetical path, migration payload, traversal string or wireframe data), not a reader destination.",
+   "evidence": "docs/platform/work-state/spec.md:117 — '| O11 | — (trực giao) | con trỏ tài liệu (docPath) | Con trỏ TÙY CHỌN tới tài liệu người-dùng-cuối mà bản ghi outcome này sinh ra — chiều LINKAGE nguồn↔tài-liệu'"
+  },
+  {
+   "rowId": "f08076",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/work-state/spec.md:711 — 'đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/coexistence.md`.'; successor docs/platform/coexistence/spec.md:29-41 (## Lãnh địa (territory))"
+  },
+  {
+   "rowId": "f08080",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/platform/work-state/spec.md:1172 — '- Trong một project mà bee đang nghỉ (phase terminal), guard hiện tại của bee chặn ghi trực tiếp vào `.fgos/` (cổng idle-intake theo-phase, allowlist tĩnh không'"
+  },
+  {
+   "rowId": "f08084",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/platform/work-state/spec.md:1203 — '- [docs/io-contract.md](../../io-contract.md)'; successor docs/platform/work-state/contracts/cli-io-contract.md:26-34 (## 1. Purpose And Scope)"
+  },
+  {
+   "rowId": "f08094",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/reading-map.md:16 — '- `docs/doc-governance.md`'; successor docs/platform/governance.md:28-40 (## 1. Principles)"
+  },
+  {
+   "rowId": "f08096",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/reading-map.md:30 — '| Understand documentation rules | [doc-governance.md](doc-governance.md) |'; successor docs/platform/governance.md:28-40 (## 1. Principles)"
+  },
+  {
+   "rowId": "f08098",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/reading-map.md:42 — '1. `docs/README.md`'; successor docs/platform/documentation/operations/portals/docs-portal.md:24-36 (## 1. Read First)"
+  },
+  {
+   "rowId": "f08099",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/reading-map.md:51 — '1. `docs/doc-governance.md`'; successor docs/platform/governance.md:28-40 (## 1. Principles)"
+  },
+  {
+   "rowId": "f08104",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/reading-map.md:114 — '| governs documentation system | [doc-governance.md](doc-governance.md) |'; successor docs/platform/governance.md:28-40 (## 1. Principles)"
+  },
+  {
+   "rowId": "f08105",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the operand sits in an 'Added in candidate' carriage/provenance note that names the frozen source or stale runner.md:<line> locators as retained text, not current authority.",
+   "evidence": "docs/reading-map.md:124 — 'Merged from the retained legacy product/source map, `docs/specs/reading-map.md`.'"
+  },
+  {
+   "rowId": "f08106",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/reading-map.md:133 — '- `docs/platform-foundations.md` — văn bản gốc 10 luật nền platform (L1–L10); spec: docs/specs/platform-foundations.md'; successor docs/platform/platform-foundations.md:86-94 (## Luật nền platform forgent (Phase 0 — compound-learning stack))"
+  },
+  {
+   "rowId": "f08110",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/reading-map.md:136 — '- `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI S'; successor docs/platform/vision.md:28-40 (## 1. Purpose)"
+  },
+  {
+   "rowId": "f08115",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/reading-map.md:140 — '- `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy'; successor docs/platform/runner/contracts/routing-handoff.md:75-83 (## Ranh giới tin cậy)"
+  },
+  {
+   "rowId": "f08116",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/reading-map.md:141 — '- `docs/io-contract.md` — hợp đồng giao tiếp VÀO/RA của cửa CLI + bề mặt stdout `fgos-runner` (str46-io-contract): danh tính `writer`/`role`, envelope `fgos.v1`'; successor docs/platform/work-state/contracts/cli-io-contract.md:26-34 (## 1. Purpose And Scope)"
+  },
+  {
+   "rowId": "f08117",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/reading-map.md:142 — '- `docs/coexistence.md` — doctrine chạy cạnh một harness agent khác (record ADR0009 (chống giao thoa lúc cài — fgOS khi cài không giao thoa tiến trình với harne'; successor docs/platform/coexistence/spec.md:29-41 (## Lãnh địa (territory))"
+  },
+  {
+   "rowId": "f08128",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/reading-map.md:149 — '- `docs/id-systems-audit.md` — audit + quyết định hình dạng mọi hệ id/mã đang sống trong hệ thống (work.id/kind/Story/ADR/Rule/Contract phía fgOS; D-hex/D-local'; successor docs/platform/documentation/history/id-systems-audit.md:29-41 (## Bối cảnh (STR47))"
+  },
+  {
+   "rowId": "f08179",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/reading-map.md:198 — '- `test/` — node:test suite (`npm test`; cỡ suite không ghi ở đây — dòng `suite: <files> files, <n> test() calls, <s> wall (baseline …)` so với `test/suite-base'"
+  },
+  {
+   "rowId": "f08180",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "docs/reading-map.md:198 — '- `test/` — node:test suite (`npm test`; cỡ suite không ghi ở đây — dòng `suite: <files> files, <n> test() calls, <s> wall (baseline …)` so với `test/suite-base'"
+  },
+  {
+   "rowId": "f08194",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/routing-handoff-contract.md:4 — '2, epic E3). Theo luật routing-theo-audience (`docs/platform-foundations.md`'; successor docs/platform/runner/contracts/routing-handoff.md:22-27 (# Routing Handoff Contract — fgos-runner)"
+  },
+  {
+   "rowId": "f08197",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/routing-handoff-contract.md:93 — '(same-user trust invariant) · `docs/platform-foundations.md` L4 (`14ebeea9`)'; successor docs/platform/runner/contracts/routing-handoff.md:111-113 (## Tham chiếu)"
+  },
+  {
+   "rowId": "f08209",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:11 — '- `docs/platform-foundations.md` — văn bản gốc 10 luật nền platform (L1–L10); spec: docs/specs/platform-foundations.md'; successor docs/reading-map.md:133-133 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08211",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:12 — '- `docs/backlog.md` — product backlog (PBI rows, scribing-owned)'; successor docs/reading-map.md:134-134 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08212",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:13 — '- `docs/architecture-map.md` — bản chuẩn kiến trúc (v0.2, record ADR0010 (bản đồ kiến trúc là bản chuẩn)): 5 tầng + 2 lớp phủ, sổ component + sổ contract (CTR00'; successor docs/reading-map.md:135-135 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08213",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:14 — '- `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI S'; successor docs/reading-map.md:136-136 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08216",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:16 — '- `docs/distribution-vision.md` — tầm nhìn nền tảng lịch sử: cài đặt/setup/doctor ổn định + tái dùng được (không cần clone, global/project không xung đột — proj'; successor docs/reading-map.md:138-138 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08218",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:18 — '- `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy'; successor docs/reading-map.md:140-140 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08219",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:19 — '- `docs/io-contract.md` — hợp đồng giao tiếp VÀO/RA của cửa CLI + bề mặt stdout `fgos-runner` (str46-io-contract): danh tính `writer`/`role`, envelope `fgos.v1`'; successor docs/reading-map.md:141-141 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08220",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:20 — '- `docs/coexistence.md` — doctrine chạy cạnh một harness agent khác (record ADR0009 (chống giao thoa lúc cài — fgOS khi cài không giao thoa tiến trình với harne'; successor docs/reading-map.md:142-142 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08223",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:23 — \"- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-regist\"; successor docs/reading-map.md:145-145 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08225",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:24 — '- `docs/decisions/` — hồ sơ quyết định dài hạn cho người ngoài (decision records); từ str64-backfill, mỗi record còn mang đầu-mô-tả OKF-style (loại/tiêu đề/nhãn'; successor docs/reading-map.md:146-146 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08227",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:24 — '- `docs/decisions/` — hồ sơ quyết định dài hạn cho người ngoài (decision records); từ str64-backfill, mỗi record còn mang đầu-mô-tả OKF-style (loại/tiêu đề/nhãn'; successor docs/reading-map.md:146-146 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08228",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:25 — '- `scripts/check-decision-citation-drift.mjs` + `test/scripts/check-decision-citation-drift.test.mjs` — quét `docs/backlog.md` + `docs/specs/*.md` tìm dòng còn '; successor docs/reading-map.md:147-147 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08231",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:27 — '- `docs/id-systems-audit.md` — audit + quyết định hình dạng mọi hệ id/mã đang sống trong hệ thống (work.id/kind/Story/ADR/Rule/Contract phía fgOS; D-hex/D-local'; successor docs/reading-map.md:149-149 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08232",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:27 — '- `docs/id-systems-audit.md` — audit + quyết định hình dạng mọi hệ id/mã đang sống trong hệ thống (work.id/kind/Story/ADR/Rule/Contract phía fgOS; D-hex/D-local'; successor docs/reading-map.md:149-149 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08244",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:37 — '- `docs/how-to/`, `docs/tutorials/`, `docs/reference/`, `docs/explanation/` — tài liệu NGƯỜI-DÙNG-CUỐI theo bốn quadrant Diataxis (audience-facing, khác `docs/s'; successor docs/reading-map.md:159-159 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08245",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:37 — '- `docs/how-to/`, `docs/tutorials/`, `docs/reference/`, `docs/explanation/` — tài liệu NGƯỜI-DÙNG-CUỐI theo bốn quadrant Diataxis (audience-facing, khác `docs/s'; successor docs/reading-map.md:159-159 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08246",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:37 — '- `docs/how-to/`, `docs/tutorials/`, `docs/reference/`, `docs/explanation/` — tài liệu NGƯỜI-DÙNG-CUỐI theo bốn quadrant Diataxis (audience-facing, khác `docs/s'; successor docs/reading-map.md:159-159 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08247",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:37 — '- `docs/how-to/`, `docs/tutorials/`, `docs/reference/`, `docs/explanation/` — tài liệu NGƯỜI-DÙNG-CUỐI theo bốn quadrant Diataxis (audience-facing, khác `docs/s'; successor docs/reading-map.md:159-159 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08250",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:37 — '- `docs/how-to/`, `docs/tutorials/`, `docs/reference/`, `docs/explanation/` — tài liệu NGƯỜI-DÙNG-CUỐI theo bốn quadrant Diataxis (audience-facing, khác `docs/s'; successor docs/reading-map.md:159-159 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08251",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:37 — '- `docs/how-to/`, `docs/tutorials/`, `docs/reference/`, `docs/explanation/` — tài liệu NGƯỜI-DÙNG-CUỐI theo bốn quadrant Diataxis (audience-facing, khác `docs/s'; successor docs/reading-map.md:159-159 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08283",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:74 — '- `docs/platform/agent-protocol/spec.md` — spec thành phần Agent protocol (L3): adapter thuần theo CLI × cách khởi động (claude, codex, agy, pi, omp × `direct` '; successor docs/reading-map.md:196-201 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08285",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:75 — '- `docs/specs/observe.md` — spec thành phần Observe (đo lường `fgos metrics` và ghi nhận `fgos friction` trọn sang Rust); source: `packages/observe/rust`, contr'; successor docs/reading-map.md:197-197 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08286",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:75 — '- `docs/specs/observe.md` — spec thành phần Observe (đo lường `fgos metrics` và ghi nhận `fgos friction` trọn sang Rust); source: `packages/observe/rust`, contr'; successor docs/reading-map.md:197-197 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08288",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/reading-map.md:77 — '- `scripts/run-test-canary.mjs` (`npm run test:canary -- <file...>`) + `scripts/test-select.mjs` (`npm run test:related -- --explain`, plus `test:related:shadow'; successor docs/reading-map.md:199-201 (## 5. Detailed Product And Source Map)"
+  },
+  {
+   "rowId": "f08305",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/specs/work-state.md:1331 — '**Đã đóng:** dư lượng CAS verb-tương-tác-vs-verb-tương-tác (per fgos-multi-session-checkout Epic 3 / STR35) — từng liệt ở đây, nay đã sửa (xem RUL10 (tiền đề có'; successor docs/platform/work-state/spec.md:1179-1179 (## 13. Known Gaps And Deferred Work)"
+  },
+  {
+   "rowId": "f08335",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor). Note (non-blocking): the successor line docs/platform/workflow/spec.md:694 still links ../../platform-foundations.md (= docs/platform-foundations.md, removed at cutover), and proof.json has no row for it; confirm another F duty owns that pointer.",
+   "evidence": "docs/specs/workflow.md:676 — '- Luật nền: [../platform-foundations.md](../platform-foundations.md) (L1, L3, L5, L9, L10).'; successor docs/platform/workflow/spec.md:693-697 (## 18. Pointers)"
+  },
+  {
+   "rowId": "f08336",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: ledger archives docs/templates/* verbatim into documentation/history/templates; the relative placeholder is carried as historical template text.",
+   "evidence": "docs/templates/architecture.md:57 — '| area portal | [../README.md](../README.md) |'; successor docs/platform/documentation/history/templates/architecture.md:63-63 (## 11. Related Files)"
+  },
+  {
+   "rowId": "f08337",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: ledger archives docs/templates/* verbatim into documentation/history/templates; the relative placeholder is carried as historical template text.",
+   "evidence": "docs/templates/architecture.md:58 — '| contracts affected | [../contracts/](../contracts/) |'; successor docs/platform/documentation/history/templates/architecture.md:64-64 (## 11. Related Files)"
+  },
+  {
+   "rowId": "f08338",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: ledger archives docs/templates/* verbatim into documentation/history/templates; the relative placeholder is carried as historical template text.",
+   "evidence": "docs/templates/contract.md:16 — '- `../README.md`'; successor docs/platform/documentation/history/templates/contract.md:78-79 (## Source Metadata (Added in candidate))"
+  },
+  {
+   "rowId": "f08339",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: ledger archives docs/templates/* verbatim into documentation/history/templates; the relative placeholder is carried as historical template text.",
+   "evidence": "docs/templates/contract.md:51 — '| owning area | [../README.md](../README.md) |'; successor docs/platform/documentation/history/templates/contract.md:57-57 (## 12. Related Files)"
+  },
+  {
+   "rowId": "f08340",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: ledger archives docs/templates/* verbatim into documentation/history/templates; the relative placeholder is carried as historical template text.",
+   "evidence": "docs/templates/decision.md:16 — '- `../README.md`'; successor docs/platform/documentation/history/templates/decision.md:67-68 (## Source Metadata (Added in candidate))"
+  },
+  {
+   "rowId": "f08341",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: ledger archives docs/templates/* verbatim into documentation/history/templates; the relative placeholder is carried as historical template text.",
+   "evidence": "docs/templates/decision.md:41 — '| owning area | [../README.md](../README.md) |'; successor docs/platform/documentation/history/templates/decision.md:45-45 (## 10. Affected Files)"
+  },
+  {
+   "rowId": "f08342",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: ledger archives docs/templates/* verbatim into documentation/history/templates; the relative placeholder is carried as historical template text.",
+   "evidence": "docs/templates/verification.md:16 — '- `../README.md`'; successor docs/platform/documentation/history/templates/verification.md:61-62 (## Source Metadata (Added in candidate))"
+  },
+  {
+   "rowId": "f08343",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: ledger archives docs/templates/* verbatim into documentation/history/templates; the relative placeholder is carried as historical template text.",
+   "evidence": "docs/templates/verification.md:35 — '| claim owner | [../README.md](../README.md) |'; successor docs/platform/documentation/history/templates/verification.md:39-39 (## 7. Related Files)"
+  },
+  {
+   "rowId": "f08344",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/transitional-switchboard.md:16 — '- `docs/reading-map.md`'; successor docs/platform/documentation/switchboard.md:137-137 (## Source Metadata (Added in candidate))"
+  },
+  {
+   "rowId": "f08345",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/transitional-switchboard.md:18 — '- `docs/doc-governance.md`'; successor docs/platform/documentation/switchboard.md:139-139 (## Source Metadata (Added in candidate))"
+  },
+  {
+   "rowId": "f08411",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/transitional-switchboard.md:114 — '| reader orientation | [docs/reading-map.md](reading-map.md) |'; successor docs/platform/documentation/switchboard.md:113-121 (## 5. Related Files)"
+  },
+  {
+   "rowId": "f08412",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor). The successor carries the relationship with a rebased destination ([docs/platform/governance.md](../governance.md)), so the literal operand differs by design.",
+   "evidence": "docs/transitional-switchboard.md:116 — '| documentation governance | [docs/doc-governance.md](doc-governance.md) |'; successor docs/platform/documentation/switchboard.md:115-123 (## 5. Related Files)"
+  },
+  {
+   "rowId": "f08415",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/ui-spec/00-overview.md:45 — 'docs/ui-spec/'; successor docs/platform/ui-spec/spec.md:66-89 (## Directory tree)"
+  },
+  {
+   "rowId": "f08416",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/ui-spec/00-overview.md:77 — 'node validate.mjs --root <repo>/docs/ui-spec'; successor docs/platform/ui-spec/spec.md:96-102 (## How to work on this spec)"
+  },
+  {
+   "rowId": "f08417",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/ui-spec/00-overview.md:78 — 'node build.mjs    --root <repo>/docs/ui-spec'; successor docs/platform/ui-spec/spec.md:96-102 (## How to work on this spec)"
+  },
+  {
+   "rowId": "f08418",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/ui-spec/00-overview.md:79 — 'node interpret-wireframe.mjs --root <repo>/docs/ui-spec'; successor docs/platform/ui-spec/spec.md:96-102 (## How to work on this spec)"
+  },
+  {
+   "rowId": "f08419",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/ui-spec/15-system-events.md:16 — '(`docs/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a'; successor docs/platform/ui-spec/contracts/15-system-events.md:35-41 (# System events)"
+  },
+  {
+   "rowId": "f08440",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/ui-spec/screens/S02-taskboard.md:32 — 'remembered (D16, `docs/history/herdr-web-dashboard/CONTEXT.md`). Neither'; successor docs/platform/ui-spec/architecture/screens/S02-taskboard.md:52-56 (## Layout)"
+  },
+  {
+   "rowId": "f08442",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/ui-spec/screens/S03-task-detail.md:64 — '│  docsRef: docs/history/tsk-4id ↗           │                          │'; successor docs/platform/ui-spec/architecture/screens/S03-task-detail.md:62-98 (## Layout)"
+  },
+  {
+   "rowId": "f08443",
+   "verdict": "APPROVE",
+   "summary": "successor-bound: Successor-bound approved: the removed source's claim is carried by the named successor unit (span contains the same relationship/operand; ledger row maps source to successor).",
+   "evidence": "docs/ui-spec/screens/S03-task-detail.md:99 — '`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/'; successor docs/platform/ui-spec/architecture/screens/S03-task-detail.md:120-124 (### What CONTEXT actually shows (D17))"
+  },
+  {
+   "rowId": "f08446",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/user/README.md:16 — '- `docs/doc-governance.md`'; successor docs/platform/governance.md:28-40 (## 1. Principles)"
+  },
+  {
+   "rowId": "f08447",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "docs/user/README.md:17 — '- `docs/README.md`'; successor docs/platform/documentation/operations/portals/docs-portal.md:24-36 (## 1. Read First)"
+  },
+  {
+   "rowId": "f08458",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-discovering/SKILL.md:104 — '`refs`, và `docsRef` (nếu item đã có `docs/history/<feature>/` từ một'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08460",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-discovering/SKILL.md:133 — '`docs/history/<feature>/RESEARCH.md` (tích luỹ, không đè) và trả về'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08461",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-exploring/SKILL.md:15 — '`docs/history/<feature>/CONTEXT.md`. This skill normally runs while a'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08462",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-exploring/SKILL.md:105 — 'Write `docs/history/<feature>/CONTEXT.md` — feature boundary, the locked'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08463",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-exploring/SKILL.md:131 — 'fgos gate-check \"<item-id>\" --gate contextApprove --artifact \"docs/history/<feature>/CONTEXT.md\"'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08464",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md:12 — 'fgos gate-check \"<item-id>\" --gate contextApprove --artifact \"docs/history/<feature>/CONTEXT.md\"'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08466",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md:110 — 'Write `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08467",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md:172 — 'fgos add --title \"<title>\" --kind <kind> --risk <risk> --verify \"<real, runnable command>\" --description \"<full-text description>\" --docs-ref \"docs/history/<fea'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08468",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-implement/SKILL.md:71 — 'locked in `docs/history/<feature>/CONTEXT.md` (cite the decision id;'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08469",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-implement/SKILL.md:143 — '`docs/history/<id>/iron-law-evidence.md` only when the result requires'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08470",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md:65 — '`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08472",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md:6 — \"`docsRef` (the feature's `docs/history/<feature>/` directory: CONTEXT.md's\". L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08474",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/SKILL.md:15 — 'Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08475",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/SKILL.md:16 — '`docs/history/<feature>/plan.md` — the mode, the approach, and the shape a'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08476",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md:7 — \"Read the item's `docsRef` field to find `docs/history/<feature>/`, then\". L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08477",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md:18 — '`docs/history/<feature>/` path of its own (a descriptive feature-slug is'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08478",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md:25 — 'fgos edit \"<item-id>\" --docs-ref \"docs/history/<feature>/\"'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08481",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md:64 — 'list of files expected to touch (at minimum `docs/history/<feature>/plan.md`'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08482",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md:68 — 'fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\"'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08483",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-shaping/SKILL.md:7 — 'keeping one coherent docs/history/<feature>/DISCUSSION.md per feature'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08484",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-shaping/SKILL.md:21 — 'living `docs/history/<feature>/DISCUSSION.md` per feature. Once the'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08485",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-shaping/SKILL.md:37 — '- Never write `docs/history/<feature>/CONTEXT.md` or `plan.md` — that stays'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08487",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-shaping/SKILL.md:88 — '`docs/history/<feature>/DISCUSSION.md`, seven fixed sections, in order:'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08488",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-shaping/SKILL.md:167 — '`docs/history/<feature>/DISCUSSION.md` where `<feature>` is a'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08489",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-shaping/SKILL.md:227 — 'fgos edit \"<item-id>\" --refs \"docs/history/<feature>/DISCUSSION.md#task-<slug>\"'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08490",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-validating/SKILL.md:15 — 'Proves `docs/history/<feature>/plan.md` against repo reality before an item'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08491",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md:7 — \"Read the item's `docsRef` to find `docs/history/<feature>/`, then read\". L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08492",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md:14 — 'fgos gate-check \"<item-id>\" --gate validateApprove --plan \"docs/history/<feature>/plan.md\" --children \\'<the child-spec JSON array from plan.md, or []>\\' --cost \"'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08495",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "domains/coding/task-specs/lock-decisions.md:10 — '- `docs/history/<feature>/CONTEXT.md`: feature boundary, a D-ID decisions'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08496",
+   "verdict": "REWORK",
+   "summary": "The retarget is right, but the prepared patch duplicates the F chain. Phase-08 step-07 `file:herdr-dashboard/src/pane_scan.rs` (beforeSha == pin) already makes the identical change, so after the chain this patch fails with 'Reversed (or previously applied)'. Record the row as covered by that chain entry and drop the parallel patch.",
+   "evidence": "herdr-dashboard/src/pane_scan.rs:27 — \"/// `docs/operator-runbook-herdr-cockpit.md`'s Hard rule forbids outright.\"; successor docs/platform/herdr-web-dashboard/operations/operator-runbook.md:64-72 (## Hard rule). step-07-composed-patches.json file:herdr-dashboard/src/pane_scan.rs '+' line: '/// `docs/platform/herdr-web-dashboard/operations/operator-runbook.md`'s Hard rule forbids outright.'; shard patch dry-run after the chain: '1 out of 1 hunk ignored'.",
+   "severity": "low"
+  },
+  {
+   "rowId": "f08509",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "plans/261020-1250-debate-pattern-and-judge-role/plan.md:38 — '| 4 | Specs: `docs/specs/workflow.md` (patterns), `docs/specs/runner.md` (roles, independence), CHANGELOG | doc guards green |'"
+  },
+  {
+   "rowId": "f08510",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "plans/261020-1250-debate-pattern-and-judge-role/plan.md:38 — '| 4 | Specs: `docs/specs/workflow.md` (patterns), `docs/specs/runner.md` (roles, independence), CHANGELOG | doc guards green |'"
+  },
+  {
+   "rowId": "f08548",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "plugins/fgOS/skills/approve/SKILL.md:189 — 'git show \"fgw/<id>:docs/history/<id>/iron-law-evidence.md\"'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08557",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "plugins/fgOS/skills/coding-shape/SKILL.md:32 — 'relevant `docs/history/<feature>/DISCUSSION.md`, holds the open'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08618",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "plugins/fgOS/skills/merge-loop/SKILL.md:98 — 'git show \"fgw/<id>:docs/history/<id>/iron-law-evidence.md\" 2>/dev/null'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08624",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "plugins/fgOS/skills/plan/SKILL.md:31 — '`.fgos/` state directly (`docs/history/discover-decompose-skill-wrapper-'"
+  },
+  {
+   "rowId": "f08625",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "plugins/fgOS/skills/plan/SKILL.md:104 — 'real build) in the same call (`docs/history/discover-decompose-skill-'"
+  },
+  {
+   "rowId": "f08634",
+   "verdict": "REWORK",
+   "summary": "The retarget is right, but it duplicates phase-08 step-07 `file:plugins/fgOS/skills/terminal/SKILL.md`, which already encodes the same line change. That entry's beforeSha no longer matches the pin, so rebase that one chain entry instead of adding a second patch for the same line.",
+   "evidence": "plugins/fgOS/skills/terminal/SKILL.md:24 — 'herdr chrome (per STR40 — `docs/operator-runbook-herdr-cockpit.md`),'; successor docs/platform/herdr-web-dashboard/operations/operator-runbook.md:64-72 (## Hard rule). step-07 '+' line: 'herdr chrome (per STR40 — `docs/platform/herdr-web-dashboard/operations/operator-runbook.md`),'; step-07 beforeSha256 != pin blob sha.",
+   "severity": "low"
+  },
+  {
+   "rowId": "f08640",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/install/coexist.mjs:3 — '// present in the same project (docs/history/install-coexistence/CONTEXT.md'"
+  },
+  {
+   "rowId": "f08643",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/intake/plan-verdict-from-plan-md.mjs:39 — \"// Real plan.md files (docs/history/*/plan.md) place the split's child-spec\""
+  },
+  {
+   "rowId": "f08645",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/intake/plan-verdict-from-plan-md.mjs:54 — \"// a `grep -h '^## .*[Ss]plit' docs/history/*/plan.md | sort -u` corpus survey\""
+  },
+  {
+   "rowId": "f08648",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/intake/plan-verdict-from-plan-md.mjs:103 — '// `docs/history/*/plan.md`\\'s own real no-fence Split sections (\"No split\",'"
+  },
+  {
+   "rowId": "f08663",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/runner/claim-port.mjs:165 — '// tsk-40m (docs/architect/doing-coordination-redesign.md): claim time no'"
+  },
+  {
+   "rowId": "f08665",
+   "verdict": "REWORK",
+   "summary": "The retarget is right, but it duplicates phase-08 step-07 `file:src/runner/dispatch/assignment-runner.mjs`, which already encodes the same line change; that entry's beforeSha is stale against the pin. Rebase the chain entry; do not add a parallel patch.",
+   "evidence": "src/runner/dispatch/assignment-runner.mjs:301 — \"* `docs/routing-handoff-contract.md`'s three locked invariants\"; successor docs/platform/runner/contracts/routing-handoff.md:75-83 (## Ranh giới tin cậy). step-07 '+' line: ' * `docs/platform/runner/contracts/routing-handoff.md`'s three locked invariants'; step-07 beforeSha256 != pin blob sha.",
+   "severity": "low"
+  },
+  {
+   "rowId": "f08668",
+   "verdict": "REWORK",
+   "severity": "low",
+   "summary": "Repoint condition not met: the operand was already absent before the cutover, and seven sibling decision-id citations are preserved. Re-judge as preserve-confirmed (decision-id citation), or open one separate item for all dead docs/decisions citations.",
+   "evidence": "src/runner/dispatch/config.mjs:654 — '* Dispatch Doctrine rule 4, `docs/decisions/0026-...md`): the valid'; successor docs/platform/runner/decisions/h-36d872fbb0e5.md:583-591 (### 0026 — Native-First Dispatch Doctrine: launcher/rootTask/capacity). proof.json f08668 operand docs/decisions/0026-...md: beforePresent=false, removedByMoveOrStep6=false. The cutover does not change it. f08810 (worker-slots.mjs:6 'docs/decisions/0026:73-87'), f08681, f08685, f08731, f08817, f08824 and f08827 cite retired docs/decisions ids in the same way and were judged preserve-confirmed. The patch also edits product code (src/runner/dispatch/config.mjs:654) at F without a cutover cause."
+  },
+  {
+   "rowId": "f08669",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/runner/dispatch/config.mjs:1012 — '* docs/architect/agent-coordination/verification/visibility-herdr/proofs/'"
+  },
+  {
+   "rowId": "f08670",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/runner/dispatch/config.mjs:1187 — '// documented-only in docs/specs/runner.md\\'s \"target vocabulary\" section)'"
+  },
+  {
+   "rowId": "f08681",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/runner/dispatch/mechanism.mjs:65 — '* 2026-08-16 user decision, `docs/decisions/0033-...md`, narrowing `0026`'"
+  },
+  {
+   "rowId": "f08685",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/runner/dispatch/resolve.mjs:226 — \"* decision, `docs/decisions/0033-...md`'s sibling `docs/history/\""
+  },
+  {
+   "rowId": "f08692",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/runner/dispatch/trust-store.mjs:12 — '// docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-p6/.'"
+  },
+  {
+   "rowId": "f08693",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/runner/dispatch/worker-home.mjs:31 — '// docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/'"
+  },
+  {
+   "rowId": "f08694",
+   "verdict": "APPROVE",
+   "summary": "repoint: Repoint approved: live Related/read-first/contract/pointer navigation; operand is removed at cutover and the patch retargets to the ledger-mapped holder; patch replays exactly (--fuzz=0 forward and reverse).",
+   "evidence": "src/runner/dispatch/worker-home.mjs:37 — '// docs/architect/proposals/coordination-worker-provider-boundary.md.'; successor docs/platform/proposals/coordination-worker-provider-boundary.md:40-52 (## Decision proposed)"
+  },
+  {
+   "rowId": "f08695",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/runner/frozen-judge.mjs:7 — '// actual changed files — but nothing composed them (docs/history/'"
+  },
+  {
+   "rowId": "f08720",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "src/runner/paths.mjs:118 — '// fgos-coding-planning write under `work.docsRef` (docs/history/<feature>/). A'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08721",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/runner/promote-engine.mjs:2 — '// (docs/history/promote-to-component/CONTEXT.md/plan.md). Resolves or'"
+  },
+  {
+   "rowId": "f08724",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "src/runner/prompt-templates/worker-prompt-discovery.txt:21 — '`docs/history/<feature>/RESEARCH.md` (accumulate, never overwrite), and'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08727",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt:55 — '`docs/history/<your item id>/iron-law-evidence.md` with the matched'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08731",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/runner/worktree.mjs:856 — '// OPERATION-TYPE WRAPPERS (docs/decisions/0022 candidate #3, ranked-priority'"
+  },
+  {
+   "rowId": "f08740",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/state/cleanup-harness.mjs:205 — '// tsk-40m (docs/architect/doing-coordination-redesign.md): these top-level'"
+  },
+  {
+   "rowId": "f08748",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/state/frontier.mjs:204 — '// about. Per decision record 0027 (D1/D2, `docs/decisions/0027-domain-so-'"
+  },
+  {
+   "rowId": "f08755",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/state/gate-bypass.mjs:196 — '* `docs/history/*&#47;plan.md` files in this repo (83.6%), driven by `audit`'"
+  },
+  {
+   "rowId": "f08769",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/state/graph-metrics.mjs:710 — '* it to accept an optional CANDIDATE SET, docs/history/execution-fanout/'"
+  },
+  {
+   "rowId": "f08778",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path is a literal example (hypothetical path, migration payload, traversal string or wireframe data), not a reader destination.",
+   "evidence": "src/state/knowledge-registry.mjs:62 — \"// 'docs/ok/../escape.md'). Deliberately string-only (no `node:path`\""
+  },
+  {
+   "rowId": "f08779",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path is a literal example (hypothetical path, migration payload, traversal string or wireframe data), not a reader destination.",
+   "evidence": "src/state/knowledge-registry.mjs:61 — \"// literal path-traversal shape: 'docs/../evil/guide.md',\""
+  },
+  {
+   "rowId": "f08783",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/state/replay.mjs:711 — '// tsk-40m (docs/architect/doing-coordination-redesign.md §7.2):'"
+  },
+  {
+   "rowId": "f08786",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/state/status-fsm.mjs:117 — '// tsk-40m (docs/architect/doing-coordination-redesign.md, design target'"
+  },
+  {
+   "rowId": "f08787",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/state/status-fsm.mjs:179 — '// fix + hard-cut RETIRED this edge entirely (docs/architect/doing-'"
+  },
+  {
+   "rowId": "f08788",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/state/store.mjs:579 — '* to be checked against (found live: tsk-4ax/tsk-55p, docs/history/<id>/'"
+  },
+  {
+   "rowId": "f08803",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Owned park is decidable now: live docs/history convention that the cutover does not move; L12-10 already rules it stays unchanged. Re-judge as keep-unchanged (preserve) with L12-10 + move-set evidence; no Lead placement decision or F work.",
+   "evidence": "src/state/work.mjs:607 — '// docs/history/<feature>/ directory, where its CONTEXT.md/plan.md actually'. L12-10 (reports/phase-08/owner-answers.md:86-88) already decided these: 'The 13 shipped docs/history/<feature>/plan.md writer conventions and sibling CONTEXT/RESEARCH/DISCUSSION conventions describe external-project topology and stay unchanged in this plan ... Any convention change is a separate backlog item ... history is not a legacy authority root.' proof.json marks the operand removedByMoveOrStep6=false, and docs/platform/governance.md:77-108 (cited by the shard itself) keeps docs/history/ in the target layout. The cutover does not touch this path, so keeping the passage unchanged is decidable now; the owned park asks the Lead a question L12-10 already answered and its nextAction ('compose this passage and its readers/writers together') contradicts 'stay unchanged in this plan'."
+  },
+  {
+   "rowId": "f08810",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/state/worker-slots.mjs:6 — '// The concept is a \"worker slot\", never \"executor\": docs/decisions/0026:73-87'"
+  },
+  {
+   "rowId": "f08817",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/verbs/merge/approve.mjs:362 — '// Trunk-boundary scoping (docs/decisions/0032, tsk-1y6-1 D1): the gate'"
+  },
+  {
+   "rowId": "f08822",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/verbs/merge/merge.mjs:4 — '// pure read. Merge-readiness ranking (docs/history/merge-standardization/'"
+  },
+  {
+   "rowId": "f08824",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/verbs/merge/merge.mjs:82 — '// Trunk-boundary scoping (docs/decisions/0032, tsk-1y6-1 D1): at'"
+  },
+  {
+   "rowId": "f08827",
+   "verdict": "APPROVE",
+   "summary": "preserve-confirmed: Preserve confirmed: the path cites the decision, proof, corpus survey or done-plan record being described; framing is dated/past-tense or citation-only, and no current-authority route is created.",
+   "evidence": "src/verbs/merge/sync-root.mjs:68 — '// Trunk-boundary scoping (docs/decisions/0032, tsk-1y6-1 D1) —'"
+  }
+ ]
+}
