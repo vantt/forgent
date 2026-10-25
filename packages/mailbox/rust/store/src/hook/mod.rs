@@ -5,6 +5,7 @@
 pub mod breaker;
 mod drain;
 mod limits;
+#[cfg(unix)]
 pub mod outcome_log;
 #[cfg(unix)]
 pub mod resolve;
@@ -15,6 +16,7 @@ pub use drain::{
     begin, finish, render_reply, Begun, Claimed, FinishTicket, HandleOf, HeadFacts, HookCall,
     HookReply, PointerOnly, QuietReason,
 };
+#[cfg(unix)]
 pub(crate) use drain::{claim_inbox, InboxClaim};
 pub use limits::{
     BreakerLimits, HookCallLimits, HookLimits, StopBlockLimits, VerbLimits,
