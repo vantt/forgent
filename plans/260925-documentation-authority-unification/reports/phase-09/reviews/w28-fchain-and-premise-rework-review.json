@@ -1,0 +1,763 @@
+{
+ "review": "w28 fchain door and premise shard rework",
+ "head": "429b987e1 (rechecked at b7ffa3be7)",
+ "counts": {
+  "APPROVE": 104,
+  "REWORK": 2
+ },
+ "items": [
+  {
+   "id": "f00148",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed w2:predecessor:apps/fgos-gateway/Cargo.toml, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/Cargo.toml. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00156",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:apps/fgos-gateway/src/gateway.rs, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/src/gateway.rs. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00158",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:apps/fgos-gateway/src/gateway.rs, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/src/gateway.rs. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00161",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:apps/fgos-gateway/src/gateway.rs, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/src/gateway.rs. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00162",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:apps/fgos-gateway/src/gateway.rs, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/src/gateway.rs. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00163",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:apps/fgos-gateway/src/gateway.rs, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/src/gateway.rs. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00175",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed w2:predecessor:apps/fgos-gateway/src/mcp.rs, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/src/mcp.rs. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00177",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:apps/fgos-gateway/web/src/App.tsx, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/web/src/App.tsx. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00178",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:apps/fgos-gateway/web/src/api/client.ts, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/web/src/api/client.ts. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00181",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:apps/fgos-gateway/web/src/api/types.ts, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/web/src/api/types.ts. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00183",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:apps/fgos-gateway/web/src/lib/network.ts, no row patch. Chain rewraps network.ts; the carry pointer is co-composed by fchain/rebased-patches.json#/patches/2 (composesChain), so no second owner.",
+   "evidence": "apps/fgos-gateway/web/src/lib/network.ts. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00187",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:apps/fgos-gateway/web/src/screens/TaskDetail.tsx, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00189",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:apps/fgos-gateway/web/src/screens/TaskDetail.tsx, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00191",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:apps/fgos-gateway/web/src/screens/Taskboard.tsx, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/web/src/screens/Taskboard.tsx. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00193",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:apps/fgos-gateway/web/src/screens/Taskboard.tsx, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "apps/fgos-gateway/web/src/screens/Taskboard.tsx. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00477",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/source-provenance -> repoint/live-authority-citations; alreadyComposed file:core/skills/_shared/citation-format.md, no row patch. Repoint already composed by the chain hunk @@ -31 of file:core/skills/_shared/citation-format.md (review option 1).",
+   "evidence": "core/skills/_shared/citation-format.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f00478",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: repoint/live-authority-citations -> repoint/live-authority-citations; alreadyComposed file:core/skills/_shared/citation-format.md, no row patch. Duplicate of the chain recorded as alreadyComposed (L13-21.1); the chain entry is in the fchain trace for this file.",
+   "evidence": "core/skills/_shared/citation-format.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03127",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/dispatch-activation-and-handoff-redesign.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/dispatch-activation-and-handoff-redesign.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03134",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/dispatch-execute-concurrency-guard.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/dispatch-execute-concurrency-guard.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03136",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/dispatch-execute-lost-uncommitted-paths-warning.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/dispatch-execute-lost-uncommitted-paths-warning.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03139",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/dispatch-execute-prompt-file-flag.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/dispatch-execute-prompt-file-flag.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03143",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/dispatch-execute-repo-root-cwd-separation.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/dispatch-execute-repo-root-cwd-separation.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03144",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/dispatch-execute-unsignaled-outcome.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/dispatch-execute-unsignaled-outcome.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03170",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/executor-dispatch-manual-log-gap-and-step-b5-fix.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/executor-dispatch-manual-log-gap-and-step-b5-fix.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03171",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/fanout-batch-background-execution-and-orphan-recovery.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/fanout-batch-background-execution-and-orphan-recovery.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03177",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/fanout-execute-consolidation.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/fanout-execute-consolidation.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03178",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/fgos-fanout-out-of-process-dispatch.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/fgos-fanout-out-of-process-dispatch.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03202",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/glm-openrouter-executor.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/glm-openrouter-executor.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03210",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/herdr-spawn-adapter-fresh-pane.md (basis chain). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/herdr-spawn-adapter-fresh-pane.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03219",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/main-checkout-lock-scope-audit.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/main-checkout-lock-scope-audit.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03250",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/root-resolution-two-call-split-propagation.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/root-resolution-two-call-split-propagation.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03294",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/retired-dispatch-door -> repoint/live-authority-citations; own patch on docs/explanation/worktree-isolation-existing-path-hazard.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/explanation/worktree-isolation-existing-path-hazard.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03352",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/completed-change-or-capture -> repoint/live-authority-citations; own patch on docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2); composed file no longer cites docs/specs/runner.md there.",
+   "evidence": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f03404",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 1: preserve-confirmed/completed-change-or-capture -> preserve-confirmed/native-file-contract; no patch. Now a retained live Related operand (group native-file-contract); reason no longer says completed change. Matches review D.",
+   "evidence": "docs/how-to/use-fgos-group-thinking.md. Row at HEAD 429b987e1 shard-1.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-1-review.json REWORK."
+  },
+  {
+   "id": "f04047",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 2: preserve-confirmed/completed-work -> repoint/live-route; own patch on docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2).",
+   "evidence": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md. Row at HEAD 429b987e1 shard-2.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-2-review.json REWORK."
+  },
+  {
+   "id": "f04287",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 2: preserve-confirmed/completed-work -> repoint/live-route; own patch on docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md (basis pin). Removed-door banner citation repointed to docs/platform/runner/decisions/h-36d872fbb0e5.md (L13-21.2).",
+   "evidence": "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md. Row at HEAD 429b987e1 shard-2.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-2-review.json REWORK."
+  },
+  {
+   "id": "f06461",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 2: repoint/live-route -> preserve-confirmed/source-relationship; own patch on docs/platform/architecture-map.md (basis chain). Re-judged preserve-confirmed lineage (review R2 option 1); the only patch is the L13-21.4 code span on line 14, keeping the path text.",
+   "evidence": "docs/platform/architecture-map.md. Row at HEAD 429b987e1 shard-2.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-2-review.json REWORK."
+  },
+  {
+   "id": "f06790",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 2: repoint/live-route -> repoint/live-route; own patch on docs/platform/governance.md (basis chain). Composed governance.md section 2 tree (lines 48-69) drops README.md, doc-governance.md and templates/ from docs/ root, adds platform/governance.md and platform/documentation/{operations/portals/docs-portal.md,history/templates/}. Destinations match the phase-08 move set.",
+   "evidence": "docs/platform/governance.md. Row at HEAD 429b987e1 shard-2.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-2-review.json REWORK."
+  },
+  {
+   "id": "f06791",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 2: repoint/live-route -> repoint/live-route; own patch on docs/platform/governance.md (basis chain). Same coherent tree patch as f06790 (shared patch, rowIds f06790/f06791/f06794/f06799).",
+   "evidence": "docs/platform/governance.md. Row at HEAD 429b987e1 shard-2.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-2-review.json REWORK."
+  },
+  {
+   "id": "f06920",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 2: preserve-confirmed/restored-host-source -> repoint/live-route; own patch on docs/platform/host-invocation-routing/architecture/release-boundaries.md (basis pin). Right-hand advisory link now ../../component-boundary.md; left-hand literal and fenced excerpts unchanged. Patch also carries the f06924 L13-21.4 code span.",
+   "evidence": "docs/platform/host-invocation-routing/architecture/release-boundaries.md. Row at HEAD 429b987e1 shard-2.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-2-review.json REWORK."
+  },
+  {
+   "id": "f06933",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 2: preserve-confirmed/restored-host-source -> repoint/live-route; own patch on docs/platform/host-invocation-routing/contracts/component-protocol.md (basis pin). Right-hand advisory link now ../../component-boundary.md at line 326.",
+   "evidence": "docs/platform/host-invocation-routing/contracts/component-protocol.md. Row at HEAD 429b987e1 shard-2.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-2-review.json REWORK."
+  },
+  {
+   "id": "f07667",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: repoint/live-navigation -> preserve-confirmed/source-carriage-note; no patch. Preserve-confirmed; former truth-rewriting patch removed. Low: reworkNotes still lists a stale-chain dependency note from before 463077c3b.",
+   "evidence": "docs/platform/runner/architecture/h-69197b459754.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f07871",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: repoint/live-navigation -> repoint/live-navigation; own patch on docs/platform/system-architecture/architecture/roadmap.md (basis chain). Composed roadmap.md line 51 now names docs/platform/agent-coordination/history/retired-engine/files/contracts/ (directory, 5 files at HEAD). Low: reworkNotes[1] still says row.patch is non-executable evidence; after 463077c3b the row patch has basis chain and is what fchain executes.",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f07886",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: repoint/live-navigation -> preserve-confirmed/historical-roadmap-process; no patch. Preserve-confirmed, consistent with f07869/f07888; no patch.",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f07889",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: repoint/live-navigation -> preserve-confirmed/historical-roadmap-process; no patch. Preserve-confirmed; the rule-rewriting replacements are gone from the shared roadmap patch.",
+   "evidence": "docs/platform/system-architecture/architecture/roadmap.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08458",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-discovering/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08460",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-discovering/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08461",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-exploring/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08462",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-exploring/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08463",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-exploring/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08464",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08466",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08467",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08468",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-implement/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08469",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-implement/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08470",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08472",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08474",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08475",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08476",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08477",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08478",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08481",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08482",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08483",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-shaping/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08484",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-shaping/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08485",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-shaping/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08487",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-shaping/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08488",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-shaping/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08489",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-shaping/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08490",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-validating/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08491",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08492",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08495",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "domains/coding/task-specs/lock-decisions.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08496",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: repoint/live-navigation -> repoint/live-navigation; alreadyComposed file:herdr-dashboard/src/pane_scan.rs, no row patch. alreadyComposed file:herdr-dashboard/src/pane_scan.rs; shard patch dropped.",
+   "evidence": "herdr-dashboard/src/pane_scan.rs. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08548",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "plugins/fgOS/skills/approve/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08557",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "plugins/fgOS/skills/coding-shape/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08618",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "plugins/fgOS/skills/merge-loop/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08634",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: repoint/live-navigation -> repoint/live-navigation; alreadyComposed recomposed-predecessor:plugins/fgOS/skills/terminal/SKILL.md, no row patch. Stale step-07 entry rebased as recomposed-predecessor:plugins/fgOS/skills/terminal/SKILL.md (463077c3b, replaces file:...); row points at it, no shard patch.",
+   "evidence": "plugins/fgOS/skills/terminal/SKILL.md. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08665",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: repoint/live-navigation -> repoint/live-navigation; alreadyComposed recomposed-predecessor:src/runner/dispatch/assignment-runner.mjs, no row patch. Stale step-07 entry rebased as recomposed-predecessor:src/runner/dispatch/assignment-runner.mjs; row points at it, no shard patch.",
+   "evidence": "src/runner/dispatch/assignment-runner.mjs. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08668",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: repoint/live-navigation -> preserve-confirmed/historical-decision-or-proof; no patch. Preserve-confirmed with the seven sibling citation-only rows; config.mjs patch dropped.",
+   "evidence": "src/runner/dispatch/config.mjs. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08720",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "src/runner/paths.mjs. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08724",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "src/runner/prompt-templates/worker-prompt-discovery.txt. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08727",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "f08803",
+   "kind": "row",
+   "verdict": "APPROVE",
+   "summary": "Shard 3: owned-park/unresolved-live-artifact-convention -> preserve-confirmed/live-artifact-convention-unchanged; no patch. docs/history convention kept unchanged under L12-10 and L13-21.3; no owner question or F patch.",
+   "evidence": "src/state/work.mjs. Row at HEAD 429b987e1 shard-3.json vs reviewed commit; composed state from fchain/check.compose(HEAD), exit 0; w23-g6-shard-3-review.json REWORK."
+  },
+  {
+   "id": "1ff225412",
+   "kind": "commit",
+   "verdict": "APPROVE",
+   "severity": "low",
+   "summary": "Shard 1 rework: 16 duplicates recorded alreadyComposed, f00477 repointed as already composed, 16 banners repointed, f03404 regrouped. All 34 REWORK rows fixed.",
+   "evidence": "Row-by-row join of w23-g6-shard-1-review.json against shard-1.json at HEAD; composed state checked."
+  },
+  {
+   "id": "8cb66d85a",
+   "kind": "commit",
+   "verdict": "APPROVE",
+   "severity": "low",
+   "summary": "Shard 2 rework: R1 banners repointed, R2 preserve plus code span, R3 coherent tree, R4 right-hand link repointed, 36 X1 lineage rows turned into code spans. Low: the subject says \"first premise shard\"; this is shard 2.",
+   "evidence": "git show --stat 8cb66d85a touches only shard-2.{json,md}."
+  },
+  {
+   "id": "8f68bcbdf",
+   "kind": "commit",
+   "verdict": "APPROVE",
+   "severity": "low",
+   "summary": "Shard 3 rework: 36 docs/history parks are keep-unchanged, f07667/f07886/f07889/f08668 preserved, f07871 directory retarget, 3 chain duplicates linked. Low: the subject says \"second premise shard\"; this is shard 3.",
+   "evidence": "git show --stat 8f68bcbdf touches only shard-3.{json,md}."
+  },
+  {
+   "id": "463077c3b",
+   "kind": "commit",
+   "verdict": "APPROVE",
+   "summary": "One check_shard.py with a chain basis. 15 stale step-07 entries are rebased as appended recomposed-predecessor specs that replace file:<path>. No historical spec was edited, effectiveSpecIds only grew, and no shard disposition changed (only the patch basis, hashes and owner fields).",
+   "evidence": "Field diff 463077c3b^..463077c3b: patch-specs has 15 added and 0 changed. Shard field changes are confined to /patch/* and two /alreadyComposed values (f08634, f08665)."
+  },
+  {
+   "id": "05b0022c7",
+   "kind": "commit",
+   "verdict": "APPROVE",
+   "summary": "fchain manifest and check.py. It composes through check_shard.replay_chain and compose.apply_diff, with no new engine. The w25 overlaps are resolved with composedBy links. No G9 decision changed: only readers, documentReaderOccurrences and the census changed. Carries gained only composedBy links.",
+   "evidence": "Field diffs of phase9-decisions.json (158 entries, 0 decision-field changes), f-composition-additions.json (14 tombstones, /19 residual, /22 added) and carries/pointer-patches.json (5 composedBy only)."
+  },
+  {
+   "id": "24600e44c",
+   "kind": "commit",
+   "verdict": "APPROVE",
+   "summary": "Rebase of the 21 findings: 6 appended rebased specs (the effective list swaps old ids for new), 5 witnesses rebased, 4 shard patch copies refreshed, 3 preservation rebinds. No decision changed. The gap05 relocation change set is identical (457 removed / 5 added lines); only the context hashes moved.",
+   "evidence": "Field diff 24600e44c^..24600e44c on patch-specs, recomposed and shard-3. Old and new rebased:w8:gap05:relocation diffs have equal -/+ line sets."
+  },
+  {
+   "id": "proofs-four",
+   "kind": "check",
+   "verdict": "APPROVE",
+   "summary": "fchain/check.py --pin HEAD, check_shard.py --all, g9/check_phase9_decisions.py and verify-carries.mjs all exit 0. I ran them at 429b987e1 and again at b7ffa3be7: HEAD moved to b7ffa3be7 during the review, with ledger/decisions and g0join changes only.",
+   "evidence": "fchain: files 548, executed 141, links 20, counts {}. check_shard: unresolved 0 (24 duplicateOfChain all resolved). Only the sourceCommit in fchain/check.json and chain-contract-controls.json changed; both restored. I deleted the generated chain-check-<sha>.json files."
+  },
+  {
+   "id": "manifest-completeness",
+   "kind": "check",
+   "verdict": "APPROVE",
+   "severity": "low",
+   "summary": "Every phase-09 record with executable diff objects is in the manifest, as an executed reader or as historical/generator evidence. The other diff-bearing phase-09 files hold content diffs or merge provenance, not prepared patches (binding-refresh contentDiff, phase9-decisions normalizedDiff, import3 merge patches). carries/document-operations.json is already applied or authored text, not a patch. Low: the phase-08 predecessors of step-07 (step-07-final-prepared-specs.json, step-05-*-cutover-specs.json, step-05-seam8-inherited-patches.json) are not named as superseded inputs; the step7 reader covers them only implicitly.",
+   "evidence": "grep \"@@ -[0-9]\" over the plan: 175 files, 19 in the manifest. The others are phase-06/07/08 review or accounting records and the 3 phase-09 files above. audit.py inventories phase-09 only."
+  },
+  {
+   "id": "single-engine",
+   "kind": "check",
+   "verdict": "APPROVE",
+   "summary": "check.py, controls.py, prepare.py and prove.py all apply patches only through composition/compose.py apply_diff (patch --batch --fuzz=0). check_shard.replay_chain owns base-chain selection. No second apply path.",
+   "evidence": "grep of fchain/*.py for apply/patch calls; check_shard.load_replayer imports compose.py."
+  },
+  {
+   "id": "negative-controls",
+   "kind": "check",
+   "verdict": "APPROVE",
+   "severity": "low",
+   "summary": "controls.py (13) and check_shard_controls.py (82) exit 0, and each control fails on its intended rule. My end-to-end probes on compose() also fail as expected: a restored unlinked G9 /2, /9 or /18 gives duplicateWithoutLink; /7 gives a conflict; removing the carries/0 link gives a conflict; a bogus composedBy target gives \"unknown composedBy\" (or a KeyError, which main() turns into exit 1); a fake owner gives ownerless; absent evidence gives a conflict; dropping shard-2 or census-join from the manifest raises an error. Low: the \"zero-fuzz conflict\" control is actually rejected by the exactBase hash guard and never reaches patch. I confirmed that the non-exact path rejects context or target drift but accepts a pure line offset. Low: the composedBy link is stored twice, in the record and in manifest.resolutions, and the record silently wins on mismatch. They agree today.",
+   "evidence": "Scratch probe scripts under /tmp/fgos-work (deleted)."
+  },
+  {
+   "id": "w25-overlaps",
+   "kind": "check",
+   "verdict": "APPROVE",
+   "summary": "w25 item 1: G9 /2,/3,/4,/6,/7,/8 are tombstones linked to shard rows f03917, f04343 (preserve), f04357, f06830/f06831/f06837, f07976 and f07985. /5 config/spec.md stays the G9 owner. Line 30 of the herdr spec and the f04343 footprint stay unchanged in the composed state. Item 2: /1 is linked to shard-1 row 42 (f00527). Item 3: the checker reads plans/ from the pin. Item 4: G6 ownership and the AGENTS anchor and path are now checked. Item 5: /9-/12, /17 and /18 are linked to carries 19/21/20/22, 16 and 14, and /19 is a named-predecessor residual of carries 3. Item 6: rootDocReaderCensus has 136 occurrences, each with proof, shard or chain owners. Every dropped G9 change is present in the composed state except the deliberately preserved lines (f04343, f06830/1) and workspace.rs, whose single owner is fchain:carry:22.",
+   "evidence": "Replayed every old G9 diff and checked that its + lines are in the composed state and its - lines are gone."
+  },
+  {
+   "id": "no-silent-decision-change",
+   "kind": "check",
+   "verdict": "APPROVE",
+   "summary": "None of the 787 premise rows changed disposition or group, except the 85 REWORK rows (all as reviewed). No G9 decision field changed. Carries and census authoring packets are unchanged apart from composedBy links.",
+   "evidence": "Joined all 787 review items to the rows at HEAD; field diffs per commit (see commit items)."
+  },
+  {
+   "id": "approve-spot-check-40",
+   "kind": "check",
+   "verdict": "APPROVE",
+   "summary": "40 random APPROVE rows (seed 28) are unchanged in disposition and group. Only f07879 has a different shared-patch replacement set, and that comes from the f07871/f07886/f07889 rework; its own replacement is identical. I also checked all 702 APPROVE rows: 0 disposition or group changes.",
+   "evidence": "Sample: f03072 f03116 f07879 f08110 f03416 f03757 f03118 f08343 f07205 f06916 f03619 f03625 f03253 f06785 f03342 f03117 f08209 f03426 f03558 f00530 f06833 f03870 f00634 f01208 f06919 f04300 f03115 f03414 f07576 f07786 f08670 f04046 f08220 f03781 f08787 f07094 f03452 f00475 f04170 f08338."
+  },
+  {
+   "id": "L13-21.2-banners",
+   "kind": "check",
+   "verdict": "APPROVE",
+   "severity": "low",
+   "summary": "All 18 banner rows (16 in shard 1, 2 in shard 2) repoint \"decision 0062 in docs/specs/runner.md\" to docs/platform/runner/decisions/h-36d872fbb0e5.md, and decision 0062 is at line 1722 of that file. Low: these 18 cite the bare file, while the chain citations of the same decision (dispatch-control-plane.md, the coordination-examples roster) add the #0062-... anchor.",
+   "evidence": "Composed-state grep of the 23 files that carry the banner shape."
+  },
+  {
+   "id": "L13-21.3-history-parks",
+   "kind": "check",
+   "verdict": "APPROVE",
+   "summary": "The 36 docs/history convention rows are now preserve-confirmed/live-artifact-convention-unchanged and cite L12-10 and L13-21.3, with no patch.",
+   "evidence": "shard-3.json at HEAD."
+  },
+  {
+   "id": "L13-21.4-lineage-code-spans",
+   "kind": "check",
+   "verdict": "APPROVE",
+   "summary": "The 36 X1 rows (27 clickable links and 9 Related headers) are all preserve-confirmed, with code-span replacements that keep the path text.",
+   "evidence": "Per-row patch ownership in shard-2.json; composed-state check."
+  },
+  {
+   "id": "L13-21.5-live-pointers",
+   "kind": "check",
+   "verdict": "APPROVE",
+   "severity": "low",
+   "summary": "The gateway yaml citations in config/spec.md:83 (G9 /5), herdr-web-dashboard/spec.md:299, S03-task-detail.md:121 and 15-system-events.md:38 now read docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml. Identity :22 and :159 now point at work-state/contracts/cli-io-contract.md. The workflow foundations link is fixed. The component-boundary advisory link is repointed (f06920/f06933). The packages/yaml-doc exclusions are recorded with reasons. Low: identity/spec.md:117 still cites `docs/io-contract.md` in a code span after F. It has the same shape as :22, but L13-21.5 did not name it and no row owns it.",
+   "evidence": "Composed state against HEAD for each named line."
+  },
+  {
+   "id": "fchain-dead-platform-links",
+   "kind": "check",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "After the complete F chain, 160 clickable Markdown links in 40 docs/platform/** files still point at paths in the phase-08 cutover move set. Examples: component-boundary.md:44-46,68 into docs/architect/**; run-supervisor/spec.md:342,351,363 into docs/specs/runner.md; work-state/README.md:32 into docs/io-contract.md; platform/README.md:32-37. Another 119 such links sit in files that F does not touch at all, such as host-invocation-routing/intent-preservation-ledger.md (50). L13-21.4 keeps guard 3 strict with no exemptions, and its 36-row scope covered only the proof rows. This is outside the Doer briefs: a Lead owner and a decision are needed before F (a link retarget pass at cutover, or more prepared patches).",
+   "evidence": "A scratch scan of every docs/platform/**/*.md, taking composed bytes where F changes the file and HEAD bytes otherwise. It resolves relative link targets outside code spans and fences against the move-set paths: 161 hits, 160 of them move-set paths."
+  },
+  {
+   "id": "gateway-yaml-x-specs",
+   "kind": "check",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "The moved gateway contract docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml is half-repointed after F. Its x-specs list keeps docs/specs/work-state.md and docs/specs/runner.md (lines 54-55) next to the repointed cli-io-contract entry. The w23 shard-2 note on f06808 said F must cover them. No row or patch does.",
+   "evidence": "Composed state of the yaml, lines 52-55."
+  },
+  {
+   "id": "g0-conditional-approvals-vs-rebase",
+   "kind": "check",
+   "verdict": "APPROVE",
+   "severity": "low",
+   "summary": "24600e44c replaced w8:gap05:relocation with rebased:w8:gap05:relocation, and the component-boundary.md after-hash changed from 9b90e37c to 6b457550. L13-23.4 makes 134 G0 overlay approvals conditional on that relocation. The relocation change set is identical and w8:gap05:history is untouched, so the condition still holds. Low: neither fchain/receipt.md nor the G0 F duties name the new spec id or hash. Record it so the F applier binds the rebased id.",
+   "evidence": "patch-specs.json at 24600e44c; reviews/w24-g0-verdicts-b5.md:21."
+  },
+  {
+   "id": "g9-root-reader-census",
+   "kind": "check",
+   "verdict": "APPROVE",
+   "severity": "low",
+   "summary": "I recomputed the census independently at pin 56b3c3ebf: 138 occurrences against 136 recorded. The 2 misses are `repo/docs/architecture-map.md` table cells in id-systems-audit (legacy and platform history copies), so history only. agent-mailbox/spec.md:602 has no census owner field, but it is owned by G9 addition /22.",
+   "evidence": "Scratch scan of every docs/**/*.md at the pin."
+  }
+ ]
+}
