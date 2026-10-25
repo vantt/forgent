@@ -294,6 +294,55 @@ fn controller_publication_and_idempotent_paths_enforce_wal_and_keep_the_fence() 
 }
 
 #[test]
+fn the_shell_that_launched_the_upgrade_does_not_block_it() {
+    use std::os::unix::fs::PermissionsExt;
+    let root = std::env::temp_dir().join(format!("fgctl-git-c5-shell-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    let ws = root.join("ws");
+    fs::create_dir(&ws).unwrap();
+    assert!(Command::new("git").args(["init", "-q"]).arg(&ws).status().unwrap().success());
+    let state = root.join("state");
+    fs::create_dir(&state).unwrap();
+    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+    let (old, new) = (root.join("old"), root.join("new"));
+    candidate(&old, false);
+    candidate(&new, true);
+    success(controller(&ws, &state, "init", &old));
+    let scan = Command::new(env!("CARGO_BIN_EXE_fgctl"))
+        .args(["internal", "quiesce-scan", "--protocol", "1", "--root"])
+        .arg(&ws)
+        .env("FGOS_STATE_ROOT", &state)
+        .output()
+        .unwrap();
+    let scan: serde_json::Value = serde_json::from_slice(&scan.stdout).unwrap();
+    if scan["result"] == "unavailable" {
+        eprintln!("process scan unavailable here: {}", scan["detail"]);
+        fs::remove_dir_all(root).unwrap();
+        return;
+    }
+    // The launching shell sits in the workspace and its command text names
+    // fgos; the trailing `:` keeps it from exec'ing away into fgctl.
+    let script = "echo fgos run; \"$1\" upgrade --from \"$2\"; :";
+    let out = Command::new("sh")
+        .args(["-c", script, "sh", env!("CARGO_BIN_EXE_fgctl")])
+        .arg(&new)
+        .current_dir(&ws)
+        .env("FGOS_STATE_ROOT", &state)
+        .stdin(Stdio::null())
+        .output()
+        .unwrap();
+    let message = String::from_utf8_lossy(&out.stderr).into_owned();
+    assert!(!message.contains("git-predecessor-writer-live"), "{message}");
+    assert!(fgos_holder_lock::tombstone::is_tombstone(
+        &ws.join(".fgos/locks/activation.lock"),
+        "activation",
+        "fgos git"
+    ));
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
 fn addon_admission_names_missing_payload_or_capability_and_preserves_activation() {
     let root = std::env::temp_dir().join(format!("fgctl-addon-m10-{}", std::process::id()));
     fs::create_dir_all(&root).unwrap();

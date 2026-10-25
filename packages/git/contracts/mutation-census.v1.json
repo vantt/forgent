@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f6e4442cb84aa36efb3d2ea488b555758118997a8f54d23c088f8fe86c29ec08",
+  "payloadDigest": "63fe64339df499fcab46de64851af6d2f95d83fa797fd5e20e1af9c68ffb56d1",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -66,7 +66,7 @@
     ".agents/skills/fgos-run/SKILL.md": "03546387e1980b232ef90159c93aa8b7e6f7da787f71980d284fceea855bdc11",
     ".githooks/pre-commit": "9657e4a358f316763bba471a178dcbfdf6abaeecb50696efe23f119775c7e6c1",
     "apps/fgctl/src/main.rs": "3f59cfc17cfd6c8268d15dcbeb0649b8cead1d18c387c7b20e14ce55ab26b9ff",
-    "apps/fgctl/tests/git_wal_activation_gate.rs": "bfea8f7ae0cf3efc8ca60adba26fa645613ccf1b1196dc2d220b69562401b8c6",
+    "apps/fgctl/tests/git_wal_activation_gate.rs": "59d08ca94acbd2af2e283734930e007a7ad28161608c10933e62d0a7268205a1",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c8a6cb7619d9578e02479069fbb0f43a5206583b53a7c6d65373d285d69ca331",
     "apps/fgos-gateway/build.rs": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",
     "apps/fgos-gateway/src/cf_access.rs": "3c9fd890e36eabbf4f9bbb9971c0acb32f5689bec2adefa414d6361b88c93040",
@@ -250,7 +250,7 @@
     "packages/distribution/rust/src/canonical.rs": "15ea0f48882aa65ed613554dea8a708618d84e94771deb1af2949fedfe682379",
     "packages/distribution/rust/src/extract.rs": "101e822a4d17774deba3585f7afd3a6718f847e6e2a392c980fa3dfd85b843a6",
     "packages/distribution/rust/src/fetch.rs": "ae1a26554583e297ea2f52bab45be9fe115952203e0413eaec933d71b301fa00",
-    "packages/distribution/rust/src/git_gate.rs": "1c1a45615797d8aadd22bbe51601bd75b41ffe07e668f8b11d2086c89439a5af",
+    "packages/distribution/rust/src/git_gate.rs": "f9e5f90d65f77b9f4553a0e459edde4babfff63229e6ab3f63689528c6d08b2c",
     "packages/distribution/rust/src/git_grant.rs": "f815308e39bf4eee770bdb47073fba60f05aba2cc1f423e165a98a5f035dd38e",
     "packages/distribution/rust/src/init.rs": "1cfecbbe025a6485495b6e76bf5076d1fa3238ae27a01cf755c83c085a4ebf1c",
     "packages/distribution/rust/src/lib.rs": "f5c75abd8e6178076826eb9baefa6936f97785b5b9f1f50bcb91e354f59f17e0",
@@ -1640,14 +1640,28 @@
     },
     {
       "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
-      "line": 302,
+      "line": 304,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
-      "line": 345,
+      "line": 327,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
+      "line": 351,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
+      "line": 394,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
