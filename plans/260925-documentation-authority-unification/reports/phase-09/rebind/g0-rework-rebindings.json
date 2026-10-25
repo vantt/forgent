@@ -1568,6 +1568,179 @@
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
       "pointer": "/bindingRefresh/474",
       "reason": "review note: metadata line moved into fence, not dropped"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/49",
+      "commit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+      "reason": "Data Dictionary links retargeted at lines 74 and 83: Khai việc -> #add-verb and Nộp vấn đề tự do -> #submit-verb; heading digest includes the changed section payload.",
+      "method": "same anchor and ancestry across the docs commit and its immediate parent; exact dual-extractor old/new unit digests",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/0",
+      "beforeWitness": {
+        "unitKind": "heading",
+        "anchor": "3-work-item-data-dictionary",
+        "textDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+        "ancestry": ["Work State Specification"],
+        "startLine": 58,
+        "endLine": 58
+      },
+      "afterWitness": {
+        "unitKind": "heading",
+        "anchor": "3-work-item-data-dictionary",
+        "textDigest": "38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b",
+        "ancestry": ["Work State Specification"],
+        "startLine": 58,
+        "endLine": 58
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/49",
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json#/claims/0"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/50",
+      "commit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+      "reason": "Data Dictionary body contains both link retargets at lines 74 and 83: workflowStep now links to #add-verb; domain now links to #add-verb/#submit-verb.",
+      "method": "same anchor and ancestry across the docs commit and its immediate parent; exact dual-extractor old/new unit digests",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/1",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "textDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
+        "ancestry": ["Work State Specification", "3. Work Item Data Dictionary"],
+        "startLine": 60,
+        "endLine": 93
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "textDigest": "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817",
+        "ancestry": ["Work State Specification", "3. Work Item Data Dictionary"],
+        "startLine": 60,
+        "endLine": 93
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/50",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json#/sourceBindings/6",
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json#/claims/1"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/55",
+      "commit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+      "reason": "Domain Model link retarget at line 516: Khai việc/Nộp vấn đề tự do -> #add-verb/#submit-verb; heading digest includes the changed section payload.",
+      "method": "same anchor and ancestry across the docs commit and its immediate parent; exact dual-extractor old/new unit digests",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/11",
+      "beforeWitness": {
+        "unitKind": "heading",
+        "anchor": "6-domain-model",
+        "textDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
+        "ancestry": ["Work State Specification"],
+        "startLine": 428,
+        "endLine": 428
+      },
+      "afterWitness": {
+        "unitKind": "heading",
+        "anchor": "6-domain-model",
+        "textDigest": "6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603",
+        "ancestry": ["Work State Specification"],
+        "startLine": 428,
+        "endLine": 428
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/127",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json#/sourceBindings/60",
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json#/claims/55"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/65",
+      "commit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+      "reason": "Domain Model body link retarget at line 516: Khai việc/Nộp vấn đề tự do -> #add-verb/#submit-verb.",
+      "method": "same anchor and ancestry across the docs commit and its immediate parent; exact dual-extractor old/new unit digests",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/12",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-54",
+        "textDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+        "ancestry": ["Work State Specification", "6. Domain Model"],
+        "startLine": 514,
+        "endLine": 523
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-54",
+        "textDigest": "c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7",
+        "ancestry": ["Work State Specification", "6. Domain Model"],
+        "startLine": 514,
+        "endLine": 523
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/128",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json#/sourceBindings/70",
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json#/claims/65"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "pointer": "/claims/57",
+      "commit": "5a849befcbdb74ec974546af42b925cab614e841",
+      "reason": "Required verifier replay exposed an earlier missing edge: Component Authority Boundary Map link at line 549 retargeted from ../architect/proposals/ to ../proposals/; heading digest includes the changed section payload. Reuses the already-authored followup witness without changing any ledger judgment.",
+      "method": "same anchor and ancestry across the docs commit and its immediate parent; exact dual-extractor old/new unit digests",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/followup-rebindings.json#/rebindings/0",
+      "beforeWitness": {
+        "unitKind": "heading",
+        "anchor": "9-hexagonal-architecture-view",
+        "textDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+        "ancestry": ["Component Boundary", "Added in candidate: component-boundary-advisory source carriage", "fgOS Component Boundary Advisory"],
+        "startLine": 485,
+        "endLine": 485
+      },
+      "afterWitness": {
+        "unitKind": "heading",
+        "anchor": "9-hexagonal-architecture-view",
+        "textDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+        "ancestry": ["Component Boundary", "Added in candidate: component-boundary-advisory source carriage", "fgOS Component Boundary Advisory"],
+        "startLine": 485,
+        "endLine": 485
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/487",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/604",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json#/claims/57"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "pointer": "/claims/64",
+      "commit": "5a849befcbdb74ec974546af42b925cab614e841",
+      "reason": "Required verifier replay exposed an earlier missing edge: Component Authority Boundary Map link at line 549 retargeted from ../architect/proposals/ to ../proposals/. Reuses the already-authored followup witness without changing any ledger judgment.",
+      "method": "same anchor and ancestry across the docs commit and its immediate parent; exact dual-extractor old/new unit digests",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/followup-rebindings.json#/rebindings/1",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-70",
+        "textDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+        "ancestry": ["Component Boundary", "Added in candidate: component-boundary-advisory source carriage", "fgOS Component Boundary Advisory", "9. Hexagonal Architecture View"],
+        "startLine": 536,
+        "endLine": 575
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-70",
+        "textDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+        "ancestry": ["Component Boundary", "Added in candidate: component-boundary-advisory source carriage", "fgOS Component Boundary Advisory", "9. Hexagonal Architecture View"],
+        "startLine": 536,
+        "endLine": 575
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/488",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/611",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json#/claims/64"
+      ]
     }
   ],
   "rows": [

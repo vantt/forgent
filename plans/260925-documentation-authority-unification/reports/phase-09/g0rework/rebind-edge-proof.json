@@ -1,0 +1,79 @@
+{
+  "head": "dfef557a8dfd0d4654cf8c9583e4915ac9175753",
+  "docsCommit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+  "changedDocs": [
+    "docs/platform/work-state/spec.md"
+  ],
+  "comparedUnitCount": 151,
+  "changedUnitCount": 4,
+  "edges": [
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/149",
+      "anchor": "3-work-item-data-dictionary",
+      "oldDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+      "newDigest": "38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b",
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/49",
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json#/claims/0"
+      ],
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/0"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/150",
+      "anchor": "unheaded-block-4",
+      "oldDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
+      "newDigest": "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817",
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/50",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json#/sourceBindings/6",
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json#/claims/1"
+      ],
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/1"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/151",
+      "anchor": "6-domain-model",
+      "oldDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
+      "newDigest": "6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603",
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/127",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json#/sourceBindings/60",
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json#/claims/55"
+      ],
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/11"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/152",
+      "anchor": "unheaded-block-54",
+      "oldDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+      "newDigest": "c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7",
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/128",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json#/sourceBindings/70",
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json#/claims/65"
+      ],
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/12"
+    }
+  ],
+  "existingRecordsUnchanged": 149,
+  "otherRecordFieldsUnchanged": true,
+  "protectedFileCount": 5818,
+  "protectedBytesUnchanged": true,
+  "scratchEntriesBefore": [],
+  "scratchEntriesAfter": [],
+  "scratchRemoved": true,
+  "nativeAddonsDisabled": true,
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py"
+      ],
+      "exit": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py\", line 378, in <module>\n    raise SystemExit(main())\n  File \"/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py\", line 188, in main\n    accounted = [dict(row=row, rebind=account_target(row, live_catalog, records, rebind['matches']))\n  File \"/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py\", line 188, in <listcomp>\n    accounted = [dict(row=row, rebind=account_target(row, live_catalog, records, rebind['matches']))\n  File \"/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py\", line 76, in account_target\n    raise AssertionError(('unaccounted live target drift', before))\nAssertionError: ('unaccounted live target drift', {'targetOwner': 'docs/platform/component-boundary.md', 'targetAnchor': '9-hexagonal-architecture-view', 'targetUnitDigest': 'c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6'})\n",
+      "stdout": ""
+    }
+  ]
+}

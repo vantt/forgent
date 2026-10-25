@@ -1,0 +1,516 @@
+{
+  "head": "dfef557a8dfd0d4654cf8c9583e4915ac9175753",
+  "unitCensuses": [
+    {
+      "commit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+      "path": "docs/platform/work-state/spec.md",
+      "comparedUnits": 151,
+      "changedUnits": 4
+    },
+    {
+      "commit": "5a849befcbdb74ec974546af42b925cab614e841",
+      "path": "docs/platform/component-boundary.md",
+      "comparedUnits": 297,
+      "changedUnits": 2
+    }
+  ],
+  "edges": [
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/149",
+      "commit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "anchor": "3-work-item-data-dictionary",
+      "oldDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+      "newDigest": "38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b",
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/49",
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json#/claims/0"
+      ],
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/0"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/150",
+      "commit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "anchor": "unheaded-block-4",
+      "oldDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
+      "newDigest": "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817",
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/50",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json#/sourceBindings/6",
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json#/claims/1"
+      ],
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/1"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/151",
+      "commit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "anchor": "6-domain-model",
+      "oldDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
+      "newDigest": "6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603",
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/127",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json#/sourceBindings/60",
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json#/claims/55"
+      ],
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/11"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/152",
+      "commit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "anchor": "unheaded-block-54",
+      "oldDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+      "newDigest": "c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7",
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/128",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json#/sourceBindings/70",
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json#/claims/65"
+      ],
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/12"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/153",
+      "commit": "5a849befcbdb74ec974546af42b925cab614e841",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "anchor": "9-hexagonal-architecture-view",
+      "oldDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+      "newDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/487",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/604",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json#/claims/57"
+      ],
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/followup-rebindings.json#/rebindings/0"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/154",
+      "commit": "5a849befcbdb74ec974546af42b925cab614e841",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-70",
+      "oldDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+      "newDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/488",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/611",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json#/claims/64"
+      ],
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/followup-rebindings.json#/rebindings/1"
+    }
+  ],
+  "existingRecordsUnchanged": 149,
+  "otherRecordFieldsUnchanged": true,
+  "protectedFileCount": 5818,
+  "protectedBytesUnchanged": true,
+  "scratchEntriesBefore": [],
+  "scratchEntriesAfter": [],
+  "scratchRemoved": true,
+  "nativeAddonsDisabled": true,
+  "initialFailedReplay": "rebind-edge-proof.json",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py"
+      ],
+      "exit": 1,
+      "stdoutSha256": "b43df0c44112e950141fdfaaf718997a335a45e6ceb366b79f51442e9b1560db",
+      "stderr": "",
+      "result": {
+        "head": "dfef557a8dfd0d4654cf8c9583e4915ac9175753",
+        "authoringPin": "5a3f7580a012da011fc09ce88cff89bbea2b9008",
+        "assertions": {
+          "rebindLeavesNoScratch": true,
+          "miscChecksUnchangedSha256": "faa095f14d65005355089b65d4896ba06e96776413a8ec4d33b138d4fb939fe4",
+          "ownershipPassed": true,
+          "clauseSpecificSourceLists": 2,
+          "addVerbFileCountRationale": true,
+          "touchedBindingHashes": 127,
+          "refreshedRationales": 124,
+          "supersedeRedecisions": 3,
+          "retiredStaleOverlayPointers": 3,
+          "parityBase": "568a11f21f442190ef86e25cf5d2303df7fc0f3d",
+          "laterSourceParityRowsAdded": 1,
+          "liveTargetsAndAncestries": 127,
+          "authoringTargetsAndAncestries": 127,
+          "exactChangedLineDiffs": 3,
+          "legacyRewriteDigests": 21,
+          "parityPriorEntriesUnchanged": 248,
+          "parityPriorSourceEntriesRefreshed": 14,
+          "parityPriorTargetOnlyRefreshed": 62,
+          "residualFileHashUnchanged": true
+        },
+        "noNativeAddonLoaded": true,
+        "ownershipAudits": [
+          {
+            "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+            "commands": [
+              {
+                "script": "ownership.mjs",
+                "exit": 0
+              },
+              {
+                "script": "audit-ownership.mjs",
+                "exit": 0
+              }
+            ],
+            "failingRows": [],
+            "ownership": {
+              "noNewDoubleOwnership": true,
+              "nativePlatformTargetIdentityDuplicates": 0,
+              "newActiveSourcePairCollisions": []
+            },
+            "checksOk": null,
+            "checksStatus": "not-run",
+            "checksReason": "checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment."
+          },
+          {
+            "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+            "commands": [
+              {
+                "script": "ownership.mjs",
+                "exit": 0
+              },
+              {
+                "script": "audit-ownership.mjs",
+                "exit": 0
+              }
+            ],
+            "failingRows": [],
+            "ownership": {
+              "noNewDoubleOwnership": true,
+              "nativePlatformTargetIdentityDuplicates": 0,
+              "newActiveSourcePairCollisions": []
+            },
+            "checksOk": null,
+            "checksStatus": "not-run",
+            "checksReason": "checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment."
+          }
+        ],
+        "fullAuditPassed": false,
+        "nativeDependentChecksNotRun": [
+          {
+            "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+            "script": "checks.mjs",
+            "reason": "checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment."
+          },
+          {
+            "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+            "script": "checks.mjs",
+            "reason": "checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment."
+          }
+        ],
+        "recordProofsPassed": false,
+        "status": "failed",
+        "ok": false
+      },
+      "nestedCommands": [
+        {
+          "label": "rebind/rebind.py --check",
+          "argv": [
+            "python3",
+            "-B",
+            "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+            "--check"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "label": "carries accounting deterministic replay",
+          "argv": [
+            "python3",
+            "-B",
+            "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py",
+            "--check"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "label": "carries/verify-carries.mjs",
+          "argv": [
+            "node",
+            "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "label": "misc-fix/verify.py (only checks.json output sink redirected)",
+          "argv": [
+            "python3",
+            "-B",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/misc-verify.py"
+          ],
+          "exit": 1,
+          "stderr": "Traceback (most recent call last):\n  File \"/tmp/fgos-work/g0rework-verify-5fdvrsb6/misc-verify.py\", line 9, in <module>\n    runpy.run_path('/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py',run_name='__main__')\n  File \"/usr/lib/python3.10/runpy.py\", line 289, in run_path\n    return _run_module_code(code, init_globals, run_name,\n  File \"/usr/lib/python3.10/runpy.py\", line 96, in _run_module_code\n    _run_code(code, mod_globals, init_globals,\n  File \"/usr/lib/python3.10/runpy.py\", line 86, in _run_code\n    exec(code, run_globals)\n  File \"/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py\", line 119, in <module>\n    if __name__=='__main__':main()\n  File \"/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py\", line 116, in main\n    verify(pathlib.Path(name))\n  File \"/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py\", line 26, in verify\n    run(['python3','-B',str(P/'reports/phase-09/misc-fix/rebind.py'),'--check'])\n  File \"/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py\", line 23, in run\n    assert proc.returncode==0,proc.stderr\nAssertionError: Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 231, in <module>\n    if __name__=='__main__': main()\n  File \"/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 222, in main\n    record=check(pin)\n  File \"/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 214, in check\n    check_live(shard, commit, docs)\n  File \"/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 157, in check_live\n    recorded = later_preimages(commit)\n  File \"/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 147, in later_preimages\n    assert raw == json.loads(source(written, path)), ('unaccounted misc-fix overlays: uncommitted record', str(path))\nAssertionError: ('unaccounted misc-fix overlays: uncommitted record', 'plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json')\n\n"
+        },
+        {
+          "label": "live rebind accounting negative controls",
+          "argv": [
+            "python3",
+            "-B",
+            "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/test-accounting.py"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "label": "step10-round5/ownership.mjs (authoring pin)",
+          "argv": [
+            "node",
+            "--require",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/authoring-inputs.cjs",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/step10-round5/ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/step10-round5"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "label": "step10-round5/audit-ownership.mjs (authoring pin)",
+          "argv": [
+            "node",
+            "--require",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/authoring-inputs.cjs",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/step10-round5/audit-ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/step10-round5"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "label": "step10-round5/ownership.mjs (live targets)",
+          "argv": [
+            "node",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/step10-round5/ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/step10-round5"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "label": "step10-sync4d/ownership.mjs (authoring pin)",
+          "argv": [
+            "node",
+            "--require",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/authoring-inputs.cjs",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/step10-sync4d/ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/step10-sync4d"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "label": "step10-sync4d/audit-ownership.mjs (authoring pin)",
+          "argv": [
+            "node",
+            "--require",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/authoring-inputs.cjs",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/step10-sync4d/audit-ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/step10-sync4d"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "label": "step10-sync4d/ownership.mjs (live targets)",
+          "argv": [
+            "node",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/step10-sync4d/ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/g0rework-verify-5fdvrsb6/step10-sync4d"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "label": "legacy docs ratchet",
+          "argv": [
+            "node",
+            "scripts/check-legacy-docs-ratchet.mjs"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "label": "whitespace",
+          "argv": [
+            "git",
+            "diff",
+            "--check"
+          ],
+          "exit": 0,
+          "stderr": ""
+        }
+      ],
+      "liveOverlayTargetCount": 127,
+      "liveOwnershipUnaccounted": [
+        [],
+        []
+      ],
+      "accountedNewEdges": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/149",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/150",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/151",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/152",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/153",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/154"
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutSha256": "9de515d28aed5879e94045524394ed36485098ee9afb1141ed04b7197e01af84",
+      "stderr": "",
+      "result": {
+        "status": "pass",
+        "mode": "check",
+        "parityRows": 346,
+        "liveHeadingRows": 91,
+        "refreshedParityRows": 35,
+        "targetOnlyParityRows": 62,
+        "refreshedCandidateBindings": 25
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutSha256": "802849659f0f588f27cdcdcc59d7ff6374b5bef0cb97cb9220ef933468a5e05f",
+      "stderr": "",
+      "result": {
+        "drift": 0,
+        "rows": [],
+        "authenticatedSupersededOrigins": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "pointer": "/claims/57",
+            "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+            "effectivePointer": "/bindingRefresh/604",
+            "binding": {
+              "targetOwner": "docs/platform/component-boundary.md",
+              "targetAnchor": "9-hexagonal-architecture-view",
+              "targetUnitDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+              "targetAncestry": [
+                "Component Boundary",
+                "Added in candidate: component-boundary-advisory source carriage",
+                "fgOS Component Boundary Advisory",
+                "9. Hexagonal Architecture View"
+              ]
+            }
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "pointer": "/claims/64",
+            "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+            "effectivePointer": "/bindingRefresh/611",
+            "binding": {
+              "targetOwner": "docs/platform/component-boundary.md",
+              "targetAnchor": "unheaded-block-70",
+              "targetUnitDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+              "targetAncestry": [
+                "Component Boundary",
+                "Added in candidate: component-boundary-advisory source carriage",
+                "fgOS Component Boundary Advisory",
+                "9. Hexagonal Architecture View"
+              ]
+            }
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "pointer": "/claims/0",
+            "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "effectivePointer": "/bindingRefresh/49",
+            "binding": {
+              "targetOwner": "docs/platform/work-state/spec.md",
+              "targetAnchor": "3-work-item-data-dictionary",
+              "targetUnitDigest": "38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b",
+              "targetAncestry": [
+                "Work State Specification",
+                "3. Work Item Data Dictionary"
+              ]
+            }
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "pointer": "/claims/1",
+            "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "effectivePointer": "/bindingRefresh/50",
+            "binding": {
+              "targetOwner": "docs/platform/work-state/spec.md",
+              "targetAnchor": "unheaded-block-4",
+              "targetUnitDigest": "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817",
+              "targetAncestry": [
+                "Work State Specification",
+                "3. Work Item Data Dictionary"
+              ]
+            }
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "pointer": "/claims/55",
+            "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "effectivePointer": "/bindingRefresh/127",
+            "binding": {
+              "targetOwner": "docs/platform/work-state/spec.md",
+              "targetAnchor": "6-domain-model",
+              "targetUnitDigest": "6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603",
+              "targetAncestry": [
+                "Work State Specification",
+                "6. Domain Model"
+              ]
+            }
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "pointer": "/claims/65",
+            "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "effectivePointer": "/bindingRefresh/128",
+            "binding": {
+              "targetOwner": "docs/platform/work-state/spec.md",
+              "targetAnchor": "unheaded-block-54",
+              "targetUnitDigest": "c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7",
+              "targetAncestry": [
+                "Work State Specification",
+                "6. Domain Model"
+              ]
+            }
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+            "pointer": "/claims/7",
+            "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "effectivePointer": "/bindingRefresh/117",
+            "binding": {
+              "targetOwner": "docs/platform/work-state/spec.md",
+              "targetAnchor": "11-business-rules",
+              "targetUnitDigest": "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41",
+              "targetAncestry": [
+                "Work State Specification",
+                "11. Business Rules"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

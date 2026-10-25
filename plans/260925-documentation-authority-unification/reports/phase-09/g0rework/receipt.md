@@ -1,6 +1,44 @@
 # G0 content rework receipt
 
-## Current verifier accounting and heading deduplication
+## Current missing-edge accounting — blocked on committed-record replay
+
+Input HEAD: `dfef557a8dfd0d4654cf8c9583e4915ac9175753`. **Records complete; required proof set is not green.** `verify.py` exits **1** because its nested misc verifier requires the edited rebind record to have been committed. This assignment forbids all Git writes; the runner owns that commit. No assertion, script, ledger or candidate document was changed, and no committed-record check was bypassed.
+
+### Edges and reused witnesses
+
+`rebind/g0-rework-rebindings.json#/records/149`–`152` account for every changed unit in docs commit `e88d4e283c8161f9bf649447e8f9c5876931107b`. Comparing both dual-extractor catalogs across the immediate parent and commit yields **151 units, four changed digests, no anchor changes**. That commit edits only `docs/platform/work-state/spec.md` under `docs/`:
+
+| Unit | Old digest prefix → new digest prefix | Cause |
+| --- | --- | --- |
+| `3-work-item-data-dictionary` | `c55decfd` → `38928382` | Heading payload includes the table edits at lines 74 and 83 |
+| `unheaded-block-4` | `fa35b5b9` → `697a5d20` | Data Dictionary links retarget to `#add-verb` and `#submit-verb` |
+| `6-domain-model` | `4b12f710` → `6409f862` | Heading payload includes the paragraph edit at line 516 |
+| `unheaded-block-54` | `fcc3b5bc` → `c7cd4adc` | Domain Model links retarget to `#add-verb`/`#submit-verb` |
+
+Each record contains both complete SHA-256 digests, commit, reason, compact unit witnesses and all affected ledger/pilot binding pointers. Full text witnesses are reused by explicit `witnessSource` references to the existing `last-rows-rebindings.json` entries 0, 1, 11 and 12; all referenced selected units were checked against the immutable commit bytes and current targets. No additional unit changed in that docs commit.
+
+The first required replay then exposed **two earlier missing edges** in `docs/platform/component-boundary.md`, from `5a849befcbdb74ec974546af42b925cab614e841`: `9-hexagonal-architecture-view` (`c1190693` → `19a6fe08`) and `unheaded-block-70` (`913b0ef1` → `5700ffb4`). The edit retargets the Component Authority Boundary Map link from `../architect/proposals/` to `../proposals/`. Records 153–154 reuse `followup-rebindings.json` entries 0–1 so the required verifier can account for these existing transitions too. Comparing the immediate-parent/commit catalogs confirms exactly those two changed units. No new judgment or pair accounting was introduced.
+
+All **149 original records** and all other existing top-level record fields remain unchanged. `sourceHead` remains the historical authoring pin, not a new approval. The shared `bindings.rows` traversal owns the affected-binding census, excluding historical snapshots.
+
+### Commands and actual exits
+
+Run from the repository root with `NODE_OPTIONS=--no-addons`; `R=plans/260925-documentation-authority-unification/reports/phase-09`. Every Python invocation uses `python3 -B`.
+
+| Command | Exit / qualification |
+| --- | --- |
+| `python3 -B "$R/g0rework/verify.py"` | **1**; all six added edges accepted, 127 authoring/live target assertions pass; 12 of 13 nested commands exit 0. The sole failure is the nested misc verifier's committed-record guard. |
+| `python3 -B "$R/g0rework/refresh-carries.py" --check` | **0**; deterministic output comparison passes, 346 parity rows and 91 live heading rows |
+| `python3 -B "$R/rebind/rebind.py" --check` | **0**; unresolved drift 0, seven authenticated superseded origins |
+| `git diff --check` | **0** |
+
+Exact blocker: `misc-fix/rebind.py:147` asserts that the entire current `g0-rework-rebindings.json` equals its last committed version before accepting its pre-existing full-row misc transitions. Appending valid edges necessarily changes that file. **Runner action: commit the scoped records through the authorized runner, then rerun all three required commands.** No passing post-commit result is claimed. The final verifier output remains `recordProofsPassed: false`, `status: failed`, `ok: false`; native-dependent full-audit recipes remain not run.
+
+Evidence: [rebind-edge-final-proof.json](rebind-edge-final-proof.json) records both commit/unit censuses, all six full-digest transitions and affected bindings, command exits, all nested command exits/errors, assertions, and all six accepted edge references. [rebind-edge-proof.json](rebind-edge-proof.json) preserves the earlier replay that stopped at the previously unaccounted Component Boundary heading. Two read-only diagnostic harness attempts also failed before any repository output: one omitted an imported frozen recipe library; another incorrectly included historical snapshots in the binding census. The completed census uses the existing owning traversal, without changing any production assertion.
+
+Safety: **5,818 protected tracked files** were fingerprinted before/after the final replay, including all three touched-area scripts; their bytes stayed unchanged. Scratch snapshots are `[]` before and after, and disposable `tempfile` directories were removed. No Git write, fgOS CLI, lifecycle verb, native addon load, product/full-suite test, forbidden audit driver, pair accounting, review approval or authority promotion ran. `impact-analysis: degraded` (no MCP capability; fgOS CLI prohibited); this is record data only, with no symbol edits. Markdown preview was not started because the task forbids extra state/service writes.
+
+## Previous verifier accounting and heading deduplication (historical)
 
 Input HEAD: `39528fa211f9a7e558b1e95467eeae1f66b68a3d`. **All four required scoped proofs exit 0; the full audit remains partial, `ok: false`.** Evidence: [accounting-proof.json](accounting-proof.json).
 
