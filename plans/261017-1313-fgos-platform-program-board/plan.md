@@ -40,7 +40,7 @@ Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (
 |---|---|---|---|
 | IDENT | `lead:IDENT` | `claude-5v7u@fg-server` | `fg-server` |
 | SEAT, SEAT-TRIM | `lead:SEAT` (lane **đóng** 10-25 21:15; vai bỏ trống) | `claude-lcpq@design-lap` (phiên đã đóng) | `design-lap` |
-| MAIL | `lead:MAIL` | trống từ 10-25 20:05 (`claude-rgvd@fg-server` đóng; phiên mới claim `lead:MAIL`, xem [bàn giao](../reports/guide-261025-2004-mailbox-lead-handoff-after-first-slice-land.md)) | `fg-server` (xác nhận; dòng MAIL trước đây ghi "máy owner" là sai) |
+| MAIL | `lead:MAIL` | `claude-6z3r@fg-server` (nhận 10-25 21:50 theo lệnh owner "land mailbox bước 1", kiêm `lead:RULE`; làm Phần 1 của [bàn giao](../reports/guide-261025-2004-mailbox-lead-handoff-after-first-slice-land.md), xong thì trả lại) | `fg-server` (xác nhận; dòng MAIL trước đây ghi "máy owner" là sai) |
 | HARDEN | `lead:HARDEN` | `claude-p74h@fg-server2` (IDENT điền từ dòng log 11:28 của HARDEN) | `fg-server2` |
 | TEST | `lead:TEST` | `claude-tt7r@fg-server2` (đã nhận vai 10-23 11:27) | `fg-server2` |
 | WORK | `lead:ES` (lane WORK đóng) | `claude-ursc@fg-server2` (nhận vai 10-25 19:06, thay `claude-uygd@fg-server2` đã đóng) | `fg-server2` |
