@@ -108,6 +108,38 @@ fn predecessor_scan(workspace: &Path) -> Result<(), InitError> {
     validate_predecessor_scan(&output.stdout, output.status.code())
 }
 
+/// Whether the command line runs fgOS: `argv[0]` is a fgOS binary, or it is an
+/// interpreter (node, bun, deno) whose arguments name a fgOS script. A shell
+/// whose `-c` text merely mentions fgos runs neither.
+fn runs_fgos(cmdline: &str) -> bool {
+    let base = |arg: &str| {
+        Path::new(arg)
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("")
+            .to_string()
+    };
+    let mut words = cmdline.split_whitespace();
+    let Some(program) = words.next().map(base) else {
+        return false;
+    };
+    if matches!(program.as_str(), "fgos" | "fgos-runner" | "fgos-gateway") {
+        return true;
+    }
+    let interpreter = matches!(program.as_str(), "bun" | "deno")
+        || program.strip_prefix("node").is_some_and(|rest| {
+            matches!(rest, "" | "js")
+                || rest.starts_with(|c: char| c.is_ascii_digit() || c == '.' || c == '-')
+        });
+    interpreter
+        && words.any(|arg| {
+            matches!(
+                base(arg).as_str(),
+                "fgos" | "fgos-runner" | "fgos-gateway" | "fgos.mjs" | "fgos-runner.mjs"
+            )
+        })
+}
+
 fn validate_predecessor_scan(bytes: &[u8], exit_code: Option<i32>) -> Result<(), InitError> {
     let scan: serde_json::Value =
         serde_json::from_slice(bytes).map_err(|e| refusal("git-predecessor-writer-live", e))?;
@@ -127,19 +159,10 @@ fn validate_predecessor_scan(bytes: &[u8], exit_code: Option<i32>) -> Result<(),
         .ok_or_else(|| refusal("git-predecessor-writer-live", "invalid process scan"))?;
     for process in processes {
         let cmdline = process["cmdline"].as_str().unwrap_or("");
-        // quiesce-scan also reports ordinary shells in the workspace. Only
-        // fgOS payloads can be predecessor writers at this capability split.
-        let fgos = cmdline.split_whitespace().any(|arg| {
-            let base = Path::new(arg)
-                .file_name()
-                .and_then(|n| n.to_str())
-                .unwrap_or("");
-            matches!(
-                base,
-                "fgos" | "fgos-runner" | "fgos-gateway" | "fgos.mjs" | "fgos-runner.mjs"
-            )
-        });
-        if !fgos {
+        // quiesce-scan also reports ordinary shells in the workspace. Only a
+        // process that runs fgOS can be a predecessor writer at this capability
+        // split, so judge what it executes, never words in its arguments.
+        if !runs_fgos(cmdline) {
             continue;
         }
         let compatible = cmdline
@@ -244,6 +267,12 @@ mod tests {
             .unwrap_err()
             .to_string();
         assert!(error.contains("424242") && error.contains("node bin/fgos.mjs"));
+        let shell = serde_json::json!({"v":1,"protocol":1,"result":"ok","unreadable":0,"processes":[{"pid":1,"cmdline":"zsh -c fgos run x; fgctl upgrade"}]});
+        validate_predecessor_scan(&serde_json::to_vec(&shell).unwrap(), Some(10)).unwrap();
+        let binary = serde_json::json!({"v":1,"protocol":1,"result":"ok","unreadable":0,"processes":[{"pid":2,"cmdline":"/opt/old/bin/fgos run x"}]});
+        assert!(
+            validate_predecessor_scan(&serde_json::to_vec(&binary).unwrap(), Some(10)).is_err()
+        );
         let clean =
             serde_json::json!({"v":1,"protocol":1,"result":"ok","unreadable":0,"processes":[]});
         validate_predecessor_scan(&serde_json::to_vec(&clean).unwrap(), Some(0)).unwrap();

@@ -323,11 +323,9 @@ fn the_shell_that_launched_the_upgrade_does_not_block_it() {
     }
     // The launching shell sits in the workspace and its command text names
     // fgos; the trailing `:` keeps it from exec'ing away into fgctl.
-    let script = format!(
-        "echo fgos run; \"$1\" upgrade --from \"$2\"; :"
-    );
+    let script = "echo fgos run; \"$1\" upgrade --from \"$2\"; :";
     let out = Command::new("sh")
-        .args(["-c", &script, "sh", env!("CARGO_BIN_EXE_fgctl")])
+        .args(["-c", script, "sh", env!("CARGO_BIN_EXE_fgctl")])
         .arg(&new)
         .current_dir(&ws)
         .env("FGOS_STATE_ROOT", &state)
