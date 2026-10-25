@@ -888,7 +888,7 @@ fn a_pi_or_omp_head_registers_with_identity_under_its_own_cli_and_is_reached_by_
         let root = identity_root(&scene);
         let head = ExtensionHead::start(&scene, cli, WRITER);
         let entries = || {
-            fgos_identity::directory::list(&root, None, false, &fgos_process::facts::judge_here)
+            fgos_identity::directory::list(&root, None, false, &fgos_process::facts::judge_here, None)
                 .map(|listed| listed.sessions)
                 .unwrap_or_default()
         };
@@ -1230,7 +1230,7 @@ fn a_handle_identity_does_not_know_reaches_the_head_whose_derived_handle_it_is()
 
 /// The sessions Identity's directory under `root` holds.
 fn identity_sessions(root: &Path) -> Vec<(String, String)> {
-    fgos_identity::directory::list(root, None, false, &fgos_process::facts::judge_here)
+    fgos_identity::directory::list(root, None, false, &fgos_process::facts::judge_here, None)
         .unwrap()
         .sessions
         .into_iter()

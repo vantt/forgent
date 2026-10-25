@@ -3,40 +3,16 @@
 //! Subcommand: `fgos metrics outcomes [<id>] [--dir <root>]`
 
 use crate::contract::{ObserveRequest, WorkObservationSource};
+use crate::metrics_cli::parse_flags;
 use serde_json::{json, Value};
 
 pub fn dispatch_outcomes(
     req: &ObserveRequest,
-    work_source: Option<&dyn WorkObservationSource>,
+    work_source: &dyn WorkObservationSource,
 ) -> Result<Value, String> {
-    let mut id: Option<String> = None;
-
-    let mut i = 0;
-    while i < req.args.len() {
-        let arg = &req.args[i];
-        if arg == "--dir" || arg.starts_with("--dir=") {
-            if arg == "--dir" {
-                i += 2;
-            } else {
-                i += 1;
-            }
-        } else if arg.starts_with("--") {
-            return Err(format!("unexpected option for metrics outcomes: {}", arg));
-        } else if id.is_none() {
-            id = Some(arg.clone());
-            i += 1;
-        } else {
-            return Err(format!(
-                "unexpected positional argument for metrics outcomes: {}",
-                arg
-            ));
-        }
-    }
-
-    let ws =
-        work_source.ok_or_else(|| "work source not available for metrics outcomes".to_string())?;
-    let report = ws
-        .read_outcomes_report(&req.root, id.as_deref())
+    let flags = parse_flags("outcomes", &req.args, &[], &[], true)?;
+    let report = work_source
+        .read_outcomes_report(&req.root, flags.positional())
         .map_err(|e| format!("work source error: {}", e))?;
 
     Ok(json!({

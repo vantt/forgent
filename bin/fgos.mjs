@@ -2792,37 +2792,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
     }
     case 'run': {
-      const sub = positional[0];
-      if (sub === 'record') {
-        const { recordInlineRun } = await import('../src/runner/execution/run.mjs');
-        const unitRunId = requireField(flags['unit-run'], '--unit-run is required for fgos run record');
-        const role = flags.role || 'producer';
-        const roundStr = requireField(flags.round, '--round is required for fgos run record');
-        const round = Number.parseInt(roundStr, 10);
-        const nonce = requireField(flags.nonce, '--nonce is required for fgos run record');
-        const evidenceStr = requireField(flags.evidence, '--evidence is required for fgos run record');
-        const evidenceRefs = evidenceStr.split(',').map((s) => s.trim()).filter(Boolean);
-        const repoRoot = flags.dir;
-        let resultObj = {};
-        const resultJson = flags.result;
-        if (resultJson) {
-          try {
-            resultObj = JSON.parse(resultJson);
-          } catch (e) {
-            throw new StoreError('validation', `invalid JSON for --result: ${e.message}`);
-          }
-        }
-        return recordInlineRun({
-          unitRunId,
-          role,
-          round,
-          nonce,
-          evidenceRefs,
-          result: resultObj,
-          repoRoot,
-        });
-      }
-
       const { runUnit, resolveGitRoots } = await import('../src/runner/execution/run.mjs');
       const { parseRunTimeout } = await import('../src/runner/dispatch/config.mjs');
       const unitPath = flags.unit;
@@ -2949,7 +2918,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
 
 
-    // `events sync|status|export|migrate` and `rebuild` are the Event Store's verbs; each use case owns its
+    // `events sync|status|export|migrate|import-legacy` and `rebuild` are the Event Store's verbs; each use case owns its
     // own validation and refusals. The Event Store is Linux-only, so every one of them refuses elsewhere.
     case 'events': {
       const sub = positional[0];
@@ -2974,7 +2943,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const { migrateUseCase } = await import('../src/verbs/events/migrate.mjs');
         return migrateUseCase({ ...ctx, writer: String(resolveWriterIdentity(dir).id) }, { baseline: flags.baseline, check: flags.check });
       }
-      throw new StoreError('validation', 'events requires sync|status|seal|export|migrate');
+      if (sub === 'import-legacy') {
+        const { importLegacyUseCase } = await import('../src/verbs/events/import-legacy.mjs');
+        return importLegacyUseCase(ctx, { file: flags.file, check: flags.check });
+      }
+      throw new StoreError('validation', 'events requires sync|status|seal|export|migrate|import-legacy');
     }
 
     case 'rebuild': {

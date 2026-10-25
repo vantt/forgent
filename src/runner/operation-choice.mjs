@@ -2350,7 +2350,7 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
         dispatchType: 'assignment',
         operation: choice.operation,
         unitRunId: unitRun.unitRunId,
-        reason: producer?.refused ? `unit-refused-${producer.refused.reason}` : (producer?.pendingInline ? 'unit-pending-inline' : 'unit-produced-no-result'),
+        reason: producer?.refused ? `unit-refused-${producer.refused.reason}` : 'unit-produced-no-result',
         canAdvanceEdge: false,
         stop: true,
       };

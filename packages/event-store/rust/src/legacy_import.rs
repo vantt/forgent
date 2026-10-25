@@ -345,6 +345,60 @@ fn import_files(inv: &Inventory) -> BTreeMap<String, Vec<u8>> {
         })
         .collect()
 }
+/// The id Git gives a tree of these entries, computed without writing the object.
+fn hashed_tree(driver: &GitDriver, repo: &RepoHandle, entries: &[TreeEntry]) -> Result<Oid, Error> {
+    let mut entries: Vec<_> = entries.iter().collect();
+    entries.sort_by_key(|e| {
+        let mut key = e.name.clone();
+        if e.mode == 0o040000 {
+            key.push(b'/');
+        }
+        key
+    });
+    let mut bytes = Vec::new();
+    for e in entries {
+        bytes.extend_from_slice(format!("{:o} ", e.mode).as_bytes());
+        bytes.extend_from_slice(&e.name);
+        bytes.push(0);
+        for pair in e.oid.as_str().as_bytes().as_chunks::<2>().0 {
+            bytes.push(u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap());
+        }
+    }
+    driver
+        .hash_object(repo, ObjectType::Tree, &bytes)
+        .map_err(git_error)
+}
+/// The id of the tree these full-path blobs form, nested by directory, without writing objects.
+fn nested_tree(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    blobs: &BTreeMap<Vec<u8>, Oid>,
+) -> Result<Oid, Error> {
+    let mut dirs = BTreeMap::<Vec<u8>, BTreeMap<Vec<u8>, Oid>>::new();
+    let mut entries = Vec::new();
+    for (path, oid) in blobs {
+        match path.iter().position(|b| *b == b'/') {
+            Some(i) => {
+                dirs.entry(path[..i].to_vec())
+                    .or_default()
+                    .insert(path[i + 1..].to_vec(), oid.clone());
+            }
+            None => entries.push(TreeEntry {
+                name: path.clone(),
+                mode: 0o100644,
+                oid: oid.clone(),
+            }),
+        }
+    }
+    for (name, children) in dirs {
+        entries.push(TreeEntry {
+            name,
+            mode: 0o040000,
+            oid: nested_tree(driver, repo, &children)?,
+        });
+    }
+    hashed_tree(driver, repo, &entries)
+}
 /// Compute migration identities without installing Git objects or changing refs.
 pub fn import_identity(
     driver: &GitDriver,
@@ -359,30 +413,7 @@ pub fn import_identity(
                     .hash_object(repo, ObjectType::Blob, bytes)
                     .map_err(git_error)
             },
-            &|entries| {
-                let mut entries: Vec<_> = entries.iter().collect();
-                entries.sort_by_key(|e| {
-                    let mut key = e.name.clone();
-                    if e.mode == 0o040000 {
-                        key.push(b'/');
-                    }
-                    key
-                });
-                let mut bytes = Vec::new();
-                for e in entries {
-                    bytes.extend_from_slice(format!("{:o} ", e.mode).as_bytes());
-                    bytes.extend_from_slice(&e.name);
-                    bytes.push(0);
-                    for pair in e.oid.as_str().as_bytes().as_chunks::<2>().0 {
-                        bytes.push(
-                            u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap(),
-                        );
-                    }
-                }
-                driver
-                    .hash_object(repo, ObjectType::Tree, &bytes)
-                    .map_err(git_error)
-            },
+            &|entries| hashed_tree(driver, repo, entries),
         )
     };
     let mut files = import_files(inv);
@@ -416,8 +447,8 @@ pub fn import_identity(
     Ok((data_tree, commit))
 }
 /// Authenticate the complete data tree (the legacy commit tree sans seal.json).
-pub fn verify_legacy_tree(port: &dyn Inspect, repo: &RepoHandle, oid: &Oid) -> Result<(), Error> {
-    let expected = match crate::walk::header(port, repo, oid)? {
+pub fn verify_legacy_tree(driver: &GitDriver, repo: &RepoHandle, oid: &Oid) -> Result<(), Error> {
+    let expected = match crate::walk::header(driver, repo, oid)? {
         Seal::Legacy {
             tree_of_fgos_events,
             ..
@@ -425,33 +456,30 @@ pub fn verify_legacy_tree(port: &dyn Inspect, repo: &RepoHandle, oid: &Oid) -> R
             .map_err(|e| invalid(e.to_string()))?,
         _ => return Err(invalid("expected legacy seal")),
     };
-    let entries =
-        |oid: &Oid, strip_seal: bool| -> Result<BTreeMap<Vec<u8>, (u32, String)>, Error> {
-            let mut out = BTreeMap::new();
-            for e in all_entries(port, repo, oid)? {
-                let p = std::str::from_utf8(&e.path).map_err(|_| invalid("legacy path UTF8"))?;
-                if strip_seal && p == "seal.json" {
-                    continue;
-                }
-                let directory = e.mode == 0o040000
-                    && e.kind == ObjectType::Tree
-                    && (p == "events"
-                        || p == "porting"
-                        || crate::export::allowed(&format!("{p}/events.jsonl")));
-                if !directory
-                    && (e.mode != 0o100644
-                        || e.kind != ObjectType::Blob
-                        || p == "seal.json"
-                        || !crate::export::allowed(p))
-                {
-                    return Err(invalid("unsafe legacy tree entry"));
-                }
-                out.insert(e.path, (e.mode, e.oid.as_str().into()));
-            }
-            Ok(out)
-        };
-    // Top directory OIDs also change if they contain an unrelated extra blob.
-    if entries(oid, true)? != entries(&expected, false)? {
+    // The listing is recursive: blobs carry full paths, directories appear as their own rows.
+    let mut blobs = BTreeMap::new();
+    for e in all_entries(driver, repo, oid)? {
+        let p = std::str::from_utf8(&e.path).map_err(|_| invalid("legacy path UTF8"))?;
+        if p == "seal.json" {
+            continue;
+        }
+        let directory = e.mode == 0o040000
+            && e.kind == ObjectType::Tree
+            && (p == "events"
+                || p == "porting"
+                || crate::export::allowed(&format!("{p}/events.jsonl")));
+        if directory {
+            continue;
+        }
+        if e.mode != 0o100644 || e.kind != ObjectType::Blob || !crate::export::allowed(p) {
+            return Err(invalid("unsafe legacy tree entry"));
+        }
+        blobs.insert(e.path, e.oid);
+    }
+    // The seal names the data tree by id only: that tree object exists only in the clone that ran
+    // the import, so every other clone recomputes the id from the published commit's own entries.
+    // Top directory ids also change if they contain an unrelated extra blob.
+    if nested_tree(driver, repo, &blobs)? != expected {
         return Err(invalid("legacy tree differs from seal.treeOfFgosEvents"));
     }
     Ok(())
@@ -829,18 +857,20 @@ fn cutover_operation_id(repo: &RepoHandle, head: &str) -> Result<String, Error> 
         .map_err(|e| invalid(e.to_string()))?;
     for attempt in 1..=100_000 {
         let id = format!("{prefix}-{attempt}");
-        let outcome = if let Some(receipt) =
-            wal.compacted(&id).map_err(|e| invalid(e.to_string()))?
-        {
-            Some(receipt.outcome().map_err(|e| invalid(e.to_string()))?)
-        } else if !wal.known_id(&id).map_err(|e| invalid(e.to_string()))? {
-            // Free, or a directory that never received record zero: a crash or
-            // refusal between mkdir and the intent left nothing to recover, and
-            // ScopedCommit reuses such a directory on its next begin.
-            return Ok(id);
-        } else {
-            wal.inspect(&id).map_err(|e| invalid(e.to_string()))?.outcome().cloned()
-        };
+        let outcome =
+            if let Some(receipt) = wal.compacted(&id).map_err(|e| invalid(e.to_string()))? {
+                Some(receipt.outcome().map_err(|e| invalid(e.to_string()))?)
+            } else if !wal.known_id(&id).map_err(|e| invalid(e.to_string()))? {
+                // Free, or a directory that never received record zero: a crash or
+                // refusal between mkdir and the intent left nothing to recover, and
+                // ScopedCommit reuses such a directory on its next begin.
+                return Ok(id);
+            } else {
+                wal.inspect(&id)
+                    .map_err(|e| invalid(e.to_string()))?
+                    .outcome()
+                    .cloned()
+            };
         // Only a settled no-effect attempt frees its id. An open chain, a commit
         // (even one whose HEAD was later reset by hand) and an effect-unknown
         // rejection keep the id, so Git's recovery refusal stays binding.

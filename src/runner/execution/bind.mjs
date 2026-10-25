@@ -244,13 +244,6 @@ function crateOverrideOf(override) {
   return Object.keys(out).length > 0 ? out : undefined;
 }
 
-/** The session lead that may run a seat inline: a lead is in the session and the seat's posture allows it. */
-function inlineLeadOf(seatPosture, session, runnerConfig) {
-  if (!seatPosture.inlineAllowed || session.headless || !(session.hasNativeAgent || session.provider)) return undefined;
-  const executor = session.provider ?? 'lead';
-  return { executor, family: getProviderFamily(runnerConfig, executor) };
-}
-
 /**
  * Everything the crate is asked for one seat. Throws RunnerConfigError for an override no seat could take
  * (an unknown tier or effort name); returns `{ refused }` for a persona conflict.
@@ -302,7 +295,6 @@ function requestOf(ask, ctx, walk) {
     const at = peers.findIndex((known) => known.seat === entry.seat);
     if (at >= 0) peers[at] = entry; else peers.push(entry);
   }
-  const inlineLead = inlineLeadOf(seatPosture, session, runnerConfig);
   const crateAsk = {
     capability: unit?.capability,
     seat,
@@ -318,7 +310,6 @@ function requestOf(ask, ctx, walk) {
     independence: { hard, hardCheckers: [], soft: peers.map((peer) => peer.seat) },
     requiredSkills,
     unitPrefer: unitPreferOf(unit?.prefer),
-    ...(inlineLead ? { inlineLead } : {}),
   };
   const launchView = launchViewOf(runnerConfig, session);
   return {
@@ -405,9 +396,6 @@ function bindingOf({ out, prep, ask, ctx, walk }) {
 
   const cand = ranked.candidates[0];
   if (!cand) return { refused: refusalOf(out.refusal ?? { reason: 'no-candidate', detail: 'no candidate' }, { session, unit }) };
-  // The crate seats the session lead inline when the seat has no candidate configured; nothing launches then.
-  const inlineFallback = cand.mechanism === 'inline';
-
   let timeout;
   try {
     timeout = timeoutOf(matchingOverride, unit);
@@ -417,14 +405,10 @@ function bindingOf({ out, prep, ask, ctx, walk }) {
 
   const executorEntry = executors[cand.executor];
   const mechanism = cand.mechanism;
-  const { transport, transportSource } = inlineFallback
-    ? { transport: 'cli', transportSource: 'default-cli' }
-    : transportOf({ cand, executorEntry, session, launchFacts: launchView.executors[cand.executor] });
+  const { transport, transportSource } = transportOf({ cand, executorEntry, session, launchFacts: launchView.executors[cand.executor] });
   const model = cand.model ?? 'default';
   const reasoningEffort = cand.effort ?? null;
-  const mechanismSource = inlineFallback ? 'lead-producer-inline'
-    : seatPosture.forceOutOfProcess ? 'posture-forced-out-of-process'
-      : 'decideExecutorDispatchMechanism';
+  const mechanismSource = seatPosture.forceOutOfProcess ? 'posture-forced-out-of-process' : 'decideExecutorDispatchMechanism';
 
   // An override pins an account (`fgos run --account pool/account`) only on a seat whose chosen entry is
   // served by that pool; any other seat runs unpinned and says why.
@@ -454,7 +438,7 @@ function bindingOf({ out, prep, ask, ctx, walk }) {
   if (cand.pool) provenance.pool = { value: cand.pool, source: cand.modelSource };
   if (ranked.skipped.length > 0) provenance.skipped = ranked.skipped;
   // Degraded independence is recorded, never hidden: which seats this one shares a provider family with.
-  if (Array.isArray(ask?.preferIndependentOf) && !inlineFallback) {
+  if (Array.isArray(ask?.preferIndependentOf)) {
     provenance.familySpread = {
       value: { family: cand.family, sharedWith: [...new Set(ranked.sharedWith)] },
       source: ranked.sharedWith.length === 0 ? 'prefer-independent-of:distinct-family' : 'prefer-independent-of:no-eligible-unused-family',
@@ -489,10 +473,10 @@ function bindingOf({ out, prep, ask, ctx, walk }) {
     ...(cand.pool && cand.account ? { leaseAccount: cand.account } : {}),
     ...(account ? { account } : {}),
     provenance,
-    ...(inlineFallback ? {} : { bindingInput: { ...bindingInput, hostVersion: out.hostVersion } }),
+    bindingInput: { ...bindingInput, hostVersion: out.hostVersion },
   };
   const from = walk?.from ?? walk?.tried?.at(-1);
-  if (from && !inlineFallback) {
+  if (from) {
     binding.provenance.fallbackFrom = fallbackFrom(from, binding, { reason: walk.reason ?? 'provider-limit', rotation: walk.rotation === true, detail: walk.detail, runnerConfig });
   }
   return binding;
@@ -563,10 +547,10 @@ export function explainSeat(ask, ctx, { walk = {} } = {}) {
   const { out, prep } = decided;
   const binding = bindingOf({ out, prep, ask, ctx, walk });
   const chain = [];
-  if (!binding.refused && binding.mechanism !== 'inline') {
+  if (!binding.refused) {
     const seen = new Set();
     let current = binding;
-    while (current && !current.refused && current.mechanism !== 'inline' && !seen.has(bindingIdentity(current))) {
+    while (current && !current.refused && !seen.has(bindingIdentity(current))) {
       seen.add(bindingIdentity(current));
       chain.push(current);
       current = bind(ask, ctx, { walk: { ...walk, tried: [...(walk.tried ?? []), ...chain] } });

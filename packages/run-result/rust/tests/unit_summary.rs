@@ -1,6 +1,9 @@
 use fgos_observe::metrics_cli::discussions::dispatch_discussions;
-use fgos_observe::{Observation, ObservationSource, ObserveRequest, SourceError, Window};
-use fgos_run_result::{scan_coverage, scan_unit_summaries, RunResultSource, UnitSummarySource};
+use fgos_observe::{
+    Observation, ObservationSource, ObserveRequest, SourceError, WorkEntropySignalsRecord,
+    WorkObservationSource, WorkOutcomesRecord, Window,
+};
+use fgos_run_result::{scan_coverage, scan_unit_summaries, RunResultSource};
 use serde_json::{json, Value};
 use std::fs;
 use std::path::PathBuf;
@@ -28,6 +31,23 @@ impl ObservationSource for UnavailableTranscripts {
             source_id: "claude-transcripts",
             message: "unrelated transcript source must not be read".to_owned(),
         })
+    }
+}
+
+// The same barrier for the work store: a discussion never reads it.
+struct UnavailableWork;
+
+impl WorkObservationSource for UnavailableWork {
+    fn read_outcomes_report(
+        &self,
+        _: &std::path::Path,
+        _: Option<&str>,
+    ) -> Result<WorkOutcomesRecord, SourceError> {
+        panic!("a discussion must not read the work store")
+    }
+
+    fn read_entropy_signals(&self, _: &std::path::Path) -> Result<WorkEntropySignalsRecord, SourceError> {
+        panic!("a discussion must not read the work store")
     }
 }
 
@@ -63,13 +83,12 @@ impl Fixture {
         };
         let sources: Vec<Box<dyn ObservationSource>> = vec![
             Box::new(RunResultSource::new()),
-            Box::new(UnitSummarySource::new()),
             Box::new(UnavailableTranscripts),
         ];
         fgos_observe::metrics_cli::dispatch(
             &request,
             &sources,
-            None,
+            &UnavailableWork,
             scan_coverage,
             scan_unit_summaries,
         )
@@ -111,7 +130,7 @@ fn unit(id: &str, choices: &[Option<&str>]) -> Value {
         "pattern": "panel", "capability": "analysis", "outcome": "pass",
         "startedAt": "2026-10-05T12:00:00.000Z", "settledAt": "2026-10-05T12:01:00.000Z",
         "seats": choices.iter().enumerate().map(|(i, choice)| seat(&format!("member-{}", i + 1), "panelist", *choice)).collect::<Vec<_>>(),
-        "inline": false, "stanceOptions": ["a", "b", "c"],
+        "stanceOptions": ["a", "b", "c"],
     })
 }
 
@@ -137,25 +156,24 @@ fn consumer_separates_all_attempts_final_seats_groups_and_refusals() {
     refusal["outcome"] = json!("policy-refusal");
     refusal["settledAt"] = json!("2026-10-05T12:02:00.000Z");
     root.summary(&refusal);
-    let mut inline = unit("unit-run-inline", &[]);
-    inline["inline"] = json!(true);
-    inline["workflow"] = Value::Null;
-    let mut inline_seat = seat("producer", "producer", None);
-    inline_seat["final"]["runId"] = Value::Null;
-    inline_seat["attempts"][0]["runId"] = Value::Null;
-    inline["seats"] = json!([inline_seat]);
-    root.summary(&inline);
+    // A seat whose attempt never got a run id is a seat, not a dispatch attempt.
+    let mut unlinked = unit("unit-run-unlinked", &[]);
+    unlinked["workflow"] = Value::Null;
+    let mut unrun_seat = seat("producer", "producer", None);
+    unrun_seat["final"]["runId"] = Value::Null;
+    unrun_seat["attempts"][0]["runId"] = Value::Null;
+    unlinked["seats"] = json!([unrun_seat]);
+    root.summary(&unlinked);
     let report = root.metrics(&["--since=2026-10-05"]);
     assert_eq!(report["totals"]["unitRuns"], 3);
     assert_eq!(report["totals"]["passRate"], json!(2.0 / 3.0));
     assert_eq!(report["totals"]["seats"], 3);
     assert_eq!(report["totals"]["attempts"], 4);
-    assert_eq!(report["totals"]["inlineSeats"], 1);
     assert_eq!(report["totals"]["fallbackSeats"], 1);
     assert_eq!(report["totals"]["fallbackRate"], json!(1.0 / 3.0));
     assert_eq!(report["totals"]["medianDurationSec"], 60.0);
     assert_eq!(report["groups"]["workflow-synthetic"]["unitRuns"], 2);
-    assert_eq!(report["groups"]["unlinked"]["inlineSeats"], 1);
+    assert_eq!(report["groups"]["unlinked"]["seats"], 1);
     let units = report["units"].as_array().unwrap();
     let refusal = units
         .iter()
@@ -289,8 +307,7 @@ fn summary_source_never_rebuilds_results_and_does_not_double_count_runs() {
         .unwrap(),
     )
     .unwrap();
-    let source = UnitSummarySource::new();
-    let mut observations = source.observations(&root.0, &Window::default()).unwrap();
+    let mut observations = scan_unit_summaries(&root.0, &Window::default()).unwrap().observations;
     assert_eq!(observations.len(), 1); // result-only unit does not become a discussion
     assert_eq!(observations[0].source, "unit-summary");
     assert_eq!(observations[0].kind, "unit.settled");
@@ -468,9 +485,9 @@ fn fallback_provenance_objects_are_consumed_and_preserved_without_reselection() 
             None,
         ));
     root.summary(&summary);
-    let source = UnitSummarySource::new()
-        .observations(&root.0, &Window::default())
-        .unwrap();
+    let source = scan_unit_summaries(&root.0, &Window::default())
+        .unwrap()
+        .observations;
     assert_eq!(source.len(), 1);
     assert_eq!(
         source[0].attrs["seats"][0]["final"]["fallbackFrom"],
@@ -522,12 +539,11 @@ fn summary_and_cli_windows_compare_offset_timestamps_temporally_and_include_equa
         summary["settledAt"] = json!(timestamp);
         root.summary(&summary);
     }
-    let source = UnitSummarySource::new();
     let bounds = Window {
         since: Some("2026-10-05T00:00:00Z".into()),
         until: Some("2026-10-05T00:00:00.000Z".into()),
     };
-    let observations = source.observations(&root.0, &bounds).unwrap();
+    let observations = scan_unit_summaries(&root.0, &bounds).unwrap().observations;
     assert_eq!(observations.len(), 2);
     assert!(observations
         .iter()
@@ -567,7 +583,6 @@ fn summary_and_cli_windows_compare_offset_timestamps_temporally_and_include_equa
 #[test]
 fn invalid_timestamp_bounds_are_named_errors_before_scanning() {
     let root = Fixture::new();
-    let source = UnitSummarySource::new();
     for (flag, value) in [("--since", "2026-02-30"), ("--until", "not-a-timestamp")] {
         let request = ObserveRequest {
             operation: "metrics".into(),
@@ -583,8 +598,7 @@ fn invalid_timestamp_bounds_are_named_errors_before_scanning() {
             since: (flag == "--since").then(|| value.to_owned()),
             until: (flag == "--until").then(|| value.to_owned()),
         };
-        assert!(source
-            .observations(&root.0, &window)
+        assert!(scan_unit_summaries(&root.0, &window)
             .unwrap_err()
             .to_string()
             .contains(&format!("invalid {flag}")));

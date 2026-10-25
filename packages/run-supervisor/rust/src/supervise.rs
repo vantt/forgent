@@ -18,7 +18,7 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
-use fgos_agent_protocol::direct::{adapter_for, DirectAdapter};
+use fgos_agent_protocol::direct::{adapter_for, Direct};
 use fgos_process::containment::{ContainmentDomain, ContainmentDriver, GuaranteeLevel, Spawned};
 use fgos_process::{facts, DomainState};
 
@@ -185,7 +185,7 @@ struct Watch {
     outbox: PathBuf,
     /// The most the two capture files may hold together before the agent is stopped.
     max_output: Option<u64>,
-    adapter: &'static dyn DirectAdapter,
+    adapter: Direct,
     boot_id: Option<String>,
 }
 

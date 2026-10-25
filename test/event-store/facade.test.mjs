@@ -188,6 +188,30 @@ test('write admission is asked of Git outside the gate and never by a read; a ga
   assert.equal(fresh.store.append('project', [event], {}, 'fixture', []).events.length, 1);
 });
 
+// No other test makes the first admission fail and then lets the failure clear: the migration and
+// gate tests only see answers that stay true for the life of the repository.
+test('a write refused by a transient Git failure is admitted once the failure clears', { skip: process.platform !== 'linux' }, t => {
+  const { store, repo } = fixture(t);
+  const refs = path.join(repo, '.git/refs');
+  const original = fs.statSync(refs).mode & 0o7777;
+  fs.chmodSync(refs, 0o000);
+  try {
+    assert.throws(() => store.append('project', [event], {}, 'fixture', []), 'unreadable refs refuse the first write');
+  } finally { fs.chmodSync(refs, original); }
+  assert.equal(store.append('project', [event], {}, 'fixture', []).events.length, 1, 'the refusal outlived the failure that caused it');
+});
+
+// Kept on purpose: `fgos events migrate` runs with every writer stopped and the runbook restarts them, so a process that
+// started before the migration never needs to see it clear.
+test('a write refused for a repository state stays refused after that state changes', { skip: process.platform !== 'linux' }, t => {
+  const { store, repo, git } = fixture(t);
+  fs.writeFileSync(path.join(repo, '.fgos/events.jsonl'), JSON.stringify({ ts: '2026-01-01T00:00:00.000Z', seq: 1, type: 'work.add', payload: { id: 'item-1', title: 'legacy' }, v: 4 }) + '\n');
+  git('add', '.fgos/events.jsonl'); git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'tracked legacy');
+  assert.throws(() => store.append('project', [event], {}, 'fixture', []), { message: /event-store-migration-required/ });
+  git('rm', '-q', '.fgos/events.jsonl'); git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'retire legacy');
+  assert.throws(() => store.append('project', [event], {}, 'fixture', []), { message: /event-store-migration-required/ }, 'a settled refusal is kept for the life of the store');
+});
+
 test('a repeat read is not sent the legacy history it already holds, and each read still gets its own events', { skip: process.platform !== 'linux' }, t => {
   const { store, repo, git } = fixture(t);
   const line = (seq) => JSON.stringify({ ts: '2026-01-01T00:00:00.000Z', seq, type: 'work.add', payload: { id: `item-${seq}`, title: 'legacy' }, v: 4 }) + '\n';

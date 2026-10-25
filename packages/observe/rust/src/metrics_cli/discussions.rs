@@ -1,7 +1,9 @@
 //! Discussion measurement consumes only owner-written `unit.settled` observations.
 
 use crate::contract::{Observation, ObserveRequest, UnitSummaryScanner, Window};
-use crate::time::{parse_timestamp_millis, ParsedWindow};
+use crate::metrics_cli::parse_flags;
+use crate::time::ParsedWindow;
+use fgos_host_runtime::civil_time::parse_rfc3339_millis;
 use serde_json::{json, Map, Value};
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -9,47 +11,24 @@ pub fn dispatch_discussions(
     req: &ObserveRequest,
     scanner: UnitSummaryScanner,
 ) -> Result<Value, String> {
-    let mut window = Window::default();
-    let mut by = "workflow".to_owned();
-    let mut i = 0;
-    while i < req.args.len() {
-        let arg = &req.args[i];
-        let (flag, inline) = arg
-            .split_once('=')
-            .map_or((arg.as_str(), None), |(flag, value)| (flag, Some(value)));
-        if !matches!(flag, "--since" | "--until" | "--by" | "--dir") {
-            return Err(format!(
-                "unexpected argument for metrics discussions: {arg}"
-            ));
-        }
-        let value = if let Some(value) = inline {
-            i += 1;
-            value
-        } else {
-            let value = req
-                .args
-                .get(i + 1)
-                .filter(|value| !value.starts_with("--"))
-                .ok_or_else(|| format!("missing value for {flag}"))?;
-            i += 2;
-            value.as_str()
-        };
-        if value.is_empty() {
-            return Err(format!("missing value for {flag}"));
-        }
-        match flag {
-            "--since" => window.since = Some(value.to_owned()),
-            "--until" => window.until = Some(value.to_owned()),
-            "--by" if matches!(value, "workflow" | "executor" | "persona") => by = value.to_owned(),
-            "--by" => {
-                return Err(format!(
-                    "invalid --by value \"{value}\". Allowed: workflow, executor, persona"
-                ))
-            }
-            "--dir" => {} // The native request already resolves the root.
-            _ => unreachable!(),
+    let flags = parse_flags("discussions", &req.args, &["--since", "--until", "--by"], &[], false)?;
+    for flag in ["--since", "--until", "--by"] {
+        if flags.value(flag).is_some_and(str::is_empty) {
+            return Err(format!("metrics discussions: missing value for {flag}"));
         }
     }
+    let window = Window {
+        since: flags.value("--since").map(str::to_owned),
+        until: flags.value("--until").map(str::to_owned),
+    };
+    let by = match flags.value("--by").unwrap_or("workflow") {
+        by @ ("workflow" | "executor" | "persona") => by.to_owned(),
+        other => {
+            return Err(format!(
+                "invalid --by value \"{other}\". Allowed: workflow, executor, persona"
+            ))
+        }
+    };
     let parsed_window = ParsedWindow::parse(&window)?;
     let scan = scanner(&req.root, &window).map_err(|err| err.to_string())?;
     let mut output = compute_discussions(&scan.observations, &by, &window, &parsed_window);
@@ -83,7 +62,6 @@ struct Totals {
     seats: usize,
     seats_passed: usize,
     attempts: usize,
-    inline_seats: usize,
     fallback_seats: usize,
     fallback_attempts: usize,
     durations: Vec<f64>,
@@ -102,12 +80,11 @@ impl Totals {
     fn seat(&mut self, seat: &Value) {
         self.seats += 1;
         self.seats_passed += usize::from(seat["final"]["outcome"] == "pass");
-        self.inline_seats += usize::from(seat["final"]["runId"].is_null());
         self.fallback_seats += usize::from(!seat["final"]["fallbackFrom"].is_null());
     }
 
     fn attempt(&mut self, attempt: &Value) {
-        // Inline records are seats, not dispatch runs. Keep the run cross-check honest.
+        // An attempt without a run id is not a dispatch run. Keep the run cross-check honest.
         if attempt["runId"].as_str().is_some() {
             self.attempts += 1;
             self.fallback_attempts += usize::from(!attempt["fallbackFrom"].is_null());
@@ -137,7 +114,6 @@ impl Totals {
             "seatsFailed": self.seats - self.seats_passed,
             "seatPassRate": ratio(self.seats_passed, self.seats),
             "attempts": self.attempts,
-            "inlineSeats": self.inline_seats,
             "fallbackSeats": self.fallback_seats,
             "fallbackAttempts": self.fallback_attempts,
             "fallbackRate": ratio(self.fallback_seats, self.seats),
@@ -222,7 +198,7 @@ fn compute_discussions(
             if observation.source != "unit-summary" || observation.kind != "unit.settled" {
                 return None;
             }
-            let timestamp = parse_timestamp_millis(&observation.ts)?;
+            let timestamp = parse_rfc3339_millis(&observation.ts)?;
             parsed_window
                 .contains(timestamp)
                 .then_some((timestamp, observation))
@@ -289,7 +265,6 @@ fn compute_discussions(
             "outcome",
             "startedAt",
             "settledAt",
-            "inline",
             "stanceOptions",
             "seats",
         ] {
@@ -315,8 +290,8 @@ fn compute_discussions(
 }
 
 fn duration_seconds(unit: &Map<String, Value>) -> Option<f64> {
-    let start = parse_timestamp_millis(unit["startedAt"].as_str()?)?;
-    let end = parse_timestamp_millis(unit["settledAt"].as_str()?)?;
+    let start = parse_rfc3339_millis(unit["startedAt"].as_str()?)?;
+    let end = parse_rfc3339_millis(unit["settledAt"].as_str()?)?;
     (end >= start).then_some((end - start) as f64 / 1000.0)
 }
 
@@ -329,7 +304,7 @@ mod tests {
         let Value::Object(attrs) = json!({
             "unitRunId": id, "workflow": null, "pattern": "panel", "capability": null,
             "outcome": "pass", "startedAt": null, "settledAt": ts,
-            "inline": false, "stanceOptions": [], "seats": []
+            "stanceOptions": [], "seats": []
         }) else {
             unreachable!()
         };

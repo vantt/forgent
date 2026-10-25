@@ -166,8 +166,10 @@ of it).
   its own allowlist, including linked worktrees and `fgw/*` branches. Existing
   root modifications/deletions remain permitted. Allowlist changes must land
   separately on main before root additions use them; the index cannot authorize
-  itself. Merge commits skip only this root guard, never existing data-loss
-  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.
+  itself. Merge commits skip this root guard; the `.fgos` deletion and worker
+  guards accept only a staged entry equal to the merge parent's where that
+  parent changed it since the merge base, and no other data-loss guard is
+  skipped. `main-checkout-hook-wired` diagnoses wiring using the existing check.
 - In fgOS source checkouts, the hook sends newly staged, copied, or renamed
   Markdown files directly under `plans/reports/` and `plans/journals/` to the
   native Convention checker. Violations and unavailable, old, or failed hosts

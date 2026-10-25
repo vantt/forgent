@@ -19,15 +19,14 @@ test('solo is one producer seat; reviewed is the producer plus one seat per chec
   const [solo] = resolveSeats({ pattern: 'solo', unit: { ...unit, writes: ['a.md'] }, runnerConfig: {} });
   assert.deepEqual({ seat: solo.seat, role: solo.role }, { seat: 'producer', role: 'producer' });
   assert.deepEqual(
-    { writer: solo.posture.writer, inlineAllowed: solo.posture.inlineAllowed, readOnly: solo.posture.readOnly },
-    { writer: true, inlineAllowed: true, readOnly: false },
+    { writer: solo.posture.writer, readOnly: solo.posture.readOnly },
+    { writer: true, readOnly: false },
   );
   const seats = resolveSeats({ pattern: 'reviewed', unit: { ...unit, rigor: 'high' }, runnerConfig: {} });
   assert.deepEqual(seats.map((s) => [s.seat, s.role]), [['producer', 'producer'], ['reviewer', 'reviewer'], ['red-team', 'red-team']]);
   for (const checker of seats.slice(1)) {
     assert.equal(checker.posture.forceOutOfProcess, true);
     assert.equal(checker.posture.readOnly, true);
-    assert.equal(checker.posture.inlineAllowed, false);
   }
 });
 
@@ -88,8 +87,8 @@ test('panel members carry the panel posture; a reviewed unit refuses declared se
   assert.deepEqual(seats.map((s) => s.seat), ['one', 'two', 'chair']);
   assert.equal(seats[0].persona, 'lens');
   assert.deepEqual(
-    { stance: seats[0].posture.stance, forceOutOfProcess: seats[0].posture.forceOutOfProcess, inlineAllowed: seats[0].posture.inlineAllowed, writer: seats[0].posture.writer },
-    { stance: true, forceOutOfProcess: true, inlineAllowed: false, writer: false },
+    { stance: seats[0].posture.stance, forceOutOfProcess: seats[0].posture.forceOutOfProcess, writer: seats[0].posture.writer },
+    { stance: true, forceOutOfProcess: true, writer: false },
   );
   assert.equal(seats[2].posture.stance, false);
   assert.deepEqual(seats.map(seatKind), ['panelist', 'panelist', 'synthesizer']);

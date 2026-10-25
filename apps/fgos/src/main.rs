@@ -264,28 +264,32 @@ fn main() {
     service.register_provider(Arc::new(EchoProvider::new()));
     service.register_provider(Arc::new(fgos_distribution::BuildShowProvider::new()));
     service.register_provider(Arc::new(fgos_work_state::GateBypassShowProvider::new()));
-    service.register_provider(Arc::new(
-        fgos_observe::ObserveMetricsProvider::with_sources(
-            wiring::metrics_sources::build_metrics_sources(),
-            wiring::metrics_sources::build_work_observation_source(),
-            fgos_run_result::scan_coverage,
-            wiring::metrics_sources::build_unit_summary_scanner(),
-        ),
-    ));
-    service.register_provider(Arc::new(
-        fgos_observe::ObserveFrictionProvider::with_legacy_sources(
-            wiring::friction_sources::build_legacy_friction_sources(),
-        ),
-    ));
+    let observe_wiring = Arc::new(fgos_observe::ObserveWiring {
+        sources: wiring::metrics_sources::build_metrics_sources(),
+        work_source: wiring::metrics_sources::build_work_observation_source(),
+        coverage_scanner: fgos_run_result::scan_coverage,
+        unit_summary_scanner: wiring::metrics_sources::build_unit_summary_scanner(),
+        legacy_friction_sources: wiring::friction_sources::build_legacy_friction_sources(),
+    });
+    for descriptor in [
+        fgos_observe::OBSERVE_METRICS_DESCRIPTOR,
+        fgos_observe::OBSERVE_FRICTION_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(fgos_observe::ObserveProvider::for_descriptor(
+            descriptor,
+            Arc::clone(&observe_wiring),
+        )));
+    }
     service.register_provider(Arc::new(fgos_convention::ConventionProvider::new()));
     for descriptor in [
         fgos_identity::IDENTITY_DESCRIPTOR,
         fgos_identity::IDENTITY_READ_DESCRIPTOR,
         fgos_identity::IDENTITY_WRITE_DESCRIPTOR,
     ] {
-        service.register_provider(Arc::new(fgos_identity::IdentityProvider::for_descriptor(
-            descriptor,
-        )));
+        service.register_provider(Arc::new(
+            fgos_identity::IdentityProvider::for_descriptor(descriptor)
+                .with_log_door(Arc::new(wiring::identity_log::StoreLogDoor)),
+        ));
     }
     for descriptor in [
         wiring::mailbox_verbs::SEND_DESCRIPTOR,

@@ -103,6 +103,7 @@ fn legacy_import_real_publication_reuses_exact_commit_and_reads_nested_porting()
         ReadRequest {
             layout: &f.layout,
             origin: "",
+            machine: "test-aa",
             streams: &streams,
             cursor: &Cursor::default(),
             folded: &[],
@@ -126,6 +127,51 @@ fn legacy_import_real_publication_reuses_exact_commit_and_reads_nested_porting()
     assert_eq!(git(&f, &["rev-list", "--count", "refs/fgos/legacy"]), "1");
     // Import releases seal 58 before the consumer may take main-checkout 50.
     drop(f.handle());
+}
+#[test]
+fn a_clone_without_the_import_data_tree_object_still_verifies_the_published_legacy_commit() {
+    let f = Fixture::new();
+    legacy(&f, true);
+    let before = inventory(&f.driver, &f.repo).unwrap();
+    let pin = import_legacy(
+        &f.driver,
+        &f.repo,
+        &f.layout,
+        before.from_commit.as_str(),
+        &[],
+        0,
+    )
+    .unwrap();
+    let oid = Oid::parse(
+        pin["legacyRefOid"].as_str().unwrap(),
+        f.repo.object_format(),
+    )
+    .unwrap();
+    let seal: serde_json::Value = serde_json::from_slice(
+        &fgos_event_store::walk::blob(&f.driver, &f.repo, &oid, b"seal.json")
+            .unwrap()
+            .unwrap(),
+    )
+    .unwrap();
+    let data_tree = seal["treeOfFgosEvents"].as_str().unwrap().to_string();
+    // No ref reaches the data tree, so a clone that fetched the legacy ref never has its object.
+    let objects = std::path::PathBuf::from(git(
+        &f,
+        &["rev-parse", "--path-format=absolute", "--git-common-dir"],
+    ))
+    .join("objects");
+    fs::remove_file(objects.join(&data_tree[..2]).join(&data_tree[2..])).unwrap();
+    assert!(
+        Command::new("git")
+            .arg("-C")
+            .arg(f.repo.trusted_main_root())
+            .args(["cat-file", "-e", &data_tree])
+            .status()
+            .unwrap()
+            .code()
+            != Some(0)
+    );
+    verify_legacy_tree(&f.driver, &f.repo, &oid).unwrap();
 }
 #[test]
 fn legacy_import_dirty_multiple_porting_and_moved_head_refuse() {
@@ -187,7 +233,7 @@ fn legacy_import_sealed_tree_refuses_missing_data_and_invalid_events_before_publ
     let mut handle = f.handle();
     let port = f.port(&mut handle, "refs/fgos/events/test-aa");
     let damaged = reader_support::commit(&port, &f.repo, vec![], vec![(b"seal.json", seal)]);
-    assert!(verify_legacy_tree(&port, &f.repo, &damaged)
+    assert!(verify_legacy_tree(&f.driver, &f.repo, &damaged)
         .unwrap_err()
         .detail
         .contains("differs"));
@@ -235,9 +281,7 @@ fn a_cutover_operation_directory_without_an_intent_does_not_block_the_next_attem
     let f = Fixture::new();
     legacy(&f, false);
     let head = inventory(&f.driver, &f.repo).unwrap().from_commit;
-    let import = || {
-        import_legacy(&f.driver, &f.repo, &f.layout, head.as_str(), &[], 0)
-    };
+    let import = || import_legacy(&f.driver, &f.repo, &f.layout, head.as_str(), &[], 0);
     let first = import().unwrap();
     let id = format!("event-store-cutover-{}-1", &head.as_str()[..32]);
     assert_eq!(first["operationId"], id);
@@ -249,4 +293,49 @@ fn a_cutover_operation_directory_without_an_intent_does_not_block_the_next_attem
             .unwrap();
     }
     assert_eq!(import().unwrap()["operationId"], id);
+}
+
+/// After the cutover a write is admitted only while every legacy mirror still
+/// names the pinned import: a mirror that moved away from the pin refuses with
+/// refspec-missing, the same answer as a pin that was never fetched.
+#[test]
+fn a_migrated_write_is_refused_when_a_legacy_mirror_differs_from_the_pin() {
+    let f = Fixture::new();
+    legacy(&f, false);
+    let head = inventory(&f.driver, &f.repo).unwrap().from_commit;
+    let pin = import_legacy(&f.driver, &f.repo, &f.layout, head.as_str(), &[], 0).unwrap();
+    let root = f.repo.trusted_main_root();
+    git(&f, &["rm", "-q", ".fgos/events.jsonl"]);
+    fs::create_dir_all(root.join(".fgos")).unwrap();
+    let fence = serde_json::json!({"legacyRefOid": pin["legacyRefOid"], "sealDigest": pin["sealDigest"], "fromCommit": pin["fromCommit"]});
+    fs::write(
+        root.join(".fgos/events"),
+        serde_json::to_vec(&fence).unwrap(),
+    )
+    .unwrap();
+    git(&f, &["add", ".fgos/events"]);
+    git(&f, &["commit", "-qm", "cutover fence"]);
+    fgos_event_store::refspec::ensure_refspecs(&f.driver, &f.repo, "origin").unwrap();
+    write_readiness(&f.driver, &f.repo, "origin").unwrap();
+    let legacy_ref = pin["legacyRefOid"].as_str().unwrap();
+    git(
+        &f,
+        &["update-ref", "refs/fgos/remotes/origin/legacy", legacy_ref],
+    );
+    write_readiness(&f.driver, &f.repo, "origin").unwrap();
+    git(
+        &f,
+        &[
+            "update-ref",
+            "refs/fgos/remotes/origin/legacy",
+            head.as_str(),
+        ],
+    );
+    assert_eq!(
+        write_readiness(&f.driver, &f.repo, "origin")
+            .unwrap_err()
+            .code
+            .to_string(),
+        "event-store-refspec-missing"
+    );
 }

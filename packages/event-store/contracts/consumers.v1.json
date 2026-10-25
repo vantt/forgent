@@ -12,6 +12,12 @@
       "contractFile": "packages/work-state/contracts/porting-event-streams.v1.json",
       "cachePath": ".fgos/cache/porting-state.json",
       "rebuildModule": "src/state/porting-store.mjs"
+    },
+    {
+      "id": "identity",
+      "contractFile": "packages/identity/contracts/identity-event-streams.v1.json",
+      "cachePath": ".fgos/cache/identity-directory.json",
+      "rebuildModule": "src/identity/directory-store.mjs"
     }
   ]
 }

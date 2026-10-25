@@ -309,7 +309,7 @@ impl From<wal::WalError> for OperationError {
     fn from(e: wal::WalError) -> Self {
         use wal::WalError::*;
         let code = match e {
-            Busy | OperationIdConflict | Untrusted | Unsupported | PublicationBorrowUnavailable | RecordTooLarge => ResultCode::Refused,
+            Busy | OperationIdConflict | Untrusted | UnsafePath(_) | Unsupported | PublicationBorrowUnavailable | RecordTooLarge => ResultCode::Refused,
             Io(_) | Corrupt(_) | FenceMissing | RecoveryRequired => ResultCode::RecoveryRequired,
         };
         let named = classified(code, e.cause());

@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
-import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from '../../src/setup/identity-checks.mjs';
+import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from '../../src/setup/identity-checks.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
 
@@ -121,6 +121,32 @@ test('project id row warns while the repository has none, passes after the expli
   const broken = checkIdentityProjectId(repo, { hostBin: HOST });
   assert.equal(broken.passed, false);
   assert.match(broken.message, /project-id-unreadable|not a project file/);
+});
+
+test('shared-directory row reads only the cache: passes with counts, warns on dropped, foreign and shared-handle entries', (t) => {
+  const { root } = withStateRoot(t);
+  const repo = path.join(root, 'shared-dir');
+  fs.mkdirSync(path.join(repo, '.fgos', 'cache'), { recursive: true });
+  assert.deepEqual(checkIdentitySharedDirectory(repo), { passed: true, message: 'no shared directory yet' });
+  fs.writeFileSync(path.join(repo, '.fgos', 'project.json'), JSON.stringify({ v: 1, projectId: 'p1', handle: 'demo' }));
+  const cacheFile = path.join(repo, '.fgos', 'cache', 'identity-directory.json');
+  assert.equal(checkIdentitySharedDirectory(repo).message, 'no shared directory yet', 'a clone with no cache yet');
+  const entry = (id, projectId, handle) => ({ id: `${id}/s`, projectId, machine: { id, handle } });
+  const write = (entries, dropped) => fs.writeFileSync(cacheFile, JSON.stringify({ v: 1, fetchedAt: '2026-10-24T03:00:00.000Z', entries, dropped, verified: [] }));
+
+  write([entry('alpha-aaaaaa', 'p1', 'alpha'), entry('beta-bbbbbb', 'p1', 'beta')], []);
+  assert.deepEqual(checkIdentitySharedDirectory(repo), { passed: true, message: '2 machine(s), 2 entries, fetched 2026-10-24T03:00:00.000Z' });
+
+  write([entry('alpha-aaaaaa', 'p2', 'alpha'), entry('beta-bbbbbb', 'p1', 'beta-bbbbbb')], [{ reason: 'key-changed', machineId: 'gamma-cccccc' }]);
+  const warned = checkIdentitySharedDirectory(repo);
+  assert.equal(warned.passed, true);
+  assert.match(warned.message, /^warning: 2 machine\(s\), 2 entries/);
+  assert.match(warned.message, /1 dropped \(key-changed from gamma-cccccc\)/);
+  assert.match(warned.message, /1 of another project \(p2\)/);
+  assert.match(warned.message, /machine handle shared, shown by id: beta-bbbbbb/);
+
+  fs.writeFileSync(cacheFile, 'not json');
+  assert.equal(checkIdentitySharedDirectory(repo).message, 'no shared directory yet', 'an unreadable cache is rebuilt by the next read, not reported');
 });
 
 test('ids row passes on a clean registry and names each repeated id, title clash and file number', (t) => {

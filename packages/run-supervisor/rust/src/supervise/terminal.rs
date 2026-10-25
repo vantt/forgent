@@ -24,7 +24,10 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use fgos_agent_protocol::port::{AgentIo, Inspection, IoError, SendInput};
-use fgos_agent_protocol::terminal::{adapter_for, ExitCommand, FsOutbox, Terminal, TerminalOutcome, UnreadableResult};
+use fgos_agent_protocol::terminal::{
+    adapter_for, ExitCommand, FsOutbox, Terminal, TerminalOutcome, UnreadableResult, REASON_AGENT_NOT_STARTED,
+    REASON_COMPLETED_NO_EXIT, REASON_FOREGROUND_NOT_AGENT, REASON_RESULT_UNREADABLE,
+};
 use fgos_process::facts::{self, ProcTuple};
 use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, ProcId};
 use fgos_terminal_control::core::{Core, Want};
@@ -50,8 +53,6 @@ const EXIT_WAIT: Duration = Duration::from_secs(20);
 const WORK_POLL_MS: u64 = 700;
 const CARRIER_EVERY: Duration = Duration::from_secs(1);
 const SCREEN_SAMPLE_EVERY: Duration = Duration::from_secs(1);
-/// The receipt reason of an attempt whose input terminal-control refused to type into the pane.
-const FOREGROUND_NOT_AGENT: &str = "terminal:foreground-not-agent";
 
 /// What the envelope says about a terminal attempt.
 struct Plan {
@@ -473,18 +474,10 @@ impl AgentIo for TermIo<'_, '_> {
             // brief: the attempt ends with the reason on its receipt, a failed attempt for the settlement.
             SendOutcome::ForegroundNotAgent { reason } => {
                 eprintln!("fgos internal supervise: nothing typed into the pane: {reason}");
-                self.sup.begin_stop("cancel", Some(FOREGROUND_NOT_AGENT));
+                self.sup.begin_stop("cancel", Some(REASON_FOREGROUND_NOT_AGENT));
                 Err(IoError::Io(format!("nothing was typed: {reason}")))
             }
         }
-    }
-
-    fn read(&mut self) -> Result<Vec<String>, IoError> {
-        Err(IoError::Unsupported)
-    }
-
-    fn activity(&self) -> Option<u64> {
-        None
     }
 
     fn screen(&mut self) -> Result<String, IoError> {
@@ -531,16 +524,6 @@ impl AgentIo for TermIo<'_, '_> {
             }
             std::thread::sleep(left.min(TICK));
         }
-    }
-}
-
-/// The reason the receipt carries for an adapter outcome that ends the run early.
-fn early_reason(outcome: &TerminalOutcome) -> Option<String> {
-    match outcome {
-        TerminalOutcome::Blocked(reason) => Some(format!("terminal:blocked:{}", reason.as_str())),
-        TerminalOutcome::NeedsHuman => Some("terminal:needs-human".into()),
-        TerminalOutcome::DeliveryUnknown => Some("terminal:delivery-unknown".into()),
-        TerminalOutcome::Ready | TerminalOutcome::Delivered | TerminalOutcome::Completed { .. } => None,
     }
 }
 
@@ -662,7 +645,7 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
         io.pause(TICK.as_millis() as u64);
     }
     if !io.sup.agent_bound && !io.sup.finished() {
-        io.sup.begin_stop("cancel", Some("terminal:agent-not-started"));
+        io.sup.begin_stop("cancel", Some(REASON_AGENT_NOT_STARTED));
     }
     if io.sup.finished() {
         return;
@@ -700,13 +683,13 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
                 other => return end_early(&mut io, &other),
             }
         }
-        let file = outbox.newest_unreadable();
+        let file = outbox.newest_unreadable(&mut io);
         let idle = io.inspect().is_ok_and(|seen| seen.state.as_deref() == Some("idle")
             && !seen.visible_working && !seen.visible_blocker);
         if unreadable.expired(file, idle, started.elapsed().as_millis() as u64) {
             io.sup.carrier_check(io.core, io.key);
             if !io.sup.finished() {
-                io.sup.begin_stop("cancel", Some("terminal:result-unreadable"));
+                io.sup.begin_stop("cancel", Some(REASON_RESULT_UNREADABLE));
             }
             return;
         }
@@ -721,7 +704,7 @@ fn end_early(io: &mut TermIo, outcome: &TerminalOutcome) {
     if io.sup.finished() {
         return;
     }
-    let reason = early_reason(outcome);
+    let reason = outcome.receipt_reason();
     io.sup.begin_stop("cancel", reason.as_deref());
 }
 
@@ -739,14 +722,28 @@ fn ask_to_leave(plan: &Plan, adapter: &Terminal, io: &mut TermIo) {
         io.pause(TICK.as_millis() as u64);
     }
     if !io.sup.finished() {
-        io.sup.begin_stop("cancel", Some("terminal:completed-no-exit"));
+        io.sup.begin_stop("cancel", Some(REASON_COMPLETED_NO_EXIT));
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fgos_agent_protocol::terminal::TerminalBlock;
+
+    /// Only a clock: every wait advances it.
+    struct Clock(u64);
+
+    impl AgentIo for Clock {
+        fn send(&mut self, _: &SendInput) -> Result<(), IoError> {
+            Err(IoError::Unsupported)
+        }
+        fn now_ms(&self) -> u64 {
+            self.0
+        }
+        fn pause(&mut self, ms: u64) {
+            self.0 += ms;
+        }
+    }
 
     #[test]
     fn unreadable_wait_requires_unchanged_bytes_and_consecutive_idle_polls() {
@@ -756,29 +753,20 @@ mod tests {
         fs::write(&path, "bad").unwrap();
         let mut outbox = FsOutbox::new(&dir);
         let mut wait = UnreadableWait::default();
-        assert!(!wait.expired(outbox.newest_unreadable(), true, 0));
-        assert!(!wait.expired(outbox.newest_unreadable(), true, 29_999));
-        assert!(!wait.expired(outbox.newest_unreadable(), false, 30_000));
-        assert!(!wait.expired(outbox.newest_unreadable(), true, 30_700));
-        assert!(wait.expired(outbox.newest_unreadable(), true, 31_400));
+        let mut clock = Clock(0);
+        assert!(!wait.expired(outbox.newest_unreadable(&mut clock), true, 0));
+        assert!(!wait.expired(outbox.newest_unreadable(&mut clock), true, 29_999));
+        assert!(!wait.expired(outbox.newest_unreadable(&mut clock), false, 30_000));
+        assert!(!wait.expired(outbox.newest_unreadable(&mut clock), true, 30_700));
+        assert!(wait.expired(outbox.newest_unreadable(&mut clock), true, 31_400));
         fs::write(&path, "new bad").unwrap();
-        assert!(!wait.expired(outbox.newest_unreadable(), true, 32_000));
-        assert!(!wait.expired(outbox.newest_unreadable(), true, 61_999));
+        assert!(!wait.expired(outbox.newest_unreadable(&mut clock), true, 32_000));
+        assert!(!wait.expired(outbox.newest_unreadable(&mut clock), true, 61_999));
         fs::write(&path, "").unwrap();
-        assert!(!wait.expired(outbox.newest_unreadable(), true, 70_000));
+        assert!(!wait.expired(outbox.newest_unreadable(&mut clock), true, 70_000));
         fs::write(&path, "{}").unwrap();
-        assert!(!wait.expired(outbox.newest_unreadable(), true, 100_000));
+        assert!(!wait.expired(outbox.newest_unreadable(&mut clock), true, 100_000));
         fs::remove_dir_all(dir).unwrap();
-    }
-
-    #[test]
-    fn an_early_end_names_why_in_the_receipt_and_a_good_step_names_nothing() {
-        assert_eq!(early_reason(&TerminalOutcome::Blocked(TerminalBlock::TrustDialog)).as_deref(), Some("terminal:blocked:trust-dialog"));
-        assert_eq!(early_reason(&TerminalOutcome::Blocked(TerminalBlock::Login)).as_deref(), Some("terminal:blocked:login"));
-        assert_eq!(early_reason(&TerminalOutcome::NeedsHuman).as_deref(), Some("terminal:needs-human"));
-        assert_eq!(early_reason(&TerminalOutcome::DeliveryUnknown).as_deref(), Some("terminal:delivery-unknown"));
-        assert_eq!(early_reason(&TerminalOutcome::Delivered), None);
-        assert_eq!(early_reason(&TerminalOutcome::Ready), None);
     }
 
     #[test]

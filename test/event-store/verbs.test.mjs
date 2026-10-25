@@ -67,11 +67,13 @@ test('config merges project over global and validates integer boundaries; the Wo
   for (const eventStore of [{ seal: { intervalSec: 0 } }, { seal: { coalesceSec: 0 } }, { seal: { coalesceSec: 1.5 } }, { seal: { coalesceSec: '30' } }, { sync: { intervalSec: -1 } }, { rebuild: { maxAttempts: 1.5 } }, { remote: '../bad' }]) assert.throws(() => eventStoreConfig({ eventStore }), /event-store-config/);
   const { rebuilt } = await rebuildStoreUseCase(f.ctx);
   // A summary, never the view: the size of each collection, the view's revision, and what its cache covers.
-  assert.deepEqual(rebuilt.map(({ consumer, counts }) => ({ consumer, counts })), [{ consumer: 'work', counts: { work: 0, decisions: 0 } }, { consumer: 'porting', counts: { porting: 0 } }]);
+  assert.deepEqual(rebuilt.map(({ consumer, counts }) => ({ consumer, counts })), [{ consumer: 'work', counts: { work: 0, decisions: 0 } }, { consumer: 'porting', counts: { porting: 0 } }, { consumer: 'identity', counts: { entries: 0, dropped: 0 } }]);
   for (const entry of rebuilt) {
     assert.deepEqual(Object.keys(entry).sort(), ['consumer', 'counts', 'cover', 'revision']);
     assert.match(entry.revision, /^[0-9a-f]{64}$/);
-    assert.deepEqual(Object.keys(entry.cover).sort(), ['covered', 'deferred', 'streams']);
+    // The identity cache is dropped, not rebuilt: it carries no cursor to cover.
+    if (entry.consumer === 'identity') assert.equal(entry.cover, null);
+    else assert.deepEqual(Object.keys(entry.cover).sort(), ['covered', 'deferred', 'streams']);
   }
   const cache = JSON.parse(fs.readFileSync(path.join(f.repo, '.fgos/cache/state.json')));
   assert.equal(rebuilt[0].revision, cache.revision, 'the reported revision is the one the consumer installed');

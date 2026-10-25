@@ -143,11 +143,11 @@ import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding/client.mjs';
 import { checkSeatBindingConfig, checkSeatBindingDryBind } from './seat-binding-checks.mjs';
-import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
+import { listAssignmentRuns, scanAssignmentLayout } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
-import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
+import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
@@ -5869,28 +5869,18 @@ export function checkObserveHostResolvable(cwd) {
     };
   }
 
-  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  // A real read of the friction store, so a store the host refuses (a symlinked
+  // directory or shard, an I/O error) fails the row instead of passing on a ping.
   try {
-    const stdout = execFileSync(hostBin, ['friction', 'ping', '--dir', root], {
-      stdio: ['pipe', 'pipe', 'pipe'],
-      encoding: 'utf8',
-    });
-    const parsed = JSON.parse(stdout);
-    if (parsed && (parsed.ok || parsed.data?.ok)) {
-      return {
-        passed: true,
-        message: `host binary at ${hostBin} resolved and verified (friction supported)`,
-      };
-    }
+    invokeHost(['friction', 'rank', '--limit', '1'], { dir: cwd });
     return {
       passed: true,
-      message: `host binary at ${hostBin} resolved`,
+      message: `host binary at ${hostBin} resolved and verified (friction store readable)`,
     };
   } catch (err) {
-    const stderr = err.stderr ? err.stderr.toString('utf8').trim() : err.message;
     return {
       passed: false,
-      message: `host binary at ${hostBin} failed version check: ${stderr || err.message}`,
+      message: `host binary at ${hostBin} failed the friction read probe: ${err.message}`,
     };
   }
 }
@@ -6061,7 +6051,6 @@ export function checkObserveRunCoverage(cwd, { hostRunner = invokeHost, scan = s
   } catch (err) {
     return { passed: false, message: `cannot enumerate run directories for ${location}: ${err.message}` };
   }
-  const eligible = projectRunEligibility(layout);
   let recent = 0;
   for (const run of layout.runs) {
     try {
@@ -6070,13 +6059,12 @@ export function checkObserveRunCoverage(cwd, { hostRunner = invokeHost, scan = s
     } catch {}
   }
   const directoryDifference = layout.runDirsSeen - coverage.runDirsSeen;
-  const admissionDifference = eligible.observed - coverage.observed;
   const tolerance = Math.max(recent, coverage.recentRuns);
-  if (Math.abs(directoryDifference) > tolerance || Math.abs(admissionDifference) > tolerance) {
+  if (Math.abs(directoryDifference) > tolerance) {
     const examples = layout.runs.slice(0, 3).map((run) => path.relative(root, run.runDir)).join(', ');
-    return { passed: false, message: `run coverage differs: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen} (difference ${directoryDifference}); eligible Node ${eligible.observed}, observed host ${coverage.observed} (difference ${admissionDifference}); recent tolerance ${tolerance}; ${location}; sample candidates (not confirmed missing): ${examples || '(none)'}` };
+    return { passed: false, message: `run coverage differs: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen} (difference ${directoryDifference}); recent tolerance ${tolerance}; ${location}; sample candidates (not confirmed missing): ${examples || '(none)'}` };
   }
-  return { passed: true, message: `run coverage matches: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen}; eligible Node ${eligible.observed}, observed host ${coverage.observed}; recent tolerance ${tolerance}; ${location}` };
+  return { passed: true, message: `run coverage matches: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen}; recent tolerance ${tolerance}; ${location}` };
 }
 
 registerCheck({
@@ -6093,7 +6081,7 @@ registerCheck({
 
 registerCheck({
   id: 'observe-host-resolvable',
-  description: 'Rust host binary resolves and supports observe commands (friction ping)',
+  description: 'Rust host binary resolves and reads the friction store (friction rank)',
   check: (cwd) => checkObserveHostResolvable(cwd),
 });
 
@@ -6171,6 +6159,12 @@ registerCheck({
 });
 
 registerCheck({
+  id: 'identity-shared-directory',
+  description: 'the shared directory of other machines\' sessions, read from its cache (.fgos/cache/identity-directory.json): passes with the counts; warns on entries dropped for a bad signature or a changed key (naming the machine id), on entries of another project than this clone\'s, and on a machine handle two machines share; no fix, the owner decides',
+  check: (cwd) => checkIdentitySharedDirectory(cwd),
+});
+
+registerCheck({
   id: 'identity-ids-unique',
   description: 'no two backlog rows share an id, no D-ADR number is headed with two different titles and no two decision files share a number; ids that travel between machines come from `fgos identity mint <kind>`, and a repeat here means one was written by hand',
   check: (cwd) => checkIdentityIdsUnique(cwd),
@@ -6216,7 +6210,7 @@ registerCheck({
 
 registerCheck({
   id: 'observe-run-coverage',
-  description: 'Observe directory totals and admitted runs match the independent Node layout and eligibility projections',
+  description: 'Observe run accounting is consistent and its directory totals match the Node layout scan',
   check: (cwd) => checkObserveRunCoverage(cwd),
 });
 

@@ -208,9 +208,14 @@ pub struct ProjectMinted {
 /// `identity project` read from `dir`: the main checkout's file, also from a
 /// linked worktree. `driver_dir` is the fgOS state root the Git driver uses.
 pub fn project_info(driver_dir: &Path, dir: &Path) -> Result<ProjectInfo, Refusal> {
+    project_at(driver_dir, dir).map(|(info, _)| info)
+}
+
+/// [`project_info`] and the root of the main checkout it was read from.
+pub fn project_at(driver_dir: &Path, dir: &Path) -> Result<(ProjectInfo, PathBuf), Refusal> {
     let (_, repo) = open_repository(driver_dir, dir)?;
     let (root, _) = main_root(&repo)?;
-    read(&root).map(ProjectInfo::from).map_err(|e| match e {
+    read(&root).map(|project| (ProjectInfo::from(project), root)).map_err(|e| match e {
         Error::Missing(_) => Refusal {
             candidates: Vec::new(),
             reason: "project-id-missing",

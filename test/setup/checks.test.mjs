@@ -110,6 +110,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'identity-ssh-keygen',
       'identity-pinned-machines',
       'identity-project-id',
+      'identity-shared-directory',
       'identity-ids-unique',
       'seat-binding-route',
       'seat-binding-config',

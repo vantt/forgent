@@ -5,13 +5,15 @@
 //! reclaim. `Drop` closes the description and never unlocks explicitly.
 
 use std::path::{Path, PathBuf};
-use std::time::{Duration, SystemTime};
+use std::time::Duration;
 
-pub const ACQUIRE_TIMEOUT: Duration = Duration::from_secs(5);
+/// Shorter than the Node client's 5 s host timeout, so the host names the
+/// timeout itself before the client kills it.
+pub const ACQUIRE_TIMEOUT: Duration = Duration::from_secs(4);
 
 #[derive(Debug, thiserror::Error)]
 pub enum ObserveLockError {
-    #[error("observe-lock-timeout: timed out after 5s acquiring lock at {0}")]
+    #[error("observe-lock-timeout: timed out acquiring lock at {0} (waits up to {secs}s)", secs = ACQUIRE_TIMEOUT.as_secs())]
     Timeout(PathBuf),
     #[error("lock-driver-unavailable: observe lock at {path}: {note}")]
     DriverUnavailable { path: PathBuf, note: String },
@@ -30,16 +32,6 @@ pub struct StoreLockGuard {
 
 impl StoreLockGuard {
     pub fn release(self) {}
-}
-
-pub fn format_iso_now() -> String {
-    if let Ok(fixed) = std::env::var("FGOS_NOW") {
-        let trimmed = fixed.trim();
-        if !trimmed.is_empty() {
-            return trimmed.to_string();
-        }
-    }
-    fgos_host_runtime::civil_time::format_system_time_utc(SystemTime::now())
 }
 
 /// `<root>/.fgos/locks/observe.lock`, the one path of the observe lock.

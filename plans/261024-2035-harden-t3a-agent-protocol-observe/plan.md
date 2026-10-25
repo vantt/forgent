@@ -1,7 +1,7 @@
 ---
 title: "HARDEN T3 part 04a sub-plan: Agent protocol and Observe"
 description: "Implementation sub-plan for HARDEN layer T3 part 04a: land the red tests with their fixes, one hardened shard door for every Observe store and the friction fixes, blocked(usage-limit) and a bounded outbox in the agent protocol, plumbing deletions, a typed run scan, specs; Q3 gated in its own last phase; then verify and land after the Work cutover."
-status: pending
+status: in-progress (phases 01-06 landed 2026-10-24 `48a45a5f5`; phase 07 landed 2026-10-25 `8622c1066`)
 priority: P1
 effort: "~5.75d work, ~4.25d lead time (P01 0.25d; P02 1.5d ∥ P03 1d; P04 1.5d; P05 0.5d; P06 0.5d; verify+land 0.5d); gated P07 +0.5d only if owner Q3 = remove"
 branch: "main (plan only; work runs on track branch harden/t3a-agent-protocol-observe, one linked worktree per phase lead)"
@@ -65,7 +65,7 @@ After 04a:
 | 04 | [Observe plumbing deletions + Windows shard door](phase-04-observe-plumbing-deletions.md) | 02, 03 (the Windows helper only) | — | — | pending |
 | 05 | [Run-scan typed read + coverage row (Q2 b)](phase-05-run-scan-typed-read-and-coverage-row.md) | 02, 04 | — | — | pending |
 | 06 | [Specs and CHANGELOG](phase-06-specs-and-changelog.md) | 02–05 | alone | — | pending |
-| 07 | [**GATED: owner Q3** — constant scorecard sections](phase-07-gated-q3-scorecard-constants.md) | 04 + Q3 = remove | after 04; never blocks 01–06 or landing | — | gated |
+| 07 | [Constant scorecard sections removed (owner Q3 = remove, decision 37)](phase-07-gated-q3-scorecard-constants.md) | 04 + Q3 = remove | after 04 | — | landed 10-25 (`8622c1066`) |
 
 Red test 8 (RT-01 settle half, commits `129230049` + `30cb75484`) is **not** landed in 04a: handed to T4 with its fix (D-T3A-1).
 

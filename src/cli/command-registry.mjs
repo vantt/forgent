@@ -1060,16 +1060,17 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos identity resolve claude-4f2a@fg-server --json', 'fgos identity resolve lead:MAIL'],
       },
       list: {
-        description: 'The sessions registered on this machine that are not dead: {sessions, pruned}, oldest registration first. `--project` keeps the sessions of this repository\'s project id. `--prune` first removes the entries proven dead (the rule of every write); an entry whose liveness is `unknown` (no terminal ancestor) may be a live session and is kept, shown with its liveness.',
+        description: 'The sessions registered on this machine that are not dead: {sessions, pruned}, oldest registration first. `--project` keeps the sessions of this repository\'s project id. `--machine <handle|id>` keeps one machine\'s sessions; the sessions other machines published for this project follow the local ones with `liveness: remote`. `--prune` first removes the entries proven dead (the rule of every write); an entry whose liveness is `unknown` (no terminal ancestor) may be a live session and is kept, shown with its liveness.',
         parameters: {
           type: 'object',
           properties: {
             project: { type: 'boolean', description: 'Only the sessions of this repository\'s project id.' },
+            machine: { type: 'string', description: 'Only the sessions of the machine with this handle or id.' },
             prune: { type: 'boolean', description: 'Remove the entries proven dead before listing (the rule of every write); an entry of unknown liveness is kept and shown.' },
           },
           required: [],
         },
-        examples: ['fgos identity list --json', 'fgos identity list --project', 'fgos identity list --prune'],
+        examples: ['fgos identity list --json', 'fgos identity list --project', 'fgos identity list --machine fg-server2', 'fgos identity list --prune'],
       },
       project: {
         description: 'This project: {id, handle, createdAt} read from the tracked file .fgos/project.json of the main checkout, so every clone, machine and linked worktree prints the same id. `--init` mints it once (main checkout only; refused when the file exists or the remote default branch already tracks it) and prints the commit command; nothing mints it automatically. `--new` mints a different id on purpose, to split a fork. Exit 65 [project-id-missing] when no id was minted yet.',
@@ -1552,7 +1553,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'run',
     invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] [--input <a>,<b>] [--verify "<cmd>"] [--sync <ref>] | --sync <ref> --writes <a>,<b> | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--timeout <dur>] [--account <pool/account>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
-    description: 'Door for one task: `fgos run "<prompt>"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel, debate); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`. Also "record" for inline producer turns.',
+    description: 'Door for one task: `fgos run "<prompt>"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel, debate); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`.',
     parameters: {
       type: 'object',
       positional: ['prompt'],
@@ -1581,13 +1582,6 @@ export const COMMAND_REGISTRY = [
         dir: { type: 'string', description: 'Main repository root directory. Storage follows it; workers start in the current directory, so run from inside that project or pass --worktree (a different project than the current directory is warned about as dir-differs-from-cwd).' },
         worktree: { type: 'string', description: 'Target worktree directory.' },
         json: { type: 'boolean', description: 'Emit machine-readable JSON output.' },
-        sub: { type: 'string', description: 'Sub-verb (e.g. "record").' },
-        'unit-run': { type: 'string', description: '"record" only: unit run ID.' },
-        role: { type: 'string', description: '"record" only: role name (producer).' },
-        round: { type: 'number', description: '"record" only: round number.' },
-        nonce: { type: 'string', description: '"record" only: issued once-nonce.' },
-        evidence: { type: 'string', description: '"record" only: comma-separated evidence file references.' },
-        result: { type: 'string', description: '"record" only: JSON-encoded result object.' },
       },
       required: [],
     },
@@ -1621,7 +1615,7 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'events',
-    invoke: 'fgos events <sync|status|seal|export|migrate>',
+    invoke: 'fgos events <sync|status|seal|export|migrate|import-legacy>',
     description: 'Synchronize, inspect, export or migrate the repository Event Store. `sync` and `migrate` write (sync pushes event refs to the remote); `status` and `export` only read.',
     subcommands: {
       sync: { description: 'Fetch event refs and publish this clone\'s own, unless --no-push.', examples: ['fgos events sync', 'fgos events sync --no-push'], parameters: { type: 'object', properties: { remote: { type: 'string', description: 'Remote name (default: eventStore.remote).' }, 'no-push': { type: 'boolean', description: 'Fetch only; publish nothing.' } }, required: [] } },
@@ -1629,6 +1623,7 @@ export const COMMAND_REGISTRY = [
       seal: { description: 'Certify the open events of one stream now, waiting for the seal lock; the detached child every Work command hands its seal to.', examples: ['fgos events seal --stream project'], parameters: { type: 'object', properties: { stream: { type: 'string', description: 'Stream to seal (for Work: project).' }, history: { type: 'string', description: 'History checkpoint file under .fgos/cache that the seal extends.' } }, required: ['stream'] } },
       export: { description: 'Write event history to a new directory, as canonical JSONL or the legacy file layout.', examples: ['fgos events export --out ./export', 'fgos events export --out ./legacy --format legacy-layout'], parameters: { type: 'object', properties: { out: { type: 'string', description: 'Directory to create; refused when it exists.' }, format: { type: 'string', enum: ['jsonl', 'legacy-layout'] }, stream: { type: 'string' }, since: { type: 'string', description: 'A cursor, as JSON.' } }, required: ['out'] } },
       migrate: { description: 'Import the tracked legacy event files into the store and install the fence that retires them.', examples: ['fgos events migrate --check', 'fgos events migrate'], parameters: { type: 'object', properties: { check: { type: 'boolean', description: 'Plan and report parity; change nothing.' }, baseline: { type: 'string', description: 'A recorded view to compare parity against.' } }, required: [] } },
+      'import-legacy': { description: 'Replay one legacy event file that never reached a commit into the Work stream, keeping each event\'s type, payload and time; lines already in history are skipped; --check writes nothing.', examples: ['fgos events import-legacy --file .fgos/runtime/tmp/landing-es-cutover-261024/untracked-events/<shard>.jsonl --check'], parameters: { type: 'object', properties: { file: { type: 'string', description: 'Legacy event file (JSONL) to replay.' }, check: { type: 'boolean', description: 'Report what would be imported and skipped without writing.' } }, required: ['file'] } },
     },
     examples: ['fgos events status', 'fgos events sync --no-push', 'fgos events export --out ./export', 'fgos events migrate --check'],
     touchesState: true,

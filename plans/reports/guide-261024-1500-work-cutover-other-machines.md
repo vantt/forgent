@@ -75,6 +75,38 @@ These are separate repositories; their own main has no fence yet. Each one needs
 
 Steps 1-9 for forgent; nothing else. It needs only its own machine's permissions.
 
+## Follow-up upgrade for machines already cut over (fg-server, design-lap)
+
+Added 2026-10-24 23:59. fg-server and design-lap (forgentX) cut over at 21:43–21:58 on releases built from `95a1b1f9b`. Upgrade each workspace once more, to a release built from `origin/main` **at or after `7349fe1e0`**. That one upgrade brings three changes together:
+
+- WORK `8650cac60`: `event-store-legacy-layout` passes on clones that never had the import's data tree object. On these machines the row was red even though the data was correct.
+- HARDEN T3-04a (`48a45a5f5`, Observe stores and the agent protocol).
+- WORK `7349fe1e0`: `fgos events import-legacy`, which replays the parked untracked shards (steps below).
+
+Steps: 3, 4 and 6 above (build from `origin/main` in a clean worktree, back up, `fgctl stage` + `fgctl upgrade`, restore `distribution.json`, `fgctl verify`), then `fgos setup` and `fgos doctor --fix`. No pull, migrate or Work stop beyond the few minutes of the upgrade. Then run every check below with `</dev/null`:
+
+1. `fgos doctor --json`: every `event-store-*` row passes, **including `event-store-legacy-layout`**.
+2. HARDEN T3-04a checks (source: `plans/reports/landing-261024-2249-harden-t3a-agent-protocol-observe-this-machine.md`):
+   - `observe-dir-writable`, `observe-host-resolvable`, `observe-run-coverage` and `observe-friction-migrated` all pass.
+   - `observe-host-resolvable` reads the friction store. If it fails, a shard cannot be read: stop and report it, and do not delete files.
+   - `observe-run-coverage` reports "directories Node N, host N" with the same N on both sides.
+   - `fgos metrics coverage > /dev/null` finishes in under 0.5 s.
+   - `fgos friction list` exits 0 and prints the records.
+   - Nothing needs migrating: `friction record` and `resolve` no longer migrate legacy friction. That fence stays until H33.
+3. Rollback: reactivate the previous release. Neither fix writes an on-disk format the older release cannot read.
+4. Write one board line per workspace with the machine, the workspace, the release digest and the doctor result.
+
+### Replay the parked untracked shards (fg-server: 1 file; design-lap forgentX: 8 files)
+
+After the upgrade above, in the workspace, for **one file at a time** (`D=.fgos/runtime/tmp/landing-es-cutover-261024/untracked-events`):
+
+1. Drop the files you decided to drop *before* importing: on design-lap, SEAT's smoke shard `937399ff…-20261024` (item `tsk-6nbuxb46ts`). Move it to `$D/dropped/`, do not delete it. Files that hold only `executor.dispatch` events import like any other.
+2. `fgos events import-legacy --file $D/<shard>.jsonl --check --json </dev/null`. It reports `lines`, `imported` and `skipped` with reasons (`already-in-history`, `item-exists`), and refuses with the line number any line that is not JSON, has no exact ISO `ts`, or has a type the Work stream does not register. Nothing is written.
+3. If the check looks right, run the same command once without `--check`. One transaction: either every kept line lands with its original type, payload and time, or none does.
+4. A receipt `<shard>.jsonl.imported.json` now sits next to the file. **It is the only guard against a second import.** Keep it, never copy the shard elsewhere and import again, and never delete the receipt. A replayed event gets a new hash, so `already-in-history` cannot catch a second run. A rerun refuses while the receipt exists.
+5. `fgos events sync --json </dev/null`, then check one replayed item with `fgos show <id>`. Write one board line per machine: files, lines, imported and skipped counts, and the receipt sha256 of each file.
+
+
 ## Rollback
 
 - Before step 5 on a workspace: nothing changed; resume writers on the old release.

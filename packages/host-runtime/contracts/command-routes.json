@@ -504,6 +504,7 @@
         "dir",
         "help",
         "json",
+        "machine",
         "project",
         "prune"
       ],

@@ -128,7 +128,7 @@ pub fn ensure_registered(state_root: &Path, cli: &Cli, head: &BoundHead) -> Opti
         Ok(session) => session.info,
         Err(refusal) => return refused(refusal.reason),
     };
-    match resolve(state_root, &own.handle, &judge_here) {
+    match resolve(state_root, &own.handle, &judge_here, None) {
         Ok(listed) if listed.id == own.id => None,
         Ok(_) => Some("ident-handle-in-use".to_string()),
         Err(refusal) if refusal.reason == "not-found" => {
@@ -182,7 +182,7 @@ pub fn address(state_root: Option<&Path>, to: &str, heads: &[HeadView]) -> Addre
         key: view.key.clone(),
         role_holder: is_role.then(|| (to.to_string(), info.handle.clone())),
     };
-    match resolve(root, to, &judge_here) {
+    match resolve(root, to, &judge_here, None) {
         Ok(listed) => ours
             .iter()
             .find(|(_, info)| info.id == listed.id && (!by_handle || info.handle == to))
@@ -252,7 +252,7 @@ pub fn handle_conflicts(state_root: &Path, heads: &[HeadView]) -> Vec<HandleConf
             .iter()
             .find(|(_, other)| other.id != info.id && other.handle == info.handle)
             .map(|(_, other)| other.id.clone());
-        let held = || match resolve(state_root, &info.handle, &judge_here) {
+        let held = || match resolve(state_root, &info.handle, &judge_here, None) {
             Ok(listed) if listed.id != info.id => Some(listed.id),
             _ => None,
         };
@@ -268,18 +268,19 @@ pub fn handle_conflicts(state_root: &Path, heads: &[HeadView]) -> Vec<HandleConf
     conflicts
 }
 
-/// Identity's candidates that are heads of this record.
+/// Identity's candidates that are heads of this record. Every head is a
+/// session of this machine, so a session of another machine is never one.
 fn ours_only(candidates: &[Candidate], ours: &[(&HeadView, SessionInfo)]) -> Vec<AliasCandidate> {
     candidates
         .iter()
         .filter(|c| ours.iter().any(|(_, info)| info.id == c.id))
-        .map(|c| AliasCandidate {
-            id: c.id.clone(),
-            handle: c.handle.clone(),
-            liveness: match c.liveness {
+        .filter_map(|c| {
+            let liveness = match c.liveness {
                 IdentityLiveness::Alive => Liveness::Alive,
                 IdentityLiveness::Unknown => Liveness::Unknown,
-            },
+                IdentityLiveness::Remote => return None,
+            };
+            Some(AliasCandidate { id: c.id.clone(), handle: c.handle.clone(), liveness })
         })
         .collect()
 }

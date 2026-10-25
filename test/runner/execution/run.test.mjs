@@ -1,4 +1,4 @@
-// test/runner/execution/run.test.mjs — Tests for fgos run door, mutating gate, and inline record (Phase 5)
+// test/runner/execution/run.test.mjs — Tests for the fgos run door and its mutating gate
 
 import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
@@ -10,7 +10,7 @@ import { execFileSync } from 'node:child_process';
 
 import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
-import { runUnit as coreRunUnit, recordInlineRun, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
+import { runUnit as coreRunUnit, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError, loadRunnerConfigFromDir } from '../../../src/runner/dispatch/config.mjs';
 import { seatConfigDigestOf } from '../../../src/runner/execution/seat-policy.mjs';
 import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
@@ -179,102 +179,6 @@ test('runUnit runs solo read-only unit end-to-end', async () => {
   assert.equal(summary.unitRunId, res.unitRunId);
   assert.equal(summary.outcome, res.outcome);
   assert.ok(summary.settledAt);
-});
-
-test('recordInlineRun admits valid producer nonce with existing evidenceRefs', () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  const unitRunId = 'unit-run-inline-test';
-  const unitDir = path.join(repoRoot, '.fgos', 'assignments', unitRunId);
-  fs.mkdirSync(unitDir, { recursive: true });
-
-  const unitRecord = {
-    unit: { id: 'u-1', objective: 'Do inline work', capability: 'code:implement', writes: ['output.txt'] },
-    overrides: [],
-    configSnapshot: snapshotRunnerConfig(repoRoot),
-    worktree: fs.realpathSync(worktreeDir),
-  };
-  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(unitRecord, null, 2));
-
-  // Create real evidence file in worktree
-  fs.writeFileSync(path.join(worktreeDir, 'output.txt'), 'done content\n');
-
-  // Create pending-inline.json
-  const pending = {
-    unitRunId,
-    seat: 'producer',
-    role: 'producer',
-    posture: { inlineAllowed: true },
-    round: 1,
-    nonce: 'secret-nonce-1234',
-  };
-  fs.writeFileSync(path.join(unitDir, 'pending-inline.json'), JSON.stringify(pending, null, 2));
-
-  // Record inline run
-  const recordResult = recordInlineRun({
-    unitRunId,
-    role: 'producer',
-    round: 1,
-    nonce: 'secret-nonce-1234',
-    evidenceRefs: ['output.txt'],
-    result: { status: 'pass' },
-    repoRoot,
-  });
-
-  assert.equal(recordResult.ok, true);
-  assert.equal(fs.existsSync(path.join(unitDir, 'pending-inline.json')), false); // Nonce consumed!
-
-  const resultPath = path.join(unitDir, 'producer', '1', 'runs', '01', 'result.json');
-  assert.ok(fs.existsSync(resultPath));
-  const saved = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
-  assert.deepEqual(saved.evidenceRefs, ['output.txt']);
-  const summary = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit-summary.json'), 'utf8'));
-  assert.equal(summary.inline, true);
-  assert.equal(summary.seats[0].role, 'producer');
-  assert.equal(summary.seats[0].final.runId, null);
-  assert.equal(summary.settledAt, saved.recordedAt);
-});
-
-test('recordInlineRun refuses invalid nonce, non-producer role, or missing evidence', () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  const unitRunId = 'unit-run-inline-reject';
-  const unitDir = path.join(repoRoot, '.fgos', 'assignments', unitRunId);
-  fs.mkdirSync(unitDir, { recursive: true });
-
-  const unitRecord = {
-    unit: { id: 'u-2', objective: 'Reject inline', capability: 'code:review', writes: [] },
-    overrides: [],
-    configSnapshot: snapshotRunnerConfig(repoRoot),
-    worktree: fs.realpathSync(worktreeDir),
-  };
-  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(unitRecord, null, 2));
-
-  const pending = {
-    unitRunId,
-    seat: 'producer',
-    role: 'producer',
-    posture: { inlineAllowed: true },
-    round: 1,
-    nonce: 'valid-nonce',
-  };
-  fs.writeFileSync(path.join(unitDir, 'pending-inline.json'), JSON.stringify(pending, null, 2));
-
-  // 1. Wrong nonce
-  assert.throws(
-    () => recordInlineRun({ unitRunId, role: 'producer', round: 1, nonce: 'wrong-nonce', evidenceRefs: ['README.md'], repoRoot }),
-    /invalid nonce/,
-  );
-
-  // 2. Non-producer role
-  assert.throws(
-    () => recordInlineRun({ unitRunId, role: 'reviewer', round: 1, nonce: 'valid-nonce', evidenceRefs: ['README.md'], repoRoot }),
-    /only the seat that was waiting inline may record an inline run/,
-  );
-
-  // 3. Non-existent evidence file
-  assert.throws(
-    () => recordInlineRun({ unitRunId, role: 'producer', round: 1, nonce: 'valid-nonce', evidenceRefs: ['non-existent.txt'], repoRoot }),
-    /evidenceRef "non-existent.txt" does not exist/,
-  );
 });
 
 test('architecture guard: src/runner/execution/run.mjs does NOT import state, coordination, or worktree', () => {
@@ -1196,55 +1100,6 @@ function recordedUnitFixture(t, pattern = 'solo') {
   return { repoRoot, worktreeDir, unitRunId, unitDir, record, readRecord, readSummary };
 }
 
-function pendingInlineFixture(fixture) {
-  fs.writeFileSync(path.join(fixture.unitDir, 'pending-inline.json'), JSON.stringify({
-    seat: 'producer', role: 'producer', posture: { inlineAllowed: true }, round: 1, nonce: 'single-use', binding: { executor: 'lead' },
-  }));
-  return { repoRoot: fixture.repoRoot, unitRunId: fixture.unitRunId, role: 'producer', round: 1,
-    nonce: 'single-use', evidenceRefs: ['README.md'], result: { status: 'done', summary: 'Answered' } };
-}
-
-test('inline reviewed producer remains pending and resume continues through checker settlement', async (t) => {
-  const fixture = recordedUnitFixture(t, 'reviewed');
-  const inline = recordInlineRun(pendingInlineFixture(fixture));
-  assert.equal(inline.ok, true);
-  assert.equal(fixture.readRecord().settlement, undefined);
-  assert.equal(fixture.readRecord().execution.status, 'pending');
-  assert.equal(fs.existsSync(path.join(fixture.unitDir, 'unit-summary.json')), false);
-  const producerResult = path.join(fixture.unitDir, 'producer', '1', 'runs', '01', 'result.json');
-  const originalProducer = fs.readFileSync(producerResult, 'utf8');
-  const resumed = await runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
-    resumeUnitRunId: fixture.unitRunId });
-  assert.equal(resumed.outcome, 'policy-refusal');
-  assert.deepEqual(resumed.results.map(({ seat }) => seat), ['producer', 'reviewer']);
-  assert.ok(resumed.results[1].refused);
-  assert.equal(fs.readFileSync(producerResult, 'utf8'), originalProducer);
-  assert.equal(fixture.readRecord().settlement.outcome, 'policy-refusal');
-  assert.equal(fixture.readSummary().outcome, 'policy-refusal');
-  assert.equal(fixture.readSummary().seats[0].kind, 'producer');
-});
-
-test('inline producer for a multi-role preset does not publish final settlement', (t) => {
-  for (const pattern of ['code-change', 'panel']) {
-    const fixture = recordedUnitFixture(t, pattern);
-    recordInlineRun(pendingInlineFixture(fixture));
-    assert.equal(fixture.readRecord().settlement, undefined);
-    assert.equal(fs.existsSync(path.join(fixture.unitDir, 'unit-summary.json')), false);
-    assert.ok(fs.existsSync(path.join(fixture.unitDir, 'producer', '1', 'runs', '01', 'result.json')));
-  }
-});
-
-test('requesting inline work does not publish a settled unit before the result is recorded', async (t) => {
-  const fixture = recordedUnitFixture(t, 'reviewed');
-  const pending = await runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
-    resumeUnitRunId: fixture.unitRunId, session: { headless: false, hasNativeAgent: true, provider: 'lead' } });
-  assert.equal(pending.outcome, 'blocked');
-  assert.ok(pending.results[0].pendingInline);
-  assert.equal(fixture.readRecord().settlement, undefined);
-  assert.equal(fixture.readRecord().execution.status, 'pending-inline');
-  assert.equal(fs.existsSync(path.join(fixture.unitDir, 'unit-summary.json')), false);
-});
-
 test('summary I/O failure leaves a successful resumed execution successful and authoritative', async (t) => {
   const fixture = recordedUnitFixture(t);
   const runDir = path.join(fixture.unitDir, 'producer', '1', 'runs', '01');
@@ -1309,34 +1164,27 @@ test('failed invalidation leaves the prior settled unit and published artifact a
 
 test('summary I/O failure cannot replace the original execution error', async (t) => {
   const fixture = recordedUnitFixture(t);
+  reviewedConfig(fixture.repoRoot, ['alpha']);
+  fixture.record.unit.capability = 'docs:write';
+  fixture.record.configSnapshot = snapshotRunnerConfig(fixture.repoRoot);
+  fs.writeFileSync(path.join(fixture.unitDir, 'unit.json'), JSON.stringify(fixture.record));
   fs.mkdirSync(path.join(fixture.unitDir, 'unit-summary.json'));
-  const failure = new Error('inline request could not be persisted');
-  const writeFile = fs.writeFileSync;
-  t.mock.method(fs, 'writeFileSync', (file, ...args) => {
-    if (file === path.join(fixture.unitDir, 'pending-inline.json')) throw failure;
-    return writeFile(file, ...args);
+  // The producer seat fails before it launches.
+  const failure = new Error('the producer attempt could not be prepared');
+  const producerDir = path.join(fixture.unitDir, 'producer');
+  const mkdir = fs.mkdirSync;
+  t.mock.method(fs, 'mkdirSync', (dir, ...args) => {
+    if (typeof dir === 'string' && (dir === producerDir || dir.startsWith(producerDir + path.sep))) throw failure;
+    return mkdir(dir, ...args);
   });
   const warning = t.mock.method(console, 'warn', () => {});
   await assert.rejects(runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
-    resumeUnitRunId: fixture.unitRunId, session: { headless: false, hasNativeAgent: true, provider: 'lead' } }),
+    resumeUnitRunId: fixture.unitRunId }),
   (error) => {
     assert.equal(error, failure);
     return true;
   });
   assert.equal(fixture.readRecord().settlement.outcome, 'execution-failure');
-  assert.equal(warning.mock.callCount(), 1);
-});
-
-test('summary I/O failure after inline solo completion warns without losing the recorded result', (t) => {
-  const fixture = recordedUnitFixture(t);
-  const params = pendingInlineFixture(fixture);
-  fs.mkdirSync(path.join(fixture.unitDir, 'unit-summary.json'));
-  const warning = t.mock.method(console, 'warn', () => {});
-  assert.equal(recordInlineRun(params).ok, true);
-  assert.equal(fixture.readRecord().settlement.outcome, 'pass');
-  assert.equal(fixture.readRecord().execution.status, 'settled');
-  assert.equal(fs.existsSync(path.join(fixture.unitDir, 'pending-inline.json')), false);
-  assert.ok(fs.existsSync(path.join(fixture.unitDir, 'producer', '1', 'runs', '01', 'result.json')));
   assert.equal(warning.mock.callCount(), 1);
 });
 
@@ -1358,7 +1206,6 @@ test('a reviewed execution error publishes its summary only after the dispatched
   fixture.record.configSnapshot = snapshotRunnerConfig(fixture.repoRoot);
   fixture.record.bindings = {
     'producer/1': [{ role: 'producer', round: 1, binding: { executor: 'alpha' } }],
-    'reviewer/1': [{ role: 'reviewer', round: 1, binding: { executor: 'beta', mechanism: 'inline' } }],
   };
   fs.writeFileSync(path.join(fixture.unitDir, 'unit.json'), JSON.stringify(fixture.record));
   const producerDir = path.join(fixture.unitDir, 'producer', '1', 'runs', '01');
@@ -1370,8 +1217,16 @@ test('a reviewed execution error publishes its summary only after the dispatched
     evidence: { artifacts: [path.relative(fixture.repoRoot, reportFile)] },
     classification: { outcome: { category: 'ok' } },
   }));
+  // The reviewer seat fails before it launches; its sibling still runs to a result.
+  const failure = new Error('the reviewer attempt could not be prepared');
+  const reviewerDir = path.join(fixture.unitDir, 'reviewer');
+  const mkdir = fs.mkdirSync;
+  t.mock.method(fs, 'mkdirSync', (dir, ...args) => {
+    if (typeof dir === 'string' && (dir === reviewerDir || dir.startsWith(reviewerDir + path.sep))) throw failure;
+    return mkdir(dir, ...args);
+  });
   await assert.rejects(runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
-    resumeUnitRunId: fixture.unitRunId }), (error) => error instanceof RunnerConfigError && /cannot be bound inline/.test(error.message));
+    resumeUnitRunId: fixture.unitRunId }), (error) => error === failure);
   const summary = fixture.readSummary();
   assert.equal(summary.outcome, 'execution-failure');
   const sibling = summary.seats.find((seat) => seat.seat === 'red-team');

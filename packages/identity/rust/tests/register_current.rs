@@ -20,7 +20,7 @@ fn registering_the_current_session_names_it_by_its_own_handle() {
     let own = current_session(&root, pid, None).unwrap();
     assert!(own.info.handle.starts_with("claude-"), "{}", own.info.handle);
     assert_eq!(
-        directory::resolve(&root, &own.info.handle, &judge_here).unwrap_err().reason,
+        directory::resolve(&root, &own.info.handle, &judge_here, None).unwrap_err().reason,
         "not-found",
         "a session is not in the directory before it registers"
     );
@@ -30,7 +30,7 @@ fn registering_the_current_session_names_it_by_its_own_handle() {
     assert_eq!(listed.handle, own.info.handle);
     assert_eq!(listed.id, own.info.id);
     assert_eq!(listed.roles, roles);
-    let found = directory::resolve(&root, &own.info.handle, &judge_here).unwrap();
+    let found = directory::resolve(&root, &own.info.handle, &judge_here, None).unwrap();
     assert_eq!(found.id, own.info.id);
-    assert_eq!(directory::resolve(&root, "lead:IDENT", &judge_here).unwrap().handle, own.info.handle);
+    assert_eq!(directory::resolve(&root, "lead:IDENT", &judge_here, None).unwrap().handle, own.info.handle);
 }

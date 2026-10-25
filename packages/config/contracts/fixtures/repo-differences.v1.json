@@ -147,6 +147,91 @@
     "commands"
    ],
    "reason": "this repository's own choice for a setting the standard fixes at the code default"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "advise",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "code:implement",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "code:refactor",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "code:test",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "coding:implement",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "execute",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "fgos-coding-implement",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "code:*",
+    "roles",
+    "red-team",
+    "prefer"
+   ],
+   "reason": "the standard appends families to this checker pool so a machine without its preferred family can still seat a red-team checker that differs from the producer; this repository keeps its own list"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "marketing:*",
+    "roles",
+    "red-team",
+    "prefer"
+   ],
+   "reason": "the standard appends families to this checker pool so a machine without its preferred family can still seat a red-team checker that differs from the producer; this repository keeps its own list"
   }
  ],
  "standard-only": [

@@ -7,35 +7,19 @@
 use crate::case_journal;
 use crate::contract::{ObserveRequest, WorkObservationSource};
 use crate::metrics_cli::entropy::calculate_entropy_score_and_parts;
-use crate::shard;
+use crate::metrics_cli::parse_flags;
+use crate::shard::{self, TornTail};
 use crate::store_lock::acquire_store_lock;
-use fgos_host_runtime::civil_time::format_system_time_utc;
+use crate::time::now_iso;
 use serde_json::json;
-use std::fs::OpenOptions;
-use std::io::Write;
 
 pub fn dispatch_snapshot(
     req: &ObserveRequest,
-    work_source: Option<&dyn WorkObservationSource>,
+    work_source: &dyn WorkObservationSource,
 ) -> Result<serde_json::Value, String> {
-    let mut i = 0;
-    while i < req.args.len() {
-        let arg = &req.args[i];
-        if arg == "--dir" {
-            i += 2;
-            continue;
-        } else if arg.starts_with("--dir=") {
-            i += 1;
-            continue;
-        } else {
-            return Err(format!("unexpected argument for metrics snapshot: {}", arg));
-        }
-    }
-
-    let ws =
-        work_source.ok_or_else(|| "work source not available for metrics snapshot".to_string())?;
-    let entropy_calc = calculate_entropy_score_and_parts(&req.root, ws)?;
-    let now = chrono_now_iso();
+    parse_flags("snapshot", &req.args, &[], &[], false)?;
+    let entropy_calc = calculate_entropy_score_and_parts(&req.root, work_source)?;
+    let now = now_iso();
 
     // Check currently open case if any
     let active_case = case_journal::list_cases(&req.root, true)
@@ -65,18 +49,10 @@ pub fn dispatch_snapshot(
 
     // Two processes sharing a writer id share a shard; the append is one
     // observe-lock critical section so their lines cannot interleave.
+    let line = shard::encode_line(&record)?;
     let _lock = acquire_store_lock(&req.root).map_err(|e| e.to_string())?;
-    let shard_file = shard::shard_path(&req.root, "snapshots").map_err(|e| e.to_string())?;
-    let mut file = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(&shard_file)
-        .map_err(|e| format!("cannot open snapshot shard: {}", e))?;
-
-    let line = serde_json::to_string(&record).map_err(|e| e.to_string())?;
-    writeln!(file, "{}", line).map_err(|e| format!("cannot write snapshot: {}", e))?;
-    file.sync_all()
-        .map_err(|e| format!("cannot sync snapshot: {}", e))?;
+    let shard_file = shard::append_lines(&req.root, "snapshots", TornTail::Heal, &[line])
+        .map_err(|e| format!("cannot write snapshot: {}", e))?;
 
     Ok(json!({
         "ok": true,
@@ -84,8 +60,4 @@ pub fn dispatch_snapshot(
         "record": record,
         "path": shard_file.to_string_lossy(),
     }))
-}
-
-fn chrono_now_iso() -> String {
-    format_system_time_utc(std::time::SystemTime::now())
 }

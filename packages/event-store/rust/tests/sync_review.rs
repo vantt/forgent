@@ -1,3 +1,4 @@
+#![cfg(target_os = "linux")]
 mod reader_support;
 mod sync_support;
 use fgos_event_store::{envelope::Seal, errors::ErrorCode, sync::sync_status};

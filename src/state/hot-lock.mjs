@@ -235,6 +235,11 @@ function underDir(fgosDir, target) {
   return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel);
 }
 
+/** An exact ISO time as `Date#toISOString` writes it (`YYYY-MM-DDTHH:mm:ss.sssZ`), the only form an imported event keeps. */
+export function isExactIsoTime(value) {
+  return typeof value === 'string' && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString() === value;
+}
+
 function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, extraRoots = [], readRoots = [], stageEffects = false, commitEvents = null, afterApply = null } = {}) {
   let live = true;
   const roots = [fgosDir, ...extraRoots];
@@ -259,7 +264,11 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, ext
       guard();
       if (!staging || !commitEvents) throw new HotLockError('state-tx-consumer-required', 'append requires a prepared consumer gate');
       if (typeof opts?.type !== 'string' || !opts.type.trim()) throw new HotLockError('validation', 'event type is required');
-      const event = { type: opts.type.trim(), payload: structuredClone(opts.payload ?? null), ts: new Date().toISOString() };
+      // An import of historical events keeps each one's original time; every other write is stamped now.
+      if (opts.ts !== undefined && !isExactIsoTime(opts.ts)) {
+        throw new HotLockError('validation', 'event ts must be an ISO time (YYYY-MM-DDTHH:mm:ss.sssZ)');
+      }
+      const event = { type: opts.type.trim(), payload: structuredClone(opts.payload ?? null), ts: opts.ts ?? new Date().toISOString() };
       events.push(event);
       return event;
     },

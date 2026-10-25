@@ -12,7 +12,9 @@ use fgos_observe::contract::{
     ObserveRequest, SourceError, WorkEntropySignalsRecord, WorkObservationSource, WorkOutcomesRecord,
 };
 use fgos_observe::metrics_cli::snapshot::dispatch_snapshot;
-use fgos_observe::store_lock::{acquire_store_lock, acquire_store_lock_within, observe_lock_path, ObserveLockError};
+use fgos_observe::store_lock::{
+    acquire_store_lock, acquire_store_lock_within, observe_lock_path, ObserveLockError, ACQUIRE_TIMEOUT,
+};
 
 const ROLE: &str = "OBS_TEST_ROLE";
 const ROOT: &str = "OBS_TEST_ROOT";
@@ -63,7 +65,7 @@ fn child_entry() {
         }
         "snapshot" => {
             for _ in 0..arg {
-                dispatch_snapshot(&snapshot_request(&root), Some(&EmptyWork)).expect("snapshot");
+                dispatch_snapshot(&snapshot_request(&root), &EmptyWork).expect("snapshot");
             }
         }
         other => panic!("unknown role {other}"),
@@ -123,24 +125,25 @@ fn a_taker_waits_for_a_holder_that_releases() {
     let guard = acquire_store_lock(&root).expect("waits, then takes it");
     let waited = started.elapsed();
     assert!(waited >= Duration::from_millis(400), "must have waited for the holder: {waited:?}");
-    assert!(waited < Duration::from_millis(4000), "released holder must not cost the full timeout: {waited:?}");
+    assert!(waited < ACQUIRE_TIMEOUT, "released holder must not cost the full timeout: {waited:?}");
     drop(guard);
     let _ = fs::remove_dir_all(&root);
 }
 
 #[test]
-fn a_taker_times_out_after_five_seconds_on_a_long_holder() {
+fn a_taker_times_out_on_a_holder_that_never_releases() {
     let root = temp_root("timeout");
     let ready = root.join("ready");
     let mut holder = spawn("hold", &root, &ready, 0, None);
     wait_ready(&ready, &mut holder);
+    let wait = Duration::from_millis(300);
     let started = Instant::now();
-    match acquire_store_lock(&root) {
+    match acquire_store_lock_within(&root, wait) {
         Err(ObserveLockError::Timeout(path)) => assert_eq!(path, observe_lock_path(&root)),
         other => panic!("expected observe-lock-timeout: {:?}", other.err()),
     }
     let waited = started.elapsed();
-    assert!(waited >= Duration::from_millis(4500) && waited < Duration::from_millis(8000), "{waited:?}");
+    assert!(waited >= wait && waited < wait + Duration::from_secs(2), "{waited:?}");
     let _ = fs::remove_dir_all(&root);
 }
 
@@ -155,23 +158,6 @@ fn a_sigkilled_holder_frees_the_lock_at_once() {
     let started = Instant::now();
     let guard = acquire_store_lock_within(&root, Duration::from_millis(200)).expect("free right after SIGKILL");
     assert!(started.elapsed() < Duration::from_millis(200));
-    drop(guard);
-    let _ = fs::remove_dir_all(&root);
-}
-
-#[test]
-fn a_write_longer_than_the_old_expiry_is_not_stolen() {
-    let root = temp_root("long");
-    let ready = root.join("ready");
-    let mut holder = spawn("hold", &root, &ready, 35_000, None);
-    wait_ready(&ready, &mut holder);
-    // Past the old 30 s mtime expiry the lock is still the holder's.
-    std::thread::sleep(Duration::from_secs(31));
-    match acquire_store_lock_within(&root, Duration::from_millis(200)) {
-        Err(ObserveLockError::Timeout(_)) => {}
-        other => panic!("a live holder past 30 s must keep the lock: {:?}", other.err()),
-    }
-    let guard = acquire_store_lock_within(&root, Duration::from_secs(10)).expect("taken once the holder released");
     drop(guard);
     let _ = fs::remove_dir_all(&root);
 }

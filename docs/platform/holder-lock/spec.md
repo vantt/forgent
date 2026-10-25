@@ -172,7 +172,7 @@ Git adds `repo-config`, a repo mutex at rank 80, `<fgosDir>/locks/repo-config.lo
 
 Mailbox adds `mailbox`, a repo mutex at rank 80, `<fgosDir>/locks/mailbox.lock`, with no legacy path. It serializes every mutation of the agent mailbox's snapshot (docs/platform/agent-mailbox/spec.md §6.4); held briefly, never across an emit. Only the mailbox's Rust store (`packages/mailbox/rust/store/src/record`) takes it. The row's `<fgosDir>` template is one Node's `resolveLock` can fill, as for `repo-config`, so this is a rule of use rather than a refusal: no Node code takes `mailbox`, and refusing it in Node would need a second owner list in the facade.
 
-The observe lock waits at most 5 s, has no TTL, and the shard snapshot is written under it. The activation and install locks are held by `fgctl` through the crate it links; a holder that is killed leaves the lock free at once. Until the main-checkout lock is cut over, `fgctl` checks the main checkout with `probe` (shared, non-blocking, never held) plus the v1 read, and reads a directory at `.fgos/main-checkout.lock` (a tombstone) as "moved".
+The observe lock waits at most 4 s (so the host names `observe-lock-timeout` before `invokeHost`'s 5 s kill), has no TTL, and the shard snapshot is written under it. The activation and install locks are held by `fgctl` through the crate it links; a holder that is killed leaves the lock free at once. Until the main-checkout lock is cut over, `fgctl` checks the main checkout with `probe` (shared, non-blocking, never held) plus the v1 read, and reads a directory at `.fgos/main-checkout.lock` (a tombstone) as "moved".
 
 ## 8. The predecessor domain rule
 

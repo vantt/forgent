@@ -78,7 +78,6 @@ test('every capability of the committed config binds headless to a runnable invo
         assert.equal(typeof result.refused.reason, 'string', capability);
         continue;
       }
-      if (result.mechanism === 'inline') continue;
       bound += 1;
       assertRunnable(result, `${capability} writes=${writes.length}`);
     }

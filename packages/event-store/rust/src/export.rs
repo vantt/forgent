@@ -19,6 +19,7 @@ use std::{
 pub struct ExportRequest<'a> {
     pub layout: &'a Layout,
     pub origin: &'a str,
+    pub machine: &'a str,
     pub streams: &'a [StreamId],
     pub since: &'a Cursor,
     pub out: &'a Path,
@@ -42,12 +43,15 @@ fn destination(out: &Path) -> Result<(), Error> {
         }
         parent = p.parent();
     }
-    let mut builder = fs::DirBuilder::new();
     #[cfg(unix)]
-    {
+    let builder = {
         use std::os::unix::fs::DirBuilderExt;
+        let mut builder = fs::DirBuilder::new();
         builder.mode(0o700);
-    }
+        builder
+    };
+    #[cfg(not(unix))]
+    let builder = fs::DirBuilder::new();
     builder.create(out).map_err(io)?;
     Ok(())
 }
@@ -91,6 +95,7 @@ fn query(
         ReadRequest {
             layout: req.layout,
             origin: req.origin,
+            machine: req.machine,
             streams: req.streams,
             cursor: &Cursor::default(),
             folded: &[],
