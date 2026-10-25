@@ -1,0 +1,88 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit": 0,
+    "stdout": "ee2ce49c4b610daccb656f79fdb29531bb41d06b\n",
+    "stderr": null,
+    "stdoutSha256": "3e3fc19afc329e5452de02486927157e3dbfdce20977d544a535e9a820f07a1f"
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+      "--check"
+    ],
+    "exit": 0,
+    "stdout": "{\n  \"drift\": 0,\n  \"rows\": [],\n  \"authenticatedSupersededOrigins\": [\n    {\n      \"file\": \"plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json\",\n      \"pointer\": \"/claims/7\",\n      \"effectiveFile\": \"plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json\",\n      \"effectivePointer\": \"/bindingRefresh/117\",\n      \"binding\": {\n        \"targetOwner\": \"docs/platform/work-state/spec.md\",\n        \"targetAnchor\": \"11-business-rules\",\n        \"targetUnitDigest\": \"0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41\",\n        \"targetAncestry\": [\n          \"Work State Specification\",\n          \"11. Business Rules\"\n        ]\n      }\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdoutSha256": "781d13299620a58dcd67832f0c33987057a84295cdaf162c5b1d503294a131b6",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py",
+      "--check"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py\", line 208, in <module>\n    main()\n  File \"/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py\", line 201, in main\n    assert path.read_text() == text, str(path)\nAssertionError: plans/260925-documentation-authority-unification/reports/phase-09/carries/source-heading-parity.json\n",
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "6600bd10c830bd9a122400fae32f50e5e4d0f92515c39b9cec9c3ed5037070fd"
+  },
+  {
+    "argv": [
+      "node",
+      "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+    ],
+    "exit": 0,
+    "stdout": "{\n  \"status\": \"pass\",\n  \"claims\": 44,\n  \"candidateUnits\": 1009,\n  \"refreshedDecisions\": 121,\n  \"droppedClaims\": 17,\n  \"pointerFiles\": 24,\n  \"currentSourceUnits\": 346,\n  \"historicalHeadingWitnesses\": 91,\n  \"liveHeadingRows\": 91,\n  \"liveSectionBlocks\": 321,\n  \"livePointerPatchDrift\": [\n    {\n      \"path\": \"bin/fgos.mjs\",\n      \"beforeSha256\": \"4ad9ed0cb07518ae19774ddcf058d78484b53de25b850ae641b7b53011010d5f\",\n      \"liveSha256\": \"1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e\",\n      \"finalPinDuty\": {\n        \"path\": \"bin/fgos.mjs\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    },\n    {\n      \"path\": \"docs/backlog.md\",\n      \"beforeSha256\": \"344552da9931e8c5ca9f946e49e0a25c40ff42b61dbf6d99c73310d5e14b7c33\",\n      \"liveSha256\": \"d0fb356de66a0bdfffac2f9835678bd4001d68779003c381e34a4f2bc9e49306\",\n      \"finalPinDuty\": {\n        \"path\": \"docs/backlog.md\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    }\n  ],\n  \"finalPinDuties\": {\n    \"version\": 1,\n    \"pointerPatchDrift\": [\n      {\n        \"path\": \"bin/fgos.mjs\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      },\n      {\n        \"path\": \"docs/backlog.md\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    ]\n  },\n  \"witnessPin\": \"f534aeaea59ebdc39613aab02c109dbd30fd36b8\",\n  \"currentLedgerSuccessors\": {\n    \"status\": \"pass\",\n    \"origins\": 1208,\n    \"currentBindings\": 1208\n  },\n  \"sourceParityQualification\": \"Current rows require exact source anchor/digest and normalized full-source inclusion at a named current target. Split/adapted rows also check target digests; explicit zero-fuzz adaptations are not false equality. Original heading census, placement and unapplied patch witnesses replay at witnessPin. Live heading census, direct-section block coverage and pointer-patch drift also check working-tree bytes; only explicitly listed final-pin duties permit drift. Patch recomposition and authority/cutover acceptance are not certified.\",\n  \"reviewStatus\": \"pending; no gate accepted\"\n}\n",
+    "stderr": "",
+    "stdoutSha256": "c8106e77dd2b88201c7ce74970dc0489c933a8cb1470836ff9582bd988449486",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "/tmp/fgos-work/g0rework-verify-aajwbhrr/misc-verify.py"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/tmp/fgos-work/g0rework-verify-aajwbhrr/misc-verify.py\", line 9, in <module>\n    runpy.run_path('/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py',run_name='__main__')\n  File \"/usr/lib/python3.10/runpy.py\", line 289, in run_path\n    return _run_module_code(code, init_globals, run_name,\n  File \"/usr/lib/python3.10/runpy.py\", line 96, in _run_module_code\n    _run_code(code, mod_globals, init_globals,\n  File \"/usr/lib/python3.10/runpy.py\", line 86, in _run_code\n    exec(code, run_globals)\n  File \"/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py\", line 119, in <module>\n    if __name__=='__main__':main()\n  File \"/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py\", line 116, in main\n    verify(pathlib.Path(name))\n  File \"/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py\", line 26, in verify\n    run(['python3','-B',str(P/'reports/phase-09/misc-fix/rebind.py'),'--check'])\n  File \"/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py\", line 23, in run\n    assert proc.returncode==0,proc.stderr\nAssertionError: Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 231, in <module>\n    if __name__=='__main__': main()\n  File \"/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 222, in main\n    record=check(pin)\n  File \"/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 214, in check\n    check_live(shard, commit, docs)\n  File \"/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py\", line 187, in check_live\n    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,\nAssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/13', ['changedClauses', 'disposition', 'priorReview', 'reviewNote'])\n\n",
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "2f72165de7e301f12dd4538d354155c4fffaf7d1edd1b787e536681aedd449f8"
+  },
+  {
+    "argv": [
+      "node",
+      "/tmp/fgos-work/g0rework-verify-aajwbhrr/step10-round5/ownership.mjs",
+      "--output-dir",
+      "/tmp/fgos-work/g0rework-verify-aajwbhrr/step10-round5"
+    ],
+    "exit": 0,
+    "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 17 }\n",
+    "stderr": "",
+    "stdoutSha256": "4c19ec65c4f7d0034a822997d4734b83c6fdd075adea1a047e8566abe6a454e4",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "node",
+      "/tmp/fgos-work/g0rework-verify-aajwbhrr/step10-round5/audit-ownership.mjs",
+      "--output-dir",
+      "/tmp/fgos-work/g0rework-verify-aajwbhrr/step10-round5"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(current.noNewDoubleOwnership)\n\n    at file:///tmp/fgos-work/g0rework-verify-aajwbhrr/step10-round5/audit-ownership.mjs:8:56 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n",
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "aafa572edcc2194a64a12993238b012bc1799253864e66f2fba6fddca5cad35c"
+  }
+]

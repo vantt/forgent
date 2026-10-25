@@ -1,0 +1,268 @@
+{
+  "sourceHead": "ee2ce49c4b610daccb656f79fdb29531bb41d06b",
+  "environment": {
+    "NODE_OPTIONS": "--no-addons",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "commands": [
+    {
+      "label": "baseline-refresh-check",
+      "argv": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/g0-rework-s49ord2q/baseline-refresh.py"
+      ],
+      "exit": 1,
+      "stdout": null,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-baseline-refresh-check.stderr.txt",
+      "stderrSha256": "b9c459eb36911fa87f9689e8d4badf1ec1e3398d34e2565adbe44b91bed699c3",
+      "plumbing": null,
+      "stdoutBytes": 0,
+      "stderrBytes": 454
+    },
+    {
+      "label": "scoped-data-validation",
+      "argv": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/g0-rework-s49ord2q/validate.py"
+      ],
+      "exit": 0,
+      "stdout": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-scoped-data-validation.txt",
+      "stdoutSha256": "e476d2b41100ddca96be3b00c665fccabcf7b7a83cebccabec02abd55a3f0b88",
+      "stderr": null,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "plumbing": null,
+      "stdoutBytes": 8756,
+      "stderrBytes": 0
+    },
+    {
+      "label": "refresh-carries-check",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py",
+        "--check"
+      ],
+      "exit": 1,
+      "stdout": null,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-refresh-carries-check.stderr.txt",
+      "stderrSha256": "6600bd10c830bd9a122400fae32f50e5e4d0f92515c39b9cec9c3ed5037070fd",
+      "plumbing": null,
+      "stdoutBytes": 0,
+      "stderrBytes": 536
+    },
+    {
+      "label": "rebind-test",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/test_rebind.py"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-rebind-test.stderr.txt",
+      "stderrSha256": "199ba496f288116d36c62f29346d4fbf0bd75745a1c893abfcbdaa4c6d5b1033",
+      "plumbing": null,
+      "stdoutBytes": 0,
+      "stderrBytes": 101
+    },
+    {
+      "label": "rebind-check",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-rebind-check.txt",
+      "stdoutSha256": "781d13299620a58dcd67832f0c33987057a84295cdaf162c5b1d503294a131b6",
+      "stderr": null,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "plumbing": null,
+      "stdoutBytes": 736,
+      "stderrBytes": 0
+    },
+    {
+      "label": "g0rework-verify",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py"
+      ],
+      "exit": 1,
+      "stdout": null,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-g0rework-verify.stderr.txt",
+      "stderrSha256": "5f64463dbfda55bee2db338c7672398d925f26cee7a609470ce6c5a29493b8f7",
+      "plumbing": null,
+      "stdoutBytes": 0,
+      "stderrBytes": 428
+    },
+    {
+      "label": "verify-carries",
+      "argv": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+      ],
+      "exit": 0,
+      "stdout": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-verify-carries.txt",
+      "stdoutSha256": "c8106e77dd2b88201c7ce74970dc0489c933a8cb1470836ff9582bd988449486",
+      "stderr": null,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "plumbing": null,
+      "stdoutBytes": 2164,
+      "stderrBytes": 0
+    },
+    {
+      "label": "g9-sweep",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+        "--check",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-g9-sweep.txt",
+      "stdoutSha256": "f0ba41bdba3e55899e449a8d3018964aea07ee3bedef1425655dbb924735b757",
+      "stderr": null,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "plumbing": null,
+      "stdoutBytes": 2139456,
+      "stderrBytes": 0
+    },
+    {
+      "label": "legacy-ratchet",
+      "argv": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exit": 0,
+      "stdout": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-legacy-ratchet.txt",
+      "stdoutSha256": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319",
+      "stderr": null,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "plumbing": null,
+      "stdoutBytes": 108,
+      "stderrBytes": 0
+    },
+    {
+      "label": "misc-verify",
+      "argv": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/g0-rework-s49ord2q/misc-verify.py"
+      ],
+      "exit": 1,
+      "stdout": null,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-misc-verify.stderr.txt",
+      "stderrSha256": "2b45197b258a948dcc253ac71d254c271f97b286140d85068b6b5f6a6a718572",
+      "plumbing": "Only misc-fix/checks.json output redirected to exit-cleaned tempfile; assertions unchanged.",
+      "stdoutBytes": 0,
+      "stderrBytes": 2411
+    },
+    {
+      "label": "g0join",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0join/join.py",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 1,
+      "stdout": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/join-ee2ce49c4.json",
+      "stdoutSha256": "031b1d5e3d733d3474bfc31057ebaa5c8f9bea8151551d04603fe68d8862346c",
+      "stderr": null,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "plumbing": null,
+      "stdoutBytes": 3011561,
+      "stderrBytes": 0
+    },
+    {
+      "label": "whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": null,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "plumbing": null,
+      "stdoutBytes": 0,
+      "stderrBytes": 0
+    }
+  ],
+  "miscChecksUnchanged": true,
+  "emptyOutputPolicy": "Empty streams have null path, byte count 0 and the SHA256 of empty bytes; no empty log files are retained.",
+  "finalWorkspaceChecks": {
+    "writeScope": [
+      "plans/260925-documentation-authority-unification/ledger/decisions/",
+      "docs/platform/",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/",
+      "plans/260925-documentation-authority-unification/reports/phase-09/rebind/",
+      "plans/260925-documentation-authority-unification/reports/phase-09/carries/"
+    ],
+    "changedOrNewPaths": [
+      "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "docs/platform/work-state/spec.md",
+      "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-native-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/join-ee2ce49c4.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-baseline-refresh-check.stderr.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-blockers.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-commands.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-data-validation.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-diagnostic-step10-round5-target-ownership.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-g0rework-nested-commands.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-g0rework-verify.stderr.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-g9-sweep.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-legacy-ratchet.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-misc-verify.stderr.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-rebind-check.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-rebind-test.stderr.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-receipt.md",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-refresh-carries-check.stderr.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-scoped-data-validation.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-verify-carries.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-code-span-scan.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-direct-rebindings.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+      "plans/260925-documentation-authority-unification/reports/phase-09/rebind/test_rebind.py"
+    ],
+    "outsideScope": [],
+    "whitespaceExit": 0,
+    "noPilotLegacyReviewRegisterOrMiscDelta": true
+  }
+}

@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py", line 208, in <module>
+    main()
+  File "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py", line 201, in main
+    assert path.read_text() == text, str(path)
+AssertionError: plans/260925-documentation-authority-unification/reports/phase-09/carries/source-heading-parity.json

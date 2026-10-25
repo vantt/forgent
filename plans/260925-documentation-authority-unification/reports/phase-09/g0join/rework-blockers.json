@@ -1,0 +1,46 @@
+{
+  "status": "blocked-not-gate-acceptance",
+  "sourceHead": "ee2ce49c4b610daccb656f79fdb29531bb41d06b",
+  "needsWrites": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py"
+  ],
+  "issues": [
+    {
+      "owner": "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py",
+      "observedExit": 1,
+      "cause": "The unchanged embedded raw-origin auditor reports 17 targetDigestDrift rows: 16 authenticated identical-unit groups with null single anchor, plus one immutable pilot origin whose exact current ledger successor is live. The verifier also hardcodes pre-duplicate effective endpoints for g0 rows 6/20/21 and earlier direct row review endpoints. It must authenticate group/effective bindings and the requested duplicate chains without dropping conservation cases. Outside writable scope; not edited.",
+      "evidence": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-diagnostic-step10-round5-target-ownership.json"
+    },
+    {
+      "owner": "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py",
+      "observedExit": 1,
+      "cause": "The unchanged deterministic generator adds a second identical release-tree-canonicalization target to carries/source-heading-parity.json. Reproduces with every live input pinned to unmodified HEAD, so not introduced by this rework. The incidental generated duplicate was restored away rather than kept to manufacture green.",
+      "baselineReplay": {
+        "source": "\"\"\"Replay unchanged generator/check with ALL live inputs pinned to turn-start HEAD.\nOnly input byte plumbing changes; no assertion or output equality is removed.\n\"\"\"\nimport json,subprocess,sys,runpy,pathlib\nP=pathlib.Path('plans/260925-documentation-authority-unification');R=P/'reports/phase-09'\nm=runpy.run_path(str(R/'g0rework/refresh-carries.py'));g=m['main'].__globals__\nfiles=subprocess.check_output(['git','ls-tree','-r','--name-only','HEAD','--',str(P/'ledger/decisions'),str(P/'pilot/decisions')],text=True).splitlines()\ndocs={p:json.loads(subprocess.check_output(['git','show','HEAD:'+p],text=True)) for p in files if p.endswith('.json')}\ng['documents']=lambda:docs\nextract=g['rebind']['extract']\ndef pinned(request):\n return extract(dict(request,paths=[],virtual=request.get('virtual',[])+[dict(path=p,content=subprocess.check_output(['git','show','HEAD:'+p],text=True)) for p in request.get('paths',[])]))\ng['rebind']['extract']=pinned\nsys.argv=['refresh-carries.py','--check']\ng['main']() if 'main' in g else m['main']()\n",
+        "argv": [
+          "python3",
+          "-B",
+          "/tmp/fgos-work/g0-rework-s49ord2q/baseline-refresh.py"
+        ],
+        "exit": 1
+      },
+      "evidence": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-baseline-refresh-check.stderr.txt"
+    },
+    {
+      "owner": "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py",
+      "observedExit": 1,
+      "cause": "check_live accepts only committed full-row transitions. The authorized truth-correction of s17 /bindingRefresh/13 cannot be accepted before the runner commits. Exact full before/after transition is provided in rebind/g0-rework-rebindings.json changes; replay unchanged proof at runner commit. No misc script/report edit is needed.",
+      "evidence": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/rework-misc-verify.stderr.txt"
+    },
+    {
+      "owner": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/join.py",
+      "observedExit": 1,
+      "cause": "--pin HEAD reads committed blobs only. The required committed join therefore remains the pre-turn 27 held and 15 REWORK state. Workers cannot commit or manufacture independent reviews. Rationale-only re-decisions can also retain binding digests, so old exact-binding REWORKs need genuinely later independent per-row verdicts, not author status. Final-pin replay belongs to the runner/Lead.",
+      "evidence": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/join-ee2ce49c4.json"
+    }
+  ],
+  "noChecksSkipped": true,
+  "noApprovalAuthored": true,
+  "noNativeAddonLoaded": true
+}

@@ -31,7 +31,26 @@
       "targetUnitDigest": "4d4c1b5f2a290762fd6921a907d31e21e2dce776ea157119f963959606d94de9",
       "targetAncestry": [
         "Observe Component Specification"
-      ]
+      ],
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_c9cc1ff2abdd7adf91641d4c8b240523",
+          "sourceUnitDigest": "53e7d20d4f0fc326b73efbd72dcbb66009bc65ec37e130c0e2178c948161adf8",
+          "targetOwner": "docs/platform/observe/spec.md",
+          "targetAnchor": "observe-component-specification",
+          "claimKind": "architecture",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+          "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The heading or scaffolding binding changes while its source heading text remains. Legacy source untouched; no promotion or cutover approval. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+          "targetUnitDigest": "4d4c1b5f2a290762fd6921a907d31e21e2dce776ea157119f963959606d94de9",
+          "targetAncestry": [
+            "Observe Component Specification"
+          ]
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "bindingSha256": "e1e8196fc047eee129ac2d200f62cf22901672e08ac9a4142ae04bfd98fd17d2"
     },
     {
       "claimId": "claim_398a2a6235ab1ae2d5264325daf42a5c",
@@ -62,7 +81,27 @@
       "targetAncestry": [
         "Observe Component Specification",
         "1. Overview & Boundaries"
-      ]
+      ],
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_a1ef5e3f7d16b7ab938e8ac6eb2209c3",
+          "sourceUnitDigest": "f3f902093f4846a4bad6229589c0ab856ff959871b4fe3a99cac6f176ec35e48",
+          "targetOwner": "docs/platform/observe/spec.md",
+          "targetAnchor": "1-overview-boundaries",
+          "claimKind": "specification",
+          "disposition": "supersede",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+          "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+          "targetUnitDigest": "3c5f074f9b5cfbd5f02d866cbcd9eac50b3c9e5f4ba8ad5d430bf42a0d598c65",
+          "targetAncestry": [
+            "Observe Component Specification",
+            "1. Overview & Boundaries"
+          ]
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "bindingSha256": "54da3b096b0c8ce617a331637fa71217cddb90e827a81ea0a30fbd424557a994"
     },
     {
       "claimId": "claim_a2b2774f89a89257732a551b52addc22",
@@ -89,7 +128,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "Source: docs/specs/observe.md:12-12#owns (current lines); unit SHA256 ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2.\nTarget: docs/platform/observe/spec.md:34-34#owns (current lines); unit SHA256 a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec\" (../platform/session-identity/spec.md) → \"spec\" (../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nHeading depth: 3 → 3; title \"Owns\" → \"Owns\".\nWhole direct section differs; depth 3 → 3; 1 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections:\nA40/step8-truth-corrections-1: \"`fgos friction rank`).\" → \"`fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"; evidence step8-truth-corrections.json; packages/observe/rust/src/friction_cli.rs:7-9 (evidence commit 2107c4761cdde5f4302502ad564258220ba6a09d).\nDisposition supersede: Account for docs/specs/observe.md#owns under docs/platform/observe/spec.md#owns; source context \"Observe Component Specification / 1. Overview & Boundaries\", target context \"Observe Component Specification / 1. Overview & Boundaries\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: native source content changed, target content/context rebind, changed-file context; no approval carry. Independent review pending. L12-112: merge 66b637a108cd6a2659112982082b4194907b8e53 and authorized identity docs carry. Complete passage and immediate neighbouring blocks checked with both unchanged extractors, using content and heading ancestry rather than block index. Exact witnesses in step-07-l12-112-merge-rebindings.json; source identity unchanged; no approval carry.",
+      "rationale": "Source: docs/specs/observe.md:12-12#owns (current lines); unit SHA256 ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2.\nTarget: docs/platform/observe/spec.md:34-34#owns (current lines); unit SHA256 15cf2d08571be0557c0159bc4ce5e07b282a840ed14172cea109bbe4f4e544c5.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec\" (../platform/session-identity/spec.md) → \"spec\" (../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nHeading depth: 3 → 3; title \"Owns\" → \"Owns\".\nWhole direct section differs; depth 3 → 3; 1 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections:\nA40/step8-truth-corrections-1: \"`fgos friction rank`).\" → \"`fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"; evidence step8-truth-corrections.json; packages/observe/rust/src/friction_cli.rs:7-9 (evidence commit 2107c4761cdde5f4302502ad564258220ba6a09d).\nDisposition supersede: Account for docs/specs/observe.md#owns under docs/platform/observe/spec.md#owns; source context \"Observe Component Specification / 1. Overview & Boundaries\", target context \"Observe Component Specification / 1. Overview & Boundaries\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: native source content changed, target content/context rebind, changed-file context; no approval carry. Independent review pending. L12-112: merge 66b637a108cd6a2659112982082b4194907b8e53 and authorized identity docs carry. Complete passage and immediate neighbouring blocks checked with both unchanged extractors, using content and heading ancestry rather than block index. Exact witnesses in step-07-l12-112-merge-rebindings.json; source identity unchanged; no approval carry.",
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "owns",
       "targetUnitDigest": "15cf2d08571be0557c0159bc4ce5e07b282a840ed14172cea109bbe4f4e544c5",
@@ -98,9 +137,33 @@
         "1. Overview & Boundaries",
         "Owns"
       ],
-      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
       "bindingSha256": "ebfcac2a9dff46497322d64d97dfb66f46efe61f1485e5bd8091cc6a6330a029",
-      "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; unique heading content and ancestry; direct payload changed. Earlier source snapshots are provenance, not exact current-text assertions."
+      "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; unique heading content and ancestry; direct payload changed. Earlier source snapshots are provenance, not exact current-text assertions.",
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_b2a51d5d39832d330879947bdbbcb227",
+          "sourcePath": "docs/specs/observe.md",
+          "sourceAnchor": "owns",
+          "sourceUnitDigest": "a0deb3897e942b588c4aaedcc2fa1f0fa590b96f10ff254ad1da5f51ce9d3487",
+          "claimKind": "specification",
+          "disposition": "supersede",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+          "rationale": "Source: docs/specs/observe.md:12-12#owns (current lines); unit SHA256 ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2.\nTarget: docs/platform/observe/spec.md:34-34#owns (current lines); unit SHA256 a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec\" (../platform/session-identity/spec.md) → \"spec\" (../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nHeading depth: 3 → 3; title \"Owns\" → \"Owns\".\nWhole direct section differs; depth 3 → 3; 1 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections:\nA40/step8-truth-corrections-1: \"`fgos friction rank`).\" → \"`fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"; evidence step8-truth-corrections.json; packages/observe/rust/src/friction_cli.rs:7-9 (evidence commit 2107c4761cdde5f4302502ad564258220ba6a09d).\nDisposition supersede: Account for docs/specs/observe.md#owns under docs/platform/observe/spec.md#owns; source context \"Observe Component Specification / 1. Overview & Boundaries\", target context \"Observe Component Specification / 1. Overview & Boundaries\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: native source content changed, target content/context rebind, changed-file context; no approval carry. Independent review pending. L12-112: merge 66b637a108cd6a2659112982082b4194907b8e53 and authorized identity docs carry. Complete passage and immediate neighbouring blocks checked with both unchanged extractors, using content and heading ancestry rather than block index. Exact witnesses in step-07-l12-112-merge-rebindings.json; source identity unchanged; no approval carry.",
+          "targetOwner": "docs/platform/observe/spec.md",
+          "targetAnchor": "owns",
+          "targetUnitDigest": "15cf2d08571be0557c0159bc4ce5e07b282a840ed14172cea109bbe4f4e544c5",
+          "targetAncestry": [
+            "Observe Component Specification",
+            "1. Overview & Boundaries",
+            "Owns"
+          ],
+          "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+          "bindingSha256": "ebfcac2a9dff46497322d64d97dfb66f46efe61f1485e5bd8091cc6a6330a029",
+          "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; unique heading content and ancestry; direct payload changed. Earlier source snapshots are provenance, not exact current-text assertions."
+        }
+      }
     },
     {
       "claimId": "claim_fde5bf697a74032ae96b87746d5f5f25",
@@ -117,7 +180,28 @@
         "Observe Component Specification",
         "1. Overview & Boundaries",
         "Must Not Own"
-      ]
+      ],
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_fde5bf697a74032ae96b87746d5f5f25",
+          "sourceUnitDigest": "24eb30e7b62ea4e840780b81f404e924c679dbc4002866fca5077bccb2b92b6e",
+          "targetOwner": "docs/platform/observe/spec.md",
+          "targetAnchor": "must-not-own",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+          "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#must-not-own (source lines 19-19) is carried at docs/platform/observe/spec.md#must-not-own (candidate lines 41-41). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+          "targetUnitDigest": "24eb30e7b62ea4e840780b81f404e924c679dbc4002866fca5077bccb2b92b6e",
+          "targetAncestry": [
+            "Observe Component Specification",
+            "1. Overview & Boundaries",
+            "Must Not Own"
+          ]
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "bindingSha256": "e7e554459652c5f1e519c0d301777cd09297585338b76e0b6ed84164cf66370b"
     },
     {
       "claimId": "claim_50d0f11082f8a7c2a9460b3a970586af",
@@ -150,7 +234,27 @@
       "targetAncestry": [
         "Observe Component Specification",
         "2. Shared Entities & Subjects"
-      ]
+      ],
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_0494c6c790b6a6cb8aaaa6822467772e",
+          "sourceUnitDigest": "f3c03447025b806dfd933bff337de6626a77b8838d4fff1036b24bcab85a93ff",
+          "targetOwner": "docs/platform/observe/spec.md",
+          "targetAnchor": "2-shared-entities-subjects",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+          "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#2-shared-entities-subjects (source lines 25-25) is carried at docs/platform/observe/spec.md#2-shared-entities-subjects (candidate lines 47-47). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+          "targetUnitDigest": "f3c03447025b806dfd933bff337de6626a77b8838d4fff1036b24bcab85a93ff",
+          "targetAncestry": [
+            "Observe Component Specification",
+            "2. Shared Entities & Subjects"
+          ]
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "bindingSha256": "c40d67824b8deb3d2aa102ffdd4ba9417e71519148a7b13258e4d2fc8df7edd8"
     },
     {
       "claimId": "claim_7910591f62e9bc90ce6c1a90b8aa31bc",
@@ -182,7 +286,27 @@
       "targetAncestry": [
         "Observe Component Specification",
         "3. Storage Model"
-      ]
+      ],
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_33ce1e718f0906ee1a5f76fb4907b417",
+          "sourceUnitDigest": "a63475b5baf9f8c247d09d757e17fd86c697eb67a12036ce5d1dad24e6407251",
+          "targetOwner": "docs/platform/observe/spec.md",
+          "targetAnchor": "3-storage-model",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+          "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#3-storage-model (source lines 36-36) is carried at docs/platform/observe/spec.md#3-storage-model (candidate lines 58-58). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package rebind at 8b2ee4dd9: native source content changed, target content/context rebind, changed-file context; no approval carry. Independent review pending.",
+          "targetUnitDigest": "a63475b5baf9f8c247d09d757e17fd86c697eb67a12036ce5d1dad24e6407251",
+          "targetAncestry": [
+            "Observe Component Specification",
+            "3. Storage Model"
+          ]
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "bindingSha256": "4487ecc707e6bc71ae436f5fd676a9a0da4d09044b6e3bddcbc4b857ef06743f"
     },
     {
       "claimId": "claim_908fe7d610c47ed8348c6b10768539c9",
@@ -198,7 +322,27 @@
       "targetAncestry": [
         "Observe Component Specification",
         "4. Commands & Routing"
-      ]
+      ],
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_908fe7d610c47ed8348c6b10768539c9",
+          "sourceUnitDigest": "b0b1d84706367b794a79b08b31f2e5bcba0e4656af65400e602890505457198d",
+          "targetOwner": "docs/platform/observe/spec.md",
+          "targetAnchor": "4-commands-routing",
+          "claimKind": "specification",
+          "disposition": "supersede",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+          "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+          "targetUnitDigest": "48ada5d895788c31e0cfc7f9dc44b26c62ca362a58d42791af1d1faae52c5567",
+          "targetAncestry": [
+            "Observe Component Specification",
+            "4. Commands & Routing"
+          ]
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "bindingSha256": "0b633c81fb6df9e6067944c11f0d9d6a7204ff346c46ba14a0c18966bc49dd08"
     },
     {
       "claimId": "claim_af8421bdba71901b8706678586ae03cb",
@@ -246,7 +390,27 @@
       "targetAncestry": [
         "Observe Component Specification",
         "5. Mục theo làn (Sub-spec sections)"
-      ]
+      ],
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_7e870015f558a75e65adab6d1b3230d2",
+          "sourceUnitDigest": "bdac824aa1ded5a576aeca01899a159abcc604b48cfa2e31ad3f660415e78cd3",
+          "targetOwner": "docs/platform/observe/spec.md",
+          "targetAnchor": "5-mục-theo-làn-sub-spec-sections",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+          "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#5-mục-theo-làn-sub-spec-sections (source lines 50-50) is carried at docs/platform/observe/spec.md#5-mục-theo-làn-sub-spec-sections (candidate lines 72-72). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+          "targetUnitDigest": "bdac824aa1ded5a576aeca01899a159abcc604b48cfa2e31ad3f660415e78cd3",
+          "targetAncestry": [
+            "Observe Component Specification",
+            "5. Mục theo làn (Sub-spec sections)"
+          ]
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "bindingSha256": "ead7507e1874e8a8543c27d104d90d28e48c011ea64c473b64f180fe5a6362ff"
     },
     {
       "claimId": "claim_b0e62ed94ed2770d0225ff91b34cbadf",
@@ -263,7 +427,28 @@
         "Observe Component Specification",
         "5. Mục theo làn (Sub-spec sections)",
         "§ Metrics (Làn A)"
-      ]
+      ],
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_b0e62ed94ed2770d0225ff91b34cbadf",
+          "sourceUnitDigest": "2ded62db9d6370e17b2cc65f35e45d117ee7b94c792128d359eb1229e628986f",
+          "targetOwner": "docs/platform/observe/spec.md",
+          "targetAnchor": "metrics-làn-a",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+          "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#metrics-làn-a (source lines 52-52) is carried at docs/platform/observe/spec.md#metrics-làn-a (candidate lines 74-74). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+          "targetUnitDigest": "2ded62db9d6370e17b2cc65f35e45d117ee7b94c792128d359eb1229e628986f",
+          "targetAncestry": [
+            "Observe Component Specification",
+            "5. Mục theo làn (Sub-spec sections)",
+            "§ Metrics (Làn A)"
+          ]
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "bindingSha256": "e83c60601d726560cd57662be18590ac828182807caae43c243fc2a6fa119d4c"
     },
     {
       "claimId": "claim_46877d1e9417370e4b6f2c36cd2a84cb",
@@ -297,7 +482,28 @@
         "Observe Component Specification",
         "5. Mục theo làn (Sub-spec sections)",
         "§ Friction (Làn B)"
-      ]
+      ],
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_3c03309b66efa4925f1255511ed80e22",
+          "sourceUnitDigest": "beb19f3cb48940ebb818fbbd587c431842314f1d66534d641baa04d9a48396ae",
+          "targetOwner": "docs/platform/observe/spec.md",
+          "targetAnchor": "friction-làn-b",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+          "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#friction-làn-b (source lines 66-66) is carried at docs/platform/observe/spec.md#friction-làn-b (candidate lines 88-88). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+          "targetUnitDigest": "beb19f3cb48940ebb818fbbd587c431842314f1d66534d641baa04d9a48396ae",
+          "targetAncestry": [
+            "Observe Component Specification",
+            "5. Mục theo làn (Sub-spec sections)",
+            "§ Friction (Làn B)"
+          ]
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "bindingSha256": "3fc8072fd3d07d504e8b317f6e26dcf975d4d2a367925518a42628af4e8da74d"
     },
     {
       "claimId": "claim_d8df03b03865a0d0968739d00129f0a3",
@@ -331,7 +537,28 @@
         "Observe Component Specification",
         "5. Mục theo làn (Sub-spec sections)",
         "§ Contract & Quyết định (Làn C / F8)"
-      ]
+      ],
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_12da781dbd66869bbf765410d887c7f0",
+          "sourceUnitDigest": "1524c34dd5cd1df09f8b4a30a383264347263a484824aab9af796fd95f4c9e03",
+          "targetOwner": "docs/platform/observe/spec.md",
+          "targetAnchor": "contract-quyết-định-làn-c-f8",
+          "claimKind": "contract",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+          "rationale": "Judgment: labelled candidate note and/or explicit relative-link destination rebases; labels, repository referents and source wording otherwise preserved. Source digest is unchanged; target digest is unequal and requires independent deep review. The whole heading unit docs/specs/observe.md#contract-quyết-định-làn-c-f8 (source lines 69-69) is carried at docs/platform/observe/spec.md#contract-quyết-định-làn-c-f8 (candidate lines 91-91). Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+          "targetUnitDigest": "2e58e1822dc58b46b60193348bdfef8dcba3ca8621bbd845c2ed61c95c720917",
+          "targetAncestry": [
+            "Observe Component Specification",
+            "5. Mục theo làn (Sub-spec sections)",
+            "§ Contract & Quyết định (Làn C / F8)"
+          ]
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "bindingSha256": "b4e4e53efac1701be56b9ce50a6a1f000ddcc1c4fae6c304dd242a325d833018"
     },
     {
       "claimId": "claim_41988cae1fdd914bf7a8a4d1df2aeb82",
@@ -449,7 +676,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "Source: docs/specs/observe.md:13-17#unheaded-block-3 (current lines); unit SHA256 36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137.\nTarget: docs/platform/observe/spec.md:35-39#unheaded-block-5 (current lines); unit SHA256 11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec\" (../platform/session-identity/spec.md) → \"spec\" (../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections:\nA40/step8-truth-corrections-1: \"`fgos friction rank`).\" → \"`fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"; evidence step8-truth-corrections.json; packages/observe/rust/src/friction_cli.rs:7-9 (evidence commit 2107c4761cdde5f4302502ad564258220ba6a09d).\nDisposition supersede: Account for docs/specs/observe.md#unheaded-block-3 under docs/platform/observe/spec.md#unheaded-block-5; source context \"Observe Component Specification / 1. Overview & Boundaries / Owns\", target context \"Observe Component Specification / 1. Overview & Boundaries / Owns\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. L12-112: merge 66b637a108cd6a2659112982082b4194907b8e53 and authorized identity docs carry. Complete passage and immediate neighbouring blocks checked with both unchanged extractors, using content and heading ancestry rather than block index. Exact witnesses in step-07-l12-112-merge-rebindings.json; source identity unchanged; no approval carry.",
+      "rationale": "Source: docs/specs/observe.md:13-17#unheaded-block-3 (current lines); unit SHA256 36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137.\nTarget: docs/platform/observe/spec.md:35-39#unheaded-block-5 (current lines); unit SHA256 516bd5db5c2ca2d7390dc20ddba2b6438a01dcce310bb225d2d2dc9d7d457eea.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec\" (../platform/session-identity/spec.md) → \"spec\" (../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections:\nA40/step8-truth-corrections-1: \"`fgos friction rank`).\" → \"`fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"; evidence step8-truth-corrections.json; packages/observe/rust/src/friction_cli.rs:7-9 (evidence commit 2107c4761cdde5f4302502ad564258220ba6a09d).\nDisposition supersede: Account for docs/specs/observe.md#unheaded-block-3 under docs/platform/observe/spec.md#unheaded-block-5; source context \"Observe Component Specification / 1. Overview & Boundaries / Owns\", target context \"Observe Component Specification / 1. Overview & Boundaries / Owns\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. L12-112: merge 66b637a108cd6a2659112982082b4194907b8e53 and authorized identity docs carry. Complete passage and immediate neighbouring blocks checked with both unchanged extractors, using content and heading ancestry rather than block index. Exact witnesses in step-07-l12-112-merge-rebindings.json; source identity unchanged; no approval carry.",
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "unheaded-block-5",
       "targetUnitDigest": "516bd5db5c2ca2d7390dc20ddba2b6438a01dcce310bb225d2d2dc9d7d457eea",
@@ -458,9 +685,33 @@
         "1. Overview & Boundaries",
         "Owns"
       ],
-      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
       "bindingSha256": "72593be3c85e403df8b73a6a4fb15f54a9fa63a326b293554ed961702bdacb2e",
-      "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; changed complete block in same ancestry; full before/after and both neighbouring blocks retained for review. Earlier source snapshots are provenance, not exact current-text assertions."
+      "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; changed complete block in same ancestry; full before/after and both neighbouring blocks retained for review. Earlier source snapshots are provenance, not exact current-text assertions.",
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_bf1888a05f53ba3cd515eb792c5059b8",
+          "sourcePath": "docs/specs/observe.md",
+          "sourceAnchor": "unheaded-block-3",
+          "sourceUnitDigest": "36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137",
+          "claimKind": "specification",
+          "disposition": "supersede",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+          "rationale": "Source: docs/specs/observe.md:13-17#unheaded-block-3 (current lines); unit SHA256 36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137.\nTarget: docs/platform/observe/spec.md:35-39#unheaded-block-5 (current lines); unit SHA256 11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec\" (../platform/session-identity/spec.md) → \"spec\" (../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections:\nA40/step8-truth-corrections-1: \"`fgos friction rank`).\" → \"`fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"; evidence step8-truth-corrections.json; packages/observe/rust/src/friction_cli.rs:7-9 (evidence commit 2107c4761cdde5f4302502ad564258220ba6a09d).\nDisposition supersede: Account for docs/specs/observe.md#unheaded-block-3 under docs/platform/observe/spec.md#unheaded-block-5; source context \"Observe Component Specification / 1. Overview & Boundaries / Owns\", target context \"Observe Component Specification / 1. Overview & Boundaries / Owns\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. L12-112: merge 66b637a108cd6a2659112982082b4194907b8e53 and authorized identity docs carry. Complete passage and immediate neighbouring blocks checked with both unchanged extractors, using content and heading ancestry rather than block index. Exact witnesses in step-07-l12-112-merge-rebindings.json; source identity unchanged; no approval carry.",
+          "targetOwner": "docs/platform/observe/spec.md",
+          "targetAnchor": "unheaded-block-5",
+          "targetUnitDigest": "516bd5db5c2ca2d7390dc20ddba2b6438a01dcce310bb225d2d2dc9d7d457eea",
+          "targetAncestry": [
+            "Observe Component Specification",
+            "1. Overview & Boundaries",
+            "Owns"
+          ],
+          "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+          "bindingSha256": "72593be3c85e403df8b73a6a4fb15f54a9fa63a326b293554ed961702bdacb2e",
+          "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; changed complete block in same ancestry; full before/after and both neighbouring blocks retained for review. Earlier source snapshots are provenance, not exact current-text assertions."
+        }
+      }
     }
   ],
   "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"

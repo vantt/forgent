@@ -52,6 +52,27 @@ def direct_rows(docs):
 
 
 def matches(row, units):
+    group = row.get('successorGroup')
+    if row.get('targetAnchor') is None and group:
+        # A contextual identical-unit group authenticates ALL members, never
+        # an arbitrary one. Its restored digest is their common complete text
+        # digest, not a hash of the list or a newly chosen individual anchor.
+        members = group.get('members', [])
+        if not members or len(members) != group.get('memberCount'):
+            return []
+        found = []
+        for member in members:
+            selected = [u for u in units if
+                        member.get('path') == row.get('targetOwner') and
+                        u['anchor'] == member.get('anchor') and
+                        u['textDigest'] == member.get('unitDigest') == row.get('targetUnitDigest') and
+                        u['ancestry'] == member.get('ancestry')]
+            if len(selected) != 1:
+                return []
+            found.extend(selected)
+        if len({u['anchor'] for u in found}) != len(members):
+            return []
+        return found
     return [u for u in units if u['anchor'] == row.get('targetAnchor') and
             u['textDigest'].startswith(row.get('targetUnitDigest') or '!')]
 
@@ -170,10 +191,22 @@ def main():
              not matches(r, cat[r['targetOwner']]['units'])]
     links = supersessions(docs)
     if args.check:
-        print(json.dumps(dict(drift=len(drift), rows=[dict(file=f, pointer=p,
+        unresolved = []
+        superseded = []
+        for file, pointer, row in drift:
+            ef, ep, current = effective(file, pointer, row, docs, links)
+            units = cat.get(current['targetOwner'], {}).get('units', [])
+            if (ef, ep) != (file, pointer) and matches(current, units):
+                superseded.append(dict(file=file, pointer=pointer,
+                                       effectiveFile=ef, effectivePointer=ep,
+                                       binding=payload(current)))
+            else:
+                unresolved.append((file, pointer, row))
+        print(json.dumps(dict(drift=len(unresolved), rows=[dict(file=f, pointer=p,
               claimId=r['claimId'], before=payload(r), effectiveFile=effective(f,p,r,docs,links)[0])
-              for f,p,r in drift]), ensure_ascii=False, indent=2))
-        return int(bool(drift))
+              for f,p,r in unresolved], authenticatedSupersededOrigins=superseded),
+              ensure_ascii=False, indent=2))
+        return int(bool(unresolved))
     histories = {file: history(file, [r for _, _, r in drift if r['targetOwner'] == file])
                  for file in sorted({r['targetOwner'] for _, _, r in drift})}
     proposed = copy.deepcopy(docs)

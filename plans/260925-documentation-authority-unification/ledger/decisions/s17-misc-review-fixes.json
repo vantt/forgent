@@ -947,9 +947,12 @@
       "sourceContent": "- `repo/package.json` — `version`, `files`, `bin.fgos`, `bin.fgos-runner`\n  fields define the installable surface.\n- `repo/README.md` — `## Install` section states the exact command for users.\n- `repo/test/install-packaging.test.mjs` — real end-to-end proof: packs the\n  package, installs it into a scratch location, and verifies both the\n  content allowlist and that running the installed binary from a fresh\n  external project creates its own data directory there, not in the source\n  repo.\n- `docs/coexistence.md` — what happens after install, at `fgos init` time.\n- `repo/scripts/fgos-shell-integration.sh` — the dev checkout shell helper;\n  defines the `fgos`/`fgos-runner` shell functions, resolving the checkout\n  root via `git rev-parse --path-format=absolute --git-common-dir` (never\n  `--show-toplevel`, which resolves wrong inside a linked worktree).\n- `repo/test/scripts/fgos-shell-integration.test.mjs` — real-git-checkout\n  proof: repo-root resolution, linked-worktree resolution, and the\n  no-git-repo error path, for both functions.\n- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the\n  helper file with one-line sourcing instructions; the \"Contributing\" note\n  documents the manual `npm run setup:hooks` command.\n- `repo/package.json` — `scripts[\"setup:hooks\"]` runs the same command the\n  automatic `prepare` script used to run; `scripts.prepare` no longer\n  exists.\n- `repo/scripts/install-git-hooks.mjs` — the contributor hooks setup logic\n  itself, unchanged; only its trigger moved from automatic to manual.\n- `repo/test/scripts/install-git-hooks.test.mjs` — includes the regression\n  case asserting `package.json` has no `prepare` key and does have\n  `setup:hooks`.\n- `repo/src/setup/ansi.mjs` — hand-rolled ANSI color helpers behind\n  `--pretty`, zero dependency.\n- `repo/src/setup/config-merge.mjs` — `mergeConfigDefaults`, the\n  general-purpose deep-merge-fill-missing-only utility (arrays treated as\n  leaves); `repo/src/runner/dispatch.mjs`'s `ensureRunnerConfig` calls it\n  when a config file already exists.\n- `repo/src/setup/shell-rc.mjs` — bash/zsh rc-file detection and idempotent\n  source-line insertion.\n- `repo/src/setup/checks.mjs` — `fgos doctor`'s check registry (Data\n  Dictionary #7).\n- `repo/bin/fgos.mjs` — `setup`/`doctor` verb dispatch, `--pretty` rendering\n  gated to only these two verbs (CTR001 unchanged for every other verb).\n- `repo/src/cli/command-registry.mjs` — `setup`/`doctor` verb manifest\n  entries.\n- `repo/docs/architecture-manifest.json` — layer registration for the four\n  `src/setup/*.mjs` files.\n- `repo/test/setup/*.test.mjs` — unit and real-CLI proof for all of the\n  above.",
       "unitKind": "unheaded-block",
       "disposition": {
-        "kind": "current-source-content-present",
-        "reason": "Only heading depth, link destination or whitespace adaptation; full current source content is present in the named holder.",
-        "evidence": []
+        "kind": "supersede",
+        "reason": "Truth correction: replace git rev-parse --path-format=absolute --git-common-dir with direct on-disk .git/commondir parsing. Root/linked-worktree behavior and remaining implementation pointers preserved; not merely link adaptation.",
+        "evidence": [
+          "scripts/fgos-shell-integration.sh",
+          "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/binding-refresh.json"
+        ]
       },
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-109",
@@ -1001,7 +1004,87 @@
         },
         "next": null,
         "content": "- `repo/package.json` — `version`, `files`, `bin.fgos`, `bin.fgos-runner`\n  fields define the installable surface.\n- `repo/README.md` — `## Install` section states the exact command for users.\n- `repo/test/install-packaging.test.mjs` — real end-to-end proof: packs the\n  package, installs it into a scratch location, and verifies both the\n  content allowlist and that running the installed binary from a fresh\n  external project creates its own data directory there, not in the source\n  repo.\n- `docs/coexistence.md` — what happens after install, at `fgos init` time.\n- `repo/scripts/fgos-shell-integration.sh` — the dev checkout shell helper;\n  defines the `fgos`/`fgos-runner` shell functions, resolving the checkout\n  root from the `.git`/gitdir/commondir layout on disk without a Git child\n  (worktree-aware, so linked worktrees resolve the main checkout).\n- `repo/test/scripts/fgos-shell-integration.test.mjs` — real-git-checkout\n  proof: repo-root resolution, linked-worktree resolution, and the\n  no-git-repo error path, for both functions.\n- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the\n  helper file with one-line sourcing instructions; the \"Contributing\" note\n  documents the manual `npm run setup:hooks` command.\n- `repo/package.json` — `scripts[\"setup:hooks\"]` runs the same command the\n  automatic `prepare` script used to run; `scripts.prepare` no longer\n  exists.\n- `repo/scripts/install-git-hooks.mjs` — the contributor hooks setup logic\n  itself, unchanged; only its trigger moved from automatic to manual.\n- `repo/test/scripts/install-git-hooks.test.mjs` — includes the regression\n  case asserting `package.json` has no `prepare` key and does have\n  `setup:hooks`.\n- `repo/src/setup/ansi.mjs` — hand-rolled ANSI color helpers behind\n  `--pretty`, zero dependency.\n- `repo/src/setup/config-merge.mjs` — `mergeConfigDefaults`, the\n  general-purpose deep-merge-fill-missing-only utility (arrays treated as\n  leaves); `repo/src/runner/dispatch.mjs`'s `ensureRunnerConfig` calls it\n  when a config file already exists.\n- `repo/src/setup/shell-rc.mjs` — bash/zsh rc-file detection and idempotent\n  source-line insertion.\n- `repo/src/setup/checks.mjs` — `fgos doctor`'s check registry (Data\n  Dictionary #7).\n- `repo/bin/fgos.mjs` — `setup`/`doctor` verb dispatch, `--pretty` rendering\n  gated to only these two verbs (CTR001 unchanged for every other verb).\n- `repo/src/cli/command-registry.mjs` — `setup`/`doctor` verb manifest\n  entries.\n- `repo/docs/architecture-manifest.json` — layer registration for the four\n  `src/setup/*.mjs` files.\n- `repo/test/setup/*.test.mjs` — unit and real-CLI proof for all of the\n  above."
-      }
+      },
+      "priorReview": {
+        "g0ReworkBefore": {
+          "sourcePath": "docs/specs/distribution.md",
+          "sourceAnchor": "unheaded-block-27",
+          "sourceUnitDigest": "dafeb397fad0ae82979e931d86c897ed92c0d4769a5e303569c6c82f36da4bb9",
+          "sourceAncestry": [
+            "Spec: Distribution",
+            "Pointers (implementation)"
+          ],
+          "sourceContent": "- `repo/package.json` — `version`, `files`, `bin.fgos`, `bin.fgos-runner`\n  fields define the installable surface.\n- `repo/README.md` — `## Install` section states the exact command for users.\n- `repo/test/install-packaging.test.mjs` — real end-to-end proof: packs the\n  package, installs it into a scratch location, and verifies both the\n  content allowlist and that running the installed binary from a fresh\n  external project creates its own data directory there, not in the source\n  repo.\n- `docs/coexistence.md` — what happens after install, at `fgos init` time.\n- `repo/scripts/fgos-shell-integration.sh` — the dev checkout shell helper;\n  defines the `fgos`/`fgos-runner` shell functions, resolving the checkout\n  root via `git rev-parse --path-format=absolute --git-common-dir` (never\n  `--show-toplevel`, which resolves wrong inside a linked worktree).\n- `repo/test/scripts/fgos-shell-integration.test.mjs` — real-git-checkout\n  proof: repo-root resolution, linked-worktree resolution, and the\n  no-git-repo error path, for both functions.\n- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the\n  helper file with one-line sourcing instructions; the \"Contributing\" note\n  documents the manual `npm run setup:hooks` command.\n- `repo/package.json` — `scripts[\"setup:hooks\"]` runs the same command the\n  automatic `prepare` script used to run; `scripts.prepare` no longer\n  exists.\n- `repo/scripts/install-git-hooks.mjs` — the contributor hooks setup logic\n  itself, unchanged; only its trigger moved from automatic to manual.\n- `repo/test/scripts/install-git-hooks.test.mjs` — includes the regression\n  case asserting `package.json` has no `prepare` key and does have\n  `setup:hooks`.\n- `repo/src/setup/ansi.mjs` — hand-rolled ANSI color helpers behind\n  `--pretty`, zero dependency.\n- `repo/src/setup/config-merge.mjs` — `mergeConfigDefaults`, the\n  general-purpose deep-merge-fill-missing-only utility (arrays treated as\n  leaves); `repo/src/runner/dispatch.mjs`'s `ensureRunnerConfig` calls it\n  when a config file already exists.\n- `repo/src/setup/shell-rc.mjs` — bash/zsh rc-file detection and idempotent\n  source-line insertion.\n- `repo/src/setup/checks.mjs` — `fgos doctor`'s check registry (Data\n  Dictionary #7).\n- `repo/bin/fgos.mjs` — `setup`/`doctor` verb dispatch, `--pretty` rendering\n  gated to only these two verbs (CTR001 unchanged for every other verb).\n- `repo/src/cli/command-registry.mjs` — `setup`/`doctor` verb manifest\n  entries.\n- `repo/docs/architecture-manifest.json` — layer registration for the four\n  `src/setup/*.mjs` files.\n- `repo/test/setup/*.test.mjs` — unit and real-CLI proof for all of the\n  above.",
+          "unitKind": "unheaded-block",
+          "disposition": {
+            "kind": "current-source-content-present",
+            "reason": "Only heading depth, link destination or whitespace adaptation; full current source content is present in the named holder.",
+            "evidence": []
+          },
+          "targetOwner": "docs/platform/packaging-distribution/spec.md",
+          "targetAnchor": "unheaded-block-109",
+          "targetUnitDigest": "eb95a58af38313457ad6b2291a30070ab9931c046294b2a22b428c3ec126fcaa",
+          "targetAncestry": [
+            "Spec: Packaging-Distribution",
+            "Retained Distribution Source Detail",
+            "Spec: Distribution",
+            "Pointers (implementation)"
+          ],
+          "bindingSha256": "b614859c5d9ec2c4111a94133eef0f8d37d91c16731af31bedbdf2dd1a8a2972",
+          "reviewStatus": "pending",
+          "supersedesBinding": {
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+            "pointer": "/sourceBindings/886",
+            "targetAnchor": "unheaded-block-109",
+            "targetUnitDigest": "dafeb397fad0ae82979e931d86c897ed92c0d4769a5e303569c6c82f36da4bb9",
+            "bindingSha256": "30676f45fe9bd6407cb09734e51d708506f9516cccd55fcf8464fa2c4c19f6fb"
+          },
+          "rebindReason": "Scoped truth/navigation correction; complete preimage and current unit/neighbour witnesses in reports/phase-09/misc-fix/binding-refresh.json. Independent review pending; no approval inherited.",
+          "placement": {
+            "selected": {
+              "anchor": "unheaded-block-109",
+              "unitKind": "unheaded-block",
+              "title": "Unheaded block 109",
+              "textDigest": "eb95a58af38313457ad6b2291a30070ab9931c046294b2a22b428c3ec126fcaa",
+              "startLine": 820,
+              "endLine": 864,
+              "ancestry": [
+                "Spec: Packaging-Distribution",
+                "Retained Distribution Source Detail",
+                "Spec: Distribution",
+                "Pointers (implementation)"
+              ]
+            },
+            "previous": {
+              "anchor": "pointers-implementation",
+              "unitKind": "heading",
+              "title": "Pointers (implementation)",
+              "textDigest": "69a415f020853dcf82a0db0e5d6f93a3223436771bc39d27c1d9b24d8741d906",
+              "startLine": 818,
+              "endLine": 818,
+              "ancestry": [
+                "Spec: Packaging-Distribution",
+                "Retained Distribution Source Detail",
+                "Spec: Distribution",
+                "Pointers (implementation)"
+              ]
+            },
+            "next": null,
+            "content": "- `repo/package.json` — `version`, `files`, `bin.fgos`, `bin.fgos-runner`\n  fields define the installable surface.\n- `repo/README.md` — `## Install` section states the exact command for users.\n- `repo/test/install-packaging.test.mjs` — real end-to-end proof: packs the\n  package, installs it into a scratch location, and verifies both the\n  content allowlist and that running the installed binary from a fresh\n  external project creates its own data directory there, not in the source\n  repo.\n- `docs/coexistence.md` — what happens after install, at `fgos init` time.\n- `repo/scripts/fgos-shell-integration.sh` — the dev checkout shell helper;\n  defines the `fgos`/`fgos-runner` shell functions, resolving the checkout\n  root from the `.git`/gitdir/commondir layout on disk without a Git child\n  (worktree-aware, so linked worktrees resolve the main checkout).\n- `repo/test/scripts/fgos-shell-integration.test.mjs` — real-git-checkout\n  proof: repo-root resolution, linked-worktree resolution, and the\n  no-git-repo error path, for both functions.\n- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the\n  helper file with one-line sourcing instructions; the \"Contributing\" note\n  documents the manual `npm run setup:hooks` command.\n- `repo/package.json` — `scripts[\"setup:hooks\"]` runs the same command the\n  automatic `prepare` script used to run; `scripts.prepare` no longer\n  exists.\n- `repo/scripts/install-git-hooks.mjs` — the contributor hooks setup logic\n  itself, unchanged; only its trigger moved from automatic to manual.\n- `repo/test/scripts/install-git-hooks.test.mjs` — includes the regression\n  case asserting `package.json` has no `prepare` key and does have\n  `setup:hooks`.\n- `repo/src/setup/ansi.mjs` — hand-rolled ANSI color helpers behind\n  `--pretty`, zero dependency.\n- `repo/src/setup/config-merge.mjs` — `mergeConfigDefaults`, the\n  general-purpose deep-merge-fill-missing-only utility (arrays treated as\n  leaves); `repo/src/runner/dispatch.mjs`'s `ensureRunnerConfig` calls it\n  when a config file already exists.\n- `repo/src/setup/shell-rc.mjs` — bash/zsh rc-file detection and idempotent\n  source-line insertion.\n- `repo/src/setup/checks.mjs` — `fgos doctor`'s check registry (Data\n  Dictionary #7).\n- `repo/bin/fgos.mjs` — `setup`/`doctor` verb dispatch, `--pretty` rendering\n  gated to only these two verbs (CTR001 unchanged for every other verb).\n- `repo/src/cli/command-registry.mjs` — `setup`/`doctor` verb manifest\n  entries.\n- `repo/docs/architecture-manifest.json` — layer registration for the four\n  `src/setup/*.mjs` files.\n- `repo/test/setup/*.test.mjs` — unit and real-CLI proof for all of the\n  above."
+          }
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "changedClauses": [
+        {
+          "oldWording": "  root via `git rev-parse --path-format=absolute --git-common-dir` (never\n  `--show-toplevel`, which resolves wrong inside a linked worktree).",
+          "newWording": "  root from the `.git`/gitdir/commondir layout on disk without a Git child\n  (worktree-aware, so linked worktrees resolve the main checkout).",
+          "changeSources": [
+            "scripts/fgos-shell-integration.sh",
+            "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/binding-refresh.json"
+          ]
+        }
+      ]
     },
     {
       "sourcePath": "docs/specs/reading-map.md",

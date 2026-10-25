@@ -2713,18 +2713,38 @@
       "sourceUnitDigest": "a4f4f7bdfed979742e3430f5339eac51ee3c16b02da9d10a6b6ec96713d0b8f3",
       "claimKind": "architecture",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/vision.md:377-378#unheaded-block-64 (current lines); unit SHA256 a4f4f7bdfed979742e3430f5339eac51ee3c16b02da9d10a6b6ec96713d0b8f3.\nTarget: docs/platform/agent-coordination/vision.md:340-341#unheaded-block-56 (current lines); unit SHA256 a4f4f7bdfed979742e3430f5339eac51ee3c16b02da9d10a6b6ec96713d0b8f3.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a4f4f7bdfed979742e3430f5339eac51ee3c16b02da9d10a6b6ec96713d0b8f3 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/vision.md#unheaded-block-64 under docs/platform/agent-coordination/vision.md#unheaded-block-56; source context \"Agent Coordination Foundation Vision / Open Design Questions Under This Vision\", target context \"Agent Coordination Foundation Vision / Open Design Questions Under This Vision\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. L12-57 merge 3732d245d75d7c40b7206ac53707821176c471ec: Unique complete passage opening under identical named ancestry; inspected main delta changes the bound unit. Full historical/current passage retained; no ordinal substitution. Current target unheaded-block-62 SHA256 2037530f444b84893e4f4be7fd6c3a9a339a3e26aee0db7f05e6b8e4e5178bdb; source identity unchanged; no native identity assignment or approval carry.",
+      "rationale": "G0 rationale text correction: current binding docs/platform/agent-coordination/vision.md#unheaded-block-62 SHA256 2037530f444b84893e4f4be7fd6c3a9a339a3e26aee0db7f05e6b8e4e5178bdb. Prior placement/evidence rationale is retained in priorReview.g0ReworkBefore; its old target digest is historical, not a current assertion. Existing disposition move unchanged; independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-62",
       "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
       "reviewStatus": "pending",
-      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
       "targetUnitDigest": "2037530f444b84893e4f4be7fd6c3a9a339a3e26aee0db7f05e6b8e4e5178bdb",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Open Design Questions Under This Vision"
       ],
-      "bindingSha256": "7df0db9ab204d1b8d872d2185d465f21d318727ba2a7e85896f2efad021a88f3"
+      "bindingSha256": "7df0db9ab204d1b8d872d2185d465f21d318727ba2a7e85896f2efad021a88f3",
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_233e60f81a8d1f6720b34de45ba20ebb",
+          "sourceUnitDigest": "a4f4f7bdfed979742e3430f5339eac51ee3c16b02da9d10a6b6ec96713d0b8f3",
+          "claimKind": "architecture",
+          "disposition": "move",
+          "rationale": "Source: docs/architect/agent-coordination/vision.md:377-378#unheaded-block-64 (current lines); unit SHA256 a4f4f7bdfed979742e3430f5339eac51ee3c16b02da9d10a6b6ec96713d0b8f3.\nTarget: docs/platform/agent-coordination/vision.md:340-341#unheaded-block-56 (current lines); unit SHA256 a4f4f7bdfed979742e3430f5339eac51ee3c16b02da9d10a6b6ec96713d0b8f3.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a4f4f7bdfed979742e3430f5339eac51ee3c16b02da9d10a6b6ec96713d0b8f3 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/vision.md#unheaded-block-64 under docs/platform/agent-coordination/vision.md#unheaded-block-56; source context \"Agent Coordination Foundation Vision / Open Design Questions Under This Vision\", target context \"Agent Coordination Foundation Vision / Open Design Questions Under This Vision\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. L12-57 merge 3732d245d75d7c40b7206ac53707821176c471ec: Unique complete passage opening under identical named ancestry; inspected main delta changes the bound unit. Full historical/current passage retained; no ordinal substitution. Current target unheaded-block-62 SHA256 2037530f444b84893e4f4be7fd6c3a9a339a3e26aee0db7f05e6b8e4e5178bdb; source identity unchanged; no native identity assignment or approval carry.",
+          "targetOwner": "docs/platform/agent-coordination/vision.md",
+          "targetAnchor": "unheaded-block-62",
+          "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
+          "reviewStatus": "pending",
+          "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+          "targetUnitDigest": "2037530f444b84893e4f4be7fd6c3a9a339a3e26aee0db7f05e6b8e4e5178bdb",
+          "targetAncestry": [
+            "Agent Coordination Foundation Vision",
+            "Open Design Questions Under This Vision"
+          ],
+          "bindingSha256": "7df0db9ab204d1b8d872d2185d465f21d318727ba2a7e85896f2efad021a88f3"
+        }
+      }
     },
     {
       "claimId": "claim_40bffb93345a1dc0814d1bb0f8f4e6e5",

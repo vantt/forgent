@@ -16,8 +16,8 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
       "targetAnchor": "unheaded-block-4",
-      "targetUnitDigest": "4bd44969ed59ec4e39dc0622f72055d196d31e5c733b7a5656450d8f07c49780",
-      "rationale": "N1 citation repair committed at b919e2b9b53b2425cafef51d16f1327c81ecc68f. Exact before/after unit and neighboring occurrence comparison binds this edited positional predecessor to native successor claim_79fd3ee646dfed5ef624678125f9f306. The predecessor identity is retained as a gap; no identity transplant, approval, promotion or implementation-truth verdict. Independent ordinary re-review pending.",
+      "targetUnitDigest": "83c4ce05b5d6a9b14dccd5a2365bec12ee589a80b555dec26a5a7275106b45ec",
+      "rationale": "G0 citation correction: 2416->2442 (0029), 2354->2380 (0028), 2590->2616 (0031), 2897->2923 (0034), tables 2477/2609->2503/2635. Each endpoint checked in current runner.md; other text preserved. Current target docs/platform/runner/architecture/h-7af1f0242611.md#unheaded-block-4 SHA256 83c4ce05b5d6a9b14dccd5a2365bec12ee589a80b555dec26a5a7275106b45ec. Independent review pending.",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-1792311894f50c@2026-10-18",
       "targetAncestry": [
@@ -25,7 +25,7 @@
         "Từ vựng dispatch hiện hành",
         "Bảng đối chiếu từ vựng dispatch"
       ],
-      "bindingSha256": "f1086894c7edbf93d9cc35a67ce3852f28ea8e536170a72916fc48b95c8f3672",
+      "bindingSha256": "c1b907e4fe26f6f3deeef5257b5a3be6e3d286de99ac835ddec7961edf16d0ac",
       "placement": {
         "selected": {
           "anchor": "unheaded-block-4",
@@ -67,7 +67,81 @@
           ]
         },
         "content": "| Thuật ngữ hiện hành | Thuật ngữ cũ / superseded | Ý nghĩa ngắn gọn | Con trỏ tham chiếu |\n|---|---|---|---|\n| `work` | `rootTask` | Đơn vị công việc gốc (T2, `tsk-*`) mang vai trò T1 khi được kích hoạt | `runner.md:2416` (ADR 0029) |\n| `child work` | `subTask` | Công việc con được phân rã từ một work cha | `runner.md:2416` (ADR 0029) |\n| `executor` | `capacity` (đơn vị thực thi) | Đối tượng thực thi cụ thể (agentType/cli/task/mcp) đảm nhận một job/capability | `runner.md:2897` (ADR 0034) |\n| `capability` | `capacity` (năng lực) | Năng lực / lời hứa hành vi có tên (abstract behavior promise) mà executor cung cấp | `runner.md:2897` (ADR 0034), `dispatch-control-plane-redesign.md:125` |\n| `launcher` | `orchestrator` (nghĩa cũ `0026`) | Tiến trình/cơ chế quyết định kích hoạt work, dựng work lên rồi rời đi (buông) | `runner.md:2354` (ADR 0028) |\n| `driver` | (không đổi) | Tiến trình/phiên đồng hành cùng work từ đầu đến cuối (ở lại) | `runner.md:2416` (ADR 0029), `runner.md:2590` (ADR 0031) |\n| `orchestrator` | (tái gán nghĩa `0029`) | Tầng hợp thành T0 quản lý N đơn vị work (ở lại) | `runner.md:2416` (ADR 0029), `runner.md:2590` (ADR 0031) |\n| `DispatchPlan` | (mới) | Kế hoạch dispatch được resolved gồm mechanism, target agent/tool, và metadata | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:175` |\n| `DispatchAssignment` | (mới) | Đơn vị phân công dispatch cụ thể gán executor cho work item | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:210` |\n| `Unit` / `capability` | (mới, thay matching L2 cũ per 0048) | Unit khai báo thuộc tính và canonical capability; bind() phân giải executor | `core/skills/_shared/capability-matching.md` |\n| `rigor` | (từ vựng chất lượng cũ) | Yêu cầu chất lượng phía cầu (`low | standard | high | critical`), gộp chỉ-nâng qua các scope và sàn capability | RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), 0046 |\n| `tier` | `modelTier` | Mức model phía cung (`nano | mini | standard | advanced | flagship | frontier`), khai trực tiếp trong config và chọn model tại `runner.modelPolicies` ([Seat Binding](../../seat-binding/spec.md)); `runner.rigorToTier` đã bị xoá | RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), 0046 |\n| `work.size` | (hạng việc cũ) | Độ lớn việc (`light | standard | heavy`), không bao giờ dẫn tới model | RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), spec Work-State |"
-      }
+      },
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_6dba574d27eb8f35739cfedf140d4775",
+          "sourcePath": "docs/platform/runner/architecture/h-7af1f0242611.md",
+          "sourceUnitDigest": "d631e41bc3433bb3f2368404a3b0144f61dc4069a2ef2d7834cfb9062fd9db6a",
+          "claimKind": "architecture",
+          "disposition": "supersede",
+          "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+          "targetAnchor": "unheaded-block-4",
+          "targetUnitDigest": "4bd44969ed59ec4e39dc0622f72055d196d31e5c733b7a5656450d8f07c49780",
+          "rationale": "N1 citation repair committed at b919e2b9b53b2425cafef51d16f1327c81ecc68f. Exact before/after unit and neighboring occurrence comparison binds this edited positional predecessor to native successor claim_79fd3ee646dfed5ef624678125f9f306. The predecessor identity is retained as a gap; no identity transplant, approval, promotion or implementation-truth verdict. Independent ordinary re-review pending.",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-1792311894f50c@2026-10-18",
+          "targetAncestry": [
+            "Added in candidate: Runner Từ vựng dispatch hiện hành",
+            "Từ vựng dispatch hiện hành",
+            "Bảng đối chiếu từ vựng dispatch"
+          ],
+          "bindingSha256": "f1086894c7edbf93d9cc35a67ce3852f28ea8e536170a72916fc48b95c8f3672",
+          "placement": {
+            "selected": {
+              "anchor": "unheaded-block-4",
+              "unitKind": "unheaded-block",
+              "title": "Unheaded block 4",
+              "textDigest": "4bd44969ed59ec4e39dc0622f72055d196d31e5c733b7a5656450d8f07c49780",
+              "startLine": 31,
+              "endLine": 45,
+              "ancestry": [
+                "Added in candidate: Runner Từ vựng dispatch hiện hành",
+                "Từ vựng dispatch hiện hành",
+                "Bảng đối chiếu từ vựng dispatch"
+              ]
+            },
+            "previous": {
+              "anchor": "bảng-đối-chiếu-từ-vựng-dispatch",
+              "unitKind": "heading",
+              "title": "Bảng đối chiếu từ vựng dispatch",
+              "textDigest": "098ff3342f3633bcb25254655f6c7b3c89c6cfdfcf1853603fa317b3b5e81d89",
+              "startLine": 29,
+              "endLine": 29,
+              "ancestry": [
+                "Added in candidate: Runner Từ vựng dispatch hiện hành",
+                "Từ vựng dispatch hiện hành",
+                "Bảng đối chiếu từ vựng dispatch"
+              ]
+            },
+            "next": {
+              "anchor": "unheaded-block-5",
+              "unitKind": "unheaded-block",
+              "title": "Unheaded block 5",
+              "textDigest": "0418cb1a82acadbbf7737247395dd563a0b64575c38f7b1ece953e5927df14ad",
+              "startLine": 47,
+              "endLine": 55,
+              "ancestry": [
+                "Added in candidate: Runner Từ vựng dispatch hiện hành",
+                "Từ vựng dispatch hiện hành",
+                "Bảng đối chiếu từ vựng dispatch"
+              ]
+            },
+            "content": "| Thuật ngữ hiện hành | Thuật ngữ cũ / superseded | Ý nghĩa ngắn gọn | Con trỏ tham chiếu |\n|---|---|---|---|\n| `work` | `rootTask` | Đơn vị công việc gốc (T2, `tsk-*`) mang vai trò T1 khi được kích hoạt | `runner.md:2416` (ADR 0029) |\n| `child work` | `subTask` | Công việc con được phân rã từ một work cha | `runner.md:2416` (ADR 0029) |\n| `executor` | `capacity` (đơn vị thực thi) | Đối tượng thực thi cụ thể (agentType/cli/task/mcp) đảm nhận một job/capability | `runner.md:2897` (ADR 0034) |\n| `capability` | `capacity` (năng lực) | Năng lực / lời hứa hành vi có tên (abstract behavior promise) mà executor cung cấp | `runner.md:2897` (ADR 0034), `dispatch-control-plane-redesign.md:125` |\n| `launcher` | `orchestrator` (nghĩa cũ `0026`) | Tiến trình/cơ chế quyết định kích hoạt work, dựng work lên rồi rời đi (buông) | `runner.md:2354` (ADR 0028) |\n| `driver` | (không đổi) | Tiến trình/phiên đồng hành cùng work từ đầu đến cuối (ở lại) | `runner.md:2416` (ADR 0029), `runner.md:2590` (ADR 0031) |\n| `orchestrator` | (tái gán nghĩa `0029`) | Tầng hợp thành T0 quản lý N đơn vị work (ở lại) | `runner.md:2416` (ADR 0029), `runner.md:2590` (ADR 0031) |\n| `DispatchPlan` | (mới) | Kế hoạch dispatch được resolved gồm mechanism, target agent/tool, và metadata | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:175` |\n| `DispatchAssignment` | (mới) | Đơn vị phân công dispatch cụ thể gán executor cho work item | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:210` |\n| `Unit` / `capability` | (mới, thay matching L2 cũ per 0048) | Unit khai báo thuộc tính và canonical capability; bind() phân giải executor | `core/skills/_shared/capability-matching.md` |\n| `rigor` | (từ vựng chất lượng cũ) | Yêu cầu chất lượng phía cầu (`low | standard | high | critical`), gộp chỉ-nâng qua các scope và sàn capability | RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), 0046 |\n| `tier` | `modelTier` | Mức model phía cung (`nano | mini | standard | advanced | flagship | frontier`), khai trực tiếp trong config và chọn model tại `runner.modelPolicies` ([Seat Binding](../../seat-binding/spec.md)); `runner.rigorToTier` đã bị xoá | RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), 0046 |\n| `work.size` | (hạng việc cũ) | Độ lớn việc (`light | standard | heavy`), không bao giờ dẫn tới model | RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), spec Work-State |"
+          }
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "rebindReason": "G0 rework; existing rebind.locate: replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; full before/after units in rebind/g0-rework-rebindings.json",
+      "changedClauses": [
+        {
+          "oldWording": "| `work` | `rootTask` | Đơn vị công việc gốc (T2, `tsk-*`) mang vai trò T1 khi được kích hoạt | `runner.md:2416` (ADR 0029) |\n| `child work` | `subTask` | Công việc con được phân rã từ một work cha | `runner.md:2416` (ADR 0029) |\n| `executor` | `capacity` (đơn vị thực thi) | Đối tượng thực thi cụ thể (agentType/cli/task/mcp) đảm nhận một job/capability | `runner.md:2897` (ADR 0034) |\n| `capability` | `capacity` (năng lực) | Năng lực / lời hứa hành vi có tên (abstract behavior promise) mà executor cung cấp | `runner.md:2897` (ADR 0034), `dispatch-control-plane-redesign.md:125` |\n| `launcher` | `orchestrator` (nghĩa cũ `0026`) | Tiến trình/cơ chế quyết định kích hoạt work, dựng work lên rồi rời đi (buông) | `runner.md:2354` (ADR 0028) |\n| `driver` | (không đổi) | Tiến trình/phiên đồng hành cùng work từ đầu đến cuối (ở lại) | `runner.md:2416` (ADR 0029), `runner.md:2590` (ADR 0031) |\n| `orchestrator` | (tái gán nghĩa `0029`) | Tầng hợp thành T0 quản lý N đơn vị work (ở lại) | `runner.md:2416` (ADR 0029), `runner.md:2590` (ADR 0031) |",
+          "newWording": "| `work` | `rootTask` | Đơn vị công việc gốc (T2, `tsk-*`) mang vai trò T1 khi được kích hoạt | `runner.md:2442` (ADR 0029) |\n| `child work` | `subTask` | Công việc con được phân rã từ một work cha | `runner.md:2442` (ADR 0029) |\n| `executor` | `capacity` (đơn vị thực thi) | Đối tượng thực thi cụ thể (agentType/cli/task/mcp) đảm nhận một job/capability | `runner.md:2923` (ADR 0034) |\n| `capability` | `capacity` (năng lực) | Năng lực / lời hứa hành vi có tên (abstract behavior promise) mà executor cung cấp | `runner.md:2923` (ADR 0034), `dispatch-control-plane-redesign.md:125` |\n| `launcher` | `orchestrator` (nghĩa cũ `0026`) | Tiến trình/cơ chế quyết định kích hoạt work, dựng work lên rồi rời đi (buông) | `runner.md:2380` (ADR 0028) |\n| `driver` | (không đổi) | Tiến trình/phiên đồng hành cùng work từ đầu đến cuối (ở lại) | `runner.md:2442` (ADR 0029), `runner.md:2616` (ADR 0031) |\n| `orchestrator` | (tái gán nghĩa `0029`) | Tầng hợp thành T0 quản lý N đơn vị work (ở lại) | `runner.md:2442` (ADR 0029), `runner.md:2616` (ADR 0031) |",
+          "changeSources": [
+            "docs/specs/runner.md@ee2ce49c4b610daccb656f79fdb29531bb41d06b"
+          ]
+        }
+      ]
     },
     {
       "claimId": "claim_9175095c05d2486024a13dedc4ee6f8d",
@@ -77,8 +151,8 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
       "targetAnchor": "unheaded-block-5",
-      "targetUnitDigest": "0418cb1a82acadbbf7737247395dd563a0b64575c38f7b1ece953e5927df14ad",
-      "rationale": "N1 citation repair committed at b919e2b9b53b2425cafef51d16f1327c81ecc68f. Exact before/after unit and neighboring occurrence comparison binds this edited positional predecessor to native successor claim_f4dd6219e0abb10fd285ed7fb7b617b6. The predecessor identity is retained as a gap; no identity transplant, approval, promotion or implementation-truth verdict. Independent ordinary re-review pending.",
+      "targetUnitDigest": "40414b50fe1dc4e6f041fd0fde8ca68afb2519c25ce3de0d798ba58b59bfc491",
+      "rationale": "G0 citation correction: 2416->2442 (0029), 2354->2380 (0028), 2590->2616 (0031), 2897->2923 (0034), tables 2477/2609->2503/2635. Each endpoint checked in current runner.md; other text preserved. Current target docs/platform/runner/architecture/h-7af1f0242611.md#unheaded-block-5 SHA256 40414b50fe1dc4e6f041fd0fde8ca68afb2519c25ce3de0d798ba58b59bfc491. Independent review pending.",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-1792311894f50c@2026-10-18",
       "targetAncestry": [
@@ -86,7 +160,7 @@
         "Từ vựng dispatch hiện hành",
         "Bảng đối chiếu từ vựng dispatch"
       ],
-      "bindingSha256": "69e5719c51b5312f0114f6b973e0631cfd483681c030f763d4759cc3c11d8f6d",
+      "bindingSha256": "17f0d5dccecee97be0c49787102db666c401f15719fdb33fb8cce0ee11c98f73",
       "placement": {
         "selected": {
           "anchor": "unheaded-block-5",
@@ -116,7 +190,69 @@
         },
         "next": null,
         "content": "*Ghi chú:*\n- Gom thang tier/rigor (RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), 0046): phân định triệt để bên cầu (`rigor`) và bên cung (`tier` khai trực tiếp qua Seat Binding; bảng `rigorToTier` đã bị xoá). Xoá hoàn toàn các lớp trung gian, cầu nối và overrides cũ. Sàn duy nhất theo loại việc là `capabilities.<cap>.rigor`.\n- Về vai trò bên gọi `launcher` / `driver` / `orchestrator`: xem các bảng tại `runner.md:2477,2609` (kỷ yếu `0031`) tóm tắt trục T1/T0.\n- Khái niệm `capacity` trong lịch sử từng đại diện cho cả năng lực lẫn đơn vị thực thi; từ ADR 0034 (`runner.md:2897`), các cấu hình `capacities.<id>` được chuyển thành `executors.<id>` và `capabilities.<id>`.\n- `rootTask` và `subTask` đã bị loại bỏ khỏi từ vựng dispatch per ADR 0029 (xem `docs/decisions/index.md`).\n- `purpose` (tham số nội bộ `resolve.mjs`/`plan.mjs`) và flag CLI `--for <purpose>` KHÔNG phải một ontology thứ ba — cả hai đặt tên cho một giá trị `capability`, chỉ là cú pháp tương thích lịch sử (compatibility syntax), không phải một identity định tuyến riêng.\n- `job` KHÔNG phải một routing identity — ADR-004 dành riêng tên này cho một scheduler tương lai (chưa dùng); nếu xuất hiện trong log, nó chỉ là nhãn ngữ cảnh của một request, không phải mục tiêu dispatch resolve tới. Một `Run` là một lần thực thi cụ thể cho một Assignment, không phải job/operation identity.\n- Dispatch core chỉ nhận đúng hai target identity — `capability` và `executor-id` — cùng hợp đồng `DispatchRequest`/`PolicyPatch`/`DispatchPlan` chính tắc và danh sách sở hữu component-internal (8 thẩm quyền + forbidden dependencies): xem [Dispatch Control Plane](../../agent-coordination/architecture/dispatch-control-plane.md).\n- `Unit` và canonical capability (thay thế matching đa tầng L2 per 0048): Unit khai báo các thuộc tính nhu cầu của đơn vị việc và capability (`domain:verb`); `bind()` chọn executor theo 5 mức (xem `core/skills/_shared/capability-matching.md`)."
-      }
+      },
+      "priorReview": {
+        "g0ReworkBefore": {
+          "claimId": "claim_9175095c05d2486024a13dedc4ee6f8d",
+          "sourcePath": "docs/platform/runner/architecture/h-7af1f0242611.md",
+          "sourceUnitDigest": "59d3caa33fb28f558fe9e4dc2e746ac1ba85e88556507691b01d35eb833af132",
+          "claimKind": "architecture",
+          "disposition": "supersede",
+          "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+          "targetAnchor": "unheaded-block-5",
+          "targetUnitDigest": "0418cb1a82acadbbf7737247395dd563a0b64575c38f7b1ece953e5927df14ad",
+          "rationale": "N1 citation repair committed at b919e2b9b53b2425cafef51d16f1327c81ecc68f. Exact before/after unit and neighboring occurrence comparison binds this edited positional predecessor to native successor claim_f4dd6219e0abb10fd285ed7fb7b617b6. The predecessor identity is retained as a gap; no identity transplant, approval, promotion or implementation-truth verdict. Independent ordinary re-review pending.",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:fgos-run_unit-run-1792311894f50c@2026-10-18",
+          "targetAncestry": [
+            "Added in candidate: Runner Từ vựng dispatch hiện hành",
+            "Từ vựng dispatch hiện hành",
+            "Bảng đối chiếu từ vựng dispatch"
+          ],
+          "bindingSha256": "69e5719c51b5312f0114f6b973e0631cfd483681c030f763d4759cc3c11d8f6d",
+          "placement": {
+            "selected": {
+              "anchor": "unheaded-block-5",
+              "unitKind": "unheaded-block",
+              "title": "Unheaded block 5",
+              "textDigest": "0418cb1a82acadbbf7737247395dd563a0b64575c38f7b1ece953e5927df14ad",
+              "startLine": 47,
+              "endLine": 55,
+              "ancestry": [
+                "Added in candidate: Runner Từ vựng dispatch hiện hành",
+                "Từ vựng dispatch hiện hành",
+                "Bảng đối chiếu từ vựng dispatch"
+              ]
+            },
+            "previous": {
+              "anchor": "unheaded-block-4",
+              "unitKind": "unheaded-block",
+              "title": "Unheaded block 4",
+              "textDigest": "4bd44969ed59ec4e39dc0622f72055d196d31e5c733b7a5656450d8f07c49780",
+              "startLine": 31,
+              "endLine": 45,
+              "ancestry": [
+                "Added in candidate: Runner Từ vựng dispatch hiện hành",
+                "Từ vựng dispatch hiện hành",
+                "Bảng đối chiếu từ vựng dispatch"
+              ]
+            },
+            "next": null,
+            "content": "*Ghi chú:*\n- Gom thang tier/rigor (RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), 0046): phân định triệt để bên cầu (`rigor`) và bên cung (`tier` khai trực tiếp qua Seat Binding; bảng `rigorToTier` đã bị xoá). Xoá hoàn toàn các lớp trung gian, cầu nối và overrides cũ. Sàn duy nhất theo loại việc là `capabilities.<cap>.rigor`.\n- Về vai trò bên gọi `launcher` / `driver` / `orchestrator`: xem các bảng tại `runner.md:2477,2609` (kỷ yếu `0031`) tóm tắt trục T1/T0.\n- Khái niệm `capacity` trong lịch sử từng đại diện cho cả năng lực lẫn đơn vị thực thi; từ ADR 0034 (`runner.md:2897`), các cấu hình `capacities.<id>` được chuyển thành `executors.<id>` và `capabilities.<id>`.\n- `rootTask` và `subTask` đã bị loại bỏ khỏi từ vựng dispatch per ADR 0029 (xem `docs/decisions/index.md`).\n- `purpose` (tham số nội bộ `resolve.mjs`/`plan.mjs`) và flag CLI `--for <purpose>` KHÔNG phải một ontology thứ ba — cả hai đặt tên cho một giá trị `capability`, chỉ là cú pháp tương thích lịch sử (compatibility syntax), không phải một identity định tuyến riêng.\n- `job` KHÔNG phải một routing identity — ADR-004 dành riêng tên này cho một scheduler tương lai (chưa dùng); nếu xuất hiện trong log, nó chỉ là nhãn ngữ cảnh của một request, không phải mục tiêu dispatch resolve tới. Một `Run` là một lần thực thi cụ thể cho một Assignment, không phải job/operation identity.\n- Dispatch core chỉ nhận đúng hai target identity — `capability` và `executor-id` — cùng hợp đồng `DispatchRequest`/`PolicyPatch`/`DispatchPlan` chính tắc và danh sách sở hữu component-internal (8 thẩm quyền + forbidden dependencies): xem [Dispatch Control Plane](../../agent-coordination/architecture/dispatch-control-plane.md).\n- `Unit` và canonical capability (thay thế matching đa tầng L2 per 0048): Unit khai báo các thuộc tính nhu cầu của đơn vị việc và capability (`domain:verb`); `bind()` chọn executor theo 5 mức (xem `core/skills/_shared/capability-matching.md`)."
+          }
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "rebindReason": "G0 rework; existing rebind.locate: replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; full before/after units in rebind/g0-rework-rebindings.json",
+      "changedClauses": [
+        {
+          "oldWording": "- Về vai trò bên gọi `launcher` / `driver` / `orchestrator`: xem các bảng tại `runner.md:2477,2609` (kỷ yếu `0031`) tóm tắt trục T1/T0.\n- Khái niệm `capacity` trong lịch sử từng đại diện cho cả năng lực lẫn đơn vị thực thi; từ ADR 0034 (`runner.md:2897`), các cấu hình `capacities.<id>` được chuyển thành `executors.<id>` và `capabilities.<id>`.",
+          "newWording": "- Về vai trò bên gọi `launcher` / `driver` / `orchestrator`: xem các bảng tại `runner.md:2503,2635` (kỷ yếu `0031`) tóm tắt trục T1/T0.\n- Khái niệm `capacity` trong lịch sử từng đại diện cho cả năng lực lẫn đơn vị thực thi; từ ADR 0034 (`runner.md:2923`), các cấu hình `capacities.<id>` được chuyển thành `executors.<id>` và `capabilities.<id>`.",
+          "changeSources": [
+            "docs/specs/runner.md@ee2ce49c4b610daccb656f79fdb29531bb41d06b"
+          ]
+        }
+      ]
     },
     {
       "claimId": "claim_1b81e94942a594c183dfbe8cdbaeaeae",
