@@ -1,0 +1,434 @@
+[
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+    "pointer": "/claims/404",
+    "targetOwner": "docs/platform/agent-coordination/vision.md",
+    "selected": {
+      "anchor": "open-design-questions-under-this-vision",
+      "unitKind": "heading",
+      "title": "Open Design Questions Under This Vision",
+      "textDigest": "b5288b6f94225cb832fcd635d42e51face82e815ebdbb0b6f196bc7d285a7b12",
+      "startLine": 354,
+      "endLine": 354,
+      "ancestry": [
+        "Agent Coordination Foundation Vision"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+    "pointer": "/registryGaps/16",
+    "targetOwner": "docs/specs/runner.md",
+    "selected": {
+      "anchor": "unheaded-block-9",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 9",
+      "textDigest": "ad50d1b4f22683791ffa9f8e122789a54e622c0cd5bc7c44c93f565f1fdaa646",
+      "startLine": 71,
+      "endLine": 85,
+      "ancestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Data Dictionary"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+    "pointer": "/claims/214",
+    "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+    "selected": {
+      "anchor": "unheaded-block-23",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 23",
+      "textDigest": "18f7037414eaa3e6682d49f5477a6f75321fd6b77ffd90110ab99539dc47298b",
+      "startLine": 258,
+      "endLine": 258,
+      "ancestry": [
+        "Contract: Release Manifest",
+        "Canonical Release Tree Rules",
+        "5. ReleaseManifest"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+    "pointer": "/registryGaps/22",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-36",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 36",
+      "textDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+      "startLine": 166,
+      "endLine": 220,
+      "ancestry": [
+        "Added in candidate: Runner Business Rules",
+        "Business Rules"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+    "pointer": "/registryGaps/3",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-36",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 36",
+      "textDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+      "startLine": 166,
+      "endLine": 220,
+      "ancestry": [
+        "Added in candidate: Runner Business Rules",
+        "Business Rules"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+    "pointer": "/registryGaps/35",
+    "targetOwner": "docs/specs/runner.md",
+    "selected": {
+      "anchor": "unheaded-block-101",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 101",
+      "textDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+      "startLine": 1244,
+      "endLine": 1294,
+      "ancestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Pointers (implementation)"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+    "pointer": "/registryGaps/36",
+    "targetOwner": "docs/specs/runner.md",
+    "selected": {
+      "anchor": "unheaded-block-9",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 9",
+      "textDigest": "ad50d1b4f22683791ffa9f8e122789a54e622c0cd5bc7c44c93f565f1fdaa646",
+      "startLine": 71,
+      "endLine": 85,
+      "ancestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Data Dictionary"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+    "pointer": "/claims/145",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-47",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 47",
+      "textDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+      "startLine": 381,
+      "endLine": 382,
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases",
+        "8.6 Crash và cleanup"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+    "pointer": "/claims/147",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-48",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 48",
+      "textDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+      "startLine": 386,
+      "endLine": 396,
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases",
+        "8.7 Bảng tình huống chuẩn"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+    "pointer": "/claims/149",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-49",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 49",
+      "textDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+      "startLine": 400,
+      "endLine": 400,
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+    "pointer": "/claims/150",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-50",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 50",
+      "textDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+      "startLine": 402,
+      "endLine": 421,
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+    "pointer": "/claims/151",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-51",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 51",
+      "textDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+      "startLine": 423,
+      "endLine": 426,
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+    "pointer": "/claims/152",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-52",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 52",
+      "textDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+      "startLine": 428,
+      "endLine": 429,
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+    "pointer": "/claims/154",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-53",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 53",
+      "textDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+      "startLine": 433,
+      "endLine": 445,
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.1 Support matrix của default"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+    "pointer": "/claims/155",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-54",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 54",
+      "textDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+      "startLine": 447,
+      "endLine": 448,
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.1 Support matrix của default"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+    "pointer": "/claims/158",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-56",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 56",
+      "textDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+      "startLine": 459,
+      "endLine": 468,
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+    "pointer": "/claims/159",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-57",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 57",
+      "textDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+      "startLine": 470,
+      "endLine": 485,
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+    "pointer": "/claims/160",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-58",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 58",
+      "textDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+      "startLine": 487,
+      "endLine": 494,
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+    "pointer": "/claims/4",
+    "targetOwner": "docs/platform/observe/spec.md",
+    "selected": {
+      "anchor": "owns",
+      "unitKind": "heading",
+      "title": "Owns",
+      "textDigest": "15cf2d08571be0557c0159bc4ce5e07b282a840ed14172cea109bbe4f4e544c5",
+      "startLine": 34,
+      "endLine": 34,
+      "ancestry": [
+        "Observe Component Specification",
+        "1. Overview & Boundaries"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+    "pointer": "/registryGaps/2",
+    "targetOwner": "docs/platform/observe/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-5",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 5",
+      "textDigest": "516bd5db5c2ca2d7390dc20ddba2b6438a01dcce310bb225d2d2dc9d7d457eea",
+      "startLine": 35,
+      "endLine": 39,
+      "ancestry": [
+        "Observe Component Specification",
+        "1. Overview & Boundaries",
+        "Owns"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+    "pointer": "/claims/12",
+    "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-5",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 5",
+      "textDigest": "11acb9f9f0326bc74fa270823e169722679dcaed64cc6da150f5f2c7912d9400",
+      "startLine": 47,
+      "endLine": 47,
+      "ancestry": [
+        "Added in candidate: Runner Data Dictionary",
+        "Data Dictionary",
+        "Hợp đồng rigor và tier (cập nhật 2026-10-21)"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+    "pointer": "/claims/484",
+    "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+    "selected": {
+      "anchor": "dispatch-operability-implementation-slice-2026-09-16",
+      "unitKind": "heading",
+      "title": "Dispatch operability implementation slice (2026-09-16)",
+      "textDigest": "1ce68806e971b372fb45ad8f92cc55e0096b7aeca115a614bdd65554d27ac1e0",
+      "startLine": 25,
+      "endLine": 25,
+      "ancestry": [
+        "Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+    "pointer": "/claims/9",
+    "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "selected": {
+      "anchor": "data-dictionary",
+      "unitKind": "heading",
+      "title": "Data Dictionary",
+      "textDigest": "de045416214e9431a47210ed32e61ade9efb33289ed7e589859f05736909f5eb",
+      "startLine": 25,
+      "endLine": 25,
+      "ancestry": [
+        "Added in candidate: Runner Data Dictionary"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+    "pointer": "/registryGaps/0",
+    "targetOwner": "docs/specs/runner.md",
+    "selected": {
+      "anchor": "unheaded-block-101",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 101",
+      "textDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+      "startLine": 1244,
+      "endLine": 1294,
+      "ancestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Pointers (implementation)"
+      ]
+    }
+  },
+  {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+    "pointer": "/registryGaps/33",
+    "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "selected": {
+      "anchor": "unheaded-block-3",
+      "unitKind": "unheaded-block",
+      "title": "Unheaded block 3",
+      "textDigest": "a943adf388f96e583638dab0a1b4278a0faf2b869916ed16b2d4c77416dffbf8",
+      "startLine": 27,
+      "endLine": 41,
+      "ancestry": [
+        "Added in candidate: Runner Data Dictionary",
+        "Data Dictionary"
+      ]
+    }
+  }
+]

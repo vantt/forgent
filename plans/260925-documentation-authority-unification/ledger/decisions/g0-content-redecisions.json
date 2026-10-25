@@ -1585,7 +1585,7 @@
       "targetAnchor": "add-verb",
       "claimKind": "specification",
       "disposition": "supersede",
-      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Supersede: the add-verb text is carried whole, with the required-field and id clauses corrected to code (required flags, optional --id, identity mint door); the rationale names the corrected clauses. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Supersede: the add-verb text is carried whole, with the required-field and id clauses corrected to code (required flags, optional --id, identity mint door); the implementation-pointer wording also changes from \"(9 file)\" to \"trong nhiều file (ví dụ …)\", avoiding a fixed file-count claim. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
       "authoredBy": "fgos-run_unit-run-17928787018826",
       "targetUnitDigest": "f74252e08dee1df2d5cf579cc8d7810918b383049620ac4077e4681ba6acfb02",
       "targetAncestry": [
@@ -3783,7 +3783,7 @@
       "claimKind": "contract",
       "disposition": "move",
       "authoredBy": "fgos-run_unit-run-17928787018826",
-      "rationale": "Supersede overlay plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/20; the current decision is this row, plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/125. Earlier s14/s15 predecessors remain in this continuous chain. Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Only link destinations changed (legacy ../../specs/* paths to platform paths, enduser specs to knowledge-registry anchors); every register row, role and boundary text is unchanged; heading depth ## to ####. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+      "rationale": "Supersede overlay plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/20; the current decision is this row, plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/125. Earlier s14/s15 predecessors remain in this continuous chain. Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Link destinations changed (legacy ../../specs/* paths to platform paths, enduser specs to knowledge-registry anchors), and two link labels changed: Enduser Docs Authoring Spec → Enduser Docs Authoring Contract and Enduser Docs Index Spec → Enduser Docs Index Contract. Apart from those labels, every register row, role and boundary text is unchanged; heading depth ## to ####. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
       "targetUnitDigest": "539e4336c8f12cd426751dbf3dd0fba533a0767d7f654edc1881aed4a559ea26",
       "targetAncestry": [
         "Component Boundary",
@@ -3897,7 +3897,7 @@
       "claimKind": "contract",
       "disposition": "move",
       "authoredBy": "fgos-run_unit-run-17928787018826",
-      "rationale": "Supersede overlay plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/21; the current decision is this row, plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/126. Earlier s14/s15 predecessors remain in this continuous chain. Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Only link destinations changed in the authority register table; every row, role and boundary text is unchanged. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+      "rationale": "Supersede overlay plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/21; the current decision is this row, plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/126. Earlier s14/s15 predecessors remain in this continuous chain. Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Link destinations changed in the authority register table, and two link labels changed: Enduser Docs Authoring Spec → Enduser Docs Authoring Contract and Enduser Docs Index Spec → Enduser Docs Index Contract. Apart from those labels, every row, role and boundary text is unchanged. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
       "targetUnitDigest": "5f4a17570b16c371d6e0e17c52b6f72acdd363faa4ed92c9c3fc125c446915ba",
       "targetAncestry": [
         "Component Boundary",

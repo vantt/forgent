@@ -1,0 +1,559 @@
+{
+  "contract": "g0-rationale-working-tree-check.v1",
+  "basePin": "429b987e1d2dc9244421cded74fdb2aef9fe4c41",
+  "committedJoin": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/join-429b987e1.json",
+  "status": "scope-and-fingerprints-verified",
+  "counts": {
+    "changedRows": 27,
+    "unchangedApproved": 1900,
+    "workingTreeReviewRequired": 27,
+    "unrelatedOpen": 0
+  },
+  "changedRows": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/45",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "2b66a21b25668a91a9e2db317146bf15bed151b6c1b661aa6547fb0514f75f3b",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "cb41b35fa7d29e351427f798fd1a434f2f262f996027a08fa1668d0c971d0a6b",
+      "rowFingerprint": "82dcfd9f4b03c9602cdc47a89781c0bb37216efdda132a52f06c250b9d09d871"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/125",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "4c43c2fb546005229ad28e9b6881ac1737afee4c90a7ca5f4afd51b91ff7adf4",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "d453019178c233a6baaadc891a8b3ebb070395e44b79434c2070baa48e6d87c0",
+      "rowFingerprint": "c9a132b1b09ad92a239ea2edaf01428b2d876208f40e0b02842525e0d3cd44f9"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/126",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "38de637ff86cdcabe8f4c90c65e27557ec6bf5056508758ac961ec9f7d6137aa",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "66377c012d017189c2c4d717e5b1a02c135ca5e3cfb04cd903dc57e1ca86ac22",
+      "rowFingerprint": "56544de471f5c558408d80592f07a5aff69db92d38e07afb2a03cc3e39a84903"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "pointer": "/claims/404",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "60258c57535838b873ceb9b92395fdcf65ab9e41118c5086e875654b6b02b252",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "65e718896509cb442d8fb814f31eb5bbf5952abeeb2b6dbff0065462dbc40a3c",
+      "rowFingerprint": "b49ebe5ad7b2cc501c19374dbad9b4999ead26bce88d3b6368c05a25f5528586"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "pointer": "/registryGaps/16",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "9545236ed63c02f92a5695507d46458fbf6f6436b409e5b6c9f0bc99168afc91",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "8330561e86f1f6c74b72bf559259828801b729f41099b1fd5ffabe15f1d6d74a",
+      "rowFingerprint": "99e7ee3e622b32fb2a4020810cfe7ae84b8b78646bf9faf12e6376d45a59b578"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "pointer": "/claims/214",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "0439a85f72084d980010739335818880edd41b7544c8f7c571434beb4c3aac15",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "5e79694e6bee38f6e0c00bb6e9558d5ff02bef653c4b6cb18ce59e19ec925bbd",
+      "rowFingerprint": "6e1363f4dfc338db696ad3991be37d253180a4ccadae6da4beae8f09994b5846"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "pointer": "/registryGaps/22",
+      "changedFields": [
+        "placement",
+        "rationale"
+      ],
+      "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "2fa9517a0fbb8793a826796ee13b6fe5d1084c38aafa5e84633e635d3b968fe9",
+      "rowFingerprint": "31f5574316359338d131315baeff1f16d90f15ef069d2320211364c7a036cbc0"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "pointer": "/registryGaps/3",
+      "changedFields": [
+        "placement",
+        "rationale"
+      ],
+      "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "dccb6fbe0ebf7ad084e1ce2145d4190428f737c5307e547264c4e9e62b97975f",
+      "rowFingerprint": "60f754d8c6dde073e623f7a915d7e5ef4f7f3aedb351a93451f6e084cc1607a4"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "pointer": "/registryGaps/35",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "c37b1a6cb90efd93096e22612f3c7688f10bd4f5cceb95131a899b79198e5df1",
+      "rowFingerprint": "c2a55bb0b5c6bf3f04028b21c1f4f3b9f36dae580845388632832935da2b6869"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "pointer": "/registryGaps/36",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "9545236ed63c02f92a5695507d46458fbf6f6436b409e5b6c9f0bc99168afc91",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "309d69419a715b70fe9553418b4a67d6623079820cb3ba9068b6cf59f90cd272",
+      "rowFingerprint": "377cc35cc98e251330efb8868dca4b51f5e310792ee9fa7d3026571c73bb0f3a"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/145",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "e97c023929b63fd956290c52016b72ded8881cdb0cff269c6001d394b5d98f15",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "a6ea52f59c0ff5d9980545a89dfeba0725cb4ecd9b3fa7d83975b93e24ff56a2",
+      "rowFingerprint": "41ac4071341b941fcc44ce353ad67ecc1b71c9fb874e47cf2e0c5e98dc043d8a"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/147",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "ae1f3dcc4e11a7f41ed3e153ce1d81b4997cb71b7b4f3ff3b6fea9e392ad5482",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "6aadb2bb3a3bacdee1797f7de304cdbfe46f8b77fdcc215f252586735d718fa7",
+      "rowFingerprint": "c06cb0281a070ad0123b0be57c7b442a69b2d9c5b5323b8c1ec7a6b5597dab74"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/149",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "9b3d7df2cad43ccac183fd6ac9b9febfa8d4ab94f7fda4aa8b09845d3107053a",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "1203c699614d026bd27df525274d211060502f92a0edd5d512811998d26c9625",
+      "rowFingerprint": "236a2756ac267520aa3d1496e31165c50270e62fff94add5e9ee761708b6e228"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/150",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "29ab0072af33d7c4b8465394439b798dbbb9daa805f0fb63375bfd5d90255860",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "ca5bddaf1b4350d078b375d101e1ebf24c3cd612fda677ac1bcbc2736acc3381",
+      "rowFingerprint": "161daaee74f0f54b1a72aea0616fbb7dcecd68c73c7da5a74e0461348714d35e"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/151",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "9486b7940a454bb9490eef062c9b13432d1d9a660c4c6f73a1619c46320e1b54",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "720913cd1f410f680c50ba97f85cda1c09d2458a0b91e03ab7720986b8aacb30",
+      "rowFingerprint": "2976d62ee61b1d829ad86d9d9dd3ef8376bbc6ca52ace529eff049e41eddc38f"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/152",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "98a35a389375ec00e9fae99ed0098f377b5d3dc320641df0fcfad7984e982961",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "2e63457df9ed4243df9b347d383234e5e330643099198e2820d25b4e7662d601",
+      "rowFingerprint": "470da72518b8e76fc48adbb295dc499d7f15662a7d6d512b45bd03c4fe633994"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/154",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "99b38d16601f26952392d86148928653a07a0816c48a9ab48a5ebb3f290164cf",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "34f71227dff8ea19e55dcd3109478794bf213e9ee5585aff9fae9e3d315c7258",
+      "rowFingerprint": "25b340808baf511061621b4172eb7af3983921f08827fb257bf1cda8f0251eee"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/155",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "3e58abffa135e5d87789c8e0f91b1a8fe677f793fb31753b150af21925e3a033",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "baf8d620c3832aed71363b5809828e3aad160ff38e93fd9c5ae721c5326c15b7",
+      "rowFingerprint": "b16d8f36474bb393bc78663f7532e9287e227202b2c780f91ba8ce7c7e6aeafb"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/158",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "a53ff66dd3db1c464d93a5912844315ec80ebf0bd5e18be13a3c9110994d424d",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "30f9e06a1ac05b769fb8d7eae8a8e41d75baa7a4fcd50463ba6d793bcd8aedaf",
+      "rowFingerprint": "54b14e1de3eb9b5f585c6c29f89e036a5cc5d69bcc717beeec95d1ce69937555"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/159",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "a2bd310ee49199d40fe4f99ee82903a09720e1dcffb3fc23616d7f268c6ebc06",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "889a02580b90018851e7aaf0e43429dd9ab49e141dad09fce09a453fb5e9919d",
+      "rowFingerprint": "25b365378ff684070d8423b594cfd297dc736f374211cd4f30c02652c77c35be"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/160",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "ea3f72bb991b365e27b3e5f7cfd57660d1a049ddb62c16d675c6cd6b89e09a41",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "fef151ee61579c15892a70c49d088a0a0a5d3389da2f447c6ba15e8234a67a15",
+      "rowFingerprint": "bd2b4ced0100b91c901520e893d0ffd25ab0d2b3193427447c5f346245bf4cfa"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/4",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "ebfcac2a9dff46497322d64d97dfb66f46efe61f1485e5bd8091cc6a6330a029",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "898b5f89eee09da35da35441173c142c10446d6fee638cd0525ff7bc056d41ea",
+      "rowFingerprint": "f1bb305224aa7083ebffadf56cb6e1c64c96f5caec8a00a89130b8f8c786b5f1"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/registryGaps/2",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "72593be3c85e403df8b73a6a4fb15f54a9fa63a326b293554ed961702bdacb2e",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "b8a2f22d3c6071515c91bd6675488a846487e8e96505e37b80c81d47d64a224f",
+      "rowFingerprint": "15143dfe0e183505d7d50dd84344b6a1e13420d9a64305c71405b0a565903ec1"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/9",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "752e30596de569f8b9533b0c4fd3a2fc211ccbe810c741606b3a539b168eed3c",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "e189401992c0491cf1446af3d3ee4c3279d4ec708657e6d49eb7dcfc10794e67",
+      "rowFingerprint": "edf33e2e72856f5ba4fed0b210d9af4cf54450ddf661a593f48ec623c811b297"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/12",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "ce604d7a23e8ad34fe86be6d4d3687dfec7e8e11dd4d8a5c255871ad39f50712",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "1f5f14c24142ef1a50a75bfaefa41c31be72928227bc66ae0742aa017af668b4",
+      "rowFingerprint": "9a8d5379d6ccd3d3b566a1a749bd9145c5df9cb6cd28d9dd00008c394c7448ff"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/0",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "0e246760afc8e4e620d48b9ccf52bf52d3f63b9f02e38478c8760b911d4f12fe",
+      "rowFingerprint": "4687438356585f75c6e8aa1261ab61cb0fef7b6a98886df0049abb96d26ed88e"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/33",
+      "changedFields": [
+        "rationale"
+      ],
+      "bindingSha256": "aa03e06d0e01701e543241265265b1649063d3614607c8a419d73366be648e39",
+      "reviewStatus": "pending",
+      "beforeRowFingerprint": "4fe17864d37fb9459eba9bcdc9a1160e4028e6a135a1af79a89e905f848ebc5b",
+      "rowFingerprint": "b8de5e4a36c41b2769b7ad725c61f9063a1474bffc53293161019da721c83451"
+    }
+  ],
+  "workingTreeReviewRequired": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/125",
+      "rowFingerprint": "c9a132b1b09ad92a239ea2edaf01428b2d876208f40e0b02842525e0d3cd44f9",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/126",
+      "rowFingerprint": "56544de471f5c558408d80592f07a5aff69db92d38e07afb2a03cc3e39a84903",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/45",
+      "rowFingerprint": "82dcfd9f4b03c9602cdc47a89781c0bb37216efdda132a52f06c250b9d09d871",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "pointer": "/claims/404",
+      "rowFingerprint": "b49ebe5ad7b2cc501c19374dbad9b4999ead26bce88d3b6368c05a25f5528586",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "pointer": "/registryGaps/16",
+      "rowFingerprint": "99e7ee3e622b32fb2a4020810cfe7ae84b8b78646bf9faf12e6376d45a59b578",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "pointer": "/claims/214",
+      "rowFingerprint": "6e1363f4dfc338db696ad3991be37d253180a4ccadae6da4beae8f09994b5846",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "pointer": "/registryGaps/22",
+      "rowFingerprint": "31f5574316359338d131315baeff1f16d90f15ef069d2320211364c7a036cbc0",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "pointer": "/registryGaps/3",
+      "rowFingerprint": "60f754d8c6dde073e623f7a915d7e5ef4f7f3aedb351a93451f6e084cc1607a4",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "pointer": "/registryGaps/35",
+      "rowFingerprint": "c2a55bb0b5c6bf3f04028b21c1f4f3b9f36dae580845388632832935da2b6869",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "pointer": "/registryGaps/36",
+      "rowFingerprint": "377cc35cc98e251330efb8868dca4b51f5e310792ee9fa7d3026571c73bb0f3a",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/145",
+      "rowFingerprint": "41ac4071341b941fcc44ce353ad67ecc1b71c9fb874e47cf2e0c5e98dc043d8a",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/147",
+      "rowFingerprint": "c06cb0281a070ad0123b0be57c7b442a69b2d9c5b5323b8c1ec7a6b5597dab74",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/149",
+      "rowFingerprint": "236a2756ac267520aa3d1496e31165c50270e62fff94add5e9ee761708b6e228",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/150",
+      "rowFingerprint": "161daaee74f0f54b1a72aea0616fbb7dcecd68c73c7da5a74e0461348714d35e",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/151",
+      "rowFingerprint": "2976d62ee61b1d829ad86d9d9dd3ef8376bbc6ca52ace529eff049e41eddc38f",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/152",
+      "rowFingerprint": "470da72518b8e76fc48adbb295dc499d7f15662a7d6d512b45bd03c4fe633994",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/154",
+      "rowFingerprint": "25b340808baf511061621b4172eb7af3983921f08827fb257bf1cda8f0251eee",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/155",
+      "rowFingerprint": "b16d8f36474bb393bc78663f7532e9287e227202b2c780f91ba8ce7c7e6aeafb",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/158",
+      "rowFingerprint": "54b14e1de3eb9b5f585c6c29f89e036a5cc5d69bcc717beeec95d1ce69937555",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/159",
+      "rowFingerprint": "25b365378ff684070d8423b594cfd297dc736f374211cd4f30c02652c77c35be",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/160",
+      "rowFingerprint": "bd2b4ced0100b91c901520e893d0ffd25ab0d2b3193427447c5f346245bf4cfa",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/4",
+      "rowFingerprint": "f1bb305224aa7083ebffadf56cb6e1c64c96f5caec8a00a89130b8f8c786b5f1",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/registryGaps/2",
+      "rowFingerprint": "15143dfe0e183505d7d50dd84344b6a1e13420d9a64305c71405b0a565903ec1",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/12",
+      "rowFingerprint": "9a8d5379d6ccd3d3b566a1a749bd9145c5df9cb6cd28d9dd00008c394c7448ff",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/9",
+      "rowFingerprint": "edf33e2e72856f5ba4fed0b210d9af4cf54450ddf661a593f48ec623c811b297",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/0",
+      "rowFingerprint": "4687438356585f75c6e8aa1261ab61cb0fef7b6a98886df0049abb96d26ed88e",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/33",
+      "rowFingerprint": "b8de5e4a36c41b2769b7ad725c61f9063a1474bffc53293161019da721c83451",
+      "errors": [
+        "stale"
+      ],
+      "note": "Working-tree decision differs; no independent verdict matches. Not a committed join."
+    }
+  ],
+  "limitations": "This checks the uncommitted delta, unchanged bindings/snapshots, and review fingerprint invalidation. join.py --pin HEAD reads committed blobs only; its seven open REWORK verdicts cannot be made stale against this delta until the runner commits. No approval or committed join is manufactured."
+}

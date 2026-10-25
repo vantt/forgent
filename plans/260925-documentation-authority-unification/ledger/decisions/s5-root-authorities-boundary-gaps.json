@@ -119,7 +119,7 @@
       "targetAnchor": "unheaded-block-36",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "rationale": "L9-10/A22: partial-carry to the actual RUL77-RUL80 successor; only historical lines not carried verbatim form the residual. This witness item 4 is contained verbatim; successor item 4 is a pure insertion relative to this source, so it contributes no residual. RUL77 heading and RUL79 mixed suffix differ. Pending independent conservation and A34 review; blocks cutover. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. W2 partial-carry sweep refreshes the current-target-bound residual; complete verbatim line coverage and its historical source witness are in g0fix/partial-carry-residuals.json. Prior acceptance does not cover the changed target/residual.",
+      "rationale": "L9-10/A22: partial-carry to the actual RUL77-RUL80 successor; only historical lines not carried verbatim form the residual. Residual source lines 1, 2, 5, 9 and 10 are respectively the RUL77 paragraph, item 1 (Account lock), item 4 (Write-back at removal), RUL79 and RUL80; item 4 is not contained verbatim in the current successor. Pending independent conservation and A34 review; blocks cutover. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. The current-target-bound residual, complete verbatim line coverage and historical source witness are in import2/partial-carry-residuals.json at the row named by residualRef. Prior acceptance does not cover the changed target/residual.",
       "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
       "targetAncestry": [
         "Added in candidate: Runner Business Rules",
@@ -134,7 +134,7 @@
           "anchor": "unheaded-block-36",
           "unitKind": "unheaded-block",
           "title": "Unheaded block 36",
-          "textDigest": "299c5b49c98df16010e0ac6cfc38a3a77e93bc6b628337f2ee0685a1b7d64269",
+          "textDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
           "startLine": 166,
           "endLine": 220,
           "ancestry": [
