@@ -1197,9 +1197,11 @@ impl GitDriver {
     /// The literal paths the main checkout's ignore rules exclude, whether or
     /// not they exist yet; a tracked path is never ignored.
     pub fn ignored_paths(&self, repo: &RepoHandle, paths: &[Vec<u8>]) -> Result<Vec<Vec<u8>>> {
+        // check-ignore reads its input as pathspecs and refuses literal mode,
+        // so a leading colon (pathspec magic) is refused here instead.
         if paths.is_empty()
             || paths.len() > 4096
-            || paths.iter().any(|p| p.is_empty() || p.contains(&0))
+            || paths.iter().any(|p| p.is_empty() || p.contains(&0) || p.starts_with(b":"))
             || paths.iter().map(|p| p.len() + 1).sum::<usize>() > LIMIT
         {
             return Err(failure("invalid-literal-path"));

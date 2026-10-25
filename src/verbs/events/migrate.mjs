@@ -199,7 +199,11 @@ export async function migrateUseCase(ctx, options = {}) {
   if (typeof git.createGitScopedCommit !== 'function') refuse('event-store-git-scoped-commit-unavailable', 'Git phase 05 must be merged and its release active before migration');
   if (typeof ctx.writer !== 'string' || !ctx.writer) refuse('event-store-writer-required', 'migration requires the resolved session writer');
   // Empty untracked legacy files hold no history; they go before the commit's baseline is taken.
-  for (const p of emptyLegacy) fs.unlinkSync(path.join(cwd, p));
+  for (const p of emptyLegacy) {
+    const file = path.join(cwd, p);
+    if (fs.lstatSync(file).size !== 0) refuse('event-store-migration-parity', `${p} gained content after the check; migrate again`);
+    fs.unlinkSync(file);
+  }
   const scoped = git.createGitScopedCommit({ stateRoot: ctx.stateRoot ?? resolveStateRoot().stateRoot, repoPath: cwd, trustedMain: cwd, writer: ctx.writer }, ctx.loaderOptions);
   const baseline = scoped.preflight();
   // Import revalidates HEAD and dirt under event-seal; that lock is dropped
