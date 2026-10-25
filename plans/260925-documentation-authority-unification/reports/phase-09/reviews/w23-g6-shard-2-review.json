@@ -1,0 +1,1592 @@
+{
+ "review": "w23-g6-shard-2",
+ "shardCommit": "b677076c0",
+ "pin": "c94545de5b45873cb2eb419f10124283fd730a2e",
+ "items": [
+  {
+   "rowId": "f03718",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/how-to-land-a-work-item-s-branch-into-main-when-its-status-a/land-a-delivered-item-whose-branch-was-never-actually-merged.md:12-20 @ c94545de5 (unit ac06a0c0f13d); surrounding-section land-a-delivered-item-whose-branch-was-never-actually-merged.md:10 '# Land a delivered item whose branch was never actually merged'"
+  },
+  {
+   "rowId": "f03719",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/how-to-land-a-work-item-s-branch-into-main-when-its-status-a/land-a-delivered-item-whose-branch-was-never-actually-merged.md:60-64 @ c94545de5 (unit ac7da683d7df); surrounding-section land-a-delivered-item-whose-branch-was-never-actually-merged.md:52 '## Why this matters beyond the two branches themselves'"
+  },
+  {
+   "rowId": "f03757",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route. Approve (borderline). RUL9/RUL11 are quoted as the rules that existed before the reversal, so the operand is the identity of that past state.",
+   "evidence": "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md:126-130 @ c94545de5 (unit 6066739b5643); surrounding-section register-a-fixable-doctor-check-in-fgos.md:108 '## Step 4 — how `doctor --fix` runs it'"
+  },
+  {
+   "rowId": "f03758",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route. Approve (borderline). 'intentional per docs/distribution-vision.md §3' gives the rationale for the past reversal. The vision is placed verbatim as history, so §3 survives there.",
+   "evidence": "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md:126-130 @ c94545de5 (unit 6066739b5643); surrounding-section register-a-fixable-doctor-check-in-fgos.md:108 '## Step 4 — how `doctor --fix` runs it'"
+  },
+  {
+   "rowId": "f03773",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/literal-input] Operand is a literal (pattern, regex prefix, quoted diagnostic, example path or fenced code comment); nothing to dereference.",
+   "evidence": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md:12-16 @ c94545de5 (unit 74fc8cd4d8a4); surrounding-section resolve-a-decision-id-collision-merge-conflict-on-approve.md:10 '# How to resolve an `fgos approve` merge-conflict caused by two branches claiming the same'"
+  },
+  {
+   "rowId": "f03775",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/literal-input] Operand is a literal (pattern, regex prefix, quoted diagnostic, example path or fenced code comment); nothing to dereference.",
+   "evidence": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md:41-41 @ c94545de5 (unit 4f2d50e4eec4); surrounding-section resolve-a-decision-id-collision-merge-conflict-on-approve.md:28 '## Steps'"
+  },
+  {
+   "rowId": "f03778",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md:97-101 @ c94545de5 (unit e6e9ad2e88ed); surrounding-section resolve-a-decision-id-collision-merge-conflict-on-approve.md:95 '## Real example'"
+  },
+  {
+   "rowId": "f03779",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md:97-101 @ c94545de5 (unit e6e9ad2e88ed); surrounding-section resolve-a-decision-id-collision-merge-conflict-on-approve.md:95 '## Real example'"
+  },
+  {
+   "rowId": "f03780",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md:106-114 @ c94545de5 (unit 3e51c2c54668); surrounding-section resolve-a-decision-id-collision-merge-conflict-on-approve.md:95 '## Real example'"
+  },
+  {
+   "rowId": "f03781",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md:121-138 @ c94545de5 (unit 4a69845927d7); surrounding-section resolve-a-decision-id-collision-merge-conflict-on-approve.md:119 '## Second real example: caught by a post-merge audit, not at approve time'"
+  },
+  {
+   "rowId": "f03782",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md:121-138 @ c94545de5 (unit 4a69845927d7); surrounding-section resolve-a-decision-id-collision-merge-conflict-on-approve.md:119 '## Second real example: caught by a post-merge audit, not at approve time'"
+  },
+  {
+   "rowId": "f03783",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md:121-138 @ c94545de5 (unit 4a69845927d7); surrounding-section resolve-a-decision-id-collision-merge-conflict-on-approve.md:119 '## Second real example: caught by a post-merge audit, not at approve time'"
+  },
+  {
+   "rowId": "f03801",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/literal-input] Operand is a literal (pattern, regex prefix, quoted diagnostic, example path or fenced code comment); nothing to dereference.",
+   "evidence": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md:28-32 @ c94545de5 (unit 76920344a9b9); surrounding-section run-a-state-verb-from-inside-a-worktree.md:18 '## Before you start'"
+  },
+  {
+   "rowId": "f03829",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md:101-110 @ c94545de5 (unit 1dea0443bd55); surrounding-section unify-a-duplicated-clean-tree-check-across-return-and-approve.md:99 '## Real example'"
+  },
+  {
+   "rowId": "f03868",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md:17-23 @ c94545de5 (unit 402e1555d9c0); surrounding-section tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md:10 '# Tiny multi-file edits stay one item when split overhead exceeds the work'"
+  },
+  {
+   "rowId": "f03869",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md:17-23 @ c94545de5 (unit 402e1555d9c0); surrounding-section tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md:10 '# Tiny multi-file edits stay one item when split overhead exceeds the work'"
+  },
+  {
+   "rowId": "f03870",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md:17-23 @ c94545de5 (unit 402e1555d9c0); surrounding-section tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md:10 '# Tiny multi-file edits stay one item when split overhead exceeds the work'"
+  },
+  {
+   "rowId": "f03871",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md:17-23 @ c94545de5 (unit 402e1555d9c0); surrounding-section tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md:10 '# Tiny multi-file edits stay one item when split overhead exceeds the work'"
+  },
+  {
+   "rowId": "f03882",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md:114-126 @ c94545de5 (unit dd48e6494fd1); surrounding-section produce-failing-test-first-proof-for-an-iron-law-gated-diff.md:112 '## Watch out for: a guard test scoped by `git ls-files` silently skips its own uncommitted'"
+  },
+  {
+   "rowId": "f03892",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/spec-docs-drift-silently-when-only-the-code-has-an-exact-mat/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md:29-30 @ c94545de5 (unit c6901de1355d); surrounding-section spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md:8 '# Spec docs drift silently when only the code has an exact-match test'"
+  },
+  {
+   "rowId": "f03893",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/spec-docs-drift-silently-when-only-the-code-has-an-exact-mat/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md:69-78 @ c94545de5 (unit 80659b7624d7); surrounding-section spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md:67 '## The gap this item left open got a real guard, later'"
+  },
+  {
+   "rowId": "f03894",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/spec-docs-drift-silently-when-only-the-code-has-an-exact-mat/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md:108-111 @ c94545de5 (unit 7ed6cf4fbe74); surrounding-section spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md:99 '## The guard caught its own predicted repeat (`tsk-2m5`)'"
+  },
+  {
+   "rowId": "f03897",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md:22-24 @ c94545de5 (unit 80d3124f7288); surrounding-section state-machine-module-file-names.md:11 '# State-machine module file names'"
+  },
+  {
+   "rowId": "f03898",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md:38-39 @ c94545de5 (unit 5346f80c6f9b); surrounding-section state-machine-module-file-names.md:36 '## Related'; ledger-mapping area-map-whole-system-architecture.md:17 '| `docs/architecture-map.md` | `docs/platform/architecture-map.md` | architecture | split '; successor docs/platform/architecture-map.md:234 '3 · Bản vẽ kết cấu — STRUCTURE (khung chính)' f115e52251fb"
+  },
+  {
+   "rowId": "f03913",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/the-coding-classify-intake-executor-s-full-lifecycle-created/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md:60-73 @ c94545de5 (unit 6b7a775d9c01); surrounding-section coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md:43 '## Step 1a (`tsk-4fk`): the rename itself left one test assertion stale'"
+  },
+  {
+   "rowId": "f03917",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md:12-18 @ c94545de5 (unit df877c315217); surrounding-section fgos-gateway-api-ctr010.md:10 '# fgOS Gateway API (CTR010)'; ledger-mapping area-map-root-authorities.md:9 '| `docs/contracts/fgos-gateway-api-v1.yaml` | `docs/platform/herdr-web-dashboard/contracts'; successor docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:1 'OpenAPI root / CTR010 identity' ac3526793c96"
+  },
+  {
+   "rowId": "f03948",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/whether-fgos-uninstall-remove-package-can-reliably-remove-it/fgos-self-uninstall-package-removal-spike.md:52-56 @ c94545de5 (unit cd8382a5b6f0); surrounding-section fgos-self-uninstall-package-removal-spike.md:44 \"## What's still unproven\""
+  },
+  {
+   "rowId": "f03952",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md:94-98 @ c94545de5 (unit 145f69bfa8e9); surrounding-section why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md:61 '## Seven structural instabilities — the reason this will recur'"
+  },
+  {
+   "rowId": "f03953",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md:262-278 @ c94545de5 (unit d2ebe7cb1be5); surrounding-section why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md:248 \"## `tsk-5eq`: the batch's largest piece, and the one deliberate non-fix inside it\""
+  },
+  {
+   "rowId": "f03967",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md:74-84 @ c94545de5 (unit d72c0e060298); surrounding-section why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md:56 '## The fix: a third enforced mirror, not a second manually-maintained one'"
+  },
+  {
+   "rowId": "f03968",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md:74-84 @ c94545de5 (unit d72c0e060298); surrounding-section why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md:56 '## The fix: a third enforced mirror, not a second manually-maintained one'"
+  },
+  {
+   "rowId": "f03970",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md:168-177 @ c94545de5 (unit 5c561e55d139); surrounding-section why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md:166 '## The same alias policy governs spec-doc prose, not just code'"
+  },
+  {
+   "rowId": "f03971",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md:168-177 @ c94545de5 (unit 5c561e55d139); surrounding-section why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md:166 '## The same alias policy governs spec-doc prose, not just code'"
+  },
+  {
+   "rowId": "f03982",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-a-work-item-s-id-is-tsk-hash-not-a-bare-hash/id-generation-design.md:46-48 @ c94545de5 (unit e68771571179); surrounding-section id-generation-design.md:11 \"# Why a work item's id is TSK<hash>, not a bare hash\""
+  },
+  {
+   "rowId": "f03995",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-d/why-bee-prefixed-identifiers-became-fgos-prefixed.md:52-60 @ c94545de5 (unit d10071cb07ff); surrounding-section why-bee-prefixed-identifiers-became-fgos-prefixed.md:33 '## The line the scope actually drew: whose naming is it?'"
+  },
+  {
+   "rowId": "f03996",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-d/why-bee-prefixed-identifiers-became-fgos-prefixed.md:52-60 @ c94545de5 (unit d10071cb07ff); surrounding-section why-bee-prefixed-identifiers-became-fgos-prefixed.md:33 '## The line the scope actually drew: whose naming is it?'"
+  },
+  {
+   "rowId": "f03997",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-d/why-bee-prefixed-identifiers-became-fgos-prefixed.md:64-77 @ c94545de5 (unit bd6d4d80f0e7); surrounding-section why-bee-prefixed-identifiers-became-fgos-prefixed.md:62 '## What actually landed'"
+  },
+  {
+   "rowId": "f03998",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-d/why-bee-prefixed-identifiers-became-fgos-prefixed.md:64-77 @ c94545de5 (unit bd6d4d80f0e7); surrounding-section why-bee-prefixed-identifiers-became-fgos-prefixed.md:62 '## What actually landed'"
+  },
+  {
+   "rowId": "f03999",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md:49-61 @ c94545de5 (unit 305e16e29114); surrounding-section why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md:47 '## Real-world confirmation (tsk-577)'"
+  },
+  {
+   "rowId": "f04015",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s/context-md-enforcement-scope.md:15-25 @ c94545de5 (unit 124fbe63974c); surrounding-section context-md-enforcement-scope.md:13 '## The gap, measured'"
+  },
+  {
+   "rowId": "f04016",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s/context-md-enforcement-scope.md:44-52 @ c94545de5 (unit 67e1f59ddb23); surrounding-section context-md-enforcement-scope.md:42 '## Why hard, not soft — the bee precedent'"
+  },
+  {
+   "rowId": "f04024",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md:120-125 @ c94545de5 (unit 4206e7fc36ea); surrounding-section why-decompose-checks-footprint-overlap-before-creating-children.md:85 '## The same rule, applied live by a session instead of the automatic gate (`tsk-36i`)'"
+  },
+  {
+   "rowId": "f04025",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md:127-132 @ c94545de5 (unit f59ee22fabe4); surrounding-section why-decompose-checks-footprint-overlap-before-creating-children.md:85 '## The same rule, applied live by a session instead of the automatic gate (`tsk-36i`)'"
+  },
+  {
+   "rowId": "f04039",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md:15-15 @ c94545de5 (unit da56419d8ee3); surrounding-section why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md:13 '## What was actually wrong'"
+  },
+  {
+   "rowId": "f04040",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md:17-19 @ c94545de5 (unit 166686e9a99c); surrounding-section why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md:13 '## What was actually wrong'"
+  },
+  {
+   "rowId": "f04041",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md:20-21 @ c94545de5 (unit 470e4181e713); surrounding-section why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md:13 '## What was actually wrong'"
+  },
+  {
+   "rowId": "f04042",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md:7-11 @ c94545de5 (unit 941c7420d627); surrounding-section why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md:5 '# Why doctor checks are documented as an open registry, not a fixed list'"
+  },
+  {
+   "rowId": "f04045",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md:63-64 @ c94545de5 (unit 2a18962e46a4); surrounding-section why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md:56 '## Why both rules, not just the one named in the title'"
+  },
+  {
+   "rowId": "f04046",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md:439-453 @ c94545de5 (unit 35ffbff829ca); surrounding-section why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md:425 '## A closing rename: \"capacity\" became \"executor\"'"
+  },
+  {
+   "rowId": "f04047",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "[preserve-confirmed/completed-work] The 'Removed door (2026-10-14)' banner is current reader framing, not the history it introduces. '(decision 0062 in docs/specs/runner.md)' locates the authority for a present claim. The shard itself repoints the same parenthetical-citation form in f06833/f06835. At cutover 0062 moves to docs/platform/runner/decisions/h-36d872fbb0e5.md (heading at line 1722; listed in proof sourceSuccessors). Re-judge as repoint with a patch, or record why a banner citation counts as lineage.",
+   "evidence": "why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md:9-15 (the banner ends 'The account below is kept as history.'). ledger/area-map-runner.md:50 maps the Lịch sử quyết định section to h-36d872fbb0e5.md. | docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md:9-15 @ c94545de5 (unit a06cab6408e3); surrounding-section why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md:7 '# Why `dispatch decide` is a hard, hook-enforced gate, not a convention'"
+  },
+  {
+   "rowId": "f04049",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md:277-284 @ c94545de5 (unit e564039f34f8); surrounding-section why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md:242 '## A configured cli-spawn capacity beats a live soul — config wins, not \"I can just do it '"
+  },
+  {
+   "rowId": "f04051",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md:439-453 @ c94545de5 (unit 35ffbff829ca); surrounding-section why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md:425 '## A closing rename: \"capacity\" became \"executor\"'"
+  },
+  {
+   "rowId": "f04070",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-approve-distinguishes-a-pre-existing-merge-head-fro/why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict.md:101-108 @ c94545de5 (unit 376b75513edd); surrounding-section why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict.md:99 '## Scope'"
+  },
+  {
+   "rowId": "f04087",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md:193-195 @ c94545de5 (unit 3ffeed0242f2); surrounding-section why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md:176 '## Post-merge prose sync (`tsk-2tk`)'"
+  },
+  {
+   "rowId": "f04088",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md:201-207 @ c94545de5 (unit 73fa04d5e6b9); surrounding-section why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md:176 '## Post-merge prose sync (`tsk-2tk`)'"
+  },
+  {
+   "rowId": "f04089",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md:201-207 @ c94545de5 (unit 73fa04d5e6b9); surrounding-section why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md:176 '## Post-merge prose sync (`tsk-2tk`)'"
+  },
+  {
+   "rowId": "f04090",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md:201-207 @ c94545de5 (unit 73fa04d5e6b9); surrounding-section why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md:176 '## Post-merge prose sync (`tsk-2tk`)'"
+  },
+  {
+   "rowId": "f04092",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md:213-219 @ c94545de5 (unit f2ae0eb8627f); surrounding-section why-fgos-planning-moved-mode-gate-to-fgos-routing.md:196 '## Third follow-up (`tsk-5iv`): the same undefined-`$root` bug, in the sibling `fgos-codin'"
+  },
+  {
+   "rowId": "f04096",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md:20-25 @ c94545de5 (unit ddf3cc714bfd); surrounding-section why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md:18 '## The real symptom this caused (`tsk-bc7`)'"
+  },
+  {
+   "rowId": "f04112",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-discover-now-trusts-a-locked-context-md-instead-of/fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md:40-45 @ c94545de5 (unit ea80e1a589ed); surrounding-section fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md:38 \"## Why `discover` isn't simply removed\""
+  },
+  {
+   "rowId": "f04131",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md:12-21 @ c94545de5 (unit 8cd81840ffa0); surrounding-section why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md:10 '# Why fgOS install is pinned to a semver tag instead of `main` HEAD'"
+  },
+  {
+   "rowId": "f04167",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md:96-102 @ c94545de5 (unit ea170bc1d522); surrounding-section why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md:72 '## Scope: real logic changes, separated cleanly from narrative-only mentions'"
+  },
+  {
+   "rowId": "f04168",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md:96-102 @ c94545de5 (unit ea170bc1d522); surrounding-section why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md:72 '## Scope: real logic changes, separated cleanly from narrative-only mentions'"
+  },
+  {
+   "rowId": "f04170",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md:72-76 @ c94545de5 (unit 556e8f26648d); surrounding-section fgos-retro-loop-and-the-restored-compound-verb.md:61 '## Restoring the removed code, not inventing a replacement'"
+  },
+  {
+   "rowId": "f04171",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md:100-107 @ c94545de5 (unit 4da97157b89b); surrounding-section fgos-retro-loop-and-the-restored-compound-verb.md:98 '## Proof it actually works'"
+  },
+  {
+   "rowId": "f04176",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md:73-79 @ c94545de5 (unit b95e47aa0440); surrounding-section fgos-capture-points-and-the-why-gap.md:62 \"## The one mechanism that does capture the why — and why it's not enough\""
+  },
+  {
+   "rowId": "f04181",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/literal-input] Operand is a literal (pattern, regex prefix, quoted diagnostic, example path or fenced code comment); nothing to dereference.",
+   "evidence": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md:33-40 @ c94545de5 (unit b7acbaedd74d); surrounding-section why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md:28 '## The citation-boundary rule: producer role, not folder location'"
+  },
+  {
+   "rowId": "f04183",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md:94-103 @ c94545de5 (unit f3863c2db60f); surrounding-section why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md:89 '## A scope collision caught and resolved before it happened'"
+  },
+  {
+   "rowId": "f04185",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-s-concurrency-tests-batch-spawned-processes-to-redu/why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout.md:62-74 @ c94545de5 (unit a7e57cf799bb); surrounding-section why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout.md:60 \"## Follow-up: the task id itself didn't belong in the comments (`tsk-2va`)\""
+  },
+  {
+   "rowId": "f04188",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-g/why-fgos-citations-carry-a-gloss-and-check-mechanically.md:51-58 @ c94545de5 (unit b25f49df3e98); surrounding-section why-fgos-citations-carry-a-gloss-and-check-mechanically.md:45 '## Extending the existing citation-drift script, not writing a third one'"
+  },
+  {
+   "rowId": "f04193",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-g/why-fgos-citations-carry-a-gloss-and-check-mechanically.md:229-234 @ c94545de5 (unit 78abf5c1c4a1); surrounding-section why-fgos-citations-carry-a-gloss-and-check-mechanically.md:227 '## Source'"
+  },
+  {
+   "rowId": "f04200",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md:49-51 @ c94545de5 (unit de75f3f49b38); surrounding-section why-fgos-self-development-is-not-the-default-mission.md:47 '## Source'"
+  },
+  {
+   "rowId": "f04201",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md:49-51 @ c94545de5 (unit de75f3f49b38); surrounding-section why-fgos-self-development-is-not-the-default-mission.md:47 '## Source'"
+  },
+  {
+   "rowId": "f04202",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md:13-17 @ c94545de5 (unit 5c122f52815a); surrounding-section fgos-uninstall-feature-overview.md:11 '## The starting ask'"
+  },
+  {
+   "rowId": "f04210",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md:64-73 @ c94545de5 (unit d440e05eb21d); surrounding-section worktree-isolation-axis-decision.md:62 '## The related race the same rollup surfaced'"
+  },
+  {
+   "rowId": "f04211",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md:80-80 @ c94545de5 (unit 7451781649e5); surrounding-section worktree-isolation-axis-decision.md:75 '## The other six items this rollup tracked'"
+  },
+  {
+   "rowId": "f04212",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md:81-81 @ c94545de5 (unit 116113a9923d); surrounding-section worktree-isolation-axis-decision.md:75 '## The other six items this rollup tracked'"
+  },
+  {
+   "rowId": "f04213",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md:82-82 @ c94545de5 (unit 20af6bdc4427); surrounding-section worktree-isolation-axis-decision.md:75 '## The other six items this rollup tracked'"
+  },
+  {
+   "rowId": "f04214",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md:83-83 @ c94545de5 (unit 3dc301c682b9); surrounding-section worktree-isolation-axis-decision.md:75 '## The other six items this rollup tracked'"
+  },
+  {
+   "rowId": "f04215",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md:84-84 @ c94545de5 (unit 8c78576aa449); surrounding-section worktree-isolation-axis-decision.md:75 '## The other six items this rollup tracked'"
+  },
+  {
+   "rowId": "f04218",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md:325-334 @ c94545de5 (unit 9468672acf00); surrounding-section gate-bypass-design.md:318 '## A bare-word marker scan created a perverse incentive to obfuscate (`tsk-3i8`)'"
+  },
+  {
+   "rowId": "f04231",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-hook-registrations-guard-against-gitignored-scripts/hook-registration-guard.md:47-52 @ c94545de5 (unit ed03519f1ec6); surrounding-section hook-registration-guard.md:45 '## Why not an in-process import shim'"
+  },
+  {
+   "rowId": "f04241",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md:26-34 @ c94545de5 (unit e0aba7125ffe); surrounding-section why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md:14 '## The bug: exact string equality instead of path equivalence'"
+  },
+  {
+   "rowId": "f04247",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md:69-71 @ c94545de5 (unit 2f5b50f9ddbb); surrounding-section merge-loop-self-diagnoses-verify-fail-post-merge.md:56 '## Why Iron Law stays completely out of this'"
+  },
+  {
+   "rowId": "f04255",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-merge-standardization-tsk-4j9-reuses-existing-mechanisms/why-merge-standardization-reuses-existing-mechanisms.md:23-27 @ c94545de5 (unit 61b43fbff064); surrounding-section why-merge-standardization-reuses-existing-mechanisms.md:15 '## State model: no new \"ready to merge\" state'"
+  },
+  {
+   "rowId": "f04256",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/literal-input] Operand is a literal (pattern, regex prefix, quoted diagnostic, example path or fenced code comment); nothing to dereference.",
+   "evidence": "docs/knowledge/why-mergereadiness-excludes-superseded-items/why-mergereadiness-excludes-superseded-items.md:42-63 @ c94545de5 (unit 6483e6982cd4); surrounding-section why-mergereadiness-excludes-superseded-items.md:40 '## The real guard, in `mergeReadiness`'"
+  },
+  {
+   "rowId": "f04258",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-mergerunneritem-returns-merge-failed-unclassified-instea/why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing.md:60-68 @ c94545de5 (unit dca5ca84aeb0); surrounding-section why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing.md:28 '## The fix — a distinct blocked reason, never folded into `merge-conflict`'"
+  },
+  {
+   "rowId": "f04267",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/literal-input] Operand is a literal (pattern, regex prefix, quoted diagnostic, example path or fenced code comment); nothing to dereference.",
+   "evidence": "docs/knowledge/why-promote-engine-merges-members-instead-of-rebasing-them/why-promote-engine-merges-members-instead-of-rebasing-them.md:15-24 @ c94545de5 (unit 08c374a2dadf); surrounding-section why-promote-engine-merges-members-instead-of-rebasing-them.md:5 '# Why `promote-engine` merges members instead of rebasing them'"
+  },
+  {
+   "rowId": "f04271",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/knowledge/why-register-a-finished-item-into-the-merge-list-needs-no-ne/merge-ready-registration-is-already-idempotent.md:29-34 @ c94545de5 (unit 2447db0b342d); surrounding-section merge-ready-registration-is-already-idempotent.md:13 '## The existing lifecycle already does this'; ledger-mapping area-map-root-authorities.md:14 '| `docs/platform-foundations.md` | `docs/platform/platform-foundations.md` | platform-foun'; successor docs/platform/platform-foundations.md:309 'L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ du' a6ed7a056ec7"
+  },
+  {
+   "rowId": "f04275",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-retrospective-documents-vanished-on-orphaned-branches/why-retrospective-documents-vanished-on-orphaned-branches.md:37-44 @ c94545de5 (unit 473c8d744a39); surrounding-section why-retrospective-documents-vanished-on-orphaned-branches.md:15 '## The root cause was a write path, not a merge accident'"
+  },
+  {
+   "rowId": "f04282",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md:11-19 @ c94545de5 (unit 16d48f6ac542); surrounding-section why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md:9 '# Why session-claim liveness measures worktree activity, not PID or event-log age'"
+  },
+  {
+   "rowId": "f04287",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "[preserve-confirmed/completed-work] Same banner and the same defect as f04047: the 'decision 0062 in docs/specs/runner.md' locator in current framing dies at F, and the decision record moves to docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+   "evidence": "why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md:12-18; ledger/area-map-runner.md:50. | docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md:12-18 @ c94545de5 (unit a06cab6408e3); surrounding-section why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md:10 '# Why `dispatch.mjs` was redesigned around \"task,\" not agent capacity'"
+  },
+  {
+   "rowId": "f04293",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md:142-144 @ c94545de5 (unit ab2a5b78e691); surrounding-section decision-record.md:120 '## The follow-up that used this clean zone (`tsk-1lv`)'"
+  },
+  {
+   "rowId": "f04294",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md:157-159 @ c94545de5 (unit 8b4e9a8d1095); surrounding-section decision-record.md:120 '## The follow-up that used this clean zone (`tsk-1lv`)'"
+  },
+  {
+   "rowId": "f04299",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md:219-230 @ c94545de5 (unit 5f8926042d76); surrounding-section decision-record.md:120 '## The follow-up that used this clean zone (`tsk-1lv`)'"
+  },
+  {
+   "rowId": "f04300",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md:219-230 @ c94545de5 (unit 5f8926042d76); surrounding-section decision-record.md:120 '## The follow-up that used this clean zone (`tsk-1lv`)'"
+  },
+  {
+   "rowId": "f04302",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md:232-237 @ c94545de5 (unit 2a2800384b1c); surrounding-section decision-record.md:120 '## The follow-up that used this clean zone (`tsk-1lv`)'"
+  },
+  {
+   "rowId": "f04305",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md:257-263 @ c94545de5 (unit 5ae561443537); surrounding-section decision-record.md:120 '## The follow-up that used this clean zone (`tsk-1lv`)'"
+  },
+  {
+   "rowId": "f04310",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md:301-319 @ c94545de5 (unit 6eaf31da8509); surrounding-section decision-record.md:120 '## The follow-up that used this clean zone (`tsk-1lv`)'"
+  },
+  {
+   "rowId": "f04316",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md:144-147 @ c94545de5 (unit 6aba21568ca9); surrounding-section multi-domain-status-category-schema.md:142 '## The decision record itself narrowed the scope it formalizes'"
+  },
+  {
+   "rowId": "f04318",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md:205-217 @ c94545de5 (unit 47f4d284765b); surrounding-section multi-domain-status-category-schema.md:203 '## Consumer migration closed the `RESOLVED_STATUSES` gap the audit flagged'"
+  },
+  {
+   "rowId": "f04320",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md:317-325 @ c94545de5 (unit d3ed09aa4b7c); surrounding-section multi-domain-status-category-schema.md:315 '## The stale triage-table doc gap (`tsk-38t-8`) — independent of the category decision'"
+  },
+  {
+   "rowId": "f04321",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md:317-325 @ c94545de5 (unit d3ed09aa4b7c); surrounding-section multi-domain-status-category-schema.md:315 '## The stale triage-table doc gap (`tsk-38t-8`) — independent of the category decision'"
+  },
+  {
+   "rowId": "f04322",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md:329-342 @ c94545de5 (unit eb522c781d29); surrounding-section multi-domain-status-category-schema.md:327 '## The `herdr-plugin` gap the audit flagged, resolved by pinning the current behavior rath'"
+  },
+  {
+   "rowId": "f04324",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md:383-387 @ c94545de5 (unit 49235960d535); surrounding-section multi-domain-status-category-schema.md:327 '## The `herdr-plugin` gap the audit flagged, resolved by pinning the current behavior rath'"
+  },
+  {
+   "rowId": "f04326",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-the-agy-cli-executor-needs-new-project-in-its-invocation/why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable.md:103-106 @ c94545de5 (unit 2dd437f49974); surrounding-section why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable.md:101 '## Source'"
+  },
+  {
+   "rowId": "f04340",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md:88-91 @ c94545de5 (unit 282ad3c34aca); surrounding-section why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md:86 '## D5: where per-machine daemon state lives'"
+  },
+  {
+   "rowId": "f04342",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md:9-14 @ c94545de5 (unit 6dc0e236c81b); surrounding-section why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md:7 \"# Why the gateway edit route reuses EDITABLE_FIELDS and passes through `fgos edit`'s refus\""
+  },
+  {
+   "rowId": "f04343",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md:49-53 @ c94545de5 (unit 0ac1e0f861fb); surrounding-section why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md:47 '## Why this route had to land before tsk-2ok, not after'"
+  },
+  {
+   "rowId": "f04350",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md:12-17 @ c94545de5 (unit d45cd7f6e04f); surrounding-section why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md:10 '# Why the herdr web dashboard became a static client of the gateway, not its own server'"
+  },
+  {
+   "rowId": "f04357",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md:128-138 @ c94545de5 (unit 7c8890a22f92); surrounding-section why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md:126 '## P3 (`tsk-5jr`): the taskboard list view, and the contract-as-single-source rule'; ledger-mapping area-map-root-authorities.md:9 '| `docs/contracts/fgos-gateway-api-v1.yaml` | `docs/platform/herdr-web-dashboard/contracts'; successor docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:1 'OpenAPI root / CTR010 identity' ac3526793c96"
+  },
+  {
+   "rowId": "f04364",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md:62-71 @ c94545de5 (unit ed2cc0c3d083); surrounding-section why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md:60 '## Pointer maintenance (`tsk-4ah`)'"
+  },
+  {
+   "rowId": "f04368",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md:62-71 @ c94545de5 (unit ed2cc0c3d083); surrounding-section why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md:60 '## Pointer maintenance (`tsk-4ah`)'"
+  },
+  {
+   "rowId": "f04370",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md:62-71 @ c94545de5 (unit ed2cc0c3d083); surrounding-section why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md:60 '## Pointer maintenance (`tsk-4ah`)'"
+  },
+  {
+   "rowId": "f04381",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md:26-30 @ c94545de5 (unit 77579a908b57); surrounding-section decision-record.md:24 '## The measured blast radius'"
+  },
+  {
+   "rowId": "f04390",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-the-main-checkout-lock-hook-used-to-block-worktree-commi/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md:28-33 @ c94545de5 (unit af4fa9ece18e); surrounding-section why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md:26 '## The original lock hazard never involved worktrees at all'"
+  },
+  {
+   "rowId": "f04410",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/literal-input] Operand is a literal (pattern, regex prefix, quoted diagnostic, example path or fenced code comment); nothing to dereference.",
+   "evidence": "docs/knowledge/why-work-acceptance-gets-a-narrow-write-time-evidence-tracea/acceptance-evidence-traceability-gate.md:53-61 @ c94545de5 (unit b528780ecb33); surrounding-section acceptance-evidence-traceability-gate.md:42 '## Why \"traceable\" means mechanical, not semantic'"
+  },
+  {
+   "rowId": "f04411",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/knowledge/why-workflow-prose-gates-on-a-capability-query-not-a-hardcod/impact-analysis-capability-gate-replaces-hardcoded-gitnexus.md:144-152 @ c94545de5 (unit 42e5cb87b242); surrounding-section impact-analysis-capability-gate-replaces-hardcoded-gitnexus.md:124 \"## `present` doesn't mean fresh or intact (`tsk-j7y`)\""
+  },
+  {
+   "rowId": "f04427",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md:41-53 @ c94545de5 (unit 3af86a8d169d); surrounding-section worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md:34 '## Occupancy is engine state, never tool/label state'; ledger-mapping area-map-root-authorities.md:13 '| `docs/operator-runbook-herdr-cockpit.md` | `docs/platform/herdr-web-dashboard/operations'; successor docs/platform/herdr-web-dashboard/operations/operator-runbook.md:64 'Hard rule' 5771d0642c66"
+  },
+  {
+   "rowId": "f04437",
+   "verdict": "APPROVE",
+   "summary": "[successor-bound/law-successor] Removed docs/platform-foundations.md claim is carried by the named unit of docs/platform/platform-foundations.md at the pin (digest checked by the checker; operand text present in the successor unit).",
+   "evidence": "docs/platform-foundations.md:14-21 @ c94545de5 (unit 8fc59c5dbdac); surrounding-section platform-foundations.md:1 '# Luật nền platform forgent (Phase 0 — compound-learning stack)'; ledger-mapping area-map-root-authorities.md:14 '| `docs/platform-foundations.md` | `docs/platform/platform-foundations.md` | platform-foun'; successor docs/platform/platform-foundations.md:99 'Luật nền platform forgent / opening provenance' ede22a666bfb"
+  },
+  {
+   "rowId": "f04438",
+   "verdict": "APPROVE",
+   "summary": "[successor-bound/law-successor] Removed docs/platform-foundations.md claim is carried by the named unit of docs/platform/platform-foundations.md at the pin (digest checked by the checker; operand text present in the successor unit).",
+   "evidence": "docs/platform-foundations.md:14-21 @ c94545de5 (unit 8fc59c5dbdac); surrounding-section platform-foundations.md:1 '# Luật nền platform forgent (Phase 0 — compound-learning stack)'; ledger-mapping area-map-root-authorities.md:14 '| `docs/platform-foundations.md` | `docs/platform/platform-foundations.md` | platform-foun'; successor docs/platform/platform-foundations.md:99 'Luật nền platform forgent / opening provenance' ede22a666bfb"
+  },
+  {
+   "rowId": "f04439",
+   "verdict": "APPROVE",
+   "summary": "[successor-bound/law-successor] Removed docs/platform-foundations.md claim is carried by the named unit of docs/platform/platform-foundations.md at the pin (digest checked by the checker; operand text present in the successor unit).",
+   "evidence": "docs/platform-foundations.md:14-21 @ c94545de5 (unit 8fc59c5dbdac); surrounding-section platform-foundations.md:1 '# Luật nền platform forgent (Phase 0 — compound-learning stack)'; ledger-mapping area-map-root-authorities.md:14 '| `docs/platform-foundations.md` | `docs/platform/platform-foundations.md` | platform-foun'; successor docs/platform/platform-foundations.md:99 'Luật nền platform forgent / opening provenance' ede22a666bfb"
+  },
+  {
+   "rowId": "f04440",
+   "verdict": "APPROVE",
+   "summary": "[successor-bound/law-successor] Removed docs/platform-foundations.md claim is carried by the named unit of docs/platform/platform-foundations.md at the pin (digest checked by the checker; operand text present in the successor unit).",
+   "evidence": "docs/platform-foundations.md:14-21 @ c94545de5 (unit 8fc59c5dbdac); surrounding-section platform-foundations.md:1 '# Luật nền platform forgent (Phase 0 — compound-learning stack)'; ledger-mapping area-map-root-authorities.md:14 '| `docs/platform-foundations.md` | `docs/platform/platform-foundations.md` | platform-foun'; successor docs/platform/platform-foundations.md:99 'Luật nền platform forgent / opening provenance' ede22a666bfb"
+  },
+  {
+   "rowId": "f04441",
+   "verdict": "APPROVE",
+   "summary": "[successor-bound/law-successor] Removed docs/platform-foundations.md claim is carried by the named unit of docs/platform/platform-foundations.md at the pin (digest checked by the checker; operand text present in the successor unit).",
+   "evidence": "docs/platform-foundations.md:36-37 @ c94545de5 (unit f960151937db); surrounding-section platform-foundations.md:28 '## L1 — Hai vật lý của tri thức: Log vs State'; ledger-mapping area-map-root-authorities.md:14 '| `docs/platform-foundations.md` | `docs/platform/platform-foundations.md` | platform-foun'; successor docs/platform/platform-foundations.md:113 'L1 — Hai vật lý của tri thức: Log vs State' ab9580104cee"
+  },
+  {
+   "rowId": "f04442",
+   "verdict": "APPROVE",
+   "summary": "[successor-bound/law-successor] Removed docs/platform-foundations.md claim is carried by the named unit of docs/platform/platform-foundations.md at the pin (digest checked by the checker; operand text present in the successor unit).",
+   "evidence": "docs/platform-foundations.md:171-177 @ c94545de5 (unit fc29fd540457); surrounding-section platform-foundations.md:154 '## L6 — Maturity ladder F0–F5'; ledger-mapping area-map-root-authorities.md:14 '| `docs/platform-foundations.md` | `docs/platform/platform-foundations.md` | platform-foun'; successor docs/platform/platform-foundations.md:239 'L6 — Maturity ladder F0–F5' 61804494df67"
+  },
+  {
+   "rowId": "f04443",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/README.md:16-16 @ c94545de5 (unit f056a8f59a4f); surrounding-section README.md:1 '# Platform Documentation'; file-framing README.md:1 '# Platform Documentation'; successor docs/platform/governance.md:28 '1. Principles' 81db6177fc61"
+  },
+  {
+   "rowId": "f04479",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/agent-confinement/spec.md:661-661 @ c94545de5 (unit e9eed2f2ef57); surrounding-section spec.md:651 '## 14. Pointers hiện tại'; file-framing spec.md:1 '---'; successor docs/platform/runner/contracts/routing-handoff.md:73 'Ranh giới tin cậy' 578c8bcc4f7d"
+  },
+  {
+   "rowId": "f04484",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately.",
+   "evidence": "docs/platform/agent-coordination/architecture/README.md:27-29 @ c94545de5 (unit 9bf0348789f4); surrounding-section README.md:25 '## Migration Status'; file-framing README.md:1 '# Agent Coordination Architecture'"
+  },
+  {
+   "rowId": "f05117",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:476-476 @ c94545de5 (unit d1cef9ea9488); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05118",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:477-477 @ c94545de5 (unit c8c9bec65bae); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05119",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:478-478 @ c94545de5 (unit 86566a9729e0); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05120",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:479-479 @ c94545de5 (unit 8af5cc7e0e57); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05121",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:480-480 @ c94545de5 (unit 5d8014dc132d); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05122",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:481-481 @ c94545de5 (unit f2c41638ebae); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05123",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:482-482 @ c94545de5 (unit d68f53811f48); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05124",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:483-483 @ c94545de5 (unit 499bb6cf05df); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05125",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:484-484 @ c94545de5 (unit 333e2190d9b9); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05126",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:485-485 @ c94545de5 (unit 359491c9d202); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05127",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:486-486 @ c94545de5 (unit 13bb9f5576d6); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05128",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:487-487 @ c94545de5 (unit 6ee87c2e54ae); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05129",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:488-488 @ c94545de5 (unit 3a1daddfd2cc); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05130",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:489-489 @ c94545de5 (unit a2c7e6e6f929); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05131",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:490-490 @ c94545de5 (unit d232749a4838); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05132",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:491-491 @ c94545de5 (unit 8070950aaef4); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05133",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:492-492 @ c94545de5 (unit 19a50ebbcc91); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f05134",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/migration-inventory] Row of the Phase 0 source inventory; header says 'Canonical for: Migration bookkeeping only' and body calls it a temporary migration aid; target cell is a recorded classification (operand already absent at pin).",
+   "evidence": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:493-493 @ c94545de5 (unit 011c37150628); surrounding-section source-inventory.md:25 '## Phase 7 Disposition'; file-framing source-inventory.md:1 '# Agent Coordination Source Inventory'"
+  },
+  {
+   "rowId": "f06397",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately.",
+   "evidence": "docs/platform/agent-coordination/proposals/README.md:29-32 @ c94545de5 (unit 5ad40f6336f4); surrounding-section README.md:27 '## Migration Status'; file-framing README.md:1 '# Agent Coordination Proposals'"
+  },
+  {
+   "rowId": "f06461",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "[repoint/live-route] The patch makes docs/platform/architecture-map.md list itself in its own Related header ('- docs/architecture-map.md' -> '- docs/platform/architecture-map.md'). The entry names the file's own legacy source (see Provenance on line 16: 'Promoted anchor from docs/architecture-map.md'). The shard preserves that same own-source shape in governance.md (f06794), coexistence (f06504), the runbook (f06823), docs-portal (f06702) and the id-systems audit (f06591). Re-judge as preserve-confirmed lineage, or as a removal with its own patch. A self-referencing repoint is wrong.",
+   "evidence": "docs/platform/architecture-map.md:11-16 at c94545de5 (Related: README, component-boundary, docs/architecture-map.md; Provenance: Promoted anchor from docs/architecture-map.md). | docs/platform/architecture-map.md:14-23 @ c94545de5 (unit 385d22db4c0e); surrounding-section architecture-map.md:1 '# Architecture Map'; file-framing architecture-map.md:1 '# Architecture Map'; successor docs/platform/architecture-map.md:234 '3 · Bản vẽ kết cấu — STRUCTURE (khung chính)' f115e52251fb"
+  },
+  {
+   "rowId": "f06504",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/history-wrapper] Candidate/History wrapper whose Related list names its own conserved legacy source (or a historical template placeholder); header excludes current canonical use. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/coexistence/spec.md:17-20 @ c94545de5 (unit f37620afa87a); surrounding-section spec.md:1 '# Coexistence'; file-framing spec.md:1 '# Coexistence'"
+  },
+  {
+   "rowId": "f06508",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/platform/coexistence/spec.md:108-114 @ c94545de5 (unit 83bb4a6e15e9); surrounding-section spec.md:106 '## Known Gaps (thành thật, chưa flip)'; file-framing spec.md:1 '# Coexistence'"
+  },
+  {
+   "rowId": "f06550",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/contracts/architecture-manifest.json:1-28 @ c94545de5 (unit cebee3498a10); file-framing architecture-manifest.json:1 '{'; ledger-mapping area-map-whole-system-architecture.md:17 '| `docs/architecture-map.md` | `docs/platform/architecture-map.md` | architecture | split '; successor docs/platform/architecture-map.md:234 '3 · Bản vẽ kết cấu — STRUCTURE (khung chính)' f115e52251fb"
+  },
+  {
+   "rowId": "f06551",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/convention/spec.md:16-25 @ c94545de5 (unit 03933e43ad61); surrounding-section spec.md:1 '# Convention Component Specification'; file-framing spec.md:1 '# Convention Component Specification'; successor docs/platform/work-state/contracts/cli-io-contract.md:26 '1. Purpose And Scope' 25289d6311a8"
+  },
+  {
+   "rowId": "f06570",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/platform/decision-citation-drift/spec.md:128-136 @ c94545de5 (unit cd9a2f1a9a58); surrounding-section spec.md:119 '## Pointers (implementation)'; file-framing spec.md:1 '---'"
+  },
+  {
+   "rowId": "f06591",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:17-20 @ c94545de5 (unit 6c2451ff0a2d); surrounding-section id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06594",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:22-27 @ c94545de5 (unit 11d382080aea); surrounding-section id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06595",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:40-48 @ c94545de5 (unit 3d3adc6c4992); surrounding-section id-systems-audit.md:29 '## Bối cảnh (STR47)'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06602",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:118-118 @ c94545de5 (unit 97abc5886518); surrounding-section id-systems-audit.md:118 '## 4 · Trạng thái quyết định theo từng hệ (chốt — xem `docs/decisions/0017-dong-audit-he-i'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06603",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:134-135 @ c94545de5 (unit fc8ef072789f); surrounding-section id-systems-audit.md:118 '## 4 · Trạng thái quyết định theo từng hệ (chốt — xem `docs/decisions/0017-dong-audit-he-i'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06604",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:161-167 @ c94545de5 (unit 7b93bfa4feaf); surrounding-section id-systems-audit.md:137 '## 5 · #7 D-hex và #8 D-local — của lĩnh vực gì, ai dùng, và luật citation chốt'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06605",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:171-171 @ c94545de5 (unit 76e725ec64de); surrounding-section id-systems-audit.md:169 '## 6 · Câu hỏi đã đóng'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06606",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:175-175 @ c94545de5 (unit bbed5edca03c); surrounding-section id-systems-audit.md:169 '## 6 · Câu hỏi đã đóng'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06608",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:181-189 @ c94545de5 (unit 620cc5608fb8); surrounding-section id-systems-audit.md:169 '## 6 · Câu hỏi đã đóng'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06609",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:181-189 @ c94545de5 (unit 620cc5608fb8); surrounding-section id-systems-audit.md:169 '## 6 · Câu hỏi đã đóng'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06610",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:181-189 @ c94545de5 (unit 620cc5608fb8); surrounding-section id-systems-audit.md:169 '## 6 · Câu hỏi đã đóng'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06611",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:181-189 @ c94545de5 (unit 620cc5608fb8); surrounding-section id-systems-audit.md:169 '## 6 · Câu hỏi đã đóng'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06612",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:181-189 @ c94545de5 (unit 620cc5608fb8); surrounding-section id-systems-audit.md:169 '## 6 · Câu hỏi đã đóng'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06613",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:181-189 @ c94545de5 (unit 620cc5608fb8); surrounding-section id-systems-audit.md:169 '## 6 · Câu hỏi đã đóng'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06614",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/audit-history] Document type: History; header says 'Do not use this for: Current canonical authority'; operand is the closed audit's own evidence/decision identity.",
+   "evidence": "docs/platform/documentation/history/id-systems-audit.md:181-189 @ c94545de5 (unit 620cc5608fb8); surrounding-section id-systems-audit.md:169 '## 6 · Câu hỏi đã đóng'; file-framing id-systems-audit.md:1 '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'"
+  },
+  {
+   "rowId": "f06697",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/history-wrapper] Candidate/History wrapper whose Related list names its own conserved legacy source (or a historical template placeholder); header excludes current canonical use. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/documentation/history/templates/architecture.md:18-21 @ c94545de5 (unit 3545159ad542); surrounding-section architecture.md:1 '# <Architecture Topic>'; file-framing architecture.md:1 '# <Architecture Topic>'"
+  },
+  {
+   "rowId": "f06698",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/history-wrapper] Candidate/History wrapper whose Related list names its own conserved legacy source (or a historical template placeholder); header excludes current canonical use. Approve as a template placeholder. Note: the link '../contracts/' is already broken at the pin (beforePresent false), so a docs/platform link guard will flag it regardless.",
+   "evidence": "docs/platform/documentation/history/templates/architecture.md:64-64 @ c94545de5 (unit 1ed45d4d3571); surrounding-section architecture.md:57 '## 11. Related Files'; file-framing architecture.md:1 '# <Architecture Topic>'"
+  },
+  {
+   "rowId": "f06699",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/history-wrapper] Candidate/History wrapper whose Related list names its own conserved legacy source (or a historical template placeholder); header excludes current canonical use. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/documentation/history/templates/area-readme.md:18-21 @ c94545de5 (unit 3545159ad542); surrounding-section area-readme.md:1 '# <Area Name>'; file-framing area-readme.md:1 '# <Area Name>'"
+  },
+  {
+   "rowId": "f06700",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/history-wrapper] Candidate/History wrapper whose Related list names its own conserved legacy source (or a historical template placeholder); header excludes current canonical use. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/documentation/history/templates/contract.md:18-21 @ c94545de5 (unit 3545159ad542); surrounding-section contract.md:1 '# Contract: <Name>'; file-framing contract.md:1 '# Contract: <Name>'"
+  },
+  {
+   "rowId": "f06702",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/history-wrapper] Candidate/History wrapper whose Related list names its own conserved legacy source (or a historical template placeholder); header excludes current canonical use. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/documentation/operations/portals/docs-portal.md:17-20 @ c94545de5 (unit cb6eb3747fdb); surrounding-section docs-portal.md:1 '# fgOS Documentation'; file-framing docs-portal.md:1 '# fgOS Documentation'"
+  },
+  {
+   "rowId": "f06711",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/frozen-metadata] Operand sits inside 'Source Metadata (Added in candidate)', the fenced original header kept as provenance.",
+   "evidence": "docs/platform/documentation/operations/portals/docs-portal.md:77-77 @ c94545de5 (unit f056a8f59a4f); surrounding-section docs-portal.md:61 '## Source Metadata (Added in candidate)'; file-framing docs-portal.md:1 '# fgOS Documentation'"
+  },
+  {
+   "rowId": "f06780",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/frozen-metadata] Operand sits inside 'Source Metadata (Added in candidate)', the fenced original header kept as provenance.",
+   "evidence": "docs/platform/documentation/switchboard.md:139-139 @ c94545de5 (unit f056a8f59a4f); surrounding-section switchboard.md:121 '## Source Metadata (Added in candidate)'; file-framing switchboard.md:1 '# Transitional Documentation Authority Switchboard'"
+  },
+  {
+   "rowId": "f06785",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/platform/event-store/spec.md:11-16 @ c94545de5 (unit e64b6db3a1aa); surrounding-section spec.md:1 '# Event Store Component Specification'; file-framing spec.md:1 '# Event Store Component Specification'"
+  },
+  {
+   "rowId": "f06786",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/event-store/spec.md:17-17 @ c94545de5 (unit 924014e39617); surrounding-section spec.md:1 '# Event Store Component Specification'; file-framing spec.md:1 '# Event Store Component Specification'; successor docs/platform/platform-foundations.md:44 '3. Law Summary' 6e8a4e47a970"
+  },
+  {
+   "rowId": "f06787",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways. Approve. Low note: the anchor '#l7-durability-ladder' follows the extractor slug (generate-doc-inventory githubSlugText collapses whitespace). GitHub renders '#l7--durability-ladder', as in AGENTS.md:359. It sits in a code span, so it is not clickable.",
+   "evidence": "docs/platform/event-store/spec.md:245-245 @ c94545de5 (unit 0a509c12e8d7); surrounding-section spec.md:223 '## 9. Append (the ack point)'; file-framing spec.md:1 '# Event Store Component Specification'; successor docs/platform/platform-foundations.md:267 'L7 — Durability ladder' c165a69b9a86"
+  },
+  {
+   "rowId": "f06790",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "[repoint/live-route] After the patch, the governance §2 'Target platform docs' tree lists 'platform/documentation/operations/portals/docs-portal.md' and 'platform/governance.md' as direct children of docs/. The platform/ subtree a few lines below does not contain them, and 'templates/' (now history) stays. The prescribed tree becomes self-contradictory, and migration-authoring-rules:83 (repointed by f07134) tells writers to follow it. A token swap is not a correct minimal patch here. Either edit the tree coherently (drop the root entries and add governance.md under platform/), or make this an owned park for the governance-carry owner.",
+   "evidence": "docs/platform/governance.md:44-87 at c94545de5. ledger/area-map-root-authorities.md: docs/README.md -> docs-portal (place verbatim), docs/templates/* -> history/templates (archive-with-reason). | docs/platform/governance.md:48-53 @ c94545de5 (unit 943dcdef49d1); surrounding-section governance.md:44 '## 2. Placement Map'; file-framing governance.md:1 '# Documentation Governance'; successor docs/platform/documentation/operations/portals/docs-portal.md:24 '1. Read First' 957b63989638"
+  },
+  {
+   "rowId": "f06791",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "[repoint/live-route] Same patch and the same defect as f06790: the docs/ root block becomes an incoherent tree.",
+   "evidence": "docs/platform/governance.md:48-53 after replay: lines 50-51 hold the platform/... paths at docs/ root level; the platform/ subtree starts at line 55 without governance.md. | docs/platform/governance.md:48-53 @ c94545de5 (unit 943dcdef49d1); surrounding-section governance.md:44 '## 2. Placement Map'; file-framing governance.md:1 '# Documentation Governance'; successor docs/platform/governance.md:44 '2. Placement Map' 43720deb68eb"
+  },
+  {
+   "rowId": "f06794",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/history-wrapper] Candidate/History wrapper whose Related list names its own conserved legacy source (or a historical template placeholder); header excludes current canonical use. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/governance.md:17-17 @ c94545de5 (unit ccec57e7c390); surrounding-section governance.md:1 '# Documentation Governance'; file-framing governance.md:1 '# Documentation Governance'"
+  },
+  {
+   "rowId": "f06799",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/governance.md:476-476 @ c94545de5 (unit 73e5e030d166); surrounding-section governance.md:467 '## 14. Related Files'; file-framing governance.md:1 '# Documentation Governance'"
+  },
+  {
+   "rowId": "f06802",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/frozen-metadata] Operand sits inside 'Source Metadata (Added in candidate)', the fenced original header kept as provenance.",
+   "evidence": "docs/platform/governance.md:499-500 @ c94545de5 (unit 6bb4f668a973); surrounding-section governance.md:478 '## Source Metadata (Added in candidate)'; file-framing governance.md:1 '# Documentation Governance'"
+  },
+  {
+   "rowId": "f06805",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways. Approve. Low note: the attached claim ('never branch on message text') lives in cli-io-contract §4 Exit Codes (line 193), but the row binds §3. The holder file is correct.",
+   "evidence": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:37-44 @ c94545de5 (unit 19cc8feacf7b); file-framing fgos-gateway-api-v1.yaml:1 'openapi: 3.1.0'; ledger-mapping area-map-root-authorities.md:12 '| `docs/io-contract.md` | `docs/platform/work-state/contracts/cli-io-contract.md` | contra'; successor docs/platform/work-state/contracts/cli-io-contract.md:129 '3. Output Direction Unified Envelope' 57519b97ea36"
+  },
+  {
+   "rowId": "f06808",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways. Approve. Informational: the same x-specs list keeps docs/specs/work-state.md and docs/specs/runner.md (lines 54-55), and proof.json has no rows for them. After this patch the list is half-repointed unless F composition covers them.",
+   "evidence": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:46-55 @ c94545de5 (unit 46a49d325405); file-framing fgos-gateway-api-v1.yaml:1 'openapi: 3.1.0'; ledger-mapping area-map-root-authorities.md:12 '| `docs/io-contract.md` | `docs/platform/work-state/contracts/cli-io-contract.md` | contra'; successor docs/platform/work-state/contracts/cli-io-contract.md:26 '1. Purpose And Scope' 25289d6311a8"
+  },
+  {
+   "rowId": "f06811",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/completed-work] Bound passage narrates a completed item/incident/verification or quotes a capture; the operand names the event's subject or source, not a current read-first route.",
+   "evidence": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:183-230 @ c94545de5 (unit 6d6d192af944); surrounding-section fgos-gateway-api-v1.yaml:67 '# before it can know a token is even required.'; file-framing fgos-gateway-api-v1.yaml:1 'openapi: 3.1.0'"
+  },
+  {
+   "rowId": "f06817",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:657-685 @ c94545de5 (unit c31dc03dccda); surrounding-section fgos-gateway-api-v1.yaml:67 '# before it can know a token is even required.'; file-framing fgos-gateway-api-v1.yaml:1 'openapi: 3.1.0'; successor docs/platform/work-state/contracts/cli-io-contract.md:186 '4. Exit Codes' 36f054fb2bed"
+  },
+  {
+   "rowId": "f06821",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:839-863 @ c94545de5 (unit 889e5f8064b7); surrounding-section fgos-gateway-api-v1.yaml:67 '# before it can know a token is even required.'; file-framing fgos-gateway-api-v1.yaml:1 'openapi: 3.1.0'; successor docs/platform/work-state/contracts/cli-io-contract.md:186 '4. Exit Codes' 36f054fb2bed"
+  },
+  {
+   "rowId": "f06823",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/history-wrapper] Candidate/History wrapper whose Related list names its own conserved legacy source (or a historical template placeholder); header excludes current canonical use. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md:17-20 @ c94545de5 (unit cfccc28a1686); surrounding-section operator-runbook.md:1 '# Operator runbook — herdr cockpit'; file-framing operator-runbook.md:1 '# Operator runbook — herdr cockpit'"
+  },
+  {
+   "rowId": "f06828",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/correction-evidence] Operand is an evidence coordinate in the A40/A19 truth-correction receipt; the line ends 'A22 rebindings are pending; no truth approval carried.'",
+   "evidence": "docs/platform/herdr-web-dashboard/spec.md:30-30 @ c94545de5 (unit 389766338cbb); surrounding-section spec.md:9 '# Spec: herdr Web Dashboard (browser surface for fgOS work)'; file-framing spec.md:1 '---'"
+  },
+  {
+   "rowId": "f06830",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/correction-evidence] Operand is an evidence coordinate in the A40/A19 truth-correction receipt; the line ends 'A22 rebindings are pending; no truth approval carried.'",
+   "evidence": "docs/platform/herdr-web-dashboard/spec.md:30-30 @ c94545de5 (unit 389766338cbb); surrounding-section spec.md:9 '# Spec: herdr Web Dashboard (browser surface for fgOS work)'; file-framing spec.md:1 '---'"
+  },
+  {
+   "rowId": "f06831",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/correction-evidence] Operand is an evidence coordinate in the A40/A19 truth-correction receipt; the line ends 'A22 rebindings are pending; no truth approval carried.'",
+   "evidence": "docs/platform/herdr-web-dashboard/spec.md:30-30 @ c94545de5 (unit 389766338cbb); surrounding-section spec.md:9 '# Spec: herdr Web Dashboard (browser surface for fgOS work)'; file-framing spec.md:1 '---'"
+  },
+  {
+   "rowId": "f06833",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/herdr-web-dashboard/spec.md:82-84 @ c94545de5 (unit 976ea0fa0b75); surrounding-section spec.md:64 '## Entry Points & Triggers'; file-framing spec.md:1 '---'; successor docs/platform/work-state/contracts/cli-io-contract.md:411 '11. Scope Boundary' a7e1633f0608"
+  },
+  {
+   "rowId": "f06835",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/herdr-web-dashboard/spec.md:213-218 @ c94545de5 (unit f5fc032607ba); surrounding-section spec.md:197 '## Actors & Access'; file-framing spec.md:1 '---'; successor docs/platform/work-state/contracts/cli-io-contract.md:411 '11. Scope Boundary' a7e1633f0608"
+  },
+  {
+   "rowId": "f06837",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/herdr-web-dashboard/spec.md:298-309 @ c94545de5 (unit e5dfdf786bb4); surrounding-section spec.md:287 '## Open Gaps'; file-framing spec.md:1 '---'; successor docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:1 'OpenAPI root / CTR010 identity' ac3526793c96"
+  },
+  {
+   "rowId": "f06843",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/herdr-web-dashboard/spec.md:347-349 @ c94545de5 (unit 03e927572b9a); surrounding-section spec.md:330 '## Pointers (implementation)'; file-framing spec.md:1 '---'; successor docs/platform/work-state/contracts/cli-io-contract.md:411 '11. Scope Boundary' a7e1633f0608"
+  },
+  {
+   "rowId": "f06861",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md:52-52 @ c94545de5 (unit 802cca9c31c5); surrounding-section external-provider-protocol.md:45 '## 4. Related Files'; file-framing external-provider-protocol.md:1 '# Architecture: External Provider Protocol'"
+  },
+  {
+   "rowId": "f06871",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/architecture/host-use-cases.md:52-52 @ c94545de5 (unit 35109ba0b78e); surrounding-section host-use-cases.md:44 '## 4. Related Files'; file-framing host-use-cases.md:1 '# Architecture: Host Use Cases'"
+  },
+  {
+   "rowId": "f06875",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md:55-55 @ c94545de5 (unit 35109ba0b78e); surrounding-section invocation-kernel.md:48 '## 4. Related Files'; file-framing invocation-kernel.md:1 '# Architecture: Invocation Kernel'"
+  },
+  {
+   "rowId": "f06883",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md:52-52 @ c94545de5 (unit 2237d9be09cf); surrounding-section legacy-cli-transition.md:45 '## 4. Related Files'; file-framing legacy-cli-transition.md:1 '# Architecture: Legacy CLI Transition'"
+  },
+  {
+   "rowId": "f06900",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md:57-57 @ c94545de5 (unit 2b6202342bbe); surrounding-section node-to-rust-migration.md:51 '## 5. Related Files'; file-framing node-to-rust-migration.md:1 '# Architecture: Node To Rust Migration'"
+  },
+  {
+   "rowId": "f06913",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/architecture/provider-routing.md:61-61 @ c94545de5 (unit 35109ba0b78e); surrounding-section provider-routing.md:54 '## 5. Related Files'; file-framing provider-routing.md:1 '# Architecture: Provider Routing'"
+  },
+  {
+   "rowId": "f06915",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/architecture/release-boundaries.md:172-185 @ c94545de5 (unit 99352315c723); surrounding-section release-boundaries.md:164 '## Restored scope'; file-framing release-boundaries.md:1 '# Architecture: Release Boundaries'"
+  },
+  {
+   "rowId": "f06916",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/architecture/release-boundaries.md:172-185 @ c94545de5 (unit 99352315c723); surrounding-section release-boundaries.md:164 '## Restored scope'; file-framing release-boundaries.md:1 '# Architecture: Release Boundaries'"
+  },
+  {
+   "rowId": "f06917",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/architecture/release-boundaries.md:172-185 @ c94545de5 (unit 99352315c723); surrounding-section release-boundaries.md:164 '## Restored scope'; file-framing release-boundaries.md:1 '# Architecture: Release Boundaries'"
+  },
+  {
+   "rowId": "f06918",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/architecture/release-boundaries.md:189-189 @ c94545de5 (unit 281da983307b); surrounding-section release-boundaries.md:187 '## Source-relative Navigation Mappings'; file-framing release-boundaries.md:1 '# Architecture: Release Boundaries'"
+  },
+  {
+   "rowId": "f06919",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/architecture/release-boundaries.md:189-189 @ c94545de5 (unit 281da983307b); surrounding-section release-boundaries.md:187 '## Source-relative Navigation Mappings'; file-framing release-boundaries.md:1 '# Architecture: Release Boundaries'"
+  },
+  {
+   "rowId": "f06920",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "[preserve-confirmed/restored-host-source] The line is not only the literal left side. It also states a live destination: 'maps to [the retained component-boundary advisory](../../../architect/component-boundary/component-boundary-advisory.md)'. That link resolves to this row's own operand, which is removedByMoveOrStep6 with successor docs/platform/component-boundary.md. The proof has no other row for it, so preserving the row leaves a clickable route that dies at F and a false 'retained'. Re-judge as repoint of the right-hand destination only. The shard md concedes it 'does not approve an unassigned live mapping destination', but this row is that assignment.",
+   "evidence": "release-boundaries.md:189 at c94545de5; proof.json f06920 normalizedOperands[0]: afterPresent false, successors [docs/platform/component-boundary.md]. | docs/platform/host-invocation-routing/architecture/release-boundaries.md:189-189 @ c94545de5 (unit 281da983307b); surrounding-section release-boundaries.md:187 '## Source-relative Navigation Mappings'; file-framing release-boundaries.md:1 '# Architecture: Release Boundaries'"
+  },
+  {
+   "rowId": "f06924",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/architecture/release-boundaries.md:60-60 @ c94545de5 (unit dcff7754177f); surrounding-section release-boundaries.md:52 '## 4. Related Files'; file-framing release-boundaries.md:1 '# Architecture: Release Boundaries'"
+  },
+  {
+   "rowId": "f06925",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/architecture/release-boundaries.md:64-64 @ c94545de5 (unit 1e313be65b6c); surrounding-section release-boundaries.md:62 '## Restored physical placement layout tree'; file-framing release-boundaries.md:1 '# Architecture: Release Boundaries'"
+  },
+  {
+   "rowId": "f06926",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/architecture/release-boundaries.md:100-100 @ c94545de5 (unit 674ba03eab8c); surrounding-section release-boundaries.md:98 '## Restored class definitions'; file-framing release-boundaries.md:1 '# Architecture: Release Boundaries'"
+  },
+  {
+   "rowId": "f06927",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/architecture/release-boundaries.md:154-154 @ c94545de5 (unit 541d70670c37); surrounding-section release-boundaries.md:152 '## Restored package json bin fgos removed pointed at workspace shim at default flip bin fg'; file-framing release-boundaries.md:1 '# Architecture: Release Boundaries'"
+  },
+  {
+   "rowId": "f06928",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/architecture/release-boundaries.md:166-166 @ c94545de5 (unit 5c2c225a6f83); surrounding-section release-boundaries.md:164 '## Restored scope'; file-framing release-boundaries.md:1 '# Architecture: Release Boundaries'"
+  },
+  {
+   "rowId": "f06932",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/contracts/component-protocol.md:228-231 @ c94545de5 (unit 71be7955e050); surrounding-section component-protocol.md:215 '## Restored per component repeat procedure'; file-framing component-protocol.md:1 '# Contract: Component Protocol'"
+  },
+  {
+   "rowId": "f06933",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "[preserve-confirmed/restored-host-source] Same defect as f06920: 'its live destination is [the retained component-boundary advisory](../../../architect/component-boundary/component-boundary-advisory.md)' is a live route to the removed operand. Re-judge as repoint of the destination link to docs/platform/component-boundary.md.",
+   "evidence": "component-protocol.md:326 at c94545de5; proof.json f06933 successors [docs/platform/component-boundary.md]. | docs/platform/host-invocation-routing/contracts/component-protocol.md:326-326 @ c94545de5 (unit 5d49788c33a3); surrounding-section component-protocol.md:324 '## Source-relative Navigation Mappings'; file-framing component-protocol.md:1 '# Contract: Component Protocol'"
+  },
+  {
+   "rowId": "f06936",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/contracts/component-protocol.md:57-57 @ c94545de5 (unit 1e313be65b6c); surrounding-section component-protocol.md:55 '## Restored contract versioning'; file-framing component-protocol.md:1 '# Contract: Component Protocol'"
+  },
+  {
+   "rowId": "f06937",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/contracts/component-protocol.md:73-73 @ c94545de5 (unit 1e313be65b6c); surrounding-section component-protocol.md:71 '## Restored lifecycle state chain received admitted refused selected refused granted refus'; file-framing component-protocol.md:1 '# Contract: Component Protocol'"
+  },
+  {
+   "rowId": "f06938",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/contracts/component-protocol.md:92-92 @ c94545de5 (unit 674ba03eab8c); surrounding-section component-protocol.md:90 '## Restored same process built ins vs runtime extensions and cross process cost'; file-framing component-protocol.md:1 '# Contract: Component Protocol'"
+  },
+  {
+   "rowId": "f06939",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/contracts/component-protocol.md:116-116 @ c94545de5 (unit 674ba03eab8c); surrounding-section component-protocol.md:114 '## Restored semantic contract stays transport neutral'; file-framing component-protocol.md:1 '# Contract: Component Protocol'"
+  },
+  {
+   "rowId": "f06940",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/contracts/component-protocol.md:128-128 @ c94545de5 (unit 541d70670c37); surrounding-section component-protocol.md:126 '## Restored both adapters delegate a complete use case'; file-framing component-protocol.md:1 '# Contract: Component Protocol'"
+  },
+  {
+   "rowId": "f06941",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/contracts/component-protocol.md:144-144 @ c94545de5 (unit 541d70670c37); surrounding-section component-protocol.md:142 '## Restored rust host first cost'; file-framing component-protocol.md:1 '# Contract: Component Protocol'"
+  },
+  {
+   "rowId": "f06942",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/contracts/component-protocol.md:156-156 @ c94545de5 (unit 5c2c225a6f83); surrounding-section component-protocol.md:154 '## Restored rejected options rationale'; file-framing component-protocol.md:1 '# Contract: Component Protocol'"
+  },
+  {
+   "rowId": "f06943",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/contracts/component-protocol.md:217-217 @ c94545de5 (unit 5c2c225a6f83); surrounding-section component-protocol.md:215 '## Restored per component repeat procedure'; file-framing component-protocol.md:1 '# Contract: Component Protocol'"
+  },
+  {
+   "rowId": "f06944",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/contracts/component-protocol.md:259-259 @ c94545de5 (unit 5c2c225a6f83); surrounding-section component-protocol.md:257 '## Restored rollback bullets'; file-framing component-protocol.md:1 '# Contract: Component Protocol'"
+  },
+  {
+   "rowId": "f06945",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/contracts/component-protocol.md:277-277 @ c94545de5 (unit ad9881bf5cd8); surrounding-section component-protocol.md:275 '## Restored p1 compatibility harness'; file-framing component-protocol.md:1 '# Contract: Component Protocol'"
+  },
+  {
+   "rowId": "f06951",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/contracts/legacy-payload.md:60-60 @ c94545de5 (unit 2237d9be09cf); surrounding-section legacy-payload.md:53 '## 5. Related Files'; file-framing legacy-payload.md:1 '# Contract: Legacy Payload'"
+  },
+  {
+   "rowId": "f06953",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/contracts/operation-catalog.md:45-45 @ c94545de5 (unit 35109ba0b78e); surrounding-section operation-catalog.md:39 '## 3. Related Files'; file-framing operation-catalog.md:1 '# Contract: Operation Catalog'"
+  },
+  {
+   "rowId": "f06956",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md:57-57 @ c94545de5 (unit 35109ba0b78e); surrounding-section operation-request-outcome.md:51 '## 6. Related Files'; file-framing operation-request-outcome.md:1 '# Contract: Operation Request And Outcome'"
+  },
+  {
+   "rowId": "f07069",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/verification/compatibility-harness.md:52-52 @ c94545de5 (unit dcff7754177f); surrounding-section compatibility-harness.md:46 '## 4. Related Files'; file-framing compatibility-harness.md:1 '# Verification: Compatibility Harness'"
+  },
+  {
+   "rowId": "f07070",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/verification/compatibility-harness.md:56-56 @ c94545de5 (unit 674ba03eab8c); surrounding-section compatibility-harness.md:54 '## Restored registry linker procedure and its input output formula'; file-framing compatibility-harness.md:1 '# Verification: Compatibility Harness'"
+  },
+  {
+   "rowId": "f07071",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/restored-host-source] Operand is inside a verbatim-restored excerpt or a commit-pinned restoration note, or is the literal left side of a navigation mapping.",
+   "evidence": "docs/platform/host-invocation-routing/verification/compatibility-harness.md:83-83 @ c94545de5 (unit ad9881bf5cd8); surrounding-section compatibility-harness.md:81 '## Restored test and review gates table'; file-framing compatibility-harness.md:1 '# Verification: Compatibility Harness'"
+  },
+  {
+   "rowId": "f07075",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md:92-92 @ c94545de5 (unit dcff7754177f); surrounding-section r1-rust-host-proof.md:85 '## 5. Related Files'; file-framing r1-rust-host-proof.md:1 '# Verification: R1 Rust Host Proof'"
+  },
+  {
+   "rowId": "f07081",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md:105-105 @ c94545de5 (unit dcff7754177f); surrounding-section r2-external-process-proof.md:96 '## 8. Related Files'; file-framing r2-external-process-proof.md:1 '# Verification: R2 External Process Proof'"
+  },
+  {
+   "rowId": "f07084",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md:112-112 @ c94545de5 (unit 2b6202342bbe); surrounding-section r3-remote-peer-proof.md:105 '## 4. Related Files'; file-framing r3-remote-peer-proof.md:1 '# Verification: R3 Remote Peer Proof'"
+  },
+  {
+   "rowId": "f07086",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md:39-39 @ c94545de5 (unit b25f5ebc33d5); surrounding-section source-preservation-audit.md:35 '## 2. Source Coverage Matrix'; file-framing source-preservation-audit.md:1 '# Host Invocation Source Preservation Audit'"
+  },
+  {
+   "rowId": "f07087",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md:40-40 @ c94545de5 (unit 9b9a50366632); surrounding-section source-preservation-audit.md:35 '## 2. Source Coverage Matrix'; file-framing source-preservation-audit.md:1 '# Host Invocation Source Preservation Audit'"
+  },
+  {
+   "rowId": "f07091",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md:41-41 @ c94545de5 (unit 80af08a8b100); surrounding-section source-preservation-audit.md:35 '## 2. Source Coverage Matrix'; file-framing source-preservation-audit.md:1 '# Host Invocation Source Preservation Audit'"
+  },
+  {
+   "rowId": "f07094",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md:42-42 @ c94545de5 (unit 980c73ec7b1a); surrounding-section source-preservation-audit.md:35 '## 2. Source Coverage Matrix'; file-framing source-preservation-audit.md:1 '# Host Invocation Source Preservation Audit'"
+  },
+  {
+   "rowId": "f07097",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md:43-43 @ c94545de5 (unit 42dc60d123cd); surrounding-section source-preservation-audit.md:35 '## 2. Source Coverage Matrix'; file-framing source-preservation-audit.md:1 '# Host Invocation Source Preservation Audit'"
+  },
+  {
+   "rowId": "f07098",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md:44-44 @ c94545de5 (unit 03c5f4dc0157); surrounding-section source-preservation-audit.md:35 '## 2. Source Coverage Matrix'; file-framing source-preservation-audit.md:1 '# Host Invocation Source Preservation Audit'"
+  },
+  {
+   "rowId": "f07105",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/vision.md:63-63 @ c94545de5 (unit 88e066b80ae5); surrounding-section vision.md:59 '## 5. Design Direction'; file-framing vision.md:1 '# Host Invocation Vision'"
+  },
+  {
+   "rowId": "f07106",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/vision.md:64-64 @ c94545de5 (unit d2ad69897303); surrounding-section vision.md:59 '## 5. Design Direction'; file-framing vision.md:1 '# Host Invocation Vision'"
+  },
+  {
+   "rowId": "f07107",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/vision.md:65-65 @ c94545de5 (unit 88a6538e3955); surrounding-section vision.md:59 '## 5. Design Direction'; file-framing vision.md:1 '# Host Invocation Vision'"
+  },
+  {
+   "rowId": "f07108",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/vision.md:66-66 @ c94545de5 (unit b027d338ffcd); surrounding-section vision.md:59 '## 5. Design Direction'; file-framing vision.md:1 '# Host Invocation Vision'"
+  },
+  {
+   "rowId": "f07109",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/vision.md:77-77 @ c94545de5 (unit 900418117253); surrounding-section vision.md:69 '## 6. Related Files'; file-framing vision.md:1 '# Host Invocation Vision'"
+  },
+  {
+   "rowId": "f07110",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/source-relationship] Operand is labelled as the promotion/preservation source (Migration Status note, 'source …' relationship row, 'Preserved from', coverage-matrix source column); current holders are listed separately. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/host-invocation-routing/vision.md:78-78 @ c94545de5 (unit b203859d8fe0); surrounding-section vision.md:69 '## 6. Related Files'; file-framing vision.md:1 '# Host Invocation Vision'"
+  },
+  {
+   "rowId": "f07111",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/intent-preservation-ledger.md:15-24 @ c94545de5 (unit f71776bc6373); surrounding-section intent-preservation-ledger.md:1 '# Platform Intent Preservation Ledger'; file-framing intent-preservation-ledger.md:1 '# Platform Intent Preservation Ledger'; successor docs/platform/governance.md:28 '1. Principles' 81db6177fc61"
+  },
+  {
+   "rowId": "f07112",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways. Approve. Low note: the anchor uses the claim-carries targetAnchor (single hyphen). GitHub's slug would start '0035--'. The anchor sits in a code span.",
+   "evidence": "docs/platform/intent-preservation-ledger.md:71-71 @ c94545de5 (unit f2a66c4e178c); surrounding-section intent-preservation-ledger.md:67 '## 4. Platform-Level Preserved Intents'; file-framing intent-preservation-ledger.md:1 '# Platform Intent Preservation Ledger'; successor docs/platform/platform-foundations.md:656 '0035 — Xác lập ranh giới sứ mệnh: fgOS phục vụ pro' fd1ba355d42a"
+  },
+  {
+   "rowId": "f07115",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/intent-preservation-ledger.md:74-74 @ c94545de5 (unit ee1602989528); surrounding-section intent-preservation-ledger.md:67 '## 4. Platform-Level Preserved Intents'; file-framing intent-preservation-ledger.md:1 '# Platform Intent Preservation Ledger'; successor docs/platform/documentation/operations/portals/docs-portal.md:24 '1. Read First' 957b63989638"
+  },
+  {
+   "rowId": "f07121",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/migration-authoring-rules.md:17-17 @ c94545de5 (unit f056a8f59a4f); surrounding-section migration-authoring-rules.md:1 '# Migration Authoring Rules (One-Owner Discipline)'; file-framing migration-authoring-rules.md:1 '# Migration Authoring Rules (One-Owner Discipline)'; successor docs/platform/governance.md:28 '1. Principles' 81db6177fc61"
+  },
+  {
+   "rowId": "f07134",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/migration-authoring-rules.md:83-83 @ c94545de5 (unit d84824cd0961); surrounding-section migration-authoring-rules.md:77 '## 3. Authoring New Platform Documentation'; file-framing migration-authoring-rules.md:1 '# Migration Authoring Rules (One-Owner Discipline)'; successor docs/platform/governance.md:44 '2. Placement Map' 43720deb68eb"
+  },
+  {
+   "rowId": "f07135",
+   "verdict": "APPROVE",
+   "summary": "[repoint/live-route] Passage routes a current reader (Related entry, normative citation or instruction); ledger maps the operand to the named holder; patch is a one-token path swap that replays with patch --fuzz=0 both ways.",
+   "evidence": "docs/platform/migration-authoring-rules.md:84-84 @ c94545de5 (unit 497e0d727085); surrounding-section migration-authoring-rules.md:77 '## 3. Authoring New Platform Documentation'; file-framing migration-authoring-rules.md:1 '# Migration Authoring Rules (One-Owner Discipline)'; successor docs/platform/governance.md:156 '5. Metadata' df37232647c8"
+  },
+  {
+   "rowId": "f07152",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/distribution-history] History doc ('Use old docs as source material, not final authority'; 'History keeps the old source trace') or portal Source type naming promotion origins; operand is the old source identity.",
+   "evidence": "docs/platform/packaging-distribution/README.md:3-13 @ c94545de5 (unit 0e32d08e4413); surrounding-section README.md:1 '# Packaging-Distribution'; file-framing README.md:1 '# Packaging-Distribution'"
+  },
+  {
+   "rowId": "f07205",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/distribution-history] History doc ('Use old docs as source material, not final authority'; 'History keeps the old source trace') or portal Source type naming promotion origins; operand is the old source identity. Cross-cutting: this preserved clickable link or Related path resolves to a file absent after F (see report finding X1).",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-baseline.md:15-15 @ c94545de5 (unit 1c1841f8d8be); surrounding-section distribution-baseline.md:1 '# History: Distribution Baseline'; file-framing distribution-baseline.md:1 '# History: Distribution Baseline'"
+  },
+  {
+   "rowId": "f07207",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/distribution-history] History doc ('Use old docs as source material, not final authority'; 'History keeps the old source trace') or portal Source type naming promotion origins; operand is the old source identity.",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-baseline.md:48-48 @ c94545de5 (unit 920413e93d4e); surrounding-section distribution-baseline.md:46 '## 3. Vision Source'; file-framing distribution-baseline.md:1 '# History: Distribution Baseline'"
+  },
+  {
+   "rowId": "f07208",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/distribution-history] History doc ('Use old docs as source material, not final authority'; 'History keeps the old source trace') or portal Source type naming promotion origins; operand is the old source identity.",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-baseline.md:77-77 @ c94545de5 (unit d0854ce347fd); surrounding-section distribution-baseline.md:71 '## 5. Supersession Guidance'; file-framing distribution-baseline.md:1 '# History: Distribution Baseline'"
+  },
+  {
+   "rowId": "f07209",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/distribution-history] History doc ('Use old docs as source material, not final authority'; 'History keeps the old source trace') or portal Source type naming promotion origins; operand is the old source identity.",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-baseline.md:78-78 @ c94545de5 (unit 26be2a98e097); surrounding-section distribution-baseline.md:71 '## 5. Supersession Guidance'; file-framing distribution-baseline.md:1 '# History: Distribution Baseline'"
+  },
+  {
+   "rowId": "f07210",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/distribution-history] History doc ('Use old docs as source material, not final authority'; 'History keeps the old source trace') or portal Source type naming promotion origins; operand is the old source identity.",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-baseline.md:79-79 @ c94545de5 (unit dc8ac37719f0); surrounding-section distribution-baseline.md:71 '## 5. Supersession Guidance'; file-framing distribution-baseline.md:1 '# History: Distribution Baseline'"
+  },
+  {
+   "rowId": "f07223",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/distribution-history] History doc ('Use old docs as source material, not final authority'; 'History keeps the old source trace') or portal Source type naming promotion origins; operand is the old source identity.",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-baseline.md:222-222 @ c94545de5 (unit 119133b3a8d6); surrounding-section distribution-baseline.md:220 '## Inherited Distribution Source Unit 1'; file-framing distribution-baseline.md:1 '# History: Distribution Baseline'"
+  },
+  {
+   "rowId": "f07224",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/distribution-history] History doc ('Use old docs as source material, not final authority'; 'History keeps the old source trace') or portal Source type naming promotion origins; operand is the old source identity.",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-baseline.md:246-246 @ c94545de5 (unit 9c7af197d2ae); surrounding-section distribution-baseline.md:244 '## Inherited Distribution Source Unit 2'; file-framing distribution-baseline.md:1 '# History: Distribution Baseline'"
+  },
+  {
+   "rowId": "f07225",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/distribution-history] History doc ('Use old docs as source material, not final authority'; 'History keeps the old source trace') or portal Source type naming promotion origins; operand is the old source identity.",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-baseline.md:258-258 @ c94545de5 (unit 9c7af197d2ae); surrounding-section distribution-baseline.md:256 '## Inherited Distribution Source Unit 3'; file-framing distribution-baseline.md:1 '# History: Distribution Baseline'"
+  },
+  {
+   "rowId": "f07226",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/distribution-history] History doc ('Use old docs as source material, not final authority'; 'History keeps the old source trace') or portal Source type naming promotion origins; operand is the old source identity.",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-baseline.md:279-279 @ c94545de5 (unit 091550659ede); surrounding-section distribution-baseline.md:277 '## Inherited Distribution Source Unit 4'; file-framing distribution-baseline.md:1 '# History: Distribution Baseline'"
+  },
+  {
+   "rowId": "f07227",
+   "verdict": "APPROVE",
+   "summary": "[preserve-confirmed/distribution-history] History doc ('Use old docs as source material, not final authority'; 'History keeps the old source trace') or portal Source type naming promotion origins; operand is the old source identity.",
+   "evidence": "docs/platform/packaging-distribution/history/distribution-baseline.md:300-300 @ c94545de5 (unit 091550659ede); surrounding-section distribution-baseline.md:298 '## Inherited Distribution Source Unit 5'; file-framing distribution-baseline.md:1 '# History: Distribution Baseline'"
+  }
+ ]
+}
