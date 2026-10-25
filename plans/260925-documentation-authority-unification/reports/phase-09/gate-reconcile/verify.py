@@ -135,20 +135,26 @@ def check():
         require(entry['sha256'] == current_inputs[entry['path']]['sha256'], 'current review fingerprint drift')
         if entry['path'].endswith('.json'):
             data = json.loads(git('show', f"{current_pin}:{entry['path']}"))
-            rows = data.get('verdicts', data.get('rows', data.get('items', [])))
+            rows = data if isinstance(data, list) else data.get('verdicts', data.get('rows', data.get('items', [])))
             require(entry['verdictCounts'] == dict(collections.Counter(r.get('verdict', 'unspecified') for r in rows)) and
                     entry['nonApproveRows'] == [{k: r[k] for k in ('id', 'rowId', 'file', 'pointer', 'verdict', 'reason') if k in r}
                                                for r in rows if r.get('verdict') == 'REWORK'],
                     'current review scope/verdict drift')
     proofs = read_json(OUT / 'current-proofs.json')
-    require(proofs['sourceCommit'] == current_pin and len(proofs['commands']) == 2,
+    require(proofs['sourceCommit'] == current_pin and len(proofs['commands']) == 3,
             'current proof pin/coverage drift')
-    g0, chain = proofs['commands']
+    g0, chain, duplicate = proofs['commands']
     require(g0['exit'] == 0 and g0['counts']['approved'] == g0['counts']['effectiveRows'] == 1929 and
             all(g0['counts'][key] == 0 for key in ['missing', 'mismatched', 'stale', 'openRework', 'invalidBindings', 'unresolved']),
             'current G0 proof not green')
-    require(chain['exit'] == 0 and chain['counts'] == {} and chain['linkIntoMoveSet'] == 0,
+    require(chain['exit'] == 0 and chain['counts'] == {} and chain['linkIntoMoveSet'] == 0 and
+            chain['linkGuard']['findings'] == 0 and chain['linkGuard']['platformMarkdownFiles'] == 628 and
+            chain['linkGuard']['population'] == 'All composed docs/platform/**/*.md, Related headers included',
             'current F composition proof not green')
+    require(duplicate['exit'] == duplicate['expectedExit'] == 1 and duplicate['result'] == 'rejected' and
+            duplicate['error'] == 'link retarget row ids are not unique' and
+            duplicate['leadFix'] == 'edf816838' and duplicate['row'] == 'L13-28:related:118' and
+            duplicate['duplicate'] == 'L13-28:related:86', 'duplicate-id mechanical-fix proof drift')
     for source in chain['sources']:
         require(source['path'] in current_inputs and source['sha256'] == current_inputs[source['path']]['sha256'],
                 'current chain source fingerprint drift')
@@ -160,7 +166,44 @@ def check():
         'met-local', 'met-local', 'met-local', 'met-local', 'external', 'external'],
             'current gate statuses drift')
     require(len(register['followUps']) == 4 and all(str(BASE / row['sourceReview']) in current_inputs
+            and row.get('owner') == 'lead:DOC' and row.get('destination') ==
+            'separate backlog item, filed when the cutover lands (backlog on main is outside PRE-FLIP scope)'
             for row in register['followUps']), 'outside-plan follow-up provenance drift')
+    corrections_now = register['cutoverReadiness']['localCorrectionReview']
+    required_coverage = {
+        'reviews/w33-link-retargets-review.json': ['a319902ab'],
+        'reviews/w35-link-guard-review.json': ['8ea185bfd'],
+        'reviews/w37-link-guard-rereview.json': ['b467e09fe'],
+        'reviews/w33-ownership-audit-review.json': ['73e89962e', '98d71bef2', 'ca3179b3c', 'c3882df26'],
+        'reviews/w32-register-review.json': ['c50b78db9'],
+    }
+    require(isinstance(corrections_now, list) and len(corrections_now) == len(required_coverage) and
+            {r['review']: r['commits'] for r in corrections_now} == required_coverage,
+            'local correction review coverage drift')
+    for correction in corrections_now:
+        raw_review = json.loads(git('show', f"{current_pin}:{BASE}/{correction['review']}"))
+        rows = raw_review if isinstance(raw_review, list) else raw_review['items']
+        reworks = {r['id'] for r in rows if r['verdict'] == 'REWORK'}
+        resolved = correction['reworkResolutions']
+        require(correction['verdictCounts'] == dict(collections.Counter(r['verdict'] for r in rows)) and
+                set(resolved) | set(correction['openRework']) == reworks and
+                not set(resolved) & set(correction['openRework']) and all(resolved.values()),
+                'local correction verdict/resolution drift')
+        require(not correction['openRework'] or all(register['gates'][int(g[1:])]['status'] == 'partial'
+                and correction['review'] in ' '.join(register['gates'][int(g[1:])]['blockers'])
+                for g in correction['affectedGates']), 'open review REWORK hidden as met-local')
+    require('edf816838' in corrections_now[2]['reworkResolutions']['w37-6'] and
+            'mechanical' in corrections_now[2]['reworkResolutions']['w37-6'] and
+            'independent' in corrections_now[4]['note'].lower(), 'mechanical fix or register review boundary drift')
+    rebind_path = ROOT / BASE / 'rebind/g0-rework-rebindings.json'
+    old_rebind = git('show', f'{current_pin}:{BASE}/rebind/g0-rework-rebindings.json')
+    new_rebind = rebind_path.read_bytes()
+    old_status = json.loads(old_rebind)['status']
+    require(json.loads(new_rebind)['status'] ==
+            'reviewed; reviews/w33-ownership-audit-review.json (5 APPROVE / 0 REWORK)' and
+            new_rebind.replace(json.dumps(json.loads(new_rebind)['status']).encode(),
+                               json.dumps(old_status).encode(), 1) == old_rebind,
+            'rebind reviewed status or edge-byte conservation drift')
     require(register['ownershipAudit']['status'] == 'reported-ok' and
             register['ownershipAudit']['commit'] == git('rev-parse', '4a4fefbe8').decode().strip(),
             'ownership audit provenance drift')
@@ -249,7 +292,7 @@ def check():
         require(gate['evidence'], gate['g'] + ' lacks provenance')
         if gate['commit'] is not None:
             require(subprocess.run(['git', 'merge-base', '--is-ancestor', gate['commit'],
-                                    commit_pins.get(gate['commit'], pin)], cwd=ROOT,
+                                    current_pin if gate['g'] == 'G0' else commit_pins.get(gate['commit'], pin)], cwd=ROOT,
                                    capture_output=True).returncode == 0, 'gate commit outside snapshot')
     require([gate['g'] for gate in register['gates']] == [f'G{i}' for i in range(12)], 'gate coverage')
     require([gate['gateId'] for gate in register['gates']] == [gate['gateId'] for gate in original['gates']], 'gate ids changed')
@@ -266,6 +309,20 @@ def check():
     require(register['cutoverReadiness']['beforeFinalPin'] == [
         f"{gate['g']}: {item}" for gate in register['gates'] for item in gate['blockers']], 'before-F projection drift')
     readiness = register['cutoverReadiness']
+    require(register['gates'][0]['commit'] == current_pin, 'G0 current join commit drift')
+    guard_duties = ' '.join(register['gates'][6]['atFinalPinUnderLease'])
+    require(all(term in guard_duties for term in ['L13-28.4', 'fchain/links.py', 'both must report 0',
+            'Related headers', '398', '394', 'multi-line', '44', 'relatedPaths()',
+            'scripts/check-doc-candidate-status.mjs', 'f06461/f06591/f07205', 'f06504', 'f06823']),
+            'guard-3 agreement or shard-2 delta duty drift')
+    require('the owner has approved the cutover packet (L13-6)' in readiness['atFinalPinUnderLease'][-1] and
+            'already sent' not in readiness['atFinalPinUnderLease'][-1], 'owner approval precondition drift')
+    require('L13-28' in register['gates'][6]['note'] and
+            'linkGuard' in register['gates'][6]['note'] and
+            'rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md' in register['gates'][7]['note'] and
+            'pending' in register['gates'][7]['note'] and 'identical change set' in register['gates'][7]['note'] and
+            all(term in register['gates'][9]['note'] for term in ['138', '136', '2 history-only', '60', '288']),
+            'current gate note disclosure drift')
     require(readiness['order'] == [
         'Complete and independently review local work to met-local',
         'Send owner cutover packet at met-local (L13-6)',
@@ -303,7 +360,9 @@ def check():
     rebased = json.loads(git('show', f'{current_pin}:{BASE}/fchain/rebased-patches.json'))
     dependencies = json.loads(git('show', f'{current_pin}:{BASE}/g9/phase9-decisions.json'))
     composition = window['fComposition']
-    require(composition['manifestSources'] == len(manifest['sources']) and
+    require('composed replay' in composition['source'] and composition['linkGuard'] == 0 and
+            composition['status'] == 'met-local' and
+            composition['manifestSources'] == len(manifest['sources']) and
             composition['baseChainFiles'] == len(chain['baseChain']['files']) and
             composition['basePatchSteps'] == sum(len(row['steps']) for row in chain['baseChain']['files']) and
             composition['rebasedEntries'] == len(rebased['patches']) and
@@ -319,7 +378,8 @@ def check():
     duties = json.loads(git('show', f'{current_pin}:{BASE}/g0rework/final-pin-duties.json'))['conditionalOverlayApprovals']
     duty_text = ' '.join(register['gates'][0]['atFinalPinUnderLease'])
     require(duties['relocation']['selectedId'] in duty_text and duties['relocation']['expectedAfterSha256'] in duty_text and
-            duties['pairedHistoryId'] in duty_text and str(duties['total']) in duty_text,
+            duties['pairedHistoryId'] in duty_text and str(duties['total']) in duty_text and
+            'rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md' in duty_text,
             'conditional G0 F duty drift')
     require(set(window['deltaReviewsPerGate']) == {'G0', 'G2', 'G6', 'G7', 'G9'}, 'F-window delta review gate coverage')
     for field in ['beforeFinalPin', 'atFinalPinUnderLease', 'external']:

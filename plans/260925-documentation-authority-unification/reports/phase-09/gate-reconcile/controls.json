@@ -1,6 +1,6 @@
 {
   "status": "passed",
-  "asOf": "f498ebded83ba5789e730adc74bb637b80e2f536",
+  "asOf": "a734c3f47ff6eb39d80ba1c16e6dd88d44cc2d53",
   "positive": "passed",
   "negativeControls": [
     {
@@ -84,6 +84,41 @@
       "error": "current F composition proof not green"
     },
     {
+      "name": "Whole-population link guard findings are rejected",
+      "result": "rejected",
+      "error": "current F composition proof not green"
+    },
+    {
+      "name": "Missing mechanical duplicate-id rejection is rejected",
+      "result": "rejected",
+      "error": "duplicate-id mechanical-fix proof drift"
+    },
+    {
+      "name": "Omitted local correction review is rejected",
+      "result": "rejected",
+      "error": "local correction review coverage drift"
+    },
+    {
+      "name": "Historical REWORK cannot be erased by a clean review count",
+      "result": "rejected",
+      "error": "local correction verdict/resolution drift"
+    },
+    {
+      "name": "An open review REWORK cannot hide behind met-local",
+      "result": "rejected",
+      "error": "open review REWORK hidden as met-local"
+    },
+    {
+      "name": "Missing guard-3 agreement duty is rejected",
+      "result": "rejected",
+      "error": "guard-3 agreement or shard-2 delta duty drift"
+    },
+    {
+      "name": "Owner packet wording must be an approval precondition",
+      "result": "rejected",
+      "error": "owner approval precondition drift"
+    },
+    {
       "name": "Unreviewed premise count is rejected",
       "result": "rejected",
       "error": "F-window source counts drift"
@@ -119,6 +154,6 @@
       "error": "F-window source counts drift"
     }
   ],
-  "count": 23,
+  "count": 30,
   "method": "In-memory copies at the read_json test seam; real owning check(), path inspection and read-only git; no source file or assertion weakened."
 }

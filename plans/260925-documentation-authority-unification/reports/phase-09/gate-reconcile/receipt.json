@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "authority": "L12-137; w17-gate-register-reconcile-brief; w21-register-catchup-brief; w23-register-corrections-brief; w32-register-catchup-brief; L13-16–27",
-  "asOf": "f498ebded83ba5789e730adc74bb637b80e2f536",
+  "authority": "L12-137; w17-gate-register-reconcile-brief; w21-register-catchup-brief; w23-register-corrections-brief; w32-register-catchup-brief; w35-register-update-brief; L13-16–28",
+  "asOf": "a734c3f47ff6eb39d80ba1c16e6dd88d44cc2d53",
   "originalSnapshotCommit": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
   "status": "reconciled-not-cutover-approval",
   "followUp": {
@@ -188,7 +188,7 @@
         "blockers": 0,
         "remainingEntries": 0,
         "cleared": 3,
-        "atFinalPinUnderLease": 2,
+        "atFinalPinUnderLease": 4,
         "external": 0
       },
       "originalDecisions": {
@@ -310,7 +310,7 @@
     },
     "atFinalPinUnderLease": {
       "before": 19,
-      "after": 29
+      "after": 31
     },
     "external": {
       "before": 6,
@@ -463,7 +463,7 @@
       "sourcePointer": "/gates/0/blockers/2",
       "item": "73/257 changedBindings rows in phase-08/step-08-preflip-gates.json not current at 77db6ed2b; register not re-joined since fd161a8c2 (w4-ledger-d7b REWORK HEAD-gate-changedBindings, LF-claim_af89c4e6-current)",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it). Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
+      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it). Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected predecessor rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md (composition/patch-specs.json#/patches/137), selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
       "gates": [
         "G0"
       ],
@@ -531,7 +531,7 @@
       "sourcePointer": "/gates/0/blockers/3",
       "item": "Earlier approvals were bound to pre-migration hashes and M1 digests; no current-digest verdict file exists",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it). Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
+      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it). Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected predecessor rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md (composition/patch-specs.json#/patches/137), selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
       "gates": [
         "G0"
       ],
@@ -599,7 +599,7 @@
       "sourcePointer": "/gates/0/blockers/4",
       "item": "Final pin F not recorded",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it). Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
+      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it). Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected predecessor rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md (composition/patch-specs.json#/patches/137), selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
       "gates": [
         "G0"
       ],
@@ -667,7 +667,7 @@
       "sourcePointer": "/gates/0/blockers/5",
       "item": "661 bindings unresolved after full patch chain; final-pin post-apply rebind required (reviews/w9-composition-fix-review.md)",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it). Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
+      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it). Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected predecessor rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md (composition/patch-specs.json#/patches/137), selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
       "gates": [
         "G0"
       ],
@@ -852,7 +852,7 @@
         },
         {
           "decision": "moved to F",
-          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
+          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected predecessor rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md (composition/patch-specs.json#/patches/137), selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -1774,7 +1774,7 @@
       "sourcePointer": "/gates/6/blockers/2",
       "item": "186 G6 rows and 86 wrapper successor digests to refresh at F",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Bind/judge the 137 park-current-passage-unbound rows against actual F bytes and obtain independent delta review. Refresh all G6 evidence at the shared G2/G6 F pin, replay twice byte-identically and pass the combined verifier; unchanged digest-bound judgments do not get re-judged by batch (L13-20.1). Apply the reviewed 163 dated notes, 6 existing repoint proposals and premise actions ONLY through fchain/manifest.json and fchain/check.py at actual F, using the real flip date; no separate retarget pass. Stop and delta-review any changed source/target. The 787 judgments and 36 keep-unchanged decisions are already settled before F (L13-21/24/26).",
+      "resolution": "Retained as an explicit F duty, not cleared: Bind/judge the 137 park-current-passage-unbound rows against actual F bytes and obtain independent delta review. Refresh all G6 evidence at the shared G2/G6 F pin, replay twice byte-identically and pass the combined verifier; unchanged digest-bound judgments do not get re-judged by batch (L13-20.1). Apply the reviewed 163 dated notes, 6 existing repoint proposals and premise actions ONLY through fchain/manifest.json and fchain/check.py at actual F, using the real flip date; no separate retarget pass. Stop and delta-review any changed source/target. The 787 judgments and 36 keep-unchanged decisions are already settled before F (L13-21/24/26/28). Guard 3 landed with the cutover must agree with fchain/links.py linkGuard on the composed tree at actual F: same whole docs/platform/** population including Related headers, moved-source removal, fence/code-span and unit-extractor anchor semantics and label rules; both must report 0 findings (L13-28.4). Do not inherit scripts/check-doc-candidate-status.mjs disagreements: its stripCode counts 398 literal occurrences (394 fenced + 4 multi-line inline-code), and relatedPaths() does not split file plus anchor for 44 Related #anchor entries (w35, w37 low note). Align that product reader or keep it out of this post-cutover guard; no exemption from the whole-population check. Final-F delta-review the changed shard-2 patch bytes named by fchain/link-retargets.json finalFDuties: f06461/f06591/f07205 and the seven newly extended owners (ten row copies: f06504, f06697, f06699, f06700, f06702, f06790/f06791/f06794/f06799, f06823). Prior approvals do not transfer to changed proposed hashes (w35-10, w37-8/11).",
       "gates": [
         "G6"
       ],
@@ -1814,7 +1814,7 @@
       "sourcePointer": "/gates/6/blockers/3",
       "item": "Combined verifier blocked on the G2 census pin",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Bind/judge the 137 park-current-passage-unbound rows against actual F bytes and obtain independent delta review. Refresh all G6 evidence at the shared G2/G6 F pin, replay twice byte-identically and pass the combined verifier; unchanged digest-bound judgments do not get re-judged by batch (L13-20.1). Apply the reviewed 163 dated notes, 6 existing repoint proposals and premise actions ONLY through fchain/manifest.json and fchain/check.py at actual F, using the real flip date; no separate retarget pass. Stop and delta-review any changed source/target. The 787 judgments and 36 keep-unchanged decisions are already settled before F (L13-21/24/26).",
+      "resolution": "Retained as an explicit F duty, not cleared: Bind/judge the 137 park-current-passage-unbound rows against actual F bytes and obtain independent delta review. Refresh all G6 evidence at the shared G2/G6 F pin, replay twice byte-identically and pass the combined verifier; unchanged digest-bound judgments do not get re-judged by batch (L13-20.1). Apply the reviewed 163 dated notes, 6 existing repoint proposals and premise actions ONLY through fchain/manifest.json and fchain/check.py at actual F, using the real flip date; no separate retarget pass. Stop and delta-review any changed source/target. The 787 judgments and 36 keep-unchanged decisions are already settled before F (L13-21/24/26/28). Guard 3 landed with the cutover must agree with fchain/links.py linkGuard on the composed tree at actual F: same whole docs/platform/** population including Related headers, moved-source removal, fence/code-span and unit-extractor anchor semantics and label rules; both must report 0 findings (L13-28.4). Do not inherit scripts/check-doc-candidate-status.mjs disagreements: its stripCode counts 398 literal occurrences (394 fenced + 4 multi-line inline-code), and relatedPaths() does not split file plus anchor for 44 Related #anchor entries (w35, w37 low note). Align that product reader or keep it out of this post-cutover guard; no exemption from the whole-population check. Final-F delta-review the changed shard-2 patch bytes named by fchain/link-retargets.json finalFDuties: f06461/f06591/f07205 and the seven newly extended owners (ten row copies: f06504, f06697, f06699, f06700, f06702, f06790/f06791/f06794/f06799, f06823). Prior approvals do not transfer to changed proposed hashes (w35-10, w37-8/11).",
       "gates": [
         "G6"
       ],
@@ -1935,7 +1935,23 @@
         },
         {
           "decision": "moved to F",
-          "item": "Apply the reviewed 163 dated notes, 6 existing repoint proposals and premise actions ONLY through fchain/manifest.json and fchain/check.py at actual F, using the real flip date; no separate retarget pass. Stop and delta-review any changed source/target. The 787 judgments and 36 keep-unchanged decisions are already settled before F (L13-21/24/26).",
+          "item": "Apply the reviewed 163 dated notes, 6 existing repoint proposals and premise actions ONLY through fchain/manifest.json and fchain/check.py at actual F, using the real flip date; no separate retarget pass. Stop and delta-review any changed source/target. The 787 judgments and 36 keep-unchanged decisions are already settled before F (L13-21/24/26/28).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Guard 3 landed with the cutover must agree with fchain/links.py linkGuard on the composed tree at actual F: same whole docs/platform/** population including Related headers, moved-source removal, fence/code-span and unit-extractor anchor semantics and label rules; both must report 0 findings (L13-28.4). Do not inherit scripts/check-doc-candidate-status.mjs disagreements: its stripCode counts 398 literal occurrences (394 fenced + 4 multi-line inline-code), and relatedPaths() does not split file plus anchor for 44 Related #anchor entries (w35, w37 low note). Align that product reader or keep it out of this post-cutover guard; no exemption from the whole-population check.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Final-F delta-review the changed shard-2 patch bytes named by fchain/link-retargets.json finalFDuties: f06461/f06591/f07205 and the seven newly extended owners (ten row copies: f06504, f06697, f06699, f06700, f06702, f06790/f06791/f06794/f06799, f06823). Prior approvals do not transfer to changed proposed hashes (w35-10, w37-8/11).",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -2493,7 +2509,7 @@
       "sourcePointer": "/gates/9/blockers/0",
       "item": "Final pin F not recorded",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: After final main import record F, run g9/sweep.py --check --pin F, rejudge every changed evidence row, recompose drifted bodies (including deferred G7/predecessor specs), and get source-delta review (execution plan §2 G9 / §3 W3). Fix/materialize the supersession source join or explicitly carry the 2 prepared-shard legacy scan gaps (README, repo-layout-vision), then rerun post-apply scan at F (w11-import3 F3; import3/receipt.md). Retain keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a until track end under L13-13.3; completed SHA re-pinning is not permission to delete their historical witnesses. Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and linkIntoMoveSet. Current replay is preparation only, not F execution (L13-24/26).",
+      "resolution": "Retained as an explicit F duty, not cleared: After final main import record F, run g9/sweep.py --check --pin F, rejudge every changed evidence row, recompose drifted bodies (including deferred G7/predecessor specs), and get source-delta review (execution plan §2 G9 / §3 W3). Fix/materialize the supersession source join or explicitly carry the 2 prepared-shard legacy scan gaps (README, repo-layout-vision), then rerun post-apply scan at F (w11-import3 F3; import3/receipt.md). Retain keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a until track end under L13-13.3; completed SHA re-pinning is not permission to delete their historical witnesses. Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and whole-population linkGuard findings, Related headers included. Current replay is preparation only, not F execution (L13-24/26/28).",
       "gates": [
         "G9"
       ],
@@ -2770,7 +2786,7 @@
         },
         {
           "decision": "moved to F",
-          "item": "Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and linkIntoMoveSet. Current replay is preparation only, not F execution (L13-24/26).",
+          "item": "Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and whole-population linkGuard findings, Related headers included. Current replay is preparation only, not F execution (L13-24/26/28).",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -3701,7 +3717,7 @@
         },
         {
           "decision": "moved to F",
-          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
+          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected predecessor rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md (composition/patch-specs.json#/patches/137), selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -3733,7 +3749,7 @@
         },
         {
           "decision": "moved to F",
-          "item": "Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and linkIntoMoveSet. Current replay is preparation only, not F execution (L13-24/26).",
+          "item": "Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and whole-population linkGuard findings, Related headers included. Current replay is preparation only, not F execution (L13-24/26/28).",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -3896,7 +3912,7 @@
         },
         {
           "decision": "moved to F",
-          "item": "Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and linkIntoMoveSet. Current replay is preparation only, not F execution (L13-24/26).",
+          "item": "Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and whole-population linkGuard findings, Related headers included. Current replay is preparation only, not F execution (L13-24/26/28).",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -3998,7 +4014,7 @@
         },
         {
           "decision": "moved to F",
-          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
+          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected predecessor rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md (composition/patch-specs.json#/patches/137), selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -4162,7 +4178,23 @@
         },
         {
           "decision": "moved to F",
-          "item": "Apply the reviewed 163 dated notes, 6 existing repoint proposals and premise actions ONLY through fchain/manifest.json and fchain/check.py at actual F, using the real flip date; no separate retarget pass. Stop and delta-review any changed source/target. The 787 judgments and 36 keep-unchanged decisions are already settled before F (L13-21/24/26).",
+          "item": "Apply the reviewed 163 dated notes, 6 existing repoint proposals and premise actions ONLY through fchain/manifest.json and fchain/check.py at actual F, using the real flip date; no separate retarget pass. Stop and delta-review any changed source/target. The 787 judgments and 36 keep-unchanged decisions are already settled before F (L13-21/24/26/28).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Guard 3 landed with the cutover must agree with fchain/links.py linkGuard on the composed tree at actual F: same whole docs/platform/** population including Related headers, moved-source removal, fence/code-span and unit-extractor anchor semantics and label rules; both must report 0 findings (L13-28.4). Do not inherit scripts/check-doc-candidate-status.mjs disagreements: its stripCode counts 398 literal occurrences (394 fenced + 4 multi-line inline-code), and relatedPaths() does not split file plus anchor for 44 Related #anchor entries (w35, w37 low note). Align that product reader or keep it out of this post-cutover guard; no exemption from the whole-population check.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Final-F delta-review the changed shard-2 patch bytes named by fchain/link-retargets.json finalFDuties: f06461/f06591/f07205 and the seven newly extended owners (ten row copies: f06504, f06697, f06699, f06700, f06702, f06790/f06791/f06794/f06799, f06823). Prior approvals do not transfer to changed proposed hashes (w35-10, w37-8/11).",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -4413,7 +4445,7 @@
         },
         {
           "decision": "moved to F",
-          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
+          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected predecessor rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md (composition/patch-specs.json#/patches/137), selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -4547,7 +4579,7 @@
         },
         {
           "decision": "moved to F",
-          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
+          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected predecessor rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md (composition/patch-specs.json#/patches/137), selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -4634,7 +4666,7 @@
         },
         {
           "decision": "moved to F",
-          "item": "Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and linkIntoMoveSet. Current replay is preparation only, not F execution (L13-24/26).",
+          "item": "Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and whole-population linkGuard findings, Related headers included. Current replay is preparation only, not F execution (L13-24/26/28).",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -4793,7 +4825,7 @@
         },
         {
           "decision": "moved to F",
-          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
+          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected predecessor rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md (composition/patch-specs.json#/patches/137), selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -4997,7 +5029,7 @@
     "scope": "Historical W22/L13-20 layer only; its then-authored G6/G9 packets were not independent approvals. Generated evidence is preserved from committed d7126c5b9, not from current working-tree files."
   },
   "currentCatchUp": {
-    "sourceCommit": "f498ebded83ba5789e730adc74bb637b80e2f536",
+    "sourceCommit": "a734c3f47ff6eb39d80ba1c16e6dd88d44cc2d53",
     "generatedHistoricalPin": "d7126c5b9",
     "inputs": [
       {
@@ -5674,23 +5706,27 @@
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/check.py",
-        "sha256": "1f98b41ca2d3bd028d51d88bf202584ad9a8a0f74722b0e2691c589cc872d214"
+        "sha256": "373a5b88baf786b17cd94c92e0c5b4ac1f8a074a4ba5819a7c366809e000df63"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json",
-        "sha256": "568d401ab9815f458f597f8a22761c0f8c01ccf5113dcfd1c8f6d8022fc0f40e"
+        "sha256": "2b1519d4c0bdcead6513765dced15f6b97b2c3821548f7d93c16b139ded70656"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/links.py",
-        "sha256": "91ef503bda8c1d2f8c07d27e9e2bca847ee628fb3db8e748aedf1874250e672c"
+        "sha256": "a8d40e5340b4f89cf03e77def7dd42e825a7f712ce5d575d6128c7b2c38205e6"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/manifest.json",
-        "sha256": "6a2318d709edf1740658d2435dae5af2fde4224f469ce3a800b8e57ee775ff91"
+        "sha256": "fe7ca5c16bdb66d1a6b246f8b0dec010d72f11ea72afd06d86c28c2ea028bcb2"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json",
         "sha256": "39d89b2ff93051d8d35bb8b778c6d705bc783656bc5a577e8133624e9c1008ab"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/receipt.md",
+        "sha256": "5a2c98ddea1f94aa2255768454ebf0ba67f631b02c7e0623e528d17a9f31e2e2"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/join.py",
@@ -5730,11 +5766,11 @@
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md",
-        "sha256": "7901b976ff3bc5e502347bbac6201c779e544d6013fbd7de90182d98c5856c59"
+        "sha256": "78e17b0a34fafd9de6e0ad42db0aabcf0950940ac4ce41b05251e0144b0f8d06"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/preflip-gate-status.json",
-        "sha256": "f53be95a454b228a0fd354d5408992cc6fd2488fcb1084b15230ab48c4ef4279"
+        "sha256": "6efd0c4765755a608ffccc9d4ed26ce0401e91c96351769e00dcdb1f5d7756e3"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/judgments.json",
@@ -5758,7 +5794,7 @@
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json",
-        "sha256": "e1a2a7ded6326020dfd98a8f2a1c79df38423dcc9b57318b6428ebc12adf8138"
+        "sha256": "edc92af6662115b75edf522e0df496098fbae2c2a572630f065de64375b737fc"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3-ids.json",
@@ -5766,11 +5802,15 @@
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json",
-        "sha256": "ee9d330aa6887d4597fd5b665f73338535ef9ca7240b9a44c56cbb6bc06597bc"
+        "sha256": "aad38fc2968a11458b232e50855eded3570b8052525cc9aa8a263771e893ce40"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/prepared-patches.json",
         "sha256": "56f51603d5cd65c1af2a8d17e11dc72408693a4e526b14a4423ec57abc1e4b5a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json",
+        "sha256": "bbe108e5af0a0cd6f0449e6dbbaf6908aa8e611bcc6d2c1f938ca1a58cb4c8ce"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b1-review.json",
@@ -6085,6 +6125,46 @@
         "sha256": "0062e38844338cb29627861219abbc7866e22a968828b03dc23ff1adb1701ed7"
       },
       {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w32-register-review.json",
+        "sha256": "15f4e72fec528d7dec671525213a6b2a22f3c7a0a07e811d1820b577dad17926"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w32-register-review.md",
+        "sha256": "847b87fe4150a22471d4eb157381724d107f10f24d8eccaefc56eb0a2ff29e95"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w33-link-retargets-review.json",
+        "sha256": "4cca7bfdac727778122d601321a1afcaf81ef3441cb1e21c65d6cfa14591fa84"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w33-link-retargets-review.md",
+        "sha256": "28692e9267b0e4b7b670a320183daeae7407c320dfb340af3a9e626811c8557b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w33-ownership-audit-review.json",
+        "sha256": "abdd688448a44232edcea37baac5451c90bed50c2377e649135933b0006bb27d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w33-ownership-audit-review.md",
+        "sha256": "d05a03cbd758c14cad1aa5caf5e086c4659df381a1cbd1949c2b7e78e1343249"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w35-link-guard-review.json",
+        "sha256": "18ba842bc7ede80fc27aa2c02b01da986ac387171dfd69d93a2c517873444043"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w35-link-guard-review.md",
+        "sha256": "77f5b8f2cd9c9a65b418ec0d5e854291e25615ab7d0d6b39379824e6fc14ad94"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w37-link-guard-rereview.json",
+        "sha256": "7be8d171e6d558f05676ae3babcd08c34aaa831236c6cccdf29567ccaa1ec094"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w37-link-guard-rereview.md",
+        "sha256": "5f033102a8fec532f3f97498b72ab264cc43c4a0b2f5ed080dccf0794e9ae1a6"
+      },
+      {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-g4-declare-review.json",
         "sha256": "64970be3264f68e4d267dadfdbee81a8013206c4582bbefa6030a18850ee1096"
       },
@@ -6159,6 +6239,10 @@
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/w32-register-catchup-brief.md",
         "sha256": "120a8d5acc4f87ebc1f5a168448eb9aeb373757186163dadb65100951ecafbc5"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w35-register-update-brief.md",
+        "sha256": "f3b290ee9b7c6fb79f25d7f2c0d4cdc913d4084c206fdcab434820846dcc3a07"
       }
     ],
     "reviewInventory": [
@@ -7019,13 +7103,114 @@
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w30-g0-verdicts-b11.md",
         "sha256": "0062e38844338cb29627861219abbc7866e22a968828b03dc23ff1adb1701ed7"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w32-register-review.json",
+        "sha256": "15f4e72fec528d7dec671525213a6b2a22f3c7a0a07e811d1820b577dad17926",
+        "verdictCounts": {
+          "APPROVE": 18,
+          "REWORK": 3
+        },
+        "nonApproveRows": [
+          {
+            "id": "G6",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "f-composition",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "cutoverReadiness.summary-and-localCorrectionReview",
+            "verdict": "REWORK"
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w32-register-review.md",
+        "sha256": "847b87fe4150a22471d4eb157381724d107f10f24d8eccaefc56eb0a2ff29e95"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w33-link-retargets-review.json",
+        "sha256": "4cca7bfdac727778122d601321a1afcaf81ef3441cb1e21c65d6cfa14591fa84",
+        "verdictCounts": {
+          "REWORK": 1,
+          "APPROVE": 4,
+          "NOTE": 3
+        },
+        "nonApproveRows": [
+          {
+            "id": "link-retargets-record",
+            "verdict": "REWORK"
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w33-link-retargets-review.md",
+        "sha256": "28692e9267b0e4b7b670a320183daeae7407c320dfb340af3a9e626811c8557b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w33-ownership-audit-review.json",
+        "sha256": "abdd688448a44232edcea37baac5451c90bed50c2377e649135933b0006bb27d",
+        "verdictCounts": {
+          "APPROVE": 5
+        },
+        "nonApproveRows": []
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w33-ownership-audit-review.md",
+        "sha256": "d05a03cbd758c14cad1aa5caf5e086c4659df381a1cbd1949c2b7e78e1343249"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w35-link-guard-review.json",
+        "sha256": "18ba842bc7ede80fc27aa2c02b01da986ac387171dfd69d93a2c517873444043",
+        "verdictCounts": {
+          "REWORK": 3,
+          "APPROVE": 7
+        },
+        "nonApproveRows": [
+          {
+            "id": "w35-1",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "w35-2",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "w35-3",
+            "verdict": "REWORK"
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w35-link-guard-review.md",
+        "sha256": "77f5b8f2cd9c9a65b418ec0d5e854291e25615ab7d0d6b39379824e6fc14ad94"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w37-link-guard-rereview.json",
+        "sha256": "7be8d171e6d558f05676ae3babcd08c34aaa831236c6cccdf29567ccaa1ec094",
+        "verdictCounts": {
+          "APPROVE": 10,
+          "REWORK": 1
+        },
+        "nonApproveRows": [
+          {
+            "id": "w37-6",
+            "verdict": "REWORK"
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w37-link-guard-rereview.md",
+        "sha256": "5f033102a8fec532f3f97498b72ab264cc43c4a0b2f5ed080dccf0794e9ae1a6"
       }
     ],
     "proofs": "gate-reconcile/current-proofs.json",
     "countsPerGate": [
       {
         "g": "G0",
-        "before": "partial",
+        "before": "met-local",
         "after": "met-local"
       },
       {
@@ -7045,7 +7230,7 @@
       },
       {
         "g": "G4",
-        "before": "met-local",
+        "before": "external",
         "after": "external"
       },
       {
@@ -7055,7 +7240,7 @@
       },
       {
         "g": "G6",
-        "before": "partial",
+        "before": "met-local",
         "after": "met-local"
       },
       {
@@ -7070,7 +7255,7 @@
       },
       {
         "g": "G9",
-        "before": "partial",
+        "before": "met-local",
         "after": "met-local"
       },
       {
@@ -7084,7 +7269,7 @@
         "after": "external"
       }
     ],
-    "scope": "Committed W23–W30 reviews and L13-16–27. Historical occurrence accounting remains at its original pin; this separate table compares current turn-start register statuses."
+    "scope": "Committed W23–W37 reviews and L13-16–28. Historical occurrence accounting remains at its original pin; this separate table compares current turn-start register statuses."
   },
   "newlyVisibleOpenItems": [],
   "scopeLimits": [
