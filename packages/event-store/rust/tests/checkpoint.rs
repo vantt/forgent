@@ -312,33 +312,53 @@ fn a_read_that_defers_an_event_writes_no_checkpoint() {
 }
 
 /// A peer mirror that was force-rewound after the checkpoint was written no
-/// longer descends from the checkpoint's tip. The checkpointed read then
-/// falls back to a walk from zero, and today the peer's authenticated events
-/// vanish from the answer with only `checkpoint.ignored` set. A rewind must
-/// not silently drop history: the events the peer's earlier tip authenticated
-/// stay in the answer (a sync keeps such a baseline, see
-/// `rewound_mirror_keeps_authenticated_baseline_and_forged_own_origin_is_refused`).
-/// It lives here because only the checkpointed read has this fallback; the
-/// retained-cursor refusal is owned by `cursor_incremental.rs`.
+/// longer descends from the checkpoint's tip. The events the peer's earlier
+/// tip authenticated stay in the answer (a sync keeps such a baseline, see
+/// `rewound_mirror_keeps_authenticated_baseline_and_forged_own_origin_is_refused`)
+/// and the mirror is named. It lives here because only the checkpointed read
+/// falls back to a walk from zero, which would drop them; the retained-cursor
+/// case is owned by `cursor_incremental.rs`. The mirror is planted, not
+/// published: publishing through this fixture also writes an own ref of the
+/// same machine, and the own machine's history stays fail-closed.
 #[test]
 fn a_rewound_peer_mirror_does_not_silently_drop_the_events_it_already_authenticated() {
     let f = Fixture::new();
     let mut h = f.handle();
-    let mirror = "refs/fgos/remotes/origin/events/test-bb";
-    let p = f.port(&mut h, mirror);
+    let p = f.port(&mut h, REF);
     let cp = checkpoint(&f, true);
     let first = seal(&p, &f.repo, vec![], &[event('b', 1, 1)], "test-bb");
-    let second = seal(&p, &f.repo, vec![first.clone()], &[event('b', 2, 2)], "test-bb");
-    publish(&p, &f.repo, mirror, None, second.clone(), "advance");
+    let second = seal(
+        &p,
+        &f.repo,
+        vec![first.clone()],
+        &[event('b', 2, 2)],
+        "test-bb",
+    );
+    plant_foreign_mirror(&f, "test-bb", &second);
     let before = fresh(&p, &f, &streams(), &cp);
     assert_eq!(before.sequence.len(), 2);
     assert!(before.checkpoint.written);
 
-    publish(&p, &f.repo, mirror, Some(second), first, "rewind");
+    plant_foreign_mirror(&f, "test-bb", &first);
     let after = fresh(&p, &f, &streams(), &cp);
     assert!(
-        after.sequence.iter().any(|e| e.origin == "b".repeat(32) && e.seq == 2),
+        after
+            .sequence
+            .iter()
+            .any(|e| e.origin == "b".repeat(32) && e.seq == 2),
         "the rewind dropped the peer's event 2 without a trace (checkpoint report: {:?})",
         after.checkpoint
+    );
+    assert!(after.checkpoint.continued, "{:?}", after.checkpoint);
+    assert_eq!(
+        after
+            .skipped_mirrors
+            .iter()
+            .map(|m| (m.ref_name.as_str(), m.code.as_str()))
+            .collect::<Vec<_>>(),
+        [(
+            "refs/fgos/remotes/origin/events/test-bb",
+            "event-store-mirror-rewound"
+        )]
     );
 }

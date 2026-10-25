@@ -338,10 +338,14 @@ fn missing_wide_and_symlink_lock_dirs_refuse() {
         "event-store-lock-dir-invalid",
     );
     fs::remove_dir(&dir).unwrap();
-    code(
-        r.append_cursor(1, &Positions::new()).unwrap_err(),
-        "event-store-lock-dir-invalid",
+    let missing = r.append_cursor(1, &Positions::new()).unwrap_err();
+    assert!(
+        missing
+            .detail
+            .ends_with("locks must be an existing 0700 directory; run fgos setup"),
+        "the refusal names the directory and the next step: {missing}"
     );
+    code(missing, "event-store-lock-dir-invalid");
     let other = r.root.join("other");
     fs::create_dir(&other).unwrap();
     fs::set_permissions(&other, fs::Permissions::from_mode(0o700)).unwrap();

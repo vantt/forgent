@@ -228,6 +228,21 @@ pub fn merge(p: &dyn Publication, r: &RepoHandle, a: &Oid, b: &Oid, machine: &st
         vec![(b"seal.json", s.canonical_line().unwrap())],
     )
 }
+/// Mirror `oid` as a foreign ref of the machine `suffix` by writing the loose
+/// ref file. The publication door cannot plant this: its fetch only maps
+/// `refs/fgos/events/*`, and the remote is this repository, so the source ref
+/// would stay behind as an own ref of this clone (every event ref outside
+/// `refs/fgos/remotes/` is), and the door refuses an invalid machine name or
+/// deleting an events ref. A file write adds no Git spawn.
+pub fn plant_foreign_mirror(f: &Fixture, suffix: &str, oid: &Oid) {
+    let path = f
+        .layout
+        .common_dir
+        .join("refs/fgos/remotes/origin/events")
+        .join(suffix);
+    fs::create_dir_all(path.parent().unwrap()).unwrap();
+    fs::write(path, format!("{}\n", oid.as_str())).unwrap();
+}
 pub fn publish(
     p: &dyn Publication,
     r: &RepoHandle,
