@@ -1,0 +1,655 @@
+{
+  "status": "pass",
+  "inputHead": "37dd5d1f90e352335ad16d301b28b74bf6b700b1",
+  "changedRows": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/45",
+      "fields": [
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "add-verb",
+        "targetUnitDigest": "f74252e08dee1df2d5cf579cc8d7810918b383049620ac4077e4681ba6acfb02",
+        "targetAncestry": [
+          "Work State Specification",
+          "9. Behaviors And Operations",
+          "Add Verb"
+        ]
+      },
+      "rowFingerprint": "e110c5e9b01f17eda4fcce84f996b917f541f106a37a83139103d3bda612f034"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/47",
+      "fields": [
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "submit-verb",
+        "targetUnitDigest": "9174cce69c473d51d4216e173317d45361ba8d5f9e3b1c7f448150ce21a61a64",
+        "targetAncestry": [
+          "Work State Specification",
+          "9. Behaviors And Operations",
+          "Submit Verb"
+        ]
+      },
+      "rowFingerprint": "9b81e0ae5ed38648de2308dc8e8e6c54512e5db1fab3edf8684ffcac9c452aa9"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/49",
+      "fields": [
+        "bindingSha256",
+        "rationale",
+        "targetUnitDigest"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "3-work-item-data-dictionary",
+        "targetUnitDigest": "38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b",
+        "targetAncestry": [
+          "Work State Specification",
+          "3. Work Item Data Dictionary"
+        ]
+      },
+      "rowFingerprint": "dafdb5cdcaee0dfd83fb3cb6b44e56ad63b4517903980344caf45cfb158c66ae"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/50",
+      "fields": [
+        "bindingSha256",
+        "rationale",
+        "targetUnitDigest"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817",
+        "targetAncestry": [
+          "Work State Specification",
+          "3. Work Item Data Dictionary"
+        ]
+      },
+      "rowFingerprint": "be46ec753c07795292eb6e92b88a3ca735ebffd404101443f495d092b3db831b"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/115",
+      "fields": [
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "2-entry-points-and-triggers",
+        "targetUnitDigest": "3f174b8615bf045066a928535372876d274f5fae4f5535422a7e7aaf32b42218",
+        "targetAncestry": [
+          "Work State Specification",
+          "2. Entry Points And Triggers"
+        ]
+      },
+      "rowFingerprint": "e7d679e9cd28d8d183d5c7aded559f4891c9481a7d0d7d3a78b829e15bdbfec3"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/117",
+      "fields": [
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "11-business-rules",
+        "targetUnitDigest": "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41",
+        "targetAncestry": [
+          "Work State Specification",
+          "11. Business Rules"
+        ]
+      },
+      "rowFingerprint": "df18cc8e3f8cbb1b4d367f733a988ff0dc4bee3f07595546d755c49cb6d2f395"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/127",
+      "fields": [
+        "authoredBy",
+        "bindingSha256",
+        "claimId",
+        "claimKind",
+        "disposition",
+        "rationale",
+        "reviewStatus",
+        "sourceUnitDigest",
+        "supersedesBinding",
+        "targetAncestry",
+        "targetAnchor",
+        "targetOwner",
+        "targetUnitDigest"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "6-domain-model",
+        "targetUnitDigest": "6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603",
+        "targetAncestry": [
+          "Work State Specification",
+          "6. Domain Model"
+        ]
+      },
+      "rowFingerprint": "3a6a1c916af1240c9e9a6fd0c7862d69e8b49ed4faa7d755c860ef07edb88a9c"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/128",
+      "fields": [
+        "authoredBy",
+        "bindingSha256",
+        "claimId",
+        "claimKind",
+        "disposition",
+        "rationale",
+        "reviewStatus",
+        "sourceUnitDigest",
+        "supersedesBinding",
+        "targetAncestry",
+        "targetAnchor",
+        "targetOwner",
+        "targetUnitDigest"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-54",
+        "targetUnitDigest": "c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7",
+        "targetAncestry": [
+          "Work State Specification",
+          "6. Domain Model"
+        ]
+      },
+      "rowFingerprint": "d8d9f4a1facf12bee1514128d4f99c0312472573eb9309c22a4ea6789a59e486"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/4",
+      "fields": [
+        "placement",
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-3",
+        "targetUnitDigest": "eb57f42ea9bddbdb72969c05a14d8f43b6a305874975de8990fddfb34b0f3644",
+        "targetAncestry": [
+          "Work State Specification",
+          "2. Entry Points And Triggers"
+        ]
+      },
+      "rowFingerprint": "e0b61ff9f97ae36e27b5f74bf024f23fbde08f5e60d32e94a8025c86b18f3b5c"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/6",
+      "fields": [
+        "bindingSha256",
+        "placement",
+        "rationale",
+        "targetUnitDigest"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817",
+        "targetAncestry": [
+          "Work State Specification",
+          "3. Work Item Data Dictionary"
+        ]
+      },
+      "rowFingerprint": "616d5609a808292c1241fe34f37d78779929b9ac63f9487fe9753ecb7b96a5a8"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/59",
+      "fields": [
+        "placement",
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-44",
+        "targetUnitDigest": "ffb0d2ad1ac7bdf66ed226440e16fe3dc0e2d6b5963d808d9bcc47da39690ad0",
+        "targetAncestry": [
+          "Work State Specification",
+          "5. Workflow Step And Stage Model",
+          "Planning Stage"
+        ]
+      },
+      "rowFingerprint": "1d17d8b8874ed45a39da02635385002ef91579293309043b66252412633d2cfc"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/60",
+      "fields": [
+        "bindingSha256",
+        "placement",
+        "rationale",
+        "targetUnitDigest"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "6-domain-model",
+        "targetUnitDigest": "6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603",
+        "targetAncestry": [
+          "Work State Specification",
+          "6. Domain Model"
+        ]
+      },
+      "rowFingerprint": "697a1693840f3b30dce8eacd21af13648e4090a2e02e67be910455b3ed455df8"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/61",
+      "fields": [
+        "placement",
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-45",
+        "targetUnitDigest": "feed8c8b2f035f912247b8dfe19899b63332ce0e071eeac988ea9880223fc98a",
+        "targetAncestry": [
+          "Work State Specification",
+          "6. Domain Model"
+        ]
+      },
+      "rowFingerprint": "8155db4ba9d5cb7676bf87b0361302eb2f4398c1f4a8cbed6efc86de49a1e680"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/69",
+      "fields": [
+        "placement",
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-53",
+        "targetUnitDigest": "ad648524d48fcbd3683cb44c82929a1787b813d7101548813fbd89440e034d7a",
+        "targetAncestry": [
+          "Work State Specification",
+          "6. Domain Model"
+        ]
+      },
+      "rowFingerprint": "ddfce1ee12ca6bf19915b5bcf6060c058577b321c16c9403d483f42141bb0ad2"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/70",
+      "fields": [
+        "bindingSha256",
+        "placement",
+        "rationale",
+        "targetUnitDigest"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-54",
+        "targetUnitDigest": "c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7",
+        "targetAncestry": [
+          "Work State Specification",
+          "6. Domain Model"
+        ]
+      },
+      "rowFingerprint": "efcb7628d65427505d84f68c570cb89ac9ad98c4e872eb8afc41c0d15e574bc4"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/71",
+      "fields": [
+        "placement",
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "7-pull-door-take-and-return",
+        "targetUnitDigest": "f810d0eb8682dd94d4cdfe5c083ae4c706090a5cbb458a572d0c15d2949fb48a",
+        "targetAncestry": [
+          "Work State Specification",
+          "7. Pull Door Take And Return"
+        ]
+      },
+      "rowFingerprint": "21b8ae39ebd0748e2a6438c6d6a0bcc1d13faaac94eed7dbe9e328dd1b72ed98"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "pointer": "/claims/404",
+      "fields": [
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/agent-coordination/vision.md",
+        "targetAnchor": "open-design-questions-under-this-vision",
+        "targetUnitDigest": "b5288b6f94225cb832fcd635d42e51face82e815ebdbb0b6f196bc7d285a7b12",
+        "targetAncestry": [
+          "Agent Coordination Foundation Vision",
+          "Open Design Questions Under This Vision"
+        ]
+      },
+      "rowFingerprint": "667a21f9fc3032d255541eb31964c0eed0beb57a394e8affd7c9f279e3f71935"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "pointer": "/registryGaps/22",
+      "fields": [
+        "placement",
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "targetAnchor": "unheaded-block-36",
+        "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+        "targetAncestry": [
+          "Added in candidate: Runner Business Rules",
+          "Business Rules"
+        ]
+      },
+      "rowFingerprint": "1dea31035e4c9a0dec42d309201c439d6a7c159cb1dfe8597c65e70f930653fa"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "pointer": "/registryGaps/3",
+      "fields": [
+        "placement",
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "targetAnchor": "unheaded-block-36",
+        "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+        "targetAncestry": [
+          "Added in candidate: Runner Business Rules",
+          "Business Rules"
+        ]
+      },
+      "rowFingerprint": "f5624c4124d35334e31362353d7bd2fdc2826ca1687ea0d86530db0a461fa2fc"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "pointer": "/registryGaps/6",
+      "fields": [
+        "placement",
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-3",
+        "targetUnitDigest": "eb57f42ea9bddbdb72969c05a14d8f43b6a305874975de8990fddfb34b0f3644",
+        "targetAncestry": [
+          "Work State Specification",
+          "2. Entry Points And Triggers"
+        ]
+      },
+      "rowFingerprint": "e6a883a98bbe1289952756ecbe44ea3edaaa4b00f1d2f72f434091e03ab25514"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/4",
+      "fields": [
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/observe/spec.md",
+        "targetAnchor": "owns",
+        "targetUnitDigest": "15cf2d08571be0557c0159bc4ce5e07b282a840ed14172cea109bbe4f4e544c5",
+        "targetAncestry": [
+          "Observe Component Specification",
+          "1. Overview & Boundaries",
+          "Owns"
+        ]
+      },
+      "rowFingerprint": "5e715f6f0c9c7567bbefc499f86ed3c908eaf97e2b4db697203682ba471b54e9"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/registryGaps/2",
+      "fields": [
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/observe/spec.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "516bd5db5c2ca2d7390dc20ddba2b6438a01dcce310bb225d2d2dc9d7d457eea",
+        "targetAncestry": [
+          "Observe Component Specification",
+          "1. Overview & Boundaries",
+          "Owns"
+        ]
+      },
+      "rowFingerprint": "cf393d04031164dca14bc9e9b98db1817d8a2178b66ce56a1649c9092e25bd94"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/9",
+      "fields": [
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "targetAnchor": "data-dictionary",
+        "targetUnitDigest": "de045416214e9431a47210ed32e61ade9efb33289ed7e589859f05736909f5eb",
+        "targetAncestry": [
+          "Added in candidate: Runner Data Dictionary",
+          "Data Dictionary"
+        ]
+      },
+      "rowFingerprint": "f3b0bdefca8bf3621df7ce567d08e77e563012077789f2471c218e4dc3f6507a"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/33",
+      "fields": [
+        "rationale"
+      ],
+      "binding": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "targetAnchor": "unheaded-block-3",
+        "targetUnitDigest": "a943adf388f96e583638dab0a1b4278a0faf2b869916ed16b2d4c77416dffbf8",
+        "targetAncestry": [
+          "Added in candidate: Runner Data Dictionary",
+          "Data Dictionary"
+        ]
+      },
+      "rowFingerprint": "bf1a5e7e4eda7098bc47c4793f661e5421b3e972f30522c564b03172d86a7466"
+    }
+  ],
+  "currentChangedTargetsAndPlacementsVerified": 24,
+  "placementScan": {
+    "placements": 3160,
+    "bodyHashes": 2004,
+    "compositeHeadings": 990,
+    "legacyShapes": 166,
+    "legacyBodyHashes": 164,
+    "legacyCompositeHeadings": 2
+  },
+  "bodyContentHashMismatches": [],
+  "translatedHeadingRows": [
+    "/bindingRefresh/45",
+    "/bindingRefresh/47",
+    "/bindingRefresh/49",
+    "/bindingRefresh/115",
+    "/bindingRefresh/117",
+    "/bindingRefresh/118",
+    "/bindingRefresh/120",
+    "/bindingRefresh/122"
+  ],
+  "additionalOverlayRowsAudited": [
+    "/bindingRefresh/127",
+    "/bindingRefresh/128"
+  ],
+  "missingTitleRationalesCorrected": [
+    "/bindingRefresh/45",
+    "/bindingRefresh/47",
+    "/bindingRefresh/115",
+    "/bindingRefresh/117"
+  ],
+  "historicalCoordinatesVerified": [
+    {
+      "file": "s2-agent-coordination-truth-judgment",
+      "pointer": "/claims/404",
+      "source": "Source: docs/architect/agent-coordination/vision.md:363-363#unheaded-block-62 (historical lines at 0d8c602e2822184014c64243726fd9f6a1a4a5ba); unit SHA256 ee50db7e449d775e1f533342f869a9fd841abf5dcfbf0d9600c4e24f9588fbb7."
+    },
+    {
+      "file": "s8-observe-01",
+      "pointer": "/claims/4",
+      "source": "Source: docs/specs/observe.md:12-12#owns (historical lines at 0d8c602e2822184014c64243726fd9f6a1a4a5ba); unit SHA256 ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2."
+    },
+    {
+      "file": "s8-observe-01",
+      "pointer": "/registryGaps/2",
+      "source": "Source: docs/specs/observe.md:13-17#unheaded-block-3 (historical lines at 0d8c602e2822184014c64243726fd9f6a1a4a5ba); unit SHA256 36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137."
+    },
+    {
+      "file": "s9-runner-01",
+      "pointer": "/claims/9",
+      "source": "Source: docs/specs/runner.md:68-68#data-dictionary (historical lines at a9a2b079f6a12d5992461312cd03b5d24c6495a2); unit SHA256 b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187."
+    },
+    {
+      "file": "s9-runner-01",
+      "pointer": "/registryGaps/33",
+      "source": "Source: docs/specs/runner.md:70-84#unheaded-block-9 (historical lines at a9a2b079f6a12d5992461312cd03b5d24c6495a2); unit SHA256 43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e."
+    }
+  ],
+  "unchangedResidualsVerified": 2,
+  "committedJoinOpenRows": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/45"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "pointer": "/registryGaps/22"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "pointer": "/registryGaps/3"
+    }
+  ],
+  "unchangedApprovedEffectiveRows": 1913,
+  "changedJoinRowsAwaitingReview": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/115",
+      "rowFingerprint": "e7d679e9cd28d8d183d5c7aded559f4891c9481a7d0d7d3a78b829e15bdbfec3"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/117",
+      "rowFingerprint": "df18cc8e3f8cbb1b4d367f733a988ff0dc4bee3f07595546d755c49cb6d2f395"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/45",
+      "rowFingerprint": "e110c5e9b01f17eda4fcce84f996b917f541f106a37a83139103d3bda612f034"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/47",
+      "rowFingerprint": "9b81e0ae5ed38648de2308dc8e8e6c54512e5db1fab3edf8684ffcac9c452aa9"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/49",
+      "rowFingerprint": "dafdb5cdcaee0dfd83fb3cb6b44e56ad63b4517903980344caf45cfb158c66ae"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/50",
+      "rowFingerprint": "be46ec753c07795292eb6e92b88a3ca735ebffd404101443f495d092b3db831b"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "pointer": "/claims/404",
+      "rowFingerprint": "667a21f9fc3032d255541eb31964c0eed0beb57a394e8affd7c9f279e3f71935"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "pointer": "/registryGaps/22",
+      "rowFingerprint": "1dea31035e4c9a0dec42d309201c439d6a7c159cb1dfe8597c65e70f930653fa"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "pointer": "/registryGaps/3",
+      "rowFingerprint": "f5624c4124d35334e31362353d7bd2fdc2826ca1687ea0d86530db0a461fa2fc"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "pointer": "/registryGaps/6",
+      "rowFingerprint": "e6a883a98bbe1289952756ecbe44ea3edaaa4b00f1d2f72f434091e03ab25514"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/4",
+      "rowFingerprint": "5e715f6f0c9c7567bbefc499f86ed3c908eaf97e2b4db697203682ba471b54e9"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/registryGaps/2",
+      "rowFingerprint": "cf393d04031164dca14bc9e9b98db1817d8a2178b66ce56a1649c9092e25bd94"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/9",
+      "rowFingerprint": "f3b0bdefca8bf3621df7ce567d08e77e563012077789f2471c218e4dc3f6507a"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/33",
+      "rowFingerprint": "bf1a5e7e4eda7098bc47c4793f661e5421b3e972f30522c564b03172d86a7466"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/127",
+      "rowFingerprint": "3a6a1c916af1240c9e9a6fd0c7862d69e8b49ed4faa7d755c860ef07edb88a9c",
+      "reason": "New effective overlay; no independent verdict yet."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/128",
+      "rowFingerprint": "d8d9f4a1facf12bee1514128d4f99c0312472573eb9309c22a4ea6789a59e486",
+      "reason": "New effective overlay; no independent verdict yet."
+    }
+  ],
+  "unrelatedOpenCommittedRows": 0,
+  "unrelatedPreexistingPlacementDriftNotChanged": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/150",
+      "reason": "Pre-existing placement drift unrelated to the three navigation references; reverted the over-broad provisional refresh, retaining original bytes. Binding already matches live content; old placement snapshot is internally consistent."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/152",
+      "reason": "Pre-existing placement drift unrelated to the three navigation references; reverted the over-broad provisional refresh, retaining original bytes. Binding already matches live content; old placement snapshot is internally consistent."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "pointer": "/registryGaps/33",
+      "reason": "Pre-existing placement drift unrelated to the three navigation references; reverted the over-broad provisional refresh, retaining original bytes. Binding already matches live content; old placement snapshot is internally consistent."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "pointer": "/registryGaps/43",
+      "reason": "Pre-existing placement drift unrelated to the three navigation references; reverted the over-broad provisional refresh, retaining original bytes. Binding already matches live content; old placement snapshot is internally consistent."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-native-successors.json",
+      "pointer": "/registryGaps/3",
+      "reason": "Pre-existing placement drift unrelated to the three navigation references; reverted the over-broad provisional refresh, retaining original bytes. Binding already matches live content; old placement snapshot is internally consistent."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "pointer": "/registryGaps/4",
+      "reason": "Pre-existing placement drift unrelated to the three navigation references; reverted the over-broad provisional refresh, retaining original bytes. Binding already matches live content; old placement snapshot is internally consistent."
+    }
+  ],
+  "proofBoundary": "Committed join reads only HEAD, not the working tree. Rerun after runner commit; independent review is still required. No author approval or synthetic Git history."
+}

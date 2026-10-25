@@ -397,7 +397,7 @@
       "targetAnchor": "unheaded-block-3",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.\nNavigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Immediate placement neighbour witness refreshed; target digest unchanged via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried.",
       "targetUnitDigest": "eb57f42ea9bddbdb72969c05a14d8f43b6a305874975de8990fddfb34b0f3644",
       "targetAncestry": [
         "Work State Specification",
@@ -433,7 +433,7 @@
           "anchor": "3-work-item-data-dictionary",
           "unitKind": "heading",
           "title": "3. Work Item Data Dictionary",
-          "textDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+          "textDigest": "38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b",
           "startLine": 58,
           "endLine": 58,
           "ancestry": [

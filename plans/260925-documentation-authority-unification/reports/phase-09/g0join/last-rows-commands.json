@@ -1,0 +1,88 @@
+[
+  {
+    "command": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+      "--check"
+    ],
+    "exit": 0,
+    "stdout": "last-rows-rebind-check.json",
+    "stderr": "last-rows-rebind-check.json.stderr.txt"
+  },
+  {
+    "command": [
+      "node",
+      "scripts/check-legacy-docs-ratchet.mjs"
+    ],
+    "exit": 0,
+    "stdout": "last-rows-ratchet.txt",
+    "stderr": "last-rows-ratchet.txt.stderr.txt"
+  },
+  {
+    "command": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/join.py",
+      "--pin",
+      "HEAD"
+    ],
+    "exit": 1,
+    "stdout": "last-rows-join-head.json",
+    "stderr": "last-rows-join-head.json.stderr.txt"
+  },
+  {
+    "command": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-check.py"
+    ],
+    "exit": 0,
+    "stdout": "last-rows-validation.json",
+    "stderr": "last-rows-validation.json.stderr.txt"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": "scope/HEAD/index audit: git diff --name-only; git ls-files --others --exclude-standard; git diff --cached --name-only; git rev-parse HEAD",
+    "exit": 0,
+    "trackedChanged": [
+      "docs/platform/work-state/spec.md",
+      "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/followup-receipt.md"
+    ],
+    "untracked": [
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-commands.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-heading-audit.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-heading-overlay.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-join-head.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-join-head.json.stderr.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-ratchet.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-ratchet.txt.stderr.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-rebind-check.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-rebind-check.json.stderr.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-validation.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-validation.json.stderr.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/last-rows-validation.stderr.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json"
+    ],
+    "indexUntouched": true,
+    "headUntouched": true
+  }
+]

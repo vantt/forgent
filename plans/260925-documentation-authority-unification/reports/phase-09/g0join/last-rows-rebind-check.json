@@ -1,0 +1,115 @@
+{
+  "drift": 0,
+  "rows": [],
+  "authenticatedSupersededOrigins": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "pointer": "/claims/57",
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "effectivePointer": "/bindingRefresh/604",
+      "binding": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "pointer": "/claims/64",
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "effectivePointer": "/bindingRefresh/611",
+      "binding": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/0",
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/49",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "3-work-item-data-dictionary",
+        "targetUnitDigest": "38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b",
+        "targetAncestry": [
+          "Work State Specification",
+          "3. Work Item Data Dictionary"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/1",
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/50",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817",
+        "targetAncestry": [
+          "Work State Specification",
+          "3. Work Item Data Dictionary"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/55",
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/127",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "6-domain-model",
+        "targetUnitDigest": "6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603",
+        "targetAncestry": [
+          "Work State Specification",
+          "6. Domain Model"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/65",
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/128",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-54",
+        "targetUnitDigest": "c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7",
+        "targetAncestry": [
+          "Work State Specification",
+          "6. Domain Model"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/7",
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/117",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "11-business-rules",
+        "targetUnitDigest": "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41",
+        "targetAncestry": [
+          "Work State Specification",
+          "11. Business Rules"
+        ]
+      }
+    }
+  ]
+}

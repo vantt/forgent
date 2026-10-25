@@ -1585,7 +1585,7 @@
       "targetAnchor": "add-verb",
       "claimKind": "specification",
       "disposition": "supersede",
-      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Supersede: the add-verb text is carried whole, with the required-field and id clauses corrected to code (required flags, optional --id, identity mint door); the implementation-pointer wording also changes from \"(9 file)\" to \"trong nhiều file (ví dụ …)\", avoiding a fixed file-count claim. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Supersede: the heading title changes from \"Khai việc (add) — bề mặt nội bộ\" (docs/specs/work-state.md:864) to \"Add Verb\" (docs/platform/work-state/spec.md:713); the add-verb text is carried whole, with the required-field and id clauses corrected to code (required flags, optional --id, identity mint door); the implementation-pointer wording also changes from \"(9 file)\" to \"trong nhiều file (ví dụ …)\", avoiding a fixed file-count claim. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
       "authoredBy": "fgos-run_unit-run-17928787018826",
       "targetUnitDigest": "f74252e08dee1df2d5cf579cc8d7810918b383049620ac4077e4681ba6acfb02",
       "targetAncestry": [
@@ -1637,7 +1637,7 @@
       "targetAnchor": "submit-verb",
       "claimKind": "specification",
       "disposition": "supersede",
-      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Supersede: the submit text is carried whole, with id generation corrected to the identity mint door and tier renamed to size plus optional --rigor; every other clause is unchanged. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Supersede: the heading title changes from \"Nộp vấn đề tự do (submit)\" to \"Submit Verb\"; the submit text is carried whole, with id generation corrected to the identity mint door and tier renamed to size plus optional --rigor; every other clause is unchanged. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
       "authoredBy": "fgos-run_unit-run-17928787018826",
       "targetUnitDigest": "9174cce69c473d51d4216e173317d45361ba8d5f9e3b1c7f448150ce21a61a64",
       "targetAncestry": [
@@ -1690,13 +1690,13 @@
       "targetAnchor": "3-work-item-data-dictionary",
       "claimKind": "specification",
       "disposition": "promote",
-      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Heading \"Data Dictionary\" carried as \"3. Work Item Data Dictionary\" with the same section; the changed payload clauses are judged on claim_5ba6768e. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
-      "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Heading \"Data Dictionary\" carried as \"3. Work Item Data Dictionary\" with the same section; the changed payload clauses are judged on claim_5ba6768e. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.\nNavigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Complete target digest rebound via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried.",
+      "targetUnitDigest": "38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b",
       "targetAncestry": [
         "Work State Specification",
         "3. Work Item Data Dictionary"
       ],
-      "bindingSha256": "ed3bfd0a1cba90117b030fe20af8347e01aa86dd92082d0969e51c5919863537",
+      "bindingSha256": "606ad20381cafa6751d9435d2d5b153c7ff21c5a07250b5e3f2b35ef99d32704",
       "reviewStatus": "pending",
       "reviewNote": "Independent review of this exact re-decision/rationale required; no approval inherited.",
       "supersedesBinding": {
@@ -1715,13 +1715,13 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "specification",
       "disposition": "supersede",
-      "rationale": "Supersede the complete data-dictionary unit with two labelled corrections: (1) the legacy fixed tsk- prefix plus short collision-avoiding suffix becomes tsk-<10 base32>, 50 random bits issued by the Identity mint door, with existing root ids preserved and child lineage unchanged (Identity spec section 4a; main 63b777873, refined in-process by 11733af37); (2) leads to model via runner.rigorToTier becomes checker count and seat independence only, not tier; tier is explicit and rigorToTier is removed (Seat Binding spec section 5.2, D-ADR0072; e0e52312a and bd8d64fdd). Old wording is authenticated by sourceUnitDigest at 49ad04648, not asserted to be current legacy wording: legacy HEAD already carries the rigor correction but retains the old id clause. Target is not an equal-digest promote. Independent review pending, no approval inherited.",
-      "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
+      "rationale": "Supersede the complete data-dictionary unit with two labelled corrections: (1) the legacy fixed tsk- prefix plus short collision-avoiding suffix becomes tsk-<10 base32>, 50 random bits issued by the Identity mint door, with existing root ids preserved and child lineage unchanged (Identity spec section 4a; main 63b777873, refined in-process by 11733af37); (2) leads to model via runner.rigorToTier becomes checker count and seat independence only, not tier; tier is explicit and rigorToTier is removed (Seat Binding spec section 5.2, D-ADR0072; e0e52312a and bd8d64fdd). Old wording is authenticated by sourceUnitDigest at 49ad04648, not asserted to be current legacy wording: legacy HEAD already carries the rigor correction but retains the old id clause. Target is not an equal-digest promote. Independent review pending, no approval inherited.\nNavigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Complete target digest rebound via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried.",
+      "targetUnitDigest": "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817",
       "targetAncestry": [
         "Work State Specification",
         "3. Work Item Data Dictionary"
       ],
-      "bindingSha256": "f8487c8c7365f91f4e87c415067b4f97973c4d26365f9534d6a498c2d8b71412",
+      "bindingSha256": "3f88f6d3f3e0c05b6701eebe2307731d04648773ad4f58c50d5a4a7f79cb6119",
       "reviewStatus": "pending",
       "reviewNote": "Independent review of this exact re-decision/rationale required; no approval inherited.",
       "supersedesBinding": {
@@ -3420,7 +3420,7 @@
       "targetAnchor": "2-entry-points-and-triggers",
       "claimKind": "specification",
       "disposition": "supersede",
-      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Supersede: all 24 entry-point bullets are carried; tier became size, events.lock became the state hot mutex, and the cleanup TTL clause was corrected per item. These are code-truth corrections of the whole unit. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Supersede: the heading title changes from \"Entry Points & Triggers\" to \"2. Entry Points And Triggers\"; all 24 entry-point bullets are carried; tier became size, events.lock became the state hot mutex, and the cleanup TTL clause was corrected per item. These are code-truth corrections of the whole unit. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
       "authoredBy": "fgos-run_unit-run-17928787018826",
       "targetUnitDigest": "3f174b8615bf045066a928535372876d274f5fae4f5535422a7e7aaf32b42218",
       "targetAncestry": [
@@ -3470,7 +3470,7 @@
       "targetAnchor": "11-business-rules",
       "claimKind": "specification",
       "disposition": "supersede",
-      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Supersede: all 54 business-rule bullets are carried, with no rule id dropped and one RUL10 note added. Edits are code-truth corrections (moveStep, size, dep-open states, claim overlay, priority and intent). Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Supersede: the heading title changes from \"Business Rules\" to \"11. Business Rules\"; all 54 business-rule bullets are carried, with no rule id dropped and one RUL10 note added. Edits are code-truth corrections (moveStep, size, dep-open states, claim overlay, priority and intent). Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
       "authoredBy": "fgos-run_unit-run-17928787018826",
       "targetUnitDigest": "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41",
       "targetAncestry": [
@@ -4002,6 +4002,54 @@
           }
         }
       }
+    },
+    {
+      "claimId": "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "sourceUnitDigest": "a90d38d0af33deb55244511fec2419e6b9009cef53e33c59caa52c392e89bba4",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "6-domain-model",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "The source heading title \"Mô hình domain (base-workflow + domain-extension)\" becomes \"6. Domain Model\"; depth H3 to H2, same scope. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nNavigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Complete target digest rebound via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried.",
+      "targetUnitDigest": "6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603",
+      "targetAncestry": [
+        "Work State Specification",
+        "6. Domain Model"
+      ],
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+        "pointer": "/claims/55",
+        "targetAnchor": "6-domain-model",
+        "targetUnitDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
+        "bindingSha256": "0373df1ddbb4e09f0eeaa8a23690a809862b1d6e6b1b930b65c179d61c155afa"
+      },
+      "bindingSha256": "2bf49a8e2c5903ec979e7569b54fe9d9c595d91ad153eb062d29e3d5e6d35811"
+    },
+    {
+      "claimId": "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "sourceUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-54",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Lazy default coding for items without a domain field is carried with its old heading references retargeted, not verbatim. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nNavigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Complete target digest rebound via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried.",
+      "targetUnitDigest": "c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7",
+      "targetAncestry": [
+        "Work State Specification",
+        "6. Domain Model"
+      ],
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+        "pointer": "/claims/65",
+        "targetAnchor": "unheaded-block-54",
+        "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+        "bindingSha256": "1f73475be0c04ea10230b152e105a0431b7475f3853ebf4556d20920f721032b"
+      },
+      "bindingSha256": "eb0f8db68d36cfd93d2f2a5634a39511f1554b84f421b6596d1b69c319d06085"
     }
   ],
   "independentReview": "pending",
