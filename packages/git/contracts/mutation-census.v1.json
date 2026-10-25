@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f6e4442cb84aa36efb3d2ea488b555758118997a8f54d23c088f8fe86c29ec08",
+  "payloadDigest": "39ac41e19b450a2badb2e2ba4824544894b2f9f8b8466c96d18d08bfeb5f461c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -285,7 +285,7 @@
     "packages/event-store/rust/src/identity.rs": "2d74d1ed7ad5d5e5eed918cc750aee9323fa13c33efa2257f5e9575a373ce8dc",
     "packages/event-store/rust/src/layout.rs": "63a715edf633be8382f1eb1a78740d1403cc9d62b5f2a57430b5027c08b95fc1",
     "packages/event-store/rust/src/legacy.rs": "acd6ea10650e7f962a3f008ba313e3f9c48fb761a96ed40d575839c3cdc68e83",
-    "packages/event-store/rust/src/legacy_import.rs": "9e7f614a5e7a4d69f286a585f0dee9a3366dcb235a9466f9c9906803fb125eb1",
+    "packages/event-store/rust/src/legacy_import.rs": "4604c4432dbba924616973ad66571e2e737cd7152200b0a00205ffc584e70407",
     "packages/event-store/rust/src/lib.rs": "3a4c4ce636c3dd857a70461c974a0571a98fa3f795fb39b01d32b4dca2b0f86f",
     "packages/event-store/rust/src/locks.rs": "036ea2964887e1c91bb4683002ff61f2ec6e49179d2f21d75a278e0bb7c18dd2",
     "packages/event-store/rust/src/open_read.rs": "0f348c1d2aad6e2fcbcbf2a36c5c37a1f255ff843a563b53aa773427c45d0102",
@@ -311,7 +311,7 @@
     "packages/event-store/rust/tests/distribution_compatibility.rs": "27a73fa86d90395fb62b98bc7dbc5779538cccae607023ee9e1675235d8b6ac9",
     "packages/event-store/rust/tests/framing_prefixes.rs": "f55b6b0377994d8f71841d666d3f84eae63f4655d001f0e3fe4e0e1b688f98ff",
     "packages/event-store/rust/tests/kill_append.rs": "cb2994d5e7c635094828133334a6e16e7e535426491a00e0be7ebc75d793adf7",
-    "packages/event-store/rust/tests/legacy_import.rs": "9e8e13f6ed68ccc22833eb872a859992c6c62f3e2d5aeaff80691800e0a24a2b",
+    "packages/event-store/rust/tests/legacy_import.rs": "aa808f7c74361a4f2c9b1a34a0775cc3690061119ed0f01b6d8013edbaa6b351",
     "packages/event-store/rust/tests/legacy_reader.rs": "f8967fe43b991e7a55896a0fc7e669159e414ed7d2ac53c19bfa0d8d95cef658",
     "packages/event-store/rust/tests/offline_sync.rs": "3bb91255c19a732217c8cfa92b86a15145dbe0e30dee1f6d3a1629f68c37c658",
     "packages/event-store/rust/tests/order_kahn.rs": "c2b1004b8772de30aace61b1f8279c2131b1678a3be45f64b15b171c1728b6e1",
@@ -340,7 +340,7 @@
     "packages/git/node-addon/src/canonical_json.rs": "e91f461709624467b89c145b906be459015ac77622522d9cf5e1b663a49bf14b",
     "packages/git/node-addon/src/config.rs": "66abc36525f4265deeb777a2bdf51a7a9541b21d192bf4a4c776481d252240ec",
     "packages/git/node-addon/src/durable_file.rs": "92d33582a588824a105683b230a694f3b103657b1b1520fc0b86bac079c490e1",
-    "packages/git/node-addon/src/event_store.rs": "75cebb47f5419c0b7bbf3bd807956f78f0d959b52518558977f9bc396178e47c",
+    "packages/git/node-addon/src/event_store.rs": "769005dc70231feb2b0967be8a75084d6cb81d9ecd74e7af4d6410caed34ac10",
     "packages/git/node-addon/src/git.rs": "1a4dc23284035ab7eb7932eee27bdb099ef2926f3e5e955e6c53509b5e2651be",
     "packages/git/node-addon/src/git/config.rs": "063357ef31bcf3abe4f73040f2ccb326ffc09ed60eaa57ac9ecb4c413e4b0b7f",
     "packages/git/node-addon/src/git/handover.rs": "8746ecbb13844722786507cdc20be16969cc4b27618d627c8932a0b9b3cdc803",
@@ -364,7 +364,7 @@
     "packages/git/node-addon/tests/yaml_parts.rs": "835efdf2a4183cd1197385f318bfb370db8804ae9f4e8e500548c75fd6a3462f",
     "packages/git/rust/src/driver.rs": "a3075f01a6e9796bd4a84844592efe034fc72d16da4b95c626f69c7b7c9533df",
     "packages/git/rust/src/grant.rs": "9702b8f72ada4502857b9ac9d151ea98d9d9a71773a2802278364476851d68d7",
-    "packages/git/rust/src/inspect.rs": "d900d81f350dabd1973c1f4265fa01f843bfe4e1605a0923068a5cf650aa066b",
+    "packages/git/rust/src/inspect.rs": "81dc675db38155ce19ce1dcd771450d2532c4070dd8e33e0847cfce899384410",
     "packages/git/rust/src/land.rs": "9205c084d08ef414a0122b8893b981bf9723d363ff1d4bddc3e293dc09f6ad1e",
     "packages/git/rust/src/lib.rs": "3f958615cdc9502755d1d47966ae3dfa4315d548149fa03e86f5daea79f056f3",
     "packages/git/rust/src/native_lock.rs": "080e481d7766c524df885fcf5c15ed5fbab6ad022378866685daa0a34b722da8",
@@ -1066,7 +1066,7 @@
     "src/verbs/events/context.mjs": "d987940a160671f4495c07b6bd7c93fe19033c6920c2bab558453a5a2a4a70a5",
     "src/verbs/events/export.mjs": "b1af8d42892ffcfccf6521e6cebec5f0507289b18be9c1283f1514f9f00ce3e2",
     "src/verbs/events/import-legacy.mjs": "47e540ea66e0a058a59aa04bfad4280ea60761473f6cf798e4ea4077ed126708",
-    "src/verbs/events/migrate.mjs": "4a5dd9de6fbea0f4b2637a630c7a6d6aade0b5e5912372c8405bf76893e100f6",
+    "src/verbs/events/migrate.mjs": "b8bb26c8ec4b0d7792eb0b2fbc46d40fcbdb5c526b7a9f764a526a4d9d1cae15",
     "src/verbs/events/parity.mjs": "6431bfc150b5876ec83bf6ff63023aeee9fe3c0b33d2e8ed54114b443e088ed7",
     "src/verbs/events/rebuild.mjs": "4e6f58a44c3546b7b30249e430c2bef861bd451dc14c0afe497c48508228d08d",
     "src/verbs/events/seal.mjs": "0651dbaca85800a74027dc30144d0d8e0f45378ea06e81eda25994be2c859474",
@@ -3310,8 +3310,8 @@
     },
     {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 159,
-      "spawn": "scanWorkspace -> src/verbs/events/migrate.mjs:115",
+      "line": 160,
+      "spawn": "scanWorkspace -> src/verbs/events/migrate.mjs:116",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     }
