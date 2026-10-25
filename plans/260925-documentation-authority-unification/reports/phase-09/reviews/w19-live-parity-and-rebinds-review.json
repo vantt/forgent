@@ -1,0 +1,363 @@
+{
+ "reviewedHead": "a808bc676",
+ "items": [
+  {
+   "id": "A-5a3f7580a",
+   "kind": "commit",
+   "verdict": "APPROVE",
+   "severity": "Low",
+   "summary": "Live heading census, live direct-block coverage and live pointer-patch drift are added next to the unchanged witness-pin checks. 12 heading rows were refreshed (4 source digests named in the brief, plus 4 block-ordinal shifts and 8 overlapping target refreshes); each keeps its full old row in accounting.previousParityRow. Parity grows 345 -> 346 with distribution.md#unheaded-block-17, and no row was dropped. final-pin-duties.json holds exactly bin/fgos.mjs and docs/backlog.md, and any unlisted drift fails. Low: a listed duty for a path that does not drift is accepted silently. Info: row 55 now lists the same target twice. Info: the trailing RUL104/foundation checks moved from the witness pin to live reads as a side effect.",
+   "evidence": [
+    "node carries/verify-carries.mjs with NODE_OPTIONS=\"--no-addons --require <dlopen-block>\": exit 0; 346 current rows, 91 live headings, 321 live section blocks, 1208 ledger successors, drift = exactly the 2 duty paths",
+    "diff 5a3f7580a^..5a3f7580a: source-parity 345->346, prefix byte-equal, only added row distribution.md#unheaded-block-17 -> packaging-distribution/spec.md#unheaded-block-98 (digest 45ccc798 on both sides); heading rows 91->91, changed indexes 54,55,63,66,77,82,85-90, each with previousParityRow byte-equal to the parent row",
+    "checker diff: +34/-3; witness-pin heading, coverage and patch loops are unchanged; live loops are additive",
+    "negative controls (read overlay, no checkout writes): drop backlog duty -> exit 1 \"unlisted live pointer-patch drift\"; drift on src/runner/dispatch/mechanism.mjs -> exit 1, all 3 paths named; duty with no patch -> exit 1; blank reason -> exit 1; drop distribution#setup heading row -> exit 1 \"live heading census\"; edit block-17 text -> exit 1 \"fresh current source\"; extra duty for non-drifting AGENTS.md -> exit 0 (stale duty accepted)",
+    "source-heading-parity.json[55].targets = two identical release-manifest.md#release-tree-canonicalization entries (the old -1 duplicate anchor no longer exists)"
+   ]
+  },
+  {
+   "id": "B-00",
+   "kind": "rebind",
+   "pointer": "/unitCarries/877",
+   "bindingSha256": "22f327c76a0b872ef63fc81c49944a3a74cb68f06845544dfcfa424ca7632bd6",
+   "targetUnitDigest": "b2e31d29c23e67a301f9f3ccec56f16299b7f68248be45832b1f92c2b4a67dd3",
+   "verdict": "APPROVE",
+   "summary": "Heading digest changed, but the heading text and ancestry are identical; the change is a section-payload effect of the new metadata fence below it. Same unit, same claim.",
+   "evidence": [
+    "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md#vendored-yaml-parser-maintenance; superseded vendored-yaml-parser-maintenance@7e4089e8cbea",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-01",
+   "kind": "rebind",
+   "pointer": "/unitCarries/878",
+   "bindingSha256": "df7df6221b40e7fe80cc137d13b4a42da7e1d12e64b660f77665b34a6c8712d1",
+   "targetUnitDigest": "c5c8e32a5e8d9e49ffbb6455615d99653681d4799adef2a4511a7943b3ec43e4",
+   "verdict": "APPROVE",
+   "summary": "Digest changed. The unit kept its Owner/Status lines (and Source for the vendored-parser file) and gained a 'Related links' line. Its old first line 'Document type: Historical decision pointer' moved verbatim into the new metadata fence (unheaded-block-1), so no carried text was lost. That fence block itself is not bound by any ledger row (Info).",
+   "evidence": [
+    "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md#unheaded-block-2; superseded unheaded-block-1@c61d833da20d",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-02",
+   "kind": "rebind",
+   "pointer": "/unitCarries/977",
+   "bindingSha256": "0eed7c800f16df83716de35df8a11ea70ea3cda899830de0a75b660611d0d226",
+   "targetUnitDigest": "8b13a3bd0514d32a4c742cf32f08220b50db158a624d8f5ed47136f34dd92d8f",
+   "verdict": "APPROVE",
+   "summary": "Heading digest changed, but the heading text and ancestry are identical; the change is a section-payload effect of the new metadata fence below it. Same unit, same claim.",
+   "evidence": [
+    "docs/platform/work-state/contracts/non-transitioning-records.md#non-transitioning-decision-and-outcome-records; superseded non-transitioning-decision-and-outcome-records@a18153ce3e95",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-03",
+   "kind": "rebind",
+   "pointer": "/unitCarries/978",
+   "bindingSha256": "98d2032a33b086c118a211ffc606273923f6574335cec0371051c969996409a4",
+   "targetUnitDigest": "700e03cb70029395a068aa3f7cdbc56d652a76018cc8ccb13e0c1f0f50883cb2",
+   "verdict": "APPROVE",
+   "summary": "Digest changed. The unit kept its Owner/Status lines (and Source for the vendored-parser file) and gained a 'Related links' line. Its old first line 'Document type: Contract' moved verbatim into the new metadata fence (unheaded-block-1), so no carried text was lost. That fence block itself is not bound by any ledger row (Info).",
+   "evidence": [
+    "docs/platform/work-state/contracts/non-transitioning-records.md#unheaded-block-2; superseded unheaded-block-1@e2643dbc4d7a",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-04",
+   "kind": "rebind",
+   "pointer": "/unitCarries/979",
+   "bindingSha256": "2e01b25659d00d2bec186ddfa7715e358a1338c582931e16931264e225744ed1",
+   "targetUnitDigest": "c91cff3604952f4bbc173116cffb123fe44c8d03e74a3684f25eaba000df8c99",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes.",
+   "evidence": [
+    "docs/platform/work-state/contracts/non-transitioning-records.md#unheaded-block-3; superseded unheaded-block-2@c91cff360495",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-05",
+   "kind": "rebind",
+   "pointer": "/unitCarries/981",
+   "bindingSha256": "c0a240d31a58683dcddbc9a23d47263f8839d1e3143edacba336fa75b2aeb26e",
+   "targetUnitDigest": "2036267728ec19e4c861fb80c37a21024deb862018786e34c723b685d1cf9000",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes. The source unit docs/specs/work-state.md#unheaded-block-5 (live digest 2036267728ec) is byte-equal to the target unit, so the claim is carried verbatim.",
+   "evidence": [
+    "docs/platform/work-state/contracts/non-transitioning-records.md#unheaded-block-4; superseded unheaded-block-3@2036267728ec",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ],
+   "claimId": "claim_a9bc0a5c1e4d634958dce841f0e8c44e"
+  },
+  {
+   "id": "B-06",
+   "kind": "rebind",
+   "pointer": "/unitCarries/982",
+   "bindingSha256": "3d580c614044a15f0babf08a27cb6cc89795777da96b3bd8a5e3ec3a9b3f0eca",
+   "targetUnitDigest": "ff1feada8730be0c2c0f9dfa7c5be3927cf2faad6056cceb6f9a5cc57102d942",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes. The source unit docs/specs/work-state.md#unheaded-block-6 (live digest ff1feada8730) is byte-equal to the target unit, so the claim is carried verbatim.",
+   "evidence": [
+    "docs/platform/work-state/contracts/non-transitioning-records.md#unheaded-block-5; superseded unheaded-block-4@ff1feada8730",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ],
+   "claimId": "claim_ef20fa89f544c95d36bedd6842407afc"
+  },
+  {
+   "id": "B-07",
+   "kind": "rebind",
+   "pointer": "/unitCarries/983",
+   "bindingSha256": "30d7e0e8faed437398898d0c4a4c6f51d53fe5ff53e81ad55f6cda9646a66455",
+   "targetUnitDigest": "cf725e032c48a71007b0fafa2a0378dd2919d5cf50358de2a7d34a2835940aae",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes. The source unit docs/specs/work-state.md#unheaded-block-7 (live digest cf725e032c48) is byte-equal to the target unit, so the claim is carried verbatim.",
+   "evidence": [
+    "docs/platform/work-state/contracts/non-transitioning-records.md#unheaded-block-6; superseded unheaded-block-5@cf725e032c48",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ],
+   "claimId": "claim_5eb3738c1994942ff2c0127bd0c5144a"
+  },
+  {
+   "id": "B-08",
+   "kind": "rebind",
+   "pointer": "/unitCarries/985",
+   "bindingSha256": "44f002b3955c9155d6c650f707aed12f9cfb12749a35ced78670872ab3d82145",
+   "targetUnitDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes. The source unit docs/specs/work-state.md#unheaded-block-86 (live digest 8e520755293c) is byte-equal to the target unit, so the claim is carried verbatim.",
+   "evidence": [
+    "docs/platform/work-state/contracts/non-transitioning-records.md#unheaded-block-7; superseded unheaded-block-6@8e520755293c",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ],
+   "claimId": "claim_b96048ae94d1c4ef2735793bd5243751"
+  },
+  {
+   "id": "B-09",
+   "kind": "rebind",
+   "pointer": "/unitCarries/987",
+   "bindingSha256": "0f70ba518b4cfaa3612efd80d4ea664cfdb7a7d49e1ef7c6eac96d0d4736f794",
+   "targetUnitDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes. The source unit docs/specs/work-state.md#unheaded-block-89 (live digest def08282f651) is byte-equal to the target unit, so the claim is carried verbatim.",
+   "evidence": [
+    "docs/platform/work-state/contracts/non-transitioning-records.md#unheaded-block-8; superseded unheaded-block-7@def08282f651",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ],
+   "claimId": "claim_80498f2c23623a2165e2fe2bf39af2d8"
+  },
+  {
+   "id": "B-10",
+   "kind": "rebind",
+   "pointer": "/unitCarries/988",
+   "bindingSha256": "970f0e204b14ff8064a5fe0d938e5de6a338dd36c41e0a9d1dc6382c26f14257",
+   "targetUnitDigest": "7a8774626c9683ebdc4fdd48b8516e748a2881ddbe5837941e9480eda9c820b3",
+   "verdict": "APPROVE",
+   "summary": "Heading digest changed, but the heading text and ancestry are identical; the change is a section-payload effect of the new metadata fence below it. Same unit, same claim.",
+   "evidence": [
+    "docs/platform/runner/contracts/conserved-dispatch-doctrine.md#conserved-dispatch-and-session-contracts; superseded conserved-dispatch-and-session-contracts@2937f744e8aa",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-11",
+   "kind": "rebind",
+   "pointer": "/unitCarries/989",
+   "bindingSha256": "405aca59d13ad84af9bc676b5b44033ead8e33a373589b24e1d6389025757791",
+   "targetUnitDigest": "cca6d29f1fff9eed188497377555ddb93238208b5e296c2e960eaaee38c1e65d",
+   "verdict": "APPROVE",
+   "summary": "Digest changed. The unit kept its Owner/Status lines (and Source for the vendored-parser file) and gained a 'Related links' line. Its old first line 'Document type: Contract' moved verbatim into the new metadata fence (unheaded-block-1), so no carried text was lost. That fence block itself is not bound by any ledger row (Info).",
+   "evidence": [
+    "docs/platform/runner/contracts/conserved-dispatch-doctrine.md#unheaded-block-2; superseded unheaded-block-1@2ac8c848f187",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-12",
+   "kind": "rebind",
+   "pointer": "/unitCarries/991",
+   "bindingSha256": "3cad6476e6fd6b3ec35b825247050fa3317863b7eed0f65338199cb242be7db5",
+   "targetUnitDigest": "cd083fe29bad64021e91c9ce38fd1405152d62cc18eb6573de3a98b67aef123a",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes.",
+   "evidence": [
+    "docs/platform/runner/contracts/conserved-dispatch-doctrine.md#unheaded-block-3; superseded unheaded-block-2@cd083fe29bad",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-13",
+   "kind": "rebind",
+   "pointer": "/unitCarries/993",
+   "bindingSha256": "225a3b06fdb91b906ac51c922f255eda0c5219918d052699d83fc753ba08744f",
+   "targetUnitDigest": "e1eb1987bf7b58fd47e0f9300cda902b245083a9020b3ed408d2460a42f42b19",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes.",
+   "evidence": [
+    "docs/platform/runner/contracts/conserved-dispatch-doctrine.md#unheaded-block-4; superseded unheaded-block-3@e1eb1987bf7b",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-14",
+   "kind": "rebind",
+   "pointer": "/unitCarries/994",
+   "bindingSha256": "a136a5069509ffd2e4932ad430ec96e144f0e73c37102627ef60b6e66844b961",
+   "targetUnitDigest": "f2b05b1f2f5ea97aab3dca336e5d3ffc624e2ede47f1ed0a6d2aa8fc39ca0c81",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes.",
+   "evidence": [
+    "docs/platform/runner/contracts/conserved-dispatch-doctrine.md#unheaded-block-5; superseded unheaded-block-4@f2b05b1f2f5e",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-15",
+   "kind": "rebind",
+   "pointer": "/unitCarries/996",
+   "bindingSha256": "cc6cd8a1ce28e11a26555e0d9d670a0164e1e5656e2087500012584eedab0bab",
+   "targetUnitDigest": "1e41299557a4659c966db84a70c60681359f8daa2d31ac30e47516b08d729977",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes.",
+   "evidence": [
+    "docs/platform/runner/contracts/conserved-dispatch-doctrine.md#unheaded-block-6; superseded unheaded-block-5@1e41299557a4",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-16",
+   "kind": "rebind",
+   "pointer": "/unitCarries/997",
+   "bindingSha256": "6d7c96dc4f8147cf64720867f5772b408e475a47a0ea1fe08568728291fe1a7c",
+   "targetUnitDigest": "f95837610cf2b87c9bb61f9ec1541161e1cf099247704ea5f48fe8c04dce199d",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes.",
+   "evidence": [
+    "docs/platform/runner/contracts/conserved-dispatch-doctrine.md#unheaded-block-7; superseded unheaded-block-6@f95837610cf2",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-17",
+   "kind": "rebind",
+   "pointer": "/unitCarries/998",
+   "bindingSha256": "d50a7778032822abcffdbf066e309b8e8a48d3b80c3474acde7f30571648a15a",
+   "targetUnitDigest": "3125540fb867e93d8341f8f66c5d236e5eac658a5f3bf3a61219151712008a3a",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes.",
+   "evidence": [
+    "docs/platform/runner/contracts/conserved-dispatch-doctrine.md#unheaded-block-8; superseded unheaded-block-7@3125540fb867",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-18",
+   "kind": "rebind",
+   "pointer": "/unitCarries/1000",
+   "bindingSha256": "c3b6a26e76c40d055795ab26312b6cb73af497dde8dc1d4ca3a2feae790067ec",
+   "targetUnitDigest": "917149c12d7ccc0fbd59bd8fd7dc6b9b1d509f79521789a2cdebafb1474c7b0d",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes.",
+   "evidence": [
+    "docs/platform/runner/contracts/conserved-dispatch-doctrine.md#unheaded-block-9; superseded unheaded-block-8@917149c12d7c",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-19",
+   "kind": "rebind",
+   "pointer": "/unitCarries/1001",
+   "bindingSha256": "501c31c254cf759500216b517ab3dace68177b20ee6321584aa66d487b2957e3",
+   "targetUnitDigest": "b0d35bd4967d4fc3aff19a546ad74616d9398640e7af86927f2a6b55d11b10f8",
+   "verdict": "APPROVE",
+   "summary": "Heading digest changed, but the heading text and ancestry are identical; the change is a section-payload effect of the new metadata fence below it. Same unit, same claim.",
+   "evidence": [
+    "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md#gateway-readiness-contracts; superseded gateway-readiness-contracts@b9b3e484070f",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-20",
+   "kind": "rebind",
+   "pointer": "/unitCarries/1002",
+   "bindingSha256": "9299540e640a78444530c4b792dc8471f848e16387f7721ddee5fbaa59a8e358",
+   "targetUnitDigest": "8a285a1e0bebe84289e83f52d7b23cc083c555a9535034212c1ef2f621107cc9",
+   "verdict": "APPROVE",
+   "summary": "Digest changed. The unit kept its Owner/Status lines (and Source for the vendored-parser file) and gained a 'Related links' line. Its old first line 'Document type: Contract' moved verbatim into the new metadata fence (unheaded-block-1), so no carried text was lost. That fence block itself is not bound by any ledger row (Info).",
+   "evidence": [
+    "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md#unheaded-block-2; superseded unheaded-block-1@272e62ab8ae7",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-21",
+   "kind": "rebind",
+   "pointer": "/unitCarries/1004",
+   "bindingSha256": "41be588eedba23317bb659757d74276536e27891d810c977335aaf9657cc447f",
+   "targetUnitDigest": "dd1876bae7e9c18d49a4dcc61252129cd8e382c8956c73a6b7c26be0a0c98a5c",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes.",
+   "evidence": [
+    "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md#unheaded-block-3; superseded unheaded-block-2@dd1876bae7e9",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-22",
+   "kind": "rebind",
+   "pointer": "/unitCarries/1005",
+   "bindingSha256": "5dd3094ac9fe68e344281618bfc29711c53c1c1d32f755844fbda941c33b9b59",
+   "targetUnitDigest": "27bd0d1d7bd193d8e07443d1387cb677b14fe694dc4fadd28d42f6a07dee4ea8",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes.",
+   "evidence": [
+    "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md#unheaded-block-4; superseded unheaded-block-3@27bd0d1d7bd1",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-23",
+   "kind": "rebind",
+   "pointer": "/unitCarries/1006",
+   "bindingSha256": "2e2ce4d6922b6b539969509ca34e80b919a43f404f76da90a07f6d2aadc76708",
+   "targetUnitDigest": "891032424c968d3a03f35d4a9ee12004f71ae32b11f7c1df9bead4856d8c47da",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes.",
+   "evidence": [
+    "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md#unheaded-block-5; superseded unheaded-block-4@891032424c96",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "B-24",
+   "kind": "rebind",
+   "pointer": "/unitCarries/1008",
+   "bindingSha256": "d5da5721adae71dc711f6128c3135d6f54d66cb284aa3afffaf6fb91950bc370",
+   "targetUnitDigest": "d9a285554f632bb1921a4fc1cd96a8448846c76a945b1ff3ee1ae65501ea162f",
+   "verdict": "APPROVE",
+   "summary": "Ordinal-only move (new metadata fence inserted above). The text is byte-identical, and the ancestry and placement neighbours match current bytes.",
+   "evidence": [
+    "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md#unheaded-block-6; superseded unheaded-block-5@d9a285554f63",
+    "unique current unit via rebind.py extract; bindingSha256 recomputed with ledgerfix/bindings.digest: match; placement content and prev/next neighbours match current bytes"
+   ]
+  },
+  {
+   "id": "C-25e8842d3",
+   "kind": "commit",
+   "verdict": "APPROVE",
+   "severity": "Low",
+   "summary": "At 25e8842d3 the receipt counts match misc-fix/checks.json exactly: 2,574/1,416/959/137/2/162/163, total 5,413, confirmations 3,990, parks 1,260, open 1,423. The 57 example/placeholder rows (55 explicit-path-placeholder + 2 example framing) and the 51 park->confirmed rows match preserve-premise/proof.json and sentence-delta.json. The marker-free sentence is gone, and L13-9 records the acceptance. Low, from later commits: at HEAD the newer 'Current G6 fixes' table (2,926/1,394/623/.../repoint 6) matches HEAD checks.json, but the older sentence-scope section below it still says 'the tables above are superseded' and 'this section supersedes'.",
+   "evidence": [
+    "git show 25e8842d3:misc-fix/checks.json counts.byResult",
+    "git show HEAD:misc-fix/checks.json counts.byResult (adds repoint-proposal 6)",
+    "preserve-premise/proof.json evidence kinds at 25e8842d3: explicit-path-placeholder 55, explicit-external-or-example-framing 2",
+    "sentence-delta.json: 53 rows, 51 park-unconfirmed -> confirmed",
+    "receipt.md lines 133-152 vs 291-307"
+   ]
+  }
+ ]
+}
