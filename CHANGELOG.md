@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A group-writable `.git/fgos` (for example made by `mkdir -p` under umask 002) is now refused as `git-wal-path-unsafe`, with the path, its mode and the fix (`chmod go-w <path>`), instead of the misleading `repository-identity-changed`.
+- `fgos events sync` no longer fails with `wal-record-too-large` once the remote holds more than about 290 machine refs: the fetch now records the mirrors in several WAL operations.
 - `fgos identity resolve` and `fgos identity list` now see the agent sessions of other machines working on the same project: after one `fgos events sync` on each machine, `resolve lead:<LANE>`, a handle or a full id answers with `liveness: remote`, the machine, `fetchedAt` and the key `pin`; `list --machine <handle|id>` keeps one machine's sessions. Entries are signed with each machine's key and dropped when the signature does not hold; `fgos doctor` has a new row `identity-shared-directory`.
 - Moving a clone's directory (`mv`) no longer locks its Event Store with `event-store-store-moved`: the store keeps its id while the machine id and the Git common directory's device and inode are unchanged. A copied clone and a changed `fgos.machineId` are still refused, now each with its own message and next step.
 - `fgos events import-legacy --file <shard> [--check]` replays a legacy event file that a machine wrote but never committed before its Event Store cutover. Each event keeps its type, payload and original time; lines already in history are skipped and named, and a receipt next to the file prevents a second import.

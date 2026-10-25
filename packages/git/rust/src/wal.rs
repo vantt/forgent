@@ -20,7 +20,13 @@ pub enum WalError {
     /// before the operation directory or any record exists, so nothing was
     /// recorded.
     RecordTooLarge,
+    /// The repository behind the WAL is not the one the operation was
+    /// recorded against.
     Untrusted,
+    /// A WAL directory or record has an owner or mode other users could
+    /// write through, or the repository path is not canonical. The text
+    /// names the path, the reason and the next step.
+    UnsafePath(String),
     OperationIdConflict,
     PublicationBorrowUnavailable,
     Busy,
@@ -41,6 +47,7 @@ impl WalError {
             Self::Corrupt(_) => "git-wal-corrupt",
             Self::RecordTooLarge => "wal-record-too-large",
             Self::Untrusted => "repository-identity-changed",
+            Self::UnsafePath(_) => "git-wal-path-unsafe",
             Self::OperationIdConflict => "operation-id-conflict",
             Self::PublicationBorrowUnavailable => "publication-borrow-unavailable",
             Self::Busy => "busy",
@@ -52,7 +59,7 @@ impl WalError {
     pub(crate) fn diagnostic(&self) -> Option<String> {
         match self {
             Self::Io(e) => Some(e.to_string()),
-            Self::Corrupt(text) => Some(text.clone()),
+            Self::Corrupt(text) | Self::UnsafePath(text) => Some(text.clone()),
             _ => None,
         }
     }
@@ -66,6 +73,38 @@ impl std::fmt::Display for WalError {
 impl std::error::Error for WalError {}
 fn corrupt(s: &str) -> WalError {
     WalError::Corrupt(s.into())
+}
+/// Names an unsafe owner or mode with the path a person can act on: WAL
+/// paths are opened through `/proc/self/fd`, so the descriptor prefix is
+/// resolved back to the directory it holds.
+#[cfg(unix)]
+fn unsafe_path(path: &Path, uid: u32, mode: u32, root_allowed: bool) -> WalError {
+    let shown = path
+        .strip_prefix("/proc/self/fd")
+        .ok()
+        .and_then(|rest| {
+            let mut parts = rest.components();
+            let fd = Path::new("/proc/self/fd").join(parts.next()?);
+            Some(fs::read_link(fd).ok()?.join(parts.as_path()))
+        })
+        .unwrap_or_else(|| path.to_path_buf());
+    let shown = shown.display();
+    let euid = unsafe { libc::geteuid() };
+    WalError::UnsafePath(if uid != euid && !(root_allowed && uid == 0) {
+        format!("{shown} is owned by uid {uid}, not by uid {euid} running fgos; chown it to that user")
+    } else {
+        format!(
+            "{shown} has mode {:04o}, writable by group or others; run: chmod go-w {shown}",
+            mode & 0o7777
+        )
+    })
+}
+fn non_canonical(path: &Path, canonical: &Path) -> WalError {
+    WalError::UnsafePath(format!(
+        "{} is not canonical (it resolves to {}); open the repository by its real path",
+        path.display(),
+        canonical.display()
+    ))
 }
 
 /// An injected filesystem checkpoint is called after each acknowledged WAL
@@ -1078,7 +1117,7 @@ impl Directory {
             if (m.uid() != unsafe { libc::geteuid() } && !(common && m.uid() == 0))
                 || m.mode() & if common { 0o002 } else { 0o022 } != 0
             {
-                return Err(WalError::Untrusted);
+                return Err(unsafe_path(path, m.uid(), m.mode(), common));
             }
             Ok(Self { file })
         }
@@ -1211,7 +1250,7 @@ impl<F: FileSystem> Wal<F> {
     pub fn with_filesystem(common: &Path, fsys: F) -> WalResult<Self> {
         let canonical = common.canonicalize()?;
         if canonical != common {
-            return Err(WalError::Untrusted);
+            return Err(non_canonical(common, &canonical));
         }
         let common = Directory::open_trusted(common, true)?;
         let identity = repository_identity(&common)?;
@@ -1230,8 +1269,9 @@ impl<F: FileSystem> Wal<F> {
     /// C5/doctor reader: opens existing descriptors without mkdir or fsync.
     /// NotFound means the WAL has never been initialized, not a corrupt chain.
     pub fn open_existing(common_path: &Path, fsys: F) -> WalResult<Self> {
-        if common_path.canonicalize()? != common_path {
-            return Err(WalError::Untrusted);
+        let canonical = common_path.canonicalize()?;
+        if canonical != common_path {
+            return Err(non_canonical(common_path, &canonical));
         }
         let common = Directory::open_trusted(common_path, true)?;
         let identity = repository_identity(&common)?;
@@ -1759,6 +1799,15 @@ fn repository_identity(dir: &Directory) -> WalResult<String> {
         Err(WalError::Unsupported)
     }
 }
+/// Whether `intent` fits one record under `id`, measured exactly as `begin`
+/// measures it, so a caller can split work before any record exists.
+pub fn intent_fits(id: &str, intent: &Intent) -> WalResult<bool> {
+    match check_record_bound(&make_record(id, 0, None, Phase::Intent(intent.clone()))?) {
+        Ok(()) => Ok(true),
+        Err(WalError::RecordTooLarge) => Ok(false),
+        Err(e) => Err(e),
+    }
+}
 fn check_record_bound(r: &Record) -> WalResult<()> {
     let bytes = serde_json::to_vec(r).map_err(|_| corrupt("serialize"))?;
     if bytes.len() as u64 > MAX_RECORD {
@@ -1800,7 +1849,7 @@ fn read_json<T: for<'de> Deserialize<'de>>(path: &Path, limit: u64) -> WalResult
         use std::os::unix::fs::MetadataExt;
         let m = file.metadata()?;
         if m.uid() != unsafe { libc::geteuid() } || m.mode() & 0o022 != 0 {
-            return Err(WalError::Untrusted);
+            return Err(unsafe_path(path, m.uid(), m.mode(), false));
         }
     }
     if !file.metadata()?.is_file() || file.metadata()?.len() > limit {
@@ -2806,8 +2855,15 @@ mod tests {
         use std::os::unix::fs::{symlink, PermissionsExt};
         let t = Temp::new();
         fs::create_dir(t.0.join("fgos")).unwrap();
-        fs::set_permissions(t.0.join("fgos"), fs::Permissions::from_mode(0o777)).unwrap();
-        assert!(Wal::with_filesystem(&t.0, OsFileSystem).is_err());
+        fs::set_permissions(t.0.join("fgos"), fs::Permissions::from_mode(0o775)).unwrap();
+        let fgos = t.0.join("fgos").display().to_string();
+        match Wal::with_filesystem(&t.0, OsFileSystem) {
+            Err(e @ WalError::UnsafePath(_)) => assert_eq!(
+                e.to_string(),
+                format!("git-wal-path-unsafe: {fgos} has mode 0775, writable by group or others; run: chmod go-w {fgos}")
+            ),
+            other => panic!("a group-writable fgos directory is refused by name: {:?}", other.err()),
+        }
         fs::remove_dir(t.0.join("fgos")).unwrap();
         let other = Temp::new();
         symlink(&other.0, t.0.join("fgos")).unwrap();
