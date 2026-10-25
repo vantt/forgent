@@ -249,69 +249,6 @@ const SEAT_BINDING_CAPABILITY_KEYS = Object.freeze(['tier', 'maxTier', 'roles', 
 const SEAT_BINDING_SCHEMA_VERSION = 1;
 
 /**
- * D1's baked-in default runner payload — mirrors this repo's own tracked
- * `.fgos/config.json`'s `runner` section verbatim, so the auto-generated
- * default is provably identical to what already works in this repo's own
- * dogfood loop.
- */
-const DEFAULT_COORDINATION_ORG_DISCHARGE_ON = Object.freeze(["accepted"]);
-
-export const DEFAULT_RUNNER_CONFIG = {
-  coordination: { orgPolicy: { dischargeOn: [...DEFAULT_COORDINATION_ORG_DISCHARGE_ON] } },
-  executor: {
-    command: 'claude',
-    args: [
-      '-p',
-      '{prompt}',
-      '--model',
-      '{model}',
-      '--permission-mode',
-      'acceptEdits',
-    ],
-  },
-  // tsk-5tm-5 D9: modelPolicies replaces the old flat `models` map --
-  // provider-keyed, each provider's own 6-tier vocab (MODEL_POLICY_TIERS
-  // below). Default here stays Claude-only (matching the default
-  // `executor.command: 'claude'` above); a project adds its own
-  // `modelPolicies.<providerModel>` block when it configures a
-  // non-Claude executor (this repo's own committed config does, for
-  // `agy`/gemini). `advanced`/`flagship` default to `sonnet` (no real
-  // consumer differentiates them from `standard` yet); `frontier`
-  // defaults to `opus`, matching `heavy`'s pre-D9 model unchanged.
-  modelPolicies: {
-    claude: {
-      nano: 'haiku',
-      standard: 'sonnet',
-      advanced: 'sonnet',
-      flagship: 'sonnet',
-      frontier: 'opus',
-    },
-  },
-  timeoutMs: 900000,
-  confinement: {
-    strict: false,
-  },
-  parallel: {
-    maxRoots: 4,
-    maxLeavesPerRoot: 4,
-  },
-  patterns: {
-    defaultRule: { mutatingMinRigor: 'standard' },
-    reviewed: {
-      maxRounds: 2,
-      checkersByRigor: {
-        standard: ['reviewer'],
-        high: ['reviewer', 'red-team'],
-        critical: ['reviewer', 'red-team', 'tester'],
-      },
-    },
-  },
-  // Generated trees a unit's write scope widens to when it touches their source:
-  // [{ from: '<source scope entry>', also: ['<render target entry>', ...] }].
-  generatedPaths: [],
-};
-
-/**
  * Shape-check one executor block ({command, args[], adapter?}) — shared by
  * the required global `cfg.executor` and every `executors.<executorId>`
  * entry naming its own `command`/`args` (P41/C9 v2). An `adapter` field,
