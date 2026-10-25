@@ -1,0 +1,2814 @@
+{
+  "head": "95432dbd807991c76a8cef383c50674da9f0e2e7",
+  "outputHashRecipe": "Each audits[].outputSha256 hashes the complete parsed census reencoded with Python json.dumps(ensure_ascii=False, indent=2) plus LF, before reducing repetitive collision prose. It is not a claim of byte equality with Node JSON serialization. Relevant raw drift bindings and command exits are retained here; source rows remain readable at the recorded HEAD.",
+  "commands": [
+    {
+      "argv": [
+        "node",
+        "--require",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/baseline.cjs",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-baseline/ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-baseline"
+      ],
+      "exit": 0,
+      "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 0 }\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "node",
+        "--require",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/baseline.cjs",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-baseline/audit-ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-baseline"
+      ],
+      "exit": 0,
+      "stdout": "{\n  collisions: 272,\n  newGapGroups: 31,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "node",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-live/ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-live"
+      ],
+      "exit": 0,
+      "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 23 }\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "node",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-live/audit-ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-live"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(current.noNewDoubleOwnership)\n\n    at file:///tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-live/audit-ownership.mjs:8:56 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n"
+    },
+    {
+      "argv": [
+        "node",
+        "--require",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/baseline.cjs",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-baseline/ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-baseline"
+      ],
+      "exit": 0,
+      "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 0 }\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "node",
+        "--require",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/baseline.cjs",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-baseline/audit-ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-baseline"
+      ],
+      "exit": 0,
+      "stdout": "{\n  collisions: 272,\n  newGapGroups: 31,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "node",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-live/ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-live"
+      ],
+      "exit": 0,
+      "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 23 }\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "node",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-live/audit-ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-live"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(current.noNewDoubleOwnership)\n\n    at file:///tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-live/audit-ownership.mjs:8:56 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n"
+    }
+  ],
+  "audits": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "mode": "baseline",
+      "scriptHashes": {
+        "step10-sync287-lib.mjs": "083795c90eac1d5601fedc2261390f15668fceed68a3053777960fea9a927dc3",
+        "ownership.mjs": "c4f7db24eadbc42290bce2ad5f716b431c77e94f4e222699580a5ea386c29650",
+        "audit-ownership.mjs": "f5b98873beb44b5a40b45441c6ec2da9d5d8896d025b10df7d0f545afe0101c3"
+      },
+      "commands": [
+        {
+          "argv": [
+            "node",
+            "--require",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/baseline.cjs",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-baseline/ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-baseline"
+          ],
+          "exit": 0,
+          "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 0 }\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "node",
+            "--require",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/baseline.cjs",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-baseline/audit-ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-baseline"
+          ],
+          "exit": 0,
+          "stdout": "{\n  collisions: 272,\n  newGapGroups: 31,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+          "stderr": ""
+        }
+      ],
+      "output": {
+        "manualRows": 9711,
+        "activeMultipleSourceCarriages": 205,
+        "noNewDoubleOwnership": true,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": [],
+        "collisionsCount": 272,
+        "targetDigestDrift": [],
+        "sameActiveSourceCollisionsCount": 203
+      },
+      "outputSha256": "c6feb751fcaa8a9a03c4e15c85a1439f99cd87c9a54ecac9b981af8c27c9f37b"
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "mode": "live",
+      "scriptHashes": {
+        "step10-sync287-lib.mjs": "083795c90eac1d5601fedc2261390f15668fceed68a3053777960fea9a927dc3",
+        "ownership.mjs": "c4f7db24eadbc42290bce2ad5f716b431c77e94f4e222699580a5ea386c29650",
+        "audit-ownership.mjs": "f5b98873beb44b5a40b45441c6ec2da9d5d8896d025b10df7d0f545afe0101c3"
+      },
+      "commands": [
+        {
+          "argv": [
+            "node",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-live/ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-live"
+          ],
+          "exit": 0,
+          "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 23 }\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "node",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-live/audit-ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-live"
+          ],
+          "exit": 1,
+          "stdout": "",
+          "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(current.noNewDoubleOwnership)\n\n    at file:///tmp/fgos-work/ownership-drift-6wuh86e8/step10-round5-live/audit-ownership.mjs:8:56 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n"
+        }
+      ],
+      "output": {
+        "manualRows": 9711,
+        "activeMultipleSourceCarriages": 205,
+        "noNewDoubleOwnership": false,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": [],
+        "collisionsCount": 272,
+        "targetDigestDrift": [
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims",
+            "claimId": "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "3-work-item-data-dictionary",
+            "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims",
+            "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "unheaded-block-4",
+            "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims",
+            "claimId": "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "6-domain-model",
+            "targetUnitDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims",
+            "claimId": "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "unheaded-block-54",
+            "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+            "collection": "claims",
+            "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "11-business-rules",
+            "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "collection": "claims",
+            "claimId": "claim_96e947d6daf7dd7612cc711be8e3e22e",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "9-hexagonal-architecture-view",
+            "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "collection": "claims",
+            "claimId": "claim_4e86e8414c4e3b780e81f77255853447",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "unheaded-block-70",
+            "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_69311391fbb9b1cf924197e6063e5cad",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_cad110bd532badff055f69c0a236644a",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_33c41de79cf4a52288035a9656c09735",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          }
+        ],
+        "sameActiveSourceCollisionsCount": 203
+      },
+      "outputSha256": "b0cc77388531ee4ebe749fe74317a2e19c78b06eb9ef2249ce2e2555f48353d9"
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "mode": "baseline",
+      "scriptHashes": {
+        "lib.mjs": "48e153938d145bd41986b47ba816d4506db1a90c664170ee08e17bc60341ba41",
+        "ownership.mjs": "0b40b9aaba28caa1904091b4e098056ecce41b70821623b9c3146592ddea5f97",
+        "audit-ownership.mjs": "784b0f6a3b7fe6f71f776fbb20dffc7976682bddc6812b5f0ac694780ab83e81"
+      },
+      "commands": [
+        {
+          "argv": [
+            "node",
+            "--require",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/baseline.cjs",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-baseline/ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-baseline"
+          ],
+          "exit": 0,
+          "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 0 }\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "node",
+            "--require",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/baseline.cjs",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-baseline/audit-ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-baseline"
+          ],
+          "exit": 0,
+          "stdout": "{\n  collisions: 272,\n  newGapGroups: 31,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+          "stderr": ""
+        }
+      ],
+      "output": {
+        "manualRows": 9711,
+        "activeMultipleSourceCarriages": 205,
+        "noNewDoubleOwnership": true,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": [],
+        "collisionsCount": 272,
+        "targetDigestDrift": [],
+        "sameActiveSourceCollisionsCount": 203
+      },
+      "outputSha256": "c6feb751fcaa8a9a03c4e15c85a1439f99cd87c9a54ecac9b981af8c27c9f37b"
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "mode": "live",
+      "scriptHashes": {
+        "lib.mjs": "48e153938d145bd41986b47ba816d4506db1a90c664170ee08e17bc60341ba41",
+        "ownership.mjs": "0b40b9aaba28caa1904091b4e098056ecce41b70821623b9c3146592ddea5f97",
+        "audit-ownership.mjs": "784b0f6a3b7fe6f71f776fbb20dffc7976682bddc6812b5f0ac694780ab83e81"
+      },
+      "commands": [
+        {
+          "argv": [
+            "node",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-live/ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-live"
+          ],
+          "exit": 0,
+          "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 23 }\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "node",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-live/audit-ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-live"
+          ],
+          "exit": 1,
+          "stdout": "",
+          "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(current.noNewDoubleOwnership)\n\n    at file:///tmp/fgos-work/ownership-drift-6wuh86e8/step10-sync4d-live/audit-ownership.mjs:8:56 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n"
+        }
+      ],
+      "output": {
+        "manualRows": 9711,
+        "activeMultipleSourceCarriages": 205,
+        "noNewDoubleOwnership": false,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": [],
+        "collisionsCount": 272,
+        "targetDigestDrift": [
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims",
+            "claimId": "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "3-work-item-data-dictionary",
+            "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims",
+            "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "unheaded-block-4",
+            "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims",
+            "claimId": "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "6-domain-model",
+            "targetUnitDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims",
+            "claimId": "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "unheaded-block-54",
+            "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+            "collection": "claims",
+            "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "11-business-rules",
+            "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "collection": "claims",
+            "claimId": "claim_96e947d6daf7dd7612cc711be8e3e22e",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "9-hexagonal-architecture-view",
+            "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "collection": "claims",
+            "claimId": "claim_4e86e8414c4e3b780e81f77255853447",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "unheaded-block-70",
+            "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_69311391fbb9b1cf924197e6063e5cad",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_cad110bd532badff055f69c0a236644a",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_33c41de79cf4a52288035a9656c09735",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps",
+            "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+          }
+        ],
+        "sameActiveSourceCollisionsCount": 203
+      },
+      "outputSha256": "b0cc77388531ee4ebe749fe74317a2e19c78b06eb9ef2249ce2e2555f48353d9"
+    }
+  ],
+  "rows": [
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/0",
+      "claimId": "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "3-work-item-data-dictionary",
+      "oldDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+      "newDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+      "causeCommit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "3-work-item-data-dictionary",
+        "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c"
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "3-work-item-data-dictionary",
+        "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c"
+      },
+      "currentMatches": [],
+      "liveUnitDigests": [
+        "38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b"
+      ],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/49",
+      "effectiveTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "3-work-item-data-dictionary",
+        "targetUnitDigest": "38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b"
+      },
+      "kind": "stale-direct-origin-with-authenticated-successor",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/149",
+      "reason": "Data Dictionary links retargeted at lines 74 and 83: Khai việc -> #add-verb and Nộp vấn đề tự do -> #submit-verb; heading digest includes the changed section payload.",
+      "targetBeforeDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+      "targetAfterDigest": "38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b",
+      "witnessRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/0",
+      "dualExtractorCommitWitnessesMatch": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/1",
+      "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-4",
+      "oldDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
+      "newDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
+      "causeCommit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53"
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53"
+      },
+      "currentMatches": [],
+      "liveUnitDigests": [
+        "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817"
+      ],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/50",
+      "effectiveTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817"
+      },
+      "kind": "stale-direct-origin-with-authenticated-successor",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/150",
+      "reason": "Data Dictionary body contains both link retargets at lines 74 and 83: workflowStep now links to #add-verb; domain now links to #add-verb/#submit-verb.",
+      "targetBeforeDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
+      "targetAfterDigest": "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817",
+      "witnessRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/1",
+      "dualExtractorCommitWitnessesMatch": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/55",
+      "claimId": "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "6-domain-model",
+      "oldDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
+      "newDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
+      "causeCommit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "6-domain-model",
+        "targetUnitDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77"
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "6-domain-model",
+        "targetUnitDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77"
+      },
+      "currentMatches": [],
+      "liveUnitDigests": [
+        "6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603"
+      ],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/127",
+      "effectiveTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "6-domain-model",
+        "targetUnitDigest": "6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603"
+      },
+      "kind": "stale-direct-origin-with-authenticated-successor",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/151",
+      "reason": "Domain Model link retarget at line 516: Khai việc/Nộp vấn đề tự do -> #add-verb/#submit-verb; heading digest includes the changed section payload.",
+      "targetBeforeDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
+      "targetAfterDigest": "6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603",
+      "witnessRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/11",
+      "dualExtractorCommitWitnessesMatch": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/65",
+      "claimId": "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-54",
+      "oldDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+      "newDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+      "causeCommit": "e88d4e283c8161f9bf649447e8f9c5876931107b",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-54",
+        "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0"
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-54",
+        "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0"
+      },
+      "currentMatches": [],
+      "liveUnitDigests": [
+        "c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7"
+      ],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/128",
+      "effectiveTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-54",
+        "targetUnitDigest": "c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7"
+      },
+      "kind": "stale-direct-origin-with-authenticated-successor",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/152",
+      "reason": "Domain Model body link retarget at line 516: Khai việc/Nộp vấn đề tự do -> #add-verb/#submit-verb.",
+      "targetBeforeDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+      "targetAfterDigest": "c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7",
+      "witnessRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/last-rows-rebindings.json#/rebindings/12",
+      "dualExtractorCommitWitnessesMatch": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/7",
+      "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "11-business-rules",
+      "oldDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc",
+      "newDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "11-business-rules",
+        "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc"
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "11-business-rules",
+        "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc"
+      },
+      "currentMatches": [],
+      "liveUnitDigests": [
+        "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41"
+      ],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/117",
+      "effectiveTarget": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "11-business-rules",
+        "targetUnitDigest": "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41"
+      },
+      "kind": "stale-direct-origin-with-authenticated-successor",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/0",
+      "reason": "594fe4194 added the explicit priority try/catch failure policy to RUL59 at line 1087; the heading digest includes that changed section payload. The unchanged direct origin retains its old digest; its current successor has the new digest.",
+      "targetBeforeDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc",
+      "targetAfterDigest": "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41",
+      "witnessRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/0",
+      "dualExtractorCommitWitnessesMatch": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "pointer": "/claims/57",
+      "claimId": "claim_96e947d6daf7dd7612cc711be8e3e22e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "9-hexagonal-architecture-view",
+      "oldDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+      "newDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+      "causeCommit": "5a849befcbdb74ec974546af42b925cab614e841",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6"
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6"
+      },
+      "currentMatches": [],
+      "liveUnitDigests": [
+        "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200"
+      ],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "effectivePointer": "/bindingRefresh/604",
+      "effectiveTarget": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "9-hexagonal-architecture-view",
+        "targetUnitDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200"
+      },
+      "kind": "stale-direct-origin-with-authenticated-successor",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/153",
+      "reason": "Required verifier replay exposed an earlier missing edge: Component Authority Boundary Map link at line 549 retargeted from ../architect/proposals/ to ../proposals/; heading digest includes the changed section payload. Reuses the already-authored followup witness without changing any ledger judgment.",
+      "targetBeforeDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+      "targetAfterDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+      "witnessRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/followup-rebindings.json#/rebindings/0",
+      "dualExtractorCommitWitnessesMatch": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "pointer": "/claims/64",
+      "claimId": "claim_4e86e8414c4e3b780e81f77255853447",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-70",
+      "oldDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+      "newDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+      "causeCommit": "5a849befcbdb74ec974546af42b925cab614e841",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a"
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a"
+      },
+      "currentMatches": [],
+      "liveUnitDigests": [
+        "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5"
+      ],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "effectivePointer": "/bindingRefresh/611",
+      "effectiveTarget": {
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5"
+      },
+      "kind": "stale-direct-origin-with-authenticated-successor",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/154",
+      "reason": "Required verifier replay exposed an earlier missing edge: Component Authority Boundary Map link at line 549 retargeted from ../architect/proposals/ to ../proposals/. Reuses the already-authored followup witness without changing any ledger judgment.",
+      "targetBeforeDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+      "targetAfterDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+      "witnessRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/followup-rebindings.json#/rebindings/1",
+      "dualExtractorCommitWitnessesMatch": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/2",
+      "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/2",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/61",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/4",
+      "claimId": "claim_69311391fbb9b1cf924197e6063e5cad",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/4",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/62",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/5",
+      "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/5",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/63",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/6",
+      "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/6",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/64",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/7",
+      "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/7",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/65",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/8",
+      "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/8",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/66",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/9",
+      "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/9",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/67",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/10",
+      "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/10",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/52",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/11",
+      "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/11",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/53",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/12",
+      "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/12",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/54",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/13",
+      "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/13",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/55",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/14",
+      "claimId": "claim_cad110bd532badff055f69c0a236644a",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/14",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/56",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/15",
+      "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/15",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/57",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/16",
+      "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/16",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/58",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/17",
+      "claimId": "claim_33c41de79cf4a52288035a9656c09735",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/17",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/59",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/18",
+      "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": null,
+      "oldDigest": null,
+      "newDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "causeCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+      "beforeCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": null
+      },
+      "afterCauseTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "currentMatches": [
+        {
+          "anchor": "unheaded-block-152",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-157",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-169",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-178",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-243",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-252",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-276",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "anchor": "unheaded-block-288",
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        }
+      ],
+      "liveUnitDigests": [],
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "effectivePointer": "/registryGaps/18",
+      "effectiveTarget": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": null,
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      "kind": "identical-unit-group-checker-mismatch",
+      "accountingRef": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json#/records/60",
+      "reason": "594fe4194 added the previously absent common targetUnitDigest; targetAnchor remains null. The frozen single-anchor predicate now visits the row and cannot match a null anchor. All eight explicitly recorded members pass the existing group-aware matcher; runner.md bytes are unchanged.",
+      "targetBeforeDigest": null,
+      "targetAfterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "groupMembersValidated": 8
+    }
+  ],
+  "scratchRemoved": true,
+  "runnerFileHashes": {
+    "6bb1c7d61": "88d0e89522a29eed0d222da57c26c1dfd3912cd3e463e36887e211bbf74e5279",
+    "594fe4194": "88d0e89522a29eed0d222da57c26c1dfd3912cd3e463e36887e211bbf74e5279",
+    "HEAD": "88d0e89522a29eed0d222da57c26c1dfd3912cd3e463e36887e211bbf74e5279"
+  },
+  "recordConsumerFinding": {
+    "ownershipInputs": [
+      "pilot/decisions/*.json: claims, registryGaps",
+      "ledger/decisions/*.json: claims, registryGaps",
+      "current document unitsOf output",
+      "working-identity-registry.json"
+    ],
+    "auditInputs": [
+      "scratch target-ownership output",
+      "committed prior target-ownership census",
+      "working-identity-registry.json"
+    ],
+    "noRebindingConsumer": true,
+    "noSuccessorGroupConsumer": true,
+    "noSupersessionConsumer": true,
+    "step00RecipeNames": [],
+    "consequence": "No phase-08 rebinding file is named/read by either frozen ownership recipe. Writing another record cannot change their 23 raw diagnostics; no ignored record or read interception is presented as a passing live proof."
+  },
+  "needsWrites": [
+    "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+    "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json"
+  ],
+  "needsWritesReason": "The first three paths hold seven stale direct-origin digests (current successors already correct); list only, no edits. The two frozen manifests would need authorized contract repair for identical-unit groups and successor/rebind accounting. Prefer that semantic repair to rewriting superseded history; neither is permitted in this round."
+}

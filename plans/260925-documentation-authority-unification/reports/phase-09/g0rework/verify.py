@@ -4,7 +4,9 @@
 Run from the repo root with python3 -B. Prints JSON, writes no repository file.
 Authoring assertions replay at the receipt's authoring commit. Live target drift
 must have an exact old/new recorded rebind; the shared rebind check owns current
-ledger correctness. Frozen ownership recipes/extractors are unchanged. The misc
+ledger correctness. Both frozen ownership/audit pairs must also pass against live
+inputs; historical replay and accounted diagnostics never waive a live failure.
+Frozen ownership recipes/extractors are unchanged. The misc
 verifier's sole repository report sink is redirected before the write, since its path is not in
 this assignment's writable list. The original checks.json is never rewritten.
 Only the embedded ownership recipes run, never phase-08/audit-report.py.
@@ -98,7 +100,8 @@ def main():
         guard = tmp / 'no-addons.cjs'
         guard.write_text("process.dlopen = () => { throw new Error('g0rework: native addon loading forbidden'); };\n")
         env = dict(os.environ)
-        env['NODE_OPTIONS'] = (env.get('NODE_OPTIONS', '') + ' --no-addons --require=' + str(guard)).strip()
+        env['NODE_OPTIONS'] = '--no-addons --require=' + str(guard)
+        env.pop('CLAUDE_CODE_SESSION_ID', None)
         env['PYTHONDONTWRITEBYTECODE'] = '1'
 
         def run(label, argv):
@@ -169,10 +172,9 @@ def main():
             dest = tmp / stem
             dest.mkdir()
             scripts = json.loads(manifest.read_text())[key]
-            for name, source in scripts.items():
-                assert Path(name).name == name
-                if name != 'checks.mjs':
-                    (dest / name).write_text(source)
+            library = 'step10-sync287-lib.mjs' if stem == 'step10-round5' else 'lib.mjs'
+            for name in [library, 'ownership.mjs', 'audit-ownership.mjs']:
+                (dest / name).write_text(scripts[name])
             outcomes = []
             for name in ['ownership.mjs', 'audit-ownership.mjs']:
                 proc = run(stem + '/' + name + ' (authoring pin)',
@@ -180,22 +182,31 @@ def main():
                 outcomes.append(dict(script=name, exit=proc.returncode))
             own = json.loads((dest / (stem + '-target-ownership.json')).read_text())
             assert own['targetDigestDrift'] == [], ('authoring target drift', stem)
-            # Live ownership census is not an authoring replay. Preserve every
-            # raw diagnostic, including legacy false positives for unit groups.
-            run(stem + '/ownership.mjs (live targets)',
-                ['node', str(dest / 'ownership.mjs'), '--output-dir', str(dest)])
+            # Live audits are mandatory, not replaced by authoring replay or
+            # exact rebind accounting. Preserve their raw failures verbatim.
+            live_outcomes = []
+            for name in ['ownership.mjs', 'audit-ownership.mjs']:
+                proc = run(stem + '/' + name + ' (live targets)',
+                           ['node', str(dest / name), '--output-dir', str(dest)])
+                live_outcomes.append(dict(script=name, exit=proc.returncode))
             live = json.loads((dest / (stem + '-target-ownership.json')).read_text())
             accounted = [dict(row=row, rebind=account_target(row, live_catalog, records, rebind['matches']))
                          for row in live['targetDigestDrift']]
             report.setdefault('liveOwnershipTargets', []).append(dict(manifest=str(manifest),
                 rawDrift=live['targetDigestDrift'], accounted=accounted, unaccounted=[]))
             report['ownershipAudits'].append(dict(manifest=str(manifest), commands=outcomes,
+                liveCommands=live_outcomes, liveFailingRows=live['targetDigestDrift'],
+                liveOwnership={k: live.get(k) for k in [
+                    'noNewDoubleOwnership', 'nativePlatformTargetIdentityDuplicates', 'newActiveSourcePairCollisions']},
                 failingRows=own['targetDigestDrift'], ownership={k: own.get(k) for k in [
                     'noNewDoubleOwnership', 'nativePlatformTargetIdentityDuplicates', 'newActiveSourcePairCollisions']},
                 checksOk=None, checksStatus='not-run',
                 checksReason='checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment.'))
-        report['assertions']['ownershipPassed'] = all(c['exit'] == 0
-            for m in report['ownershipAudits'] for c in m['commands'])
+        report['assertions']['liveOwnershipPassed'] = all(
+            all(c['exit'] == 0 for c in m['liveCommands']) and not m['liveFailingRows']
+            for m in report['ownershipAudits'])
+        report['assertions']['ownershipPassed'] = report['assertions']['liveOwnershipPassed'] and all(
+            c['exit'] == 0 for m in report['ownershipAudits'] for c in m['commands'])
         report['fullAuditPassed'] = False
 
         run('legacy docs ratchet', ['node', 'scripts/check-legacy-docs-ratchet.mjs'])

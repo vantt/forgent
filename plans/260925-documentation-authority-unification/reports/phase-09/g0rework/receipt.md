@@ -1,5 +1,136 @@
 # G0 content rework receipt
 
+## Current ownership-drift accounting — blocked by the frozen reader contract
+
+Input HEAD: `95432dbd807991c76a8cef383c50674da9f0e2e7`. **All 23 diagnostics are explained; the requested all-green proof set is impossible within the exact writable scope.** Both live ownership censuses exit **0** and emit the same 23 rows; both unchanged live audit scripts exit **1** at `assert(current.noNewDoubleOwnership)`. The verifier now propagates those failures instead of treating a passing authoring-pin replay as live audit success.
+
+Evidence owners:
+- [ownership-drift-proof.json](ownership-drift-proof.json): all 23 claim IDs, exact shard/pointer, cause commit, complete old/new target digests, current member matches, successor coordinates, existing rebind references, script hashes and baseline/live command exits.
+- [ownership-drift-verification.json](ownership-drift-verification.json): every required and nested command/argv/exit, both live failure traces, other owning assertions, protection census and scratch cleanup.
+
+### What the frozen scripts actually read
+
+The `ownership.mjs` in each manifest reads only `claims` and `registryGaps` from pilot/ledger decision shards and tests current `unitsOf(targetOwner)` with:
+
+```js
+u.anchor === r.targetAnchor && u.textDigest.startsWith(r.targetUnitDigest)
+```
+
+Neither recipe reads `reports/phase-08/step-00-*-rebindings.json`, `rebind/g0-rework-rebindings.json`, `successorGroup`, or supersession edges. The companion audit reads that raw census, the prior collision census and the identity registry. There is **no rebinding filename named by either ownership recipe**. Therefore adding a Phase 8 record cannot change these results; no unused record was invented as a purported fix. Existing rebind records below remain the single witness/edge owners, referenced rather than copied or edited.
+
+Historical confirmation: the exact same three embedded sources (library, ownership, audit) at `6bb1c7d61` and HEAD are byte-identical. Replaying with input JSON/Markdown reads pinned to `6bb1c7d61` gives **0 drift**, and both pairs exit **0**. This is explicitly a historical diagnostic, not the live proof. Live runs have no input preload, filtering, synthetic units, census rewrite or assertion waiver.
+
+### The 16 runner rows: changed records, unchanged document
+
+Cause for **each row in the following table**: commit `594fe4194693d1a6026ed7801168002f89e6c85e` filled the previously **absent** `targetUnitDigest` with the common complete member digest:
+
+`95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104`.
+
+The owner remains `docs/specs/runner.md`, the anchor remains `null`, and the disposition is `supersede`. Previously, the audit's truthy-digest guard skipped these rows. Now it visits them, but no extracted unit has a null anchor. This is a group-contract mismatch, **not document drift or a stale digest**. Each row's eight explicit members independently authenticates against current units through the existing `rebind.matches` contract (128 member checks total). Deleting the digest or inventing a single occurrence would conceal the mismatch and weaken the real group contract; neither was done.
+
+`docs/specs/runner.md` has SHA-256 `88d0e89522a29eed0d222da57c26c1dfd3912cd3e463e36887e211bbf74e5279` at `6bb1c7d61`, `594fe4194` and HEAD. `git diff 6bb1c7d61 HEAD -- docs/specs/runner.md` is empty.
+
+All pointers below are in `ledger/decisions/s9-runner-01.json`. `Record` is an existing `/records/N` reference in `../rebind/g0-rework-rebindings.json`; it records that same missing-group-digest repair, not a newly invented document transition.
+
+| Claim ID | Pointer | Record | Cause / digest transition |
+| --- | --- | --- | --- |
+| `claim_004b47fc284721eff96cfa890f85aac0` | `/registryGaps/2` | 61 | `594fe4194`; absent → common digest above |
+| `claim_69311391fbb9b1cf924197e6063e5cad` | `/registryGaps/4` | 62 | `594fe4194`; absent → common digest above |
+| `claim_c1d4ad0697013185af2572dd0a944024` | `/registryGaps/5` | 63 | `594fe4194`; absent → common digest above |
+| `claim_79fd838ebf7eb7bbaa72efa619535671` | `/registryGaps/6` | 64 | `594fe4194`; absent → common digest above |
+| `claim_99f595d515a3a60d4796192d78e67eae` | `/registryGaps/7` | 65 | `594fe4194`; absent → common digest above |
+| `claim_0f9aa9f49945a45860e3e3c2d1e880bd` | `/registryGaps/8` | 66 | `594fe4194`; absent → common digest above |
+| `claim_b3960a6316827da8f49bc10a9221b4c5` | `/registryGaps/9` | 67 | `594fe4194`; absent → common digest above |
+| `claim_2afd573c3c2205adb49a698535fbf864` | `/registryGaps/10` | 52 | `594fe4194`; absent → common digest above |
+| `claim_298fc2ef185e234bd4b65f047f70ecec` | `/registryGaps/11` | 53 | `594fe4194`; absent → common digest above |
+| `claim_09dd63bd1aaf9b4b6078de434144efb0` | `/registryGaps/12` | 54 | `594fe4194`; absent → common digest above |
+| `claim_3c1dfb5d442b11bec14ecd32e309c1dd` | `/registryGaps/13` | 55 | `594fe4194`; absent → common digest above |
+| `claim_cad110bd532badff055f69c0a236644a` | `/registryGaps/14` | 56 | `594fe4194`; absent → common digest above |
+| `claim_d3cb0eccd8b39c08a3ec7af9b4b14d18` | `/registryGaps/15` | 57 | `594fe4194`; absent → common digest above |
+| `claim_b2afbadf035b6374ed73289b388f5d20` | `/registryGaps/16` | 58 | `594fe4194`; absent → common digest above |
+| `claim_33c41de79cf4a52288035a9656c09735` | `/registryGaps/17` | 59 | `594fe4194`; absent → common digest above |
+| `claim_fa95d7f496a850ef197d25f18ad6f760` | `/registryGaps/18` | 60 | `594fe4194`; absent → common digest above |
+
+### The seven stale direct-origin rows
+
+These original rows retain their old digests, while their explicit effective successors already match the live document. Both immutable parent/commit snapshots were re-extracted with the existing dual-extractor adapter; all seven complete old/new digests match their existing witness owners and live successors. The prefixes below are display-only; the evidence JSON and referenced records contain full SHA-256 values.
+
+`B = pilot/decisions/b-data-dictionary.json`; `E = pilot/decisions/b-entry-actors-rules-pointers.json`; `C = ledger/decisions/s6-whole-system-component-component-boundary-advisory.json`.
+
+| Claim ID / origin | Target unit | Digest before → live | Cause commit and exact change | Existing record |
+| --- | --- | --- | --- | --- |
+| `claim_4333c7a8ff0e32c7b69dc10ed113f25b`; B `/claims/0` | work-state `3-work-item-data-dictionary` | `c55decfd` → `38928382` | `e88d4e283`; section payload includes lines 74/83 retargeting Khai việc/Nộp vấn đề tự do to `#add-verb`/`#submit-verb` | 149 |
+| `claim_5ba6768e5c4f7d93e77ccceda19d0103`; B `/claims/1` | work-state `unheaded-block-4` | `fa35b5b9` → `697a5d20` | `e88d4e283`; same two link changes in the dictionary table | 150 |
+| `claim_79b8aa6e1e59ca0593c2e3f1a409a459`; B `/claims/55` | work-state `6-domain-model` | `4b12f710` → `6409f862` | `e88d4e283`; section payload includes line 516's Add/Submit link retarget | 151 |
+| `claim_5430b3f4676f8ecc0c94b8f0680f45c6`; B `/claims/65` | work-state `unheaded-block-54` | `fcc3b5bc` → `c7cd4adc` | `e88d4e283`; same line 516 link retarget in the body | 152 |
+| `claim_477a30f4902261e390c34ab888145dcd`; E `/claims/7` | work-state `11-business-rules` | `6780225c` → `0c7dbff4` | `594fe4194`; RUL59 line 1087 adds explicit priority `try/catch`, stderr and intentional swallow policy; heading payload changes | 0 |
+| `claim_96e947d6daf7dd7612cc711be8e3e22e`; C `/claims/57` | component-boundary `9-hexagonal-architecture-view` | `c1190693` → `19a6fe08` | `5a849befc`; section payload includes line 549's `../architect/proposals/` → `../proposals/` link retarget | 153 |
+| `claim_4e86e8414c4e3b780e81f77255853447`; C `/claims/64` | component-boundary `unheaded-block-70` | `913b0ef1` → `5700ffb4` | `5a849befc`; same line 549 link retarget in the body | 154 |
+
+Full remaining cause commits: `5a849befcbdb74ec974546af42b925cab614e841` and `e88d4e283c8161f9bf649447e8f9c5876931107b`. The four e88 edges reuse the existing `last-rows-rebindings.json` witnesses; the two component edges reuse `followup-rebindings.json`. No witness, edge or ledger was copied or rewritten.
+
+Effective bindings for B are `g0-content-redecisions.json#/bindingRefresh/{49,50,127,128}` in table order; E resolves to its `/bindingRefresh/117`. C resolves to `s14-resync-b.json#/bindingRefresh/{604,611}`. `rebind/rebind.py --check` authenticates all seven superseded origins and reports unresolved drift **0**. The frozen ownership audit instead checks the stale origins directly.
+
+### Durable check change and scope blocker
+
+`verify.py` now extracts only the required library and two scripts from each frozen manifest into its existing exit-cleaned tempfile directory, then runs **both** live pairs with explicit `--output-dir`. It clears `CLAUDE_CODE_SESSION_ID`, uses `NODE_OPTIONS=--no-addons` plus its existing throwing `process.dlopen` guard, preserves every raw diagnostic and exit, and includes live exits/zero-drift in `ownershipPassed`. The historical pin replay, exact rebind accounting, collision checks, all 127 live target assertions and every existing proof remain intact. Neither `checks.mjs` nor `phase-08/audit-report.py` is executed or materialized by this extraction.
+
+Prior art reused: `594fe4194`'s group-digest repair and target witnesses; `d104c32ab`'s historical/live separation and `account_target` predicate; the unchanged group-aware `rebind.matches`, dual extractors and supersession traversal. The missing behavior was mandatory **live audit-ownership execution and failure propagation**, not another rebinding mechanism. `impact-analysis: degraded`: no MCP capability is available and this assignment expressly forbids the fgOS capability-query CLI; direct symbol/caller and git-history inspection were used instead. Only this verifier's `main` changes; no frozen symbol is edited.
+
+`needsWrites` (listed only; no outside-scope writes):
+
+- `plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json` — four stale direct-origin digests.
+- `plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json` — one stale direct-origin digest.
+- `plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json` — two stale direct-origin digests.
+- `plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json`.
+- `plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json`.
+
+The last two paths require explicit authorization for an owning-reader contract repair: authenticate identical-unit groups and follow existing successor/rebind records without dropping raw diagnostics. **Recommended next step: authorize that repair rather than rewrite superseded ledger history.** Listing the first three stale-origin paths does not recommend deleting their history; refreshing them alone still cannot fix the 16 null-anchor groups. The brief forbids both ledger edits and frozen-script changes, so this round cannot honestly claim completion or all-green proofs. No assertion was weakened, no input projection was installed for a live audit, and no records-only fix is falsely claimed.
+
+### Commands and actual exits
+
+All commands run from the repository root. `R=plans/260925-documentation-authority-unification/reports/phase-09`, `T` is the disposable tempfile root under `/tmp/fgos-work/`, and `D` is its applicable manifest subdirectory. Every Python invocation uses `python3 -B`; live Node commands have `NODE_OPTIONS=--no-addons` and `CLAUDE_CODE_SESSION_ID` unset. The verifier additionally requires its throwing no-addons guard. Exact argv and stderr are in the linked evidence, including temporary paths that have since been removed.
+
+| Required command | Exit / result |
+| --- | --- |
+| Round5 `node "$D/ownership.mjs" --output-dir "$D"` | **0**; 23 raw drift rows |
+| Round5 `node "$D/audit-ownership.mjs" --output-dir "$D"` | **1**; `assert(current.noNewDoubleOwnership)`; native duplicates 0, introduced active pairs 0 |
+| Sync4d `node "$D/ownership.mjs" --output-dir "$D"` | **0**; identical 23 raw drift rows |
+| Sync4d `node "$D/audit-ownership.mjs" --output-dir "$D"` | **1**; same assertion and no new duplicate/pair |
+| `python3 -B "$R/g0rework/verify.py"` | **1**; both live audit failures are now mandatory; 127 live targets/ancestries and all other owning assertions pass |
+| `python3 -B "$R/g0rework/refresh-carries.py" --check` | **0**; 346 parity rows, 91 live heading rows |
+| `python3 -B "$R/rebind/rebind.py" --check` | **0**; unresolved drift 0, seven authenticated superseded origins |
+| `python3 -B "$R/g0join/join.py" --pin HEAD` | **0**; existing join status reported unchanged; no approval manufactured |
+| `git diff --check` | **0** |
+
+All **15** nested verifier commands, in execution order:
+
+| Nested command | Exit |
+| --- | --- |
+| `python3 -B "$R/rebind/rebind.py" --check` | 0 |
+| `python3 -B "$R/g0rework/refresh-carries.py" --check` | 0 |
+| `node "$R/carries/verify-carries.mjs"` | 0 |
+| `python3 -B "$T/misc-verify.py"` (existing output-only wrapper around misc verifier; `checks.json` sink redirected before writing) | 0 |
+| `python3 -B "$R/g0rework/test-accounting.py"` | 0 |
+| Round5 `node --require "$T/authoring-inputs.cjs" "$D/ownership.mjs" --output-dir "$D"` | 0 |
+| Round5 `node --require "$T/authoring-inputs.cjs" "$D/audit-ownership.mjs" --output-dir "$D"` | 0 |
+| Round5 `node "$D/ownership.mjs" --output-dir "$D"` (live) | 0 |
+| Round5 `node "$D/audit-ownership.mjs" --output-dir "$D"` (live) | **1** |
+| Sync4d `node --require "$T/authoring-inputs.cjs" "$D/ownership.mjs" --output-dir "$D"` | 0 |
+| Sync4d `node --require "$T/authoring-inputs.cjs" "$D/audit-ownership.mjs" --output-dir "$D"` | 0 |
+| Sync4d `node "$D/ownership.mjs" --output-dir "$D"` (live) | 0 |
+| Sync4d `node "$D/audit-ownership.mjs" --output-dir "$D"` (live) | **1** |
+| `node scripts/check-legacy-docs-ratchet.mjs` | 0 |
+| `git diff --check` | 0 |
+
+Earlier diagnostic harness (`python3 -B` via stdin) exits **0**: each of the four baseline commands `node --require "$T/baseline.cjs" "$D/{ownership,audit-ownership}.mjs" --output-dir "$D"` (both manifests) exits **0**, with zero drift at `6bb1c7d61`; the four separate live commands exit **0,1,0,1** as above. The commit-witness/record-reference harness exits **0**, checking all seven dual-extractor old/new edges and all 128 group members. The final required-command capture harness exits **0** as a recorder, **not** as a passing verdict over its child commands; it records the two failing live audits and verifier exit 1 explicitly.
+
+Final record/syntax/scope harness (`python3 -B` via stdin) exits **0**: verifier AST parses, both new JSON files parse, all 23 references resolve, seven complete digest edges match, 16 groups authenticate 128 members, expected command exits are preserved, only four `g0rework/**` files changed, and scratch is empty. Final `git diff --check` exits **0**.
+
+Final state: `recordProofsPassed: false`, `liveOwnershipPassed: false`, `ownershipPassed: false`, `status: failed`, `ok: false`, `fullAuditPassed: false`. All 23 rows have existing exact accounting references; that fact does not turn raw audit failure into success. Both native-dependent `checks.mjs` remain not run.
+
+Safety: **17,814 protected tracked files** fingerprint identically before/after the final proof replay; scratch snapshots are `[]` before and after. Tempfiles were removed. Only `g0rework/**` changed. No docs, ledger, register, review, reproduction manifest or rebind record was edited; no pair accounting, fgOS CLI, Git write, native-addon load, product/full-suite test or forbidden audit driver ran. Markdown preview was not started because this task forbids extra state/service writes. Earlier receipt sections below are historical and do not override this blocked result.
+
 ## Current missing-edge accounting — blocked on committed-record replay
 
 Input HEAD: `dfef557a8dfd0d4654cf8c9583e4915ac9175753`. **Records complete; required proof set is not green.** `verify.py` exits **1** because its nested misc verifier requires the edited rebind record to have been committed. This assignment forbids all Git writes; the runner owns that commit. No assertion, script, ledger or candidate document was changed, and no committed-record check was bypassed.
