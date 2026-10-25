@@ -1,0 +1,2556 @@
+{
+ "batch": 2,
+ "pin": "dbc8d6655fe9fb3b77f67930eb0c9a18cb91bb9f",
+ "verdicts": [
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/195",
+   "bindingSha256": "4677e12abb59c8d43561686d95ef27bf5700d51866522c2f6006fe0a40adf152",
+   "targetUnitDigest": "05a4a572afe7805c98f4f64da60ed44cbd2855e7d3cbf8c6039352004788d914",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/196",
+   "bindingSha256": "1b4baa2daeed35c58ff883b61187a95338668f8df7c51d616aba4179806d1d92",
+   "targetUnitDigest": "0d7f5690aadc8ca344c7fb9df79799bd2a78728eac9d30ac6fe909b398d758ab",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/197",
+   "bindingSha256": "f08f43bd914c916d302640e99cd2bf2f621aeead8b10a27b734abb398208b807",
+   "targetUnitDigest": "c40a8682ffa292a9dfb878fdce7d7c0d8038e522a9b494259a386e957ac1185f",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/198",
+   "bindingSha256": "9ce5dff6f8c06cca61c591b447e035e3dbac8af7a7ff2d988960fca301eaaa7b",
+   "targetUnitDigest": "64d4f358d2200590f5ba616df09241be6d6faec44ae0347a64657b9e0e30db08",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/199",
+   "bindingSha256": "043e3e7cfc64ec9c2a83e4ee48e7ceba92dd889b0b5f3721cf12ef728fdced97",
+   "targetUnitDigest": "f0d08f85372d67b013e8decc2aeb9207c0ec09204d2f98289c6fe06acad1c58d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/2",
+   "bindingSha256": "e907787e8766d8d362e1d6440e59ef39ac7373c0e3f4c9baf1bd242d002a3795",
+   "targetUnitDigest": "118bda54e627872dc06d9e0291f46ebef0482c4069393da76b92af62e1187a54",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/20",
+   "bindingSha256": "27f04fa25f47eabdd8bc510eb445335d25e4e2834db6cf98e3c59df1b041a1eb",
+   "targetUnitDigest": "17de3a7412a9b9cced76ac9fc6c4559d9a0c0e0cd1a7c55f5e1f6af87e83c2ae",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/200",
+   "bindingSha256": "d2306a2315a0b837314bde2ff77472e30561ca404bcafcf77f175d56ba4956c5",
+   "targetUnitDigest": "e036f87064f9de401d3ce13b7c21d52ba1999b4dc022bc534042fe72b65b62f2",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/201",
+   "bindingSha256": "ce6666bf3ca0566e65cbc8854060ab89f6fdecea2c16d02002c4b851ddb61f65",
+   "targetUnitDigest": "79b57d5eaf84488795fc3e15efa818284bc9fd278d5980e7dd475628d31a40bc",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/202",
+   "bindingSha256": "e9e06a66a278a7d23d3e973a7173ecfb8796e1ebb4e7e3d8296b5ca7765b6987",
+   "targetUnitDigest": "7b217e78644682bf5fb3c8469998c0bf7cf98ee461a6c4670dfccf1698b14b20",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/203",
+   "bindingSha256": "551c10039bf78c0fd906a0679812133058b50c857763e3412e82d0629412e647",
+   "targetUnitDigest": "92af37d06179ba63f2bead050296074aab5515d3f39d36e88d862ce428fbea63",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/204",
+   "bindingSha256": "a2618481847a7939c2f6f3bf9bab6a52a1cd515d31b37049a352c69681078d66",
+   "targetUnitDigest": "460edb721dad567e0aea4753cc01eb703fe1650642ee50c60c4e5e9e7e657cd0",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/205",
+   "bindingSha256": "a399b778d6181138534aac9fc055b250aa6cf781773313eee8f27360400d6008",
+   "targetUnitDigest": "33475ff19656d93983ed9b1ef710c2cc520d2747775a69dd11a99940b5c8cc90",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/206",
+   "bindingSha256": "64ab376c4e273c819eeffd19a816d87eb8a76c06e78a65e67042859c315e912e",
+   "targetUnitDigest": "56bfc0ab19c4b1852ed910b6c308e4b79a205e35d712fa49d699620c3cde32b0",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/207",
+   "bindingSha256": "f3b0c4bfa240dc20521f696bfb23624b009cdbfcf8e198e766a2ad291268cc78",
+   "targetUnitDigest": "ed05039981d32e82414320277eeef3068e4d01396339b8273e45e4689ca808f9",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/208",
+   "bindingSha256": "1c07391b924b466253bcf602054f4a4029e60c397e2713117f4fe8b2c1e66b56",
+   "targetUnitDigest": "e98af2a720fd2c8bcfc6421a0669dfa51607b77ca8ea47a6d6f2223e02dca48f",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/209",
+   "bindingSha256": "533c97fdf4c6cfbf06bae0826f878d210955b7b8a1a525b8e7778ebaf0f6cf96",
+   "targetUnitDigest": "38e63695f1355212a2d99283870994ca134c42a59058813c951c482cd51c2bf0",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/21",
+   "bindingSha256": "7b336b4ea0cadc87222e443dfbb9071c2c347b04bc9c722a6ca5cda638486572",
+   "targetUnitDigest": "8db4034852b1ebbf320991b529739b3a9aea4aca2e32704ecdff3b3e1c11074d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/210",
+   "bindingSha256": "baf4c83ea9750909638565ab5c318accb99397a8a25302e0a7e1841f7fa8a06d",
+   "targetUnitDigest": "fc8d5fc538012a26310a065cc5dc9fb846fcecd55ce56a9f254af0016c5d63b9",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/211",
+   "bindingSha256": "310a361a9000d4ba2227221c8abe751be2d3455c691a9cf06e5c30b8289bf965",
+   "targetUnitDigest": "36694efcf999709176ca6aeeadba44b177a1a0e69384205583d1e8c0d1ec7630",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/212",
+   "bindingSha256": "a78c95f15bd6a8dec4470144b7b2dd29a9260d249db3c8bcfb0084b44ec6216d",
+   "targetUnitDigest": "6048c6c312f170a57f27326b806fcea3a9bd81d23372deae1e42d8c841d1dc1c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/213",
+   "bindingSha256": "81284c7a2c95ff0759564490244d17dbdb048da4adfabdadde87f6351e6599a9",
+   "targetUnitDigest": "9149a43f8f6208ec6597d241e6785f8ba107936de84b038f808b86b5ae9caa4e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/214",
+   "bindingSha256": "e466482368212aa04f159b74cb366e208291ea0b083a8842db30b67d30f34b54",
+   "targetUnitDigest": "4bbd29fa6a45180aae8736f9730b975549cee73c87459f343ad6a7fb917efb85",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/215",
+   "bindingSha256": "9dfbbeca4fd13a255c883fc4d4d495fc574e7eadf272caa1fe4df7a8f2cc0593",
+   "targetUnitDigest": "53c4a7211e3881f23572600e5b4b213cd0bc7fab9b484b6ae6ebf33e1b951955",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/216",
+   "bindingSha256": "29c3b46a97d66fd1347b08e43e4588999021ed48e8f8f1521a899e00bda3e62a",
+   "targetUnitDigest": "539a94bd2ffc130c202614c7a10910874dbe99af039d4e31c1d2635d17a56cf8",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/217",
+   "bindingSha256": "51a25f29e65802cc4ef8d4e8f6bb5986fc2cee59326fdbe706df40928bc9e048",
+   "targetUnitDigest": "509249e9d874d3b38524f4fecfcb8972ee730b77fde8afdfb90640b8f8916e91",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/218",
+   "bindingSha256": "d44c2b22d84644421804aa1a34488d7d2ff6a5111f12f6c3ada684c8871246e4",
+   "targetUnitDigest": "5bc785bffefdce7739f2189d72e4c0cfc44865a5fbed3968f62c2a16e93b67ea",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/219",
+   "bindingSha256": "84a19664002ce01a8a65351166c7d885ec262f268575c06e53d5ba550644ea53",
+   "targetUnitDigest": "200a3bdbd0d878e2c472d518e40d06c62bf2fce0bbe7c6767ddae81b37356e14",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/22",
+   "bindingSha256": "ed211b263ba8ef5736e6435f9ab8844ed36ef2e31eb854d68d83706bda8aa60c",
+   "targetUnitDigest": "f1d7ce982467ab4b3e6a484b4789cd492af23ddc46f47e96635096fa1a5b7502",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/220",
+   "bindingSha256": "e3c03a87bc962a863c7b8c0da31a2e6ded58b671a57c4e5583560528ffab0925",
+   "targetUnitDigest": "9090a79249368120ec509138ffabc5bf8c3d86b775f3bdf2cfecd6bbf6749f43",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/221",
+   "bindingSha256": "64b4a6071df91c5d87d8087e264c5692fa8eadb487e1f7ad06e4eed6b4630bfc",
+   "targetUnitDigest": "81e3eb32fcf8aede74fc71b5784f64d1d601a733f77e7a93637ea54a7ee1490e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/222",
+   "bindingSha256": "4e53d287b4e0dcc0e43a508afc16581d020542d8d3227893913d02f0dff45412",
+   "targetUnitDigest": "9c6163989228ade2dcfef2123fec0d87df91341529976f947769af33317489cb",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/223",
+   "bindingSha256": "52cf0333ce53be2bd1702f031970fe0bd6dd55444209a28e126ad67d42e24b3c",
+   "targetUnitDigest": "e1e52962536c7b81ca6fbb6203edd4192c8042a0903cf921645da77bd34bead5",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/224",
+   "bindingSha256": "9717a720d79e88c36832c2d56ed969d318314cdc1680c98749f2c8c303db515b",
+   "targetUnitDigest": "3481deec302d0f411600c75f1ef26237bdda37ad29392ee5dc4ba17043fdd54e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/225",
+   "bindingSha256": "c74f1cd6cea0fc0cbb07872c725eac3ab0c72cc1a4c4aaa18760be07f196b52a",
+   "targetUnitDigest": "6a46b36c4c9d7c9dad99fa4069476104463998afd2dcac215d1786352f0db5bf",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/226",
+   "bindingSha256": "01165512e72fa284de1137155973c0fbcd3dd3b7547ceed77c969c3b1b6ae54f",
+   "targetUnitDigest": "e6f47acd9670d333786deb61a4b225891326c677e144e1bc539a815215a73c85",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/227",
+   "bindingSha256": "c947fef8a67404211ebf11af3ea9c2517c496bdc57fb4f782c64bf8b444a9850",
+   "targetUnitDigest": "36c5ecf5d43f0fb6461d6125e58a2275177b6eccdde88bd4a850929c7b2192d4",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/228",
+   "bindingSha256": "bc101f0a930709a2230150868a8ac7e6909f48cd051433d8ff82991abe734544",
+   "targetUnitDigest": "e0f943d40a2477e609632b0ac72e10d9cf535256d523974c5bb231a2a88729da",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/229",
+   "bindingSha256": "807d091838b0969e33d3bbc9a79935cafb1d32f0379a19b0fd9d04814c569aa9",
+   "targetUnitDigest": "6773124371a70c5ffee6d5ae623b525206b51669d32eba24ae96f89802c2cd01",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/23",
+   "bindingSha256": "06a8c2320877fd17d1d7c3a59877f1de610aa4ee4b7bc338b183c44e9c6d9d03",
+   "targetUnitDigest": "a8b2d6271978f883d37d758eeb39ab04f890f9b260930728b42c8c50a9ebbafb",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/230",
+   "bindingSha256": "b599e179f275e3c427daa2592a5edbf96cb013f62a0d9b5afc6a4d4994b23bca",
+   "targetUnitDigest": "894f547678199dfdf85b8ef95db6bbfa3cdd2276cb3d3e6965208a82a4b9ffec",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/231",
+   "bindingSha256": "c36dba0bee64b4700fbbed87eb9b68cdce96e3c893c3506266f89ae287689a0a",
+   "targetUnitDigest": "fc872b26d644a52f4918579c0fac95f9a6fbd3e43bd031387607bf6bc87016f3",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/232",
+   "bindingSha256": "f01f16c538e19eda9b5c2882e1b054a34b4cdfeaaf78a5058145b68830c40e07",
+   "targetUnitDigest": "4870c6044fc9c60b53415c0e492d793098057d0ef14904df2b36b7db4a6a4a72",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/233",
+   "bindingSha256": "da323888505880321925c0337df6d95ef13ea70a315e9d2b3ac5a8d9ea85124b",
+   "targetUnitDigest": "51b21d32ae0c0b8b0fc6868399b70a37d1e38460a875e1f63ecba79e5f3eb052",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/234",
+   "bindingSha256": "2114442a98fd926290b82fa24e603d7412c6a284367a200ab30f7ca7f3a013e3",
+   "targetUnitDigest": "daa6b1814e69d82d203037b597ce695d16b83cd2cfd16ee32bff20e37b1d5b22",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/235",
+   "bindingSha256": "7e4bb03b849136004b3e6160d4ccebaad1295a16d7b6a7fcd5758ef9777b7a7e",
+   "targetUnitDigest": "40fd602703467aab6492b0496eca66e8daada8a0ae147bd4e6b8cc1f779bc33e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/236",
+   "bindingSha256": "22279515b8009c9d87e11abd0b63ce47a7cf43293133af97bd8d4384e90dc0d9",
+   "targetUnitDigest": "d390977f346d54226a22eaa7cedb78cb2dac5d38621bc903342b02d44189ff21",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/237",
+   "bindingSha256": "5af7dc95aca3ec0f3dc94df29485721a67bc0ec7c6bc48f78b16494b60330ade",
+   "targetUnitDigest": "9c935acdbc9ca6ac40e7ecb9565f6d3071d53f23caea069839bf6bea3bce5704",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/238",
+   "bindingSha256": "5b3ccc913873c4439b847b0534af36df3c06a46ad5a510fe2c9f81018c225626",
+   "targetUnitDigest": "28f71276e99ef02d60b77bf0fcc5d0c3aedc7adea176a04b38e26aa359de9f05",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/239",
+   "bindingSha256": "463c0fe6648f26176788dd254cae115a8653c0ffc445a0ff2e87da978807db83",
+   "targetUnitDigest": "5057a9c2e90990d8d25a4f48677898fccd02524494e9f6d8de6e1f9edfc81bc4",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/24",
+   "bindingSha256": "8309ce15978cbf9c70d1e7b1b1e2bc7d24a5fed881078b51ba7bb76d40f789b2",
+   "targetUnitDigest": "6316d5aebc3de69a965e89d2fb167b1b2322dbbc84e91ebc8cd0f3c2618c7e28",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/240",
+   "bindingSha256": "30c9370d6a466b2327039e3889bf2f1ca6ad04cee3aaacad51260df4f56b213a",
+   "targetUnitDigest": "76b945e9a0389feba40242167a7f6710849d38ad7f09551cc423858cfa939e01",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/241",
+   "bindingSha256": "d34bb91fc3a70c70f64bb2563f5d2992a8e0663a7cbfb55dc0f80a0fe2f3cc9d",
+   "targetUnitDigest": "e859548e19ffc5aadf9ecda2f2b54be82a7aa7c156e30f9f729d5c168a7c8420",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/242",
+   "bindingSha256": "6e60f63e9324149ebccb33898e2fd2121f9cfa2dd8fafd46b4f9d51458cfd7c4",
+   "targetUnitDigest": "25f88e77eb6e8d5c96b22a5bd6b70d37644e3ac29c1e9b9f1bbea6920fbe1424",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/243",
+   "bindingSha256": "c87dc0ccec16727fb6c21e9524802e6e02af9584eeaae5f0572f2722219d0dce",
+   "targetUnitDigest": "300ddcd126272fc32c1b0aedd34043bd2c9fc14a232e3b0130918e237aa800f6",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/244",
+   "bindingSha256": "6fd6b61721a65a18cf48318a4b472119c7fb3cf49806ae29fca9d3299cca81d3",
+   "targetUnitDigest": "4b7c0333dce2d7c87417aebc548d32ee0e8eb610f3b356d1f4ca75fcc2734bbc",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/245",
+   "bindingSha256": "732ced4915abed1dfbdc2ec7e65edfb8c1941f5dd8a25e43d75bbfa08ed1057a",
+   "targetUnitDigest": "6921021abeb820f21b1bf544b4612dfe683480f9db9116acc317c7ef75d90c66",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/246",
+   "bindingSha256": "9e4bb03c0e5ae553ef3a049a988ecb2e0873c80147e706cb750a8518b99b8f63",
+   "targetUnitDigest": "c8e6275b2eabe5e4186ca023a307ef50b857b33cad73f30ef695abb5c09c1d4e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/247",
+   "bindingSha256": "0fcacdc4d83d16717b47f49a9adb6c49b1d90c0f58b713992fddc71c5af1bb27",
+   "targetUnitDigest": "ec4d4c4650fd034f4c2ceee336e55d2dd8b2ad2af6deab161470ad63c47f3908",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/248",
+   "bindingSha256": "811445d9046381d4239c694e5e700a796ecf7232c869d712fb804c31e44572ba",
+   "targetUnitDigest": "7ad45ed5809a8a34beebc31e071d809ad5220feda3b051fa098a057560479bb9",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/249",
+   "bindingSha256": "6ce988cf9c7c59122bf26b8fe3bb70732bc8a283b6dda7fad6c766116320b659",
+   "targetUnitDigest": "91c50719caaef1a7be4fb5be1b9e098792bd4e86de8345a4943f3b505415a86f",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/25",
+   "bindingSha256": "05c15d401386dad4ca0108e9e1474022c49335d91872da06d746b3d9515b8cd3",
+   "targetUnitDigest": "164d8dd34f192ab6066338637aae65e6826043760805a2b9f3cc68498ef52ee8",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/250",
+   "bindingSha256": "13049ebb8b0b3308242374742f770ed83e216693e0349d5685057d6368cebd7b",
+   "targetUnitDigest": "b74d7ae1ffc44c9f6ec51148e1de9d617cfdb3c5e3f56d6d4679e59afdc7a9ac",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/251",
+   "bindingSha256": "0ad7671e3637267aa825bd5cb61ac728f1c1c2accb3fd9384e3cf1f2fba40c82",
+   "targetUnitDigest": "412d33196d2a4bf6287b09112c783c94cf8714374bcc9fc7f17316cc1134bd6a",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/252",
+   "bindingSha256": "562294ecba2984653222a235ccf012b814e78a7a659598c981cc7317c733455d",
+   "targetUnitDigest": "85d27d89147ecf4717a0e28ad0a7e330473fc90a2bc6e6de4caecfc41e9adf7e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/253",
+   "bindingSha256": "0e3aed25b1156a0c0bb23482d252de4806eed700a917ad3347e9b58d15b62b5c",
+   "targetUnitDigest": "4a1e6cd548c0773f3df757bc9dee7693a0d463c2e875592589f602e425c015c5",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/254",
+   "bindingSha256": "ec1022a233f7e9d2586f0f26df7ba618cfaaaec215cc327ac6d1e20f3b1ee30a",
+   "targetUnitDigest": "86b46732329e685f2401fe5aecddc6b604443532d6ec0f57c4a640ce50a79452",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/255",
+   "bindingSha256": "c8b5d7e72a7c898a66c3f21dde5be37183281438667af8b0f85bc2836d585397",
+   "targetUnitDigest": "5f38e7f9ec3cf3110290addf0bf55cfb9c87af3e598d5da4516933ff391b476c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/256",
+   "bindingSha256": "652781790a14be7b85a35924afb048311e320115a9434f884cf108627a8d91e8",
+   "targetUnitDigest": "113518efe8d6febed9822a3b3cd8b2d5716c4fa7f60e34fc6193d8c2e2abdf97",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/257",
+   "bindingSha256": "ea7dbab61e9d0aa9163177b52187fbe42c0b6919378a959766ebe18f80603f7c",
+   "targetUnitDigest": "aab8231773dc7185c97213d86161d6468332bcd4039a233843d85e0b96445e12",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/258",
+   "bindingSha256": "6e056c52997ff0c55c5399fd081b711c15a79229cd02663af4b1a9f646d6d56f",
+   "targetUnitDigest": "5f500030a83d8d1fafa2de208554b3ea789d9bf520416dbc28119cf098bb0985",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/259",
+   "bindingSha256": "2022b939d2bf41b289cdea6aa5b4c898e7ea655f8f87719a87794015aed87bb7",
+   "targetUnitDigest": "7f4e38b70e9456ef7ab9e0e774c703bc02f313b7c8ded86c6a2aede050f1b612",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/26",
+   "bindingSha256": "05c15d401386dad4ca0108e9e1474022c49335d91872da06d746b3d9515b8cd3",
+   "targetUnitDigest": "164d8dd34f192ab6066338637aae65e6826043760805a2b9f3cc68498ef52ee8",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/260",
+   "bindingSha256": "5393bbe658210048e57ee1d8c76bdd98b154d9d34276069332de35080ae8dfe8",
+   "targetUnitDigest": "a7f8550a06e970a8a91e4b42784fc886adcf3a0b048fad70b3d0ba3569a845bf",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/261",
+   "bindingSha256": "bf5cd114520e4aaed133c658ee6980eac1895085fa071b77ed9c17bcfdb6a47a",
+   "targetUnitDigest": "39b50bd8c6ddac181995fe532c7e3ce4e497a753ee46c6de9d229c46e2f51f96",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/262",
+   "bindingSha256": "6e6777bfd60d21aeeb00ededc44937ef10c500c2ed6ef23907bf68b860fd37ed",
+   "targetUnitDigest": "53a3bdaf52994ee808a4982bcb77998a023a014295a557e98254dc2ea7db0736",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; heading title identical to source; section digest differs only by a relative-link rebase in its body."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/263",
+   "bindingSha256": "50267552c843145e87a972d409c0568416d9cd480cf841c62f56fe49ac59f79d",
+   "targetUnitDigest": "98cf7dfad6e60a06c9c243358ce763758e71e28aaa14a463e3320129302cb726",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; only relative-link rebasing to the new holder depth; prose and labels identical."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/264",
+   "bindingSha256": "8c5a78424963355775a1eed2f275fcb5bb39cce33a2d7d24d2c69c8ebd41a978",
+   "targetUnitDigest": "23182398244609cfebe930cc7fb685a4c8b49dcecadbbb923abb65094cb5471d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/265",
+   "bindingSha256": "34bece23445d5850634a6d7a3a3e312a4f8dc161f9c531718ceaf7e594be1281",
+   "targetUnitDigest": "de44c5468113d854faa2de83d52ccec66ded77f358a79cb4f13e69eeb1ad9c13",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/266",
+   "bindingSha256": "b0fbc4a038cb22241074211d3dd8a86085f5c309688b494e6032fa2db77329da",
+   "targetUnitDigest": "b22641b4106c5af932e65756cc83d04284c19d8a246c0afb564169f0bea88e57",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/267",
+   "bindingSha256": "ae242ac090a9d8fe93663daa2610a4a9516783ed39a978e0c9036d66217c3dfa",
+   "targetUnitDigest": "eca6803e5e2d782fccbe4259b52323c8eea41b7e7661820c1a96783691925c44",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/268",
+   "bindingSha256": "9f95234d53fad85b7380a1720ed2e4e06354c1b07ffb0530af5f8271a257d9a2",
+   "targetUnitDigest": "30202be6f28db1654bfceb2506b8af6a99b2281ed9043cb5540b798c06d364db",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; legacy YAML front matter is carried verbatim inside a yaml provenance fence, as the row reason states."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/269",
+   "bindingSha256": "1a94cf2598f391be06615353eeaf4e3b3b507e12ea8123f56bbbc93cb2e9bed2",
+   "targetUnitDigest": "d7934bd533b1bc12e76898a6895bce3ec2c20dcf8e92543cf776712e68c07212",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; heading title identical to source; section digest differs only by a relative-link rebase in its body."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/27",
+   "bindingSha256": "06a8c2320877fd17d1d7c3a59877f1de610aa4ee4b7bc338b183c44e9c6d9d03",
+   "targetUnitDigest": "a8b2d6271978f883d37d758eeb39ab04f890f9b260930728b42c8c50a9ebbafb",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/270",
+   "bindingSha256": "097dc388f83ec69fe757c0c21f671398183f62b8767d156fd9d1674a25bc7879",
+   "targetUnitDigest": "8a3f41b22c836a60f9bb5a4737cb0a1364a2b9f1d7aad7d152a4d01ae0f6b2b3",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; only relative-link rebasing to the new holder depth; prose and labels identical."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/271",
+   "bindingSha256": "2ae7e74e57acd0e1ccfcb440edda27ffe5e742ea817a7ff1cece68ae8e703442",
+   "targetUnitDigest": "c9dd291e9471864bb067e63b216edfe7ade8f70e0d6db5b8ca6698f996f09567",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; only relative-link rebasing to the new holder depth; prose and labels identical."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/272",
+   "bindingSha256": "8482f241bc56c2b07decb296320e8f435e24e5f78f039f6d95e61b86f536964a",
+   "targetUnitDigest": "517801950d55972ec4517de7ae858aa5ce852f5756390cdf25a1825c774fed1d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/273",
+   "bindingSha256": "9aab807b55a33caf79638d624c76b1a289647a612840cc7f219aad937cf6b757",
+   "targetUnitDigest": "dd2301096a79764cacaa681b480ef91e15f0dcca558145e3567e423e1d689aa2",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/274",
+   "bindingSha256": "66bf1b06262dea1958eae14ff77bb97b2b2536721ade69fa18f07bfad78fe3f0",
+   "targetUnitDigest": "0a213190073df2388eca1f09eaeb9c1f9e1ab484b7863aee1290cdbb9a381c89",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/275",
+   "bindingSha256": "e6584f1e044036557c4982b7454af14ce2ec4595a3974108b141a921469cebbf",
+   "targetUnitDigest": "5dcac6829b90f8e32fe088758a2daceeb915928b7ed6359600b5e50c7314172b",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/276",
+   "bindingSha256": "8d2ac1aa7e27cb7c5a2367894bd8a55a496fb30bc475217ae1a58ee34be523a5",
+   "targetUnitDigest": "e31031d8fe8d1e7c761052b7a9472d6e3744129eacc5978e0f39d85f322a4124",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/277",
+   "bindingSha256": "8747a46b9fcaac1320d05adb1d8235c8720d76253dd3f0ff91c579e1d2fd8133",
+   "targetUnitDigest": "a4e0d1148116d68c0bc9fd7112638cb879b3e304704eeede5e8d24e3c2c2ad68",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/278",
+   "bindingSha256": "34ba150bfe634a9d34c7d828c9044de2d27a9a91a139cbe4fc5df92c211b4270",
+   "targetUnitDigest": "44a341ce32c08d1458f947254a980cdcd7768ccff2b9b666357b21d49f60ee94",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/279",
+   "bindingSha256": "10b7540cc0f672c01afaf018bbda3ff04daeb8094011b78ea9ff09dd7f154509",
+   "targetUnitDigest": "2388a6dc8072524e145a6532daaf82bfa2b384ff91ad992b0f506b372b8b27ff",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/28",
+   "bindingSha256": "9d51db682ade7212467de6c68f93749d0cc0ca83c441eecb9af661233cd88299",
+   "targetUnitDigest": "71e25a61065f98282a54ec2e879a41172073dcb7b059054ac5ecb6ba2b4b97ef",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/280",
+   "bindingSha256": "58e021f593b265e3e4cd3be70b00613668602eefba58ebad78a4b7dd6654167d",
+   "targetUnitDigest": "9e38ecbec781d4a5d3867e25f0925ce936212067f09371321014ad178bce7b5c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/281",
+   "bindingSha256": "15a0d7ea0ddc8141e8bc80db6b0870c46d04f12c0db44a92f02b2c6e0b418660",
+   "targetUnitDigest": "49344205eec35915a69126a3492752c2d2a414642172e5a81d3404cace57f9cc",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/282",
+   "bindingSha256": "6463d53df6e15205f3b4b0254f5f1b798fd9c5f9f9c56627a222450cb98c5d5b",
+   "targetUnitDigest": "84ddeaf7a013688ff0c6f27539d56d3f21c003ce6424eb47a4b8cd65a1e0ea3d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/283",
+   "bindingSha256": "b5758439048b858f4f5ddf600a8e43cdab5f40463ba6dc6b94ff46545c389503",
+   "targetUnitDigest": "c8affa63f033ace624aa85b35cbf650c300d1ad93413827faf5b8924f59ced40",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/284",
+   "bindingSha256": "5a4cb0fdbbe74995cc86f5909880882b76512d1bfa0366a48b9dc09dfaa6fd8b",
+   "targetUnitDigest": "04433e1b80ff4cb85275d8f56be4ff72d40d22b630d237035a25fd8b4df7f6a6",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/285",
+   "bindingSha256": "94fc5ecc998aeafb78fcee4994aad14668934776d9b90b98984109fbc6fa1a49",
+   "targetUnitDigest": "0bf521619c1e91b0e2d1d8ae6d41dd1aa1256659c478fb4ee8d7698af7d5f68b",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/286",
+   "bindingSha256": "1aa9365be9d43017bfdc57638ee2fde6583cff53f869a2dfe88ff697f0386fa1",
+   "targetUnitDigest": "a112a85754690e179901b91e14da9d148334af6fd33a4b6d1dccb43f693709d1",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/287",
+   "bindingSha256": "c202bc5ddc6bfcb3a2927f50ef78d94eb88e48565778a0729b327b0fbc2ec91c",
+   "targetUnitDigest": "1138ef729398c5617e552552d497e1d788ca4a0ec17ae6ed746ca2b07151c0a7",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/288",
+   "bindingSha256": "1afcbe4c05a606f7575b50dcabfcb1c92834022ddb3a0a517ce8a3ca22ba67f2",
+   "targetUnitDigest": "bc2e182ba5dbadeabde401b96d3627ec50d9096f8965c77eea8fdef5291ee205",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/289",
+   "bindingSha256": "dadd3760d105becf9c4c08e38c70a054db759fc7da6c5bb9d14a217d8bd8cc10",
+   "targetUnitDigest": "abc869942ea3920879ff669c212bcc47e26aa86a88baeacd1c1c3887a0d1a932",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/29",
+   "bindingSha256": "4ea2e97cc93d0fa304b48552da74dbcdd3dbf199c495617719034bed0e10effb",
+   "targetUnitDigest": "0368179b5fa125296baaaff2714566c9c8a2f8abdb09362ee060b951709a4add",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/290",
+   "bindingSha256": "7ccdb8ec013ab43dae510e914405046a32c1faee4f02dd1989c00914826129c0",
+   "targetUnitDigest": "7e24672febfe67210b3701136656c54d0443b073a561063d129e4748dc0df1fe",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/291",
+   "bindingSha256": "959966b167802e382c6d83330192e4a92235e1d348e3f22703831db0d2ac475d",
+   "targetUnitDigest": "ca390fd86b4bc526dfff948674fdd28b3c856fc4c7a542425f398c49b805f920",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/292",
+   "bindingSha256": "85672bd8d2563ace76edb7f7dd7358a4dfcc738bf6f50291350d50d36c3f4b1f",
+   "targetUnitDigest": "2334b9e6a96dc255d4b129d973f086e0005ec08796ee45679b2ce8b850ccd531",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/293",
+   "bindingSha256": "1372495f678fce19a9feeea7f4ef33fe9d90a1e2ec0a520c47b70b01e94f5f63",
+   "targetUnitDigest": "c6fa6463cba652f64934ffee85404b4e345cd7f9030963bd4692fd9b7aa04a96",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/294",
+   "bindingSha256": "d4934fea995ede363bc299eb1a92740f7c81e7d6741475f1b137ad707813a6d5",
+   "targetUnitDigest": "ba2a6d0f513756dc5859094f9ca64399a92907934a71d7cdd5b9bc28e18a7856",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/295",
+   "bindingSha256": "deea864faf349401eb23ca19154670a3e9fe31c10be4529a639c6681d8423d05",
+   "targetUnitDigest": "6652d357804ae814e54c1fbf867ff40bf7a2861c2fb67cad39905945d9e05ca3",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/296",
+   "bindingSha256": "276bc9be04f927e6d6f3c4dbfc75908c42c45502a27fdfead1bf44576cc900a2",
+   "targetUnitDigest": "d69c9226be35df18e76eb13204595acaf212555c731cd19209c85761b270f747",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/297",
+   "bindingSha256": "5d1d0480ab8ed47745b83fbd0140968cec201e266466c21331e612d32a0f52ae",
+   "targetUnitDigest": "098ce604ec61e13355404c782d1a17ad1b3efd2d82a6c02ad6bd9197641eface",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/298",
+   "bindingSha256": "0ad3938e744fd5c9a24b3c15d63cc250904e209d0ff86d8e8b60117690165495",
+   "targetUnitDigest": "85e579ef8f27fdf2a5cce029e5a9c485d09ea032f650d065d1e1920026e5ddac",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/299",
+   "bindingSha256": "b139759b8e9892616a7710112fae6758c297fd15cf83b0f5e28492f774c68acb",
+   "targetUnitDigest": "e55b87d0489eb5d1c923848290a84c8b72c3acf927827305e8aff2b05eb36b53",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/3",
+   "bindingSha256": "40a32ad777b345d01a439394cc2af1a2150e801d6dfb6a6387fa5ed1f9c20d0e",
+   "targetUnitDigest": "ab013fd6504d9c688821999d8ab2da20e13e983a2a9ac94e39f97730f4f9ccb1",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/30",
+   "bindingSha256": "dcf20acf2c6b7e1bb29bea53ef40022723838323352a5aace00551e0fb8bc1e1",
+   "targetUnitDigest": "ab89678d8e3454b4156bc1b984715f542d793032d6075ef32ed06a13634e4d69",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/300",
+   "bindingSha256": "e59676e9e991c5a7a51a2341f86e3b4b6484da15b2bde2a66334004ede35f6e1",
+   "targetUnitDigest": "d32d9cbf0ea5a4c81f0f409931f079dcd2b0ec63f7562955f9a93cf700a08943",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/301",
+   "bindingSha256": "c403794fb04e8f04d73f7e8c816b8263410d3dfb08587b1c175253e60b146204",
+   "targetUnitDigest": "d88d054c1353e60632dec82df5cea213aa86308d64eebe85de11e2f16db36ed2",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/302",
+   "bindingSha256": "5baa0ba2c88f5f9a312ec2f95edf0080d53e64d7a27c9ed50be73394f5e549ac",
+   "targetUnitDigest": "fd95a66f46c03e3adceb6f8a5f85192bde214a6dd5cdded830da459fe443df94",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/303",
+   "bindingSha256": "46a5704763c9e9319f762993cffac7a9823778072b082617b7ff6ee28065eed6",
+   "targetUnitDigest": "960b8a382d8cec1d0466d8a21b0b6b1750dfd057c38cc355aa5f5895208b5ff3",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/304",
+   "bindingSha256": "d3dd96bab84cf24edabe9746437b81f1d54309b796ef7ed1beeb887e2bc44653",
+   "targetUnitDigest": "2a6ab99320c3d817c988013a5d801450bb6676d4fce05d0fac3a6f7f1b9f657d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/305",
+   "bindingSha256": "96b48ad4bca2be6dfb67cd3a6581ed1ef8b4d85312eb6197ca9f229c44cdc682",
+   "targetUnitDigest": "eb339b03325fc9382c4c91b7a64453ada48a82356f85bff0efacdf6f7f1a1aaf",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/306",
+   "bindingSha256": "1e4d67e6a598ca62cc4a47cf373ee721885390b236fb42ce4b117da78e0a4240",
+   "targetUnitDigest": "521a340f1aae9551730614feb22338187ba5b6b4ecaa6f58d39ff32d5c67f33a",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/307",
+   "bindingSha256": "aec8966be6c1c8eda2b67250d1f3e4fb5e6004a3c1a8c64ecaa222e7312bc794",
+   "targetUnitDigest": "f9ac8983f9c0a5573fbc63de18e44f3afcb284ecf0ed7e380fbe155100fb49c2",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/308",
+   "bindingSha256": "39c9a66d7e8aa53534bfa9a0ad5004ed53e3848e93558a8b1c4917b705cbb42e",
+   "targetUnitDigest": "57cefe80f25ea7d259e20696a42da2163d3f0711d2b653f21069cd24ca1c8214",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/309",
+   "bindingSha256": "fd6cbd0c80982b31b86d6e2e8003eb9162fc60c76d2d91289b26dab5f2d3e24c",
+   "targetUnitDigest": "e45c7eecddca9f16939c1a6f3feb9327f60acb17b4ef7d7c490ba537edf470a1",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/31",
+   "bindingSha256": "24279511504aa7c2eeb90d22874b75811bd82103fd53a7590381245531d1921f",
+   "targetUnitDigest": "14c91976ca34753ce0629af1c4e8d6953a732edb5cd0222c1647d2a416bde018",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/310",
+   "bindingSha256": "d168916a240be73fb23a27a1c66a3436ff1be34f89b3cbdabf018cc4496e4f35",
+   "targetUnitDigest": "d78166433760b0f4b8ef514eaf7e081ce1629b1a0d899b5f6eb84d011291ba6d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/311",
+   "bindingSha256": "14319826feb572bd7f180bd449e6b64fa40a8d4442969b4ec6732b443ca5d0d3",
+   "targetUnitDigest": "71c6e9817915e166cd0965b9a16059d96026d2099af7204b2f01ea05c0798081",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/312",
+   "bindingSha256": "af06cefa26afed3f42e3b5773bdebcc89b411165925ff9bd195deee9a7f8d518",
+   "targetUnitDigest": "46512d7d8f7aa842ef210241fad88b1d9aa17c6f855eef7a9fcc7e6d318c3558",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/313",
+   "bindingSha256": "3f98af337d1784d473195e4e21104e776f8121520ef9b758b51e6aa1312c657c",
+   "targetUnitDigest": "f7db4ad151f15dee6bc030da528f6b7cce5a6b348e173fc34a4237172ee43062",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/314",
+   "bindingSha256": "8b7f425983e2290012ed34d44381e37b739456fc5b81b737fb1c1817a480f2cd",
+   "targetUnitDigest": "a9dd322a960b04d4efd89f9dee88f46ddfbaa146d4e05934cc701bb7a0b282f0",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/315",
+   "bindingSha256": "9358a894a1dcb5c53d6289197895d5df737eb2dcc1b8dc0257ccf8634fd67a67",
+   "targetUnitDigest": "5be683778c53585f01cf00dac72ec2f52bcc2e0bf7d7ba6e6035d3e6d69c7727",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/316",
+   "bindingSha256": "80443f2b6e1e0aa16e6e14211401d168e43c55d1d38fa4b8f1c99c699f5c4739",
+   "targetUnitDigest": "262cb28ed3fb057cc9091495660cf0f8eee4c684347b8eaa0aab4001266da566",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/317",
+   "bindingSha256": "8072400af97a7bc78ec72ee73d52cb0d0bc9edb55a5cd3b129e3bb11ce040580",
+   "targetUnitDigest": "7ea549f7e6fa4e7a3d992a327636b418f4e7f1b4bad3e29342aa1d1ba58c00ca",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/318",
+   "bindingSha256": "e425b68ad70854eec910095c03fb9bdceba34236d827a3c95e79e7d4fd0466d4",
+   "targetUnitDigest": "a03b3d93b4ed29bbaee79dee77fffd3aa00e0ddb2b7c350a96692b4c2b4c0fa2",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/319",
+   "bindingSha256": "b008177be8b0701b04a0693e65199b0f79820b57c585b4890f3301b683750b7e",
+   "targetUnitDigest": "7f9b37c10f7b7ca032d3bf48200d328097f9941cae48e0271d1544c6ea3f601c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/32",
+   "bindingSha256": "52d610c2e9664bfe6655e1d1cad2928aad8e987b9d64c07c2bc52b31e481ff57",
+   "targetUnitDigest": "369fc6d6eb14fb951d38c910d0be608b6fbcdeecc593998e07dcc618bd2b4270",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target unit and section are byte-identical to the legacy holder unit at HEAD (s11 carry), preserving the cited section or narrative named by the duty."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/320",
+   "bindingSha256": "2cbb9c2e8fb4dc81bb297eeeb439615146baaa0039b75b752b211aad93b23c2f",
+   "targetUnitDigest": "8161e3f26e3e3b7eee3352efd89f72e5dd4ae6506c5a8afd7fabd5a2b94dd6a9",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/321",
+   "bindingSha256": "6c429e5d69d697467962bfa7cbbfba7d0795b3bd5119fd4eaed3858f620255b5",
+   "targetUnitDigest": "7209c204d269660033adb3439096b86f857f228d6c1229b4163ff5828c80ae98",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/322",
+   "bindingSha256": "536b3ff436ccc2587a07e77ede73ad601ee9b8c33a0fa4da17a7b96bed68a4db",
+   "targetUnitDigest": "aab1a82cd8bf35303addbf05db36014da634b5433689ba5a772d16387aa113c7",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/323",
+   "bindingSha256": "d5d4cf3f575acd92dc992c6a7ef28496f78640a35e6d515c7a10f702cb9cf184",
+   "targetUnitDigest": "f7feb3da03a6e864dccf787f36cc3a17b17bc662647930525c5b19dfcbd8b9cb",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/324",
+   "bindingSha256": "7ae4843a6630738abc8c636bf5183b61985c79665064a4822fa01cf94577ff5d",
+   "targetUnitDigest": "c3ba3d10c9573ae2e190254c1c6de25dcaaf9ef983d4e916d82139633dafdf59",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/325",
+   "bindingSha256": "63ce2dec551ea5acb7a24f5d66184e3ba341e6cc51751f6e6c157fa19707cff8",
+   "targetUnitDigest": "9f06140403ab488dd48b62a8bd683623838c53466ac09f912be9302df4170f55",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/326",
+   "bindingSha256": "75bf4d4bbaeb4cf499aba2869ea5b1fe89638cdb16690f2d2c80f1d3bd4060bc",
+   "targetUnitDigest": "47124606f9e02f3c489fe1c656ffadfdfb2437b06bc4cd782ee518fec4c5a461",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/327",
+   "bindingSha256": "f82e1d21aeaa0f04ca78e0ef3e71046346daab9e24ee7cd21cd8f9530983865d",
+   "targetUnitDigest": "202c8ade22756715ea230f6ef159fd31f58685e93c91cd59f069eba62e0aa590",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/328",
+   "bindingSha256": "c0b25ee601089bb8981acd232493ac4d6277d65b806e8d7ad6f0f32385fd075f",
+   "targetUnitDigest": "7887a8003dad217ba45818d864230fb47e12dffae8d3dda90b977c34f287d290",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/329",
+   "bindingSha256": "004da29b2b6131da59264d619383ab64d25781306f59769232be5956825c54bf",
+   "targetUnitDigest": "04e9d1c3aec25ba8dd40ec9d114d05bbcb4a36ffe57bff5a6b7763d7faadd7a8",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; superseded s12 carry and refresh keep the identical unit digest; target text equals the frozen sourceContent."
+  },
+  {
+   "claimId": "claim_d8ac30166d62dd668cf76d7dfb0a8170",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/0",
+   "bindingSha256": "356e432cd0dbaf5fa370e3579f9271aa35f56b06c2b8413eb9b73e7b18330ce5",
+   "targetUnitDigest": "65f1a543b02216f53bae6ea6c9bbf42802c2f2d9325e4bbbc972d8f53b397aff",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Supersede; heading title identical; section digest differs only by the labelled root-navigation change."
+  },
+  {
+   "claimId": "claim_2c3300909e21da9dd0feb02e991c5f0a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/10",
+   "bindingSha256": "f786dc0748d00f4258c3a21479aa14d432d9f16858abf9907b88b3702a684af5",
+   "targetUnitDigest": "ebe762d7e34a8290e4103f5a0ae8adb7cc4efa4c0820b97be07cd42344f1ce8c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Supersede; heading retitled from \"rigor -> tier (Phase 2)\" to \"rigor và tier (cập nhật 2026-10-21)\" to match the current legacy source and the Seat Binding authority. Rationale evidence cites the older A41 change, not the resync-a rebind (non-blocking)."
+  },
+  {
+   "claimId": "claim_62d9996e5897714517de064047f1ff83",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/11",
+   "bindingSha256": "3217bb4542b6d20af2fe1717a9cd912042a8c0a3e26f0082c9c0ccb0a5da58a7",
+   "targetUnitDigest": "5a6a28507ce8fe1d6df98cd239c61f9d9dbf6e320621f21459fba8174c108939",
+   "verdict": "REWORK",
+   "reason": "Disposition \"move\" with rationale \"Full native unit digest equal\", but sourceUnitDigest != targetUnitDigest and the target rewrites the claim: source says Runner maps rigor through runner.rigorToTier to tier and derives reasoningEffort from rigor; target says rigor never decides tier or effort (Seat Binding, D-ADR0072). Record as supersede citing the resync-a adjudication (runner.md unheaded-block-10)."
+  },
+  {
+   "claimId": "claim_0735a1a1ac2e5c08ab7dde6f393746f0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/12",
+   "bindingSha256": "ce604d7a23e8ad34fe86be6d4d3687dfec7e8e11dd4d8a5c255871ad39f50712",
+   "targetUnitDigest": "11acb9f9f0326bc74fa270823e169722679dcaed64cc6da150f5f2c7912d9400",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Supersede; effort paragraph rewritten to the tier-cell effort rule, identical to the current docs/specs/runner.md unit. The dropped validation detail is carried by Seat Binding §5.3, and the dispatch-execute door is retired. Rationale evidence is the older A41 change (non-blocking)."
+  },
+  {
+   "claimId": "claim_092c6c62f6b2c014d24f74aca3dee571",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/13",
+   "bindingSha256": "724a9d40aafcd1da0f662c784e93190ae9cc1d4925e1aa8a1e554a79992d5074",
+   "targetUnitDigest": "344985adb8cb7f6b7f62c1b4ef88be9a3d3f73e531130851c57fa9a9106d3c12",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_49a878f920dd60fd0449e74d71b5fc1b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/130",
+   "bindingSha256": "00767f0d8e298a811e9c2af2c44485d91fe7fc6aa3bbde783b8874dd9319f05d",
+   "targetUnitDigest": "f43d4e34b06779c58f17e45c31f66be1d2a0daa7d90d6fbbe78f88131ea5d609",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_532692d4c5ebdea48d2a8352129cc843",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/132",
+   "bindingSha256": "3158c6ca8e1f9a43ff1a66f69fc82fbfaf718be837fb1f9d57a9ec5bbca166dc",
+   "targetUnitDigest": "098ff3342f3633bcb25254655f6c7b3c89c6cfdfcf1853603fa317b3b5e81d89",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Supersede; heading title identical; section change is the link rebase in the following note."
+  },
+  {
+   "claimId": "claim_e212e87da06a0a552cc1ccde10b5aaab",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/133",
+   "bindingSha256": "f1086894c7edbf93d9cc35a67ce3852f28ea8e536170a72916fc48b95c8f3672",
+   "targetUnitDigest": "4bd44969ed59ec4e39dc0622f72055d196d31e5c733b7a5656450d8f07c49780",
+   "verdict": "REWORK",
+   "reason": "Disposition \"move\" with rationale \"Full native unit digest equal\", but sourceUnitDigest != targetUnitDigest and the target rewrites the claim: the vocabulary table changes the tier cell from \"configured via runner.rigorToTier\" to \"declared directly; rigorToTier deleted\" and renumbers every runner.md line citation. This is a correction (resync-a unheaded-block-104), not a move. Record as supersede."
+  },
+  {
+   "claimId": "claim_17f27ab085e951c529afff07f099e25b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/134",
+   "bindingSha256": "69e5719c51b5312f0114f6b973e0631cfd483681c030f763d4759cc3c11d8f6d",
+   "targetUnitDigest": "0418cb1a82acadbbf7737247395dd563a0b64575c38f7b1ece953e5927df14ad",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Supersede; rigorToTier qualified as deleted, runner.md line citations and a relative link rebased; nothing else is lost."
+  },
+  {
+   "claimId": "claim_ec3f286e81c31817022a1caa3eebda54",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/14",
+   "bindingSha256": "3217bb4542b6d20af2fe1717a9cd912042a8c0a3e26f0082c9c0ccb0a5da58a7",
+   "targetUnitDigest": "5a6a28507ce8fe1d6df98cd239c61f9d9dbf6e320621f21459fba8174c108939",
+   "verdict": "REWORK",
+   "reason": "Disposition \"move\" with rationale \"Full native unit digest equal\", but sourceUnitDigest != targetUnitDigest and the target rewrites the claim: source (explicit `tier` channel may only raise above the rigor-derived tier; legacy tier field migrated at load) is bound to unheaded-block-4, the rigor paragraph, which says --tier raises are refused. The rationale itself names unheaded-block-7. The migration sentence is lost. Rebind or record as supersede/retire with evidence."
+  },
+  {
+   "claimId": "claim_e9802a0cf16dad3c227c5159d457e3dd",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/15",
+   "bindingSha256": "adc69f36a7118cdeb7c8bb5bde0fba74e9602f2ca6708b46de91ca3ba2551974",
+   "targetUnitDigest": "a8bf93ec2567af2434702019c1658d02480d403ef4be9666fb28bb6c81f14746",
+   "verdict": "REWORK",
+   "reason": "Disposition \"move\" with rationale \"Full native unit digest equal\", but sourceUnitDigest != targetUnitDigest and the target rewrites the claim: source says a capability must not declare model or tier (only a rigor floor); target says a capability declares its own tier and maxTier. This contradicts the source; record as supersede with D-ADR0072/Seat Binding evidence."
+  },
+  {
+   "claimId": "claim_c71a4a589ecddc5c1ccc30f983c45d9f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/154",
+   "bindingSha256": "477661f702e37a9252670a9642ff0b30aa121613dc802f7f0ce6cd2bf947c92e",
+   "targetUnitDigest": "a696f244df3709c995c6a5d8a35ec2083a12d72b54ddba980e58c1d556c623e4",
+   "verdict": "REWORK",
+   "reason": "Disposition \"move\" with rationale \"Full native unit digest equal\", but sourceUnitDigest != targetUnitDigest and the target rewrites the claim: the source claim \"Workflow uses DAG steps + integrates the Work lifecycle\" becomes \"historical DAG model; Workflow does not know Work\", and debate and the two doors are added (resync-a unheaded-block-123/124, D-ADR0070). This contradicts the source; record as supersede."
+  },
+  {
+   "claimId": "claim_d940e5b03dd1e19deb086af4a0a22fa2",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/155",
+   "bindingSha256": "cd47f51bfb8b4954115e1daefe6556675346690ba636e11f8b88bbe54bda4a40",
+   "targetUnitDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_ac655fa53e915603a6788b8cbf14d529",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/156",
+   "bindingSha256": "7ef3308fcf2e64fcfb7e3bacd7c3ff92b954fb95ac67b27dd8589a76204be6a6",
+   "targetUnitDigest": "604f27c0c0b41f7c810ab6fbdc753ca0554a9af27dbac7ef93d99156bf4cc7e9",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_1116c4f544e78436e0e564fa8d827cac",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/157",
+   "bindingSha256": "6a91599526f7f141367d7911d1e8fa4f445d9c992050ed5668f00cc687903ac4",
+   "targetUnitDigest": "b39158ae03ad6358028e813139d4157895186944f4a10ddd3e8756f61cbc8824",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_7199fa94f36517e6e6624b9d1101c363",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/158",
+   "bindingSha256": "8fc5773a54205bcb2f2c1314fe0745e5cd248d5ac1537e3b91cb4b4def41a8db",
+   "targetUnitDigest": "49cae4ddc1865a937f0b1c0abd2da02e2472e6ec39e2c93c8e97cf4c42d0e5e5",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Supersede; link-only relative-path rebase; text otherwise identical."
+  },
+  {
+   "claimId": "claim_27d6318e5b61562f3521a24fece7d015",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/159",
+   "bindingSha256": "077f026edfdb22ca646e3f9509b77726730085e3840d9d3b775f1e6fa67d53b1",
+   "targetUnitDigest": "1dc2761ded279b2db8a63a37ab46622ee0857ac91ac6bddc70b647b6fd45659f",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_a181e4f5f88806fa1e2b473d7f4f5126",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/160",
+   "bindingSha256": "ee535f1a8fb8a2a776d765537844161ddd2df439490eb70ea365ac506574cd5c",
+   "targetUnitDigest": "34db7211ce509cdaf2ef7613983a16f6aab954c23fbbc8f68d5285428a8caf0b",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Supersede; link-only relative-path rebase; text otherwise identical."
+  },
+  {
+   "claimId": "claim_f6c6b09386500ad22dbd1626b3ed4e6d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/161",
+   "bindingSha256": "4fbed225d79b9986320fba27acd83731ba6e1dfab05767e816ca8527c7add45a",
+   "targetUnitDigest": "4b15465cd96b21dc93f09103788ffd32cae520bf9d682a9f62cb23eb7e3d681b",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Supersede; linkage updated to {caseId, activity, reservationId} (old {runId, stepId, unitId} still readable), matching current docs/specs/runner.md; link rebased; rest identical."
+  },
+  {
+   "claimId": "claim_64b0cdea180e4a5760597816f59d901b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/162",
+   "bindingSha256": "f5a5cc3379247dd0d839cd9e916eec3aba133c96bd41cd5b28833ff67b1fc9a9",
+   "targetUnitDigest": "025b8b721ce848ae9047ff219539a44ddcb48627029daad0566fd065a33c2a52",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_4cc8a229ab16588700d7367a2883e5e5",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/163",
+   "bindingSha256": "24965530bf5e047663d58827a75777863561aaec3cbcb1d1afd352c926331d6b",
+   "targetUnitDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_927f25d69eecea02a9f490ac358f9160",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/164",
+   "bindingSha256": "c44ab7e94712811da87c49d6566bd5c936764eb0ba0dbe3cea818be0a83e5cba",
+   "targetUnitDigest": "59d0cd5865c681d2535cd1fdfcfa91bb8062f779329ace7673d29537159e2163",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_e1d796c4b41dd038701bdca812ad80e1",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/165",
+   "bindingSha256": "5e902f8963ea53f13c7f5ad63b83089c7e92eef0f90e2b1f32931ad4a486732f",
+   "targetUnitDigest": "04f51a4f5dfccd3bd32411d47268161e9a971db21e975f38699939e78a1f0c55",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_ee954f73b86887b8350bd2735d3640c8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/166",
+   "bindingSha256": "16e4aa570d737cc2b559291c2d577c6a0500f75f2ef582bbcc1833e763578dd6",
+   "targetUnitDigest": "124888c61ed54076f79cc849c645c99501bb225b3f323f33af973891f9a5749d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_bb7a322701d0d2aaafa73446c3ab66de",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/167",
+   "bindingSha256": "4e28b65556cc1eb2fe32acbcc44a49cf7c4973438710160426854fe7061697f3",
+   "targetUnitDigest": "c11d67db6566ba3bc0468506dfdcdc3333c4c43943db1813332d60a8e6be3278",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_9d234a2abbcec244d40fa6dd3439dd60",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/168",
+   "bindingSha256": "03ceea8e6e2cea767fa1f197511beabc44cfe7a4cef0765b11807b278a4b889b",
+   "targetUnitDigest": "a23e016ecbd901a3f370dd33b3fa87d0f679a24d9be45e178f34b4e24134334c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_a11926d30be8de43744fc81023f6dab5",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/169",
+   "bindingSha256": "00d1d0ec7e14e27eb9696a270960209213edafccd0f2c525b47bc4490fc448a6",
+   "targetUnitDigest": "fa12380ba45b60a32c819272d07b996412a915e0e5bae3a091799807c78d882b",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Supersede; only an explicit \"Added in candidate: removed in 2180b4e72\" retired-engine label added."
+  },
+  {
+   "claimId": "claim_88d627e8f4ea6556a45d97bc81b03f28",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/170",
+   "bindingSha256": "e14c1fa865c65869490f1e4c63eb5940ddba8cf383e3dd19e85f5fac0c4c49aa",
+   "targetUnitDigest": "5c2cca94cc507e1f552e5a5a6b298bd81f7c9d5b4bd3abd8fbe9e1c2d24db498",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Supersede; only an explicit \"Added in candidate: removed in 2180b4e72\" former-adapter label added."
+  },
+  {
+   "claimId": "claim_5e0cf165c59b615201e26c123abc8099",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/171",
+   "bindingSha256": "e4949fb13c9b759de912a06c748085fef5f27b6595ed6fc528b220ee3c527dc3",
+   "targetUnitDigest": "67ff0ec2d25af01f6dcbc9715018d0d3113542ed4c3d9fd321c10748d2fad180",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_12073295363676caa66ef2cbc89bf5af",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/172",
+   "bindingSha256": "7bbb7c7cd47809b0120bb6c75e2defaed6970520154306837596fa15e0332c6f",
+   "targetUnitDigest": "455696e32c5e98ffca93441a2068682b5e085c16763e97e0605fa46948bff67b",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_4060effa4f71f4e9367b0fc41af34ef0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/173",
+   "bindingSha256": "d6c97607aa54164451585e619389d6e8145b8a5abd2e0f29b11877bd181c27ac",
+   "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_4b894cf655ce33acc51fa458ba3f8e4d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/175",
+   "bindingSha256": "0c603fe4442c500601c65b05ed2ca23c761d3259888415b88bcc610f64134ec4",
+   "targetUnitDigest": "8c6dec18f6bef92315f061a9bdcf6803f5c40f688265b36d608602036bf9778a",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_c94a50fe7441df62bb996eb30a0710bf",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/176",
+   "bindingSha256": "bd7f3c5fdcfa27cd20b32b92cce7e47b43f37485063e6b5e4d97e1e547501614",
+   "targetUnitDigest": "c85972d73e0c1fc03329d33ae01a1fcf036d3d19c81c2e91389f04163992016e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_bf68003224dd8e23200b03335dd8e9fe",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/180",
+   "bindingSha256": "5229aed7d044983ac144cb84c27f4c9621484dac7eb989e0aaf5f67c81c372c7",
+   "targetUnitDigest": "c64245dd24cd536e06e0a8df7540ead2e5fd6cbcbb309cdd520cbcfe14dee163",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_4dd29ceecc93f1f78204aab75f0191c8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/182",
+   "bindingSha256": "e2f0d761777ea6dc194b45531a51001fbd50a18e4752c3f905f0b1e40114f613",
+   "targetUnitDigest": "bd3abb8a9b8884d507aa39dad26a0a8669326d975f1cbbcddaa1a1d70d2b692f",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_1bdd6442655fafc5d31fb4eee31ddb62",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/185",
+   "bindingSha256": "a0176abf2fd252e86c8e7f9910e23df4a508e475e2e77ae6d32e350115032d54",
+   "targetUnitDigest": "4a89d0eee1476346d312e102a9990ae398d0c9a0a04621614c32bf60ac3586ff",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_66b520efdcb55944f5d7e765a9e7d03a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/186",
+   "bindingSha256": "b83e573f26a0ac7b3037033fc676059e9721a48e26b625be660e7fe3e00f8241",
+   "targetUnitDigest": "bb0b97a3dd60e838c00bfb454fb5731d1d570dcbae8d0c0dbe03171d04f5b62d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_3b42c6e8e46058e613ce1e8a84199a50",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/188",
+   "bindingSha256": "30c50296228b549adf34e10a85374d9f9b0e85045ddb8230d14dab4d2530abe5",
+   "targetUnitDigest": "687fa164315afb5b3f0ef967cd17ef3510d04921541a2ae26ee408ca699e4b9e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_ea583c26caf4f098a74cc11792a4a322",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/191",
+   "bindingSha256": "0eb977a1644fcc5e6cb0804abc83fdf01494c23e1e42dcdc00c9e21af69f4184",
+   "targetUnitDigest": "c0d2ed8b1050279455c37226890b760cbd9991f77066c97d57813548c46c3810",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_fc2a29f61b3b82c22ab9271e70a866b7",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/194",
+   "bindingSha256": "601898e16bfb050b9a4dd641efa20b064b668ba84773a87eff59e47b5f94e7c8",
+   "targetUnitDigest": "846ae5c87d5d064d453beeb1084d4670a19a4da867ab19c3c1cb6fbc5c62b088",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_6c3d0086a14dc2c147748d7549f12f27",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/195",
+   "bindingSha256": "121ca8209b1772a148cac25b600df72b9750c392228a8891eaaf566dda2df219",
+   "targetUnitDigest": "6fb8b852b1fc94c9a926ec161be7278c2b7e11bce46ac025cacbb612e9514698",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_b3e99ecb4c96ba9df259b1da12621dfb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/199",
+   "bindingSha256": "ba9e1b7a9dff5c563cef90692f3eae7f8b1846ca8ef1c398f454835f5be584c8",
+   "targetUnitDigest": "bd3af91b774c6ce83cc9a74d0becc4c5344bf3ed8b8aeb45504bfdd1b0efe1a5",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_7bdaab988a25b47521c865264de5bda2",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/202",
+   "bindingSha256": "89a4c8ba8accebc8884e01d967baf6deebc2bbd038ec2e0602dc44919e1c8dff",
+   "targetUnitDigest": "e864974187268596c338d30eef5701de3316dcd7714c54b7999fab819bf746a4",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_b272040e723c24b073c0927d9cc44ec3",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/204",
+   "bindingSha256": "de28b1c36c075fb24841e4f9cfe430eea17b77329a3d051c75790934365c26aa",
+   "targetUnitDigest": "5246787f1280c40ba0d102aebc576fcf363c3461cd01d5d710c4c8962bf89c92",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_97b71c7b8325cf01a893754c17c27dc7",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/206",
+   "bindingSha256": "7a45520f5ab8ecae16f2331e21f79ade37c159ab39100af781bad2b6b2785d6f",
+   "targetUnitDigest": "9042f3c00d50553049e56f46052cc4a6bee2765b2f785f9d014a82a509b5a684",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_f5934f88d357e84d390235e5863c051c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/210",
+   "bindingSha256": "ac450efbcc8cdff56b5cc8378c81e78fa8385751ce2f7c877bd9de35b52e9994",
+   "targetUnitDigest": "1a4eed607d10e73fe1cff749ffe1c5c17c6d79ec05d5928d3e014b24ccac6e39",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_ae62e94e555e534f15f87337b38c4fca",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/213",
+   "bindingSha256": "a003c4b321781dd69c0ecb536002dd461f43eb4f2d1c47414989fc15f0a64fc5",
+   "targetUnitDigest": "959caa2c40413558eef7fc8ddf9b56e55624d8e1d2d1ca39bef105028e8bf7d4",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_22c8f33258e3b20ea891e98973ca284c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/214",
+   "bindingSha256": "6094fc3473cf4ea2e5447700872d7c40aa6bba3c3a9b718594217aee08b05850",
+   "targetUnitDigest": "ad761744dda5fb4efe907ece8dd148f3e6441853b0b4f328bd323958720ff323",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_cfc4f47f0ecd03e0836b6bedd3158f60",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/218",
+   "bindingSha256": "363241e717a6bcf6ca77ceeb6ae5f56b3851c5aa9ace7a0190a6fcf4a4162567",
+   "targetUnitDigest": "d1db4a7c3ce7c8f2bc3ddf73e57b92cd02a65d20bd2fd63344faeea85098befe",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_5afb8f3b4089acd884d2c3cd6b9bbb57",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/221",
+   "bindingSha256": "f94bad97ac5b5c286e5aef49e337af57974783c99f8425dd3511db337e3e56b1",
+   "targetUnitDigest": "afd23010642e58b41119693e1921573d2ecd30670335d595e8695b6859558d92",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_e5fcd366a66ba29887d712945fd7e3ff",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/223",
+   "bindingSha256": "8f8f07bfb142c49479e7e3a118283c76f7d6be1711c8ce286591b7211374f74d",
+   "targetUnitDigest": "33047932d1952db55caadf82cb612b1447614e58dd792f2223325b36a0cb5994",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_7a7eaa509c57c203757dafb1ef42c770",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/225",
+   "bindingSha256": "8684cbab2155d8706c0fb870082de58a96b88fe3d9566447ff59b449da66aa3b",
+   "targetUnitDigest": "7296dfaf2a21f7bff97e45c9dd7c77dc69ff49061dab1577395d67343b6aa8aa",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_8b22a5fd98d87a35c5c2d50c57060b46",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/228",
+   "bindingSha256": "b1af876b9490261c4905eaefc2296fef5a6afc32f35e78f2627bd5ebba86ae72",
+   "targetUnitDigest": "2666cf25c87f39bcaee829d110aae261bf5290761df53f486b3ac0466a855df2",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_3e759fdd13b85a14dca58cfdc902cb5d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/229",
+   "bindingSha256": "a101ea912423fd280e5c820d1ee241b85dbcc4d9f183717efa2b2b7a1e2e1b3a",
+   "targetUnitDigest": "2230d7de38bd1a697ef276c8eeded79ab4e02a9783ab94813ca816a268ea86e0",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_6403b0907bb0a7415a2e48bfdcd576bb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/231",
+   "bindingSha256": "354b08e226449622473f8a2904c25bd58c4f0dad7a13a77305795b823222b0a3",
+   "targetUnitDigest": "8ddbd223d18aa054946e9087698849202a8fb1d634c58e09c58f7a3fbf21f56a",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_317aead16cf595b7cf55ed42eaa18ddc",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/232",
+   "bindingSha256": "e76ce5f7f9df6ecdf3effe9ebd65e7182f0de55d85e57b3a035679ffff86291a",
+   "targetUnitDigest": "383a56412366b74d58d2487ea5cbb859bb51413dafb467340b1539b61389f380",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_b016edf6f12e3024cb092606bb771b0a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/233",
+   "bindingSha256": "32c8e45a94b5bbd1dee1ca78bb6ae29bc6e952674a14285f8b6b313292e5085a",
+   "targetUnitDigest": "e8eee63f828f4b5a6653239b4bf2c3e087acc21bae56fec77dd99514d5d129db",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_e991f8dfb06ca966ca78f96b15566357",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/239",
+   "bindingSha256": "b3424255989a604d026ce6533530418744436a40d98782dd79c2cb478e173f7a",
+   "targetUnitDigest": "0ef1161a7277126cde540e2316d3d5205f0f9625e2f1153621fa6751da9f9f23",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_9121a224604fce68e66e2bf9877a4231",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/244",
+   "bindingSha256": "d83cf0d6bb73c60010137608a165811db11d0c56309c844d1bd26417f9ee8062",
+   "targetUnitDigest": "a78fe17050bf93323f164ddab36560dea3178d289cf4fe2faa2add23a0b28e02",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_cbdb1b45324e09cc15d67abf3193f88a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/248",
+   "bindingSha256": "208960e9350d7d3095e673f8fa0e4d68154ef88dcd43bce98f268348ec948192",
+   "targetUnitDigest": "83c14a937143634c17008b10bddbfb2657bc4377adadd84f6886d486aa293bd1",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Heading title identical to source; digest differs only because the section body (claims/250) changed; heading claim carried."
+  },
+  {
+   "claimId": "claim_3eb8339e6534b30ba7e1214255a11800",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/250",
+   "bindingSha256": "b9da875bbfaf5e2ec94ba5fac0e5e69bf8afc2f051470f6f3744eae8e7531751",
+   "targetUnitDigest": "f1dec519dfc928f2992606822417a8aa677796a14914454c1794b1900b8021ed",
+   "verdict": "REWORK",
+   "reason": "Disposition \"move\" with rationale \"Full native unit digest equal\", but sourceUnitDigest != targetUnitDigest and the target rewrites the claim: a dated decision-history record (choke-point audit) has its single locked write door changed from withEventsLock/appendEventLocked (src/state/events.mjs) to withStateTx (src/state/hot-lock.mjs) without a label. The historical citation is lost; label the correction and record it as supersede, or restore the original text."
+  },
+  {
+   "claimId": "claim_6c5782d3c915607c1c05c83fb5ebd255",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/251",
+   "bindingSha256": "94c63dd0f736940204e73e2f86efc8dc1b956f65c67d4e8ec4af4bfeee5a4966",
+   "targetUnitDigest": "d22438074db150b18a097bf95f2422820648903c6bb211b4fb534786fb80abe8",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_ab17d2e0d5e4c02ee484af949c0ed6d9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/253",
+   "bindingSha256": "fe67533bf1aea3e3b259f25b4c98badf2ba009eca6f4923cfdaf688316984455",
+   "targetUnitDigest": "ee1cb2a967d0c218f823083a8bc9a3ea16f1f8143ad93917deed9b8182b89d83",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_5d4011da92ecd1ef38890896ddec0b30",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/256",
+   "bindingSha256": "1e6fee5f5e666f7de203c340274c6fb5e120eb155af0d69a7fa2b1d12b39db7d",
+   "targetUnitDigest": "548b6bf935db008c18905bf1410559c4382dbc9ec1d6188f5d7c198dd76e0f16",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_8e7177164c1170f64004f6394da10f28",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/258",
+   "bindingSha256": "46b66cf3aab6e395b7781fa44cc501b5178f2f81f7e5bb563a9ff677936b29f7",
+   "targetUnitDigest": "71c4c7fc47a234ace33d1fab94af73c79c2f18a1ef050fa9f5fd9c04c768f2ea",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_ace313a6fdc22d289460ebc961626058",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/259",
+   "bindingSha256": "ea152873c5d2a850d83e61295fcf75b64729c3a0f568208fc4c6ca374e0caab4",
+   "targetUnitDigest": "075828bc1bd5b16a6aafd698e6df6b86fe652be3869fb73bad7375114adc3d59",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_cfcf01219968c9c43844432a9bf45106",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/263",
+   "bindingSha256": "5eb27e63eda20f47da886828d699970cdb986c8966e764de8df1e1e5812f359b",
+   "targetUnitDigest": "9e61d7cdb723ab7a1d3186b5071cada36c232dfc859c799ebb1787ffc2ae2062",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_34f4766922b81e1632751f0946d57c19",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/266",
+   "bindingSha256": "8aee238c9158a67c0d775b905fc0665ad22dd87412579c05720e2913381cb5c4",
+   "targetUnitDigest": "6a6306aef856dae488426e2f9c17c5aa4238d67a541a93b4f82272e68bdc44c3",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_1fea4b6f88d29b497e4695ae53ad21a5",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/268",
+   "bindingSha256": "d46ec5a345ddaf59244023f8076689bd368ef63537381a4c06ec0e85a3fc3a4d",
+   "targetUnitDigest": "8308c59db81e66797b42ab24e7bc3b432c96beb5abcbca95bcfe6a6bab4befa1",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_82480fdae45d11c28fcfddadadcf6f8c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/269",
+   "bindingSha256": "379d7ac1e4b21099d18262715e108a069e50e5326facb9e4ff94f6ea4ff2ff06",
+   "targetUnitDigest": "337ae164cf0ab9962947a018e618fb6050db1b0d5f66bdef1833bf5be32fa074",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_3f39255d8460bbdb8d376bb58688db71",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/273",
+   "bindingSha256": "19092a6e4c4d071c7ba13af1f58c6a032cd67296bbeccf8e099da7e88751d0b3",
+   "targetUnitDigest": "e1835ebad72f5b4522351d7504db6f466b96f63a0a7ba2f1d77493d9290c948a",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_a7a07f60563e296d7b435b89f3889787",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/276",
+   "bindingSha256": "60ba8d3518b983fa6e7f1d8f47e78aa0f1f364a6a313344a94e058e7c89e64a2",
+   "targetUnitDigest": "e2b8ec3df45f9427347649d739024782c07610b9db9527048e03239ac4144653",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_b6d8e91e3e324b46ed6e14a8f8b15350",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/278",
+   "bindingSha256": "06d82e2968f6a3cf9c9eedf9d3eba9f647ac470cbc4d8c34c364e2d2f273e26a",
+   "targetUnitDigest": "3395002bbbad9673076cc5761147e259830826a543af999b57db2cd8be66efb9",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_5ecb968b071f9bff993acfbb3fd36127",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/284",
+   "bindingSha256": "7e56bd8cf4e37f858f61ec9b473312b0401e08996c06e6da6b2ac1792885e151",
+   "targetUnitDigest": "b5feb9dc39066908a13b2af9470dc682055b21f096f7c68e2f64169a72656e6f",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_94a01565f18c613f6e7502977d54e6ac",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/286",
+   "bindingSha256": "b41b5a3569c7aea94c87e573cace06f83c8d0e8bd60400e85cdb4cb7ed6d097e",
+   "targetUnitDigest": "23e631bc21b94f5af0a02cfab78693f61b33d25c52b30ce2e7aa4de386bf2466",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_9c4e625714d537e186cddc9ec62ae473",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/288",
+   "bindingSha256": "9ea261bc753ddcfe392f7aa0c0b8f02c9f671a44c27d3e4e6c07231d6e6da5c4",
+   "targetUnitDigest": "f2dbf6f92ba2d466ecbe8d9f4416f78fbb4cc4eccec3d67038e6df42067258d6",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_60fa2dd65b4761863bd7399ade02f9c6",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/294",
+   "bindingSha256": "763246ff75774908140446fd6b6addc34b3d8e14c6b505e6c24bc355ebbe3d80",
+   "targetUnitDigest": "f1aa6cca2ce7b982e026e4827859149b12fdbb5d226ff76cadf3fa1f0830be8f",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_e0885603b38fb62d780a5ab48de1269e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/300",
+   "bindingSha256": "bf9243ae90f127c0fecbe92b1827e01f1c7792c6ad7d5e4a1615eecc6eea5d69",
+   "targetUnitDigest": "9b2c1c5aa2f0cbe0a71c20381d107b564322d4b545b758aafe493376a8c25ddf",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_da73abd735dca12fcb4d508d11f9f975",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/305",
+   "bindingSha256": "10475bb9005ecc6f4170bc2de78ccb2dc8e49e4619ae28c944961d51a70a1135",
+   "targetUnitDigest": "5d0d207831679ad73d093b302ed61abea90fecf30e2e55a713a66456b0bd6437",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_4434041dbcdebe16d090670b036ca41f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/307",
+   "bindingSha256": "73b84484a4b4a2f1e14df368fac03b288bfded649e3d4327d9c4bd9d3f2ec5f8",
+   "targetUnitDigest": "a51871f12e9a056d232f85809eae3593b63633b95dc564ad11cf4e63ff4dc290",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_6c06438943e64ad92cb4fe0f910c6deb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/309",
+   "bindingSha256": "7ab26e5dc046049564ae1edf1d0eb796ce7d6bd6b6cfb75a4df67f20a47af756",
+   "targetUnitDigest": "39ae73107c09cc580fc96e697fe28d1f9995430ced506ede8c82324729180de5",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_6ba08f50d0899a95fc8a30c738430037",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/311",
+   "bindingSha256": "c01178c595ea34dde7f15bc3d473e3894ee45fff0cdc2d241aa385252aacdbdb",
+   "targetUnitDigest": "86dc66eee5838d77b40475ed0b27263538b8e6f1b99af3bb84febac27800220c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_c534a1d34445a9c84f0ac6d415c6ac94",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/313",
+   "bindingSha256": "0a45bd9cabc0609499d11c75281f2c46d6e428cbe06bb28d20ca4b25430f6539",
+   "targetUnitDigest": "2333b6eb1f3a2b9c23f8744316800c7d17c79d5c3427fa96a6b2ffe4b971f0dd",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_a1ca672a9ce5da2f5d1be2f4a304897e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/315",
+   "bindingSha256": "7f3196083afae38616c193ca0759f9d2de6dbc1076b46ac8ae4482eddd072c70",
+   "targetUnitDigest": "d8f1249a2c419f0baf2d767776d91463f1efa81acbfb98ec917f75e46fd0841d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_21481f570623626c555abeb66544e32a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/316",
+   "bindingSha256": "edf22b2da8d787194417fae1b8fa86d6d7460f25d2cbcc2daf6246f98728017c",
+   "targetUnitDigest": "a2c04691faba0522f2ef90f8e0d4e0940e61682ea1c81b226f8fe75d6e33b523",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_92527ac22d56830923e42002f45e4503",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/320",
+   "bindingSha256": "e64f2b52aa414854bd5ae0a70294ce4bc8813395d635ee5acc443def427026c5",
+   "targetUnitDigest": "6fa9c9fcc7c65f27e78a080da2ba7c23d99924ddccad999cad74da219cbe06f8",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_044216d43ee604e2c391f65904d4fc67",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/324",
+   "bindingSha256": "5138ee643cdd8cb3630e0447eed52eeb0c1be989527d278a0ca7f9ca57fac554",
+   "targetUnitDigest": "736119c4cc6845655cbf0c7bd974e6ca9aa47af56a18637967135727d7999319",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_02222a3adca323c42d68bfc1e3ef0074",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/327",
+   "bindingSha256": "4404032054aaa0149b3e406ba3ab7fc1e8d586ecfadae7e701be76b3472c577e",
+   "targetUnitDigest": "c93ff7accfa74d803887b10ccc4f1c83000d462985b7ca40b18b41104939ce8c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_95df09dc4b082eed910954ae3d9f2982",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/328",
+   "bindingSha256": "42e14c964b3201bf0aba62c4b52ffb03ece2f706834570c996baefa56daf8329",
+   "targetUnitDigest": "3c0b2783128372e5b83c4cf6a47c550f020d1f903c41e8896f17326cfc17d153",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_d6ffa6438e88873e2ab109de98c88b8e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/330",
+   "bindingSha256": "2e8da4eff7bb3fd0c6653bc1112e2471b1dcf2982d3c4e30b57037bdcc84775a",
+   "targetUnitDigest": "e47e55176fe9a60d019524370f213d7ef2e9a101127b1fe1240f73a96c81447f",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_90bc8da9f3ac54b28ee99c0571f3d644",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/331",
+   "bindingSha256": "f241e937e1f26c491cc1bc4c0920481581d583c43b43ad93b720fc85e2bd7d60",
+   "targetUnitDigest": "a45acaeb1652116327762820c76424ed00d2f2de131d94c16cb179b6e8c57e0d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_4cf1caaebb2f42d74bcb0fbf1f5ad1fe",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/334",
+   "bindingSha256": "02cdadbb79b0696367f200cca97e51dbdf07fda6909d48052f40fe644c666de0",
+   "targetUnitDigest": "bdb952cf50f1ad2350771dd66bf8d2457df5227ab87f184abce12a8a277f22fe",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_670f343b35cc44d578eb070e60695f68",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/337",
+   "bindingSha256": "cefeeec0545643b91d231c245c17c0a46cc2eaa61b84a4ee50fe611f67557e6e",
+   "targetUnitDigest": "616c222609568f919a78d2faa84edfc975c8e8db9c2d046ea7922f4e48b47cdc",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_ca231ef093c8bd2a5ac89d1299e01853",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/340",
+   "bindingSha256": "7a26a9e83a09eac8973ff9c38c74871a1e186caeb9ddb914555e88c2e535a40a",
+   "targetUnitDigest": "c5c6ad2ea55987a32ed41732beb0582d0326128ed827cc655b29e2a14ae2d9bc",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_5f006128a4aace4f23ca9e593da3fed3",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/343",
+   "bindingSha256": "7086aa804ab7c594c8e49b63d3bf141fe1a31c893c6b4b05b5c95d150b9963a7",
+   "targetUnitDigest": "b4e45c574dd418a120f4959d19440e0169a7d4b0c40a269d51b720a72969744a",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_e85546ebdc346910e6f0d4d7e87b6f44",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/345",
+   "bindingSha256": "41afebbc3912f39754aa861a7f31f305a6299528400b13ffca27c1029e2ad2a1",
+   "targetUnitDigest": "37bc1d87f4949e20df85dca9c8cf5e71c743366dc424168490705486abc1948d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_4df3e42351bed50bab155db31cac4d69",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/346",
+   "bindingSha256": "db0b124c3717783aae56216a13e7fbc265c11a54b032d2aabf46530f10de8abf",
+   "targetUnitDigest": "77fee056c5b08ef7af1a1bd3f50d5e10fd9d4101b583320d9bab46f92be1f2b4",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_fd76a88f32041021be905c2f4380324f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/350",
+   "bindingSha256": "85fd6678148bad36e131113a3f7df963fb26540a568d49204d8dc4457673062f",
+   "targetUnitDigest": "d4d6ff311ac72b18d05f94392218e60335e9242e5e10ddd7ab10b74588fd8506",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_08ee8d10e6e6426a684a03a41da86f1f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/354",
+   "bindingSha256": "37cc5cfa0636c5f3aab64a434466787ee82c0f969f52653cff6780469546468e",
+   "targetUnitDigest": "14e0aa722cef643382c26bad2388e9cc7bf76b7d52067c72502af1cb2804f9d6",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_e85cb1459d8e0fc199c75abec6e29f13",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/356",
+   "bindingSha256": "f88f7925ee5bd9461a88310fb73c2efebcc7a01fb6acec535ceed273f282587b",
+   "targetUnitDigest": "0e40c4bec2d4c007a8ad19cda638c3a3bfc1c4866c8ca1c5ab81526c001a12dd",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_05afdb7e532066f2333782f0e57421a8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/357",
+   "bindingSha256": "4f74c2657da91b47ea06ba077acc1cf3424055877d5b3ff63e97d0b459417b6e",
+   "targetUnitDigest": "357a2a344123089446a3a10e192e9d89e9b224d4ded3e0b8366bb07d00e9ef9e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_16c0859152da30723055fd61b63e1478",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/364",
+   "bindingSha256": "d381ac4a80b0c7b3f9b54a3f835e96c519cd41a490149551f1ca1d296beba149",
+   "targetUnitDigest": "ee4f9e8c3f3602f8e8533b425a457f3807c79f7dcac0a5f2a7c77d66d16cfe52",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_1504531748cba9ccf7f26bedd67ed19b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/371",
+   "bindingSha256": "7ce49edcd074fece933bdca68eb41b780e89958f314059e8a910ee4e7abcd27b",
+   "targetUnitDigest": "c3f9e6193d91ecc9ecdd333a232e60012efb98b73cabc4604a691623bc8c5dc0",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_5bdcc916625cf6efb3b0b017be1700fb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/374",
+   "bindingSha256": "994c2b9b780236149559fc765e1db56795dc0a40f21ea1a8c5f62c6ef3ab709e",
+   "targetUnitDigest": "f41ecefca1aa681c16ead99e85a938e4f0983c804ca956852f7eed8ff235e966",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_3a9eedae02739e6ffe690d3a2b6c5684",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/377",
+   "bindingSha256": "26d5a75013455f0ba6be7c50a473cd4deb45920d480bef590ba5d86a592fa4f6",
+   "targetUnitDigest": "6e0fca4e38d4ff34faef73f00f135eff9fca9da23e37671624e66878e09e767d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_c0672ae1fee3b8e0cf510d20e0a8182e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/379",
+   "bindingSha256": "2907b2c07e09c404da061170876ae2b87615f2509517ee34f436ac7e33c6bd09",
+   "targetUnitDigest": "518b40214e39e32458b4abd8df5835a0d63076b09fe1e495606b103633fcfb69",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_002a6b92116ec28d662640e1e89671b7",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/380",
+   "bindingSha256": "e1db0c348d4555e7068b09731e5ff152bcb4ebdea05d70ded22a7ff7aa6701e2",
+   "targetUnitDigest": "c59a3e00f3c7354ba734d5bcf7728b08b771cdc2b66131e43a37719b2491dd98",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_00ce8ef23aaec1a6dd9be0251ba0ca3b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/385",
+   "bindingSha256": "dec72a14a00fa51687cda90b061139522fdc39c0f8d6839cc76ce4b7d26be5f2",
+   "targetUnitDigest": "fba7f5b48c1c78a285046e389aae2c388dcef9ec26dca41f2bc524687c5fb0fc",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_b7ccfa65fda08cc020c57ffa801d1c38",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/390",
+   "bindingSha256": "c741b41a8c2c58e3d7df87da66cb4dd2be060ad08b282525eee48dc133c109d7",
+   "targetUnitDigest": "493d626ba20ba39d1c0c025b7cce217de45a7a7f4356dbd99a54e93a652e00b2",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_48f4ffa8956be8bea3cda3d930af48ac",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/392",
+   "bindingSha256": "b780c03e6daafe07e977980d1cbb4bc5eca18e7c59b7c774541dd5fd638a5497",
+   "targetUnitDigest": "93cb01610d213afd09e43ef535222c463834632e403ebf4cd74a394dfdf9dcb6",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_d06b2ce15133866437a691773e465006",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/395",
+   "bindingSha256": "316b33b3a790401e79b0d7e64e52b13c55f405206dbfc46854922a3a5d5d6971",
+   "targetUnitDigest": "5292300def034a62a06d6730a25aebc712c8ba45596415819b28aea1203b9eea",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_6347e924083dea028ded2fda743ce159",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/397",
+   "bindingSha256": "9430f80ecf85ec1a4c8946ceedf244897e29bb22735a66c84874be3378b5c24a",
+   "targetUnitDigest": "870f0cda11251eb1ee8a3e50538b008cffb4f7b6e3c406b5216a9f297085ab6a",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_c1782e7b7f51dd2fa7de56e718cb2bff",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/398",
+   "bindingSha256": "e243315cf13678665ec092ed7d90ec289136410ecc434a5c923f0f03daf82527",
+   "targetUnitDigest": "92affba9ca672c1949df2d2497933025ca559c05df380d6b225ac301f4e214ee",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_68e9ce61dbff7a530b70a2ccf6531a45",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/400",
+   "bindingSha256": "818870492f1a952cb3e004c062df96d1f1b4f5288f5d2523a9105c0a8b421578",
+   "targetUnitDigest": "99e69377f8cb77fffdb4d0dd03bf62e409dbbda997a1f43fd988af8463577e0f",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_42f9bfce702ea73a320ebcbe6cd80249",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/402",
+   "bindingSha256": "d0ebd297e56f8a1a7cedf90bcca2e9935b944bb2bfcc1cea85be7166252a4093",
+   "targetUnitDigest": "b7aba936a64f091810574771c9d240bca4572e4156645068cd6091066de02482",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_b9b783d16e302d9058489856e6cde481",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/404",
+   "bindingSha256": "1e9f2a1056bb82172c193d276ba7a565ff34a5e5d064ff443c61f20ce1601e84",
+   "targetUnitDigest": "d248d7c3ed3bab201338d35554aed966136f261e32da3c1e0fc366b38ec4532e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_f63e378b765126fb5426a7286a0a46c9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/407",
+   "bindingSha256": "603bb243d1d424cd11c8411b65387ae97eea2afd363f3cdba8dca61ba2810847",
+   "targetUnitDigest": "d57167acd4b6dac5fe237e41eba7b61e6dcda1ea2e8c99e7049040ab37795c9b",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_b41ad20350f43a6ae7e49e01615baf5a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/409",
+   "bindingSha256": "8bfaf25b2fb1fa701b152ca8f27f51ab47685c959143ef1078f4bdb85855de06",
+   "targetUnitDigest": "3ca5ca86cbe88cbd6cdb04778c8c5e2b286ddcb3a3c84997a5651e3a06b245c3",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_8f08ea8e31fecc895af7d5e5a5e729ba",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/411",
+   "bindingSha256": "6be8ef89130b0aedfa77078c6ba957c66703ce80f2ef208634f7baa5e69b5955",
+   "targetUnitDigest": "f6a4d6d2d0eb4259dc2343f3344d63c3acffaf1211b2439f1d7c66502f3e8fb5",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_6b073340e38b94b93db36f74a464f9c1",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/413",
+   "bindingSha256": "21c63c846122a38cdb6c841b983d8308473468235235d65309712dbee758e738",
+   "targetUnitDigest": "8e58276b0592e40372a37ac42f2a7f2d457d7751f65c5a612dfc3921d4b43f44",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_de74e982f45712c6d325e6a73eff45d6",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/414",
+   "bindingSha256": "d8e15c3676bca5a758d6f717e0d456f46ce34997c98a6f198e8bab78598a7b03",
+   "targetUnitDigest": "c671382ac14dd3666195d2f3fd236db5229c64fdca276adb03d3df4f3356732c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_23287bcf7f6983bd1851efd037ced88f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/417",
+   "bindingSha256": "0339999f81a606fb2014a4a91d732f5675c43f7b496542ee3c1ac5b4735a426c",
+   "targetUnitDigest": "b6f027726edfbe603e799e5140a6545f768a1d496d716420bd7007dadb9af319",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_ea470beddec07b87fdc8d614f0e8c5c1",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/419",
+   "bindingSha256": "558d38dd92a29cdc5ab3e1bb36d7e853a3d625356648362ed5e02be6bbde62ab",
+   "targetUnitDigest": "6e5e5e820342d46018e9baf0a6c91d9e0d1bd9c917b2cf556203ff08ffd4b51e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_b8231625af5863b35986d15572ab7041",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/421",
+   "bindingSha256": "99522651d01d8259ab2a8bfcb8b483f370657740eef48747b4b5fba22bb5fa2e",
+   "targetUnitDigest": "c808ccbd6f107366a00b785c1279ac815806af56be163e696dd57963f3d7f01d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_b92bcaec50873a4ba6513926553e9df2",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/423",
+   "bindingSha256": "54bff2d69cf09b6c95ce8bf254fe52afcabc9b3a576d79fb0e141f41f20dae07",
+   "targetUnitDigest": "b90fe65b5bef9a02785fc21cad4b5cb34ac2759baf44596540350352ea23c48c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_f88e4e8f91d884a569207232482994b8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/425",
+   "bindingSha256": "7e56c7a68ac6b4e15ce9998b09c4050517d2c79ee0cdc7ba0b54e729fc298814",
+   "targetUnitDigest": "80ab9c4a9405eed4d1289cd8872637275cca4685a9bb0934ed9cb2d807fb8b4a",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_ea6c7805244cf8d32e0049344304793c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/426",
+   "bindingSha256": "d39b0134c08fd23b0eeaa257254ecf134c5d4475740bfad6bdf692895eae9793",
+   "targetUnitDigest": "eb63404bcc234075d335c4fcc64cbd5befb02d4124e963a16b942b574c80d0a0",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_f47c2464ff9bf0ea6de9116bdbe10a7e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/428",
+   "bindingSha256": "09ec29945962ccdc03d432fb2610aab94009ef33201fac02100645a6cf84bcf3",
+   "targetUnitDigest": "f53f0f718c2ee9e2ec07a7c380f22072bdfe1e65e21fc0fa4b60b4031234ae70",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_9a32cf51438ebcc2dbfcd8e4a11de03f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/429",
+   "bindingSha256": "4dbbe5e4c03afe4daf0480ae32885df090f5843490218e9888851cac094098da",
+   "targetUnitDigest": "e5395a5b412821882f3c67d2451a4826444e307371e31dd29d081604f3874236",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_fe16812176a17d9c4073dd71e177ead9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/431",
+   "bindingSha256": "9797f463ba41e96a5a6b0581a388e415414915552bc4b558849812bb54aff68f",
+   "targetUnitDigest": "6a9b6ff7d029a5a396af6faf728380f673e6388b6c65fb6746894d1fd11dc43d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_98c9deafd1078e8774b93960ce4d5b3a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/432",
+   "bindingSha256": "eb0d764fce8ea21b85d9a71b6153afc9c388c5eb03f9c23646d9193087c585e0",
+   "targetUnitDigest": "e22e3f4f933e9b5b9551432d2b8165e1ef3839c6296a10be73f67a35a44ec4e8",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_c1357150cb5532d69feff97882984ccd",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/434",
+   "bindingSha256": "48cd11383eff3ebcc0875d1c75c66fa981b51db59222540d8108b101ce4e88d9",
+   "targetUnitDigest": "1c0f8a82fce53e8ea0e4eb69a11ec8110ac6f111764803a6fcfadd3b51c3b33d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_fc981ac524ca57bc04c4ead8ea3161fe",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/437",
+   "bindingSha256": "eff79c9539dbaffc20606b065c1df388562c4c86632e43c5521cc9c3fc74bf8d",
+   "targetUnitDigest": "dbeaeb4c91c0c1aa4cc786077744b445ebe85a135036ce8325e42897dbeeca6e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_e79647f02e8a3507c31e2e57c75b929c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/439",
+   "bindingSha256": "e7c267d16676e1c5087c07ae09e1222ed8e9d214174c47e987584b443bba6f5e",
+   "targetUnitDigest": "0a6915d3d53788e9d70de92159d89758b13182872f5a7ee48020efc0ffacf620",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Heading carried with an added D-ADR0056 partial-supersession annotation, identical to current docs/specs/runner.md; nothing lost. The \"digest equal\" wording in the rationale is stale (non-blocking)."
+  },
+  {
+   "claimId": "claim_cdf96a5e899850a9fdb3343d9d6c4fcd",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/440",
+   "bindingSha256": "d874df25fb5281f5bb4d3d46f88861419684420ad4b7b1b9355fd55a1cd38f54",
+   "targetUnitDigest": "c0bbf53368466ef1474fbff89514a960821b2902802db0104386c556b460a32c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_3f61f80f487a94e1e4bb0963bf6348b5",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/441",
+   "bindingSha256": "c0ec7cd87c7fbb9f62d1ac2cf7c9240eaf24cc104a1255e22988653d323d7380",
+   "targetUnitDigest": "b348235f25df183af98143ce5220b4b9731b2e44dd4578dcd41d9432a5461c48",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_bd37b242f88115e67cb9870bf1741376",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/442",
+   "bindingSha256": "8c2d6903aa6c0c130b7eb8d17c5408ef78dbe1fdc5de7e10c44b60b17d963ac3",
+   "targetUnitDigest": "435237be21da6e98f5e57f152e12c65d5d01a3f36040305b225d95a2eda0ab1a",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_755111c889e95014f99c54a41a112ca3",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/443",
+   "bindingSha256": "84c755cca2031efc8b8335dea71b0791e6e5c7a4a3cdb6e3cb648e1cf8db9569",
+   "targetUnitDigest": "58e740e33a9a769ae192744c810c87b42186d4cdf7bd00141de737534efe7c0c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_dc3c8fc66a4e43d514339862bcc10846",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/444",
+   "bindingSha256": "a9d191a9f1fc2b3ec50c7b2a4c807e301249c4a115cf84769b48ec2517f0431b",
+   "targetUnitDigest": "28a2888fab360eae6e8483223120b6b767c32cddd3194d81541cc478bdc06af9",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_0a282d6aafb1cee14928a469d20dbcf2",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/445",
+   "bindingSha256": "f4e68d4ea2211f96a467485d4958b6a1615901070f06bd700edc73c718bc3bcd",
+   "targetUnitDigest": "44dac5df762c5f87cc45d20804acdd3feb26cc918d6555421c131c555aea4fd4",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_b34c6fba42019062dea0b1058540985e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/446",
+   "bindingSha256": "148f6a2fd103da65e31f440820c539cc1fa357c1c15df88f4d097870933d72fb",
+   "targetUnitDigest": "eede37c34599d00d26acf3126dcc0dd2f0ef3db8aaaf8b372af48043b41531b1",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_44294c754f97f771769d49ebd6a0614d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/447",
+   "bindingSha256": "e0340fb6e6566ec4fd6e93a373097ed6ef62e7fab646c0f258a07d12ee33ddec",
+   "targetUnitDigest": "b65eccb0bfb36f2ca3b4aea4c026dfaaaa60367e4b4e0ee0b082bf19ad74d5eb",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_b2d081ec1426e138bd79fc0703ba645a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/448",
+   "bindingSha256": "9a3473bd951b69d14e1bd5d8613f713ec1df5436e104a7d5031b66e3b4d3c41b",
+   "targetUnitDigest": "3e06e42c903776657538aeb0c3293d568aeaaed3c5ee38896d893cccd4c15e09",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_c7fbd134619006f07ca2281f69601c5d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/449",
+   "bindingSha256": "0b95e6d402886405ed6034a2163467d7fbfbc3e72fda1807d23fe470184b7b23",
+   "targetUnitDigest": "d0b9dc422c288c90827e052e3925c863364d5c1da85bdc9b591861a9fa4b5e82",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_de96b9e2eda969f6cf15d3c98779e1ee",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/450",
+   "bindingSha256": "a18cd87b842235363d094350369ec640f8ad695f065d6faceddbdfc3a32a6755",
+   "targetUnitDigest": "7a82fc342dbc99f94ab1d7f5cb7b99e4f1d2fb4e701626cfe52efea70c0169da",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_65ec90fc672e6d1a8dff764c3e3dd516",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/451",
+   "bindingSha256": "fe390a7798f6bcd3f0b7201ee7fc71fbd0b4c599b03581eab94b03bbf700646f",
+   "targetUnitDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_8f31a4f2f6b6f91fcbf89cace7be6bff",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/452",
+   "bindingSha256": "51939a41c7810ade8177b04e51ee6c125ab1efca737571a4a06cd18b9f5827d3",
+   "targetUnitDigest": "8eb6fc7fa7239f55dc32f5aff96506fdb14e1dab2dcc19646c88f9c35d022dcc",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Heading title identical to source; digest differs only through added section supersession notes (resync-a); heading claim carried."
+  },
+  {
+   "claimId": "claim_6f695d26a139ec834153e132e8024107",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/453",
+   "bindingSha256": "24ad159bc32029ce5d209cc40e650040150033612ef3aa8be8f4b8f98d9252f5",
+   "targetUnitDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  },
+  {
+   "claimId": "claim_5f10674a9a170a84bfd02d6b1462ea18",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/454",
+   "bindingSha256": "81c3dbd6e6931d21e6ac5ee3fdbd630c376bbb1f3ea0925d04291186df0ce768",
+   "targetUnitDigest": "a53cd6b5733054d5303010da8b1c661ba5322563d115210eb26ba3a6986cd7f8",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Heading title identical to source; digest differs only through added section supersession notes (resync-a); heading claim carried."
+  },
+  {
+   "claimId": "claim_5348a42561949a4c0042f0196fe52f56",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/455",
+   "bindingSha256": "5fa4d89274f84622dc3fc163f44f69fb4f33497fa85e1e422d7e240d20929cda",
+   "targetUnitDigest": "657e5b15bf7f9f37215c2f5ee49bc8e3138f6c678dc74b8d68a051604c85cd71",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; frozen source unit digest equals target digest (byte-identical carriage of the claim into its mapped runner holder)."
+  }
+ ]
+}
