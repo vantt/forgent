@@ -652,7 +652,7 @@ Clarification, 2026-10-22: only the automatic triggers are gated by the dispatch
 - SIGKILL tests do not prove power-loss safety; the guarantee rests on `fsync` semantics of the filesystem, reported by doctor.
 - A branch rename is not followed by the branch stream key.
 - Deleting a machine ref on the remote removes it from other clones at their next pruning fetch; the history then lives only on that machine.
-- Erasing a secret that reached a pushed ref needs a history rewrite on every clone; there is no tombstone protocol.
+- A secret that reached a pushed event cannot be erased. There is no tombstone protocol, and the store refuses a rewritten history: a rewound peer mirror keeps its earlier tip and is named `event-store-mirror-rewound` (section 14), and a rewound own ref refuses. The remedy is to treat the secret as leaked: revoke or rotate it at its issuer, and stop writing it into Work text. Events are not masked at append today (decision of 2026-10-25; backlog `p-nykfevjxqf`): worker secrets reach workers only through the environment, and `executor.dispatch` records the configured command unexpanded, so the exposure is text a person types into an item, note or reason.
 - The chain grows with history, and a range walk does not make that free. In V-REF-01, on a DAG of 100,011 commits, a full `rev-list` took 224 ms and a range `A..B` took 190 ms for 90,011 commits (section 15). Ref-chain snapshot and compaction are a later item, opened when a full rebuild exceeds the budget V-SPAWN-01 fixes for reads. Owner threshold (2026-10-17): open that item when a full rebuild exceeds 2 s on the slowest of the owner's machines.
 
 ## 23. Proof gates
