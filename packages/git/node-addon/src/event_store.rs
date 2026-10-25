@@ -59,8 +59,8 @@ pub struct EventStore {
     registry: Registry,
     machine: String,
     resolved: (Arc<GitDriver>, Arc<RepoHandle>),
-    /// Legacy-migration admission: asked once, by the first write or the
-    /// pre-gate `admit_writes`, never by a read.
+    /// Legacy-migration admission: asked by the first write or the pre-gate
+    /// `admit_writes`, never by a read, and kept once the answer is settled.
     write_refusal: OnceLock<Option<String>>,
     publication_remote: String,
     /// What this store's last complete read answered; see `ReadMemo`.
@@ -243,6 +243,13 @@ fn stream_ids(streams: &[String]) -> Result<Vec<StreamId>> {
         .map(|s| StreamId::parse(s).map_err(error))
         .collect()
 }
+fn is_repository_state(code: fgos_event_store::errors::ErrorCode) -> bool {
+    use fgos_event_store::errors::ErrorCode;
+    matches!(
+        code,
+        ErrorCode::EventStoreMigrationRequired | ErrorCode::EventStoreRefspecMissing
+    )
+}
 impl EventStore {
     /// The reason writes are refused, or `None`. The answer is asked of Git
     /// once per store, and Git is never asked inside the Work gate (rank 60):
@@ -256,14 +263,21 @@ impl EventStore {
             return Err(error("event-store-admission-required"));
         }
         let (driver, repo) = &self.resolved;
-        let asked = fgos_event_store::legacy_import::write_readiness(
+        match fgos_event_store::legacy_import::write_readiness(
             driver,
             repo,
             &self.publication_remote,
-        )
-        .err()
-        .map(|e| e.to_string());
-        Ok(self.write_refusal.get_or_init(|| asked).as_deref())
+        ) {
+            Ok(()) => Ok(self.write_refusal.get_or_init(|| None).as_deref()),
+            // Only a refusal that names a repository state is a settled answer.
+            // Any other failure (a Git command or I/O error) may clear, so it
+            // is returned to this write and the next write asks again.
+            Err(e) if is_repository_state(e.code) => {
+                let asked = Some(e.to_string());
+                Ok(self.write_refusal.get_or_init(|| asked).as_deref())
+            }
+            Err(e) => Err(error(e)),
+        }
     }
     fn context(&self, ranks: &[u32], depth: u32) -> Result<(&GitDriver, &RepoHandle, &str)> {
         available()?;

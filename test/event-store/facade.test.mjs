@@ -201,6 +201,15 @@ test('a write refused by a transient Git failure is admitted once the failure cl
   assert.equal(store.append('project', [event], {}, 'fixture', []).events.length, 1, 'the refusal outlived the failure that caused it');
 });
 
+test('a write refused for a repository state stays refused after that state changes', { skip: process.platform !== 'linux' }, t => {
+  const { store, repo, git } = fixture(t);
+  fs.writeFileSync(path.join(repo, '.fgos/events.jsonl'), JSON.stringify({ ts: '2026-01-01T00:00:00.000Z', seq: 1, type: 'work.add', payload: { id: 'item-1', title: 'legacy' }, v: 4 }) + '\n');
+  git('add', '.fgos/events.jsonl'); git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'tracked legacy');
+  assert.throws(() => store.append('project', [event], {}, 'fixture', []), { message: /event-store-migration-required/ });
+  git('rm', '-q', '.fgos/events.jsonl'); git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'retire legacy');
+  assert.throws(() => store.append('project', [event], {}, 'fixture', []), { message: /event-store-migration-required/ }, 'a settled refusal is kept for the life of the store');
+});
+
 test('a repeat read is not sent the legacy history it already holds, and each read still gets its own events', { skip: process.platform !== 'linux' }, t => {
   const { store, repo, git } = fixture(t);
   const line = (seq) => JSON.stringify({ ts: '2026-01-01T00:00:00.000Z', seq, type: 'work.add', payload: { id: `item-${seq}`, title: 'legacy' }, v: 4 }) + '\n';
