@@ -5,6 +5,8 @@
     "commit": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
     "date": "2026-10-25",
     "finalPinF": null,
+    "followUpCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+    "followUpRuling": "L13-17 (W18 corrections)",
     "basis": "Immutable committed turn-start snapshot only (git show 53de2207e1ea8a9417ac131f785704d6ab72ba2c:path), including every reviews/ file, L13-1..L13-16 and the owning receipts. Concurrent carries/** and g0rework/** edits are excluded. Scope-specific APPROVE/FIXED/pass does not turn an overall REWORK into approval of a whole gate. met-local means no unowned local work remains before F; owner/external/F duties remain explicit, not accepted or completed.",
     "evidencePathBase": "plans/260925-documentation-authority-unification/reports/phase-09",
     "reconciliation": "gate-reconcile/receipt.json"
@@ -63,7 +65,7 @@
         }
       ],
       "atFinalPinUnderLease": [
-        "Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). The 73/257 mismatch count is historical at 77db6ed2b, not a current count.",
+        "Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count.",
         "After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F.",
         "After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it)."
       ],
@@ -174,7 +176,7 @@
     {
       "gateId": "non-behavioral-census-join",
       "g": "G2",
-      "status": "met-local",
+      "status": "partial",
       "evidence": [
         "census-join/receipt.md",
         "reviews/w2-g2-census-review.json",
@@ -187,12 +189,14 @@
       ],
       "commit": "b25dadae2",
       "pin": "3d0169f39",
-      "note": "Reviewed custody at 3d0169f39: 1,126 ids = 646 owning-proof joins + 293 REJECT confirmations + 187 owned judgments. Post-pin delta: 143 dynamic sites (87 proof joins / 56 source judgments) and 16 literals, including 8 open judgments. W3 approves their recorded ownership, not settlement of those judgments. The 33 moved Rust proof locators and combined verifier pin remain F work under L13-9.4; no current-pin or final coverage is claimed.",
-      "remaining": "",
-      "blockers": [],
+      "note": "Historical reviewed custody at 3d0169f39 was 646 proof joins + 293 REJECT confirmations + 187 owned judgments. The additive settlement at a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6 gives those 187 ids individual dispositions: 134 owning-test joins, 49 re-graded REJECTs and 4 owned navigation-citation parks. Four additional drifted grades are separately re-judged REJECT; current original-census totals are 780 joins + 342 REJECTs + 4 parks = 1,126. No independent settlement approval is claimed. Historical post-pin coverage (143 dynamics and 16 literals, including 8 open judgments), 33 moved Rust locators and combined-verifier F duties are not promoted by this turn (L13-17.1; census-join/receipt.md).",
+      "remaining": "Independently review the pinned settlement in census-join/receipt.md and census-join/settlement.json; settle its 4 explicitly owned citation parks before F. G2 stays partial until settlement and independent review (L13-17.1).",
+      "blockers": [
+        "Independently review the pinned settlement in census-join/receipt.md and census-join/settlement.json; settle its 4 explicitly owned citation parks before F. G2 stays partial until settlement and independent review (L13-17.1)."
+      ],
       "cleared": [],
       "atFinalPinUnderLease": [
-        "Re-run census-join/join.py --pin F --rescan; refresh the 33 moved Rust locators, settle/review the 187 original owned judgments and 8 open post-pin literal judgments plus any new F delta, and obtain current-pin delta review (execution plan §2 G2 / §3 W3; L13-9.4).",
+        "Re-run census-join/join.py --pin F --rescan; refresh the 33 moved Rust locators, settle/review the 8 open post-pin literal judgments plus any new F delta, and obtain current-pin delta review (execution plan §2 G2 / §3 W3; L13-9.4). The original 187 judgments belong before F under L13-17.1.",
         "Refresh G2/G6 to a shared F pin and make preserve-premise/verify.py exit 0 without weakening its pin equality (L13-9.4)."
       ],
       "external": []
@@ -208,12 +212,12 @@
       ],
       "commit": "f534aeaea",
       "pin": null,
-      "note": "All 17 dropped ids have independent per-id APPROVE at cffe725b9, with dropped-010 superseded and no tie. Subsequent target edits do not inherit those approvals; final current-anchor/digest and register-status reconciliation is still required at F, as the existing execution plan W3 requires.",
+      "note": "All 17 dropped ids have independent per-id APPROVE at cffe725b9, with dropped-010 superseded and no tie. Subsequent target edits do not inherit those approvals; final current-anchor/digest and register-status reconciliation is still required at F, as the original register already required (execution plan §2 G3; W3 does not name G3).",
       "remaining": "",
       "blockers": [],
       "cleared": [],
       "atFinalPinUnderLease": [
-        "Re-check all 17 restored/superseded targets at F anchors/digests; delta-review changed targets and replace restored-pending-review / superseded-pending-review with final dispositions (execution plan §2 G3 / §3 W3)."
+        "Re-check all 17 restored/superseded targets at F anchors/digests; delta-review changed targets and replace restored-pending-review / superseded-pending-review with final dispositions (pre-existing register G3 remaining/F duty; execution plan §2 G3, not W3)."
       ],
       "external": []
     },
@@ -286,7 +290,7 @@
     {
       "gateId": "step3-step4-preserve-premise-review",
       "g": "G6",
-      "status": "met-local",
+      "status": "partial",
       "evidence": [
         "preserve-premise/receipt.md",
         "preserve-premise/sentence-delta.json",
@@ -306,12 +310,14 @@
       ],
       "commit": "db023f065",
       "pin": "4178dcc6e",
-      "note": "W8 parks covers all 1,260 rows (1,220 APPROVE / 40 REWORK); W8 judgments covers 163 notes plus the overturn (163 APPROVE / 1 REWORK). W9 independently APPROVEs all seven fix items in db023f065. Current pin-scoped totals: 5,413 = 4,320 bounded confirmations + 924 owned parks + 163 dated notes + 6 repoint proposals; 1,093 action rows are not resolved by this reconciliation, but have reviewed custody/prepared work. Scoped proof replays are byte-identical. c5586146c’s verifier pin was independently approved in W8; the combined verifier is still an F obligation.",
-      "remaining": "",
-      "blockers": [],
+      "note": "W8 parks covers all 1,260 rows (1,220 APPROVE / 40 REWORK); W8 judgments covers 163 notes plus the overturn (163 APPROVE / 1 REWORK). W9 approved db023f065's reclassification of 319 parks and 20 operand rows by rule, with a 56-row spot check and positive/negative controls, not row by row; this is accepted under L13-17.3. Current pin-scoped totals: 5,413 = 4,320 bounded confirmations + 924 owned parks + 163 dated notes + 6 repoint proposals; 1,093 action rows are not resolved by this reconciliation, but have reviewed custody/prepared work. Scoped proof replays are byte-identical. c5586146c’s verifier pin was independently approved in W8; its misc-fix receipt counts were corrected in 25e8842d3 but still need independent re-review (L13-17.4). That before-F remaining item makes G6 partial under the existing met-local integrity rule; the combined verifier is still an F obligation.",
+      "remaining": "Independently re-review 25e8842d3, the misc-fix receipt counts (W18 F4; L13-17.4); W8 cleared only c5586146c's verifier-pin fix.",
+      "blockers": [
+        "Independently re-review 25e8842d3, the misc-fix receipt counts (W18 F4; L13-17.4); W8 cleared only c5586146c's verifier-pin fix."
+      ],
       "cleared": [
         {
-          "item": "c5586146c (w7 pin fix) not independently checked.",
+          "item": "c5586146c verifier-pin fix only: W8 independently checked it. The separate misc-fix receipt-count correction in 25e8842d3 remains open under L13-17.4.",
           "clearedBy": [
             "c5586146c"
           ],
@@ -335,7 +341,7 @@
       ],
       "atFinalPinUnderLease": [
         "Refresh all preserve-premise evidence at F (the earlier 186 G6 rows / 86 wrapper digests are historical lower bounds, not current totals), replay twice byte-identically and obtain delta review (execution plan §2 G6 / §3 W3, L13-9.4).",
-        "Co-compose the reviewed 163 dated wrapper notes, owned-park actions and 6 repoint proposals (including the prepared four-line dispatch patch), use actual flip date/placement, and validate them with the full F chain before cutover. Owned parks remain owned, not automatic preserves or blanket retirements (preserve-premise receipt; w9-g6-fix review).",
+        "Co-compose the reviewed 163 dated wrapper notes, owned-park actions and 6 repoint proposals (including the prepared four-line dispatch patch), use actual flip date/placement, and validate them with the full F chain before cutover. Owned parks remain owned, not automatic preserves or blanket retirements (L13-17.2; preserve-premise receipt; w9-g6-fix review). Only composition is deferred; the judgments were reviewed before F.",
         "Pass the combined G2/G6 verifier at the shared F pin (L13-9.4)."
       ],
       "external": []
@@ -499,6 +505,8 @@
         "reviews/w11-g9-rework-review.json",
         "reviews/w12-g9-followup-review.json",
         "reviews/w15-g9-parks-review.json",
+        "reviews/w13-misc-pin-and-gloss-review.json",
+        "reviews/w14-check-hardening-review.json",
         "g9/receipt.md",
         "reviews/w11-import3-review.json",
         "owner-answers.md",
@@ -506,7 +514,7 @@
       ],
       "commit": "33cc5539d",
       "pin": null,
-      "note": "Interim work and rework have independent reviews. Current cohort is 574 physical records / 684 memberships, not 518+144 distinct rows: 526 still-valid, 15 needs-recomposition, 31 superseded, 2 owned backlog parks. All former 338 mechanical parks were reviewed and drift-only corrections approved in W16 B-pass. 15 inherited phase-08 /parked blockers remain open via carriedBlocker at their original owning records (L13-14). 546 prepared bodies; W16 sweep has zero drift/chain/body/judgment errors. Record SHA re-pins and the ratchet exception field are reviewed; L13-13.3 still keeps the two historical Doer refs.",
+      "note": "Interim work and rework have independent reviews. Current cohort is 574 physical records / 684 memberships, not 518+144 distinct rows: 526 still-valid, 15 needs-recomposition, 31 superseded, 2 owned backlog parks. The former 338 mechanical parks were re-judged in 63c884240. W15 reviewed the 50 parks, superseded rows and recomposition rows in full (5 parks + 32 superseded + 13 recomposition), and sampled 60 of the 288 still-valid rows; drift-only corrections were approved in W16 B-pass. 15 inherited phase-08 /parked blockers remain open via carriedBlocker at their original owning records (L13-14). 546 prepared bodies; W16 sweep has zero drift/chain/body/judgment errors. Record SHA re-pins and the ratchet exception field are reviewed; L13-13.3 still keeps the two historical Doer refs.",
       "remaining": "",
       "blockers": [],
       "cleared": [
@@ -538,7 +546,9 @@
           "reviews": [
             "reviews/w11-g9-rework-review.json",
             "reviews/w10-g9-interim-review.json",
-            "reviews/w12-g9-followup-review.json"
+            "reviews/w12-g9-followup-review.json",
+            "reviews/w13-misc-pin-and-gloss-review.json",
+            "reviews/w14-check-hardening-review.json"
           ],
           "verdict": "APPROVE: Changed paths are only g9/**, composition/** and the exceptions file. The exceptions diff is exactly the one-line inputCommit 92260972c -> 5965143b4 re-pin."
         },
@@ -610,28 +620,30 @@
     }
   ],
   "cutoverReadiness": {
-    "summary": "Met-local (not met at F): G2, G3, G4, G6, G7, G9. G0/G1 still need independent review of 25 new pending candidate rebinds; G1 also has the L13-16 live-parity REWORK. G5 lacks the surviving-map clause check and owner acceptance; G8 lacks repository-local archive-ref custody and independent review of its receipt correction. These local gaps still block the cutover approval packet. Owner backlog/carried blockers, HARDEN declarations/section 7 consent, SEAT release/routes and G10 rehearsal remain explicit external dependencies; F joins, post-apply rebinds, guards, census/G6 refresh, full-suite attribution and final status review remain unperformed. No cutover, publication, main import or lease is approved here.",
+    "summary": "Met-local (not met at F): G3, G4, G7, G9. G2 remains partial pending independent settlement review and its 4 before-F citation parks; G6 is partial pending independent re-review of 25e8842d3’s misc-fix receipt counts (L13-17). G0/G1 still need independent review of 25 new pending candidate rebinds; G1 also has the L13-16 live-parity REWORK. G5 lacks the surviving-map clause check and owner acceptance; G8 lacks repository-local archive-ref custody and independent review of its receipt correction. These local gaps still block the cutover approval packet. Owner backlog/carried blockers, HARDEN declarations/section 7 consent, SEAT release/routes and G10 rehearsal remain explicit external dependencies; F joins, post-apply rebinds, guards, census/G6 refresh, full-suite attribution and final status review remain unperformed. No cutover, publication, main import or lease is approved here.",
     "beforeFinalPin": [
       "G0: Independently review the 25 pending carries-current-rebindings rows (8 target-digest changes), binding each verdict to the current claim/row and digests; W17-3 is scope/mechanical PASS, not per-row content approval.",
       "G1: Fix and independently re-review W17-1: refresh the 4 live distribution.md heading rows, add parity for unheaded-block-17 and restore live heading/direct-block coverage alongside authoring replay (L13-16). No parallel uncommitted fix is counted.",
       "G1: Obtain current-digest independent review for the 25 pending candidate rebinds introduced by a8ea05c50 (8 target-digest changes), shared with G0; mechanical W17-3 PASS is not semantic approval.",
+      "G2: Independently review the pinned settlement in census-join/receipt.md and census-join/settlement.json; settle its 4 explicitly owned citation parks before F. G2 stays partial until settlement and independent review (L13-17.1).",
       "G5: Extend g5/check.py with per-span surviving docs/reading-map.md locations and explicit proposed text for the banner restatement and Truth-correction suffix; obtain an independent check of that complete clause. The current 10-span legacy check is insufficient.",
+      "G6: Independently re-review 25e8842d3, the misc-fix receipt counts (W18 F4; L13-17.4); W8 cleared only c5586146c's verifier-pin fix.",
       "G8: Provide the authorized LOCAL archive ref with pinned custody evidence; archive/design.md says it existed only in the disposable rehearsal, whose scratch was removed. No repository-local archive ref was found. No push/main publication is authorized by this task.",
       "G8: Independently re-review f67e0f676’s records-only fix for W14 w8-archive-receipt-json-stale; do not infer independent approval from the Lead’s edit. Keep the separate low documentation note about retained JSON path-string recovery visible."
     ],
     "atFinalPinUnderLease": [
       "Import main once with merge accounting and record final pin F; any later import reopens changed-path delta work (execution plan §3 W3).",
-      "G0: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). The 73/257 mismatch count is historical at 77db6ed2b, not a current count.",
+      "G0: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count.",
       "G0: After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F.",
       "G0: After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
       "G1: Apply the reviewed prepared composition/GAP-05/citation chain under lease, then rerun owning dead-vocabulary and citation guards on the post-apply tree, baseline unchanged (L13-11.2–3).",
       "G1: Recompose the 2 drifted carries pointer patches, bin/fgos.mjs and docs/backlog.md, and recheck all 24 at F (W17-2 ACCEPT-DISCLOSED; L13-16).",
-      "G2: Re-run census-join/join.py --pin F --rescan; refresh the 33 moved Rust locators, settle/review the 187 original owned judgments and 8 open post-pin literal judgments plus any new F delta, and obtain current-pin delta review (execution plan §2 G2 / §3 W3; L13-9.4).",
+      "G2: Re-run census-join/join.py --pin F --rescan; refresh the 33 moved Rust locators, settle/review the 8 open post-pin literal judgments plus any new F delta, and obtain current-pin delta review (execution plan §2 G2 / §3 W3; L13-9.4). The original 187 judgments belong before F under L13-17.1.",
       "G2: Refresh G2/G6 to a shared F pin and make preserve-premise/verify.py exit 0 without weakening its pin equality (L13-9.4).",
-      "G3: Re-check all 17 restored/superseded targets at F anchors/digests; delta-review changed targets and replace restored-pending-review / superseded-pending-review with final dispositions (execution plan §2 G3 / §3 W3).",
+      "G3: Re-check all 17 restored/superseded targets at F anchors/digests; delta-review changed targets and replace restored-pending-review / superseded-pending-review with final dispositions (pre-existing register G3 remaining/F duty; execution plan §2 G3, not W3).",
       "G5: Re-run the full retention/accepted-surviving-span check at F (execution plan §2 G5 / §3 W3); do not treat the historical ten-span check as satisfying both clauses.",
       "G6: Refresh all preserve-premise evidence at F (the earlier 186 G6 rows / 86 wrapper digests are historical lower bounds, not current totals), replay twice byte-identically and obtain delta review (execution plan §2 G6 / §3 W3, L13-9.4).",
-      "G6: Co-compose the reviewed 163 dated wrapper notes, owned-park actions and 6 repoint proposals (including the prepared four-line dispatch patch), use actual flip date/placement, and validate them with the full F chain before cutover. Owned parks remain owned, not automatic preserves or blanket retirements (preserve-premise receipt; w9-g6-fix review).",
+      "G6: Co-compose the reviewed 163 dated wrapper notes, owned-park actions and 6 repoint proposals (including the prepared four-line dispatch patch), use actual flip date/placement, and validate them with the full F chain before cutover. Owned parks remain owned, not automatic preserves or blanket retirements (L13-17.2; preserve-premise receipt; w9-g6-fix review). Only composition is deferred; the judgments were reviewed before F.",
       "G6: Pass the combined G2/G6 verifier at the shared F pin (L13-9.4).",
       "G7: Recheck every approved spec digest at F; recompose/delta-review changed specs and the 36 G9-deferred specs plus predecessor chain (execution plan §2 G7, §3 W3).",
       "G7: Run the full post-apply ledger resolution/rebind, covering all residual bindings, not just GAP-05. Use the W10 inventory (407 distinct = 361 chain-caused + 46 at pin; 556 assertions) only as a historical sizing witness, then re-enumerate at F (w10-composition-rework F7).",

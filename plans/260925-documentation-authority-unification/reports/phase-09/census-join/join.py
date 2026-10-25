@@ -95,7 +95,11 @@ def main():
     assert args.out.resolve() == HERE or str(args.out.resolve()).startswith('/tmp/fgos-work/w2-d4b/')
     args.out.mkdir(parents=True, exist_ok=True)
     pin = git('rev-parse', '--verify', args.pin+'^{commit}').decode().strip()
-    register = json.loads((OLD / 'step-08-preflip-gates.json').read_text())
+    settlement_path = HERE / 'settlement-decisions.json'
+    settlement = json.loads(settlement_path.read_text()) if settlement_path.exists() else None
+    settling = settlement is not None and settlement['sourceCommit'] == pin
+    register_bytes = git('show', pin + ':' + str((OLD / 'step-08-preflip-gates.json').relative_to(ROOT)))
+    register = json.loads(register_bytes)
     inventory_pin = json.loads((OLD / 'step-08-post-census-join.json').read_text())['inventorySourceCommit']
     sites = register['nonBehavioralCensusSites']
     assert len(sites) == len({s['id'] for s in sites}) == 1126
@@ -109,7 +113,7 @@ def main():
     sources = {f: git('show', pin + ':' + f).decode() if f in tracked else '' for f in files}
     js = sorted(f for f in files if f in tracked and f.endswith(('.mjs', '.js')) and (f.startswith('test/') or '/tests/' in f))
     cmd = ['node', '--expose-internals', str(HERE / 'test-locators.mjs')]
-    proc = subprocess.run(cmd, cwd=ROOT, input=json.dumps({'pin': pin, 'files': js}), text=True, capture_output=True, check=True)
+    proc = subprocess.run(cmd, cwd=ROOT, input=json.dumps({'pin': pin, 'files': js, 'includeTemplates': settling}), text=True, capture_output=True, check=True)
     locators = json.loads(proc.stdout)
     oldargv = sys.argv[:]
     sys.argv = [str(OLD / 'step-02l-inventory.py'), '--input-commit', pin]
@@ -122,7 +126,7 @@ def main():
         sources[file] = git('show', pin+':'+file).decode()
     extra_js = sorted(f for f in fresh_files if f not in locators and f.endswith(('.mjs','.js')) and (f.startswith('test/') or '/tests/' in f))
     if extra_js:
-        proc = subprocess.run(cmd,cwd=ROOT,input=json.dumps({'pin':pin,'files':extra_js}),text=True,capture_output=True,check=True)
+        proc = subprocess.run(cmd,cwd=ROOT,input=json.dumps({'pin':pin,'files':extra_js,'includeTemplates':settling}),text=True,capture_output=True,check=True)
         locators.update(json.loads(proc.stdout))
     expressions = collections.defaultdict(list)
     for data in fresh.values():
@@ -208,12 +212,10 @@ def main():
         rows.append(row)
     assert sum('gradeRecord' in r for r in rows) == 314
     residue = [r for r in rows if r['status'] == 'judgment-required']
-    out = dict(sourceCommit=pin, inventorySourceCommit=inventory_pin, registerSha256=sha((OLD / 'step-08-preflip-gates.json').read_bytes()),
+    out = dict(sourceCommit=pin, inventorySourceCommit=inventory_pin, registerSha256=sha(register_bytes),
                counts=dict(sites=len(rows), files=len(files), statuses=dict(collections.Counter(r['status'] for r in rows))),
                independentApproval=False, finalPinCoverage=False,
                method='Join stable register identities; current tracked blob digests; exact grade passages, or lexical same-file test/fixture-helper custody. No tests executed and no generic fixture or role exemption.', rows=rows)
-    dump(args.out / 'join.json', out)
-    dump(args.out / 'residue.json', dict(sourceCommit=pin, count=len(residue), rows=residue))
     def named_proof(file, title):
         source = sources.get(file)
         if source is None: source = git('show',pin+':'+file).decode(); sources[file] = source
@@ -221,10 +223,82 @@ def main():
             test, = [t for t in rust_tests(source) if t['title']==title and not t['ignored']]
             return rust_proof(file,source,test)
         if file not in locators:
-            run = subprocess.run(cmd,cwd=ROOT,input=json.dumps({'pin':pin,'files':[file]}),text=True,capture_output=True,check=True)
+            run = subprocess.run(cmd,cwd=ROOT,input=json.dumps({'pin':pin,'files':[file],'includeTemplates':settling}),text=True,capture_output=True,check=True)
             locators.update(json.loads(run.stdout))
         test, = [t for t in locators[file]['tests'] if t['title']==title]
         return dict(file=file,testTitle=title,line=test['start'],locator=file+':'+title,sourceSha256=sha(source))
+
+    if settling:
+        # Additive, source-bound judgments; the old pin never loads this layer.
+        baseline = json.loads(git('show', settlement['baselinePin'] + ':' +
+                                  str((HERE / 'residue.json').relative_to(ROOT))))
+        original_ids = {r['id'] for r in baseline['rows']}
+        assert len(original_ids) == 187
+        decisions = {r['id']: r for r in settlement['rows']}
+        assert len(decisions) == len(settlement['rows'])
+        assert set(decisions) == original_ids | {r['id'] for r in residue}, 'Unlisted or unrelated current judgment'
+        settled_rows = []
+        for row in rows:
+            if row['id'] not in decisions: continue
+            decision = decisions[row['id']]
+            group = settlement['groups'][decision['group']]
+            assert decision['sourceSha256'] == row['sourceSha256'], row['id']
+            assert decision['file'] == row['file']
+            evidence = decision['evidence']
+            assert evidence, row['id']
+            for span in evidence:
+                raw = git('show', span['pin'] + ':' + span['file']).decode()
+                assert sha(raw) == span['sourceSha256'], span
+                assert raw.splitlines()[span['line']-1] == span['text'], span
+            proofs = [named_proof(p['file'], p['testTitle']) for p in decision.get('proofs', [])]
+            disposition = decision['disposition']
+            detail = dict(id=row['id'], originalOwnedJudgment=row['id'] in original_ids,
+                          group=decision['group'], disposition=disposition,
+                          reason=group['reason'], detail=decision['detail'], file=row['file'],
+                          sourceSha256=row['sourceSha256'], originalLine=row['originalLine'],
+                          currentLine=row['currentLine'], evidence=evidence, owningProofs=proofs,
+                          previousStatus=row['status'])
+            anchor = next((s for s in evidence if s['pin'] == pin and s['file'] == row['file']), evidence[0])
+            detail['locator'] = {key: anchor[key] for key in ['pin', 'file', 'line']}
+            if 'gradeRecord' in row:
+                detail['priorGradeRecord'] = {key: row['gradeRecord'][key] for key in ['path', 'line', 'memberId']}
+            if disposition == 'joined':
+                assert proofs and row['sourcePresent']
+                row.update(status='joined-owning-test', owningProofs=proofs, custody=group['reason']+' '+decision['detail'])
+            elif disposition == 'confirmed REJECT':
+                assert not proofs
+                grade = dict(admission='REJECT', disposition='preserve', nonDocumentUse=True,
+                             reason=group['reason']+' '+decision['detail'], sourceCommit=pin,
+                             sourceSha256=row['sourceSha256'], evidence=evidence)
+                if not row['sourcePresent']:
+                    assert decision['deletingCommit'] == row['deletingCommit']
+                    detail['deletingCommit'] = row['deletingCommit']
+                    grade['retiredSource'] = True
+                row.update(status='confirmed-settlement-REJECT', settlementGrade=grade)
+                detail['gradeRecord'] = grade
+            else:
+                assert disposition == 'owned park' and decision['owner'] and decision['nextAction']
+                assert not proofs
+                row.update(status='judgment-required', owner=decision['owner'],
+                           blocker=decision['detail'], nextAction=decision['nextAction'])
+                detail.update(owner=decision['owner'], nextAction=decision['nextAction'])
+            if disposition != 'owned park':
+                for key in ['blocker', 'owner', 'contextLocatorIsBound', 'currentContext']:
+                    row.pop(key, None)
+            row['settlement'] = dict(path='census-join/settlement.json', id=row['id'], group=decision['group'])
+            settled_rows.append(detail)
+        assert len(settled_rows) == len(decisions)
+        dump(args.out / 'settlement.json', dict(sourceCommit=pin, baselinePin=settlement['baselinePin'],
+             decisionsSha256=sha(settlement_path.read_bytes()), independentApproval=False,
+             originalOwnedJudgments=len(original_ids), additionalDrift=len(decisions)-len(original_ids),
+             counts=dict(collections.Counter(r['disposition'] for r in settled_rows)),
+             originalCounts=dict(collections.Counter(r['disposition'] for r in settled_rows if r['originalOwnedJudgment'])),
+             groups=settlement['groups'], rows=settled_rows))
+        out['counts']['statuses'] = dict(collections.Counter(r['status'] for r in rows))
+        out['settlement'] = dict(path='census-join/settlement.json', sourceCommit=pin)
+        residue = [r for r in rows if r['status'] == 'judgment-required']
+    dump(args.out / 'join.json', out)
+    dump(args.out / 'residue.json', dict(sourceCommit=pin, count=len(residue), rows=residue))
 
     if args.rescan:
         # Reuse the unchanged committed census door, not a new scanner grammar.

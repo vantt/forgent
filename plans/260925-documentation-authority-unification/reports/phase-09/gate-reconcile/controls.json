@@ -21,7 +21,7 @@
     {
       "name": "Met-local with local before-F work is rejected",
       "result": "rejected",
-      "error": "G2 has before-F local work"
+      "error": "G3 has before-F local work"
     },
     {
       "name": "Omitted original occurrence is rejected",
@@ -37,8 +37,13 @@
       "name": "False snapshot fingerprint is rejected",
       "result": "rejected",
       "error": "snapshot hash drift: plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md"
+    },
+    {
+      "name": "False follow-up fingerprint is rejected",
+      "result": "rejected",
+      "error": "follow-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md"
     }
   ],
-  "count": 7,
+  "count": 8,
   "method": "In-memory copies at the read_json test seam; real owning check(), path inspection and read-only git; no source file or assertion weakened."
 }

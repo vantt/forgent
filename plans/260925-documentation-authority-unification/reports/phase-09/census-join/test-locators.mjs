@@ -17,7 +17,11 @@ for (const file of request.files) {
         const callee = node.callee;
         const name = callee.type === 'Identifier' ? callee.name : callee.type === 'MemberExpression' && callee.object.type === 'Identifier' ? callee.object.name : null;
         if (name) calls.push({ name, start: node.loc.start.line, end: node.loc.end.line });
-        if (['test', 'it'].includes(name) && typeof node.arguments[0]?.value === 'string') tests.push({ title: node.arguments[0].value, start: node.loc.start.line, end: node.loc.end.line });
+        const title = node.arguments[0];
+        if (['test', 'it'].includes(name) && typeof title?.value === 'string') tests.push({ title: title.value, start: node.loc.start.line, end: node.loc.end.line });
+        // Opt-in for the pinned settlement only: retain the literal template,
+        // never evaluate a test or invent its expanded runtime titles.
+        else if (request.includeTemplates && ['test', 'it'].includes(name) && title?.type === 'TemplateLiteral') tests.push({ title: source.slice(title.start, title.end), start: node.loc.start.line, end: node.loc.end.line });
       }
       if (['FunctionDeclaration', 'FunctionExpression', 'ArrowFunctionExpression'].includes(node.type)) {
         const name = node.id?.name ?? (parent?.type === 'VariableDeclarator' ? parent.id.name : null);

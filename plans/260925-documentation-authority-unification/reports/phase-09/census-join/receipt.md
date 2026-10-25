@@ -1,4 +1,68 @@
-# Census custody follow-up receipt
+# Census judgment settlement receipt
+
+Settlement pin: `a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6` (HEAD at start). Authority: W18 brief and L13-17. **Records slice complete; G2 remains partial**, pending independent settlement review and four owned citation dispositions before F. No product tests ran.
+
+## Current settlement
+
+Every original owned id has its own disposition, locator and digest-bound evidence in `settlement.json`; `settlement-decisions.json` is the pinned input layer. Historical grades are unchanged.
+
+| Original population | Joined | Re-graded REJECT | Owned park | Total |
+|---|---:|---:|---:|---:|
+| Fixture judgments | 132 | 27 | 0 | 159 |
+| Drifted grades | 0 | 21 | 0 | 21 |
+| Other judgments | 2 | 1 | 4 | 7 |
+| Total | 134 | 49 | 4 | 187 |
+
+Four **additional** grade drifts at this HEAD (`pc-d-0948`, `pc-d-0960`, `pc-d-0961`, `pc-d-1086`) are separately re-graded REJECT, not folded into the 187. Current original-census totals: **780 owning-test joins + 289 unchanged grade confirmations + 53 settlement REJECTs + 4 parks = 1,126**. All ids and all 140 file identities are retained.
+
+Grouped causes (each row still has its own evidence):
+
+- **55 lexical/template-test joins:** retain the source template title and test-call line, without evaluating it or pretending an expanded title is known. Includes the two native-load occurrences previously hinted as help text.
+- **11 Rust helper joins:** explicit same-file helper callers lead to non-ignored test attributes/function lines.
+- **68 shared-fixture joins:** module constants, setup hooks and imported helpers have explicit owning tests and loader/caller evidence. `trackedLegacy` joins the default `porting=true` inventory test; failover's `llmAccounts` branch joins a test that actually supplies pool accounts, rather than a caller that leaves the branch off.
+- **27 retired fixture REJECTs:** exact historical slots plus deletion `5a33989fa39e0eb3d3253ddb4189cb502f93bd21`; frozen conversion config/test data is no longer live. This is a recorded retirement/non-document grade, not an invented successor test.
+- **25 drifted-grade REJECTs (21 original + 4 additional):** every row links its original grade-record member/line and historical span to current evidence. Lease `console.log` → returned messages remains scalar rendering; removed conversion/pre-seat-run diagnostics stay retired, not rebound to unrelated current line numbers; centralized Git path validation, renamed error mapping and the extracted Land warning remain non-document uses. One conversion reader source was deleted by the same explicit retirement commit.
+
+- **One lexical-comment-fragment REJECT:** `pc-d-0758` is the exact fragment `path: in a` inside the line-3 comment “no addon-less Git read path: in a”, not a config path or a document citation. The nearby real distribution citation remains separately parked as `pc-l-0056`.
+
+## Four before-F parks
+
+Owner for each: **Documentation integration Lead (L13-17.1)**. These are live explanatory citations, not literals a test executes; rejecting them as non-document data would be false. Every row carries the concrete next action: bind the exact citation to its current holder/section, independently review that disposition, then co-compose any needed comment retarget. No citation is silently deferred to F.
+
+| Id | Current locator | Citation to settle |
+|---|---|---|
+| `pc-l-0042` | `test/runner/execution/bind-tier-composition.test.mjs:1` | seat-binding sections 5.4 / 6.3 |
+| `pc-l-0056` | `test/setup/doctor-fresh-run.test.mjs:6` | distribution Entry Points |
+| `pc-l-0077` | `src/setup/registrations.mjs:6354` | workflow RUL-WF-27 |
+| `pc-l-0078` | `src/setup/workflow-case-checks.mjs:2` | workflow RUL-WF-27 |
+
+## Proofs and reproduction
+
+Let `P=plans/260925-documentation-authority-unification/reports/phase-09`. `replay.json` records exact argv, stdout and SHA-256 values.
+
+| Command | Exit | Evidence |
+|---|---:|---|
+| `python3 -B P/census-join/join.py --pin a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6` — run 1 | 0 | `replay.json` |
+| Same command — run 2 | 0 | stdout and all three outputs (`join.json`, `residue.json`, `settlement.json`) byte-identical |
+| `python3 -B P/census-join/join.py --pin 3d0169f390e21c67bc3fc69081fd1bc07186599f --rescan --out <tempfile directory>` | 0 | all four historical outputs byte-identical to committed turn-start artifacts |
+| `python3 -B P/gate-reconcile/reconcile.py` — twice | 0 / 0 | `gate-reconcile/reproduction.json`; generated register/receipts byte-identical |
+| `python3 -B P/gate-reconcile/verify.py` | 0 | `gate-reconcile/verification.json`; `checkedAtHead` restored after execution |
+| `python3 -B P/gate-reconcile/controls.py` | 0 | `gate-reconcile/controls.json`; 8 rejecting controls |
+| `git diff --check` | 0 | final scoped verification |
+
+The first historical comparison caught a pre-existing replay defect: `registerSha256` read today's whole register, although its census-id set was unchanged. It now reads the register blob at `--pin`; the complete old output, not only its counts, reproduces exactly. The historical rescan is a compatibility check, **not** a new-pin/final-pin rescan: post-pin literal/dynamic artifacts below remain explicitly at their old pin, with the eight literal judgments still open.
+
+## Register follow-up
+
+`gate-reconcile/reconcile.py` remains the one generator for the register and its receipts. It keeps the original `53de2207e` reconciliation snapshot/fingerprints and fingerprints W18/L13-17 separately at this turn's pin. Corrections: G2 original judgments return before F; W15 coverage is disclosed as exhaustive 50 plus sampled 60/288; W9 mechanical 319/20 reclassification is accepted by rule with its 56-row check (L13-17.3); owned-park **composition only** cites L13-17.2; 25e8842d3 receipt-count re-review remains local, so G6 cannot honestly remain met-local; G0 duplicate bindings follow later rebinds; G3 cites its pre-existing F duty, not W3; G9 clearance cites W13/W14; the two misleading G9 receipt labels are cleared only for the reviewed demands, with external/F execution still open.
+
+Reuse/prior art: `bade6b6b3` introduced the join; `b25dadae2` added pin/delta custody. Reused the Node-bundled Acorn locator, Rust helper grammar, original register/grades and gate reconciliation generator; only the pinned layer opts into template titles. No product mechanism added. Impact-analysis: **degraded/unqueried** under the no-CLI/no-MCP constraint. No Git writes, fgOS CLI/lifecycle, pair accounting, suites, native addon loading, docs/tests/ledger edits or preview service. Scratch uses tempfile directories under `/tmp/fgos-work/` and is removed at completion. Independent review, four citation dispositions, eight post-pin literal judgments and final F work remain Lead custody. `needsWrites: []`.
+
+---
+
+## Historical custody receipt (superseded for original-judgment counts only)
+
+The text below records the prior pin; its 187-open count is historical, not the current settlement state.
 
 Pin: `3d0169f390e21c67bc3fc69081fd1bc07186599f` (HEAD at execution). This supersedes the W1 receipt at `bade6b6b3`, not its historical evidence. **Records task complete; G2 remains unmet**, without independent approval or final-pin F coverage.
 
