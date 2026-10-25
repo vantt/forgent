@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "eb3afcb30a9826e0ab60a747c887a651b1f4cd85e26a4ff7e2d35d48bce08d58",
+  "payloadDigest": "2e2ab6ec074d9b38e32e2042650bc25bcc030dc556ab7736a416310cc23b9466",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -892,7 +892,7 @@
     "src/event-store/consumers.mjs": "c47969fb96a24a3a31c001c1155d75bd72c13fa59fc084df5d199ebc69577b42",
     "src/event-store/index.mjs": "4432a0299d564d1c4edcd747d834fcb1ad76da2421d9658d419fca4f03289fae",
     "src/event-store/maintenance.mjs": "bfba47317edcae43436ed59afe23eda3c50ad41c6dfca23b946232cd14845a5c",
-    "src/event-store/native.mjs": "bc2b906cc957ca7b0f4daa122b493da89064304c1685505ca5e170f1ad2335d3",
+    "src/event-store/native.mjs": "475ca3d03942cb16c7ccf5e1f2380a07efc43d05315333eab3a73e0759ab457e",
     "src/event-store/seal-coalescing.mjs": "84eae01cdf29251f7e50e06ffbac46ea949457adb7b3f4ed20bda542448bd2c3",
     "src/evolve/iron-law.mjs": "c3dce0c23705a8fd1ec463a782fba000ee67f21889f47e7ff350043f7a7ff8d7",
     "src/git/config.mjs": "c630748f9c0b7f21d96d16211a829bc1c1fa4f50c735e7235e5995c62619b69a",
