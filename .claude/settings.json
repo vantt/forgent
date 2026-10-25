@@ -40,6 +40,16 @@
           }
         ],
         "matcher": "*"
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "S=\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\"; [ -x \"$S\" ] || exit 0; \"$S\" hook mailbox --cli claude --event post-tool-use || true",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "PreCompact": [
@@ -137,6 +147,15 @@
           }
         ],
         "matcher": "*"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "S=\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\"; [ -x \"$S\" ] || exit 0; \"$S\" hook mailbox --cli claude --event stop || true",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SubagentStart": [
