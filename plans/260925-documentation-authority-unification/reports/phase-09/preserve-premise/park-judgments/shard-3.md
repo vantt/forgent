@@ -1,354 +1,158 @@
-# Shard 3 — premise judgments
+# Shard 3 — premise rework against the F chain
 
-Pin at turn start: `c94545de5b45873cb2eb419f10124283fd730a2e`.
+**Status: blocked on checker support, not accepted.** Row judgments and post-chain proposals are prepared; the required stale-only checker outcome is **not** achieved. No patch was applied, and no review acceptance, gate closure, authority promotion or cutover readiness is claimed.
 
-Status: **row judgments prepared; independent review still required**. No gate acceptance, authority promotion, flip readiness or applied patch is claimed. The 36 owned parks below remain real pre-flip decisions, not work silently moved into the lease window. All rows have `needsFlipDate: false`.
+- Rework pin: `c58f2b230e14e73db42cb8ccc965ef8967bb085a`.
+- Frozen source-evidence pin retained: `c94545de5b45873cb2eb419f10124283fd730a2e`. Source passages and digests are unchanged; new Lead authority is separately pinned in `decisionRefs`.
+- Read first: [rework brief](../../w25-shard-rework-brief.md), [review](../../reviews/w23-g6-shard-3-review.md), L13-21 in [owner answers](../../owner-answers.md), [chain-check report and Lead correction](chain-check.md), then [shard-3.json](shard-3.json).
+- The JSON records every changed row in `reworkChanges`/`reworkNotes`, exact replacement evidence, post-chain proposals, hashes, roundtrip results and the outstanding checker limitations.
 
-Read first: [the brief](../../w22-g6-park-judgments-brief.md), the W22 G6 finding, W8 parks and W9 fixes reviews, [receipt](../receipt.md), and L13-10/L13-20 in [owner answers](../../owner-answers.md). Exact per-row evidence and prepared patches: [shard-3.json](shard-3.json).
+## Before and after
 
-## Counts
+| Disposition | Before | After |
+|---|---:|---:|
+| preserve-confirmed | 98 | 138 |
+| repoint | 77 | 73 |
+| successor-bound | 50 | 50 |
+| owned-park | 36 | 0 |
+| retire-with-source | 0 | 0 |
+| **Total** | **261** | **261** |
 
-| Disposition | Rows |
-|---|---:|
-| `preserve-confirmed` | 98 |
-| `repoint` | 77 |
-| `successor-bound` | 50 |
-| `retire-with-source` | 0 |
-| `owned-park` | 36 |
-| **Total** | **261** |
+All 44 review REWORK rows have an explicit response. There are 122 changed row objects, including shared-patch regeneration and stale-dependency notes; the other 139 row objects are unchanged. Every original source binding remains byte-for-byte identical. All rows retain `needsFlipDate: false`.
 
-The input kinds are 211 unconfirmed-premise, 48 removed-by-cutover and 2 absent-source rows. The 50 latter rows all have a successor claim; none is silently retired. There are **39 unique composed-per-file prepared patches**, linked by the 77 repoint rows; forward plus reverse replay is **78 patch executions**. Source-coordinate labeling accounts for 23 repoints; the other 54 correct live routes or qualify the retired CLI paragraph.
+| Proof measure | Before | After |
+|---|---:|---:|
+| Unique pin-evidence file patches | 39 | 34 |
+| Duplicate row patches | 3 | 0 |
+| alreadyComposed markers | 0 | 3 |
+| Checker unresolved, shard-local | 29 | 26 |
+| Checker unresolved, global chain included | 38 | 35 |
+| Checker exit | 1 | 1 |
 
-## Method and scope
+After: one resolved duplicate (`f08496`), two stale-dependent markers, 16 reported conflicts, two absent-source false positives and six shard-local stale entries. The resolved duplicate is included in the finding counts but not the unresolved total. There remain **20 non-stale shard-local findings**: 13 unrecognized rebases, three gloss false positives, two absent-source false positives and two markers blocked by stale predecessors. These are not waived or relabelled to obtain green.
 
-- Read each assigned bound passage and its surrounding header/section at the start pin, not just the old park reason. No row outside `shard-3-ids.json` is judged.
-- Reused the existing prepared-patch fields (`file`, `patch`, `sourceSha256`, `proposedSha256`, `replacements`, `rowIds`, `status`) and frozen area maps. Source labels are explicit non-navigation, never self-links. Related metadata is not excused merely because its file is a candidate.
-- Evidence stores exact physical line spans, full blob SHA-256 and span SHA-256. A span hashes UTF-8 lines joined with LF, without a trailing LF; file digests hash the original blob bytes. Every row has its own current binding, even when explanations or composed patches are shared.
-- Source absence is checked against the pin. The two Session Identity rows are bound to Identity’s explicit rename/merge header and writer-contract relationship, not to a fictitious recreated source.
-- The checker validates exact ID coverage, kinds, source occurrence lines, all quoted bytes/digests, successor sections, owner/actions and patch linkage. Every unique patch replays with `patch --batch --fuzz=0 -p1 --forward` and `patch --batch --fuzz=0 -p1 -R` against a tempfile copy; proposed bytes and exact original restoration are checked. It does **not** independently approve semantic judgments.
-- Patches are **shard-local proposals only**. A later composition turn must merge them with the other shards and existing F patches; they are not claimed to be a complete file-wide cutover chain. In particular, successor-bound navigation can still contain a separately owned pointer-composition duty.
-- Impact-analysis: degraded/unqueried. The brief forbids the fgOS CLI and exposes no GitNexus tool. Only a documentation-evidence checker is added; product symbols are not edited. No lifecycle verbs, git writes, native addons, test suites, service or Markdown-preview process was run. Required output paths came verbatim from the assignment, not a new naming convention.
+Independent data/replay checks passed: exact 261-row coverage and existing checker span/digest validation; all 44 review REWORKs accounted for; 36 sole file proposals replayed forward and reverse at `--fuzz=0` (72 executions). **35 proposal chains are strict; `docs/reading-map.md` is diagnostic only** until its stale predecessor is repaired. This independent result does not replace the required consolidated-checker proof.
 
-## Shared-cause groups
+## Proposal representation and blocker
 
-### historical-package-record (23)
+Existing `validate_shard` requires every row patch to be exactly the standard `difflib.unified_diff` from the **bare evidence pin** and its declared replacements (`check_shard.py:146–166`). `inspect_rows` then sends that **same diff** to `patch_roundtrip` on the **F-chain output** (`:304–310`). It has no representation for a different post-chain context or a patch on a successor holder rather than the source file.
 
-Dated distribution source, closed-track inventory, audit errata and redirect inventories record the original source coordinates; they do not prescribe those coordinates as current authority.
+Consequently the four context-conflict files cannot both satisfy its bare-pin diff equality and supply the chain-rebased diff required by L13-21.1. The checker is outside this shard's exact writable list and was not changed.
 
-Rows: `f07230`, `f07231`, `f07233`, `f07282`, `f07283`, `f07284`, `f07285`, `f07286`, `f07287`, `f07288`, `f07289`, `f07290`, `f07325`, `f07326`, `f07355`, `f07356`, `f07369`, `f07370`, `f07371`, `f07372`, `f07373`, `f07374`, `f07377`.
+The artifact makes this distinction explicit, pending checker/contract review:
 
-### literal-example (9)
+- `rows[].patch` retains the existing frozen-pin replacement proof. For a file named in `chainRebases`, it is **evidence only, not another executable proposal**.
+- `chainRebases` contains the sole proposed post-chain diff for five files: platform-foundations, routing-handoff, roadmap, work-state README and CLI I/O contract. The first, second, fourth and fifth fix context conflicts; roadmap is also regenerated at its post-chain line positions instead of relying on an offset. Each has its chain-entry list, pre/post hashes and actual forward/reverse replay results.
+- Other row patches already replay on the chain; their post-chain hashes are recorded in `postChainReplay` rather than misusing their pin-time `proposedSha256` as a chain hash.
+- `successorPatches` contains one prepared post-chain patch each for Identity and Workflow, with source evidence, rollback diffs and replay results. They are attached by existing row ids, not invented proof rows or ids.
+- `alreadyComposed` rows have **no patch**. Diagnostic replay never approves a stale chain entry.
 
-Hypothetical paths, migration payload examples, traversal-rejection examples and wireframe data are literals, not documentation destinations. Preserve the example exactly.
+This is a blocked proposal contract, not a new accepted application door. Do not silently apply either representation. The needed out-of-scope change is `preserve-premise/park-judgments/check_shard.py`: validate a guarded chain basis as well as frozen replacement evidence, validate successor-holder proposals, distinguish pre-existing absent sources, and distinguish harmless gloss additions from lost preserved references. Stale-marker certification additionally waits for the separately assigned chain-rebase turn.
 
-Rows: `f07406`, `f07574`, `f07575`, `f07576`, `f07577`, `f07975`, `f08074`, `f08778`, `f08779`.
+## Every changed row and its reason
 
-### source-carriage-note (21)
+Rows grouped below share exactly the stated cause; each id is explicit. JSON carries per-row notes and evidence.
 
-The candidate correction note names the frozen source or stale runner line locator as provenance, expressly retaining text rather than certifying current authority.
+### Review REWORKs
 
-Rows: `f07656`, `f07660`, `f07671`, `f07672`, `f07686`, `f07690`, `f07693`, `f07782`, `f07786`, `f07789`, `f07790`, `f07802`, `f07805`, `f07813`, `f07816`, `f07833`, `f07836`, `f07839`, `f07842`, `f07935`, `f08105`.
+- **f08458, f08460, f08461, f08462, f08463, f08464, f08466, f08467, f08468, f08469, f08470, f08472, f08474, f08475, f08476, f08477, f08478, f08481, f08482, f08483, f08484, f08485, f08487, f08488, f08489, f08490, f08491, f08492, f08495, f08548, f08557, f08618, f08720, f08724, f08727, f08803:** change owned-park to preserve-confirmed, **keep the live convention unchanged** under L12-10 and L13-21.3. Added exact L12-10 evidence and per-row operand facts. The physical move/removal set contains no `docs/history/` path. Removed the unnecessary owner question and caller-migration action; these are not reclassified as historical examples.
+- **f07667:** preserve the carried coordination CLI paragraph verbatim. The examples glob is unaffected by cutover, and the line-23 carriage note explicitly defers truth correction. Removed both the paragraph rewrite and retarget. Its source file also depends on the stale `h-69197b459754.md` chain entry.
+- **f07886, f07889:** preserve the dated P12/section-9 generated-spec process claims, consistent with f07869/f07888 and the provenance header. Removed their replacements from the shared roadmap patch; no new editing/generation rule for platform specs is introduced.
+- **f07871:** retarget the plural contracts directory to `docs/platform/agent-coordination/history/retired-engine/files/contracts/`, not one coordination-session contract. Bind the collection README's `## Contracts` section, which lists all four contracts. Regenerate its shared patch on the chain result.
+- **f08668:** preserve the already-absent abbreviated decision-id citation (`beforePresent: false`, `removedByMoveOrStep6: false`) consistently with its seven siblings. Remove the unjustified product-comment patch.
+- **f08496:** drop its duplicate patch and set `alreadyComposed: file:herdr-dashboard/src/pane_scan.rs`; the checker verifies this exact bound retarget and resolves the duplicate.
+- **f08634:** drop its duplicate patch and set `alreadyComposed: file:plugins/fgOS/skills/terminal/SKILL.md`. Record the stale predecessor dependency; checker certification is still blocked, not claimed.
+- **f08665:** drop its duplicate patch and set `alreadyComposed: file:src/runner/dispatch/assignment-runner.mjs`. Record the stale predecessor dependency; checker certification is still blocked, not claimed.
 
-### historical-decision-or-proof (45)
+### Shared-patch and live-pointer work
 
-The cited path identifies the decision, corpus survey, incident, benchmark or implementation rationale being recorded. The quoted date, decision heading or observation frames the operand; it is not a new current-authority route.
+- **f07532:** use relative `../governance.md`, matching this Related list's convention and preserving its mapped destination.
+- **f07872, f07873, f07874, f07875, f07876, f07877, f07878, f07879, f07880, f07881:** regenerate their shared roadmap patch after the directory correction and removal of f07886/f07889 changes. Their approved pointer-token replacements remain unchanged. Their sole post-chain proposal is the roadmap entry in `chainRebases`.
+- **f07380, f07398:** prepare a platform-foundations post-chain diff, preserving the chain's changed neighbouring table row. Frozen pin replacement evidence remains distinct; checker cannot yet consume the rebased context.
+- **f07697, f07698, f07701:** prepare a routing-handoff post-chain diff, preserving the chain's neighbouring ADR-0005 retarget. Same checker limitation.
+- **f08012, f08013, f08021, f08024:** prepare a work-state README post-chain diff, preserving the chain's Purpose/Read-first/legacy-owner changes. Same checker limitation.
+- **f08033, f08044, f08046, f08047:** prepare a CLI I/O contract post-chain diff, preserving the chain's neighbouring version/envelope retargets. Same checker limitation.
+- **f07852, f07854:** prepare Identity successor-holder navigation for `:22` and `:159` to the CLI I/O area contract. Keep successor-bound: commit `9fdaac9ba` removed the old Session Identity file before the pin and merged the writer contract into Identity §7a. Git ancestry, source absence, the successor header and preserved claim are evidence against `successorOfSurvivingSource`; an already-absent source is not a surviving file. Do not retire the surviving writer claim merely to silence the checker.
+- **f08335:** prepare the Workflow successor-holder law link, changing only destination `../../platform-foundations.md` to `../platform-foundations.md`. The actual pointer is line 693 at the pin (the review/Lead locator says 694). No unnamed future composition duty remains.
+- **f07976, f07985, f08419, f08443:** record that the two ui-spec holder patches cover both live gateway-YAML citations and the two removed-source successor claims. Do not create duplicate successor patches.
 
-Rows: `f07407`, `f07785`, `f07810`, `f07811`, `f07819`, `f07848`, `f07851`, `f08050`, `f08051`, `f08057`, `f08058`, `f08080`, `f08179`, `f08180`, `f08509`, `f08510`, `f08624`, `f08625`, `f08640`, `f08643`, `f08645`, `f08648`, `f08663`, `f08669`, `f08670`, `f08681`, `f08685`, `f08692`, `f08693`, `f08695`, `f08721`, `f08731`, `f08740`, `f08748`, `f08755`, `f08769`, `f08783`, `f08786`, `f08787`, `f08788`, `f08810`, `f08817`, `f08822`, `f08824`, `f08827`.
+### Checker findings answered with evidence
 
-### live-navigation (54)
+- **f07786, f07789, f07790:** retain preserve-confirmed/source-carriage-note. `w8:gloss:docs/platform/runner/spec.md` inserts only `(doctor checks executor posture readiness without spawning agents)` after RUL100. All source-coordinate operands survive unchanged. Added exact post-chain text and digest in `chainEvidence`. The checker uses whole-line equality, so it reports a conflict despite no lost preserved reference. An `alreadyComposed` marker would be false: this is not a retarget.
 
-Related metadata, read-first routes, present contract references and active-stream primary-doc cells are reader navigation. Prepare exact retargets to mapped holders; do not infer preservation merely from a candidate header.
+### Dependency notes only — judgments unchanged
 
-Rows: `f07293`, `f07376`, `f07398`, `f07532`, `f07667`, `f07698`, `f07701`, `f07849`, `f07871`, `f07872`, `f07873`, `f07874`, `f07875`, `f07876`, `f07877`, `f07878`, `f07879`, `f07880`, `f07881`, `f07886`, `f07889`, `f07950`, `f07976`, `f07982`, `f07985`, `f07993`, `f08008`, `f08012`, `f08013`, `f08021`, `f08024`, `f08027`, `f08044`, `f08069`, `f08076`, `f08084`, `f08094`, `f08096`, `f08098`, `f08099`, `f08104`, `f08106`, `f08110`, `f08115`, `f08116`, `f08117`, `f08128`, `f08446`, `f08447`, `f08496`, `f08634`, `f08665`, `f08668`, `f08694`.
+- **f07660:** stale predecessor `file:docs/platform/runner/architecture/h-69197b459754.md`.
+- **f07671, f07672, f07686:** stale predecessor `file:docs/platform/runner/architecture/h-7af1f0242611.md`.
+- **f07816, f07819:** stale predecessor `file:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`.
+- **f08094, f08096, f08098, f08099, f08104, f08105, f08106, f08110, f08115, f08116, f08117, f08128, f08179, f08180, f08209, f08211, f08212, f08213, f08216, f08218, f08219, f08220, f08223, f08225, f08227, f08228, f08231, f08232, f08244, f08245, f08246, f08247, f08250, f08251, f08283, f08285, f08286, f08288:** stale predecessor `file:docs/reading-map.md`, whether the file is the source or bound successor. Current diagnostic patch replay is not approval of that predecessor.
 
-### source-coordinate-label (23)
+## Retained judgment groups
 
-A legacy source pointer maps back to its own carrier or is explicitly a legacy-source footer. Label it non-navigational provenance instead of proposing a self-link or substituting a different claim.
+| Shared cause | Rows | Meaning |
+|---|---:|---|
+| historical-package-record | 23 | Dated distribution/closeout/audit source coordinates, not live authority routes |
+| literal-example | 9 | Hypothetical paths, payloads, traversal strings and wireframe literals |
+| source-carriage-note | 22 | Explicit frozen-source/stale-locator provenance, including f07667 |
+| historical-decision-or-proof | 46 | Dated/citation-only decision and evidence references, including f08668 |
+| historical-roadmap-process | 2 | Dated generated-spec process claims, not new platform rules |
+| live-navigation | 50 | Live routes; three are covered by named chain entries, others have proposals |
+| source-coordinate-label | 23 | Non-navigation code-span provenance, not self-links |
+| successor-navigation-merge | 40 | Exact surviving relationship in a mapped successor unit |
+| historical-template-carriage | 8 | Archived templates and placeholders, not new authoring rules |
+| identity-rename | 2 | Writer contract survives the pre-existing rename into Identity §7a |
+| live-artifact-convention-unchanged | 36 | Live external-project conventions explicitly unchanged under L12-10 |
+| **Total** | **261** | **No owned parks remain** |
 
-Rows: `f07229`, `f07380`, `f07697`, `f07953`, `f07957`, `f07960`, `f07963`, `f07966`, `f07969`, `f07973`, `f07978`, `f07984`, `f07987`, `f07990`, `f07995`, `f07997`, `f07999`, `f08007`, `f08031`, `f08033`, `f08046`, `f08047`, `f08067`.
+## L13-21 cross-cutting coverage
 
-### successor-navigation-merge (40)
+- All **36** lineage rows identified by shard 2 review X1 belong to shard 2; intersection with shard-3 ids is empty. Their ids and exclusion reason are in `coverageNotes.lineageLinks`. No other shard was edited. Existing shard-3 source-coordinate-label proposals already produce explicit code spans/non-navigation framing.
+- All 18 removed-door banners belong to shards 1/2; none is assigned here.
+- Gateway YAML: shard 3 owns the S03-task-detail and 15-system-events holders, covered by f07976/f07985. The config and herdr-web-dashboard holders are shard 2's, not silently patched here.
+- `packages/yaml-doc` mentions are excluded: crate source, upgrade-record and fixture coordinates are not the moved gateway API document or legacy authority roots. Observed examples include `packaging-distribution/spec.md:217,221,742` and `docs/reading-map.md:187`; no package-directory rewrite is warranted.
+- Identity and Workflow uncovered live pointers have explicit prepared successor patches in this artifact, rather than a promise of a later unnamed owner.
 
-The removed source has a concrete retained clause in its successor, including the detailed reading-map merge. Bind the successor unit, not just its filename. This does not certify other pending pointer composition in that unit.
+## Stale chain entries left for the separate turn
 
-Rows: `f08194`, `f08197`, `f08209`, `f08211`, `f08212`, `f08213`, `f08216`, `f08218`, `f08219`, `f08220`, `f08223`, `f08225`, `f08227`, `f08228`, `f08231`, `f08232`, `f08244`, `f08245`, `f08246`, `f08247`, `f08250`, `f08251`, `f08283`, `f08285`, `f08286`, `f08288`, `f08305`, `f08335`, `f08344`, `f08345`, `f08411`, `f08412`, `f08415`, `f08416`, `f08417`, `f08418`, `f08419`, `f08440`, `f08442`, `f08443`.
+Each id below is prefixed by `file:`. Expected/actual hashes remain in the pinned chain-check evidence; no chain record was rewritten or waived.
 
-### historical-template-carriage (8)
-
-The removed authoring template survives in an explicitly historical carrier. Its relative paths are preserved template placeholders, not current authoring navigation.
-
-Rows: `f08336`, `f08337`, `f08338`, `f08339`, `f08340`, `f08341`, `f08342`, `f08343`.
-
-### identity-rename (2)
-
-The absent Session Identity source was merged into Identity by 9fdaac9ba, explicitly recorded in the successor header. Its writer/CLI-contract relationship survives; absence is not grounds to retire it.
-
-Rows: `f07852`, `f07854`.
-
-### unresolved-live-artifact-convention (36)
-
-These are live coding-artifact read/write conventions, not historical examples. L13-10 explicitly leaves these parked; neither the frozen source maps nor a concrete member binding chooses a replacement for future feature/id paths. Do not historicize or mass-rewrite the templates. Lead must obtain the coding-domain placement decision before flip.
-
-Rows: `f08458`, `f08460`, `f08461`, `f08462`, `f08463`, `f08464`, `f08466`, `f08467`, `f08468`, `f08469`, `f08470`, `f08472`, `f08474`, `f08475`, `f08476`, `f08477`, `f08478`, `f08481`, `f08482`, `f08483`, `f08484`, `f08485`, `f08487`, `f08488`, `f08489`, `f08490`, `f08491`, `f08492`, `f08495`, `f08548`, `f08557`, `f08618`, `f08720`, `f08724`, `f08727`, `f08803`.
-
-## Decisions worth checking closely
-
-- **f07667:** the paragraph advertises a former coordination CLI, yet its local adapter is marked removed. The current mapped portal explicitly says `coordination` is not a public verb. Prepare an historical-only prefix for the entire CLI paragraph, keep the old example coordinate as a literal, and route present execution to the portal. No invented exact wildcard-collection successor and no remaining park.
-- **f07398:** full law wording already lives below in the same carrier. Replace the old-root navigation with an in-document textual direction; no self-link.
-- **f07871–f07881:** active-stream Primary Docs cells are live navigation despite the roadmap’s candidate carriage header. Use mapped portals/specific holders. The historical coordination contract is explicitly a retired-engine snapshot, not a restored runtime contract.
-- **f07886/f07889:** route area-spec discovery through the platform registry rather than blindly converting a wildcard into a supposedly generated file tree.
-- **f07950/f07982/f07993:** the overview portal’s related source goes to the actual spec; raw YAML/JSON provenance wrappers go to their raw mapped payloads, not to themselves.
-- **f08021/f08024:** preserve the platform-vision ownership boundary and old source identity while replacing obsolete retained-source navigation.
-- **f07852/f07854:** rename commit `9fdaac9ba` explicitly merged Session Identity into Identity §7a. The successor still contains the CLI-contract relationship. Retirement would lose a surviving claim.
-- **f08209–f08288:** all 24 removed-map rows bind to the merged detailed map. Agent Protocol’s terminal wording and fast-test feedback’s archived plan locator are current qualifications, not missing successor claims.
-- **f08335:** Workflow’s foundational-laws relationship survives in its related-files section with a rebased destination.
-- **f08336–f08343:** the templates survive as historical templates; their relative placeholder routes do not become new maintained authoring rules.
-
-## Every owned park
-
-Common named owner: **Documentation Lead (A42) + coding-domain documentation owner**. The repository proves these are live readers/writers, not source-bound history. L13-10 expressly left live conventions parked; the general governance placement map is not a decision about each future coding artifact’s storage contract. No concrete replacement binding is supplied for these feature/id templates. The next action is one coordinated placement decision and caller migration, not 36 independent date questions. Each exact operand, caller and action is recorded below and in JSON.
-
-### f08458
-
-Caller: `domains/coding/skills/fgos-coding-discovering/SKILL.md:102–106`.
-
-For f08458, approve whether the live `docs/history/<feature>/` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08460
-
-Caller: `domains/coding/skills/fgos-coding-discovering/SKILL.md:129–135`.
-
-For f08460, approve whether the live `docs/history/<feature>/RESEARCH.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08461
-
-Caller: `domains/coding/skills/fgos-coding-exploring/SKILL.md:14–21`.
-
-For f08461, approve whether the live `docs/history/<feature>/CONTEXT.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08462
-
-Caller: `domains/coding/skills/fgos-coding-exploring/SKILL.md:105–111`.
-
-For f08462, approve whether the live `docs/history/<feature>/CONTEXT.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08463
-
-Caller: `domains/coding/skills/fgos-coding-exploring/SKILL.md:130–132`.
-
-For f08463, approve whether the live `docs/history/<feature>/CONTEXT.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08464
-
-Caller: `domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md:11–13`.
-
-For f08464, approve whether the live `docs/history/<feature>/CONTEXT.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08466
-
-Caller: `domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md:110–114`.
-
-For f08466, approve whether the live `docs/history/<feature>/CONTEXT.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08467
-
-Caller: `domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md:171–173`.
-
-For f08467, approve whether the live `docs/history/<feature>/` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08468
-
-Caller: `domains/coding/skills/fgos-coding-implement/SKILL.md:70–74`.
-
-For f08468, approve whether the live `docs/history/<feature>/CONTEXT.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08469
-
-Caller: `domains/coding/skills/fgos-coding-implement/SKILL.md:140–144`.
-
-For f08469, approve whether the live `docs/history/<id>/iron-law-evidence.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08470
-
-Caller: `domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md:64–73`.
-
-For f08470, approve whether the live `docs/history/<id>/iron-law-evidence.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08472
-
-Caller: `domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md:5–10`.
-
-For f08472, approve whether the live `docs/history/<feature>/` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08474
-
-Caller: `domains/coding/skills/fgos-coding-planning/SKILL.md:15–21`.
-
-For f08474, approve whether the live `docs/history/<feature>/CONTEXT.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08475
-
-Caller: `domains/coding/skills/fgos-coding-planning/SKILL.md:15–21`.
-
-For f08475, approve whether the live `docs/history/<feature>/plan.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08476
-
-Caller: `domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md:7–11`.
-
-For f08476, approve whether the live `docs/history/<feature>/` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08477
-
-Caller: `domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md:15–22`.
-
-For f08477, approve whether the live `docs/history/<feature>/` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08478
-
-Caller: `domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md:24–26`.
-
-For f08478, approve whether the live `docs/history/<feature>/` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08481
-
-Caller: `domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md:63–65`.
-
-For f08481, approve whether the live `docs/history/<feature>/plan.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08482
-
-Caller: `domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md:67–69`.
-
-For f08482, approve whether the live `docs/history/<feature>/plan.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08483
-
-Caller: `domains/coding/skills/fgos-coding-shaping/SKILL.md:1–15`.
-
-For f08483, approve whether the live `docs/history/<feature>/DISCUSSION.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08484
-
-Caller: `domains/coding/skills/fgos-coding-shaping/SKILL.md:19–28`.
-
-For f08484, approve whether the live `docs/history/<feature>/DISCUSSION.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08485
-
-Caller: `domains/coding/skills/fgos-coding-shaping/SKILL.md:37–39`.
-
-For f08485, approve whether the live `docs/history/<feature>/CONTEXT.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08487
-
-Caller: `domains/coding/skills/fgos-coding-shaping/SKILL.md:88–88`.
-
-For f08487, approve whether the live `docs/history/<feature>/DISCUSSION.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08488
-
-Caller: `domains/coding/skills/fgos-coding-shaping/SKILL.md:159–168`.
-
-For f08488, approve whether the live `docs/history/<feature>/DISCUSSION.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08489
-
-Caller: `domains/coding/skills/fgos-coding-shaping/SKILL.md:226–228`.
-
-For f08489, approve whether the live `docs/history/<feature>/DISCUSSION.md#task-<slug>` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08490
-
-Caller: `domains/coding/skills/fgos-coding-validating/SKILL.md:15–20`.
-
-For f08490, approve whether the live `docs/history/<feature>/plan.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08491
-
-Caller: `domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md:7–11`.
-
-For f08491, approve whether the live `docs/history/<feature>/` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08492
-
-Caller: `domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md:13–15`.
-
-For f08492, approve whether the live `docs/history/<feature>/plan.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08495
-
-Caller: `domains/coding/task-specs/lock-decisions.md:10–11`.
-
-For f08495, approve whether the live `docs/history/<feature>/CONTEXT.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08548
-
-Caller: `plugins/fgOS/skills/approve/SKILL.md:188–190`.
-
-For f08548, approve whether the live `docs/history/<id>/iron-law-evidence.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08557
-
-Caller: `plugins/fgOS/skills/coding-shape/SKILL.md:29–34`.
-
-For f08557, approve whether the live `docs/history/<feature>/DISCUSSION.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08618
-
-Caller: `plugins/fgOS/skills/merge-loop/SKILL.md:97–99`.
-
-For f08618, approve whether the live `docs/history/<id>/iron-law-evidence.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08720
-
-Caller: `src/runner/paths.mjs:117–143`.
-
-For f08720, approve whether the live `docs/history/<feature>/` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08724
-
-Caller: `src/runner/prompt-templates/worker-prompt-discovery.txt:19–23`.
-
-For f08724, approve whether the live `docs/history/<feature>/RESEARCH.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08727
-
-Caller: `src/runner/prompt-templates/worker-prompt-skill-pointer.txt:45–59`.
-
-For f08727, approve whether the live `docs/history/<your item id>/iron-law-evidence.md` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-### f08803
-
-Caller: `src/state/work.mjs:605–620`.
-
-For f08803, approve whether the live `docs/history/<feature>/` convention remains under docs/history or name its replacement via the owning coding-artifact convention; then compose this exact passage and its readers/writers together. Do not classify it as history or wait for a flip date.
-
-## Commands and exits
-
-All shell commands ran from `/home/vantt/projects/forgentX-p9-w1-d3`; Python was always `python3 -B`. File reads/searches through the harness did not execute product code. The following includes the exploratory failures rather than presenting only the final pass.
-
-| Command / command family | Exit / result |
+| Shard-local file | Dependent rows |
 |---|---|
-| `git rev-parse HEAD && git status --short` at entry | 0; the pin above; clean |
-| `python3 -B - <<'PY'` read-only inspections of `proof.json`, IDs, current-unit text, source-successor matches, and patch replacements | 0 on every inspection |
-| `git log -5 --oneline -S'check_shard' -- plans/260925-documentation-authority-unification && git log -3 --oneline -S'docs/history/<feature>/' -- ...` | Harness timeout at 10 s; no process exit code returned. The first search found the launch commit. |
-| `git log -4 --format='%h %s' -- docs/platform/session-identity/spec.md && git log -3 --format='%h %s' -S'writer' -- docs/platform/identity/spec.md` | 0; found `9fdaac9ba` rename/merge |
-| `python3 -B` scratch tempfile allocation under `/tmp/fgos-work/` | 0 |
-| Scratch generation, first attempt | 1; a guessed unretired coordination-contract path did not exist; corrected to the ledger-supported retired-engine carrier before emitting an artifact |
-| Scratch generation after correction, and final regeneration | 0 |
-| `python3 -B .../check_shard_3.py --shard 3`, first draft | 0; 261 rows, initial draft counts |
-| Checker after successor-section strengthening | 1; YAML section indentation did not equal the normalized section label; corrected the label, not the evidence or validation |
-| `python3 -B .../check_shard_3.py --shard 3`, final | 0; 261 rows, 39 patches, 78 exact replays |
-| Scratch checker negative controls: missing/duplicate ID, invented evidence, wrong file/span digest, nonexistent successor section, corrupt prepared patch | 0; all 7 mutations rejected |
-| Two final checker subprocesses, stdout equality and artifact-byte non-mutation check | 0; byte-identical output, no artifact mutation |
-| `git diff --check && git status --short` plus exact output-scope assertion | 0; only the three assigned outputs |
-| Scratch cleanup (`shutil.rmtree` on this turn’s tempfile directory) | 0 |
+| docs/platform/runner/architecture/h-69197b459754.md | f07660, f07667 |
+| docs/platform/runner/architecture/h-7af1f0242611.md | f07671, f07672, f07686 |
+| docs/platform/runner/subcomponents/h-6979005beaf7/spec.md | f07816, f07819 |
+| docs/reading-map.md | All 38 reading-map source/successor dependency-note rows listed above |
+| plugins/fgOS/skills/terminal/SKILL.md | f08634; its marker remains uncertified |
+| src/runner/dispatch/assignment-runner.mjs | f08665; its marker remains uncertified |
 
-Final reproduction (from repository root):
+The unchanged checker also includes nine stale global entries outside shard source files: `.githooks/pre-commit`, `docs/io-contract.md`, `docs/platform/agent-confinement/contracts/confinement-authority-v1.md`, `docs/platform/agent-confinement/decisions/confinement-authority-decisions.md`, `docs/platform/agent-confinement/history/rollout-and-settled-facts.md`, `docs/platform/agent-coordination/decisions/README.md`, `src/runner/dispatch/confinement/policies.mjs`, `src/runner/dispatch/herdr-round.mjs`, and `test/runner/dispatch-worker-session.test.mjs`. Thus global stale count is 15, not six.
 
-```bash
-python3 -B plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard_3.py --shard 3
+## Commands, verification and scope
+
+All work ran from `/home/vantt/projects/forgentX-p9-w1-d3`. Python was always `python3 -B`. Scratch was confined to a turn-specific tempfile directory under `/tmp/fgos-work/` and removed at handoff.
+
+| Command / operation | Exit / result |
+|---|---|
+| `git rev-parse HEAD`, `git status --short` at entry | 0; clean, rework pin above |
+| Read-only JSON/evidence/chain inspections | 0 except one exploratory dump stopped on absent-source `text` (KeyError); no artifact emitted |
+| `git log -3 --oneline -S'alreadyComposed' -- .../check_shard.py` | 0; found `926000dbd`, which introduced the consolidated checker |
+| `git show --stat --oneline 9fdaac9ba -- ...`, ancestry check | 0; confirmed Session Identity removal and merge before evidence pin |
+| Initial checker invocation via I/O-only wrapper, first attempt | 1/traceback: wrapper also blocked legitimate tempfile `write_text`; fixed wrapper to permit scratch writes, not checker logic |
+| Unchanged checker `main()` with `--shard 3`, before rework | Return 1; 29 own / 38 global unresolved |
+| Scratch proposal generation, including exact chain replay | 0; 34 file patches, five rebases, two successor patches |
+| Unchanged checker `main()` with `--shard 3`, after rework | Return 1; 26 own / 35 global unresolved; no invalidShard |
+| Independent artifact verification, first draft | 1; verifier incorrectly compared a post-chain hash with a pin-only hash; corrected verifier to use recorded post-chain hash, not proposal data |
+| Independent final artifact verification | 0; 261 bindings, 44 REWORK responses, 122 changed rows, 36 proposals / 72 exact executions, 35 strict chains |
+| `git diff --check`, exact two-file scope check | 0 |
+
+The CLI's normal final report path `chain-check-<HEAD>.json` is outside the writable list. To avoid that forbidden write, the scratch wrapper imported the unchanged module and called its unchanged `main()` with the exact arguments, relocating **only that report sink** into its tempfile directory. Legitimate replay scratch writes remained enabled; no assertion, source input, finding, command result or return code was altered. The invocation returned 1, and its relevant results are retained in `verification` in the JSON. No outside-scope chain-check report was created.
+
+Normal reproduction, in a turn authorized to create the checker report:
+
+```sh
+python3 -B plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard.py --shard 3
 ```
 
-Expected: exit 0; `status: passed`, 261 rows, 98 preserve-confirmed, 77 repoint, 50 successor-bound, 36 owned-park, 39 patches and 78 replays. Scratch copies are automatically removed on success and failure. The 36 placement decisions and exhaustive independent review remain owed; passing this checker is not semantic acceptance.
+Expected at this rework pin: exit 1 **with the non-stale blockers described above**, not a stale-only pass. Independent replay uses the existing `composition/compose.py` `apply_diff`, the checker `patch_roundtrip` and the actual effective-chain output; it does not invent another chain or transfer stale approvals.
+
+Only this Markdown file and `shard-3.json` were changed. No git writes/staging, fgOS CLI, lifecycle verb, native addon, product test, ledger/register edit, source-doc edit or preview service was run. Impact-analysis: degraded; the brief forbids the capability-query CLI and no impact tool is exposed. Required artifact names were supplied verbatim, not newly constructed. This records slice adds no product dependency/default/env var and does not change shipped user behavior.
