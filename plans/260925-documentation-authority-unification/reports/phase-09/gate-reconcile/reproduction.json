@@ -1,0 +1,78 @@
+{
+  "status": "passed",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/reconcile.py"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"gates\": 12,\n  \"originalOccurrences\": 87,\n  \"reviewsRead\": 110,\n  \"inputs\": 169\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/reconcile.py"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"gates\": 12,\n  \"originalOccurrences\": 87,\n  \"reviewsRead\": 110,\n  \"inputs\": 169\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"status\": \"passed\",\n  \"exit\": 0,\n  \"asOf\": \"53de2207e1ea8a9417ac131f785704d6ab72ba2c\",\n  \"checkedAtHead\": \"53de2207e1ea8a9417ac131f785704d6ab72ba2c\",\n  \"originalOccurrences\": 87,\n  \"gates\": 12,\n  \"reviewFiles\": 110,\n  \"snapshotInputs\": 169,\n  \"evidenceAndReviewPaths\": 110,\n  \"clearedEntries\": 16,\n  \"exactVerdictQuotes\": 16,\n  \"clearedByCommits\": [\n    \"0fe6c4381\",\n    \"33cc5539d\",\n    \"4c9e1f31e\",\n    \"4f08d504d\",\n    \"53499dc9d\",\n    \"5c3b57347\",\n    \"5fe778624\",\n    \"63c3db9c6\",\n    \"63c884240\",\n    \"6f5b9419d\",\n    \"928f5cc14\",\n    \"984829939\",\n    \"a8ea05c50\",\n    \"bc2a6a014\",\n    \"c25e8cf6a\",\n    \"c5586146c\",\n    \"d22072da2\",\n    \"d786e305e\",\n    \"daa87810b\",\n    \"db023f065\"\n  ],\n  \"checks\": [\n    \"original occurrence coverage and text\",\n    \"path existence\",\n    \"clearedBy ancestry at snapshot and HEAD\",\n    \"committed exact review quotes\",\n    \"before/after counts\",\n    \"met-local has no local before-F blockers\",\n    \"immutable input fingerprints and all-review coverage\"\n  ],\n  \"limits\": \"Record integrity only. No independent semantic approval, F gate execution or full product-suite claim.\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"status\": \"passed\",\n  \"asOf\": \"53de2207e1ea8a9417ac131f785704d6ab72ba2c\",\n  \"positive\": \"passed\",\n  \"negativeControls\": [\n    {\n      \"name\": \"Missing evidence path is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"missing evidence path: gate-reconcile/absent-negative-control.json\"\n    },\n    {\n      \"name\": \"Existing commit outside the snapshot ancestry is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"clearedBy/asOf 42c5a0a55 not ancestor of 53de2207e1ea8a9417ac131f785704d6ab72ba2c\"\n    },\n    {\n      \"name\": \"Invented verdict quotation is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"not an exact review verdict quote: The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F.\"\n    },\n    {\n      \"name\": \"Met-local with local before-F work is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"G2 has before-F local work\"\n    },\n    {\n      \"name\": \"Omitted original occurrence is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"missing/extra/altered original occurrence\"\n    },\n    {\n      \"name\": \"False before/after counts are rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"before/after counts drift\"\n    },\n    {\n      \"name\": \"False snapshot fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"snapshot hash drift: plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md\"\n    }\n  ],\n  \"count\": 7,\n  \"method\": \"In-memory copies at the read_json test seam; real owning check(), path inspection and read-only git; no source file or assertion weakened.\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "generationByteIdentical": true,
+  "sha256": {
+    "plans/260925-documentation-authority-unification/reports/phase-09/preflip-gate-status.json": "99d22ee4cd8b600093c9b790a2f71e701f9f826c747698f3ad86da500d79071c",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.json": "9b9318010604ede1553305d1a6fc781228637f895fb779a262790998dfc6d1c0",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.md": "37321742e666479886717209c0f3e50b2e398ef8ceebd4923b5cc8b43ae35e48",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/sources.json": "a01e36251707e446088715cb6a8084cda6a753e7f90d5e336ac329090c239bb4",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/plan-branch-log.txt": "abcd3b28e1d719145cb6081f472a1c82134f3d4f8bed02b4cb060c5d2b30e2b4"
+  },
+  "writeScopeCheck": "passed",
+  "modified": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/preflip-gate-status.json"
+  ],
+  "newFiles": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/plan-branch-log.txt",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/reconcile.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/sources.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py"
+  ]
+}

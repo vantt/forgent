@@ -1,0 +1,452 @@
+53de2207e docs(records): brief the gate register reconciliation
+93dfed0ae docs(records): require live parity checks alongside the authoring pin
+ba335d4b4 docs(review): record source parity rework review
+a8ea05c50 fix(records): reconcile current source parity and clean temporary workspaces
+9c8d2ce06 docs(plan): record the content rework review, its rulings and the parity rework brief
+35c7f92bf docs(records): account the park judgment, content rework and review record paths
+d8d77543a fix(records): compare appended parity rows with the version before their commit
+3e1612222 Merge the binding content rework
+c25e8cf6a docs(ledger): redecide changed clauses and reconcile source parity
+33cc5539d fix(records): separate drift judgments from carried blockers
+72077976b docs(plan): record the park judgment review and the drift-only park rule
+568a11f21 docs(plan): add the binding content rework brief
+21bdbcf7d docs(plan): record the content re-review of the rebound bindings
+d9c65b9f6 Merge the judged source-context parks
+63c884240 docs(records): judge parked source bindings against current evidence
+eed2a2dfd docs(plan): record the per-unit review of the third import bindings
+c767bc45c docs(plan): record the night wave rulings and keep register evidence at the final rebuild
+f67e0f676 docs(plan): record the archive retention review and mark the sandbox attempt as history
+0763c2259 docs(plan): add the source-context park judgment brief
+da1498e0d docs(records): account the check hardening, gloss and ledger record paths
+b3cadb89e docs(plan): update the gate ledger for the reviewed composition and source-context work
+a0c7d0af9 docs(plan): record the check hardening review
+daa87810b fix(records): harden live overlay checks and disposable replay workspaces
+8b4d778d3 docs(plan): record the misc-fix pin and gloss review and the check hardening brief
+aaf127d23 Merge the polished gloss labels
+0fe6c4381 docs(records): polish gloss labels and make replay scratch disposable
+18ba87145 Merge the pinned misc-fix authoring checks
+901c41dea fix(records): pin authoring checks and account for live rebinds
+8fd37e359 docs(plan): record the source-context follow-up review and the gloss polish brief
+335b7faa9 docs(plan): add the misc-fix pin check brief
+eac6a30b5 docs(records): account the import resync, source-evidence and review record paths
+c4133d86a Merge the replayed bodies and refreshed source evidence
+4c9e1f31e fix(docs): bind replayed bodies and refresh source evidence
+c4e03c90d docs(plan): record the third import review and its finished resync
+d786e305e docs(platform): resync imported authority sources and prepared-shard accounting
+814c06f3d docs(plan): add the third import resume brief
+605a472b3 Merge the third import accounting
+7693ae514 docs(import): account main documentation changes and report resync blockers
+6442bad6a docs(plan): add the source-context follow-up brief
+d4392da11 docs(plan): record the source-context rework review
+0e8c6c15b docs(plan): add the third main import accounting brief
+bc2a6a014 fix(docs): refresh composed patches and source judgments
+d14d89865 docs(plan): add the source-context and gloss rework brief
+be9c82a27 docs(plan): record the interim source-context review
+ada271895 docs(plan): record the composition rework review
+ac27aa1bb docs(records): account the composition, source-judgment and review record paths
+83305ec4d Merge the interim source-context judgments
+4f08d504d docs(records): bind current source judgments and replay composed patches
+928f5cc14 fix(docs): repair moved bindings and prepared citation glosses
+70e57b016 docs(plan): record the composition fix review and the post-apply rebind duty
+7e02f52e3 docs(plan): record the preserve-premise fix review
+cd4f80ecc docs(plan): add the interim source-context brief
+081e0362a docs(plan): account the review and fix wave commit/path pairs
+1e4a0206a Merge the composition fixes
+63c3db9c6 docs(composition): rebase records and prepare citation fixes
+db023f065 fix(records): normalize preserve operands and bind historical framing
+eb744281d docs(plan): record the corrected review branch decision
+e14e31b86 docs(plan): record the composition review and add its fix brief
+073dd6e02 docs(plan): add the preserve-premise fix brief and record the review rulings
+25e8842d3 docs(plan): bring the misc, rebind and archive receipts current and narrow the retention gate claim
+ca0a2a061 docs(plan): record the exhaustive judgment row review
+b4362dce0 docs(plan): record the exhaustive park row verification
+f2162d9ff docs(plan): add the retention span check and record its first run
+b726d44ed docs(plan): rebuild the pre-flip gate status from committed evidence
+01e64719d docs(plan): account the review correction commit/path pairs
+6f5b9419d docs(ownership): resolve a double move and withdraw two false carry statements
+c5586146c docs(plan): run the example proof assertions at their recorded pin and refresh the counts
+0d468a225 docs(plan): account the second rework wave commit/path pairs
+6c628b07e docs(plan): replay the example proofs at their recorded pin and record the second rework wave
+cc8573d15 Merge the contract header blocks
+845306efd Merge the sentence-scoped example framing
+30ed2bbf4 docs(contracts): add candidate metadata headers
+afb5bb35c fix(records): bind example evidence to its sentence or table cell
+b9f6e0832 Merge the archive cold timing
+5c3b57347 docs(archive): record the measured cold and warm checkout timing
+f647fc617 docs(plan): add the contract header block brief
+bd99b9dc8 docs(plan): account the gate rework commit/path pairs, including merged branch commits
+2eb79909a Merge the ownership rebinds
+8e7c6ee93 fix(ownership): apply authenticated passage rebinds and read historical preimages from their pin
+77bdddccb docs(plan): record the misc rework review and add the sentence scope brief
+1ecdfddf9 Merge the archive ruling link retention
+984829939 docs(archive): retain direct ruling link targets
+8cab0204d docs(plan): add the ownership rebind apply brief
+727d78bf0 Merge the ownership rebind proposals
+56559edf2 Merge the misc rework
+7bbad6f12 docs(ownership): record the located passage rebind proposals
+9d6070828 fix(records): correct doctor counts and scope example evidence to bound lines
+c1b5e4f5a docs(plan): add the second archive rework brief
+d3efc70c5 docs(archive): record the over-budget retained-link closure
+53499dc9d docs(git): limit the wrapper escape rule to the shapes the scan reports
+87c4f5f7a Merge the git declaration wrapper escape fix
+1c64b1904 fix(git): refuse declarations for escaping wrapper callers
+3c368e520 docs(plan): record the archive review and add its rework brief
+f0265cd06 docs(plan): correct the suite attribution and record the second gate reviews
+0d8068bdd docs(plan): record the git declaration review and add the wrapper escape brief
+4178dcc6e docs(plan): record the misc fix review and add its rework brief
+dbf8ad715 docs(plan): add the ownership rebind brief
+1c7af13dc docs(plan): account the gate fix commit/path pairs
+1975d4403 Merge the archive retained-set correction
+22ff13db5 docs(archive): preserve navigation and verify retained readers
+ad94156cf fix(docs): correct distribution facts and preserve-premise judgments
+23f6eaccf docs(plan): add the misc and archive correction briefs
+7c50f1552 docs(plan): record the suite attribution, its fixes and the census hook findings
+53b2b718f fix(test): await native land preparation in the lease race mocks and refresh runner identity pins
+a1fae5356 docs(plan): record the suite attribution and add the suite fix brief
+db4b7de4d fix(git): bind pass-through declarations to their wrapper callers
+571a996f5 chore(merge): bring main's census drift hook, config verb and seat trim into the plan branch
+cac2f6ce7 Merge remote-tracking branch 'origin/main' into cfg/slice-d
+af3c4b4e0 docs(board): announce the Config migration slice on main
+7a9db5cf5 docs(plan): add the git declaration wrapper fix brief
+bfa4e240a Merge remote-tracking branch 'origin/main' into cfg/slice-d
+641151f0c docs(board): bring the machine table's release column up to date
+e6890d28e docs(board): record every machine's signing key fingerprint in the machine table
+bbe262542 docs(board): record the second build server's machine signing key fingerprint
+35db93bc4 docs(harden): record the gate git-call investigation and the spawn-door decision
+5482adef3 docs(board): close the seat trim lane
+9447562ff docs(test): record WORK's first cutover gate on the merged tree
+dfe719150 test(config): write the tombstone fixture through the config helper and regenerate the envelope vectors for the config verb
+77db6ed2b docs(plan): account the pre-flip waves in both reproduction manifests
+478f351ff refactor(config): refuse a retired rigorToTier in the global config instead of dropping it in memory
+4b62385cb docs: reconcile imported documentation and refresh authority bindings
+5965143b4 docs(plan): record the second import's navigation blocker and current drift
+bd5fd089d docs(harden): announce the census pre-commit check and close the release-probe hand-off
+a86348e7b docs(harden): update the census pre-commit lead report after review
+f03e22b13 Merge branch 'harden/census-precommit-check': refuse a commit whose staged product files outrun the one-door census
+4b6132e2b fix(hook): document the census check's inputs and merge refusal text
+de1dc1282 docs(board): record the retired tier key removal on the second build server
+c31cf38b4 chore(git): regenerate the mutation census after the release probe change
+ff4ef92bb Merge branch 'harden/h32-release-probe-first': settle a release with the shared probe before any lock-table read
+d4a4f3ff6 Merge remote-tracking branch 'origin/main' into cfg/slice-d
+e3ad559aa docs(config): close the migration slice and move its door, doctor and reader phases into the cutover slice
+59f5d2e49 refactor(process): remove the lock-table reader release no longer uses
+8ba869cd0 feat(hook): refuse a commit whose staged product files outrun the Git one-door census
+da8e91175 perf(holder-lock): probe the independent description before reading the lock table on release
+acefe7f3f docs(board): ask the second server to drop the retired tier key
+577fca343 docs(harden): close the git and terminal-control layer on the owner's size answer and take the census pre-commit check
+18882678b docs(test): move the cutover review to the owner's accepted release level
+69e0dfaec docs(board): record the owner accepting the measured release cost for the Work cutover
+bbf4ba2c1 docs(plan): rewrite the pattern degree spec on a config-declared pattern catalog over four loops
+b76e92a0b docs(report): record the owner's answers to the batched mailbox decisions
+ea7c62f41 docs(test): close the false nested store-leak report
+cd2237e4a test(scripts): run the exit-status propagation case in its fixture, not the checkout
+992532d14 docs(board): ask the git owner to review the declared one-door sites
+2e57b8bc1 feat(git): declare owner-approved one-door exemptions
+771a0860f docs(board): record the owner's vocabulary and params decisions after the second panel
+38061020f docs(harden): note the census drift path under the git-call follow-up
+2abbc3498 docs(board): record landing main on the second machine
+f67862e28 chore(git): regenerate the mutation census for the identity session-register change
+41b3143ea chore(gateway): record the durable-file dependencies in the gateway lock file
+7be8f6714 docs(report): record landing the hardened Git and terminal release on the owner machine
+b2fdeb309 docs(harden): record the two CLI print-path costs handed over from the Work release A/B
+8387c8177 docs(test): record the release-addon CLI A/B on WORK's cutover branch
+221bbd58b docs(report): record the Windows build and provider trim
+2bc3eb9b7 fix(config): build the native verbs on every release target and slim the provider
+5d975ffde refactor(config): one public door for the revision a write compares against
+72ecf6f55 Merge branch 'cfg/slice-d' into cfg/slice-d-verbs
+8bfc254fd docs(report): record the config verbs phase and the cap overrun
+890c84526 test(config): wiring cases for set, unset, patch, migrate, the confined refusal and refresh-docs
+5be65b72a feat(config): native fgos config show, explain, standard, check and the write verbs over the Config crate
+4b745e304 docs(config): record the repairs report and name the legacy-only copy fix in the contract
+33c616d47 feat(config): apply every doctor repair and observe the machine files in the check
+1180b7a53 refactor(config): take the config locks through one function
+aa11b0490 docs(board): record the retired tier key removal on fg-server
+73436becb fix(config): key the snapshot cache on the token file
+3f26a47c3 fix(config): replace a runner tier cell whole in every form it can take
+dac65ad8b docs(plan): add the second import and git declaration briefs
+bc5589ed7 chore(merge): bring main's YAML addon, identity signing and hardening work into the plan branch
+64b60a56f docs(plan): record the raised ceiling for the Config migration slice
+bb6b3232a Merge remote-tracking branch 'origin/main' into cfg/slice-d
+b893322d5 docs(plan): record the owner's decisions on git exemptions and early cutover
+dff50b64c fix(docs): repair navigation and metadata provenance
+7f1eb147f docs(archive): justify retained inputs and rehearse lean record tips
+62ce98513 docs(board): mark the seat trim work path move as done and name the last open branch
+20f7b4323 docs(board): ask each machine to drop the retired rigorToTier key from its global config
+34a4d328e docs(test): withdraw the wrong correction of the nested canary report
+6914a43cf docs(test): close the session fifty-process load red after T2
+00c02b2b9 docs(board): record the Work lane's background CLI seal and its measurement
+1fa580e07 docs(harden): record the independent close verify of the git and terminal-control layer
+b9961d5a1 docs(test): record the owner's detached-seal choice and the wave 7 checks
+b1fc4c299 docs(board): record the owner's choice to seal CLI commands in a short background child
+f1783edbf docs(report): batch the mailbox lane's open owner decisions after the V7 rungs
+9fc6c0728 docs(board): record the mailbox V7 codex, alias, pi and omp results on the branch
+4d9b74d5b docs(plan): add the independent review of the pi and omp mailbox adapters
+90bf30852 docs(board): record the cheaper identity registration on the hook path
+3da93a25a docs(identity): report the register hook-path cost measurement
+388f01c20 perf(identity): register a session without scanning the directory unless it must
+57d21f904 perf(identity): read the head for a session key only when its label needs the ancestry
+623ee7f22 docs(plan): record prompt-level write grants and add the last re-sync fix brief
+fd161a8c2 fix(docs): bind ledger hashes to current content and correct distribution facts
+0c64bb4af docs(test): record the ext4 CLI move A/B after WORK's wave 6
+6a2fd1669 docs(test): correct the nested canary report's cause
+172759783 docs(board): record the orphan fix and the twenty-round worktree race
+c6eb78beb docs(test): record WORK's CLI move cost split and the review bar
+011b98927 docs(test): record HARDEN's lock fence fix
+a5d4497d2 test(runner): race eight processes for the worktree-admin lock twenty rounds again
+7bd1293af docs(plan): add the ledger hygiene brief and the wave-three reviews
+d9bedf229 docs(platform): resync legacy documentation and repair candidate navigation
+fc45170a7 docs(plan): add the independent review of the codex postooluse re-measurement
+d6a1a48e5 docs(harden): close the lock fence final-probe race
+8811c48b2 chore(git): regenerate the mutation census
+8a9e3fb79 fix(lock-fence): wait for the killed holder's lock to free within the kill wait
+bd25dba50 docs(test): take the four-day commit-death orphans
+32d3ad95b test: stop the commit-death hook before removing its fixture, and fail a run that leaves processes behind
+1ed9031b3 docs(harden): land T2 on fg-server2, add the owner-machine guide and the T2 closing report
+5069820ca fix(docs): clean verifier setup before guarded worktree removal
+6d275ad81 docs(plan): regenerate the legacy drift scan after the first re-sync
+7be0cbc52 docs: repair documentation holders and resync legacy carriage
+c9bc0623b docs(test): land the mutation checkout target fix and note the nested canary report
+7926ab9db docs(test): hand the lock fence final-probe race to HARDEN
+1cea08b09 docs(test): take the shared-target poisoning and the lock fence load flake
+50d6ae857 test(scripts): build the mutation checkout into a Cargo target of its own
+e158e6726 docs(plan): add the second-round fix briefs for git tooling and the archive
+b25dadae2 fix(records): bind census deltas and preserve judgments to explicit pins
+084da2df7 merge: main into the HARDEN T2 landing
+4667c2d37 merge: main into the HARDEN T2 landing
+98955a654 docs(harden): record the lock fence final-probe race from TEST
+a01f725bf merge: HARDEN T2, Git and terminal-control hardened
+aedd052d7 fix(plan): count removed legacy units by their source digest in the drift scan
+b59698e6e Merge remote-tracking branch 'origin/main' into cfg/slice-c-a
+6f0ff77b5 docs(board): announce the YAML door landing
+5e8a4c7a6 chore(git): regenerate the mutation census for the addon's YAML namespace
+4f8156119 Merge remote-tracking branch 'origin/main' into cfg/slice-c-a
+ae9b9a6ef docs(bindings): finish pilot rebind and verify repaired bindings
+e70742232 docs(plan): unify binding hashes and refresh the reviewed residuals
+0ed5a246e docs(plan): add the re-sync doer briefs
+3d0169f39 docs(plan): add the wave-two reviews and the census and preserve fix brief
+e5af4c501 docs(platform): preserve late area specs and end-user contracts
+c9826a369 docs(archive): design record retention and rehearse reduced checkouts
+7d9a33a2d fix(docs): preserve byte-pinned reproduction tooling
+2005eeeac docs(board): record the fg-server signing key fingerprint and landing
+dfb7c5ff3 Merge branch 'cfg/slice-d-migrate' into cfg/slice-d
+cd2fd6c5e docs(plan): report the comment renderer, project migration and findings engine phases
+24c8ceb0e feat(config): report layers that disagree about a path's shape once each source is sound
+d2902fa0c feat(config): check every config source and machine fact for the doctor rows, with two repairs
+75407f0ad docs(board): record the Work cutover runner and CLI timing comparison
+8552eb60e docs(test): record the CLI A/B on WORK's cutover branch
+209fe7316 Merge branch 'cfg/slice-d-machine-moves-pending' into cfg/slice-d
+356af580d docs(report): machine files and key moves held back on module caps
+0f343fdc5 feat(config): machine files and the two-stage key move out of the global JSON
+b666a9981 feat(config): migrate a project's config.json to config.yaml with a backup and a tombstone
+ea5e57c57 docs(board): record the machine signing key and head reference landings
+968cee25b Merge remote-tracking branch 'origin/main' into ident/head-ref
+285059829 Merge remote-tracking branch 'origin/main' into ident/i5-signing
+00f64acb4 feat(config): render doc lines across an existing file and refresh them in one transaction
+53bc71d32 docs(report): record landing A of the native YAML door
+722cd9d07 docs(yaml): gloss every decision citation the YAML door change added
+d309519fa docs(yaml): record the native YAML door and the supersession of the vendored parser
+c38a2f686 refactor(yaml): delete the vendored js-yaml and forbid any YAML library
+1598a2d15 feat(confinement): mark every confined worker for the config session class
+866acc891 feat(config): declare the machine-file modules and add the session class
+f0b79f31d feat(confinement): hide machine-private roots from every confined dispatch
+21c45f9f7 feat(yaml): read YAML through the native addon
+cc463d668 docs(spec): list machine-private roots hidden from every confined dispatch
+97d4679fa docs(plan): record the re-verified facts for the config migration slice
+282afe45e docs(plan): add the late legacy areas doer brief
+be16cae2a docs(plan): rule on late legacy areas and the missing holders
+d22072da2 docs(plan): compose the remaining available parks and record four holder blockers
+63044decd feat(addon): add the yaml namespace and the shared failure/panic marshal
+158ba01bc chore(git): regenerate the mutation census
+078bc4b94 merge: main into the Git and terminal-control track
+615503439 docs(setup): list the machine signing key, OpenSSH and pinned machines doctor rows in the registry
+aeb11845d docs(board): open the Config migration slice and the YAML door landing
+8d5e0c67b docs(identity): report the head reference change
+d9736f0fa docs(identity): document the head reference, its refusal and the handle-suffix grinding limit
+da1a7ad66 feat(identity): name the head by pid and start time in register_writer and session_for
+cffe725b9 docs(plan): record the first-wave close and the pinned tooling ruling
+6d790f198 docs(plan): add the second-wave doer briefs
+949e24c22 docs(plan): account the first pre-flip wave in both reproduction manifests
+c86965d2c docs(board): record the PI_SESSION_ID writer source landing
+295a99eac Merge remote-tracking branch 'origin/main' into ident/i5-signing
+bade6b6b3 docs(records): join census custody and review preserve premises
+5fe778624 docs(plan): compose scan successors, holder table and most composition parks
+f534aeaea docs: conserve live claims and refresh packaging contracts
+fc23b59c6 docs(plan): add the git one-door migration receipt
+898989f21 refactor(git): route documentation tooling through existing ports
+19bfb5817 Merge remote-tracking branch 'origin/main' into ident/pi-session-id
+651315220 docs(identity): report the machine signing key and pins implementation
+61aa843e4 docs(identity): record the machine signing key, sign and verify, and pinned keys
+180d0b157 feat(setup): add doctor rows for the machine signing key, OpenSSH and pinned machines
+f59e0b639 docs(plan): rule that the documentation work does not extend the git component
+d80112aa1 docs(plan): add the independent review of the codex stop, alias and status rungs
+0a110bed5 docs(test): close the stray verify-worktree registration
+0d962c33e test(scripts): keep the stray-registration case's run-tests output in the test
+f38aa2016 docs(test): take the stray verify-worktree registration
+caa097259 test: fail a run that leaves a linked-checkout registration behind, and clean the mutate checkout
+9137074d4 docs(plan): carry the V6 review's safety decisions into the V7 run phases
+3e2d05af8 docs(plan): add the first-wave doer briefs and review notes
+f5f3a4d80 docs(plan): plan the Config cutover slice with the Node door, three landings and a per-machine preflight
+f71635c24 docs(board): open a second architecture panel on config-declared patterns and easy run-time params
+119cd6946 test(config): name the writer CLI in the fixture writer identities
+54b5acd06 docs(plan): record the first composition and binding review verdicts
+ae23b605a docs(unification): account main import and refresh affected bindings
+00720b445 docs(board): record the Git review verdicts for the census deletes, retention row, repository handle and HEAD listing
+fa8f0b885 chore(git): regenerate the mutation census
+8633fa191 perf(event-store): bound the HEAD-carrying tip listing for branch-heavy repositories
+8a9385eca docs(plan): prepare the first pre-flip wave: batches, status ledger and import brief
+12c76f572 Merge remote-tracking branch 'origin/harden/t2-git-terminal-control' into harden/head-in-tip-listing
+4472f0dff chore(git): regenerate the mutation census
+6de51d3e4 fix(durable-file): build on macOS by naming the Linux-only resolve flags where they are used
+d5e42cdac chore(git): regenerate the mutation census
+fba879aa7 docs(git): report the HEAD-in-tip-listing change
+e649b1e6a perf(git): read HEAD inside the Event Store tip listing
+db5f19193 chore(git): regenerate the mutation census
+a0437901b merge: main into the Git and terminal-control track
+aff7f2d54 chore(config): take the project's terminal layout to the even-split default
+72be1570b chore(git): regenerate the mutation census
+3647f2aab merge: the even-split placement policy as the default into the track
+2e893c31f feat(runner): seats launched together tell the terminal how many panes share the tab
+52d4e8543 chore(git): regenerate the mutation census
+ed16948da revert: drop the batch size plumbing that has no producer
+fab6f8877 feat(terminal): a work item's tab carries the item title
+53497e860 feat(dispatch): carry the batch size with the batch key into the terminal allocate
+7edee5836 docs(report): record the even-split policy slice
+6dacc0ee0 feat(terminal-control): even-split placement policy becomes the default layout
+d49a80206 feat(terminal): readable tab and pane labels built in one place
+a486166cf chore(git): regenerate the mutation census
+789ca69e7 fix(holder-lock): build on macOS by keeping an unproven borrower protected
+e36ca7eb8 feat(process): read a process's parent on macOS so pane ownership works there
+248ab182e merge: the last pane access moves behind the terminal-control port
+8e852c637 chore(git): regenerate the mutation census
+b6fe879cd docs(git): drop the dormant label from the Land header
+fcaaed505 chore(git): regenerate the mutation census after the terminal port moves
+80b15cf4b docs(plan): report the move of the last pane accesses behind the terminal-control port
+329ac53b4 Merge remote-tracking branch 'origin/main' into ident/pi-session-id
+1416f1426 docs(identity): report the PI_SESSION_ID implementation and ancestry probe
+b99fcb04f docs(identity): add PI_SESSION_ID to the writer-id rule and move its Node copies
+fc783a03b feat(identity): read PI_SESSION_ID as a writer id and label its CLI from the process ancestry
+f67fe37bd feat(process): read a process's kernel command name through the one stat parser
+ea3c7136c docs(terminal-control): say who closes a retained pane and write the moved herdr accesses into the spec
+25389c01e feat(identity): show the machine key fingerprint and list or forget pinned machine keys
+5d6280bd4 refactor(terminal-control): attach verifies that the caller runs in the pane it takes
+71a9b7b0c test(identity): assert the pinned key passes without a bool comparison
+117ab238c feat(identity): mint a machine signing key and sign and verify with pinned machine keys
+f5a06b06b merge: one repository handle per process into the track
+88a9a8b35 chore(git): regenerate the mutation census after the checkout facts change
+0f98b057a docs(plan): add the repository fact cache phase report
+ec66c5f22 perf(git): checkout handles reuse the config and formats the stamp still proves
+96e0c7cc6 refactor(terminal-control): derive the herdr socket from the session name inside the driver
+5bac2ff01 refactor(terminal-control): answer herdr agent kinds and integration hooks through capabilities
+3cf43f4c8 docs(plan): report the journal retention row
+54f701fca chore(architecture): register the journal retention sentence module
+79a24863a refactor(terminal-control): answer the doctor's anchor pane check through capabilities
+41170bf4b chore(git): regenerate the mutation census after the journal scan edit
+a87bfae7f feat(doctor): show retained finished Git chains, their size and oldest age in the journal row
+fd734fa2b chore(git): regenerate the mutation census after the comment edits
+7f8602e83 chore(git): drop the stale dormant label from the facade and transport comments
+f06b30fa3 docs(git,terminal): write the T2 shapes into the specs, contracts and changelog
+282662a64 merge: unused Node Git arms and the outcome-kind spec sentence into the track
+b5678965b docs(identity): record pi and omp session id probe
+83c9ee4b7 docs(board): record the census-gated delete phase report
+299adc4b5 chore(git): regenerate the mutation census
+bf9c6f284 docs(git): state the machine names of abandonment and config approval
+f80dcaadb refactor(git): drop the Node arms that no caller reaches
+0565fff4f merge: the trimmed publication ceremony into the Git and terminal-control track
+36b2b80a5 chore(git): regenerate the mutation census
+2561c9c2a test(git): move the publication child-count case into its own binary
+d4fb900b8 chore(git): regenerate the mutation census
+82b73641a docs(harden): report the publication ceremony trim
+7084dde72 chore(git): regenerate the mutation census
+584d29551 fix(doctor): the journal row keeps the retained-Land warning when it fails and survives a failed Land listing
+66117d9d3 perf(git): drop the publication ceremony's Git reads whose answer the operation already holds
+fc0439d95 chore(git): regenerate the mutation census
+e16a04201 refactor(doctor): shrink the Git check module below its size before the row fold
+f0d87c587 docs(harden): record the doctor row fold, condition map and call count
+9431d3b98 chore(git): regenerate the mutation census
+94d9b005b refactor(doctor): fold the Git rows 10 to 6 and the terminal rows 3 to 2, one sentence per failing row
+2658282ae chore(git): regenerate the mutation census
+0825e5ee6 docs(harden): record the post-review fix and final verification
+dc756d2af fix(git): a restore tolerates a bisect in progress as it did before the shared native-state list
+535295f3a docs(git): retire the Node native-lock door and the six unused result codes in the spec
+dc2b63e30 docs(harden): report the git skeleton and surface consolidation
+0e05bb68f fix(git): ports.v1.json names what the addon serves, pinned against the loaded addon
+8668f8e69 refactor(git): delete the unused Node native-lock door and decode native errors in one place
+e6a1bdadf refactor(git): delete the six result codes no port returns
+16ef4b46f refactor(git): native lock quarantine syncs directories and exchanges paths through one helper each
+ebb16759d refactor(git): one checkout transaction skeleton and one public function per verb
+026dd8ff0 merge: Git consolidation of errors, driver, WAL and readers into the track
+76ce77bca chore(git): regenerate the mutation census
+fd8ff0c8b docs(harden): report the bracketed HEAD read and its children counts
+476683a26 fix(git): HEAD is read in two bracketed steps and a switch between them is refused
+519ab6f4b chore(git): regenerate the mutation census
+ab3ffdbd2 docs(harden): phase lead report for Git errors, driver and WAL slices
+aae0aa00d perf(git): observe HEAD with one child when it is born
+38cd9ea16 refactor(git): Publication's missing-object read names the layout gap through the driver's one rule
+8f7c425e1 chore(git): regenerate the mutation census
+a939981c9 refactor(git): one unadmitted config listing, no renamed read, one scope-literal predicate
+eef312c22 refactor(git): one byte-path reader, one zero id, one registered-checkout topology, one name grammar
+2464b7cc2 refactor(git): one ref reader, one ref-directory chain, one strictness for an intact candidate
+e28fdee24 refactor(git): the WAL runs on the durable-file checkpoint trait and one open door
+6ead91400 docs(plan): report on the terminal layout and label bug fixes
+69a57e5db fix(terminal-control): name every allocated worker pane
+fc1250c2d fix(terminal-control): number a group's overflow tabs
+1c6ab0644 fix(terminal-control): measure tab geometry once per allocate
+d3df8bf85 refactor(git): one layout cause for a failed read, one directory-safety path, one name per borrowed or contained failure
+8e62db729 chore(git): regenerate the mutation census
+e1c67c1b3 fix(setup): keep the terminal config check's host spawn resolvable for the one-door census
+55fab6e9c test(git): judge only the counter's own commands in the writeout-only claim case
+a59d6889c refactor(git): one constructor per result code and one mapping for a WAL failure
+bd452d4f2 chore(git): regenerate the mutation census after the terminal-control folds
+ab5968bea merge: terminal-control folds and deletes into the Git and terminal-control track
+18e454e09 docs(harden): record the terminal-control rest phase lead report
+fee2fd6de chore(git): regenerate the mutation census
+a887abfa8 fix(git): a Land call that panics on the calling thread leaves the port idle
+006f92975 refactor(runner): delete the herdr agent vocabulary module and the dead binding finder
+65b861513 docs(harden): phase lead report for the Git cost and Land wait slice
+9477257d2 chore(git): regenerate the mutation census
+54658b1b4 refactor(terminal-control): setup no longer repairs a directory the store creates itself
+6e385ef5a refactor(terminal-control): the Node client carries only the operations Node calls
+1c8b45be2 test(terminal-control): the route refuses non-integer, non-positive and unregistered config by name
+cca48c63a refactor(git): Land waits for its locks inside the native port without blocking the event loop
+1648524f8 refactor(terminal-control): Node reads the core's defaults and registry and prints what the core refuses
+333f0664d fix(terminal-control): the core names what it refuses and answers what it defaults to
+e8a349d10 refactor(terminal-control): delete the surface nothing reaches
+901e2b3fb perf(git): reuse a held inspect port when building mutation port options
+b7d229142 perf(git): list only the requested ref namespace
+635af1aef merge: main into the Git and terminal-control track
+e6d1471f7 chore(git): regenerate the mutation census after the correctness fixes
+a7d5b3a66 merge: Git correctness fixes into the Git and terminal-control track
+d45fef194 docs(harden): record the CF09 review round in the phase lead report
+31af4a247 chore(git): regenerate the mutation census after the shared fsync helper
+26e5f496c test(git): a local claim forces a flushing method despite writeout-only config
+443e93dcc fix(git): every durable git write forces a flushing fsync method
+a777ee90e docs(harden): phase lead report for Git correctness
+db87f571b chore(git): regenerate the mutation census after the lost-lease reasons
+2d38cac97 fix(git): a claim lost to a concurrent claim on the remote is still a lost lease
+694087bd8 docs(harden): report the terminal-control correctness fixes
+56365578f fix(terminal-control): the allocation scan reports and never closes
+e19156374 chore(git): regenerate the mutation census for the sequence and config changes
+5dcfd19ba fix(git): a local counter claim is durable before it is reported
+0eaa381f0 fix(git): a sequence push the remote refuses keeps the remote's reason
+e7d037593 fix(git): finish config durability before acknowledging a recovered change
+4be13abcf fix(terminal-control): an install whose directory sync failed is answered unknown and keeps the installed fact
+511288542 fix(terminal-control): a foreground process is owned only by its recorded process tuple
+6716931fa fix(git): failed-write temporaries never count against the WAL record bound
+e9568d68f fix(terminal-control): herdr commands inherit no caller descriptor and are awaited with a deadline
+9d935588c chore(git): regenerate the mutation census for the remote door and one-read admission
+711e1ed37 docs(harden): record the reverted compaction and one-read admission in the phase report
+3f1a7ef3c fix(git): read the WAL once when admitting a ref or config operation
+3a655a8b3 revert(git): remove finished-chain compaction from worktree and ref operations
+fb095a57d docs(harden): record the OPC changes round in the phase report
+c158aaa53 docs(git): say the bracketed IPv6 scp form is refused
+004807272 fix(git): keep create chains while their worktree exists and let compaction skip stuck chains
+585045108 docs(harden): record the per-pass compaction cap in the phase report
+7bac1c05f fix(git): compact at most eight finished chains per pass, oldest first
+116a80d3f docs(harden): report the remote door, liveness evidence and compaction phase
+8e1ecbf63 fix(git): compact finished worktree and ref chains beyond the recent few
+df4c30d82 fix(git): one remote door reads the configured URL and accepts scp-form ssh origins
+ee541123e test(git): pin the exact refusals and keep the fake ssh boundary
+3e43fa59e fix(dispatch): keep the herdr socket when the server's state is unknown
+fc5b4e434 docs(harden): report the red tests of the Git and terminal-control track
+3619a0a7a test(terminal-control): pin read-only scans, pid-only ownership, unproven durability and high descriptors
+e33224774 test(git): pin ssh origins, sequence refusals, WAL temporaries and cause names as red cases

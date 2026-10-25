@@ -1,0 +1,4011 @@
+{
+  "version": 1,
+  "authority": "L12-137; w17-gate-register-reconcile-brief",
+  "asOf": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
+  "status": "reconciled-not-cutover-approval",
+  "evidencePathBase": "plans/260925-documentation-authority-unification/reports/phase-09",
+  "method": "Every required original occurrence is keyed by its JSON pointer and original text. Mixed sentences are decomposed into independently decided parts. Counts below count list entries, not unique defects or underlying claim populations; remaining is one original prose entry per gate and may overlap its blockers.",
+  "impactAnalysis": "degraded/unqueried: no fgOS CLI allowed and no impact-analysis MCP exposed; only records and new scoped verifier tooling change.",
+  "priorArtReused": "Existing phase-09 evidence-path convention, independent review verdicts, owner rulings and owning receipt counts; git history of the register and carriedBlocker inspected. No new product mechanism, no claim approval inferred from author tests.",
+  "countsPerGate": [
+    {
+      "g": "G0",
+      "before": {
+        "status": "partial",
+        "blockers": 6,
+        "remainingEntries": 1,
+        "cleared": 0
+      },
+      "after": {
+        "status": "partial",
+        "blockers": 1,
+        "remainingEntries": 1,
+        "cleared": 1,
+        "atFinalPinUnderLease": 3,
+        "external": 0
+      },
+      "originalDecisions": {
+        "cleared": 2,
+        "moved to F": 4,
+        "still open": 1
+      }
+    },
+    {
+      "g": "G1",
+      "before": {
+        "status": "partial",
+        "blockers": 5,
+        "remainingEntries": 1,
+        "cleared": 0
+      },
+      "after": {
+        "status": "partial",
+        "blockers": 2,
+        "remainingEntries": 1,
+        "cleared": 4,
+        "atFinalPinUnderLease": 2,
+        "external": 0
+      },
+      "originalDecisions": {
+        "cleared": 4,
+        "moved to F": 1,
+        "still open": 1
+      }
+    },
+    {
+      "g": "G2",
+      "before": {
+        "status": "final-pin",
+        "blockers": 4,
+        "remainingEntries": 1,
+        "cleared": 0
+      },
+      "after": {
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 0,
+        "atFinalPinUnderLease": 2,
+        "external": 0
+      },
+      "originalDecisions": {
+        "moved to F": 5
+      }
+    },
+    {
+      "g": "G3",
+      "before": {
+        "status": "final-pin",
+        "blockers": 2,
+        "remainingEntries": 1,
+        "cleared": 0
+      },
+      "after": {
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 0,
+        "atFinalPinUnderLease": 1,
+        "external": 0
+      },
+      "originalDecisions": {
+        "moved to F": 3
+      }
+    },
+    {
+      "g": "G4",
+      "before": {
+        "status": "external",
+        "blockers": 3,
+        "remainingEntries": 1,
+        "cleared": 0
+      },
+      "after": {
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 1,
+        "atFinalPinUnderLease": 0,
+        "external": 1
+      },
+      "originalDecisions": {
+        "still open": 3,
+        "cleared": 1
+      }
+    },
+    {
+      "g": "G5",
+      "before": {
+        "status": "partial",
+        "blockers": 0,
+        "remainingEntries": 1,
+        "cleared": 0
+      },
+      "after": {
+        "status": "partial",
+        "blockers": 1,
+        "remainingEntries": 1,
+        "cleared": 0,
+        "atFinalPinUnderLease": 1,
+        "external": 1
+      },
+      "originalDecisions": {
+        "still open": 1
+      }
+    },
+    {
+      "g": "G6",
+      "before": {
+        "status": "partial",
+        "blockers": 4,
+        "remainingEntries": 1,
+        "cleared": 0
+      },
+      "after": {
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 2,
+        "atFinalPinUnderLease": 3,
+        "external": 0
+      },
+      "originalDecisions": {
+        "cleared": 2,
+        "moved to F": 3
+      }
+    },
+    {
+      "g": "G7",
+      "before": {
+        "status": "partial",
+        "blockers": 6,
+        "remainingEntries": 1,
+        "cleared": 0
+      },
+      "after": {
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 4,
+        "atFinalPinUnderLease": 2,
+        "external": 0
+      },
+      "originalDecisions": {
+        "cleared": 4,
+        "moved to F": 3
+      }
+    },
+    {
+      "g": "G8",
+      "before": {
+        "status": "partial",
+        "blockers": 4,
+        "remainingEntries": 1,
+        "cleared": 0
+      },
+      "after": {
+        "status": "partial",
+        "blockers": 2,
+        "remainingEntries": 1,
+        "cleared": 1,
+        "atFinalPinUnderLease": 1,
+        "external": 1
+      },
+      "originalDecisions": {
+        "cleared": 1,
+        "moved to F": 1,
+        "still open": 3
+      }
+    },
+    {
+      "g": "G9",
+      "before": {
+        "status": "partial",
+        "blockers": 4,
+        "remainingEntries": 1,
+        "cleared": 0
+      },
+      "after": {
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 3,
+        "atFinalPinUnderLease": 3,
+        "external": 2
+      },
+      "originalDecisions": {
+        "moved to F": 3,
+        "cleared": 2
+      }
+    },
+    {
+      "g": "G10",
+      "before": {
+        "status": "external",
+        "blockers": 3,
+        "remainingEntries": 1,
+        "cleared": 0
+      },
+      "after": {
+        "status": "external",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 0,
+        "atFinalPinUnderLease": 1,
+        "external": 1
+      },
+      "originalDecisions": {
+        "still open": 2,
+        "moved to F": 2
+      }
+    },
+    {
+      "g": "G11",
+      "before": {
+        "status": "external",
+        "blockers": 3,
+        "remainingEntries": 1,
+        "cleared": 0
+      },
+      "after": {
+        "status": "external",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 0,
+        "atFinalPinUnderLease": 1,
+        "external": 2
+      },
+      "originalDecisions": {
+        "still open": 3,
+        "moved to F": 1
+      }
+    }
+  ],
+  "readinessCounts": {
+    "beforeFinalPin": {
+      "before": 6,
+      "after": 6
+    },
+    "atFinalPinUnderLease": {
+      "before": 19,
+      "after": 25
+    },
+    "external": {
+      "before": 6,
+      "after": 9
+    }
+  },
+  "decisionCounts": {
+    "cleared": 21,
+    "moved to F": 44,
+    "still open": 22
+  },
+  "decisions": [
+    {
+      "sourcePointer": "/gates/0/blockers/0",
+      "item": "124 content rebind rows pending re-review (rebind/rereview-claim-ids.json)",
+      "decision": "cleared",
+      "resolution": "The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F.",
+      "gates": [
+        "G0"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/0/blockers/1",
+      "item": "3 rows corrected in 6f5b9419d (claim_26b3a49a move->merge, claim_2e2bc926, claim_5ba6768e) not independently re-reviewed",
+      "decision": "cleared",
+      "resolution": "The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F.",
+      "gates": [
+        "G0"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/0/blockers/2",
+      "item": "73/257 changedBindings rows in phase-08/step-08-preflip-gates.json not current at 77db6ed2b; register not re-joined since fd161a8c2 (w4-ledger-d7b REWORK HEAD-gate-changedBindings, LF-claim_af89c4e6-current)",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+      "gates": [
+        "G0"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/0/blockers/3",
+      "item": "Earlier approvals were bound to pre-migration hashes and M1 digests; no current-digest verdict file exists",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+      "gates": [
+        "G0"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/0/blockers/4",
+      "item": "Final pin F not recorded",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+      "gates": [
+        "G0"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/0/blockers/5",
+      "item": "661 bindings unresolved after full patch chain; final-pin post-apply rebind required (reviews/w9-composition-fix-review.md)",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+      "gates": [
+        "G0"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/0/remaining",
+      "item": "Re-review the 124 pending content rebind rows and the 3 rows corrected in 6f5b9419d, then at F re-join every changedBindings row to its ledger row and produce a verdict join with 0 missing, 0 mismatched and 0 open REWORK.",
+      "decision": "still open",
+      "resolution": "Independently review the 25 pending carries-current-rebindings rows (8 target-digest changes), binding each verdict to the current claim/row and digests; W17-3 is scope/mechanical PASS, not per-row content approval.",
+      "gates": [
+        "G0"
+      ],
+      "evidence": [
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md",
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F.",
+          "clearedBy": [
+            "6f5b9419d",
+            "c25e8cf6a",
+            "a8ea05c50"
+          ],
+          "reviews": [
+            "reviews/w16-g0-rework-and-park-rule-review.json",
+            "reviews/w14-g0-content-rereview.json",
+            "reviews/w17-parity-rework-review.json"
+          ],
+          "verdict": "pass: Scope in writable list; 3 supersede re-decisions cite existing main commits and spec sections; 127 bindings recompute, all pending; sample 5 parity digests correct; 15 sampled rationales true; d5ba1eda remainder 797c7185; stale pointers resolve to current-binding rows; rebind --check 0; g0rework/verify.py 0."
+        },
+        {
+          "decision": "moved to F",
+          "item": "Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). The 73/257 mismatch count is historical at 77db6ed2b, not a current count.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "Independently review the 25 pending carries-current-rebindings rows (8 target-digest changes), binding each verdict to the current claim/row and digests; W17-3 is scope/mechanical PASS, not per-row content approval.",
+          "evidence": [
+            "review-batches.json",
+            "reviews/g0-b1-review.json",
+            "reviews/g0-b2-review.json",
+            "reviews/g0-b3-review.json",
+            "reviews/g0-b4-review.json",
+            "reviews/g0-b5-review.json",
+            "reviews/w2-g0-delta-review.json",
+            "reviews/w4-ledger-d7b-review.json",
+            "reviews/w7-rebind-review.json",
+            "g0fix/receipt.md",
+            "ledgerfix/receipt.md",
+            "ledgerfix/recipe-migration.json",
+            "rebind/receipt.md",
+            "rebind/rereview-claim-ids.json",
+            "reviews/w16-g0-rework-and-park-rule-review.json",
+            "reviews/w14-g0-content-rereview.json",
+            "reviews/w17-parity-rework-review.json",
+            "g0rework/receipt.md",
+            "g0rework/receipt.json",
+            "carries/current-binding-refresh.json",
+            "reviews/w17-parity-rework-review.md",
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/1/blockers/0",
+      "item": "No independent review found for composition/** (family 8 successor scan sets, family 13 convention/citation-drift scan, family 17 area-holder table)",
+      "decision": "cleared",
+      "resolution": "No independent composition review / no per-member join over all 115 members.",
+      "gates": [
+        "G1"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "carries/receipt.md",
+        "composition/receipt.md",
+        "composition/member-joins.json",
+        "composition/area-holder-table.json",
+        "composition/gap05-placement-proposal.json",
+        "composition/w2-gap05-verification.json",
+        "late-areas/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "reviews/w2-g1-carries-review.json",
+        "reviews/w2-late-areas-review.json",
+        "reviews/w3-d1b-resync-review.json",
+        "reviews/w3-d7-resync-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w13-misc-pin-and-gloss-review.json",
+        "reviews/w14-import3-binding-review.json",
+        "reviews/w14-import3-binding-review.md",
+        "reviews/w17-parity-rework-review.json",
+        "import3/receipt.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/1/blockers/1",
+      "item": "GAP-05 placement proposal (composition/gap05-placement-proposal.json) awaits Lead approval; test/runner/dead-vocabulary-guard.test.mjs red (L13-7 D class)",
+      "decision": "cleared",
+      "resolution": "GAP-05 placement awaited Lead approval and moved-body bindings were unresolved.",
+      "gates": [
+        "G1"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "carries/receipt.md",
+        "composition/receipt.md",
+        "composition/member-joins.json",
+        "composition/area-holder-table.json",
+        "composition/gap05-placement-proposal.json",
+        "composition/w2-gap05-verification.json",
+        "late-areas/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "reviews/w2-g1-carries-review.json",
+        "reviews/w2-late-areas-review.json",
+        "reviews/w3-d1b-resync-review.json",
+        "reviews/w3-d7-resync-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w13-misc-pin-and-gloss-review.json",
+        "reviews/w14-import3-binding-review.json",
+        "reviews/w14-import3-binding-review.md",
+        "reviews/w17-parity-rework-review.json",
+        "import3/receipt.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/1/blockers/2",
+      "item": "test/scripts/check-decision-citation-drift.test.mjs real-repo baseline case reports 124 new findings (open parity gap per composition/receipt.md)",
+      "decision": "moved to F",
+      "resolution": "Citation-drift prepared-chain parity gap (old 124 finding count). The prepared chain is reviewed; applying and rescanning it still belongs to F under L13-11.3.",
+      "gates": [
+        "G1"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "carries/receipt.md",
+        "composition/receipt.md",
+        "composition/member-joins.json",
+        "composition/area-holder-table.json",
+        "composition/gap05-placement-proposal.json",
+        "composition/w2-gap05-verification.json",
+        "late-areas/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "reviews/w2-g1-carries-review.json",
+        "reviews/w2-late-areas-review.json",
+        "reviews/w3-d1b-resync-review.json",
+        "reviews/w3-d7-resync-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w13-misc-pin-and-gloss-review.json",
+        "reviews/w14-import3-binding-review.json",
+        "reviews/w14-import3-binding-review.md",
+        "reviews/w17-parity-rework-review.json",
+        "import3/receipt.md"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "Citation-drift prepared-chain parity gap (old 124 finding count). The prepared chain is reviewed; applying and rescanning it still belongs to F under L13-11.3.",
+          "clearedBy": [
+            "63c3db9c6",
+            "928f5cc14",
+            "bc2a6a014",
+            "4c9e1f31e",
+            "0fe6c4381",
+            "daa87810b"
+          ],
+          "reviews": [
+            "reviews/w14-check-hardening-review.json",
+            "reviews/w10-composition-rework-review.json",
+            "reviews/w13-misc-pin-and-gloss-review.json"
+          ],
+          "verdict": "pass: Witness #2 now says the forks were recorded at the time and that the Stop-drain decision was settled later. The chain replays byte-exact. The citation scan reports 0."
+        },
+        {
+          "decision": "moved to F",
+          "item": "Apply the reviewed prepared composition/GAP-05/citation chain under lease, then rerun owning dead-vocabulary and citation guards on the post-apply tree, baseline unchanged (L13-11.2–3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/1/blockers/3",
+      "item": "No per-member APPROVE join over all 115 members found",
+      "decision": "cleared",
+      "resolution": "No independent composition review / no per-member join over all 115 members.",
+      "gates": [
+        "G1"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "carries/receipt.md",
+        "composition/receipt.md",
+        "composition/member-joins.json",
+        "composition/area-holder-table.json",
+        "composition/gap05-placement-proposal.json",
+        "composition/w2-gap05-verification.json",
+        "late-areas/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "reviews/w2-g1-carries-review.json",
+        "reviews/w2-late-areas-review.json",
+        "reviews/w3-d1b-resync-review.json",
+        "reviews/w3-d7-resync-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w13-misc-pin-and-gloss-review.json",
+        "reviews/w14-import3-binding-review.json",
+        "reviews/w14-import3-binding-review.md",
+        "reviews/w17-parity-rework-review.json",
+        "import3/receipt.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/1/blockers/4",
+      "item": "Pending content rebind re-review (rebind/rereview-claim-ids.json) overlaps carried claims",
+      "decision": "cleared",
+      "resolution": "The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F.",
+      "gates": [
+        "G1"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "carries/receipt.md",
+        "composition/receipt.md",
+        "composition/member-joins.json",
+        "composition/area-holder-table.json",
+        "composition/gap05-placement-proposal.json",
+        "composition/w2-gap05-verification.json",
+        "late-areas/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "reviews/w2-g1-carries-review.json",
+        "reviews/w2-late-areas-review.json",
+        "reviews/w3-d1b-resync-review.json",
+        "reviews/w3-d7-resync-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w13-misc-pin-and-gloss-review.json",
+        "reviews/w14-import3-binding-review.json",
+        "reviews/w14-import3-binding-review.md",
+        "reviews/w17-parity-rework-review.json",
+        "import3/receipt.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/1/remaining",
+      "item": "Independent per-unit review of the 24 import-3 bindings and the 8 adapted rows (s18-import3-resync.json); at F re-run the owning guards (dead-vocabulary, citation drift) on the post-apply tree.",
+      "decision": "still open",
+      "resolution": "Complete the L13-16 live-proof correction and independent current-row reviews; retain F guard/patch duties separately.",
+      "gates": [
+        "G1"
+      ],
+      "evidence": [
+        "carries/receipt.md",
+        "composition/receipt.md",
+        "composition/member-joins.json",
+        "composition/area-holder-table.json",
+        "composition/gap05-placement-proposal.json",
+        "composition/w2-gap05-verification.json",
+        "late-areas/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "reviews/w2-g1-carries-review.json",
+        "reviews/w2-late-areas-review.json",
+        "reviews/w3-d1b-resync-review.json",
+        "reviews/w3-d7-resync-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w13-misc-pin-and-gloss-review.json",
+        "reviews/w14-import3-binding-review.json",
+        "reviews/w14-import3-binding-review.md",
+        "reviews/w17-parity-rework-review.json",
+        "import3/receipt.md",
+        "owner-answers.md"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "No independent composition review / no per-member join over all 115 members.",
+          "clearedBy": [
+            "5fe778624",
+            "d22072da2",
+            "63c3db9c6"
+          ],
+          "reviews": [
+            "reviews/w8-composition-review.json",
+            "reviews/w9-composition-fix-review.json",
+            "reviews/w2-g1-carries-review.json"
+          ],
+          "verdict": "APPROVE: 115/115 integrationParkMembers joined: 72 families 8/13/17 in member-joins.json, 43 families 14/15/16/18 in carries/claim-carries.json. Per-member independent APPROVE now exists for the 72 (this file); the 43 carried members rely on w2-g1-carries review."
+        },
+        {
+          "decision": "cleared",
+          "item": "GAP-05 placement awaited Lead approval and moved-body bindings were unresolved.",
+          "clearedBy": [
+            "63c3db9c6",
+            "928f5cc14"
+          ],
+          "reviews": [
+            "reviews/w10-composition-rework-review.json",
+            "reviews/w9-composition-fix-review.json"
+          ],
+          "verdict": "APPROVE: GAP-05: 0 moved units unresolved; 171 origin assertions = 90 s14 terminals + 81 s6 claims superseding into 81 of them; 90 overlays is honest."
+        },
+        {
+          "decision": "cleared",
+          "item": "Citation-drift prepared-chain parity gap (old 124 finding count). The prepared chain is reviewed; applying and rescanning it still belongs to F under L13-11.3.",
+          "clearedBy": [
+            "63c3db9c6",
+            "928f5cc14",
+            "bc2a6a014",
+            "4c9e1f31e",
+            "0fe6c4381",
+            "daa87810b"
+          ],
+          "reviews": [
+            "reviews/w14-check-hardening-review.json",
+            "reviews/w10-composition-rework-review.json",
+            "reviews/w13-misc-pin-and-gloss-review.json"
+          ],
+          "verdict": "pass: Witness #2 now says the forks were recorded at the time and that the Stop-drain decision was settled later. The chain replays byte-exact. The citation scan reports 0."
+        },
+        {
+          "decision": "cleared",
+          "item": "Independent per-unit review of import-3 24 source bindings, including its 8 adapted rows (8 is a subset, not 24+8).",
+          "clearedBy": [
+            "d786e305e"
+          ],
+          "reviews": [
+            "reviews/w14-import3-binding-review.json",
+            "reviews/w14-import3-binding-review.md"
+          ],
+          "verdict": "APPROVE, 98 of 98 rows."
+        },
+        {
+          "decision": "moved to F",
+          "item": "Apply the reviewed prepared composition/GAP-05/citation chain under lease, then rerun owning dead-vocabulary and citation guards on the post-apply tree, baseline unchanged (L13-11.2–3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Recompose the 2 drifted carries pointer patches, bin/fgos.mjs and docs/backlog.md, and recheck all 24 at F (W17-2 ACCEPT-DISCLOSED; L13-16).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "Fix and independently re-review W17-1: refresh the 4 live distribution.md heading rows, add parity for unheaded-block-17 and restore live heading/direct-block coverage alongside authoring replay (L13-16). No parallel uncommitted fix is counted.",
+          "evidence": [
+            "carries/receipt.md",
+            "composition/receipt.md",
+            "composition/member-joins.json",
+            "composition/area-holder-table.json",
+            "composition/gap05-placement-proposal.json",
+            "composition/w2-gap05-verification.json",
+            "late-areas/receipt.md",
+            "resync-a/receipt.md",
+            "resync-b/receipt.md",
+            "reviews/w2-g1-carries-review.json",
+            "reviews/w2-late-areas-review.json",
+            "reviews/w3-d1b-resync-review.json",
+            "reviews/w3-d7-resync-review.json",
+            "reviews/w4-ledger-d7b-review.json",
+            "reviews/w5-misc-fix-review.json",
+            "reviews/w6-misc-rework-review.json",
+            "reviews/w8-composition-review.json",
+            "reviews/w9-composition-fix-review.json",
+            "reviews/w10-composition-rework-review.json",
+            "reviews/w14-check-hardening-review.json",
+            "reviews/w13-misc-pin-and-gloss-review.json",
+            "reviews/w14-import3-binding-review.json",
+            "reviews/w14-import3-binding-review.md",
+            "reviews/w17-parity-rework-review.json",
+            "import3/receipt.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "Obtain current-digest independent review for the 25 pending candidate rebinds introduced by a8ea05c50 (8 target-digest changes), shared with G0; mechanical W17-3 PASS is not semantic approval.",
+          "evidence": [
+            "carries/receipt.md",
+            "composition/receipt.md",
+            "composition/member-joins.json",
+            "composition/area-holder-table.json",
+            "composition/gap05-placement-proposal.json",
+            "composition/w2-gap05-verification.json",
+            "late-areas/receipt.md",
+            "resync-a/receipt.md",
+            "resync-b/receipt.md",
+            "reviews/w2-g1-carries-review.json",
+            "reviews/w2-late-areas-review.json",
+            "reviews/w3-d1b-resync-review.json",
+            "reviews/w3-d7-resync-review.json",
+            "reviews/w4-ledger-d7b-review.json",
+            "reviews/w5-misc-fix-review.json",
+            "reviews/w6-misc-rework-review.json",
+            "reviews/w8-composition-review.json",
+            "reviews/w9-composition-fix-review.json",
+            "reviews/w10-composition-rework-review.json",
+            "reviews/w14-check-hardening-review.json",
+            "reviews/w13-misc-pin-and-gloss-review.json",
+            "reviews/w14-import3-binding-review.json",
+            "reviews/w14-import3-binding-review.md",
+            "reviews/w17-parity-rework-review.json",
+            "import3/receipt.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/2/blockers/0",
+      "item": "Pinned to 3d0169f39, not F",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Re-run census-join/join.py --pin F --rescan; refresh the 33 moved Rust locators, settle/review the 187 original owned judgments and 8 open post-pin literal judgments plus any new F delta, and obtain current-pin delta review (execution plan §2 G2 / §3 W3; L13-9.4). Refresh G2/G6 to a shared F pin and make preserve-premise/verify.py exit 0 without weakening its pin equality (L13-9.4).",
+      "gates": [
+        "G2"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "census-join/receipt.md",
+        "reviews/w2-g2-census-review.json",
+        "reviews/w2-g2-dyn-delta.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w6-misc-rework-review.md",
+        "preserve-premise/verification.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/2/blockers/1",
+      "item": "33 G2 Rust test locators moved since the pin",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Re-run census-join/join.py --pin F --rescan; refresh the 33 moved Rust locators, settle/review the 187 original owned judgments and 8 open post-pin literal judgments plus any new F delta, and obtain current-pin delta review (execution plan §2 G2 / §3 W3; L13-9.4). Refresh G2/G6 to a shared F pin and make preserve-premise/verify.py exit 0 without weakening its pin equality (L13-9.4).",
+      "gates": [
+        "G2"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "census-join/receipt.md",
+        "reviews/w2-g2-census-review.json",
+        "reviews/w2-g2-dyn-delta.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w6-misc-rework-review.md",
+        "preserve-premise/verification.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/2/blockers/2",
+      "item": "8 post-pin literal judgments open",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Re-run census-join/join.py --pin F --rescan; refresh the 33 moved Rust locators, settle/review the 187 original owned judgments and 8 open post-pin literal judgments plus any new F delta, and obtain current-pin delta review (execution plan §2 G2 / §3 W3; L13-9.4). Refresh G2/G6 to a shared F pin and make preserve-premise/verify.py exit 0 without weakening its pin equality (L13-9.4).",
+      "gates": [
+        "G2"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "census-join/receipt.md",
+        "reviews/w2-g2-census-review.json",
+        "reviews/w2-g2-dyn-delta.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w6-misc-rework-review.md",
+        "preserve-premise/verification.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/2/blockers/3",
+      "item": "preserve-premise/verify.py exits 1 on the G2 census pin",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Re-run census-join/join.py --pin F --rescan; refresh the 33 moved Rust locators, settle/review the 187 original owned judgments and 8 open post-pin literal judgments plus any new F delta, and obtain current-pin delta review (execution plan §2 G2 / §3 W3; L13-9.4). Refresh G2/G6 to a shared F pin and make preserve-premise/verify.py exit 0 without weakening its pin equality (L13-9.4).",
+      "gates": [
+        "G2"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "census-join/receipt.md",
+        "reviews/w2-g2-census-review.json",
+        "reviews/w2-g2-dyn-delta.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w6-misc-rework-review.md",
+        "preserve-premise/verification.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/2/remaining",
+      "item": "At F, re-run join.py with --pin F and --rescan, refresh the 33 moved Rust locators, settle the 8 open literal judgments, get preserve-premise/verify.py to exit 0 and get a delta review.",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
+      "gates": [
+        "G2"
+      ],
+      "evidence": [
+        "census-join/receipt.md",
+        "reviews/w2-g2-census-review.json",
+        "reviews/w2-g2-dyn-delta.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w6-misc-rework-review.md",
+        "preserve-premise/verification.json",
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Re-run census-join/join.py --pin F --rescan; refresh the 33 moved Rust locators, settle/review the 187 original owned judgments and 8 open post-pin literal judgments plus any new F delta, and obtain current-pin delta review (execution plan §2 G2 / §3 W3; L13-9.4).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Refresh G2/G6 to a shared F pin and make preserve-premise/verify.py exit 0 without weakening its pin equality (L13-9.4).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/3/blockers/0",
+      "item": "Per-id approvals are bound to cffe725b9; targets edited afterwards",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Re-check all 17 restored/superseded targets at F anchors/digests; delta-review changed targets and replace restored-pending-review / superseded-pending-review with final dispositions (execution plan §2 G3 / §3 W3).",
+      "gates": [
+        "G3"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "carries/receipt.md",
+        "reviews/w2-g3-packaging-review.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/3/blockers/1",
+      "item": "Register statuses still restored-pending-review / superseded-pending-review",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Re-check all 17 restored/superseded targets at F anchors/digests; delta-review changed targets and replace restored-pending-review / superseded-pending-review with final dispositions (execution plan §2 G3 / §3 W3).",
+      "gates": [
+        "G3"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "carries/receipt.md",
+        "reviews/w2-g3-packaging-review.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/3/remaining",
+      "item": "At F, re-check the 17 register targets at their current anchor and unit digest, get a delta review for any changed target, and move the register statuses off *-pending-review.",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
+      "gates": [
+        "G3"
+      ],
+      "evidence": [
+        "carries/receipt.md",
+        "reviews/w2-g3-packaging-review.json",
+        "preflip-execution-plan.md"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Re-check all 17 restored/superseded targets at F anchors/digests; delta-review changed targets and replace restored-pending-review / superseded-pending-review with final dispositions (execution plan §2 G3 / §3 W3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/4/blockers/0",
+      "item": "Git owner / HARDEN review of the 25 declarations not done; review-branch push waits for WORK \"cutover xong\" (L13-9)",
+      "decision": "still open",
+      "resolution": "Still open with corrected scope/owner: Git owner / HARDEN reviews the 25 declarations and the explicitly open aliased-export declared-wrapper inheritance gap. Review branch review/doc-git-one-door must use full plan ancestry under L13-12 A', not L13-9’s superseded selective-commit shape.",
+      "gates": [
+        "G4"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "git-one-door/receipt.md",
+        "git-one-door/exemption-proposal.md",
+        "git-one-door/declared-exemptions/receipt.md",
+        "git-one-door/wrapper-callers/receipt.md",
+        "git-one-door/wrapper-escapes/receipt.md",
+        "git-one-door/git-owner-review-request.md",
+        "reviews/w2-g4-code-review.json",
+        "reviews/w4-g4-declare-review.json",
+        "reviews/w5-g4-wrapper-review.json",
+        "reviews/w6-g4-escape-review.json",
+        "reviews/w8-lead-fixes-review.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/4/blockers/1",
+      "item": "53499dc9d (w6 REWORK fix) not independently re-reviewed",
+      "decision": "cleared",
+      "resolution": "53499dc9d (w6 spec-sentence REWORK fix) not independently re-reviewed.",
+      "gates": [
+        "G4"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "git-one-door/receipt.md",
+        "git-one-door/exemption-proposal.md",
+        "git-one-door/declared-exemptions/receipt.md",
+        "git-one-door/wrapper-callers/receipt.md",
+        "git-one-door/wrapper-escapes/receipt.md",
+        "git-one-door/git-owner-review-request.md",
+        "reviews/w2-g4-code-review.json",
+        "reviews/w4-g4-declare-review.json",
+        "reviews/w5-g4-wrapper-review.json",
+        "reviews/w6-g4-escape-review.json",
+        "reviews/w8-lead-fixes-review.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/4/blockers/2",
+      "item": "Aliased-export scan gap is an open Git-owner item (git-one-door/git-owner-review-request.md)",
+      "decision": "still open",
+      "resolution": "Still open with corrected scope/owner: Git owner / HARDEN reviews the 25 declarations and the explicitly open aliased-export declared-wrapper inheritance gap. Review branch review/doc-git-one-door must use full plan ancestry under L13-12 A', not L13-9’s superseded selective-commit shape.",
+      "gates": [
+        "G4"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "git-one-door/receipt.md",
+        "git-one-door/exemption-proposal.md",
+        "git-one-door/declared-exemptions/receipt.md",
+        "git-one-door/wrapper-callers/receipt.md",
+        "git-one-door/wrapper-escapes/receipt.md",
+        "git-one-door/git-owner-review-request.md",
+        "reviews/w2-g4-code-review.json",
+        "reviews/w4-g4-declare-review.json",
+        "reviews/w5-g4-wrapper-review.json",
+        "reviews/w6-g4-escape-review.json",
+        "reviews/w8-lead-fixes-review.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/4/remaining",
+      "item": "Git owner (HARDEN) must review the declarations on the review branch, and 53499dc9d needs an independent check.",
+      "decision": "still open",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
+      "gates": [
+        "G4"
+      ],
+      "evidence": [
+        "git-one-door/receipt.md",
+        "git-one-door/exemption-proposal.md",
+        "git-one-door/declared-exemptions/receipt.md",
+        "git-one-door/wrapper-callers/receipt.md",
+        "git-one-door/wrapper-escapes/receipt.md",
+        "git-one-door/git-owner-review-request.md",
+        "reviews/w2-g4-code-review.json",
+        "reviews/w4-g4-declare-review.json",
+        "reviews/w5-g4-wrapper-review.json",
+        "reviews/w6-g4-escape-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "owner-answers.md"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "53499dc9d (w6 spec-sentence REWORK fix) not independently re-reviewed.",
+          "clearedBy": [
+            "53499dc9d"
+          ],
+          "reviews": [
+            "reviews/w8-lead-fixes-review.json"
+          ],
+          "verdict": "APPROVE: Scanner unchanged since 87c4f5f7a. applyDeclarations refuses any non-empty escapes unless class configured-binary; .call/.apply, 'stored in an array' and 'passed to an unresolved callee' (Reflect.apply, setTimeout) are real escape kinds. Aliased-export gap stated as open; owner request names declared-wrapper inheritance. Parenthetical lists 4 of ~14 escape kinds, true as examples."
+        },
+        {
+          "decision": "still open",
+          "item": "Git owner / HARDEN reviews the 25 declarations and the explicitly open aliased-export declared-wrapper inheritance gap. Review branch review/doc-git-one-door must use full plan ancestry under L13-12 A', not L13-9’s superseded selective-commit shape.",
+          "evidence": [
+            "git-one-door/receipt.md",
+            "git-one-door/exemption-proposal.md",
+            "git-one-door/declared-exemptions/receipt.md",
+            "git-one-door/wrapper-callers/receipt.md",
+            "git-one-door/wrapper-escapes/receipt.md",
+            "git-one-door/git-owner-review-request.md",
+            "reviews/w2-g4-code-review.json",
+            "reviews/w4-g4-declare-review.json",
+            "reviews/w5-g4-wrapper-review.json",
+            "reviews/w6-g4-escape-review.json",
+            "reviews/w8-lead-fixes-review.json",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/5/remaining",
+      "item": "Extend g5/check.py to the surviving docs/reading-map.md: banner lines 3-9 are restated in English in §3, line 34 survives only with a Truth correction suffix (line 156), line 37 is exact (line 159); the restatement and suffix need owner acceptance (cutover packet), then rerun at F.",
+      "decision": "still open",
+      "resolution": "Extend g5/check.py with per-span surviving docs/reading-map.md locations and explicit proposed text for the banner restatement and Truth-correction suffix; obtain an independent check of that complete clause. The current 10-span legacy check is insufficient.",
+      "gates": [
+        "G5"
+      ],
+      "evidence": [
+        "g5/check.py",
+        "g5/check-b726d44ed.json",
+        "reviews/w8-lead-fixes-review.json",
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Re-run the full retention/accepted-surviving-span check at F (execution plan §2 G5 / §3 W3); do not treat the historical ten-span check as satisfying both clauses.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "Extend g5/check.py with per-span surviving docs/reading-map.md locations and explicit proposed text for the banner restatement and Truth-correction suffix; obtain an independent check of that complete clause. The current 10-span legacy check is insufficient.",
+          "evidence": [
+            "g5/check.py",
+            "g5/check-b726d44ed.json",
+            "reviews/w8-lead-fixes-review.json",
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "Owner acceptance of the surviving reading-map English banner restatement and the compounding/knowledge line’s Truth-correction suffix is required in the cutover packet (L13-10; w8-lead-fixes g5-check-implements-gate).",
+          "evidence": [
+            "g5/check.py",
+            "g5/check-b726d44ed.json",
+            "reviews/w8-lead-fixes-review.json",
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/6/blockers/0",
+      "item": "c5586146c (w7 REWORK fixes) not independently re-reviewed",
+      "decision": "cleared",
+      "resolution": "c5586146c (w7 pin fix) not independently checked.",
+      "gates": [
+        "G6"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "preserve-premise/receipt.md",
+        "preserve-premise/sentence-delta.json",
+        "preserve-premise/sentence-replay.json",
+        "misc-fix/receipt.md",
+        "reviews/w2-g6-preserve-review.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w7-header-sentence-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "reviews/w9-g6-fix-review.json",
+        "reviews/w8-g6-parks-review.json",
+        "reviews/w8-g6-judgments-review.json",
+        "preserve-premise/receipt.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/6/blockers/1",
+      "item": "No exhaustive APPROVE over the 1,423 open judgment/note rows and every overturn (w2-g6 was a stratified sample)",
+      "decision": "cleared",
+      "resolution": "No exhaustive APPROVE over all 1,423 judgment/note rows and every overturn.",
+      "gates": [
+        "G6"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "preserve-premise/receipt.md",
+        "preserve-premise/sentence-delta.json",
+        "preserve-premise/sentence-replay.json",
+        "misc-fix/receipt.md",
+        "reviews/w2-g6-preserve-review.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w7-header-sentence-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "reviews/w9-g6-fix-review.json",
+        "reviews/w8-g6-parks-review.json",
+        "reviews/w8-g6-judgments-review.json",
+        "preserve-premise/receipt.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/6/blockers/2",
+      "item": "186 G6 rows and 86 wrapper successor digests to refresh at F",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Refresh all preserve-premise evidence at F (the earlier 186 G6 rows / 86 wrapper digests are historical lower bounds, not current totals), replay twice byte-identically and obtain delta review (execution plan §2 G6 / §3 W3, L13-9.4). Co-compose the reviewed 163 dated wrapper notes, owned-park actions and 6 repoint proposals (including the prepared four-line dispatch patch), use actual flip date/placement, and validate them with the full F chain before cutover. Owned parks remain owned, not automatic preserves or blanket retirements (preserve-premise receipt; w9-g6-fix review). Pass the combined G2/G6 verifier at the shared F pin (L13-9.4).",
+      "gates": [
+        "G6"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "preserve-premise/receipt.md",
+        "preserve-premise/sentence-delta.json",
+        "preserve-premise/sentence-replay.json",
+        "misc-fix/receipt.md",
+        "reviews/w2-g6-preserve-review.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w7-header-sentence-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "reviews/w9-g6-fix-review.json",
+        "reviews/w8-g6-parks-review.json",
+        "reviews/w8-g6-judgments-review.json",
+        "preserve-premise/receipt.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/6/blockers/3",
+      "item": "Combined verifier blocked on the G2 census pin",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Refresh all preserve-premise evidence at F (the earlier 186 G6 rows / 86 wrapper digests are historical lower bounds, not current totals), replay twice byte-identically and obtain delta review (execution plan §2 G6 / §3 W3, L13-9.4). Co-compose the reviewed 163 dated wrapper notes, owned-park actions and 6 repoint proposals (including the prepared four-line dispatch patch), use actual flip date/placement, and validate them with the full F chain before cutover. Owned parks remain owned, not automatic preserves or blanket retirements (preserve-premise receipt; w9-g6-fix review). Pass the combined G2/G6 verifier at the shared F pin (L13-9.4).",
+      "gates": [
+        "G6"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "preserve-premise/receipt.md",
+        "preserve-premise/sentence-delta.json",
+        "preserve-premise/sentence-replay.json",
+        "misc-fix/receipt.md",
+        "reviews/w2-g6-preserve-review.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w7-header-sentence-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "reviews/w9-g6-fix-review.json",
+        "reviews/w8-g6-parks-review.json",
+        "reviews/w8-g6-judgments-review.json",
+        "preserve-premise/receipt.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/6/remaining",
+      "item": "Get c5586146c independently checked, get an APPROVE on every overturn/judgment row (the reviews so far were sampled), then refresh the proof at F and replay it twice.",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
+      "gates": [
+        "G6"
+      ],
+      "evidence": [
+        "preserve-premise/receipt.md",
+        "preserve-premise/sentence-delta.json",
+        "preserve-premise/sentence-replay.json",
+        "misc-fix/receipt.md",
+        "reviews/w2-g6-preserve-review.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w7-header-sentence-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "reviews/w9-g6-fix-review.json",
+        "reviews/w8-g6-parks-review.json",
+        "reviews/w8-g6-judgments-review.json",
+        "preserve-premise/receipt.json",
+        "owner-answers.md"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "c5586146c (w7 pin fix) not independently checked.",
+          "clearedBy": [
+            "c5586146c"
+          ],
+          "reviews": [
+            "reviews/w8-lead-fixes-review.json"
+          ],
+          "verdict": "APPROVE: Scratch-clone rerun at f2162d9ff exit 0 (95 s); regenerated checks.json differs from committed only in HEAD sha and temp dir names; g6SourceCommit 4178dcc6e. Replay, assertion header pin and source() all at g6pin; owning section still extracted verbatim; proof.py prefix widening is a scratch guard, not an assertion. No weakening."
+        },
+        {
+          "decision": "cleared",
+          "item": "No exhaustive APPROVE over all 1,423 judgment/note rows and every overturn.",
+          "clearedBy": [
+            "db023f065"
+          ],
+          "reviews": [
+            "reviews/w9-g6-fix-review.json",
+            "reviews/w8-g6-parks-review.json",
+            "reviews/w8-g6-judgments-review.json"
+          ],
+          "verdict": "APPROVE: Counts are conserved (4320 + 924 + 163 + 6 = 5413) and match an independent diff. All 14 changed files are on the brief's writable list."
+        },
+        {
+          "decision": "moved to F",
+          "item": "Refresh all preserve-premise evidence at F (the earlier 186 G6 rows / 86 wrapper digests are historical lower bounds, not current totals), replay twice byte-identically and obtain delta review (execution plan §2 G6 / §3 W3, L13-9.4).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Co-compose the reviewed 163 dated wrapper notes, owned-park actions and 6 repoint proposals (including the prepared four-line dispatch patch), use actual flip date/placement, and validate them with the full F chain before cutover. Owned parks remain owned, not automatic preserves or blanket retirements (preserve-premise receipt; w9-g6-fix review).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Pass the combined G2/G6 verifier at the shared F pin (L13-9.4).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/7/blockers/0",
+      "item": "2 REWORK specs recomposed but not re-reviewed",
+      "decision": "cleared",
+      "resolution": "Both recomposed specs have independent per-spec APPROVE in W8.",
+      "gates": [
+        "G7"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "reviews/w8-composition-review.md",
+        "reviews/w14-check-hardening-review.json"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "Recomposed g7-c5 test/cli/fgos-merge.test.mjs REWORK spec not re-reviewed.",
+          "clearedBy": [
+            "5fe778624",
+            "d22072da2"
+          ],
+          "reviews": [
+            "reviews/w8-composition-review.json"
+          ],
+          "verdict": "APPROVE: g7-c5 REWORK resolved: stray added blank line dropped (hunk -922,8 +922,7), single-line retarget kept; target docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md exists. patch --fuzz=0 forward exit 0 -> 158da868, rollback exit 0 -> e6ecac95 == beforeSha256; HEAD f2162d9ff bytes == beforeSha256."
+        },
+        {
+          "decision": "cleared",
+          "item": "Recomposed g7-c7 docs/how-to/fix-bare-citation-findings.md REWORK spec not re-reviewed.",
+          "clearedBy": [
+            "5fe778624",
+            "d22072da2"
+          ],
+          "reviews": [
+            "reviews/w8-composition-review.json"
+          ],
+          "verdict": "APPROVE: g7-c7 REWORK resolved: example now names docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules (## Business Rules at line 25, holds the runner RULs). fuzz=0 forward -> a32b04a8, rollback -> 11d8cb55 == beforeSha256; HEAD bytes == beforeSha256."
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/7/blockers/1",
+      "item": "101 park actions without independent review",
+      "decision": "cleared",
+      "resolution": "101 park actions lacked review / four holder-blocked actions.",
+      "gates": [
+        "G7"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "reviews/w8-composition-review.md",
+        "reviews/w14-check-hardening-review.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/7/blockers/2",
+      "item": "4 park actions blocked: system-overview f07928/f07929, architecture-intent 8 Related/evidence rows, transitional-switchboard f08382-f08384, documentation/switchboard f06749-f06751",
+      "decision": "cleared",
+      "resolution": "101 park actions lacked review / four holder-blocked actions.",
+      "gates": [
+        "G7"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "reviews/w8-composition-review.md",
+        "reviews/w14-check-hardening-review.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/7/blockers/3",
+      "item": "124 content rebind rows plus 3 corrected rows (6f5b9419d) pending re-review",
+      "decision": "cleared",
+      "resolution": "124 content rows plus the three overlapping Lead corrections still needed re-review.",
+      "gates": [
+        "G7"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "reviews/w8-composition-review.md",
+        "reviews/w14-check-hardening-review.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/7/blockers/4",
+      "item": "36 specs deferred to G9; approvals bound to 8a9385eca bytes",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Recheck every approved spec digest at F; recompose/delta-review changed specs and the 36 G9-deferred specs plus predecessor chain (execution plan §2 G7, §3 W3). Run the full post-apply ledger resolution/rebind, covering all residual bindings, not just GAP-05. Use the W10 inventory (407 distinct = 361 chain-caused + 46 at pin; 556 assertions) only as a historical sizing witness, then re-enumerate at F (w10-composition-rework F7).",
+      "gates": [
+        "G7"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "reviews/w8-composition-review.md",
+        "reviews/w14-check-hardening-review.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/7/blockers/5",
+      "item": "661 bindings unresolved after full patch chain; final-pin post-apply rebind required (reviews/w9-composition-fix-review.md)",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Recheck every approved spec digest at F; recompose/delta-review changed specs and the 36 G9-deferred specs plus predecessor chain (execution plan §2 G7, §3 W3). Run the full post-apply ledger resolution/rebind, covering all residual bindings, not just GAP-05. Use the W10 inventory (407 distinct = 361 chain-caused + 46 at pin; 556 assertions) only as a historical sizing witness, then re-enumerate at F (w10-composition-rework F7).",
+      "gates": [
+        "G7"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "reviews/w8-composition-review.md",
+        "reviews/w14-check-hardening-review.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/7/remaining",
+      "item": "Re-check every approved spec digest at F and get delta reviews; the 4 blocked park actions were resolved in the w8/w9 composition rework.",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
+      "gates": [
+        "G7"
+      ],
+      "evidence": [
+        "review-batches.json",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "reviews/w8-composition-review.md",
+        "reviews/w14-check-hardening-review.json",
+        "preflip-execution-plan.md"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "Recomposed g7-c5 test/cli/fgos-merge.test.mjs REWORK spec not re-reviewed.",
+          "clearedBy": [
+            "5fe778624",
+            "d22072da2"
+          ],
+          "reviews": [
+            "reviews/w8-composition-review.json"
+          ],
+          "verdict": "APPROVE: g7-c5 REWORK resolved: stray added blank line dropped (hunk -922,8 +922,7), single-line retarget kept; target docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md exists. patch --fuzz=0 forward exit 0 -> 158da868, rollback exit 0 -> e6ecac95 == beforeSha256; HEAD f2162d9ff bytes == beforeSha256."
+        },
+        {
+          "decision": "cleared",
+          "item": "Recomposed g7-c7 docs/how-to/fix-bare-citation-findings.md REWORK spec not re-reviewed.",
+          "clearedBy": [
+            "5fe778624",
+            "d22072da2"
+          ],
+          "reviews": [
+            "reviews/w8-composition-review.json"
+          ],
+          "verdict": "APPROVE: g7-c7 REWORK resolved: example now names docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules (## Business Rules at line 25, holds the runner RULs). fuzz=0 forward -> a32b04a8, rollback -> 11d8cb55 == beforeSha256; HEAD bytes == beforeSha256."
+        },
+        {
+          "decision": "cleared",
+          "item": "101 park actions lacked review / four holder-blocked actions.",
+          "clearedBy": [
+            "63c3db9c6",
+            "928f5cc14"
+          ],
+          "reviews": [
+            "reviews/w9-composition-fix-review.json",
+            "reviews/w8-composition-review.json",
+            "reviews/w10-composition-rework-review.json"
+          ],
+          "verdict": "APPROVE: Base and partial recomposed at HEAD bytes (chain exact); f07928/f07929 become spec: links to the two resolved knowledge-registry sections."
+        },
+        {
+          "decision": "cleared",
+          "item": "124 content rows plus the three overlapping Lead corrections still needed re-review.",
+          "clearedBy": [
+            "6f5b9419d",
+            "c25e8cf6a",
+            "a8ea05c50"
+          ],
+          "reviews": [
+            "reviews/w16-g0-rework-and-park-rule-review.json",
+            "reviews/w14-g0-content-rereview.json",
+            "reviews/w17-parity-rework-review.json"
+          ],
+          "verdict": "pass: Scope in writable list; 3 supersede re-decisions cite existing main commits and spec sections; 127 bindings recompute, all pending; sample 5 parity digests correct; 15 sampled rationales true; d5ba1eda remainder 797c7185; stale pointers resolve to current-binding rows; rebind --check 0; g0rework/verify.py 0."
+        },
+        {
+          "decision": "moved to F",
+          "item": "Recheck every approved spec digest at F; recompose/delta-review changed specs and the 36 G9-deferred specs plus predecessor chain (execution plan §2 G7, §3 W3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Run the full post-apply ledger resolution/rebind, covering all residual bindings, not just GAP-05. Use the W10 inventory (407 distinct = 361 chain-caused + 46 at pin; 556 assertions) only as a historical sizing witness, then re-enumerate at F (w10-composition-rework F7).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/8/blockers/0",
+      "item": "984829939 and 5c3b57347 (w5-d5c REWORK fixes) not independently re-reviewed",
+      "decision": "cleared",
+      "resolution": "984829939 direct-link retention and 5c3b57347 cold timing not independently reviewed.",
+      "gates": [
+        "G8"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "archive/receipt.md",
+        "archive/design.md",
+        "archive/manifest.json",
+        "archive/verification.json",
+        "archive/rehearsal.json",
+        "archive/link-closure.json",
+        "reviews/w2-g8-archive-review.json",
+        "reviews/w4-g8-archive-review.json",
+        "reviews/w5-d5c-archive-review.json",
+        "reviews/w14-g8-retention-timing-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "archive/receipt.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/8/blockers/1",
+      "item": "Partition bound to d3efc70c5; rebuild required at F",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
+      "gates": [
+        "G8"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "archive/receipt.md",
+        "archive/design.md",
+        "archive/manifest.json",
+        "archive/verification.json",
+        "archive/rehearsal.json",
+        "archive/link-closure.json",
+        "reviews/w2-g8-archive-review.json",
+        "reviews/w4-g8-archive-review.json",
+        "reviews/w5-d5c-archive-review.json",
+        "reviews/w14-g8-retention-timing-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "archive/receipt.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/8/blockers/2",
+      "item": "No local archive ref in the repository (rehearsal clone only)",
+      "decision": "still open",
+      "resolution": "Still open with corrected scope/owner: Provide the authorized LOCAL archive ref with pinned custody evidence; archive/design.md says it existed only in the disposable rehearsal, whose scratch was removed. No repository-local archive ref was found. No push/main publication is authorized by this task. Independently re-review f67e0f676’s records-only fix for W14 w8-archive-receipt-json-stale; do not infer independent approval from the Lead’s edit. Keep the separate low documentation note about retained JSON path-string recovery visible. Owner cutover approval S2 is required for archive ref publication and main manifest merge; local rehearsal is not that permission.",
+      "gates": [
+        "G8"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "archive/receipt.md",
+        "archive/design.md",
+        "archive/manifest.json",
+        "archive/verification.json",
+        "archive/rehearsal.json",
+        "archive/link-closure.json",
+        "reviews/w2-g8-archive-review.json",
+        "reviews/w4-g8-archive-review.json",
+        "reviews/w5-d5c-archive-review.json",
+        "reviews/w14-g8-retention-timing-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "archive/receipt.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/8/blockers/3",
+      "item": "Publication (S2) needs owner cutover approval",
+      "decision": "still open",
+      "resolution": "Still open with corrected scope/owner: Provide the authorized LOCAL archive ref with pinned custody evidence; archive/design.md says it existed only in the disposable rehearsal, whose scratch was removed. No repository-local archive ref was found. No push/main publication is authorized by this task. Independently re-review f67e0f676’s records-only fix for W14 w8-archive-receipt-json-stale; do not infer independent approval from the Lead’s edit. Keep the separate low documentation note about retained JSON path-string recovery visible. Owner cutover approval S2 is required for archive ref publication and main manifest merge; local rehearsal is not that permission.",
+      "gates": [
+        "G8"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "archive/receipt.md",
+        "archive/design.md",
+        "archive/manifest.json",
+        "archive/verification.json",
+        "archive/rehearsal.json",
+        "archive/link-closure.json",
+        "reviews/w2-g8-archive-review.json",
+        "reviews/w4-g8-archive-review.json",
+        "reviews/w5-d5c-archive-review.json",
+        "reviews/w14-g8-retention-timing-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "archive/receipt.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/8/remaining",
+      "item": "At F: rebuild the partition keeping register evidence (L13-13.4), re-enumerate readers to 0 unresolved and retime from a cold cache.",
+      "decision": "still open",
+      "resolution": "Finish local archive-ref custody and the independent receipt-fix check; rebuild/readers/timing stay at F, publication stays owner-gated.",
+      "gates": [
+        "G8"
+      ],
+      "evidence": [
+        "archive/receipt.md",
+        "archive/design.md",
+        "archive/manifest.json",
+        "archive/verification.json",
+        "archive/rehearsal.json",
+        "archive/link-closure.json",
+        "reviews/w2-g8-archive-review.json",
+        "reviews/w4-g8-archive-review.json",
+        "reviews/w5-d5c-archive-review.json",
+        "reviews/w14-g8-retention-timing-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "archive/receipt.json",
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "984829939 direct-link retention and 5c3b57347 cold timing not independently reviewed.",
+          "clearedBy": [
+            "984829939",
+            "5c3b57347"
+          ],
+          "reviews": [
+            "reviews/w14-g8-retention-timing-review.json",
+            "reviews/w8-lead-fixes-review.json"
+          ],
+          "verdict": "APPROVE: Committed audit/rehearsal-commands.json.gz worktree-add rows equal rehearsal.json runs: 2.9292/2.7071/2.9036 s and 41.7036/10.5524/12.4394 s, exit 0; medians 2.904 and 12.439 s; eviction 704,667,648 -> 0; residency chain 0 -> 230,699,008 / 382,160,896 holds; per-file sums equal totals. Evidence unchanged since w8 (git diff --quiet f2162d9ff HEAD)."
+        },
+        {
+          "decision": "moved to F",
+          "item": "Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "Provide the authorized LOCAL archive ref with pinned custody evidence; archive/design.md says it existed only in the disposable rehearsal, whose scratch was removed. No repository-local archive ref was found. No push/main publication is authorized by this task.",
+          "evidence": [
+            "archive/receipt.md",
+            "archive/design.md",
+            "archive/manifest.json",
+            "archive/verification.json",
+            "archive/rehearsal.json",
+            "archive/link-closure.json",
+            "reviews/w2-g8-archive-review.json",
+            "reviews/w4-g8-archive-review.json",
+            "reviews/w5-d5c-archive-review.json",
+            "reviews/w14-g8-retention-timing-review.json",
+            "reviews/w8-lead-fixes-review.json",
+            "archive/receipt.json",
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "Independently re-review f67e0f676’s records-only fix for W14 w8-archive-receipt-json-stale; do not infer independent approval from the Lead’s edit. Keep the separate low documentation note about retained JSON path-string recovery visible.",
+          "evidence": [
+            "archive/receipt.md",
+            "archive/design.md",
+            "archive/manifest.json",
+            "archive/verification.json",
+            "archive/rehearsal.json",
+            "archive/link-closure.json",
+            "reviews/w2-g8-archive-review.json",
+            "reviews/w4-g8-archive-review.json",
+            "reviews/w5-d5c-archive-review.json",
+            "reviews/w14-g8-retention-timing-review.json",
+            "reviews/w8-lead-fixes-review.json",
+            "archive/receipt.json",
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "Owner cutover approval S2 is required for archive ref publication and main manifest merge; local rehearsal is not that permission.",
+          "evidence": [
+            "archive/receipt.md",
+            "archive/design.md",
+            "archive/manifest.json",
+            "archive/verification.json",
+            "archive/rehearsal.json",
+            "archive/link-closure.json",
+            "reviews/w2-g8-archive-review.json",
+            "reviews/w4-g8-archive-review.json",
+            "reviews/w5-d5c-archive-review.json",
+            "reviews/w14-g8-retention-timing-review.json",
+            "reviews/w8-lead-fixes-review.json",
+            "archive/receipt.json",
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/9/blockers/0",
+      "item": "Final pin F not recorded",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: After final main import record F, run g9/sweep.py --check --pin F, rejudge every changed evidence row, recompose drifted bodies (including deferred G7/predecessor specs), and get source-delta review (execution plan §2 G9 / §3 W3). Fix/materialize the supersession source join or explicitly carry the 2 prepared-shard legacy scan gaps (README, repo-layout-vision), then rerun post-apply scan at F (w11-import3 F3; import3/receipt.md). Retain keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a until track end under L13-13.3; completed SHA re-pinning is not permission to delete their historical witnesses.",
+      "gates": [
+        "G9"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "late-areas/receipt.md",
+        "late-areas/legacy-drift.json",
+        "import2/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "w0-deferred-rebinds.json",
+        "w0-prior-overlap-replay.json",
+        "composition/w2-predecessor-recomposition.json",
+        "reviews/w4-import2-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w10-g9-interim-review.json",
+        "reviews/w11-g9-rework-review.json",
+        "reviews/w12-g9-followup-review.json",
+        "reviews/w15-g9-parks-review.json",
+        "g9/receipt.md",
+        "reviews/w11-import3-review.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/9/blockers/1",
+      "item": "Interim and final re-judgment of 518 + 144 records not done",
+      "decision": "moved to F",
+      "resolution": "Interim re-judgment of 518 + 144 records not done / no G9 review.",
+      "gates": [
+        "G9"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "late-areas/receipt.md",
+        "late-areas/legacy-drift.json",
+        "import2/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "w0-deferred-rebinds.json",
+        "w0-prior-overlap-replay.json",
+        "composition/w2-predecessor-recomposition.json",
+        "reviews/w4-import2-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w10-g9-interim-review.json",
+        "reviews/w11-g9-rework-review.json",
+        "reviews/w12-g9-followup-review.json",
+        "reviews/w15-g9-parks-review.json",
+        "g9/receipt.md",
+        "reviews/w11-import3-review.json"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "Interim re-judgment of 518 + 144 records not done / no G9 review.",
+          "clearedBy": [
+            "4f08d504d",
+            "bc2a6a014",
+            "4c9e1f31e",
+            "63c884240",
+            "33cc5539d"
+          ],
+          "reviews": [
+            "reviews/w16-g0-rework-and-park-rule-review.json",
+            "reviews/w10-g9-interim-review.json",
+            "reviews/w11-g9-rework-review.json",
+            "reviews/w12-g9-followup-review.json",
+            "reviews/w15-g9-parks-review.json"
+          ],
+          "verdict": "pass: Exactly 15 /parked records carry carriedBlocker (record, /parked, sha match, open); dispositions 13/0/1/1; step04-029:1 still-valid with 000484/000485 retired via e71381aba; backlog action edits directly; reason/group fixes present; recomposed.json kept correctly (bodies owned by composition chain); sweep --check --pin HEAD 0; counts 526/15/31/2 and 296/9/31/2 match."
+        },
+        {
+          "decision": "moved to F",
+          "item": "After final main import record F, run g9/sweep.py --check --pin F, rejudge every changed evidence row, recompose drifted bodies (including deferred G7/predecessor specs), and get source-delta review (execution plan §2 G9 / §3 W3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/9/blockers/2",
+      "item": "Doer-SHA record pins not re-pinned to plan-branch SHAs (w4-import2 REWORK)",
+      "decision": "cleared",
+      "resolution": "Doer-SHA provenance and previousMainMergeAccounting still unrepinned (w4-import2).",
+      "gates": [
+        "G9"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "late-areas/receipt.md",
+        "late-areas/legacy-drift.json",
+        "import2/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "w0-deferred-rebinds.json",
+        "w0-prior-overlap-replay.json",
+        "composition/w2-predecessor-recomposition.json",
+        "reviews/w4-import2-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w10-g9-interim-review.json",
+        "reviews/w11-g9-rework-review.json",
+        "reviews/w12-g9-followup-review.json",
+        "reviews/w15-g9-parks-review.json",
+        "g9/receipt.md",
+        "reviews/w11-import3-review.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/9/blockers/3",
+      "item": "No G9 review",
+      "decision": "cleared",
+      "resolution": "Interim re-judgment of 518 + 144 records not done / no G9 review.",
+      "gates": [
+        "G9"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "late-areas/receipt.md",
+        "late-areas/legacy-drift.json",
+        "import2/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "w0-deferred-rebinds.json",
+        "w0-prior-overlap-replay.json",
+        "composition/w2-predecessor-recomposition.json",
+        "reviews/w4-import2-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w10-g9-interim-review.json",
+        "reviews/w11-g9-rework-review.json",
+        "reviews/w12-g9-followup-review.json",
+        "reviews/w15-g9-parks-review.json",
+        "g9/receipt.md",
+        "reviews/w11-import3-review.json"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/9/remaining",
+      "item": "At F: rerun sweep.py --check --pin F and judge every row whose evidence changed since d786e305e; recompose drifted specs; the 338 owned parks are mechanical (5 fixed rules, generic next action) and need the Lead re-judgment or an owner before F; source review of the F delta.",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
+      "gates": [
+        "G9"
+      ],
+      "evidence": [
+        "late-areas/receipt.md",
+        "late-areas/legacy-drift.json",
+        "import2/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "w0-deferred-rebinds.json",
+        "w0-prior-overlap-replay.json",
+        "composition/w2-predecessor-recomposition.json",
+        "reviews/w4-import2-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w10-g9-interim-review.json",
+        "reviews/w11-g9-rework-review.json",
+        "reviews/w12-g9-followup-review.json",
+        "reviews/w15-g9-parks-review.json",
+        "g9/receipt.md",
+        "reviews/w11-import3-review.json",
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "Interim re-judgment of 518 + 144 records not done / no G9 review.",
+          "clearedBy": [
+            "4f08d504d",
+            "bc2a6a014",
+            "4c9e1f31e",
+            "63c884240",
+            "33cc5539d"
+          ],
+          "reviews": [
+            "reviews/w16-g0-rework-and-park-rule-review.json",
+            "reviews/w10-g9-interim-review.json",
+            "reviews/w11-g9-rework-review.json",
+            "reviews/w12-g9-followup-review.json",
+            "reviews/w15-g9-parks-review.json"
+          ],
+          "verdict": "pass: Exactly 15 /parked records carry carriedBlocker (record, /parked, sha match, open); dispositions 13/0/1/1; step04-029:1 still-valid with 000484/000485 retired via e71381aba; backlog action edits directly; reason/group fixes present; recomposed.json kept correctly (bodies owned by composition chain); sweep --check --pin HEAD 0; counts 526/15/31/2 and 296/9/31/2 match."
+        },
+        {
+          "decision": "cleared",
+          "item": "Doer-SHA provenance and previousMainMergeAccounting still unrepinned (w4-import2).",
+          "clearedBy": [
+            "4f08d504d",
+            "bc2a6a014",
+            "4c9e1f31e"
+          ],
+          "reviews": [
+            "reviews/w11-g9-rework-review.json",
+            "reviews/w10-g9-interim-review.json",
+            "reviews/w12-g9-followup-review.json"
+          ],
+          "verdict": "APPROVE: Changed paths are only g9/**, composition/** and the exceptions file. The exceptions diff is exactly the one-line inputCommit 92260972c -> 5965143b4 re-pin."
+        },
+        {
+          "decision": "cleared",
+          "item": "338 mechanical parks await Lead re-judgment or an owner.",
+          "clearedBy": [
+            "63c884240",
+            "33cc5539d"
+          ],
+          "reviews": [
+            "reviews/w16-g0-rework-and-park-rule-review.json",
+            "reviews/w15-g9-parks-review.json"
+          ],
+          "verdict": "pass: Exactly 15 /parked records carry carriedBlocker (record, /parked, sha match, open); dispositions 13/0/1/1; step04-029:1 still-valid with 000484/000485 retired via e71381aba; backlog action edits directly; reason/group fixes present; recomposed.json kept correctly (bodies owned by composition chain); sweep --check --pin HEAD 0; counts 526/15/31/2 and 296/9/31/2 match."
+        },
+        {
+          "decision": "moved to F",
+          "item": "After final main import record F, run g9/sweep.py --check --pin F, rejudge every changed evidence row, recompose drifted bodies (including deferred G7/predecessor specs), and get source-delta review (execution plan §2 G9 / §3 W3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Fix/materialize the supersession source join or explicitly carry the 2 prepared-shard legacy scan gaps (README, repo-layout-vision), then rerun post-apply scan at F (w11-import3 F3; import3/receipt.md).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Retain keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a until track end under L13-13.3; completed SHA re-pinning is not permission to delete their historical witnesses.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "Backlog owner must decide the intended current STR70a/STR62 claims for batch-126.jsonl:2 and generators-skills-and-support.jsonl:66, edit docs/backlog.md directly and return exact row identities; these 2 G9 parks are not generic Lead-review debt (g9/receipt.md; W16 B-pass).",
+          "evidence": [
+            "late-areas/receipt.md",
+            "late-areas/legacy-drift.json",
+            "import2/receipt.md",
+            "resync-a/receipt.md",
+            "resync-b/receipt.md",
+            "w0-deferred-rebinds.json",
+            "w0-prior-overlap-replay.json",
+            "composition/w2-predecessor-recomposition.json",
+            "reviews/w4-import2-review.json",
+            "reviews/w16-g0-rework-and-park-rule-review.json",
+            "reviews/w10-g9-interim-review.json",
+            "reviews/w11-g9-rework-review.json",
+            "reviews/w12-g9-followup-review.json",
+            "reviews/w15-g9-parks-review.json",
+            "g9/receipt.md",
+            "reviews/w11-import3-review.json",
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "The 15 phase-08 /parked dependencies remain open with their original owners through carriedBlocker; WORK/knowledge/export/retention obligations are not settled by G9 drift approval (L13-14; g9/receipt.md).",
+          "evidence": [
+            "late-areas/receipt.md",
+            "late-areas/legacy-drift.json",
+            "import2/receipt.md",
+            "resync-a/receipt.md",
+            "resync-b/receipt.md",
+            "w0-deferred-rebinds.json",
+            "w0-prior-overlap-replay.json",
+            "composition/w2-predecessor-recomposition.json",
+            "reviews/w4-import2-review.json",
+            "reviews/w16-g0-rework-and-park-rule-review.json",
+            "reviews/w10-g9-interim-review.json",
+            "reviews/w11-g9-rework-review.json",
+            "reviews/w12-g9-followup-review.json",
+            "reviews/w15-g9-parks-review.json",
+            "g9/receipt.md",
+            "reviews/w11-import3-review.json",
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/10/blockers/0",
+      "item": "Git owner section 7 consent not recorded",
+      "decision": "still open",
+      "resolution": "Still open with corrected scope/owner: Git owner section 7 consent is not recorded; after that consent and G11 release, Lead runs holder Land publish/ref verification, non-holder refusal and rollback on the G8 shrunk F-code clone, and commits the owning receipt (execution plan §2 G10).",
+      "gates": [
+        "G10"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/10/blockers/1",
+      "item": "Depends on G11 release and F",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: G10 rehearsal must use G11’s release and F code commit on the G8 shrunk clone, before final G8 timing (execution plan §3 W4).",
+      "gates": [
+        "G10"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/10/blockers/2",
+      "item": "Depends on G8 rehearsal clone at F",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: G10 rehearsal must use G11’s release and F code commit on the G8 shrunk clone, before final G8 timing (execution plan §3 W4).",
+      "gates": [
+        "G10"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/10/remaining",
+      "item": "After section 7 consent and the G11 release, run holder Land publish, non-holder refusal and rollback on the shrunk clone at the F code commit and commit the receipt JSON.",
+      "decision": "still open",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
+      "gates": [
+        "G10"
+      ],
+      "evidence": [
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "G10 rehearsal must use G11’s release and F code commit on the G8 shrunk clone, before final G8 timing (execution plan §3 W4).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "Git owner section 7 consent is not recorded; after that consent and G11 release, Lead runs holder Land publish/ref verification, non-holder refusal and rollback on the G8 shrunk F-code clone, and commits the owning receipt (execution plan §2 G10).",
+          "evidence": [
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/gates/11/blockers/0",
+      "item": "SEAT release not staged",
+      "decision": "still open",
+      "resolution": "Still open with corrected scope/owner: SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11). Respect L13-12 host-specific stop/import constraints and the separate owner cutover approval; the superseded L13-9 blanket no-run/no-push wording is not the current rule.",
+      "gates": [
+        "G11"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/11/blockers/1",
+      "item": "Depends on F",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Bind staged release R sourcePin to the F code commit and rerun G11/G10 on any relevant subsequent code change (execution plan §3 W4).",
+      "gates": [
+        "G11"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/11/blockers/2",
+      "item": "WORK cutover stop: DOC launches no fgos run, pull or push until \"cutover xong\" (L13-9)",
+      "decision": "still open",
+      "resolution": "Still open with corrected scope/owner: SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11). Respect L13-12 host-specific stop/import constraints and the separate owner cutover approval; the superseded L13-9 blanket no-run/no-push wording is not the current rule.",
+      "gates": [
+        "G11"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md"
+      ]
+    },
+    {
+      "sourcePointer": "/gates/11/remaining",
+      "item": "SEAT stages release R with sourcePin equal to the F code commit; the Lead then proves docs-lease acquire/status/release/abandon in a disposable clone.",
+      "decision": "still open",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
+      "gates": [
+        "G11"
+      ],
+      "evidence": [
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Bind staged release R sourcePin to the F code commit and rerun G11/G10 on any relevant subsequent code change (execution plan §3 W4).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11).",
+          "evidence": [
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "Respect L13-12 host-specific stop/import constraints and the separate owner cutover approval; the superseded L13-9 blanket no-run/no-push wording is not the current rule.",
+          "evidence": [
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/beforeFinalPin/0",
+      "item": "Re-review the 124 pending content rebind rows in rebind/rereview-claim-ids.json and the 3 rows corrected in 6f5b9419d (G0, G7)",
+      "decision": "cleared",
+      "resolution": "Original review/run demand reconciled by its parts below; existing reviews do not close new rebinds, owner actions or final-pin work.",
+      "gates": [
+        "G0",
+        "G7"
+      ],
+      "evidence": [
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md",
+        "owner-answers.md",
+        "preflip-execution-plan.md",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w8-composition-review.md",
+        "reviews/w14-check-hardening-review.json"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F.",
+          "clearedBy": [
+            "6f5b9419d",
+            "c25e8cf6a",
+            "a8ea05c50"
+          ],
+          "reviews": [
+            "reviews/w16-g0-rework-and-park-rule-review.json",
+            "reviews/w14-g0-content-rereview.json",
+            "reviews/w17-parity-rework-review.json"
+          ],
+          "verdict": "pass: Scope in writable list; 3 supersede re-decisions cite existing main commits and spec sections; 127 bindings recompute, all pending; sample 5 parity digests correct; 15 sampled rationales true; d5ba1eda remainder 797c7185; stale pointers resolve to current-binding rows; rebind --check 0; g0rework/verify.py 0."
+        },
+        {
+          "decision": "moved to F",
+          "item": "claim_2e2bc926 successor must be re-decided after final main import (L13-15.2); current new candidate-row review debt is a separate before-F item.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/beforeFinalPin/1",
+      "item": "Get independent re-reviews of the Lead REWORK fixes: c5586146c (G6), 6f5b9419d (G0/G7), 53499dc9d (G4 spec sentence), 984829939 and 5c3b57347 (G8)",
+      "decision": "cleared",
+      "resolution": "Original review/run demand reconciled by its parts below; existing reviews do not close new rebinds, owner actions or final-pin work.",
+      "gates": [
+        "G0",
+        "G4",
+        "G6",
+        "G7",
+        "G8"
+      ],
+      "evidence": [
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md",
+        "owner-answers.md",
+        "preflip-execution-plan.md",
+        "git-one-door/receipt.md",
+        "git-one-door/exemption-proposal.md",
+        "git-one-door/declared-exemptions/receipt.md",
+        "git-one-door/wrapper-callers/receipt.md",
+        "git-one-door/wrapper-escapes/receipt.md",
+        "git-one-door/git-owner-review-request.md",
+        "reviews/w2-g4-code-review.json",
+        "reviews/w4-g4-declare-review.json",
+        "reviews/w5-g4-wrapper-review.json",
+        "reviews/w6-g4-escape-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "preserve-premise/receipt.md",
+        "preserve-premise/sentence-delta.json",
+        "preserve-premise/sentence-replay.json",
+        "misc-fix/receipt.md",
+        "reviews/w2-g6-preserve-review.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w7-header-sentence-review.json",
+        "reviews/w9-g6-fix-review.json",
+        "reviews/w8-g6-parks-review.json",
+        "reviews/w8-g6-judgments-review.json",
+        "preserve-premise/receipt.json",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w8-composition-review.md",
+        "reviews/w14-check-hardening-review.json",
+        "archive/receipt.md",
+        "archive/design.md",
+        "archive/manifest.json",
+        "archive/verification.json",
+        "archive/rehearsal.json",
+        "archive/link-closure.json",
+        "reviews/w2-g8-archive-review.json",
+        "reviews/w4-g8-archive-review.json",
+        "reviews/w5-d5c-archive-review.json",
+        "reviews/w14-g8-retention-timing-review.json",
+        "archive/receipt.json"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F.",
+          "clearedBy": [
+            "6f5b9419d",
+            "c25e8cf6a",
+            "a8ea05c50"
+          ],
+          "reviews": [
+            "reviews/w16-g0-rework-and-park-rule-review.json",
+            "reviews/w14-g0-content-rereview.json",
+            "reviews/w17-parity-rework-review.json"
+          ],
+          "verdict": "pass: Scope in writable list; 3 supersede re-decisions cite existing main commits and spec sections; 127 bindings recompute, all pending; sample 5 parity digests correct; 15 sampled rationales true; d5ba1eda remainder 797c7185; stale pointers resolve to current-binding rows; rebind --check 0; g0rework/verify.py 0."
+        },
+        {
+          "decision": "cleared",
+          "item": "53499dc9d (w6 spec-sentence REWORK fix) not independently re-reviewed.",
+          "clearedBy": [
+            "53499dc9d"
+          ],
+          "reviews": [
+            "reviews/w8-lead-fixes-review.json"
+          ],
+          "verdict": "APPROVE: Scanner unchanged since 87c4f5f7a. applyDeclarations refuses any non-empty escapes unless class configured-binary; .call/.apply, 'stored in an array' and 'passed to an unresolved callee' (Reflect.apply, setTimeout) are real escape kinds. Aliased-export gap stated as open; owner request names declared-wrapper inheritance. Parenthetical lists 4 of ~14 escape kinds, true as examples."
+        },
+        {
+          "decision": "cleared",
+          "item": "c5586146c (w7 pin fix) not independently checked.",
+          "clearedBy": [
+            "c5586146c"
+          ],
+          "reviews": [
+            "reviews/w8-lead-fixes-review.json"
+          ],
+          "verdict": "APPROVE: Scratch-clone rerun at f2162d9ff exit 0 (95 s); regenerated checks.json differs from committed only in HEAD sha and temp dir names; g6SourceCommit 4178dcc6e. Replay, assertion header pin and source() all at g6pin; owning section still extracted verbatim; proof.py prefix widening is a scratch guard, not an assertion. No weakening."
+        },
+        {
+          "decision": "cleared",
+          "item": "984829939 direct-link retention and 5c3b57347 cold timing not independently reviewed.",
+          "clearedBy": [
+            "984829939",
+            "5c3b57347"
+          ],
+          "reviews": [
+            "reviews/w14-g8-retention-timing-review.json",
+            "reviews/w8-lead-fixes-review.json"
+          ],
+          "verdict": "APPROVE: Committed audit/rehearsal-commands.json.gz worktree-add rows equal rehearsal.json runs: 2.9292/2.7071/2.9036 s and 41.7036/10.5524/12.4394 s, exit 0; medians 2.904 and 12.439 s; eviction 704,667,648 -> 0; residency chain 0 -> 230,699,008 / 382,160,896 holds; per-file sums equal totals. Evidence unchanged since w8 (git diff --quiet f2162d9ff HEAD)."
+        },
+        {
+          "decision": "moved to F",
+          "item": "claim_2e2bc926 successor must be re-decided after final main import (L13-15.2); current new candidate-row review debt is a separate before-F item.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/beforeFinalPin/2",
+      "item": "Get an exhaustive APPROVE of every G6 overturn/judgment row, including the 1,423 open judgment/note rows (G6)",
+      "decision": "cleared",
+      "resolution": "Original review/run demand reconciled by its parts below; existing reviews do not close new rebinds, owner actions or final-pin work.",
+      "gates": [
+        "G6"
+      ],
+      "evidence": [
+        "preserve-premise/receipt.md",
+        "preserve-premise/sentence-delta.json",
+        "preserve-premise/sentence-replay.json",
+        "misc-fix/receipt.md",
+        "reviews/w2-g6-preserve-review.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w7-header-sentence-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "reviews/w9-g6-fix-review.json",
+        "reviews/w8-g6-parks-review.json",
+        "reviews/w8-g6-judgments-review.json",
+        "preserve-premise/receipt.json",
+        "owner-answers.md"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "No exhaustive APPROVE over all 1,423 judgment/note rows and every overturn.",
+          "clearedBy": [
+            "db023f065"
+          ],
+          "reviews": [
+            "reviews/w9-g6-fix-review.json",
+            "reviews/w8-g6-parks-review.json",
+            "reviews/w8-g6-judgments-review.json"
+          ],
+          "verdict": "APPROVE: Counts are conserved (4320 + 924 + 163 + 6 = 5413) and match an independent diff. All 14 changed files are on the brief's writable list."
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/beforeFinalPin/3",
+      "item": "Run and commit the G5 retention hash check (G5)",
+      "decision": "still open",
+      "resolution": "Legacy hash run exists, but W8 REWORK keeps the full surviving-target check open.",
+      "gates": [
+        "G5"
+      ],
+      "evidence": [
+        "g5/check.py",
+        "g5/check-b726d44ed.json",
+        "reviews/w8-lead-fixes-review.json",
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ],
+      "parts": [
+        {
+          "decision": "still open",
+          "item": "Extend g5/check.py with per-span surviving docs/reading-map.md locations and explicit proposed text for the banner restatement and Truth-correction suffix; obtain an independent check of that complete clause. The current 10-span legacy check is insufficient.",
+          "evidence": [
+            "g5/check.py",
+            "g5/check-b726d44ed.json",
+            "reviews/w8-lead-fixes-review.json",
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/beforeFinalPin/4",
+      "item": "Re-judge or assign owners for the 338 mechanical G9 parks (G9)",
+      "decision": "still open",
+      "resolution": "Original review/run demand reconciled by its parts below; existing reviews do not close new rebinds, owner actions or final-pin work.",
+      "gates": [
+        "G9"
+      ],
+      "evidence": [
+        "late-areas/receipt.md",
+        "late-areas/legacy-drift.json",
+        "import2/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "w0-deferred-rebinds.json",
+        "w0-prior-overlap-replay.json",
+        "composition/w2-predecessor-recomposition.json",
+        "reviews/w4-import2-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w10-g9-interim-review.json",
+        "reviews/w11-g9-rework-review.json",
+        "reviews/w12-g9-followup-review.json",
+        "reviews/w15-g9-parks-review.json",
+        "g9/receipt.md",
+        "reviews/w11-import3-review.json",
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "338 mechanical parks await Lead re-judgment or an owner.",
+          "clearedBy": [
+            "63c884240",
+            "33cc5539d"
+          ],
+          "reviews": [
+            "reviews/w16-g0-rework-and-park-rule-review.json",
+            "reviews/w15-g9-parks-review.json"
+          ],
+          "verdict": "pass: Exactly 15 /parked records carry carriedBlocker (record, /parked, sha match, open); dispositions 13/0/1/1; step04-029:1 still-valid with 000484/000485 retired via e71381aba; backlog action edits directly; reason/group fixes present; recomposed.json kept correctly (bodies owned by composition chain); sweep --check --pin HEAD 0; counts 526/15/31/2 and 296/9/31/2 match."
+        },
+        {
+          "decision": "still open",
+          "item": "Backlog owner must decide the intended current STR70a/STR62 claims for batch-126.jsonl:2 and generators-skills-and-support.jsonl:66, edit docs/backlog.md directly and return exact row identities; these 2 G9 parks are not generic Lead-review debt (g9/receipt.md; W16 B-pass).",
+          "evidence": [
+            "late-areas/receipt.md",
+            "late-areas/legacy-drift.json",
+            "import2/receipt.md",
+            "resync-a/receipt.md",
+            "resync-b/receipt.md",
+            "w0-deferred-rebinds.json",
+            "w0-prior-overlap-replay.json",
+            "composition/w2-predecessor-recomposition.json",
+            "reviews/w4-import2-review.json",
+            "reviews/w16-g0-rework-and-park-rule-review.json",
+            "reviews/w10-g9-interim-review.json",
+            "reviews/w11-g9-rework-review.json",
+            "reviews/w12-g9-followup-review.json",
+            "reviews/w15-g9-parks-review.json",
+            "g9/receipt.md",
+            "reviews/w11-import3-review.json",
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "The 15 phase-08 /parked dependencies remain open with their original owners through carriedBlocker; WORK/knowledge/export/retention obligations are not settled by G9 drift approval (L13-14; g9/receipt.md).",
+          "evidence": [
+            "late-areas/receipt.md",
+            "late-areas/legacy-drift.json",
+            "import2/receipt.md",
+            "resync-a/receipt.md",
+            "resync-b/receipt.md",
+            "w0-deferred-rebinds.json",
+            "w0-prior-overlap-replay.json",
+            "composition/w2-predecessor-recomposition.json",
+            "reviews/w4-import2-review.json",
+            "reviews/w16-g0-rework-and-park-rule-review.json",
+            "reviews/w10-g9-interim-review.json",
+            "reviews/w11-g9-rework-review.json",
+            "reviews/w12-g9-followup-review.json",
+            "reviews/w15-g9-parks-review.json",
+            "g9/receipt.md",
+            "reviews/w11-import3-review.json",
+            "owner-answers.md",
+            "preflip-execution-plan.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/beforeFinalPin/5",
+      "item": "Independent per-unit review of the 24 import-3 bindings and 8 adapted rows in s18-import3-resync.json (G0, G1)",
+      "decision": "cleared",
+      "resolution": "Original review/run demand reconciled by its parts below; existing reviews do not close new rebinds, owner actions or final-pin work.",
+      "gates": [
+        "G0",
+        "G1"
+      ],
+      "evidence": [
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md",
+        "owner-answers.md",
+        "preflip-execution-plan.md",
+        "carries/receipt.md",
+        "composition/receipt.md",
+        "composition/member-joins.json",
+        "composition/area-holder-table.json",
+        "composition/gap05-placement-proposal.json",
+        "composition/w2-gap05-verification.json",
+        "late-areas/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "reviews/w2-g1-carries-review.json",
+        "reviews/w2-late-areas-review.json",
+        "reviews/w3-d1b-resync-review.json",
+        "reviews/w3-d7-resync-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w13-misc-pin-and-gloss-review.json",
+        "reviews/w14-import3-binding-review.json",
+        "reviews/w14-import3-binding-review.md",
+        "import3/receipt.md"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "Independent per-unit review of import-3 24 source bindings, including its 8 adapted rows (8 is a subset, not 24+8).",
+          "clearedBy": [
+            "d786e305e"
+          ],
+          "reviews": [
+            "reviews/w14-import3-binding-review.json",
+            "reviews/w14-import3-binding-review.md"
+          ],
+          "verdict": "APPROVE, 98 of 98 rows."
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/0",
+      "item": "Import main (M2) with merge accounting and record F; no further main import after it",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [
+        "G0",
+        "G9"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md",
+        "late-areas/receipt.md",
+        "late-areas/legacy-drift.json",
+        "import2/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "w0-deferred-rebinds.json",
+        "w0-prior-overlap-replay.json",
+        "composition/w2-predecessor-recomposition.json",
+        "reviews/w4-import2-review.json",
+        "reviews/w10-g9-interim-review.json",
+        "reviews/w11-g9-rework-review.json",
+        "reviews/w12-g9-followup-review.json",
+        "reviews/w15-g9-parks-review.json",
+        "g9/receipt.md",
+        "reviews/w11-import3-review.json"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). The 73/257 mismatch count is historical at 77db6ed2b, not a current count.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After final main import record F, run g9/sweep.py --check --pin F, rejudge every changed evidence row, recompose drifted bodies (including deferred G7/predecessor specs), and get source-delta review (execution plan §2 G9 / §3 W3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Fix/materialize the supersession source join or explicitly carry the 2 prepared-shard legacy scan gaps (README, repo-layout-vision), then rerun post-apply scan at F (w11-import3 F3; import3/receipt.md).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Retain keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a until track end under L13-13.3; completed SHA re-pinning is not permission to delete their historical witnesses.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/1",
+      "item": "Re-pin Doer-SHA record pins to plan-branch SHAs, keeping plan/260925-w1-d* branches until then (w4-import2 REWORK)",
+      "decision": "cleared",
+      "resolution": "Record re-pins and the previousMainMergeAccounting exception inputCommit are independently reviewed (W10 sha-map; W11 scope-and-repin; W12 rejudge). L13-13.3 still requires keeping historical refs until track end, not until re-pin only.",
+      "gates": [
+        "G9"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "late-areas/receipt.md",
+        "late-areas/legacy-drift.json",
+        "import2/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "w0-deferred-rebinds.json",
+        "w0-prior-overlap-replay.json",
+        "composition/w2-predecessor-recomposition.json",
+        "reviews/w4-import2-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w10-g9-interim-review.json",
+        "reviews/w11-g9-rework-review.json",
+        "reviews/w12-g9-followup-review.json",
+        "reviews/w15-g9-parks-review.json",
+        "g9/receipt.md",
+        "reviews/w11-import3-review.json"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "Doer-SHA provenance and previousMainMergeAccounting still unrepinned (w4-import2).",
+          "clearedBy": [
+            "4f08d504d",
+            "bc2a6a014",
+            "4c9e1f31e"
+          ],
+          "reviews": [
+            "reviews/w11-g9-rework-review.json",
+            "reviews/w10-g9-interim-review.json",
+            "reviews/w12-g9-followup-review.json"
+          ],
+          "verdict": "APPROVE: Changed paths are only g9/**, composition/** and the exceptions file. The exceptions diff is exactly the one-line inputCommit 92260972c -> 5965143b4 re-pin."
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/2",
+      "item": "G9: run the all-spec hash sweep at F, recompose drifted specs (including the 36 deferred G7 specs and 19 predecessors) and get a source review",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [
+        "G7",
+        "G9"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "reviews/w8-composition-review.md",
+        "reviews/w14-check-hardening-review.json",
+        "late-areas/receipt.md",
+        "late-areas/legacy-drift.json",
+        "import2/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "w0-deferred-rebinds.json",
+        "w0-prior-overlap-replay.json",
+        "reviews/w4-import2-review.json",
+        "reviews/w10-g9-interim-review.json",
+        "reviews/w11-g9-rework-review.json",
+        "reviews/w12-g9-followup-review.json",
+        "reviews/w15-g9-parks-review.json",
+        "g9/receipt.md",
+        "reviews/w11-import3-review.json"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Recheck every approved spec digest at F; recompose/delta-review changed specs and the 36 G9-deferred specs plus predecessor chain (execution plan §2 G7, §3 W3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Run the full post-apply ledger resolution/rebind, covering all residual bindings, not just GAP-05. Use the W10 inventory (407 distinct = 361 chain-caused + 46 at pin; 556 assertions) only as a historical sizing witness, then re-enumerate at F (w10-composition-rework F7).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After final main import record F, run g9/sweep.py --check --pin F, rejudge every changed evidence row, recompose drifted bodies (including deferred G7/predecessor specs), and get source-delta review (execution plan §2 G9 / §3 W3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Fix/materialize the supersession source join or explicitly carry the 2 prepared-shard legacy scan gaps (README, repo-layout-vision), then rerun post-apply scan at F (w11-import3 F3; import3/receipt.md).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Retain keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a until track end under L13-13.3; completed SHA re-pinning is not permission to delete their historical witnesses.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/3",
+      "item": "G0: re-join all changedBindings rows to the ledger at F (73/257 stale at 77db6ed2b) and run the verdict join to 0 missing or mismatched",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [
+        "G0"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). The 73/257 mismatch count is historical at 77db6ed2b, not a current count.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/4",
+      "item": "G7: re-check every approved spec digest at F and get delta reviews",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [
+        "G7"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "reviews/w8-composition-review.md",
+        "reviews/w14-check-hardening-review.json"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Recheck every approved spec digest at F; recompose/delta-review changed specs and the 36 G9-deferred specs plus predecessor chain (execution plan §2 G7, §3 W3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Run the full post-apply ledger resolution/rebind, covering all residual bindings, not just GAP-05. Use the W10 inventory (407 distinct = 361 chain-caused + 46 at pin; 556 assertions) only as a historical sizing witness, then re-enumerate at F (w10-composition-rework F7).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/5",
+      "item": "G2: run join.py --pin F --rescan, refresh the 33 Rust locators, settle the 8 open literal judgments, get preserve-premise/verify.py to exit 0 and get a delta review",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [
+        "G2"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "census-join/receipt.md",
+        "reviews/w2-g2-census-review.json",
+        "reviews/w2-g2-dyn-delta.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w6-misc-rework-review.md",
+        "preserve-premise/verification.json"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Re-run census-join/join.py --pin F --rescan; refresh the 33 moved Rust locators, settle/review the 187 original owned judgments and 8 open post-pin literal judgments plus any new F delta, and obtain current-pin delta review (execution plan §2 G2 / §3 W3; L13-9.4).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Refresh G2/G6 to a shared F pin and make preserve-premise/verify.py exit 0 without weakening its pin equality (L13-9.4).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/6",
+      "item": "G6: refresh the proof at F (186 rows, 86 wrapper digests plus any later drift), replay twice and get a review",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [
+        "G6"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "preserve-premise/receipt.md",
+        "preserve-premise/sentence-delta.json",
+        "preserve-premise/sentence-replay.json",
+        "misc-fix/receipt.md",
+        "reviews/w2-g6-preserve-review.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w7-header-sentence-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "reviews/w9-g6-fix-review.json",
+        "reviews/w8-g6-parks-review.json",
+        "reviews/w8-g6-judgments-review.json",
+        "preserve-premise/receipt.json"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Refresh all preserve-premise evidence at F (the earlier 186 G6 rows / 86 wrapper digests are historical lower bounds, not current totals), replay twice byte-identically and obtain delta review (execution plan §2 G6 / §3 W3, L13-9.4).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Co-compose the reviewed 163 dated wrapper notes, owned-park actions and 6 repoint proposals (including the prepared four-line dispatch patch), use actual flip date/placement, and validate them with the full F chain before cutover. Owned parks remain owned, not automatic preserves or blanket retirements (preserve-premise receipt; w9-g6-fix review).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Pass the combined G2/G6 verifier at the shared F pin (L13-9.4).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/7",
+      "item": "G3: re-check the 17 register targets at F and set their final statuses",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [
+        "G3"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "carries/receipt.md",
+        "reviews/w2-g3-packaging-review.json"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Re-check all 17 restored/superseded targets at F anchors/digests; delta-review changed targets and replace restored-pending-review / superseded-pending-review with final dispositions (execution plan §2 G3 / §3 W3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/8",
+      "item": "G5: hash check at F",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [
+        "G5"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "g5/check.py",
+        "g5/check-b726d44ed.json",
+        "reviews/w8-lead-fixes-review.json"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Re-run the full retention/accepted-surviving-span check at F (execution plan §2 G5 / §3 W3); do not treat the historical ten-span check as satisfying both clauses.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/9",
+      "item": "Pair-account every new plan-branch commit",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md"
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/10",
+      "item": "Run the full suite in an isolated clone at F with main-vs-branch attribution",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md"
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/11",
+      "item": "G8: rebuild the partition at F, re-enumerate readers and time a cold checkout (after G10 per W4)",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [
+        "G8"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "archive/receipt.md",
+        "archive/design.md",
+        "archive/manifest.json",
+        "archive/verification.json",
+        "archive/rehearsal.json",
+        "archive/link-closure.json",
+        "reviews/w2-g8-archive-review.json",
+        "reviews/w4-g8-archive-review.json",
+        "reviews/w5-d5c-archive-review.json",
+        "reviews/w14-g8-retention-timing-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "archive/receipt.json"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/12",
+      "item": "Write the final status ledger and get an independent review of it",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md"
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/13",
+      "item": "At F, after applying every composed patch, rerun the ownership/ledger binding resolution and rebind: review w9-composition-fix found 661 bindings unresolved after the full patch chain (2 at HEAD), e.g. 339 in platform-foundations.md from block-position shifts. The final-pin rebind must cover composed patches, not only GAP-05.",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection. W10 replaces earlier chain counts with 407 distinct (361 + 46), 556 assertions; W9’s 661 is not an additional backlog.",
+      "gates": [
+        "G0",
+        "G7"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w8-composition-review.md",
+        "reviews/w14-check-hardening-review.json"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). The 73/257 mismatch count is historical at 77db6ed2b, not a current count.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Recheck every approved spec digest at F; recompose/delta-review changed specs and the 36 G9-deferred specs plus predecessor chain (execution plan §2 G7, §3 W3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Run the full post-apply ledger resolution/rebind, covering all residual bindings, not just GAP-05. Use the W10 inventory (407 distinct = 361 chain-caused + 46 at pin; 556 assertions) only as a historical sizing witness, then re-enumerate at F (w10-composition-rework F7).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/14",
+      "item": "Size the post-apply rebind as two groups: 361 bindings broken by the composed patch chain and 46 already unresolved at the pin (w10-composition-rework); the 661 figure from w9 counts assertions across the full chain",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection. W10 replaces earlier chain counts with 407 distinct (361 + 46), 556 assertions; W9’s 661 is not an additional backlog.",
+      "gates": [
+        "G0",
+        "G7"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "reviews/w8-composition-review.json",
+        "reviews/w9-composition-fix-review.json",
+        "reviews/w10-composition-rework-review.json",
+        "reviews/w8-composition-review.md",
+        "reviews/w14-check-hardening-review.json"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). The 73/257 mismatch count is historical at 77db6ed2b, not a current count.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Recheck every approved spec digest at F; recompose/delta-review changed specs and the 36 G9-deferred specs plus predecessor chain (execution plan §2 G7, §3 W3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Run the full post-apply ledger resolution/rebind, covering all residual bindings, not just GAP-05. Use the W10 inventory (407 distinct = 361 chain-caused + 46 at pin; 556 assertions) only as a historical sizing witness, then re-enumerate at F (w10-composition-rework F7).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/15",
+      "item": "Legacy drift scan after applying the prepared w8/w9 shards reports 2 gaps (README, repo-layout-vision) because its source join does not follow supersession; fix the join or carry them before the scan gate at F (w11-import3 F3)",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [
+        "G9"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "late-areas/receipt.md",
+        "late-areas/legacy-drift.json",
+        "import2/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "w0-deferred-rebinds.json",
+        "w0-prior-overlap-replay.json",
+        "composition/w2-predecessor-recomposition.json",
+        "reviews/w4-import2-review.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w10-g9-interim-review.json",
+        "reviews/w11-g9-rework-review.json",
+        "reviews/w12-g9-followup-review.json",
+        "reviews/w15-g9-parks-review.json",
+        "g9/receipt.md",
+        "reviews/w11-import3-review.json"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "After final main import record F, run g9/sweep.py --check --pin F, rejudge every changed evidence row, recompose drifted bodies (including deferred G7/predecessor specs), and get source-delta review (execution plan §2 G9 / §3 W3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Fix/materialize the supersession source join or explicitly carry the 2 prepared-shard legacy scan gaps (README, repo-layout-vision), then rerun post-apply scan at F (w11-import3 F3; import3/receipt.md).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Retain keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a until track end under L13-13.3; completed SHA re-pinning is not permission to delete their historical witnesses.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/16",
+      "item": "Every check that reads committed bytes takes an explicit --pin; run them at F, not at a moving HEAD",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md"
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/17",
+      "item": "G8 rebuild at F keeps every file named as evidence in preflip-gate-status.json and the final status ledger (L13-13.4); 70 of 92 register evidence paths would otherwise be archived (w14-g8-retention-timing-review)",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection. L13-13.4 applies to the expanded evidence/review set, not just historical 70/92.",
+      "gates": [
+        "G8"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "archive/receipt.md",
+        "archive/design.md",
+        "archive/manifest.json",
+        "archive/verification.json",
+        "archive/rehearsal.json",
+        "archive/link-closure.json",
+        "reviews/w2-g8-archive-review.json",
+        "reviews/w4-g8-archive-review.json",
+        "reviews/w5-d5c-archive-review.json",
+        "reviews/w14-g8-retention-timing-review.json",
+        "reviews/w8-lead-fixes-review.json",
+        "archive/receipt.json"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/atFinalPinUnderLease/18",
+      "item": "After the final main import, redo the claim_2e2bc926 supersede against main Event Store cutover 42c5a0a55 (events.mjs removed on main), L13-15.2",
+      "decision": "moved to F",
+      "resolution": "Still a final-pin duty, not completed; use the corrected atFinalPinUnderLease projection.",
+      "gates": [
+        "G0"
+      ],
+      "evidence": [
+        "preflip-execution-plan.md",
+        "owner-answers.md",
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json",
+        "reviews/w16-g0-rework-and-park-rule-review.json",
+        "reviews/w14-g0-content-rereview.json",
+        "reviews/w17-parity-rework-review.json",
+        "g0rework/receipt.md",
+        "g0rework/receipt.json",
+        "carries/current-binding-refresh.json",
+        "reviews/w17-parity-rework-review.md"
+      ],
+      "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). The 73/257 mismatch count is historical at 77db6ed2b, not a current count.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/external/0",
+      "item": "Git owner / HARDEN reviews the 25 git one-door declarations on review/doc-git-one-door (G4)",
+      "decision": "still open",
+      "resolution": "Retain the external decision/execution dependency; apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
+      "gates": [
+        "G4"
+      ],
+      "evidence": [
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/external/1",
+      "item": "Git owner gives section 7 consent (G10)",
+      "decision": "still open",
+      "resolution": "Retain the external decision/execution dependency; apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
+      "gates": [
+        "G10"
+      ],
+      "evidence": [
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/external/2",
+      "item": "SEAT stages the docs-lease release from the F code commit; the Lead proves the four routes in a disposable clone (G11)",
+      "decision": "still open",
+      "resolution": "Retain the external decision/execution dependency; apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
+      "gates": [
+        "G11"
+      ],
+      "evidence": [
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/external/3",
+      "item": "Lead runs the G10 holder Land rehearsal on the shrunk clone with that release",
+      "decision": "still open",
+      "resolution": "Retain the external decision/execution dependency; apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
+      "gates": [
+        "G10"
+      ],
+      "evidence": [
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/external/4",
+      "item": "Owner decides S2, the archive ref push and main manifest merge (G8 publication)",
+      "decision": "still open",
+      "resolution": "Retain the external decision/execution dependency; apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
+      "gates": [
+        "G8"
+      ],
+      "evidence": [
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ]
+    },
+    {
+      "sourcePointer": "/cutoverReadiness/external/5",
+      "item": "Owner approves the cutover (lease + Land) as a separate decision",
+      "decision": "still open",
+      "resolution": "Retain the external decision/execution dependency; apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
+      "gates": [],
+      "evidence": [
+        "owner-answers.md",
+        "preflip-execution-plan.md"
+      ]
+    }
+  ],
+  "newlyVisibleOpenItems": [
+    {
+      "gates": [
+        "G0",
+        "G1"
+      ],
+      "item": "Independently review the 25 pending carries-current-rebindings rows (8 target-digest changes), binding each verdict to the current claim/row and digests; W17-3 is scope/mechanical PASS, not per-row content approval.",
+      "evidence": [
+        "reviews/w17-parity-rework-review.json",
+        "carries/current-binding-refresh.json"
+      ]
+    },
+    {
+      "gates": [
+        "G1"
+      ],
+      "item": "Fix and independently re-review W17-1: refresh the 4 live distribution.md heading rows, add parity for unheaded-block-17 and restore live heading/direct-block coverage alongside authoring replay (L13-16). No parallel uncommitted fix is counted.",
+      "evidence": [
+        "reviews/w17-parity-rework-review.json",
+        "owner-answers.md"
+      ]
+    },
+    {
+      "gates": [
+        "G8"
+      ],
+      "item": "Independently re-review f67e0f676’s records-only fix for W14 w8-archive-receipt-json-stale; do not infer independent approval from the Lead’s edit. Keep the separate low documentation note about retained JSON path-string recovery visible.",
+      "evidence": [
+        "reviews/w14-g8-retention-timing-review.json",
+        "archive/receipt.json",
+        "archive/design.md"
+      ]
+    }
+  ],
+  "scopeLimits": [
+    "No parallel uncommitted carries/g0rework content read; all input bytes come from git show at asOf.",
+    "This is evidence reconciliation, not new independent review of the prior Doers, not proof that F work ran.",
+    "No pair accounting, Git writes, fgOS CLI, lifecycle verbs, native addons, audit-report.py, npm test, Cargo suite or preview service.",
+    "G0 scoped audit remains partial; missing native-dependent full checks belong to the final owning proof.",
+    "Historical receipt status/counts are used only at their own pins and subordinate to the later scoped review/ruling."
+  ],
+  "checks": {
+    "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py",
+    "exit": 0,
+    "output": "gate-reconcile/verification.json",
+    "controlsCommand": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py",
+    "controlsExit": 0,
+    "controlsOutput": "gate-reconcile/controls.json",
+    "initialFailure": "The first verification exited 1 because its own not-yet-created verification.json was listed as input evidence. The output is now named as output, not self-referential input; no missing source path or ancestry check was bypassed."
+  },
+  "planBranchLog": {
+    "command": "git log --oneline 8a9385eca^..53de2207e1ea8a9417ac131f785704d6ab72ba2c",
+    "lines": 452,
+    "path": "gate-reconcile/plan-branch-log.txt"
+  },
+  "localArchiveRefs": {
+    "command": "git for-each-ref --format=%(refname) %(objectname) refs/heads/archive/ refs/archive/",
+    "stdout": ""
+  },
+  "needsWrites": []
+}

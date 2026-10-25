@@ -1,0 +1,2148 @@
+{
+  "asOf": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
+  "inputs": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md",
+      "sha256": "54872054c6b16f096caecccdef9f9792237033bb300b477fa12a7e7238711365"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/link-closure.json",
+      "sha256": "93be72ebb0f8b964eccdb38666c8045c29fe2bd842d0bbc473aaf447d3b4e893"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/manifest.json",
+      "sha256": "6769af99654dad754600178988a012f12cbabe6b70afd028833188623becf694"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/receipt.json",
+      "sha256": "2220f3f6dbc39d6b9372808b32be32f5091690488b4296c6a9fedd93031df135"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/receipt.md",
+      "sha256": "d62ed114cda352e26c24a995287535d7c34c4d11856269053944c89d37c3fbd4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal.json",
+      "sha256": "1cf91be78e953da67054fe8ac3dbedcf409cce4a5d87d25f9fd486e4af03137c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/verification.json",
+      "sha256": "02def5daee0f455dae70120e075c862d0dedcf16c0bbb5a0849d74c3f255607f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/current-binding-refresh.json",
+      "sha256": "a7b9ad60382510758f5b8c9b2250cb4c01b3aafe36dcbc887d33f578a49e9829"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/receipt.json",
+      "sha256": "a15abc1786ccc0bea7771709676531a5d1b1f53063059184bb69879432b8b771"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/receipt.md",
+      "sha256": "1c6e6e232282cbbef9155731c465e51c354d585e62b1bbef9ac868bfffe788ee"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/receipt.md",
+      "sha256": "7f23412cd50c0a3dc245f933831c793155a2cbe08cd515364a5992d7556e4f22"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/area-holder-table.json",
+      "sha256": "ad2da75ebe1b3c6d7f2964a47e73c3011c6578e6ff07d3de483e7ec8472a0005"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/gap05-placement-proposal.json",
+      "sha256": "133e94ac452c0ed7928e6945fbd80eb0f746219d6634d0758381d068c7d23e59"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json",
+      "sha256": "c2116432c57126885c94575a17b58faddab2a6637f14eee0bd695c60fe0fe852"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/receipt.json",
+      "sha256": "5854d2e965de1c9fefb3f01eeb0c76bbfb288650a0165dbedb2b32c805b8c9bb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/receipt.md",
+      "sha256": "e6567448a22dd61a26be563b01f28b4ec4af34771ba8a94f89b7e67c0baf75d1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w2-gap05-verification.json",
+      "sha256": "1b66b5483c53ab43eee1eb28dbe459b4a053ef0478b2cf0050416b88ffcede4f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w2-independent-verification.json",
+      "sha256": "108fe9ae1be942cc83e1441a3a6daa2b1ed49dd97453360c670b655a87424aee"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w2-predecessor-recomposition.json",
+      "sha256": "77ff9b1a82f091abe69d469b7332b67caee198418be7fed817a5619f1c3b6a25"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/receipt.md",
+      "sha256": "7943d29c550cca3748a0591bcc85ba21822bd752205cc8c4265cd7f302c84876"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/receipt.json",
+      "sha256": "c304ff5ca00667a09e6be2d1bdbb39197e51c29b0b2b475b8493dbc7e7d0428b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/receipt.md",
+      "sha256": "1350a41e5f650f423980a7080c0f66cce63f35694f87d2cdaa9e8ad995d070e7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g5/check-b726d44ed.json",
+      "sha256": "3eedf282927c58b493b0f14609b36e76bf366eeb9d6992e4fdc28ad92cf0880d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g5/check.py",
+      "sha256": "7e8dc421a50d97bfdbb5c3603efe4e4fdf1f0ed0cfeee3ece50abe7e87ebaca1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/receipt.md",
+      "sha256": "affdbb6ec09268ef1a336fa95c84b621505f5c73b0d987dee5bacd104c223473"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/declared-exemptions/receipt.md",
+      "sha256": "5c9f8cfa0bdaff9387190ea894d169d0ff1911075529e854397950cb965ca98c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/exemption-proposal.md",
+      "sha256": "e58c6f9c706cd9f8e9ec32537c04d83feb812d82242e1f7799f4f6517f86c256"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/git-owner-review-request.md",
+      "sha256": "2c9578bdb665065435226756d7b43452db5b5c14f5d4a23ab51dbd18ddf5f618"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/receipt.md",
+      "sha256": "11f8808fbc0155ac127837cacba23c10c7c443887b91180128bf34f13553a741"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/wrapper-callers/receipt.md",
+      "sha256": "badd5219067d88f0960584acd7a96724b1ca4bef8d1e5ca24d30f92ae23dce99"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/wrapper-escapes/receipt.md",
+      "sha256": "fc3967fb27ca83176b8602391b529b2eecf2d09025133ead4f3015aced01e95f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/receipt.md",
+      "sha256": "dca32f135cde63a6c1c3d7ce0628af68493b2d06e50102e78ae83bf5455a6ec8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import3/receipt.json",
+      "sha256": "5638a20e2f232bda6dbad5ec2886d64f90fc86c1feb1733e2644b2c35b931aff"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import3/receipt.md",
+      "sha256": "5ecaf0d941f957f11b834018b922ad2ee4bdded3a60c163a491b294a86d53d84"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json",
+      "sha256": "67acf94fc3dc8d9c27a796d2c86f39ee544b63634d0f9c82cd947e108186e382"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/receipt.md",
+      "sha256": "82be0fdee309e3e29ba80d311f783627125dbc471f96a96c59ca0451fcb67278"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/ledgerfix/receipt.md",
+      "sha256": "b1e0450167e7833ea8bcfc96bbeda5821445ff5b0dab607afc634c2f41a1d338"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/ledgerfix/recipe-migration.json",
+      "sha256": "6cf1a4e0fe3b437414bcdeeb2b6e3564eece12be4d44a9c0ceac1c1efceac009"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/receipt.json",
+      "sha256": "adca33e03ccbb522e3e92b17e24db6ac7922f7849115923603cde4ab4184b618"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/receipt.md",
+      "sha256": "53fc3db58fe926e10c1de7b699b602255f82ff24a81e10034b2a378b86959f38"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md",
+      "sha256": "8272acd0edc53c1e9a7d87a47cf5ac6aa78b11667a8aaa6d20867dd635a274c0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preflip-execution-plan.md",
+      "sha256": "936258450b95d78b0815442040ec7b29e8a6571ed47fdce733a6c90d4271327c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preflip-gate-status.json",
+      "sha256": "62bcd96f9747e0ad760f49e0948d60c4c5a07d315c5ab0927279dd9d2a0b8f03"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/receipt.json",
+      "sha256": "7f0ca006ee343b3bc1367cb6987f0d497172d796646b99fdf7821dc7752170c8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/receipt.md",
+      "sha256": "2dcba5ddcba3082a0699a9cfffe8588c2f1b5dd7fb4487f80ed3db8e64158df7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/sentence-delta.json",
+      "sha256": "2776ce62108f934a87eb8918e44e984fe8388462e1db9321bc3bd62ee2ab95d7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/sentence-replay.json",
+      "sha256": "e39dd10d514268555bfcdb86b24a0299bf181a0adc020d7ec454504ca20d53ec"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verification.json",
+      "sha256": "f2e4a531c74a5de6b74dfb43ee7a96371ab8601e7cef2045de99f13e5cbfc9ec"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/receipt.md",
+      "sha256": "756e7c765932ddd044be0d34ecb9b0f2033c596eafffe8f2c08696a78d4431ce"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rereview-claim-ids.json",
+      "sha256": "c6df137bd2ac735d7d685e3e6e837598d13dc56e3afe457a2dc3a4a67651195e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/receipt.md",
+      "sha256": "9a0c669df06ca54cf57ed28df607099da3a354191b20ea2e890c53c6f4ef5d75"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/receipt.md",
+      "sha256": "b5d525e5768533968e9019ec61bd7ecf76acd66a194113892b4b866a4671d3ce"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/review-batches.json",
+      "sha256": "8658ece46ea6a44bc2a778b0d989a6254bf5abd742069061de6bbf8d1fd9e16d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b1-review.json",
+      "sha256": "acfe29b8c2ce6aeaaa7d87ebb9a97034e813b96cdc9894401a5325e85a3c2cd0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b1-review.md",
+      "sha256": "238ca9e316a5ba8cba9350a6a75faee0b31b5b25d38c03e1016391f0b5972e94"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b2-review.json",
+      "sha256": "f83dc0cdbcf8829128cf4f5e34f1c729fa03e793bd6b8066fe98a5a9ceb3ae9d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b2-review.md",
+      "sha256": "be459abbc847440d866d8885964da012d01252550184a06c6b5ebe00b607116f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b3-review.json",
+      "sha256": "5b2d0f09ab349d60a29f584734b08dbbd5224377f2c00e6f0319435d8e9d0295"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b3-review.md",
+      "sha256": "cc4bcdca3cf6557e6c1e199dd95f746f25c70e480b1a6fc2d51416d9e1567882"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b4-review.json",
+      "sha256": "85fa7e6735640f1e9b9a178cd08d7889ac3317c4a5d9072c3b96b63330faeca7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b4-review.md",
+      "sha256": "1ecf42087629fdd4415018adba79534ae7eb0859112d1d0edf6b9b058afabb8a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b5-review.json",
+      "sha256": "f0334c409ae837943f8478e7489f44ebef21c9406b770cc1fb35eacb363db5d9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b5-review.md",
+      "sha256": "d76cf9d92eb21b6a536b2b9e7572c4748aab6d561710cf26fec28e2de6d93948"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c1-review.json",
+      "sha256": "2995a47b200e072b020bb5d6868fedb06d4f4560d33c204eec2ace34d9c2189b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c1-review.md",
+      "sha256": "eb5a5a3172c4cc63b045a09cc3bb9b49dea7dc5d391193362263aa36597fd94e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c2-review.json",
+      "sha256": "a6c2328abb38e9b1b703b8d8979d1352557eefbb3e48b7a917fcf024dfe266f2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c2-review.md",
+      "sha256": "756f898f3bb531ffaed3f522822825f8d3016aa3c48b8e3ba5e34fd99da322e7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c3-review.json",
+      "sha256": "9d8d1e8ebe8cbd18c1cf98367368d3f7a7e887e2e46424173b449951d8411ed4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c3-review.md",
+      "sha256": "866587f185ddc1cb754cb976db1a2ed78bb080f5efacab7585546735a3293dc6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c4-review.json",
+      "sha256": "f9fbcdc6fa88054e24d01b7966a6ef9a6e51f90892608b8ac44b079f7c1d1128"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c4-review.md",
+      "sha256": "e875a77b21ab8bb4144c7509c05f49b367dcf79ca431e767a4495acf0be79108"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c5-review.json",
+      "sha256": "9f2ea7615d95d565853ae387bdf08ae09ad7160482dc1aca5bd00167ba09dff3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c5-review.md",
+      "sha256": "10a4d97b0a547ff4f7dbf42fdec6bc6ec6591e68b48efa6aa379e2e5e402e8e2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c6-review.json",
+      "sha256": "436a7582874ca1318e572e4f09b44e107c1d1024937bf39c8b3315f1f8f83ae1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c6-review.md",
+      "sha256": "f4f7d705fe63a9b5e854fcf5c1a8e1aa12f5aca529d4184eb7d377b9ce68a05e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c7-review.json",
+      "sha256": "170cfd21b7316af5501037d92ea08276229b3b320ec2d4574f1d7e669c0ce157"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c7-review.md",
+      "sha256": "55a35f4ecfb20a34dce3c8c9f1b89ebc9e2568efd5c83dc16a5bdb7871715c31"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/probes/w4-g4-wrapper-probe.mjs",
+      "sha256": "dee0ba518c820db872eeeb30db0830500e310c3e0a2b47bd97c40498bdcbde85"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w10-composition-rework-review.json",
+      "sha256": "efcf1c93a1aa67692bce387191350fa796574c0a230ef69005076e1915ef23b8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w10-composition-rework-review.md",
+      "sha256": "5b158b238fa5d6b31a83bcea8ef60d1e091656453feaa4d385bd4638724e48b1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w10-g9-interim-review.json",
+      "sha256": "b380e3f52102f4f7f42f8b1d6c63ddeb566e48c9cf2a973c58ce47533bfec949"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w10-g9-interim-review.md",
+      "sha256": "4a60765bc627749283c22b816dee1298415022c8718d18680cab61d5fe5f6776"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w11-g9-rework-review.json",
+      "sha256": "feaab9e6ea8dd2431e6ffa6a52f0ba95a120900aea3bfed73b99f22ebfe6facf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w11-g9-rework-review.md",
+      "sha256": "5ce82a7408933c73952f3999370f371aa6043c73e87770fd4caefca249bc225a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w11-import3-review.json",
+      "sha256": "c5414051b1afa29ad5ccdbaf4cb18d77b7931084a5f868de725feea1ee9d38e2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w11-import3-review.md",
+      "sha256": "f5a8a768269f2fa61cb8ea534269936258ad36091f1f9fdfa7250213d3646255"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w12-g9-followup-review.json",
+      "sha256": "c2df6aed9d55dbaf7aeec0b9f239fcb1d57c51da43f3161b649a330ebd016344"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w12-g9-followup-review.md",
+      "sha256": "b4f8eed03852f206d4a3d9d8731132df3a6b0c0ceb78c94bd907b97144e06d30"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w13-misc-pin-and-gloss-review.json",
+      "sha256": "3f2de0933fce23bb886a49d2f7c14d14cc8428873e82b8d8aca418a307c7cd1e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w13-misc-pin-and-gloss-review.md",
+      "sha256": "d5f69dd1ccf7b17a0d2a12e291afa8de81825cc08a491ec8c315328a7c2dc316"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-check-hardening-review.json",
+      "sha256": "2d65e74b9571ff8c5accee835724d3f090a1844343419adf741c7cabf021e813"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-check-hardening-review.md",
+      "sha256": "e2e78e3215bea6e389778b6b74aaca6db2238ee948fdf2dfada57a7a15adbb57"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-g0-content-rereview.json",
+      "sha256": "80c3a500bab01ec0f02961e50d2253c3a1b27928a613afc69dda578edf6a21f6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-g0-content-rereview.md",
+      "sha256": "b615353f6c814353380205b7b14a9c20521dd26dbb916c0cef8ea84e43b67bda"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-g8-retention-timing-review.json",
+      "sha256": "73754841b871a00b3afa8a63c84496540e1dd37d00c76a2ffa14af1b45fe3747"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-g8-retention-timing-review.md",
+      "sha256": "1b6e5812c8316811f007d2888ab9276c40e2164ada24155eda655560a0586612"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-import3-binding-review.json",
+      "sha256": "932505078ab932843684ef5e2544221d40815d5960a4fe95ad67694fad1b5d46"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-import3-binding-review.md",
+      "sha256": "d1b0b10aebfa4ea5f59c598bff980e2f08595470d6c5e8c1977e6c3df1b28ba7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w15-g9-parks-review.json",
+      "sha256": "410e5c09cd36781f49cea606bca650b425ecb084dfc2ba2c185f844943f30b23"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w15-g9-parks-review.md",
+      "sha256": "8c6db0ad6be20a6db7d16d8bfa9e6e666fba3182ef8a511eb1781bc1fbb37c24"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w16-g0-rework-and-park-rule-review.json",
+      "sha256": "9b098ffb7d02f3b7200e9e63b8f2131257f6f185995afda40521079cb363164a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w16-g0-rework-and-park-rule-review.md",
+      "sha256": "6a91cf4b781d1691eccd5e0cd73ad3be95ec97c2314017af1b6523487b3bca05"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w17-parity-rework-review.json",
+      "sha256": "abd60a48105d2c697e03539345c46372a8f6380037942ba9d49a8fd9a200d1d1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w17-parity-rework-review.md",
+      "sha256": "47ecae58ebbed27d20b10928f8727c8cee3714c50e812a3cb4fc6e05811ce852"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g0-delta-review.json",
+      "sha256": "9fd2f63eb9aaf5b8b15b72c6db3a836db08082ffd723ca4448d2a15af8027fc2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g0-delta-review.md",
+      "sha256": "3fe49ce9b68ba15c2debc9a930d477f9ee5b6999256a5de62cb4f279eb34c775"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g1-carries-review.json",
+      "sha256": "392c49db19416b4e012ddff50305c0f80ea095d66e25f2d243349c7b6e1dfe42"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g1-carries-review.md",
+      "sha256": "6744be9a0504cfbbc2377ac40929e8bd762384967ec89518945ecc8c33599cb9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g2-census-review.json",
+      "sha256": "35959ea0b06ccf6bbc13466cc1811783fcdd4e44373539e868268f101f8d60b0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g2-census-review.md",
+      "sha256": "94350615d5a2da24be610bd54120356f7d31ed39708aa8762a010d1d1620c214"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g2-dyn-delta.json",
+      "sha256": "613802f108315f1ed3d87dc7eb3e94f85b5cb69f58ea6a9697515effa5c5e9a7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g3-packaging-review.json",
+      "sha256": "f150831b7f68f95ccc9081f4ebba1042a280687ec148978ec45be300fd75ab14"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g3-packaging-review.md",
+      "sha256": "18035a28809cc5c298a4f05025718752d8ea58489110297587a1048b514d51ec"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g4-code-review.json",
+      "sha256": "78925fc6deb663c523da72d217064840d85f2c1992bf9d8490c7c9601d171c72"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g4-code-review.md",
+      "sha256": "b8c46f0549c1ab76596bd331f87576725b7df97b29320199b4a91f01f5132465"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g6-preserve-review.json",
+      "sha256": "bc087c5afa2f6449c9ab99c565cd35373cb9c2ad76ed30d31496f825afedcbe2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g6-preserve-review.md",
+      "sha256": "11f11e3a7c670280326bf1ea529d92f81d43df50cefed19dfb06a8d6f1abad49"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g8-archive-review.json",
+      "sha256": "0ad67163696226d1df79335fd0fcfb7f58fe4e4193b8d573133fdb7f908e4959"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g8-archive-review.md",
+      "sha256": "ea66a268cbac149472888944c395c0718bb35a1e2667a734027e2206fd26a5a5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-late-areas-review.json",
+      "sha256": "5cf92d63d6a32c1c237f72b87aecfad19b798b3a13d31cc6d54166f6c7e1d153"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-late-areas-review.md",
+      "sha256": "6846f4764c10b768d5d67b21610b86bece1be724ab2116f74749015261bb5eb9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-d1b-resync-review.json",
+      "sha256": "bc33c6da5e57159a9021a8cfd3015ff9b7a377ad218944157db2b38b144759e8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-d1b-resync-review.md",
+      "sha256": "be91aaf65e05a6600164e36ecd160440c8f69717f1a33471392c705babd1e8c8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-d7-resync-review.json",
+      "sha256": "490b338c5350e59cf09b85a0d7120c7fd977a105e88edc6013ec1bf691fbd5b0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-d7-resync-review.md",
+      "sha256": "a2629a237a275ca3dd17be685cbc0f05d0a217e285424d5e1960004fce421aef"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-g2g6-delta-review.json",
+      "sha256": "0d14aa16f03a707e1d1f811c99620a746163cc5dc00761080c8adabac69af0fc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-g2g6-delta-review.md",
+      "sha256": "ea5db13d57425fd49e239733e98ffbebcef83e4f508f62c4e41188cb6d1ecaa9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-g4-declare-review.json",
+      "sha256": "64970be3264f68e4d267dadfdbee81a8013206c4582bbefa6030a18850ee1096"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-g4-declare-review.md",
+      "sha256": "e78dd3d5377f9efafc046fd2c8c9bff6609e870cdb54c4f6d29781f1ebc2fe24"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-g8-archive-review.json",
+      "sha256": "28d29d272a071902e4c4ad51f154a7a448f5981eeaf70c208759e0dda0880580"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-g8-archive-review.md",
+      "sha256": "72c670426d4b571d3d7e9112dfd434791b431fd66e79e4ba7054dfa4bb4a79e6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-import2-review.json",
+      "sha256": "5d5a039258b79ffe81ea837048a68dcbd62eb7d7124d73d2ee333b519bdd0c2b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-import2-review.md",
+      "sha256": "d2e4feddbcb0d7373bc22ce905e7a186d49851ebc7b5303e06e05064753274dc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-ledger-d7b-review.json",
+      "sha256": "3d766273e76328b1796615b72ce33963cab5bd9ca1e3171935be7cb1b266645b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-ledger-d7b-review.md",
+      "sha256": "051d8939924588fd5e4e96fa5e42ee189080bdb93f56ed3afab719b5b53826bc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-d5c-archive-review.json",
+      "sha256": "1f9d71e5b60483377acb387868904b53829149add52d8b8ab3cd0c13bc288758"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-d5c-archive-review.md",
+      "sha256": "784ac26bced0cfec665857eaeebaaa6b4fc395364d0d3e7d91033afc1a576657"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-g4-wrapper-review.json",
+      "sha256": "cc775d5e7d88166aa70a21125bc0b3c39a4a7a66db5bd9188ff8e09010776496"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-g4-wrapper-review.md",
+      "sha256": "822066beee15681b8561767dafacb42e26022b6cd5c500fb4ae670efb68e6a52"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-misc-fix-review.json",
+      "sha256": "cceb5deefb3f481c26bf81ff5917461b069586270b2c9fab55e0eb732da9895d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-misc-fix-review.md",
+      "sha256": "89524ca689dca26ebf2c20847e081f16cf72b57329b2ecbba29daf37459e90fe"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-suite-fix-review.json",
+      "sha256": "dc2eeacae63ec4f6ba0817c6b6b21dd76dd028a5ed4bf71153133de58d530562"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-suite-fix-review.md",
+      "sha256": "35ce455a7344e50a6756701250afe35afb228d659b4281bc331b81b0c55a366e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w6-g4-escape-review.json",
+      "sha256": "6c883b2e671d8a6d2ad7ccf9a9d4a99a494630da601cb2b863be43d19bb65dc6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w6-g4-escape-review.md",
+      "sha256": "2482ccd5630db467bd6c734db1f3bafad9f45954415df8e874fff152ac438ecc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w6-misc-rework-review.json",
+      "sha256": "331dda17e83c77ea6fc52295308b3d128e80834129a250f94d959f03f96f389d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w6-misc-rework-review.md",
+      "sha256": "b834b20f89613b8ea47735157cbf75e15b1fe46d66033400c17e76fed1eb44c9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w7-header-sentence-review.json",
+      "sha256": "fac7293c55398146d9d415e16980c668de365b60b45da45f798fcc302886e27c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w7-header-sentence-review.md",
+      "sha256": "0afa1a892851e7bd4848a2748c469cf6171c70ef4f46ad3f4312478d65654a70"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w7-rebind-review.json",
+      "sha256": "bbf284cff157aa4acb9574ae6d1287673e1b73267c4e6539b820099bb92123ec"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w7-rebind-review.md",
+      "sha256": "dde79ebec615b1d36f05b7c8423cb4c1aabbb95fe3cf3c48445a1fb66e85b2f1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-composition-review.json",
+      "sha256": "c88e7aa695f4aecc1022870b91f01fa31a161bb35693d9b54475072ee47bdf49"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-composition-review.md",
+      "sha256": "6d3a4c9967a69f16d58d7094ad48cc6cd05e2cd0341f3175fdd549fb9b4ae256"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-g6-judgments-review.json",
+      "sha256": "9b2c00795128cee6832be378a63f222a5727c61aff556d42e5ddc5144bd769d2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-g6-judgments-review.md",
+      "sha256": "d2aa226dcf55daf839bb3f27b21264301574aaa8e6c6708fc4845479312956f8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-g6-parks-review.json",
+      "sha256": "628903357ff0a64578de8477ad4d33df672bdb576c9945857d08ce396ec4fc6d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-g6-parks-review.md",
+      "sha256": "31140d3bb469deb5e5248853509ec1ec13848815d997d95bd5a6161d965a406f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-lead-fixes-review.json",
+      "sha256": "275f0469b5923c6feccba6882a75c7382e1972cf9738c84a3200e146dede4c28"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-lead-fixes-review.md",
+      "sha256": "7c88d9131579110493a9804a1b97bfb072befdf193b78aadd4755c47632e6c83"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w9-composition-fix-review.json",
+      "sha256": "05558a07c42170fbe30b54940929f854160bee6a66692ba1123bfe76cfdff172"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w9-composition-fix-review.md",
+      "sha256": "861cd4f256f680f80fa878ea14609c415ebbf9d51bc4afbaa4e819b68075bcf4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w9-g6-fix-review.json",
+      "sha256": "44dbec4cce835fdb1559608e5df7b34ec01a8bde1f85fede71f5c1844b886c90"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w9-g6-fix-review.md",
+      "sha256": "0282389544b61b50c7ec016e35a30ad4d6672ba4bc87ee7dc20dcc4db24e7ba7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/w0-deferred-rebinds.json",
+      "sha256": "17796b3e5e97fb97b45edb99ae9b42ae9152cde1afb9edd79dfca267951a66ce"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/w0-prior-overlap-replay.json",
+      "sha256": "5a9dcb13a9129de777ccc1ae3e4addf29553087ef456b70e4f99826765efeb21"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/w1-review-notes.md",
+      "sha256": "df3c7fe52058073c293c2a5f84b31ab886150af0dd75f02c6f2076668931402b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/w17-gate-register-reconcile-brief.md",
+      "sha256": "7722cbd90b1601ad58276f7930d3cde03e5bc80394911b54d27d4a2f046d741a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/w17-parity-live-brief.md",
+      "sha256": "fac679155dc7a1596be60f654c88f7159c233982fc4445dbbb41e965161500f9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/w2-review-notes.md",
+      "sha256": "85cde1023c44fe15ac520937fa684196f17f0d7df837c52a78d648b62090c1fa"
+    }
+  ],
+  "reviews": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b1-review.json",
+      "sha256": "acfe29b8c2ce6aeaaa7d87ebb9a97034e813b96cdc9894401a5325e85a3c2cd0",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 51,
+        "REWORK": 4
+      },
+      "nonApproveIds": [
+        "claim_9881ddf76dc1db230f605f5ea5af6bc3",
+        "claim_249083eda8db1792917b6bc5239e48dd",
+        "claim_c87924f5a8b4ef3683e8133768ec69b9",
+        "claim_9d97a24e7d17ac4be484f2c75a5e116a"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b1-review.md",
+      "sha256": "238ca9e316a5ba8cba9350a6a75faee0b31b5b25d38c03e1016391f0b5972e94",
+      "verdictExcerpts": [
+        "Commit 8a9385eca (worktree /home/vantt/projects/forgentX-s8-review). The batch has 55 rows, all targeting docs/platform/packaging-distribution/spec.md, from 7 shards. Verdicts: **51 APPROVE, 4 REWORK**. Full verdicts are in g0-g0-b1-review.json.",
+        "## REWORK",
+        "## Concerns outside this batch's verdicts"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b2-review.json",
+      "sha256": "f83dc0cdbcf8829128cf4f5e34f1c729fa03e793bd6b8066fe98a5a9ceb3ae9d",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 49,
+        "REWORK": 1
+      },
+      "nonApproveIds": [
+        "claim_83a4a91369ae5c2fd8959d7835a2f76e"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b2-review.md",
+      "sha256": "be459abbc847440d866d8885964da012d01252550184a06c6b5ebe00b607116f",
+      "verdictExcerpts": [
+        "Result: 50 rows. 49 APPROVE, 1 REWORK.",
+        "## REWORK"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b3-review.json",
+      "sha256": "5b2d0f09ab349d60a29f584734b08dbbd5224377f2c00e6f0319435d8e9d0295",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 38,
+        "REWORK": 4
+      },
+      "nonApproveIds": [
+        "claim_20a5804444535524364c0049e5bc87dd",
+        "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+        "claim_d5ba1eda7530b865fec747ee0adbc102",
+        "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b3-review.md",
+      "sha256": "cc4bcdca3cf6557e6c1e199dd95f746f25c70e480b1a6fc2d51416d9e1567882",
+      "verdictExcerpts": [
+        "**Result: 38 APPROVE, 4 REWORK.**",
+        "## REWORK",
+        "## Approved, with notes"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b4-review.json",
+      "sha256": "85fa7e6735640f1e9b9a178cd08d7889ac3317c4a5d9072c3b96b63330faeca7",
+      "verdict": null,
+      "verdictCounts": {
+        "REWORK": 2,
+        "APPROVE": 20
+      },
+      "nonApproveIds": [
+        "claim_af89c4e6063eb43c4e690c3fdd430677",
+        "claim_891db485a75cdb558cf725c3315f3857"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b4-review.md",
+      "sha256": "1ecf42087629fdd4415018adba79534ae7eb0859112d1d0edf6b9b058afabb8a",
+      "verdictExcerpts": [
+        "Result: 22 rows. 20 APPROVE, 2 REWORK. Verdicts are in `g0-g0-b4-review.json`.",
+        "## REWORK"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b5-review.json",
+      "sha256": "f0334c409ae837943f8478e7489f44ebef21c9406b770cc1fb35eacb363db5d9",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 19,
+        "REWORK": 3
+      },
+      "nonApproveIds": [
+        "claim_15308eb4847ddd38be79bd87bd69a0b6",
+        "claim_a7278e1567e5432cfb079506cf2f5050",
+        "claim_f5365b8e40fb58c75adc56a574263242"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b5-review.md",
+      "sha256": "d76cf9d92eb21b6a536b2b9e7572c4748aab6d561710cf26fec28e2de6d93948",
+      "verdictExcerpts": [
+        "Result: 22 rows, 19 APPROVE, 3 REWORK. Verdicts: `g0-g0-b5-review.json`, next to this file.",
+        "## REWORK",
+        "## Notes on approved rows",
+        "Status: DONE_WITH_CONCERNS"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c1-review.json",
+      "sha256": "2995a47b200e072b020bb5d6868fedb06d4f4560d33c204eec2ace34d9c2189b",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 73
+      },
+      "nonApproveIds": []
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c1-review.md",
+      "sha256": "eb5a5a3172c4cc63b045a09cc3bb9b49dea7dc5d391193362263aa36597fd94e",
+      "verdictExcerpts": [
+        "Verdicts: 73 specs, 73 APPROVE, 0 REWORK. Machine file: g7-g7-c1-review.json."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c2-review.json",
+      "sha256": "a6c2328abb38e9b1b703b8d8979d1352557eefbb3e48b7a917fcf024dfe266f2",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 68
+      },
+      "nonApproveIds": []
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c2-review.md",
+      "sha256": "756f898f3bb531ffaed3f522822825f8d3016aa3c48b8e3ba5e34fd99da322e7",
+      "verdictExcerpts": [
+        "- APPROVE: 68",
+        "- REWORK: 0",
+        "   - Where a bare file reference now points to a section, I checked that the section holds the cited content (for example tsk-2z3, tsk-5l2, STORE_MISSING_WARNING_VERBS, createClaimWorktree/claimWork, planApprove).",
+        "## Note (not a REWORK)"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c3-review.json",
+      "sha256": "9d8d1e8ebe8cbd18c1cf98367368d3f7a7e887e2e46424173b449951d8411ed4",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 68
+      },
+      "nonApproveIds": []
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c3-review.md",
+      "sha256": "866587f185ddc1cb754cb976db1a2ed78bb080f5efacab7585546735a3293dc6",
+      "verdictExcerpts": [
+        "- APPROVE: 68",
+        "- REWORK: 0",
+        "## REWORK"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c4-review.json",
+      "sha256": "f9fbcdc6fa88054e24d01b7966a6ef9a6e51f90892608b8ac44b079f7c1d1128",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 41
+      },
+      "nonApproveIds": []
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c4-review.md",
+      "sha256": "e875a77b21ab8bb4144c7509c05f49b367dcf79ca431e767a4495acf0be79108",
+      "verdictExcerpts": [
+        "Scope: 41 composed specs, rest of `docs/platform/agent-coordination/**`. Verdicts: [g7-g7-c4-review.json](g7-g7-c4-review.json).",
+        "- APPROVE: 41",
+        "- REWORK: 0"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c5-review.json",
+      "sha256": "9f2ea7615d95d565853ae387bdf08ae09ad7160482dc1aca5bd00167ba09dff3",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 59,
+        "REWORK": 1
+      },
+      "nonApproveIds": [
+        null
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c5-review.md",
+      "sha256": "10a4d97b0a547ff4f7dbf42fdec6bc6ec6591e68b48efa6aa379e2e5e402e8e2",
+      "verdictExcerpts": [
+        "- APPROVE: 59",
+        "- REWORK: 1",
+        "## REWORK"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c6-review.json",
+      "sha256": "436a7582874ca1318e572e4f09b44e107c1d1024937bf39c8b3315f1f8f83ae1",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 30
+      },
+      "nonApproveIds": []
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c6-review.md",
+      "sha256": "f4f7d705fe63a9b5e854fcf5c1a8e1aa12f5aca529d4184eb7d377b9ce68a05e",
+      "verdictExcerpts": [
+        "- Specs: 30. APPROVE 30, REWORK 0.",
+        "- coexistence/spec.md L43: repo-convention anchor; GitHub slug would be `approval-gate--reviewapprovereject` (already noted by earlier A38 review)."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c7-review.json",
+      "sha256": "170cfd21b7316af5501037d92ea08276229b3b320ec2d4574f1d7e669c0ce157",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 46,
+        "REWORK": 1
+      },
+      "nonApproveIds": [
+        null
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c7-review.md",
+      "sha256": "55a35f4ecfb20a34dce3c8c9f1b89ebc9e2568efd5c83dc16a5bdb7871715c31",
+      "verdictExcerpts": [
+        "Verdicts are in `g7-g7-c7-review.json`, next to this file.",
+        "- 47 specs: **46 APPROVE, 1 REWORK**.",
+        "## REWORK"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/probes/w4-g4-wrapper-probe.mjs",
+      "sha256": "dee0ba518c820db872eeeb30db0830500e310c3e0a2b47bd97c40498bdcbde85",
+      "kind": "historical reviewer probe, read but not executed"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w10-composition-rework-review.json",
+      "sha256": "efcf1c93a1aa67692bce387191350fa796574c0a230ef69005076e1915ef23b8",
+      "verdict": "REWORK",
+      "verdictCounts": {
+        "APPROVE": 9,
+        "REWORK": 1
+      },
+      "nonApproveIds": [
+        "F10"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w10-composition-rework-review.md",
+      "sha256": "5b158b238fa5d6b31a83bcea8ef60d1e091656453feaa4d385bd4638724e48b1",
+      "verdictExcerpts": [
+        "# W10 composition rework review",
+        "**Verdict: REWORK (one low-severity line). 9 APPROVE, 1 REWORK.** Machine file: [w10-composition-rework-review.json](w10-composition-rework-review.json).",
+        "Scope: commit `928f5cc14` against [w9-composition-rework-brief](../w9-composition-rework-brief.md) and [w9-composition-fix-review](w9-composition-fix-review.md). Reviewed at the commit bytes; the two later commits (`4f08d504d`, `83305ec4d`) touch neither `docs/` nor `composition/**` (only one line in `s16-import2-resync.json`).",
+        "### F1 — Scope: APPROVE",
+        "### F2 — GAP-05 body overlays: APPROVE",
+        "### F3 — 44 lookup-only rows kept out of G0 counting: APPROVE (note)",
+        "### F4 — Seven gloss lines: APPROVE",
+        "### F5 — Patch replay `--fuzz=0`: APPROVE"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w10-g9-interim-review.json",
+      "sha256": "b380e3f52102f4f7f42f8b1d6c63ddeb566e48c9cf2a973c58ce47533bfec949",
+      "verdict": "REWORK",
+      "verdictCounts": {
+        "APPROVE": 6,
+        "REWORK": 4
+      },
+      "nonApproveIds": [
+        "recomposed-stale-at-head",
+        "duplicate-line-false-changed",
+        "overlap-dependency-reasons",
+        "w4-source-pin-provenance"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w10-g9-interim-review.md",
+      "sha256": "4a60765bc627749283c22b816dee1298415022c8718d18680cab61d5fe5f6776",
+      "verdictExcerpts": [
+        "**Verdict: REWORK.** One high finding (`recomposed.json` no longer matches the composition chain at HEAD, and `sweep.py --check` cannot see this). The w4 source-pin-provenance REWORK is closed for the records, but stays open at Lead level.",
+        "### scope: APPROVE",
+        "### sweep-check-at-head: APPROVE",
+        "### recomposed-stale-at-head: REWORK (high)",
+        "### judgment-evidence: APPROVE",
+        "### parks-are-mechanical: APPROVE (note)",
+        "### duplicate-line-false-changed: REWORK (low)",
+        "### overlap-dependency-reasons: REWORK (low)"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w11-g9-rework-review.json",
+      "sha256": "feaab9e6ea8dd2431e6ffa6a52f0ba95a120900aea3bfed73b99f22ebfe6facf",
+      "verdict": "REWORK",
+      "verdictCounts": {
+        "REWORK": 2,
+        "APPROVE": 7,
+        "NOTE": 2
+      },
+      "nonApproveIds": [
+        "sweep-check-fails-at-commit",
+        "gloss-lowercase-after-label-removal",
+        "chain-check-metadata-only",
+        "moved-trailing-newline-gap"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w11-g9-rework-review.md",
+      "sha256": "5ce82a7408933c73952f3999370f371aa6043c73e87770fd4caefca249bc225a",
+      "verdictExcerpts": [
+        "# W11 review of the G9 and composition rework (commit bc2a6a014)",
+        "Verdict: **REWORK** (one high, small fix). Read-only review against `w10-g9-rework-brief.md`. Branch HEAD at review time: `0e8c6c15b`, which adds only `w10-import3-brief.md` on top of `bc2a6a014`.",
+        "| id | severity | verdict | summary |",
+        "| sweep-check-fails-at-commit | high | REWORK | `sweep.py --check` exits 1 at `bc2a6a014` and at HEAD. It exits 0 only at the parent `d14d89865`, which is the pin the receipt certified. |",
+        "| gloss-lowercase-after-label-removal | low | REWORK | Witnesses #61, #62 and #64 (holder-lock spec lines 420, 425, 428) lost their `D1:`…`D8:` labels and now start sentences in lowercase. The receipt says no other fault was found. |",
+        "| scope-and-repin | info | APPROVE | Scope is exact, and the exceptions diff is the single `inputCommit` line. Blobs are byte-equal and patch-ids are equal. |",
+        "| ratchet-not-caused-or-masked | info | APPROVE | The 3 digest mismatches come before this commit. No checker reads the field that was changed, and `docs/` is untouched. |",
+        "| gloss-16 | info | APPROVE | #16 now reads \"in the plan, porting uses `project:porting`…\". The line reads naturally, it is true, and it has no citation token. |"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w11-import3-review.json",
+      "sha256": "c5414051b1afa29ad5ccdbaf4cb18d77b7931084a5f868de725feea1ee9d38e2",
+      "verdict": "accept-with-followups",
+      "verdictCounts": {
+        "open": 3,
+        "accepted": 1
+      },
+      "nonApproveIds": [
+        "F1",
+        "F2",
+        "F3",
+        "F4"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w11-import3-review.md",
+      "sha256": "f5a8a768269f2fa61cb8ea534269936258ad36091f1f9fdfa7250213d3646255",
+      "verdictExcerpts": [
+        "Verdict: **accept, with two follow-ups for the Lead.** Reviewed at d786e305e. Read-only.",
+        "- All rows are `reviewStatus: pending`.",
+        "  - Both `checks.mjs` children died on `git-floor-probe-failed` (EROFS in the Doer sandbox) before giving a verdict. Those checks have no verdict at this commit."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w12-g9-followup-review.json",
+      "sha256": "c2df6aed9d55dbaf7aeec0b9f239fcb1d57c51da43f3161b649a330ebd016344",
+      "verdict": "pass-with-findings",
+      "verdictCounts": {
+        "pass": 4,
+        "open": 6
+      },
+      "nonApproveIds": [
+        "C1-scope",
+        "C2-sweep-and-rejudge",
+        "C4-body-vs-chain",
+        "C5-trailing-lf",
+        "M1",
+        "M2",
+        "M3",
+        "L1",
+        "L2",
+        "L3"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w12-g9-followup-review.md",
+      "sha256": "b4f8eed03852f206d4a3d9d8731132df3a6b0c0ceb78c94bd907b97144e06d30",
+      "verdictExcerpts": [
+        "Verdict: **pass with findings**. The checks hold. Three gloss findings (medium) remain in the prepared records and should be fixed before F. Nothing blocks the next step.",
+        "- `python3 -B g9/sweep.py --check --pin X` exits 0 for X = HEAD, `4c9e1f31e` and `d786e305e` (about 16 s each). Result: 0 drift, 0 chain mismatches, 0 body mismatches, 0 judgment errors, 1,016 body replay commands."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w13-misc-pin-and-gloss-review.json",
+      "sha256": "3f2de0933fce23bb886a49d2f7c14d14cc8428873e82b8d8aca418a307c7cd1e",
+      "verdict": "pass-with-findings",
+      "verdictCounts": {
+        "fix-before-F": 1,
+        "fix": 2,
+        "optional": 1,
+        "fix-wording": 1,
+        "pass": 2
+      },
+      "nonApproveIds": [
+        "A-M1",
+        "A-L1",
+        "B-L1",
+        "B-L2",
+        "B-L3",
+        "A-pass",
+        "B-pass"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w13-misc-pin-and-gloss-review.md",
+      "sha256": "d5f69dd1ccf7b17a0d2a12e291afa8de81825cc08a491ec8c315328a7c2dc316",
+      "verdictExcerpts": [
+        "Verdict: **pass with findings**. A has one medium finding: the live part of the old check lost some assertions. B has only low findings. Nothing blocks the next step, but fix A-M1 before F.",
+        "| row 2 `reviewStatus` set to `approved` | not caught |"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-check-hardening-review.json",
+      "sha256": "2d65e74b9571ff8c5accee835724d3f090a1844343419adf741c7cabf021e813",
+      "verdict": "pass-with-findings",
+      "verdictCounts": {
+        "pass": 5,
+        "fix": 1,
+        "note": 3
+      },
+      "nonApproveIds": [
+        "scope",
+        "A-M1",
+        "A-L1+B-L2",
+        "B-L1",
+        "B-L3",
+        "L1",
+        "I1",
+        "I2",
+        "I3"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-check-hardening-review.md",
+      "sha256": "e2e78e3215bea6e389778b6b74aaca6db2238ee948fdf2dfada57a7a15adbb57",
+      "verdictExcerpts": [
+        "Verdict: **pass with findings**. All five findings are fixed, and each fix held up when I re-ran it myself. One low finding is left: the old scratch directory `/tmp/fgos-work/w11-misc-pin` still exists on this machine. The other three notes are info only. Nothing blocks the next step.",
+        "| `reviewStatus=approved` (rows 5 and 18) | FAIL: `misc-fix live review requires committed exact-claim/binding approval` |",
+        "| Extra field `approvedBy` (row 5) | FAIL: `live row differs ['approvedBy']` |",
+        "- **I3 (info): fixed scratch paths remain outside this brief.** `rebind/rebind.py` (`w5-rebind-apply`), `import3/resync.py` (`w11-import3`) and older `composition/` scripts (`compose.py`, `w10-rework.py`, `complete-parks.py`, `verify-effective.py`) still use fixed paths. The owning rebind check was run through a wrapper that moves its scratch into a temporary directory, and the receipt says so."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-g0-content-rereview.json",
+      "sha256": "80c3a500bab01ec0f02961e50d2253c3a1b27928a613afc69dda578edf6a21f6",
+      "verdict": "REWORK",
+      "verdictCounts": {
+        "APPROVE": 121,
+        "REWORK": 3
+      },
+      "nonApproveIds": [
+        "claim_b5695d38282e111f8ed06656b2efa433",
+        "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+        "claim_2e2bc9264b289319dfae5c6487978f99"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-g0-content-rereview.md",
+      "sha256": "b615353f6c814353380205b7b14a9c20521dd26dbb916c0cef8ea84e43b67bda",
+      "verdictExcerpts": [
+        "Pin: `0763c2259ee3bf1801f4dc9621cbfa7955a156b6`. Per-row verdicts are in [w14-g0-content-rereview.json](w14-g0-content-rereview.json).",
+        "## Verdict",
+        "**REWORK** overall: 121 APPROVE, 3 REWORK.",
+        "| Verdict | Rows |",
+        "| APPROVE | 121 |",
+        "| REWORK | 3 (`claim_b5695d38…`, `claim_5ba6768e…`, `claim_2e2bc926…`) |",
+        "## REWORK rows",
+        "- **`claim_26b3a49a…` (now merge): APPROVE.** The old reaper/herdr-session paragraph and the 2026-10-15 binding paragraph collapsed into one legacy paragraph, `confinement-authority.md#unheaded-block-112`. That paragraph equals the target block-45. The target retires both: no `herdrSession` field, no herdr-launch-command file. `merge` fits, with `claim_d572bb9d…` as the move owner."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-g8-retention-timing-review.json",
+      "sha256": "73754841b871a00b3afa8a63c84496540e1dd37d00c76a2ffa14af1b45fe3747",
+      "verdict": "APPROVE_WITH_REWORK",
+      "verdictCounts": {
+        "APPROVE": 4,
+        "NOTE": 2,
+        "CARRY-TO-F": 1,
+        "REWORK": 1
+      },
+      "nonApproveIds": [
+        "json-path-strings-undocumented",
+        "pin-partition-archives-gate-evidence",
+        "raw-stdout-log-not-committed",
+        "w8-archive-receipt-json-stale"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-g8-retention-timing-review.md",
+      "sha256": "1b6e5812c8316811f007d2888ab9276c40e2164ada24155eda655560a0586612",
+      "verdictExcerpts": [
+        "**Verdict: APPROVE with 1 REWORK (Low).** Full rows: [w14-g8-retention-timing-review.json](w14-g8-retention-timing-review.json).",
+        "The retention rule and the timing numbers hold. The w8 receipt REWORK is only half done: `receipt.json` now says two opposite things.",
+        "## 3. Prior w8 REWORKs on these commits",
+        "Only w8 REWORK 3 (`archive-receipt-json-stale`) concerns 984829939/5c3b57347. w8 approved the retention and timing rows. 25e8842d3 fixed **part** of it:",
+        "- **Fixed:** top-level `status: verified-local`, `verifierExit 0`, `verifierStatus verified`, `rehearsalRerunCompleted`, `newTimingRuns 6`, `coldCacheEvidence`, `checkARevalidated`, `runtimeExercised`, `leadRunCommit 5c3b57347`, `historicalBlocker`; `receipt.md` now has a \"superseded\" pointer under its H1.",
+        "- **Not fixed (REWORK, Low):** the old values were left in place next to the new top-level copies, so the same JSON contradicts itself:",
+        "  - `proofs.verifierExit: 2`, `proofs.verifierStatus: blocked-rehearsal-not-current`, `proofs.rehearsalRerunCompleted: false`, `proofs.newTimingRuns: 0`, `proofs.coldCacheEvidence: false`, `proofs.checkARevalidated: false`;",
+        "  - `design.md` line 3 still says \"**Current status: blocked** … full verification exits 2\"."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-import3-binding-review.json",
+      "sha256": "932505078ab932843684ef5e2544221d40815d5960a4fe95ad67694fad1b5d46",
+      "verdict": "APPROVE",
+      "verdictCounts": {
+        "APPROVE": 98
+      },
+      "nonApproveIds": []
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-import3-binding-review.md",
+      "sha256": "d1b0b10aebfa4ea5f59c598bff980e2f08595470d6c5e8c1977e6c3df1b28ba7",
+      "verdictExcerpts": [
+        "Verdict: **APPROVE, 98 of 98 rows.** No REWORK.",
+        "- Machine record: [w14-import3-binding-review.json](w14-import3-binding-review.json). Every verdict is bound to `{claimId or file+pointer, bindingSha256, targetUnitDigest}`.",
+        "Status: DONE"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w15-g9-parks-review.json",
+      "sha256": "410e5c09cd36781f49cea606bca650b425ecb084dfc2ba2c185f844943f30b23",
+      "verdict": "ACCEPT_WITH_FIXES",
+      "verdictCounts": {
+        "fix": 3,
+        "note": 2,
+        "pass": 4
+      },
+      "nonApproveIds": [
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "F5",
+        "OK-scope",
+        "OK-superseded",
+        "OK-recompose",
+        "OK-sweep"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w15-g9-parks-review.md",
+      "sha256": "8c6db0ad6be20a6db7d16d8bfa9e6e666fba3182ef8a511eb1781bc1fbb37c24",
+      "verdictExcerpts": [
+        "## Verdict",
+        "**ACCEPT_WITH_FIXES.** The data is consistent and the replays are exact. The still-valid sample has no wrong verdicts. Two disposition problems still need a fix before G9 counts as closed:",
+        "- 25 git-change rows: commit is an ancestor; before/after/diff hashes match; status is `D` for 24 and `M` for `approve.mjs`; the path is absent at the pin.",
+        "**Wrong disposition: `step-04-records/step04-029.jsonl:1` (`src/verbs/merge/approve.mjs`).** Only edges `class6-l-000484`/`000485` were removed by `e71381aba`. Edges `000481` (`docs/history/tsk-3bn-…`, now lines 267-268), `000482` (`docs/history/leaf-merge-into-resolved-root/`, 308-309) and `000483` (`docs/decisions/0032`, 362) are still in the file, byte-equal (`moved`). Retiring the whole record leaves three live preserve edges with no owner. The fix: mark it still-valid, with the two removed edges retired by `e71381aba`.",
+        "**Wrong verdicts: 0.** The threshold for REWORK was more than 3, so the sample passes. Almost every changed passage is a REJECT non-document operand, or a whole-file overlap whose referenced role is unchanged.",
+        "Weaknesses (not wrong verdicts):",
+        "- **Borderline verdict:** `runtime-judgment-part-26.jsonl:2` (`classify.mjs`). All 4 bound passages are absent, yet it is still-valid. Whole-file deletions are treated as superseded instead. Population-wide, the same pattern also appears at `runtime-r20.jsonl:147`.",
+        "Sweep result: 546 files, drifted 0, chain mismatches 0, body mismatches 0, judgmentErrors 0."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w16-g0-rework-and-park-rule-review.json",
+      "sha256": "9b098ffb7d02f3b7200e9e63b8f2131257f6f185995afda40521079cb363164a",
+      "verdict": "REWORK",
+      "verdictCounts": {
+        "fail": 4,
+        "note": 4,
+        "pass": 3
+      },
+      "nonApproveIds": [
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "F5",
+        "F6",
+        "F7",
+        "F8",
+        "A-pass",
+        "B-pass",
+        "C-pass"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w16-g0-rework-and-park-rule-review.md",
+      "sha256": "6a91cf4b781d1691eccd5e0cd73ad3be95ec97c2314017af1b6523487b3bca05",
+      "verdictExcerpts": [
+        "# W16 review: G0 content rework, G9 park rule, parity-base fix",
+        "## Verdict",
+        "**REWORK (narrow).**",
+        "## A. Binding content rework (`c25e8cf6a`, merged in `3e1612222`)",
+        "**(1) Scope: pass.** The commit touches five files, all inside the writable list: the redecisions shard, `source-parity.json` and `g0rework/**`. No legacy or docs file changed.",
+        "- `g0rework/verify.py` → 0 at `35c7f92bf`. Its rebind, misc and ratchet steps and `git diff --check` all exit 0. The audit-report step exits 1 because checks.mjs is not run (126) in both manifests (F6).",
+        "- **Population.** Exactly 15 of the 574 records carry a non-empty phase-08 `/parked`. All 15, and no others, have `carriedBlocker`. Each has `pointer:/parked` and `status:open`, and its `recordSha256` equals the physical line's SHA-256.",
+        "- **step04-029:1.** It is still-valid with `retiredPassageIds` 000484 and 000485 via `e71381aba`. That commit's diff removes those two docs/history references. Current `approve.mjs` lines 267-268, 308-309 and 362 still carry tsk-3bn, leaf-merge and 0032."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w17-parity-rework-review.json",
+      "sha256": "abd60a48105d2c697e03539345c46372a8f6380037942ba9d49a8fd9a200d1d1",
+      "verdict": "REWORK-NARROW",
+      "verdictCounts": {
+        "REWORK": 1,
+        "ACCEPT-DISCLOSED": 1,
+        "FIXED": 6,
+        "PASS": 1,
+        "NOTE": 1
+      },
+      "nonApproveIds": [
+        "W17-1",
+        "W17-2",
+        "F1",
+        "F3",
+        "F4",
+        "F6",
+        "F8",
+        "I3",
+        "W17-3",
+        "W17-4"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w17-parity-rework-review.md",
+      "sha256": "47ecae58ebbed27d20b10928f8727c8cee3714c50e812a3cb4fc6e05811ce852",
+      "verdictExcerpts": [
+        "# W17 review: source parity rework and scratch hygiene",
+        "Reviewer: independent, read-only. Branch `plan/260925-documentation-authority-unification`, commit `a8ea05c50` (HEAD did not move during the review). Brief: `w16-parity-rework-brief.md`. F2 is deferred by L13-15.2 and not counted.",
+        "## Verdict",
+        "**REWORK (narrow).** F1, F3, F4, F6, F8 and I3 are fixed and every required proof exits 0. One Medium remains: to make the carries checker pass, the commit moved its heading census and direct-block coverage check to a historical pin. That hides the same defect class F1 was about: 4 stale `distribution.md` heading rows, plus 1 current source block that no parity row covers.",
+        "All 21 changed files are inside the writable list: `carries/**`, `ledger/decisions/**`, `g0rework/**`, `rebind/rebind.py`, `import3/**` and `composition/**`. No docs, `.fgos` or code files changed.",
+        "- **F6.** `verify.py` reports `status: partial`, `ok: false` and `fullAuditPassed: false`. `nativeDependentChecksNotRun` names `checks.mjs` for both phase-06 manifests. It no longer calls `phase-08/audit-report.py`. It runs the embedded `ownership.mjs` and `audit-ownership.mjs` pairs directly, and all four exit 0. The carries checker and `refresh-carries.py --check` are now among its proofs. Exit 0 here means only that the scoped proofs passed.",
+        "- **Before and after.** `/tmp/fgos-work` held only my own disposable directory before and after each of these runs, and nothing else appeared: `rebind.py --check`, `g0rework/verify.py`, `import3/resync.py --check`, `refresh-carries.py --check`, `misc-fix/verify.py`, `sweep.py` and the carries checker.",
+        "- **Info.** `w10-rework.py` records `scratchOnly: str(TMP)`. If that script is ever re-run, the value is now a random path. No current check runs it."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g0-delta-review.json",
+      "sha256": "9fd2f63eb9aaf5b8b15b72c6db3a836db08082ffd723ca4448d2a15af8027fc2",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 10,
+        "REWORK": 2
+      },
+      "nonApproveIds": [
+        "claim_af89c4e6063eb43c4e690c3fdd430677",
+        "recipe-heading-ancestry-convention"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g0-delta-review.md",
+      "sha256": "3fe49ce9b68ba15c2debc9a930d477f9ee5b6999256a5de62cb4f279eb34c775",
+      "verdictExcerpts": [
+        "APPROVE 10 / REWORK 2. I checked every item by my own recompute. Nothing was sampled.",
+        "## REWORK",
+        "## APPROVE"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g1-carries-review.json",
+      "sha256": "392c49db19416b4e012ddff50305c0f80ea095d66e25f2d243349c7b6e1dfe42",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 69,
+        "REWORK": 5
+      },
+      "nonApproveIds": [
+        "reference-000232",
+        "reference-003709",
+        "reference-002295",
+        "finding:retired-history-inbound-links",
+        "finding:release-manifest-duplicate-and-dead-link"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g1-carries-review.md",
+      "sha256": "6744be9a0504cfbbc2377ac40929e8bd762384967ec89518945ecc8c33599cb9",
+      "verdictExcerpts": [
+        "Verdicts: 69 APPROVE, 5 REWORK out of 74 items. The items are the 44 claims, the 24 pointer patches and 6 aggregate or finding items. Every item was checked; nothing was sampled. Machine verdicts are in `w2-g1-carries-review.json`.",
+        "## REWORK"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g2-census-review.json",
+      "sha256": "35959ea0b06ccf6bbc13466cc1811783fcdd4e44373539e868268f101f8d60b0",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 231,
+        "REWORK": 33
+      },
+      "nonApproveIds": [
+        "F-pin-drift",
+        "F-postpin-dynamic",
+        "F-postpin-hardcoded-join",
+        "F-rust-proof-line",
+        "F-ignored-child-proof",
+        "F-residue-custody-text",
+        "pc-l-0030",
+        "pc-l-0031",
+        "pc-l-0032",
+        "pc-l-0033",
+        "pc-l-0034",
+        "pc-l-0035",
+        "pc-l-0036",
+        "pc-l-0037",
+        "pc-l-0038",
+        "pc-l-0039",
+        "pc-d-0775",
+        "pc-d-0776",
+        "pc-d-0777",
+        "pc-d-0778",
+        "pc-d-0779",
+        "pc-d-0780",
+        "pc-d-0781",
+        "pc-d-0782",
+        "pc-d-0783",
+        "pc-d-0784",
+        "pc-d-0785",
+        "pc-d-0786",
+        "pc-d-0787",
+        "pc-d-0788",
+        "pc-d-0789",
+        "pc-d-0790",
+        "pc-d-0791"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g2-census-review.md",
+      "sha256": "94350615d5a2da24be610bd54120356f7d31ed39708aa8762a010d1d1620c214",
+      "verdictExcerpts": [
+        "## REWORK",
+        "APPROVE 231, REWORK 33 (264 verdicts: 11 findings, 66 sampled, 187 residue)."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g2-dyn-delta.json",
+      "sha256": "613802f108315f1ed3d87dc7eb3e94f85b5cb69f58ea6a9697515effa5c5e9a7",
+      "dataRows": 132
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g3-packaging-review.json",
+      "sha256": "f150831b7f68f95ccc9081f4ebba1042a280687ec148978ec45be300fd75ab14",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 27,
+        "REWORK": 5
+      },
+      "nonApproveIds": [
+        "PKG-doctor-registry-code-truth",
+        "PKG-release-manifest-duplicate",
+        "PKG-activation-binding-duplicate",
+        "PKG-spec-legacy-setup-duplicate",
+        "PKG-receipt-recipe-statement"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g3-packaging-review.md",
+      "sha256": "18035a28809cc5c298a4f05025718752d8ea58489110297587a1048b514d51ec",
+      "verdictExcerpts": [
+        "Review commit: cffe725b9 (read-only worktree /home/vantt/projects/forgentX-s8-review). Verdicts: 27 APPROVE, 5 REWORK. Machine verdicts are in `w2-g3-packaging-review.json`.",
+        "## Approved",
+        "## Rework",
+        "## Observations (not verdicts)",
+        "Status: DONE_WITH_CONCERNS"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g4-code-review.json",
+      "sha256": "78925fc6deb663c523da72d217064840d85f2c1992bf9d8490c7c9601d171c72",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 17,
+        "REWORK": 2
+      },
+      "nonApproveIds": [
+        "doc-git-reads-raw-high-limit-branch",
+        "verify-phase-cleanup-always-retains"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g4-code-review.md",
+      "sha256": "b8c46f0549c1ab76596bd331f87576725b7df97b29320199b4a91f01f5132465",
+      "verdictExcerpts": [
+        "Result: 17 APPROVE, 2 REWORK. Full verdicts are in `w2-g4-code-review.json`.",
+        "## REWORK",
+        "   - Result: every run leaves a registered linked worktree plus a full `node_modules` in tmpdir.",
+        "## Note (APPROVE)",
+        "- A scratch probe of `removeWorktree`, which was refused with `git-fence-missing`. The REWORK 1 finding therefore rests on the source code and the documented port contract."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g6-preserve-review.json",
+      "sha256": "bc087c5afa2f6449c9ab99c565cd35373cb9c2ad76ed30d31496f825afedcbe2",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 68,
+        "REWORK": 50
+      },
+      "nonApproveIds": [
+        "negative-probes",
+        "evidence-external-example-whole-file",
+        "wrapper-uniformity",
+        "pin-drift",
+        "f00106",
+        "f00117",
+        "f00148",
+        "f00156",
+        "f00158",
+        "f00161",
+        "f00162",
+        "f00163",
+        "f00187",
+        "f00189",
+        "f00191",
+        "f00193",
+        "f00477",
+        "f00478",
+        "f03758",
+        "f07697",
+        "f07698",
+        "f07701",
+        "f08033",
+        "f08044",
+        "f08047",
+        "f08069",
+        "f08071",
+        "f08076",
+        "f08077",
+        "f08079",
+        "f08084",
+        "f08634",
+        "f08665",
+        "f00515",
+        "f00521",
+        "f00525",
+        "f01225",
+        "f08411",
+        "f05646",
+        "f05655",
+        "f05661",
+        "f05671",
+        "f05677",
+        "f05693",
+        "f05720",
+        "f05730",
+        "f05742",
+        "f06391",
+        "f06167",
+        "f07526"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g6-preserve-review.md",
+      "sha256": "11f11e3a7c670280326bf1ea529d92f81d43df50cefed19dfb06a8d6f1abad49",
+      "verdictExcerpts": [
+        "Verdicts: 68 APPROVE, 50 REWORK. Full list: w2-g6-preserve-review.json.",
+        "## Findings (REWORK)"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g8-archive-review.json",
+      "sha256": "0ad67163696226d1df79335fd0fcfb7f58fe4e4193b8d573133fdb7f908e4959",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 7,
+        "REWORK": 5
+      },
+      "nonApproveIds": [
+        "G8-6 retirement specs name an owning proof",
+        "G8-7 rehearsal test equivalence",
+        "G8-9 1.27 GB vs ~0.2 GB justification",
+        "G8-11 filesystem label",
+        "G8-12 'small manifest on main'"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g8-archive-review.md",
+      "sha256": "ea66a268cbac149472888944c395c0718bb35a1e2667a734027e2206fd26a5a5",
+      "verdictExcerpts": [
+        "Verdicts: 6 APPROVE / 6 REWORK (12 items, all checked; no sampling). Machine form: w2-g8-archive-review.json.",
+        "## Verified (APPROVE)",
+        "## REWORK"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-late-areas-review.json",
+      "sha256": "5cf92d63d6a32c1c237f72b87aecfad19b798b3a13d31cc6d54166f6c7e1d153",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 20,
+        "REWORK": 2
+      },
+      "nonApproveIds": [
+        "rebind-join-after-later-commits",
+        "drift-removed-units-bug"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-late-areas-review.md",
+      "sha256": "6846f4764c10b768d5d67b21610b86bece1be724ab2116f74749015261bb5eb9",
+      "verdictExcerpts": [
+        "APPROVE 20 / REWORK 2. Sample seed 20261023: docs/architect/packaging-distribution/runtime-identity-and-activation.md, docs/architect/component-boundary/README.md, docs/specs/confinement-authority.md, docs/architect/domainization/README.md, docs/specs/distribution.md",
+        "## REWORK",
+        "## APPROVE (with notes)",
+        "- header-layout: The candidateCore fields (Document type, Audience, Purpose, Design status, Last reviewed, Related) are present. With the real minimum-constitution.json the checker returns 0 findings and the switchboard reports status candidate. Low: the legacy front matter (status: implemented, coverage: full-target) sits above the candidate header, and the header lacks the Canonical: No / Supersedes lines that the runner candidate carries. The Design status line disclaims promotion."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-d1b-resync-review.json",
+      "sha256": "bc33c6da5e57159a9021a8cfd3015ff9b7a377ad218944157db2b38b144759e8",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 61,
+        "REWORK": 6
+      },
+      "nonApproveIds": [
+        "G1:reference-002295 / activation-binding implementation fact",
+        "G1:finding:release-manifest-duplicate-and-dead-link + G3:PKG-release-manifest-duplicate",
+        "G3:PKG-doctor-registry-code-truth",
+        "runner Data Dictionary fenced historical carrier",
+        "adj[17] runner.md#unheaded-block-9",
+        "adj[44] distribution.md#unheaded-block-5"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-d1b-resync-review.md",
+      "sha256": "be91aaf65e05a6600164e36ecd160440c8f69717f1a33471392c705babd1e8c8",
+      "verdictExcerpts": [
+        "Read-only review in /home/vantt/projects/forgentX-s8-review. Scratch is /tmp/fgos-work/w3-d1b-resync/. Verdicts: [w3-d1b-resync-review.json](w3-d1b-resync-review.json). Result: **61 APPROVE / 6 REWORK** across 67 items.",
+        "## REWORK",
+        "## APPROVE highlights"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-d7-resync-review.json",
+      "sha256": "490b338c5350e59cf09b85a0d7120c7fd977a105e88edc6013ec1bf691fbd5b0",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 21,
+        "REWORK": 3
+      },
+      "nonApproveIds": [
+        "not-carried-banner-125-132-247",
+        "bindingRefresh-475-label",
+        "component-boundary-specs-links"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-d7-resync-review.md",
+      "sha256": "a2629a237a275ca3dd17be685cbc0f05d0a217e285424d5e1960004fce421aef",
+      "verdictExcerpts": [
+        "Verdicts: **21 APPROVE / 3 REWORK**. Every item was checked; no sampling was needed.",
+        "- **Scanner rerun.** The owning scanner was rerun at d9bedf229 with only its plumbing changed and output written to /tmp. Result: 33 files, 0 missing units, 0 missing changed units. The records match the receipt's scan apart from `head`. Baseline at 6d275ad81: 594 missing units.",
+        "## REWORK"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-g2g6-delta-review.json",
+      "sha256": "0d14aa16f03a707e1d1f811c99620a746163cc5dc00761080c8adabac69af0fc",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 103,
+        "REWORK": 1
+      },
+      "nonApproveIds": [
+        "G6-N1 example-branch-dead"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-g2g6-delta-review.md",
+      "sha256": "ea5db13d57425fd49e239733e98ffbebcef83e4f508f62c4e41188cb6d1ecaa9",
+      "verdictExcerpts": [
+        "Verdicts: 103 APPROVE, 1 REWORK (Low). Every earlier REWORK item from w2-g2-census and w2-g6-preserve is fixed. G2 and G6 both stay unmet, as their receipts say. Full list: w3-g2g6-delta-review.json.",
+        "1. **REWORK (Low, conservative)**: the example/external branch now matches only `span.text`, which on 726 of 783 rows is the bare token."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-g4-declare-review.json",
+      "sha256": "64970be3264f68e4d267dadfdbee81a8013206c4582bbefa6030a18850ee1096",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 12,
+        "REWORK": 2
+      },
+      "nonApproveIds": [
+        "siteId-binds-call-not-argv-set",
+        "git-spec-not-updated"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-g4-declare-review.md",
+      "sha256": "e78dd3d5377f9efafc046fd2c8c9bff6609e870cdb54c4f6d29781f1ebc2fe24",
+      "verdictExcerpts": [
+        "Verdicts: 12 APPROVE, 2 REWORK. Full rows are in w4-g4-declare-review.json. Every item was checked; none was sampled.",
+        "## REWORK",
+        "## APPROVE highlights"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-g8-archive-review.json",
+      "sha256": "28d29d272a071902e4c4ad51f154a7a448f5981eeaf70c208759e0dda0880580",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 10,
+        "REWORK": 3
+      },
+      "nonApproveIds": [
+        "G8-7b removal is not clean for the frozen H / candidate-status check",
+        "G8-9b retained reasons are real",
+        "G8-9c plan navigation complete"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-g8-archive-review.md",
+      "sha256": "72c670426d4b571d3d7e9112dfd434791b431fd66e79e4ba7054dfa4bb4a79e6",
+      "verdictExcerpts": [
+        "10 APPROVE / 3 REWORK. Full verdicts: `w4-g8-archive-review.json`. Scratch: `/tmp/fgos-work/w4-g8-archive/`.",
+        "## REWORK",
+        "Status: DONE_WITH_CONCERNS",
+        "Summary: 10 APPROVE / 3 REWORK. Check A is green after accounting when I re-run the unchanged recipe, and tip bytes and timing reproduce (cold first run 51 s). But the removal breaks a live switchboard link that the H / candidate-status check catches, archives navigation files that live docs link to, and keeps 22 rows (23.3 MB) on false basename reasons."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-import2-review.json",
+      "sha256": "5d5a039258b79ffe81ea837048a68dcbd62eb7d7124d73d2ee333b519bdd0c2b",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 18,
+        "REWORK": 2
+      },
+      "nonApproveIds": [
+        "data-dictionary-rows-adapted-carry",
+        "source-pin-provenance"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-import2-review.md",
+      "sha256": "d2e4feddbcb0d7373bc22ce905e7a186d49851ebc7b5303e06e05064753274dc",
+      "verdictExcerpts": [
+        "APPROVE 18 / REWORK 2. Exhaustive recomputation, no sampling.",
+        "## REWORK",
+        "## APPROVE"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-ledger-d7b-review.json",
+      "sha256": "3d766273e76328b1796615b72ce33963cab5bd9ca1e3171935be7cb1b266645b",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 17,
+        "REWORK": 5
+      },
+      "nonApproveIds": [
+        "LF-shell-helper-second-holder",
+        "LF-adj-distribution-block-5",
+        "LF-claim_af89c4e6-current",
+        "HEAD-ledger-current-targets",
+        "HEAD-gate-changedBindings"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-ledger-d7b-review.md",
+      "sha256": "051d8939924588fd5e4e96fa5e42ee189080bdb93f56ed3afab719b5b53826bc",
+      "verdictExcerpts": [
+        "APPROVE 17 / REWORK 5. Every item was checked by my own recompute; nothing was sampled.",
+        "## REWORK",
+        "- **LF-claim_af89c4e6-current** (plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json changedBindings id claim_af89c4e6; plans/260925-documentation-authority-unification/ledger/decisions/s15-navigation-review-fixes.json /bindingRefresh/5): Current at fd161a8c2 (e98cc059 = block-11 then), but not at HEAD. D7b dff50b64c changed block-11 (46c67ead) and added overlay s15 bindingRefresh/5 superseding s3 registryGaps/2. The 4b62385cb import moved it again (afe8743b). The register row still binds e98cc059 / e3423594 with no successor row in changedBindings, so an approval keyed on it would approve bytes that no longer exist. The gate was already stale at dff50b64c: D7b's writable list excluded the register.",
+        "## APPROVE"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-d5c-archive-review.json",
+      "sha256": "1f9d71e5b60483377acb387868904b53829149add52d8b8ab3cd0c13bc288758",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 8,
+        "REWORK": 2
+      },
+      "nonApproveIds": [
+        "D5c-9 retained rulings link to archived files",
+        "D5c-10 cold timing"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-d5c-archive-review.md",
+      "sha256": "784ac26bced0cfec665857eaeebaaa6b4fc395364d0d3e7d91033afc1a576657",
+      "verdictExcerpts": [
+        "8 APPROVE / 2 REWORK. Full verdicts: `w5-d5c-archive-review.json`. Scratch `/tmp/fgos-work/w5-d5c-review/` was deleted after use.",
+        "## REWORK",
+        "Status: DONE_WITH_CONCERNS",
+        "Summary: 8 APPROVE / 2 REWORK. The partition, tip bytes, verify-design, check A on the committed accounted candidate, and live-link and navigation-root retention all reproduce. But the retained rulings (the constitution and the relocation policy) link to 4 archived files, including one of the 20 moved rows, and the \"cold\" timing is a warm page-cache run."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-g4-wrapper-review.json",
+      "sha256": "cc775d5e7d88166aa70a21125bc0b3c39a4a7a66db5bd9188ff8e09010776496",
+      "verdict": null,
+      "verdictCounts": {
+        "REWORK": 1,
+        "APPROVE": 6
+      },
+      "nonApproveIds": [
+        "wrapper-escape-callers"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-g4-wrapper-review.md",
+      "sha256": "822066beee15681b8561767dafacb42e26022b6cd5c500fb4ae670efb68e6a52",
+      "verdictExcerpts": [
+        "Verdicts: 6 APPROVE, 1 REWORK. Full rows are in w5-g4-wrapper-review.json. I checked all 25 declarations.",
+        "## REWORK",
+        "   - `.githooks/pre-commit` `leaseGitRead`: I added `git.call(null, ['update-ref','refs/heads/main','HEAD'])` in `guardCommit` (`src/runner/documentation-cutover-lease-hook.mjs`). Result: **0 sites**, and the hook verb check still passes. This is a write in the shipped hook path.",
+        "   - `scripts/verify-phase-02.mjs` `run`: I added `run.call(null,'git',['push','--force',...])` and `Reflect.apply(run, null, ['git',['push','--force',...]])`. Result: **0 sites** for both.",
+        "   - `scripts/check-evidence-relocation.mjs` `git`: I added `git.call(...)`, `Reflect.apply(git, ...)` and `const tbl=[git]; tbl[0](r,['reset','--hard','HEAD'])`. Result: **0 sites** for all three.",
+        "## APPROVE highlights",
+        "- **The 25 declarations (check 4)** split into 1 hook, 5 configured-binary and 19 tooling. db4b7de4d changed only 9 siteIds; every reason and `retireWhen` is the same text the w4 review approved."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-misc-fix-review.json",
+      "sha256": "cceb5deefb3f481c26bf81ff5917461b069586270b2c9fab55e0eb732da9895d",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 9,
+        "REWORK": 2
+      },
+      "nonApproveIds": [
+        "M1 block-5 adjudication count",
+        "M4 example predicate scope"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-misc-fix-review.md",
+      "sha256": "89524ca689dca26ebf2c20847e081f16cf72b57329b2ecbba29daf37459e90fe",
+      "verdictExcerpts": [
+        "9 APPROVE / 2 REWORK. Full verdicts: `w5-misc-fix-review.json`. Scratch: `/tmp/fgos-work/w5-misc-review/`. Brief: [w4-misc-fix-brief.md](../w4-misc-fix-brief.md).",
+        "## Approved",
+        "## REWORK",
+        "Status: DONE_WITH_CONCERNS",
+        "Summary: 9 APPROVE / 2 REWORK. The doc fixes, rebound hashes, self-link removal and the byte-identical G6 rerun all reproduce. However, the new adjudication text gives a false 133+8 split (it is 136+5), and the widened example predicate confirms 9 previously parked rows from markers that are not on the bound line."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-suite-fix-review.json",
+      "sha256": "dc2eeacae63ec4f6ba0817c6b6b21dd76dd028a5ed4bf71153133de58d530562",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 3,
+        "REWORK": 1
+      },
+      "nonApproveIds": [
+        "l13-7-b-class-overclaim"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-suite-fix-review.md",
+      "sha256": "35ce455a7344e50a6756701250afe35afb228d659b4281bc331b81b0c55a366e",
+      "verdictExcerpts": [
+        "Verdicts: **3 APPROVE, 1 REWORK**. Reviewer is independent and read-only; the only files written are this report and its JSON twin.",
+        "## 1. Lease-race mocks: APPROVE",
+        "## 2. Registry re-pin: APPROVE (not runner-only, but reproducible)",
+        "## 3. L13-7 classification: REWORK (one overclaim)",
+        "## 4. Touched files run: APPROVE"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w6-g4-escape-review.json",
+      "sha256": "6c883b2e671d8a6d2ad7ccf9a9d4a99a494630da601cb2b863be43d19bb65dc6",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 6,
+        "REWORK": 1
+      },
+      "nonApproveIds": [
+        "spec-sentence-overclaims"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w6-g4-escape-review.md",
+      "sha256": "2482ccd5630db467bd6c734db1f3bafad9f45954415df8e874fff152ac438ecc",
+      "verdictExcerpts": [
+        "Verdicts: 6 APPROVE, 1 REWORK (Medium, documentation only). The full rows are in w6-g4-escape-review.json.",
+        "The code fix is correct. All nine escape shapes from the earlier review now make the scan refuse on the real files, and so do several shapes the tests do not list. The one REWORK is about wording. The new spec sentence says every caller the value-flow scan cannot follow refuses the declaration. That is false for an aliased export, which the scan cannot follow and does not report as an escape. A new caller reached that way still inherits a declared wrapper silently.",
+        "## REWORK",
+        "1. **Medium: the spec sentence claims more than the code does.** The sentence in `docs/platform/git/spec.md` (section 12, line 638) says: \"A caller the value-flow scan cannot follow (including `.call`/`.apply`, `Reflect.apply` and array-slot calls) refuses the wrapper declaration rather than inheriting its exemption.\" I tested this on a `git archive` copy of 87c4f5f7a. I added `export { git as gitAlias };` to `scripts/check-evidence-relocation.mjs` and a new `scripts/zz-probe.mjs` that runs `gitAlias('.', ['reset', '--hard', 'HEAD'])`. Result: **0 sites, no throw**, and the declared `git:79ebd2a9…` still matches. The control case with a plain `export { git }` does throw `stale or ambiguous`. This is the known export-alias gap from the earlier review. It is not fixed here, and the brief says not to fix it. But it means the new general claim in the spec is untrue. The open item in `git-owner-review-request.md` also undersells the gap. It says the alias \"yields zero sites even with no declarations\". It does not say that the alias also lets a new caller inherit a **declared** wrapper's exemption.",
+        "## APPROVE",
+        "- **The CHANGELOG line and code comment are accurate (check 4, apart from the REWORK).** The owner request lists the export-alias gap as OPEN."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w6-misc-rework-review.json",
+      "sha256": "331dda17e83c77ea6fc52295308b3d128e80834129a250f94d959f03f96f389d",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 10,
+        "REWORK": 1
+      },
+      "nonApproveIds": [
+        "line-scoped-predicate"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w6-misc-rework-review.md",
+      "sha256": "b834b20f89613b8ea47735157cbf75e15b1fe46d66033400c17e76fed1eb44c9",
+      "verdictExcerpts": [
+        "# w6 misc rework review (commit 9d6070828)",
+        "10 APPROVE / 1 REWORK. Full verdicts: [w6-misc-rework-review.json](w6-misc-rework-review.json). Brief: [w5-misc-rework-brief.md](../w5-misc-rework-brief.md). Prior review: [w5-misc-fix-review.md](w5-misc-fix-review.md).",
+        "## Approved",
+        "## REWORK"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w7-header-sentence-review.json",
+      "sha256": "fac7293c55398146d9d415e16980c668de365b60b45da45f798fcc302886e27c",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 14,
+        "REWORK": 2
+      },
+      "nonApproveIds": [
+        "B8-lead-verify-pin",
+        "B10-misc-receipt-stale"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w7-header-sentence-review.md",
+      "sha256": "0afa1a892851e7bd4848a2748c469cf6171c70ef4f46ad3f4312478d65654a70",
+      "verdictExcerpts": [
+        "**14 APPROVE / 2 REWORK.** Full verdicts: [w7-header-sentence-review.json](w7-header-sentence-review.json).",
+        "## Approved",
+        "## REWORK",
+        "- Side effects of running `misc-fix/verify.py`: its scratch root is hardcoded to `/tmp/fgos-work/w5-misc-rework` and `proof.py` still creates `/tmp/fgos-work/w6-misc-sentence`. I backed up and restored the two files it overwrites."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w7-rebind-review.json",
+      "sha256": "bbf284cff157aa4acb9574ae6d1287673e1b73267c4e6539b820099bb92123ec",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 217,
+        "REWORK": 3
+      },
+      "nonApproveIds": [
+        "claim_26b3a49adef572e1be2ed219e292c8b0",
+        "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+        "claim_2e2bc9264b289319dfae5c6487978f99"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w7-rebind-review.md",
+      "sha256": "dde79ebec615b1d36f05b7c8423cb4c1aabbb95fe3cf3c48445a1fb66e85b2f1",
+      "verdictExcerpts": [
+        "Records: [rebind/receipt.md](../rebind/receipt.md), [rebindings.json](../rebind/rebindings.json), [rereview-claim-ids.json](../rebind/rereview-claim-ids.json). Per-row verdicts are in [w7-rebind-review.json](w7-rebind-review.json).",
+        "## Verdict counts",
+        "| Verdict | Count |",
+        "| APPROVE | 217 (214 rows, the ownership resolution, the misc-fix change, the commit scope) |",
+        "| REWORK | 3 rows: `claim_26b3a49a…`, `claim_2e2bc926…`, `claim_5ba6768e…` |",
+        "The rebind itself is correct. Every row binds the same passage at its current location. Two of the three REWORKs are re-decisions for the pending re-review, not wrong locations.",
+        "## Other findings (not REWORK)",
+        "- **Double move ownership:** `claim_d572bb9d…` (s10) and `claim_26b3a49a…` (s8) are both `move` rows bound to `agent-confinement/spec.md#unheaded-block-45`. The same pair already existed in the s14-resync-b overlays (`/bindingRefresh/0` and `/1011`). Neither claim is in the active registry, so the receipt's \"zero new active native pairs\" is true but does not cover this. The direct rows only became a pair in this apply. The REWORK on `claim_26b3a49a` covers it."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-composition-review.json",
+      "sha256": "c88e7aa695f4aecc1022870b91f01fa31a161bb35693d9b54475072ee47bdf49",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 164,
+        "REWORK": 19
+      },
+      "nonApproveIds": [
+        "file:docs/specs/workflow.md",
+        "file:docs/platform/governance.md",
+        "file:docs/enduser-docs-index.json",
+        "file:docs/platform/documentation/switchboard.md",
+        "file:docs/transitional-switchboard.md",
+        "file:docs/ui-spec/generated/wireframe-v2.html",
+        "supplemental:docs/platform/system-overview/spec.md",
+        "supplemental:docs/platform/system-architecture/architecture/architecture-intent.md",
+        "author-seam8-agents-decision-home-74",
+        "reference-000123",
+        "reference-000145",
+        "reference-000151",
+        "reference-000231",
+        "reference-003643",
+        "reference-003666",
+        "reference-003908",
+        "family-17-area-holder-table",
+        "gap05-dynamic-023895",
+        "citation-drift-124"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-composition-review.md",
+      "sha256": "6d3a4c9967a69f16d58d7094ad48cc6cd05e2cd0341f3175fdd549fb9b4ae256",
+      "verdictExcerpts": [
+        "**183 verdicts: 164 APPROVE, 19 REWORK.** Machine file: [w8-composition-review.json](w8-composition-review.json).",
+        "| Scope | APPROVE | REWORK |",
+        "| Recomposed G7 REWORK specs (c5, c7) | 2 | 0 |",
+        "## 1. The two recomposed REWORK specs: both resolved",
+        "- **Semantic spot-check of 26:** the 7 hunk parks, the identity successor, the reading-map retirement, 6 status, convention and row specs, 5 render diffs, both REWORK specs, and the 4 blocked groups. Targets and anchors exist. The fgos.rs comment correction is accurate.",
+        "**6 REWORK actions:**",
+        "| system-overview f07928/f07929 (outside the 101) | The holders exist: the two end-user sections in `work-state/contracts/knowledge-registry.md`, approved as `enduser-contract-carry`. HEAD lines 44-45 already link to them. The step-07 base spec no longer applies at HEAD. Recompose the base and the partial spec at current bytes, and add the two rows. |",
+        "- **Family 8 (48 members):** APPROVE. 28 members are \"preserve\" rows with no spec. One of them, `reference-003640`, has no owning proof and its file changed, but the predicate is still present. 10 member source files changed after the pin; re-anchor them at F."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-g6-judgments-review.json",
+      "sha256": "9b2c00795128cee6832be378a63f222a5727c61aff556d42e5ddc5144bd769d2",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 163,
+        "REWORK": 1
+      },
+      "nonApproveIds": [
+        "f07526"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-g6-judgments-review.md",
+      "sha256": "d2aa226dcf55daf839bb3f27b21264301574aaa8e6c6708fc4845479312956f8",
+      "verdictExcerpts": [
+        "Verdicts: **163 APPROVE, 1 REWORK** (164 rows). The full list is in [w8-g6-judgments-review.json](w8-g6-judgments-review.json).",
+        "## REWORK"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-g6-parks-review.json",
+      "sha256": "628903357ff0a64578de8477ad4d33df672bdb576c9945857d08ce396ec4fc6d",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 1220,
+        "REWORK": 40
+      },
+      "nonApproveIds": [
+        "f00144",
+        "f00417",
+        "f00418",
+        "f00419",
+        "f00429",
+        "f03463",
+        "f03478",
+        "f04208",
+        "f04387",
+        "f06557",
+        "f06569",
+        "f06829",
+        "f07654",
+        "f08000",
+        "f08062",
+        "f08209",
+        "f08211",
+        "f08212",
+        "f08213",
+        "f08216",
+        "f08218",
+        "f08219",
+        "f08220",
+        "f08223",
+        "f08225",
+        "f08227",
+        "f08228",
+        "f08231",
+        "f08232",
+        "f08244",
+        "f08245",
+        "f08246",
+        "f08247",
+        "f08250",
+        "f08251",
+        "f08283",
+        "f08285",
+        "f08286",
+        "f08288",
+        "f08335"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-g6-parks-review.md",
+      "sha256": "31140d3bb469deb5e5248853509ec1ec13848815d997d95bd5a6161d965a406f",
+      "verdictExcerpts": [
+        "**Verdicts: 1,220 APPROVE, 40 REWORK** (of 1,260 park rows). Per-row verdicts: [w8-g6-parks-review.json](w8-g6-parks-review.json).",
+        "| Result | Rows | APPROVE | REWORK |",
+        "Result: all 1,260 recorded results are reproduced at the pin, and every one still holds at HEAD. Between the pin and HEAD only five docs and CHANGELOG changed, and that did not move any park result.",
+        "## REWORK class A: operand normalization (15 rows)",
+        "## REWORK class B: removed source with no successor (25 rows)",
+        "Note on the sample: being parked is a safe outcome for G6 (\"owned park\"), so the over-parking is cost for the Lead, not a correctness defect. That is why those rows are APPROVE, not REWORK. The affected populations are 150 in distillery and 184 in archive/plans plus plans/reports. File- or frontmatter-anchored evidence kinds for them are a possible addition and need the owner to choose them. They are not part of this rework.",
+        "`f07526` is an unconfirmed park that carries a `repoint-proposal` with a present successor. It is APPROVE as an owned prepared repoint, even though its blocker text does not repeat the row id."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-lead-fixes-review.json",
+      "sha256": "275f0469b5923c6feccba6882a75c7382e1972cf9738c84a3200e146dede4c28",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 8,
+        "REWORK": 4
+      },
+      "nonApproveIds": [
+        "misc-receipt-stale-claims",
+        "claim-2e2bc926-correction-and-receipt-count",
+        "archive-receipt-json-stale",
+        "g5-check-implements-gate"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-lead-fixes-review.md",
+      "sha256": "7c88d9131579110493a9804a1b97bfb072befdf193b78aadd4755c47632e6c83",
+      "verdictExcerpts": [
+        "# w8 review: the Lead's own rework fixes, at f2162d9ff",
+        "**8 APPROVE / 4 REWORK.** Full rows: [w8-lead-fixes-review.json](w8-lead-fixes-review.json).",
+        "All the code and data fixes hold. Three REWORKs are stale or incomplete records. The fourth is the G5 checker: it checks only half of the gate.",
+        "- I made a `git clone --shared` of W in `/tmp/fgos-work/w8-lead-review/` and did all runs there. Before running, I backed up the two files `misc-fix/verify.py` overwrites in its hardcoded `/tmp/fgos-work/w5-misc-rework/`, and I restored them byte-equal afterwards. The scratch is deleted. In W I wrote nothing except these two files.",
+        "- `archive/verify-design.py` at detached d3efc70c5, with W's `archive/` copied in: **exit 0**, `status: verified`. Its `verification.json` is byte-equal to the committed one.",
+        "## APPROVE",
+        "## REWORK",
+        "   - `rebind/receipt.md` says \"checked all 217 rows: 217 APPROVE, 3 REWORK\". That reads as 220 rows. The actual split is 214 rows approved and 3 rows REWORK; the 217 APPROVE count includes 3 non-row verdicts."
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w9-composition-fix-review.json",
+      "sha256": "05558a07c42170fbe30b54940929f854160bee6a66692ba1123bfe76cfdff172",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 17,
+        "REWORK": 2
+      },
+      "nonApproveIds": [
+        "gap05-dynamic-023895",
+        "citation-drift-124"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w9-composition-fix-review.md",
+      "sha256": "861cd4f256f680f80fa878ea14609c415ebbf9d51bc4afbaa4e819b68075bcf4",
+      "verdictExcerpts": [
+        "**19 verdicts: 17 APPROVE, 2 REWORK.** Machine file: [w9-composition-fix-review.json](w9-composition-fix-review.json).",
+        "Scope: commit `63c3db9c6` against [w8-composition-review](w8-composition-review.md) (19 REWORK) and ruling L13-11. Reviewed at HEAD `081e0362a`. No `docs/`, `src/` or `test/` path changed between the record pin `eb744281d` and HEAD, so the HEAD bytes are the pin bytes. All replays ran in `/tmp/fgos-work/w9-comp-rereview/`, which was deleted afterwards. No git write, no fgOS CLI, no full suite.",
+        "- **Patch replay (my own script, not the Doer's).** It applies the 79 `effectiveSpecIds` in order, then the 14 `finalPinFSpecIds`. Step-07 predecessors are resolved by `expectedAfterSha256`. Every spec runs with `patch --batch --fuzz=0 -p1`, forward and back. Result: 106 applications (79 + 14 + 13 step-07 predecessors) on 74 files. Every before hash, after hash and per-step rollback is exact, and a full reverse rollback returns all 74 files to HEAD bytes.",
+        "## REWORK 1: GAP-05 overlays miss the moved body blocks",
+        "## REWORK 2: grammar errors in prepared glosses",
+        "## Notes (no verdict)"
+      ]
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w9-g6-fix-review.json",
+      "sha256": "44dbec4cce835fdb1559608e5df7b34ec01a8bde1f85fede71f5c1844b886c90",
+      "verdict": null,
+      "verdictCounts": {
+        "APPROVE": 7
+      },
+      "nonApproveIds": []
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w9-g6-fix-review.md",
+      "sha256": "0282389544b61b50c7ec016e35a30ad4d6672ba4bc87ee7dc20dcc4db24e7ba7",
+      "verdictExcerpts": [
+        "**Verdicts: 7 APPROVE, 0 REWORK** (one per brief item). Per-item verdicts: [w9-g6-fix-review.json](w9-g6-fix-review.json).",
+        "1. **Operand normalization: APPROVE.** 20 rows gain a stable operand. They are the 15 class-A rows plus f00420, f07646, f07715, f08493 (a trailing `>` is stripped) and f08561 (a truncated `docs/history/main-checkout-destructive-` is expanded from the line).",
+        "2. **Class-B rows: APPROVE.** All 25 rows (24 in reading-map, plus f08335) now carry `recheckHolder`, with `docs/reading-map.md` or `docs/platform/workflow/spec.md`. Each holder is present after the cutover and pinned by sha.",
+        "3. **File-level framing: APPROVE.** Unconfirmed parks went from **959 to 623**.",
+        "4. **Repoints: APPROVE.** Each of f08113, f08071 and f06985 now points to the successor its old blocker or candidate list named. For f06985, `architecture/node-to-rust-migration.md` is the \"Promoted from\" holder under L12-26(1).",
+        "5. **f07526 patch: APPROVE.** The patch in `prepared-patches.json` changes exactly lines 22, 29, 33 and 37 to the text the brief specifies, and its status is `prepared-not-applied`. The doc is unchanged from the pin to HEAD, and the commit touches no `docs/` file. f07527 and f07528 are now `repoint-proposal`, and all three rows link to `patches[0]`.",
+        "6. **Determinism and verifiers: APPROVE.**",
+        "7. **Receipts and scope: APPROVE.** The receipt arithmetic adds up: 4,320 + 924 + 163 + 6 = 5,413. The per-rule counts match my diff. All 14 changed files are on the brief's writable list."
+      ]
+    }
+  ],
+  "reviewFiles": 110
+}
