@@ -4032,7 +4032,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // different (external) project, or just regenerating wrappers
       // in-place for forgentX's own dev-checkout self-hosting run (see
       // materializeSkillsIntoProject's own self-hosting no-copy branch).
-      const { copied: skillsSourceCopied, wrappersWritten: skillWrappersGenerated } = materializeSkillsIntoProject(PACKAGE_ROOT, repoRoot);
+      const { copied: skillsSourceCopied, wrappersWritten: skillWrappersGenerated, skipped: skillFilesKept } = materializeSkillsIntoProject(PACKAGE_ROOT, repoRoot);
       const deprecation = COMMAND_REGISTRY.find((entry) => entry.name === 'setup')?.deprecated ?? null;
       const deprecationText = formatDeprecation(deprecation);
       return {
@@ -4054,6 +4054,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         fixed,
         skillsSourceCopied,
         skillWrappersGenerated: skillWrappersGenerated.length,
+        skillFilesKept,
       };
     }
 
@@ -4685,6 +4686,9 @@ function renderPretty(verb, data) {
           '.agents/skills is the canonical source',
         ),
       );
+    }
+    for (const kept of data.skillFilesKept ?? []) {
+      lines.push(formatCheck(false, 'kept project skill file (newer version or uncommitted changes), not overwritten', kept));
     }
   }
   return `${lines.join('\n')}\n`;
