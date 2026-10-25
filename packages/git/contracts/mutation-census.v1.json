@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9884a882c5a66d3a8ae975ba12e34c93c730f601fc525070724ae163c68306b7",
+  "payloadDigest": "fab84e0a6588911c2eb051c1cb8431925aba48747eeb82522f52be3576413e94",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -860,7 +860,7 @@
     "src/runner/dispatch/assignment.mjs": "a8d4660fe96ff678cb12bc9d34bb7c4c4acbd4bcc1f747fe450e72eb7e97c31f",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "95c9e5ba54705cdcc129234a23096cc033b776010ce351959a15b6628c22e1a9",
-    "src/runner/dispatch/config.mjs": "87245508dc682f3e5e450c4ecdbaf91d990adf01425818c2aedcfead23512077",
+    "src/runner/dispatch/config.mjs": "aa3dad76df7ad0071b21f40a0fed48ebb8bd00f08e356617022c39febc0bebea",
     "src/runner/dispatch/confinement/attestation-store.mjs": "79e413d77b1a92e5f5016fe5c0da789bb6810824c0c747ce7c1e38c70fbea284",
     "src/runner/dispatch/confinement/authority.mjs": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
     "src/runner/dispatch/confinement/backend-registry.mjs": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
@@ -895,7 +895,7 @@
     "src/runner/dispatch/reconciliation-planner.mjs": "4b9656622397128a0d861abbf8512830bfecd670ac9b7fe2489ad3e0eeb1af2f",
     "src/runner/dispatch/recovery-planner.mjs": "d30b45e5ec808c2f451b70c5ac6d1aaccc3b4f1c480143559502afc2da89942b",
     "src/runner/dispatch/recovery.mjs": "4f2b86847289118fbfe50ca261310de18864a2718f6962214bc362569310e5ca",
-    "src/runner/dispatch/resolve.mjs": "8b2dc376199f2a34dcad5dec5c2f7d600ba00f51df6ce9e400ee5c2541982ad3",
+    "src/runner/dispatch/resolve.mjs": "43f445921ecfe5bfc1e05d139934982b042c3cadcb42ab775188b58e0ab35f44",
     "src/runner/dispatch/result-ladder.mjs": "32f5c419991c663b2b7165951a5d79c5a1f556a70972fea3e511ed530574e9c3",
     "src/runner/dispatch/run-lock.mjs": "6163eab9be0fa44f6ac4b80d800ddc6fc615a23d698b392df63f427e2356c53d",
     "src/runner/dispatch/run-result.mjs": "9d0bf13cc9f695ae58d60052debbdf446868260b481c6ef036f9acaa611890f9",
