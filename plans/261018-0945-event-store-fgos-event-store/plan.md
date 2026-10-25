@@ -1,7 +1,7 @@
 ---
 title: "Event Store fgos-event-store: implement the signed D-ADR0055 spec"
 description: "Build the Rust fgos-event-store crate and its Node facade in the combined addon, publish sealed events through Git's Publication port on per-machine refs, then cut Work and porting over in one stop-everything change on every machine and workspace."
-status: in-progress
+status: completed
 priority: P1
 effort: 272h
 branch: main
@@ -11,6 +11,8 @@ blocks: []   # Git 07 and 08 wait for ES-11 and ES-05 by phase edge, see Cross-p
 created: 2026-10-18
 ---
 
+> **Status 2026-10-25: completed.** Phases 09–11 are done. Work and porting cut over on all three machines on 2026-10-24: fg-server2 at 20:58 (grant `51bee6b53`), fg-server at 21:58 (IDENT) and design-lap forgentX at 21:45 (SEAT); revision `af617cb5…` on each. The owner confirmed on 2026-10-24 23:3x that the other projects are done too. Fixes after the cutover landed: `55018b032` (merge hook, legacy-layout check, F17), `7349fe1e0` (`fgos events import-legacy`), `0a5143717` (a moved clone keeps its store id) and `work/close-out` (admission mirror proof, quiesce test). What remains is in "Hand-offs received for after the cutover": the stray-shard import runs on fg-server and design-lap, and H33 with D4–D7, D13 and D14 at the fence release. Further Event Store changes (HARDEN 04b) are reviewed by `lead:ES`.
+>
 > **Status 2026-10-22.** Phases 01–08 are done on main:
 > - crate, open log, reader, seal through Git's Publication port, sync, Node facade, verbs, migration export;
 > - power loss 20/20; forge probe PASS; V-EVENT held.

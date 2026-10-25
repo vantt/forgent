@@ -413,7 +413,6 @@ dependencies = [
  "fgos-holder-lock",
  "fgos-host-runtime",
  "fgos-identity",
- "fgos-yaml-doc",
  "libc",
  "serde",
  "serde_json",

@@ -193,6 +193,7 @@ impl Clone {
             ReadRequest {
                 layout: &self.layout,
                 origin: &origin,
+                machine: &self.machine,
                 streams: &[StreamId::parse("project").unwrap()],
                 cursor: &Cursor::default(),
                 folded: &[],

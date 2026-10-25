@@ -35,8 +35,23 @@ pub struct ReadResult {
     /// The answer came from the process's `ReadMemo`: every observed input was
     /// the remembered one, so nothing was walked, certified or ordered.
     pub memoized: bool,
+    /// Foreign mirrors this answer did not take as they are; never dropped
+    /// silently. A rewound one still answers with its earlier tip.
+    pub skipped_mirrors: Vec<SkippedMirror>,
+}
+/// One foreign mirror a read did not use as it is, and why.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SkippedMirror {
+    pub ref_name: String,
+    pub machine: String,
+    pub code: String,
+    pub detail: String,
 }
 pub struct ReadRequest<'a> {
+    /// This machine's id. Its mirror is its own history: a failure there
+    /// refuses the read, where a peer's mirror is skipped and named.
+    pub machine: &'a str,
     pub layout: &'a Layout,
     pub origin: &'a str,
     /// Include all streams the view observes in `seen`; a predecessor outside
@@ -93,6 +108,7 @@ struct Last {
     missing: BTreeSet<(String, u64)>,
     concurrent: Vec<(String, String)>,
     full_order: Vec<String>,
+    skipped_mirrors: Vec<SkippedMirror>,
 }
 impl ReadMemo {
     pub fn new() -> Self {
@@ -150,6 +166,7 @@ impl ReadMemo {
             },
             checkpoint: CheckpointReport::default(),
             memoized: true,
+            skipped_mirrors: last.skipped_mirrors.clone(),
         })
     }
     fn remember(
@@ -172,6 +189,7 @@ impl ReadMemo {
             missing: answer.missing.clone(),
             concurrent: answer.concurrent.clone(),
             full_order: answer.full_order.clone(),
+            skipped_mirrors: answer.skipped_mirrors.clone(),
         });
     }
 }
@@ -203,15 +221,91 @@ pub(crate) fn mirror_suffix(rest: &str) -> Result<Option<&str>, Error> {
             .any(|p| suffix.starts_with(p)))
     .then_some(suffix))
 }
-/// Event ref tips, the legacy mirrors, and the HEAD the same listing observed (when attached).
-type ListedTips = (Vec<Tip>, BTreeMap<String, Oid>, Option<HeadFact>);
+/// The machine segment of an event ref or its mirror; empty when it has none.
+fn ref_machine(name: &str) -> &str {
+    let rest = name.strip_prefix("refs/fgos/").unwrap_or(name);
+    let rest = match rest.strip_prefix("remotes/") {
+        Some(mirror) => mirror.split_once('/').map_or("", |(_, suffix)| suffix),
+        None => rest,
+    };
+    rest.split('/').nth(1).unwrap_or("")
+}
+/// What one listing observed.
+struct Listed {
+    tips: Vec<Tip>,
+    legacy: BTreeMap<String, Oid>,
+    /// The HEAD the same listing observed (when attached).
+    head: Option<HeadFact>,
+    skipped: Vec<SkippedMirror>,
+}
+impl Listed {
+    /// A peer's mirror that fails is skipped and named; a ref outside
+    /// `refs/fgos/remotes/`, the mirror of `own` (this machine), or a mirror
+    /// that names no machine fails the read.
+    fn skip(&mut self, own: &str, name: &str, error: Error) -> Result<(), Error> {
+        let machine = ref_machine(name);
+        if !name.starts_with("refs/fgos/remotes/") || machine.is_empty() || machine == own {
+            return Err(error);
+        }
+        self.skipped.push(SkippedMirror {
+            ref_name: name.into(),
+            machine: machine.into(),
+            code: error.code.as_str().into(),
+            detail: error.detail,
+        });
+        Ok(())
+    }
+}
+enum Listing {
+    Tip(Tip),
+    Legacy(Oid),
+}
+/// One listed ref as a tip, a legacy mirror, or nothing this query reads.
+fn listing(name: &str, value: &RefValue, streams: &[StreamId]) -> Result<Option<Listing>, Error> {
+    let (rest, mirror) = match name.strip_prefix("refs/fgos/remotes/") {
+        Some(r) => match mirror_suffix(r)? {
+            Some(suffix) => (suffix, true),
+            None => return Ok(None),
+        },
+        None => (name.strip_prefix("refs/fgos/").unwrap_or(name), false),
+    };
+    let oid = || match value {
+        RefValue::Direct(oid) => Ok(oid.clone()),
+        _ => Err(Error::new(
+            ErrorCode::EventStoreRefTampered,
+            "symbolic event ref",
+        )),
+    };
+    if rest == "legacy" {
+        return Ok(Some(Listing::Legacy(oid()?)));
+    }
+    let Some((kind, suffix)) = rest.split_once('/') else {
+        return Ok(None);
+    };
+    let scope = match kind {
+        "events" => Scope::Project,
+        "branch-events" => Scope::Branch,
+        "local-events" => Scope::Local,
+        _ => return Ok(None),
+    };
+    let oid = oid()?;
+    let machine = suffix.split('/').next().unwrap();
+    if !fgos_identity::machine::valid_machine_id(machine) {
+        return Err(invalid("invalid machine in ref"));
+    }
+    Ok(streams.iter().any(|s| s.scope() == scope).then(|| {
+        Listing::Tip(Tip {
+            name: name.into(),
+            oid,
+            machine: machine.into(),
+            scope,
+            mirror,
+        })
+    }))
+}
 /// The listing that reads the event refs also lists `refs/heads/`, so the branch HEAD names, with
 /// its own listed value, comes with it (see `refs::list_with_head`).
-fn tips(
-    port: &dyn Inspect,
-    repo: &RepoHandle,
-    streams: &[StreamId],
-) -> Result<ListedTips, Error> {
+fn tips(port: &dyn Inspect, repo: &RepoHandle, req: &ReadRequest<'_>) -> Result<Listed, Error> {
     let prefixes = [
         "refs/fgos/events/",
         "refs/fgos/branch-events/",
@@ -222,65 +316,24 @@ fn tips(
     .iter()
     .map(|p| RefPrefix::parse(p).map_err(|e| invalid(e.to_string())))
     .collect::<Result<Vec<_>, _>>()?;
-    let mut tips = Vec::new();
-    let mut legacy = BTreeMap::new();
-    let (listed, head) = crate::refs::list_with_head(port, repo, &prefixes)?;
-    for e in listed {
-        let name = e.name.as_str();
-        let (rest, mirror) = if let Some(r) = name.strip_prefix("refs/fgos/remotes/") {
-            (
-                match mirror_suffix(r)? {
-                    Some(suffix) => suffix,
-                    None => continue,
-                },
-                true,
-            )
-        } else {
-            (name.strip_prefix("refs/fgos/").unwrap(), false)
-        };
-        let relevant = rest == "legacy"
-            || ["events/", "branch-events/", "local-events/"]
-                .iter()
-                .any(|p| rest.starts_with(p));
-        if !relevant {
-            continue;
-        }
-        let oid = match e.value {
-            RefValue::Direct(o) => o,
-            _ => {
-                return Err(Error::new(
-                    ErrorCode::EventStoreRefTampered,
-                    "symbolic event ref",
-                ))
+    let (entries, head) = crate::refs::list_with_head(port, repo, &prefixes)?;
+    let mut listed = Listed {
+        tips: Vec::new(),
+        legacy: BTreeMap::new(),
+        head,
+        skipped: Vec::new(),
+    };
+    for e in &entries {
+        match listing(e.name.as_str(), &e.value, req.streams) {
+            Ok(Some(Listing::Tip(tip))) => listed.tips.push(tip),
+            Ok(Some(Listing::Legacy(oid))) => {
+                listed.legacy.insert(e.name.as_str().into(), oid);
             }
-        };
-        if rest == "legacy" {
-            legacy.insert(name.into(), oid);
-            continue;
+            Ok(None) => {}
+            Err(error) => listed.skip(req.machine, e.name.as_str(), error)?,
         }
-        let (kind, suffix) = rest.split_once('/').unwrap();
-        let machine = suffix.split('/').next().unwrap();
-        if !fgos_identity::machine::valid_machine_id(machine) {
-            return Err(invalid("invalid machine in ref"));
-        }
-        let scope = match kind {
-            "events" => Scope::Project,
-            "branch-events" => Scope::Branch,
-            "local-events" => Scope::Local,
-            _ => unreachable!(),
-        };
-        if !streams.iter().any(|s| s.scope() == scope) {
-            continue;
-        }
-        tips.push(Tip {
-            name: name.into(),
-            oid,
-            machine: machine.into(),
-            scope,
-            mirror,
-        });
     }
-    Ok((tips, legacy, head))
+    Ok(listed)
 }
 fn legacy_files(
     port: &dyn Inspect,
@@ -592,7 +645,10 @@ fn read_from(
     for stream in req.streams {
         local.extend(read_own(req.layout, req.origin, stream)?.events);
     }
-    let (tips, legacy_refs, mut listed_head) = tips(port, repo, req.streams)?;
+    let mut listed = tips(port, repo, req)?;
+    let observed_tips = listed.tips.clone();
+    let legacy_refs = std::mem::take(&mut listed.legacy);
+    let mut listed_head = listed.head.take();
     // A replay source is retained by the consumer, not hidden inside the cursor.
     let query: BTreeSet<String> = req.streams.iter().map(|s| s.as_str().into()).collect();
     let caller_has_history = holds_history(req, &query);
@@ -605,7 +661,7 @@ fn read_from(
     {
         let legacy = legacy_view(port, repo, &legacy_refs, req.streams, listed_head.take())?;
         let observed = Observed {
-            tips: &tips,
+            tips: &observed_tips,
             legacy_refs: &legacy_refs,
             local: &local,
         };
@@ -620,20 +676,40 @@ fn read_from(
         Some(found) => (&found.cursor, found.folded.as_slice(), true),
         None => (req.cursor, req.folded, caller_has_history),
     };
-    if let Some(found) = retained {
-        verify_retained(found, &tips, &local, req)?;
-    }
+    // A rewound or vanished peer mirror keeps the tip this history already
+    // authenticated, the baseline sync keeps too; the own machine's refuses.
     for (name, old) in &retained_cursor.mirror_tips {
-        let tip = tips
-            .iter()
-            .find(|t| &t.name == name)
-            .ok_or_else(|| Error::new(ErrorCode::EventStoreMirrorRewound, "mirror disappeared"))?;
-        if !descends(port, repo, &tip.oid, old)? {
-            return Err(Error::new(
+        let at = listed.tips.iter().position(|t| &t.name == name);
+        let checked = match at {
+            None => Err(Error::new(
                 ErrorCode::EventStoreMirrorRewound,
-                "mirror no longer descends from previous tip",
-            ));
+                "mirror disappeared",
+            )),
+            Some(i) => descends(port, repo, &listed.tips[i].oid, old).and_then(|kept| {
+                kept.then_some(()).ok_or_else(|| {
+                    Error::new(
+                        ErrorCode::EventStoreMirrorRewound,
+                        "mirror no longer descends from previous tip",
+                    )
+                })
+            }),
+        };
+        let Err(error) = checked else { continue };
+        listed.skip(req.machine, name, error)?;
+        let baseline = Oid::parse(old, repo.object_format()).map_err(|e| invalid(e.to_string()))?;
+        match at {
+            Some(i) => listed.tips[i].oid = baseline,
+            None => {
+                if let Some(Listing::Tip(tip)) =
+                    listing(name, &RefValue::Direct(baseline), req.streams)?
+                {
+                    listed.tips.push(tip);
+                }
+            }
         }
+    }
+    if let Some(found) = retained {
+        verify_retained(found, &listed.tips, &local, req)?;
     }
 
     let base = if have_history {
@@ -646,7 +722,6 @@ fn read_from(
     } else {
         BTreeSet::new()
     };
-    let oids: Vec<_> = tips.iter().map(|t| t.oid.clone()).collect();
     let mut walked = walk::Walked::default();
     let mut own_published = Positions::new();
     // A certified object is reusable only under the exact namespace binding
@@ -661,38 +736,30 @@ fn read_from(
                 .map(String::as_str)
                 == Some(tip.oid.as_str())
     };
-    for tip in &tips {
-        if unchanged(tip) {
-            continue;
-        }
-        let part = walk::walk_verified(
-            port,
-            repo,
-            &tip.oid,
-            &base,
-            &certificates,
-            &tip.machine,
-            tip.scope,
-        )?;
+    let verify = |tip: &Tip, stops: &BTreeSet<String>| -> Result<walk::Walked, Error> {
+        let part =
+            walk::walk_verified(port, repo, &tip.oid, &base, stops, &tip.machine, tip.scope)?;
         // A checkpoint's certified commit stands in for its whole history only
         // while the ref still descends from it: the walk must have met it.
-        if retained.is_some() {
-            if let Some(previous) = retained_cursor.verified_tips.get(&tip.name) {
-                if !part.stops_reached.contains(previous) {
-                    return Err(Error::new(
-                        ErrorCode::EventStoreRefMoved,
-                        "a ref no longer descends from its certified commit",
-                    ));
-                }
+        if let Some(previous) = retained.and_then(|_| retained_cursor.verified_tips.get(&tip.name))
+        {
+            if !part.stops_reached.contains(previous) {
+                return Err(Error::new(
+                    ErrorCode::EventStoreRefMoved,
+                    "a ref no longer descends from its certified commit",
+                ));
             }
         }
-        if !tip.mirror {
-            for (key, seq) in &part.published {
-                own_published
-                    .entry(key.clone())
-                    .and_modify(|n| *n = (*n).max(*seq))
-                    .or_insert(*seq);
-            }
+        Ok(part)
+    };
+    // Own refs first: what they published bounds the own origin in every mirror.
+    for tip in listed.tips.iter().filter(|t| !t.mirror && !unchanged(t)) {
+        let part = verify(tip, &certificates)?;
+        for (key, seq) in &part.published {
+            own_published
+                .entry(key.clone())
+                .and_modify(|n| *n = (*n).max(*seq))
+                .or_insert(*seq);
         }
         walked.events.extend(part.events);
         walked.visited.extend(part.visited);
@@ -706,23 +773,35 @@ fn read_from(
             .and_modify(|n| *n = (*n).max(*seq))
             .or_insert(*seq);
     }
-    for tip in tips.iter().filter(|t| t.mirror && !unchanged(t)) {
-        let mirror_stops = if retained_cursor.mirror_tips.contains_key(&tip.name) {
-            certificates.clone()
+    // Each mirror is verified on its own (spec section 14).
+    let mut rejected = Vec::new();
+    let no_stops = BTreeSet::new();
+    for tip in listed.tips.iter().filter(|t| t.mirror && !unchanged(t)) {
+        // A mirror this history has not seen is walked from its roots, so its
+        // whole claim on the own origin is bounded; one walk serves both.
+        let stops = if retained_cursor.mirror_tips.contains_key(&tip.name) {
+            &certificates
         } else {
-            BTreeSet::new()
+            &no_stops
         };
-        let mirror = walk::walk_verified(
-            port,
-            repo,
-            &tip.oid,
-            &base,
-            &mirror_stops,
-            &tip.machine,
-            tip.scope,
-        )?;
-        walk::own_origin_bounded(&mirror.published, req.origin, &bounds)?;
+        let checked = verify(tip, stops).and_then(|part| {
+            walk::own_origin_bounded(&part.published, req.origin, &bounds)?;
+            Ok(part)
+        });
+        match checked {
+            Ok(part) => {
+                walked.events.extend(part.events);
+                walked.visited.extend(part.visited);
+            }
+            Err(error) => rejected.push((tip.name.clone(), error)),
+        }
     }
+    for (name, error) in rejected {
+        listed.tips.retain(|t| t.name != name);
+        listed.skip(req.machine, &name, error)?;
+    }
+    let tips = &listed.tips;
+    let oids: Vec<_> = tips.iter().map(|t| t.oid.clone()).collect();
     let mut union = retained_events.to_vec();
     union.extend(local.iter().cloned());
     union.extend(walked.events.iter().cloned());
@@ -814,10 +893,11 @@ fn read_from(
         full_order,
         checkpoint: CheckpointReport::default(),
         memoized: false,
+        skipped_mirrors: listed.skipped,
     };
     if let Some(Memoized { memo, .. }) = memo.filter(|_| answer.deferred.is_empty()) {
         let observed = Observed {
-            tips: &tips,
+            tips: &observed_tips,
             legacy_refs: &legacy_refs,
             local: &local,
         };

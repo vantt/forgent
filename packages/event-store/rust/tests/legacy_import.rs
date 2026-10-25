@@ -103,6 +103,7 @@ fn legacy_import_real_publication_reuses_exact_commit_and_reads_nested_porting()
         ReadRequest {
             layout: &f.layout,
             origin: "",
+            machine: "test-aa",
             streams: &streams,
             cursor: &Cursor::default(),
             folded: &[],

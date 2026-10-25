@@ -128,7 +128,10 @@ fn validate_directory(
     if !valid {
         return Err(Error::new(
             ErrorCode::EventStoreLockDirInvalid,
-            "locks must be an existing 0700 directory; run setup fix",
+            format!(
+                "{} must be an existing 0700 directory; run fgos setup",
+                dir.display()
+            ),
         ));
     }
     let guarantee = fs.guarantee(&dir);

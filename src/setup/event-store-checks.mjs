@@ -73,7 +73,16 @@ export function checkEventStore(cwd, kind, options = {}) {
         const age = Math.max(0, ...status.streams.map(s => s.oldestUnsealedAgeSec));
         return age > 3600 ? fail(`unsealed events age ${age}s exceeds 3600s`) : age > 2 * config.seal.intervalSec ? warn(`unsealed events age ${age}s exceeds twice seal interval`) : pass(`oldest unsealed age ${age}s`);
       }
-      case 'event-store-integrity': return status.integrityErrors.length ? fail(JSON.stringify(status.integrityErrors)) : pass(`verified ${Object.keys(status.refs).length} refs; ${status.deferred.length} deferred events`);
+      case 'event-store-integrity': {
+        // A peer's mirror the reader or the last sync refused is history this clone does not see: it fails the row
+        // by name. A shared machine ref is the machine-id row's warning.
+        const problems = [
+          ...status.integrityErrors.map(error => JSON.stringify(error)),
+          ...status.skippedMirrors.map(m => `${m.code} ${m.refName}: ${m.detail}`),
+          ...status.sync.warnings.filter(w => !w.startsWith('event-store-machine-ref-shared:')).map(w => `sync: ${w}`),
+        ];
+        return problems.length ? fail(problems.join('; ')) : pass(`verified ${Object.keys(status.refs).length} refs; ${status.deferred.length} deferred events`);
+      }
       case 'event-store-sync': {
         if (!facts.remoteFact.configured) return pass('info: no remote configured');
         const push = status.lastPush;

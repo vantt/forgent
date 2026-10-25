@@ -61,7 +61,7 @@ impl World {
         read_checkpointed(
             port,
             &self.repo,
-            ReadRequest { layout: &self.r.layout, origin: &self.origin, streams: &streams, cursor: &empty, folded: &[], project: true },
+            ReadRequest { layout: &self.r.layout, origin: &self.origin, machine: "test-aa2345", streams: &streams, cursor: &empty, folded: &[], project: true },
             None,
             cp,
             None,
@@ -74,7 +74,7 @@ impl World {
         read(
             &self.driver,
             &self.repo,
-            ReadRequest { layout: &self.r.layout, origin: &self.origin, streams: &streams, cursor: &empty, folded: &[], project: true },
+            ReadRequest { layout: &self.r.layout, origin: &self.origin, machine: "test-aa2345", streams: &streams, cursor: &empty, folded: &[], project: true },
         )
         .unwrap()
         .sequence
