@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "29cc0d5e998357f3ec9af38445195d326d7ca3bc243a804a11ee011f9f42efc8",
+  "payloadDigest": "cefa2c04b35d212f4e3f2b28e28b2e7a6d16b141e77b902f5472ae63d21aaa14",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -748,7 +748,7 @@
     "scripts/prepare-release.mjs": "66a025419962863905a07726cc68e1f8c510d50e372239a11833d60ce46ab73c",
     "scripts/probe-storytelling-material.mjs": "b2991c1c14879193953d901e9122a9e511136a91907949643b7f1af008590df4",
     "scripts/project-agents.mjs": "5fd5bfacfda8d8814c9620c1c3086136de167957f7cd5d781e663a9b9c6a268f",
-    "scripts/regenerate-observe-fixtures.mjs": "3d9fad7d18037005f50e28c9a5cef8e6b7b813d1cb17f1dd2e6685f26239e24b",
+    "scripts/regenerate-observe-fixtures.mjs": "19b954de8f832a233d9ddea71f603ddfa4ec94a75e95497c83e87503e06733bd",
     "scripts/run-rust-dev-host.mjs": "e10af7fa8c280ecb62cbde50e8d2e2160e1135b2bdd20c02867d0f0351ba641b",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
     "scripts/run-tests.mjs": "dcb0dd67e550e8e54835d3ddfb87482cb2ccfe336c4fe128e851e306efc2bc60",
