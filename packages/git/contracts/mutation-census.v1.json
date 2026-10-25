@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "4dbed8844e1937abd996472d72a45cf35df7d9c845c4a85c8f43ac6a7b9ef3e8",
+  "payloadDigest": "02b7c7fe4f962ad7a6daf6d9ea4c2aaadf4f0d55812212d7e8f19a48f0bceef0",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -1094,7 +1094,7 @@
     "src/setup/git-checks.mjs": "2d79b76427d89c30841728cbdb2ea054d6698dca079626c9193dcedf00bb59ca",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
     "src/setup/git-retention-note.mjs": "8e4bacd772c5562a964c4beeea95d9ee808f41e122a7b6adc09fee81c96949fd",
-    "src/setup/holder-lock-checks.mjs": "c00f856125aeba1a7466cd152a7fbf7a187e7c5679fb5281437c6cfa86b9c26d",
+    "src/setup/holder-lock-checks.mjs": "278f2a01cafeecd7e7d88408677aa8f86d663155b2280297db6405b526bb522d",
     "src/setup/identity-checks.mjs": "100ade442dcbc818eccc2f837761545d1e3355a15d044cf5ca0d59c6da6328b0",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
     "src/setup/instruction-projections.mjs": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
