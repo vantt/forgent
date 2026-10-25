@@ -1,0 +1,110 @@
+{
+  "review": "w37-link-guard-rereview",
+  "commit": "b467e09fe7d60c6aeac3ad6af33a4730060558e3",
+  "authority": [
+    "L13-4.1",
+    "L13-26.2",
+    "L13-28"
+  ],
+  "brief": "../w36-link-guard-rework-brief.md",
+  "prior": "w35-link-guard-review.json",
+  "items": [
+    {
+      "id": "w37-1",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "1. Moved-source resurrection (links.tree) and probes",
+      "evidence": "links.py:137 now computes (pin paths | composed states) - moving. Independent probe on real compose(HEAD b467e09fe) states: 21 edited move-set sources are in states (docs/README.md, doc-governance.md, routing-handoff-contract.md, io-contract.md, transitional-switchboard.md, coexistence.md, operator-runbook-herdr-cockpit.md, architecture-manifest.json, contracts/fgos-gateway-api-v1.yaml, 12 ui-spec files). Baseline scan 0 findings. Injecting [gov](../doc-governance.md), [r](../routing-handoff-contract.md), [r](../transitional-switchboard.md) into docs/platform/README.md each yields exactly 1 linkGuard moved-target. Injecting a Related entry for each of the 21 edited sources (plus docs/io-contract.md, docs/README.md) yields exactly 1 moved-target each. Semantics match the original linkIntoMoveSet scan of a319902ab (md files under docs/platform, any link resolving to a move-set source).",
+      "fix": "None."
+    },
+    {
+      "id": "w37-2",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "1. The 11 Related entries and Related/clickable agreement",
+      "evidence": "Corrected guard reports 0 findings. The 11 fixes follow L13-28 rule order: 5 self-sources to their old-source H1 anchors (coexistence#coexistence, docs-portal#fgos-documentation, governance#documentation-governance, operator-runbook#operator-runbook-herdr-cockpit, switchboard#transitional-documentation-authority-switchboard; each anchor equals the slug of the pinned old source's H1 and exists per listAnchors), 6 cross-file to move destinations (3 templates -> docs/platform/governance.md, 2 -> documentation/switchboard.md, 1 -> runner/contracts/routing-handoff.md). Agreement: every row with oldPath docs/routing-handoff-contract.md (1 clickable, 1 Related) targets docs/platform/runner/contracts/routing-handoff.md; docs/io-contract.md rows (5 retarget + 1 relabel, no Related left) target work-state/contracts/cli-io-contract.md; doc-governance, transitional-switchboard and README Related/clickable rows likewise share one destination each.",
+      "fix": "None."
+    },
+    {
+      "id": "w37-3",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "1. Control isolation and discrimination",
+      "evidence": "controls.py adds 4 probes (clickable and Related into the edited docs/doc-governance.md, inline and reference stale labels); each asserts exit 1, exactly one finding, kind linkGuard, the probe file and the expected reason, and that docs/doc-governance.md is in states; no additions mutation is mixed in (the composedBy-disagreement control now runs separately). Mutation proof by in-process patching of the links module used by compose(): reverting tree() to (paths - moving) | states kills controls.py at 'clickable link into an edited move-set source' (findings []); disabling the stale-label append kills it at 'old filename label on an earlier retarget'.",
+      "fix": "None."
+    },
+    {
+      "id": "w37-4",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "2. related:36 and rule-2.2 literal rows",
+      "evidence": "related:36 (docs/platform/config/spec.md line 18 '- docs/specs/seat-binding.md §5.1 ...') now targets docs/platform/seat-binding/spec.md#51-ladder-một-nguồn-comment-sinh-ra, rule 2.1, source L13-4.1; the anchor exists. 11 rule-2.2 rows remain (was 16): 4 machine-absolute /home/vantt/projects/mdview/... citations (external repo), 6 src/test files deleted with the retired engine (git log --diff-filter=D shows 2180b4e72 for schema.mjs, run.mjs, session-engine.mjs, store.mjs, coordination-recovery-and-quorum.test.mjs, team-cognition/schema.mjs; no rename), and .claude/hooks/privacy-block.cjs (never tracked in this repo; a ClaudeKit global hook). Each carries source.successorChecks with 5 entries (move set, phase-08 L12 and phase-09 L13 owner answers with hashes, docs/reading-map.md, 40 docs/platform/**/spec.md). I found no successor for any of them in the move set, the owner answers or reading-map. link:18, link:19 and related:73 moved to rule 2.1 with evidence. related:64 is now rule 2.3.",
+      "fix": "None."
+    },
+    {
+      "id": "w37-5",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "3. Rule 2.4 labels and the new stale-label check",
+      "evidence": "Independent oracle (not links.scan) over every non-Related row with a newTarget: located 600 inline/reference labels in the final composed text; 0 contain the old basename when it differs from the new one, and 0 equal the old target or old path. All 80 relabel rows change only the label (target bytes identical); descriptive labels untouched; §/mục locators kept. Injection into real composed states: reverting label:7, :20, :53, :4, :65 each yields exactly 1 stale-label; setting a retargeted link's label to the old basename, the backticked old relative path or the repo-rooted old path each yields 1; a descriptive label yields 0; a fresh [doc-governance.md](governance.md) and a same-dir-different-basename [docs/specs/seat-binding.md](seat-binding/spec.md) each yield 1. Latent gap: HTML <a href> labels are not checked (0 such links exist in docs/platform or in the rows).",
+      "fix": "None now; if guard 3 accepts HTML anchors, cover their text labels too."
+    },
+    {
+      "id": "w37-6",
+      "severity": "medium",
+      "verdict": "REWORK",
+      "area": "4. Record integrity: duplicate row id",
+      "evidence": "link-retargets.json has 377 rows but 376 distinct ids: 'L13-28:related:86' is used twice, for the pre-existing row (docs/platform/system-architecture/history/architect-readme.md, docs/architect/README.md -> ...#architect-level-design, stage 1) and for the new composed-by-owner row (docs/platform/coexistence/spec.md, docs/coexistence.md -> #coexistence, shard-2 rows/148). The new composedBy rows were numbered 86..96 although 86 already existed. check.py:242 builds owner_files[row['id']], so the single key now owns both files, and check.json lists 'L13-28:related:86' among the architect-readme patch owners while link-validation.json uses the same id for the coexistence row. No check (check.py, controls.py, the rework validationSource) asserts id uniqueness, so this passed all five proofs.",
+      "fix": "Renumber the coexistence row to an unused id (e.g. L13-28:related:97) everywhere it is cited (link-retargets rows, link-validation.json, finalFDuties if referenced), and add an id-uniqueness assertion to the link-retargets reader in check.py so owner_files cannot merge two rows."
+    },
+    {
+      "id": "w37-7",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "4. Rows and patches replay",
+      "evidence": "All 88 patches: final composed bytes match expectedAfterSha256, rollback gives beforeSha256, forward reproduces the final bytes; 47 have the pinned blob as their base. All 104 added/changed rows (91 added, 12 changed, plus 1 id collision) checked, more than the 25 asked: stage-0 rows match before-bytes at start/end, every after string is present in the final text, every composedBy expectedLine is present, every newTarget resolves to its recorded newPath, which exists after F, and every fragment exists per listAnchors. Every 2.1 row's newPath is a move-set destination of its oldPath, except related:36, which has an L13-4.1 ruling. The only anomaly is the duplicate id in w37-6.",
+      "fix": "None beyond w37-6."
+    },
+    {
+      "id": "w37-8",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "5. Receipt claims",
+      "evidence": "Verified: 377 rows / 88 patches; byRule 207/11/70/80/3/6; 2,705 destinations over 628 platform Markdown files (links.population on the real states); 595 files / 229 proposals / 20 links and 0 findings (check.py); 25 controls; 11 -> 0 Related move-source findings; 394 fenced + 4 multi-line inline code spans in P00.1.md; f06461/f06591/f07205 are in shard 2 (shard-3 only cites f06591/f07205 at lines 19693/19727), as the receipt says, so the brief's 'shard-3' wording was wrong, and the duty is recorded machine-readably in finalFDuties along with the 7 newly extended owners. Two notes. (a) The 'historical' w34 section of receipt.md was rewritten in place (its table row is now '11 -> 0 (corrected tree; current rework counts)'), so it no longer records what that receipt claimed. (b) The '64 with old metadata' count was not independently reproduced.",
+      "fix": "Optional: leave the historical section verbatim and put the correction only in the current section."
+    },
+    {
+      "id": "w37-9",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "5. Related entries with fragments vs product relatedPaths",
+      "evidence": "44 Related rows now carry '#anchor' operands (related:36 is new and adds the anchor from the '§5.1' prose). scripts/check-doc-candidate-status.mjs relatedPaths() keeps '#...' in the token and checks fs.existsSync, so it would report unresolved-related on these lines for candidate/promoted files. The pattern was approved in w35 (rule 2.3 anchors), and finalFDuties.guard3-semantics-agreement covers guard 3. It does not name this product reader.",
+      "fix": "Add to the guard3 duty that Related '#fragment' operands are resolved as file plus anchor, and that relatedPaths/check-doc-candidate-status is aligned or out of scope after cutover."
+    },
+    {
+      "id": "w37-10",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "6. Proofs",
+      "evidence": "python3 -B P/fchain/check.py --pin HEAD: exit 0, {files 595, executed 229, links 20}, no findings; check.json differed only in sourceCommit and was restored with git checkout; no fchain chain-check file was written. python3 -B P/fchain/controls.py: exit 0, 25 controls (4m35s). python3 -B P/preserve-premise/park-judgments/check_shard.py --all: exit 0, unresolved 0, duplicateOfChain 24; the transient chain-check-b467e09fe.json was deleted.",
+      "fix": "None."
+    },
+    {
+      "id": "w37-11",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "7. Shard-2 park-judgment change",
+      "evidence": "The commit changes only 'after', 'patch' and 'proposedSha256' of 10 shard-2 proposals (f06504, f06697, f06699, f06700, f06702, f06790/91/94/99, f06823). Each turns a Related code span '`docs/x.md`' (still parsed as a path by relatedPaths and links.related, which strip backticks; that is the source of the 11 hidden findings) into the L13-28 rule-2.1 or 2.3 target. Extending the existing same-line owner, instead of adding a second link-record patch on that line, follows the single-owner rule (sameLinesTwice). Judgments, dispositions and frozen evidence are unchanged; check_shard --all passes; the file is in the brief's writable set; all 7 files are listed in finalFDuties.rework-premise-patch-delta-review.",
+      "fix": "None."
+    }
+  ],
+  "counts": {
+    "items": 11,
+    "APPROVE": 10,
+    "REWORK": 1,
+    "high": 0,
+    "medium": 1,
+    "low": 2,
+    "none": 8
+  }
+}
