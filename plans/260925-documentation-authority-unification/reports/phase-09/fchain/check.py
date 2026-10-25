@@ -237,7 +237,7 @@ def compose(pin, manifest=None, additions=None):
     for source in manifest['sources']:
         if source['reader'] == 'link-retargets':
             for row in load(ROOT / source['path'])['rows']:
-                if row['ruling'] != 'L13-26':
+                if row['ruling'] not in {'L13-26', 'L13-28'}:
                     raise ValueError('link retarget lacks owning ruling')
                 owner_files.setdefault(row['id'], set()).add(shard.safe_path(row['file']))
     for number in (1, 2, 3):

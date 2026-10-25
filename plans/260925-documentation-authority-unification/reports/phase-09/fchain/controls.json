@@ -112,7 +112,7 @@
     },
     {
       "case": "injected clickable link into a moved path fails the F door",
-      "rejectedBy": "linkIntoMoveSet",
+      "rejectedBy": "linkGuard",
       "findings": [
         {
           "kind": "conflict",
@@ -121,7 +121,48 @@
           "reason": "record and manifest composedBy disagree"
         },
         {
-          "kind": "linkIntoMoveSet",
+          "kind": "linkGuard",
+          "start": 272,
+          "end": 305,
+          "targetStart": 281,
+          "targetEnd": 304,
+          "target": "#injected-broken-anchor",
+          "file": "docs/platform/injected-anchor-control.md",
+          "line": 11,
+          "oldPath": "docs/platform/injected-anchor-control.md",
+          "fragment": "injected-broken-anchor",
+          "reason": "missing-anchor"
+        },
+        {
+          "kind": "linkGuard",
+          "start": 37,
+          "end": 65,
+          "targetStart": 37,
+          "targetEnd": 65,
+          "target": "docs/platform/not-present.md",
+          "related": true,
+          "file": "docs/platform/injected-anchor-control.md",
+          "line": 5,
+          "oldPath": "docs/platform/not-present.md",
+          "fragment": "",
+          "reason": "missing-file"
+        },
+        {
+          "kind": "linkGuard",
+          "start": 125,
+          "end": 188,
+          "targetStart": 125,
+          "targetEnd": 188,
+          "target": "docs/platform/injected-anchor-control.md#missing-related-anchor",
+          "related": true,
+          "file": "docs/platform/injected-anchor-control.md",
+          "line": 7,
+          "oldPath": "docs/platform/injected-anchor-control.md",
+          "fragment": "missing-related-anchor",
+          "reason": "missing-anchor"
+        },
+        {
+          "kind": "linkGuard",
           "start": 0,
           "end": 32,
           "targetStart": 13,
@@ -129,9 +170,48 @@
           "target": "../specs/runner.md",
           "file": "docs/platform/injected-link-control.md",
           "line": 1,
-          "oldPath": "docs/specs/runner.md"
+          "oldPath": "docs/specs/runner.md",
+          "fragment": "",
+          "reason": "moved-target"
         }
       ]
+    },
+    {
+      "case": "injected broken anchor fails while extracted headings resolve and code stays literal",
+      "rejectedBy": "linkGuard",
+      "findings": [
+        {
+          "kind": "linkGuard",
+          "start": 272,
+          "end": 305,
+          "targetStart": 281,
+          "targetEnd": 304,
+          "target": "#injected-broken-anchor",
+          "file": "docs/platform/injected-anchor-control.md",
+          "line": 11,
+          "oldPath": "docs/platform/injected-anchor-control.md",
+          "fragment": "injected-broken-anchor",
+          "reason": "missing-anchor"
+        },
+        {
+          "kind": "linkGuard",
+          "start": 125,
+          "end": 188,
+          "targetStart": 125,
+          "targetEnd": 188,
+          "target": "docs/platform/injected-anchor-control.md#missing-related-anchor",
+          "related": true,
+          "file": "docs/platform/injected-anchor-control.md",
+          "line": 7,
+          "oldPath": "docs/platform/injected-anchor-control.md",
+          "fragment": "missing-related-anchor",
+          "reason": "missing-anchor"
+        }
+      ]
+    },
+    {
+      "case": "Related metadata is checked even in its txt header fence",
+      "passed": true
     },
     {
       "case": "record composedBy cannot silently override the manifest",
@@ -162,6 +242,6 @@
       "passed": true
     }
   ],
-  "count": 19,
+  "count": 21,
   "reuse": "Real apply_one with compose.apply_diff; real G9 scan_gateway with immutable Git fixture replies."
 }

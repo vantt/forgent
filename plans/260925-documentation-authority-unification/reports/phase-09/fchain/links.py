@@ -1,13 +1,14 @@
-"""Clickable local Markdown targets, with source coordinates preserved.
+"""Guard 3's local links over the composed tree, with source coordinates.
 
-Records-only counterpart of check-doc-candidate-status.relativeLinkTargets:
-retain offsets (for prepared diffs), handle matching code delimiters and
-reference links, and resolve against the move set rather than the checkout.
-No document rendering, product imports or alternate patch engine.
+Code stays literal except the document's Related metadata (the same population
+as check-doc-candidate-status.relatedPaths). Anchors delegate to listAnchors,
+which uses the unit extractor; no copied slug algorithm or patch engine.
 """
 import html
+import json
 import posixpath
 import re
+import subprocess
 from urllib.parse import unquote, urlsplit
 
 
@@ -52,8 +53,10 @@ def prose(text):
 
 def local_path(file, target):
     value = urlsplit(html.unescape(target))
-    if value.scheme or value.netloc or not value.path:
+    if value.scheme or value.netloc:
         return None
+    if not value.path:
+        return file if value.fragment else None
     path = unquote(re.sub(r'\\([!"#$%&\'()*+,\-./:;<=>?@\[\]\\^_`{|}~])', r'\1', value.path))
     if path.startswith('repo/docs/'):
         path = path[5:]
@@ -73,12 +76,12 @@ def clickable(text):
         definitions.setdefault(key, (m, 2 if m[2] is not None else 3))
         definition_spans.append(m.span())
     occupied = []
-    for m in re.finditer(r'(?<![\\!])\[(?:\\.|[^\]\\])*\]\(\s*(?:' + destination + r')(?:\s+["\'][^\n]*?["\'])?\s*\)', masked):
+    for m in re.finditer(r'(?<!\\)\[(?:\\.|[^\]\\])*\]\(\s*(?:' + destination + r')(?:\s+["\'][^\n]*?["\'])?\s*\)', masked):
         group = 1 if m[1] is not None else 2
         occupied.append(m.span())
         yield dict(start=m.start(), end=m.end(), targetStart=m.start(group), targetEnd=m.end(group), target=text[m.start(group):m.end(group)])
     used = set()
-    for m in re.finditer(r'(?<![\\!])\[([^\]\n]+)\](?:\[([^\]\n]*)\])?', masked):
+    for m in re.finditer(r'(?<!\\)\[([^\]\n]+)\](?:\[([^\]\n]*)\])?', masked):
         if any(a <= m.start() < b for a, b in occupied + definition_spans):
             continue
         key = ' '.join((m[2] or m[1]).split()).casefold()
@@ -86,7 +89,9 @@ def clickable(text):
             used.add(key)
             definition, group = definitions[key]
             yield dict(start=definition.start(), end=definition.end(), targetStart=definition.start(group), targetEnd=definition.end(group), target=text[definition.start(group):definition.end(group)], reference=key)
-    for m in re.finditer(r'<(?:a|area)\b[^>]*?\bhref\s*=\s*(["\'])(.*?)\1[^>]*>|<((?:\.?\.?/|/|docs/)[^<>\s]+)>', masked, re.I):
+    for m in re.finditer(r'<[A-Za-z][\w:-]*\b[^>]*?\bhref\s*=\s*(["\'])(.*?)\1[^>]*>|<((?:\.?\.?/|/|docs/)[^<>\s]+)>', masked, re.I):
+        if any(a <= m.start() < b for a, b in occupied + definition_spans) or re.fullmatch(r'</[A-Za-z][\w:-]*\s*>', m[0]):
+            continue  # Neither a nested <destination> nor an HTML closing tag is an autolink.
         group = 2 if m[2] is not None else 3
         yield dict(start=m.start(), end=m.end(), targetStart=m.start(group), targetEnd=m.end(group), target=text[m.start(group):m.end(group)])
 
@@ -98,14 +103,85 @@ def into_move_set(file, text, moving):
             yield dict(link, file=file, line=text.count('\n', 0, link['targetStart']) + 1, oldPath=path)
 
 
-def scan(pin, states, shard, root):
-    """All pinned platform Markdown plus new files materialized by the F chain."""
-    paths = set(shard.subprocess.check_output(['git', '--no-optional-locks', 'ls-tree', '-r', '--name-only', pin, '--', 'docs/platform/'], cwd=root, text=True).splitlines()) | set(states)
+def related(text):
+    """Coordinate-preserving equivalent of headerBlock + relatedPaths."""
+    header = re.search(r'^# .+\n+```txt\n([\s\S]*?)\n```', text, re.M)
+    if not header:
+        return
+    lines = re.finditer(r'[^\n]*(?:\n|$)', header[1])
+    active = False
+    for line in lines:
+        value = re.match(r'Related:\s*(.*)', line[0]) if not active else re.match(r'\s*-\s+(.+)', line[0])
+        if not value:
+            if active:
+                break
+            continue
+        active = True
+        token = re.match(r'`([^`]+)`|([^\s]+)', value[1])
+        if not token:
+            continue
+        group = 1 if token[1] is not None else 2
+        target = token[group].rstrip(',;')
+        if ('/' not in target and not re.search(r'\.md$', target)) or '*' in target or re.match(r'^[a-z][a-z0-9+.-]*:', target, re.I):
+            continue
+        start = header.start(1) + line.start() + value.start(1) + token.start(group)
+        yield dict(start=start, end=start + len(target), targetStart=start,
+                   targetEnd=start + len(target), target=target, related=True)
+
+
+def tree(pin, states, shard, root):
+    """Post-F files only: pin objects, minus moves/removals, plus composed bytes."""
+    paths = set(subprocess.check_output(['git', '--no-optional-locks', 'ls-tree', '-r', '--name-only', pin], cwd=root, text=True).splitlines())
     moving = {r['oldPath']: r for r in shard.load(shard.P8 / 'step-05-cutover-move-set.json')['paths']}
-    findings = []
+    paths = (paths - set(moving)) | set(states)
+    cache = {file: state['text'] for file, state in states.items()}
+    def read(file):
+        if file not in cache:
+            cache[file] = (shard.blob(pin, file) or b'').decode('utf-8', errors='replace')
+        return cache[file]
+    return paths, moving, read
+
+
+def anchor_index(contents, root):
+    """Batch the owning extractor, including its accepted GitHub heading slugs."""
+    script = '''import {listAnchors} from './scripts/list-doc-anchors.mjs';
+let input = ''; for await (const chunk of process.stdin) input += chunk;
+const result = Object.fromEntries(Object.entries(JSON.parse(input)).map(([file, text]) =>
+  [file, [...new Set(listAnchors(text).flatMap(a => [a.anchor, a.githubSlug]).filter(Boolean))]]));
+process.stdout.write(JSON.stringify(result));'''
+    result = subprocess.run(['node', '--no-addons', '--input-type=module', '-e', script],
+        cwd=root, input=json.dumps(contents), text=True, capture_output=True, check=True)
+    return json.loads(result.stdout)
+
+
+def population(pin, states, shard, root):
+    paths, moving, read = tree(pin, states, shard, root)
+    directories = {path[:i] for path in paths for i, c in enumerate(path) if c == '/'}
+    existing = paths | directories
+    links = []
     for file in sorted(paths):
         if not file.startswith('docs/platform/') or not file.endswith('.md'):
             continue
-        text = states[file]['text'] if file in states else (shard.blob(pin, file) or b'').decode()
-        findings.extend(dict(kind='linkIntoMoveSet', **link) for link in into_move_set(file, text, moving))
-    return findings
+        text = read(file)
+        for link in [*clickable(text), *related(text)]:
+            path = local_path(file, link['target'])
+            if path is None:
+                continue
+            if link.get('related') and link['target'].split('#')[0] in existing:
+                path = link['target'].split('#')[0]
+            fragment = unquote(urlsplit(html.unescape(link['target'])).fragment)
+            links.append(dict(link, file=file, line=text.count('\n', 0, link['targetStart']) + 1,
+                              oldPath=path, fragment=fragment))
+    anchors = anchor_index({link['oldPath']: read(link['oldPath']) for link in links
+                            if link['fragment'] and link['oldPath'] in paths}, root)
+    for link in links:
+        path = link['oldPath']
+        if path not in existing:
+            link['reason'] = 'moved-target' if path in moving else 'missing-file'
+        elif link['fragment'] and link['fragment'] not in anchors.get(path, []):
+            link['reason'] = 'missing-anchor'
+    return links
+
+
+def scan(pin, states, shard, root):
+    return [dict(kind='linkGuard', **link) for link in population(pin, states, shard, root) if 'reason' in link]

@@ -74,10 +74,16 @@ def main():
         + '[label `code`](' + old + ' "title")\n'
         + '[ref][used]\n[used]: ' + old + '\n[unused]: ' + old + '\n'
         + '[escaped](../specs/%72unner.md#section)\n'
+        + '[angle](<' + old + '>)\n![image](' + old + ')\n'
+        + '<a href="' + old + '">reader</a>\n'
         + '[external](https://example.com/docs/specs/runner.md)\n'
         + '\\[not-a-link](' + old + ')\n')
     hits = list(links.into_move_set(file, sample, {'docs/specs/runner.md'}))
-    assert len(hits) == 3, hits
+    assert len(hits) == 6, hits
+    assert len(list(links.clickable('[x](<' + old + '>)'))) == 1
+    assert not list(links.clickable('<a id="real-anchor"></a>'))
+    related_sample = '# Header\n\n```txt\nRelated:\n- docs/first.md\n\n- docs/not-related.md\n```\n'
+    assert [link['target'] for link in links.related(related_sample)] == ['docs/first.md']
     assert all(sample[h['targetStart']:h['targetEnd']] == h['target'] for h in hits)
     results.append(dict(case='clickable links exclude code, comments, escapes and unused definitions', passed=True))
 
@@ -93,12 +99,35 @@ def main():
     injected_patch.update(path=injected_file, rowIds=['injected-link'], forwardDiff=injected_patch.pop('diff'))
     record['patches'].append(injected_patch)
     record['rows'].append(dict(id='injected-link', file=injected_file, ruling='L13-26'))
+    anchor_file = 'docs/platform/injected-anchor-control.md'
+    anchor_text = ('# Valid — heading\n\n```txt\nRelated:\n- docs/platform/not-present.md\n'
+        '- docs/platform/injected-anchor-control.md#valid-heading\n'
+        '- docs/platform/injected-anchor-control.md#missing-related-anchor\n'
+        '- packages/durable-file/rust\n```\n'
+        '[valid](#valid-heading) [angle](<#valid-heading>)\n'
+        '[broken](#injected-broken-anchor)\n'
+        '[reference][used]\n[used]: #valid-heading\n'
+        '<a href="#valid-heading">valid</a>\n'
+        '`[literal](#missing)`\n~~~text\n[literal](#missing)\n~~~\n')
+    anchor_patch = entry('anchor-injected', '', anchor_text)
+    anchor_patch['diff'] = anchor_patch['diff'].replace('sample.md', anchor_file)
+    anchor_patch.update(path=anchor_file, rowIds=['injected-anchor'], forwardDiff=anchor_patch.pop('diff'))
+    record['patches'].append(anchor_patch)
+    record['rows'].append(dict(id='injected-anchor', file=anchor_file, ruling='L13-28'))
     additions = copy.deepcopy(c.load(c.PHASE / 'g9/f-composition-additions.json'))
     additions['patches'][0]['composedBy'] = ['bogus-record-edge']
     original_load = c.load
     with patch.object(c, 'load', side_effect=lambda path: record if path == record_path else original_load(path)):
         report, _ = c.compose(pin, additions=additions)
-    test('injected clickable link into a moved path fails the F door', report['findings'], 'linkIntoMoveSet')
+    test('injected clickable link into a moved path fails the F door', report['findings'], 'linkGuard')
+    assert any(f['kind'] == 'linkGuard' and f['file'] == injected_file and f['reason'] == 'moved-target' for f in report['findings'])
+    anchor_findings = [f for f in report['findings'] if f['kind'] == 'linkGuard' and f['file'] == anchor_file]
+    assert {(f['target'], f['reason']) for f in anchor_findings} == {
+        ('#injected-broken-anchor', 'missing-anchor'), ('docs/platform/not-present.md', 'missing-file'),
+        ('docs/platform/injected-anchor-control.md#missing-related-anchor', 'missing-anchor')}, anchor_findings
+    test('injected broken anchor fails while extracted headings resolve and code stays literal',
+         [f for f in anchor_findings if f['reason'] == 'missing-anchor'], 'linkGuard')
+    results.append(dict(case='Related metadata is checked even in its txt header fence', passed=True))
     assert report['exit'] == 1
     assert any(f.get('reason') == 'record and manifest composedBy disagree' for f in report['findings'])
     results.append(dict(case='record composedBy cannot silently override the manifest', passed=True))

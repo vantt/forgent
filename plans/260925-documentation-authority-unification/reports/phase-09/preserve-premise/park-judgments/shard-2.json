@@ -7606,19 +7606,19 @@
           "f06461"
         ],
         "sourceSha256": "b85a0630399c9ed85c6d722f7cc6e4c44e14bdd9021182aeb616f86f7791046f",
-        "proposedSha256": "8461412596c670b5627be1dd72c990b01be04f306350e11774afd8d018094aaf",
+        "proposedSha256": "88c691a30fec5e8531f25e88ce4a717bb5d12352268fbf3b3312c22f27eff5d3",
         "replacements": [
           {
             "line": 14,
             "sourceLine": 14,
             "before": "docs/architecture-map.md",
-            "after": "`docs/architecture-map.md`",
+            "after": "Historical source: `docs/architecture-map.md`",
             "ownerRowIds": [
               "f06461"
             ]
           }
         ],
-        "patch": "--- a/docs/platform/architecture-map.md\n+++ b/docs/platform/architecture-map.md\n@@ -11,7 +11,7 @@\n Related:\n - docs/platform/README.md\n - docs/platform/component-boundary.md\n-- docs/architecture-map.md\n+- `docs/architecture-map.md`\n Implementation: Partial\n Provenance: Promoted anchor from docs/architecture-map.md\n Writer type: Original writer attribution not recorded; retained source provenance\n",
+        "patch": "--- a/docs/platform/architecture-map.md\n+++ b/docs/platform/architecture-map.md\n@@ -11,7 +11,7 @@\n Related:\n - docs/platform/README.md\n - docs/platform/component-boundary.md\n-- docs/architecture-map.md\n+- Historical source: `docs/architecture-map.md`\n Implementation: Partial\n Provenance: Promoted anchor from docs/architecture-map.md\n Writer type: Original writer attribution not recorded; retained source provenance\n",
         "chainEntryIds": [
           "file:docs/platform/architecture-map.md"
         ],
@@ -8098,19 +8098,19 @@
           "f06591"
         ],
         "sourceSha256": "50a036a1cafbca9862192a0ba11927cc60aa9f5e35a26667e15175ff487e0161",
-        "proposedSha256": "5b505682d1a01343ffb5f403b85635dbf029f8904e6b9141442639ec12b55518",
+        "proposedSha256": "ac5294e83e43b996a5db1854bc8f50f225fd7cb2416a30cd35cbb4869b4ecb15",
         "replacements": [
           {
             "line": 17,
             "sourceLine": 17,
             "before": "docs/id-systems-audit.md",
-            "after": "`docs/id-systems-audit.md`",
+            "after": "Historical source: `docs/id-systems-audit.md`",
             "ownerRowIds": [
               "f06591"
             ]
           }
         ],
-        "patch": "--- a/docs/platform/documentation/history/id-systems-audit.md\n+++ b/docs/platform/documentation/history/id-systems-audit.md\n@@ -14,7 +14,7 @@\n Do not use this for: Current canonical authority or proof of implemented behavior\n Last reviewed: 2026-10-14\n Related:\n-- docs/id-systems-audit.md\n+- `docs/id-systems-audit.md`\n Supersedes: None; candidate only\n Superseded by: None\n ```\n"
+        "patch": "--- a/docs/platform/documentation/history/id-systems-audit.md\n+++ b/docs/platform/documentation/history/id-systems-audit.md\n@@ -14,7 +14,7 @@\n Do not use this for: Current canonical authority or proof of implemented behavior\n Last reviewed: 2026-10-14\n Related:\n-- docs/id-systems-audit.md\n+- Historical source: `docs/id-systems-audit.md`\n Supersedes: None; candidate only\n Superseded by: None\n ```\n"
       }
     },
     {
@@ -16266,19 +16266,19 @@
           "f07205"
         ],
         "sourceSha256": "dfee7edd8a926ff1e64d0132770eedf243ccf3cbaf638d95c15b9fe72e8e28f5",
-        "proposedSha256": "6a567896e49b448f79c933837d61d72a5a5b35d02e8ba07fc378fb6e43fe5493",
+        "proposedSha256": "663defbbf56bf6a1413eee922b35ff7f2d42e027f9088591d4bb52efd4c848c9",
         "replacements": [
           {
             "line": 15,
             "sourceLine": 15,
             "before": "docs/distribution-vision.md",
-            "after": "`docs/distribution-vision.md`",
+            "after": "Historical source: `docs/distribution-vision.md`",
             "ownerRowIds": [
               "f07205"
             ]
           }
         ],
-        "patch": "--- a/docs/platform/packaging-distribution/history/distribution-baseline.md\n+++ b/docs/platform/packaging-distribution/history/distribution-baseline.md\n@@ -12,7 +12,7 @@\n Last reviewed: 2026-09-13\n Related:\n - docs/platform/packaging-distribution/spec.md\n-- docs/distribution-vision.md\n+- `docs/distribution-vision.md`\n - docs/platform/packaging-distribution/vision.md\n - docs/architect/packaging-distribution/history/distribution-baseline.md\n Implementation: Original section-specific implementation statements retained; carriage is pending independent review\n",
+        "patch": "--- a/docs/platform/packaging-distribution/history/distribution-baseline.md\n+++ b/docs/platform/packaging-distribution/history/distribution-baseline.md\n@@ -12,7 +12,7 @@\n Last reviewed: 2026-09-13\n Related:\n - docs/platform/packaging-distribution/spec.md\n-- docs/distribution-vision.md\n+- Historical source: `docs/distribution-vision.md`\n - docs/platform/packaging-distribution/vision.md\n - docs/architect/packaging-distribution/history/distribution-baseline.md\n Implementation: Original section-specific implementation statements retained; carriage is pending independent review\n",
         "chainEntryIds": [
           "file:docs/platform/packaging-distribution/history/distribution-baseline.md"
         ],

@@ -692,6 +692,12 @@
         "w2:status:docs/platform/work-state/README.md"
       ],
       "reason": "L13-26 retargets a still-legacy destination on a status-framing line changed by the exact base chain. Co-compose that named base input into this single final patch; no earlier source retargets this link. Other intervening patches change distinct lines and retain their ownership."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/78": {
+      "composesChain": [
+        "w8:gap05:history"
+      ],
+      "reason": "L13-24 exact co-composition: the selected carriage creation is one guarded base chain, not an independent second final owner; adjust only its relocated physical link routes in the single final patch."
     }
   }
 }

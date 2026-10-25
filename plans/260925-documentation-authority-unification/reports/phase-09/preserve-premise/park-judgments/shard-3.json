@@ -1980,9 +1980,6 @@
       "reworkNotes": [
         "The coordination-examples glob is unaffected by the move set. Preserve the carried CLI paragraph verbatim under its line-23 stale-carriage note; the former patch changed a historical truth claim without a cutover trigger (review finding 2).",
         "The selected recomposed-predecessor chain is strict and executable; this preserved row has no independent patch (463077c3b, L13-21.1)."
-      ],
-      "staleChainDependencies": [
-        "file:docs/platform/runner/architecture/h-69197b459754.md"
       ]
     },
     {

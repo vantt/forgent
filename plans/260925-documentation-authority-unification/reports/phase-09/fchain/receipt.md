@@ -1,4 +1,158 @@
-# One F composition door — link retarget and work-state rebase receipt
+# Whole-population link guard — records-only receipt
+
+Authority: L13-24, L13-26 and L13-28; [brief](../w34-link-guard-brief.md),
+[w33 review](../reviews/w33-link-retargets-review.json). Turn-start and replay pin:
+`0557f175b0ec253f56d803d0995ea0f26c7faea7`. **All five required proofs pass.
+No source application, semantic approval, decision change, lease, gate closure or
+cutover authorization.**
+
+## Population, before any retarget amendments
+
+The new scanner examined all **628 Markdown files** in the composed platform
+population, not only files touched by F. It uses pinned Git objects minus the
+move set, with composed after-images and newly created files overlaid. Files and
+directories must exist there; anchors come directly from the unit extractor via
+`scripts/list-doc-anchors.mjs::listAnchors`, including its accepted heading slugs.
+
+| Measure | Before | After |
+| --- | ---: | ---: |
+| Local clickable/Related destinations examined | 2,722 | 2,701 |
+| Related entries pointing into the move set | 67 | 0 |
+| Other missing Related destinations | 2 | 0 |
+| Missing clickable file destinations | 41 | 0 |
+| Missing clickable anchors | 7 | 0 |
+| Total `linkGuard` findings | **117** | **0** |
+| Prepared link record rows / file patches | 162 / 41 | 285 / 82 |
+| Composed files / executed proposals | 572 / 182 | 594 / 223 |
+| Explicit existing composition links | 20 | 20 |
+| Owning F controls | 19 | 21 |
+
+The w33 legacy-regex population is reproduced exactly: **411** failures in pin
+files and **24** in F-created files, **435** total. Of those source occurrences,
+**398 are inside literal fences**, and **37 are live relative routes** (13 in pin
+files, all 24 in created files). The 398 literal occurrences remain byte-for-byte
+unchanged, as required by the brief; they are text, not exempted live links. The
+41 missing clickable files comprise those 37 routes plus four machine-absolute
+historical proof citations. Seven anchor failures and 69 Related failures make
+the full 117. The old backtick-only regex still misreads the same 398 literal
+occurrences after this work. The eventual cutover guard must agree with the
+matched-fence/unit-anchor semantics of this pre-F witness (L13-28.4), rather than
+restore that old regex's false positives.
+
+[link-scan-before.json](link-scan-before.json) retains every initial finding and
+all 435 legacy-regex occurrences with literal/source coordinates. An initial
+scratch comparison reported 471 because it compared trailing-slash directory
+strings incorrectly; its 36 existing directories are not findings. The corrected
+435 census, not that diagnostic, is the recorded evidence.
+
+## Rules and single ownership
+
+[link-retargets.json](link-retargets.json) remains the only retarget record. Each
+row carries its rule, source selector and exact replacement basis. Each file has
+one combined forward/rollback patch. The original 41 patch indices remain stable;
+only new-file patch selectors follow them.
+
+| Owning rule | Rows |
+| --- | ---: |
+| L13-28.2.1 — evidenced successor / anchor rename | 196 |
+| L13-28.2.2 — absent target, no successor, made literal | 16 |
+| L13-28.2.3 — self-link to matching source-title anchor, otherwise literal | 64 |
+| L13-28.4 — link to the earlier lineage-formatting owner | 3 |
+| L13-28.5 — additional gateway references | 6 |
+| Total | **285** |
+
+Rule 2.4 additionally fixes **10** old-path labels; the eleventh reviewed label
+is in the one original self-link made literal. All **24** w33 self-links are
+accounted: **23** point to the matching original-source title anchor, **1** has no
+matching anchor and becomes a code span. Related self-references use the same
+rule. There are 19 newly literal rows overall; earlier literal lineage operands
+are not converted back into live authority claims.
+
+- **Row 125:** exact destination span 2184–2210, `../../reading-map.md`, G5 survivor
+  `docs/reading-map.md`, null alias, plan/G5 selector. Its w33-only intermediate
+  postimage is independently verified as
+  `8ce81ee7f54c1f655e6e814b6f76e8448bb29efff04c83b64de3d75427c9b884`.
+  `/patches/24` has the same preimage, but its final combined hash is
+  `15feba80d72ad7e128a4a9efe0b1dfbb63692422a6283be1a23c0801ed9d988a`,
+  because the same file also needs L13-28's self-anchor and Related amendments.
+  Keeping the intermediate hash as the final hash would miscertify those bytes;
+  `row125ReviewCheckpoint` preserves the exact requested intermediate witness.
+- **Three already-owned lines:** f06461, f06591 and f07205 already own literal
+  lineage formatting in shard 2. Their patches now say `Historical source:`
+  before the same exact code-span operand, so Related readers do not mistake
+  literal provenance for a route. The new record links those owners and carries
+  no second delta for those lines. Their judgments, paths and frozen evidence
+  are unchanged. Both preserve obligations still pass.
+- **Carriage creation:** its existing `w8:gap05:history` chain is explicitly
+  co-composed through the existing exact-base `composesChain` edge. This uses
+  the established single final owning patch, not a new replay/overlap waiver.
+- **Gateway:** both `x-specs` entries remain on their whole-file successors.
+  All four descriptions at 456/607/710/739 follow those same successors. The two
+  removed decision-file citations point to their named retained decision
+  headings. The real YAML key is `x-decisions` (called `x-docs` in the brief).
+- Removed only f07667's contradictory `staleChainDependencies` field. No other
+  judgment, reason, evidence or decision changed.
+
+## Reused doors and proof
+
+`compose()` and `composition/compose.py::apply_diff` remain the sole replay
+engine. `links.py` extends its existing coordinate-preserving scanner with
+Related metadata, file/anchor resolution and the existing extractor's anchor
+lookup; no copied slug algorithm or alternate apply engine. Inline, used
+reference, image and HTML href destinations are covered. `[x](<…>)` is counted
+once; HTML closing tags are not mistaken for local autolinks. Code spans,
+backtick/tilde fences and comments remain literal. The owning control retains
+the moved-path injection and adds broken ordinary/Related anchors, valid
+extracted anchors, Related root directories and literal-code checks through a
+real `compose()` invocation. Blank lines end the Related list as in its owner.
+
+[link-validation.json](link-validation.json) authenticates all **82** exact
+forward/inverse roundtrips, staged row-to-patch coverage, the three earlier-owner
+links, all 787 unchanged judgments/frozen evidence, all 158 unchanged G9
+decisions, unchanged historical composition records and **16,614** unchanged
+Markdown literal regions outside Related operands. The move set, aliases, all
+source documents, ledgers, register and reviews remain untouched.
+
+With `P=plans/260925-documentation-authority-unification/reports/phase-09`, from
+repository root, `NODE_OPTIONS=--no-addons` and every Python invocation `-B`:
+
+| Command | Exit / result |
+| --- | --- |
+| `python3 -B $P/fchain/check.py --pin HEAD` | **0**; 594 files, 223 executed, 20 links, no findings including `linkGuard` |
+| `python3 -B $P/fchain/controls.py` | **0**; 21 controls |
+| `python3 -B $P/preserve-premise/park-judgments/check_shard.py --all` | **0**; 787 rows, 0 unresolved, 24 existing resolved markers |
+| `python3 -B $P/g9/check_phase9_decisions.py` | **0**; 158 entries, 594 shared-chain files, 12 gateway readers |
+| `node $P/carries/verify-carries.mjs` | **0**; 44 claims, 24 pointer files, 1,208 current bindings; two existing final-pin duties unchanged |
+| `python3 -B -c <validationSource in link-commands.json>` | **0**; population, exact roundtrips, staged ownership, source/decision/literal conservation |
+| `git diff --check` | **0** |
+
+[link-commands.json](link-commands.json) records final argv/stdout/stderr/exits and
+self-contained validation source; its previous command evidence stays historical.
+Diagnostic commands are not passing proofs: the first baseline serialization
+failed on Python sets; the first author attempt assumed the wrong YAML index;
+the first integrated F replay rejected six same-line/preservation findings;
+a scratch Node census hit its default buffer limit; the initial directory census
+was corrected as above. Early validation diagnostics rejected YAML backtick
+citations under a Markdown-only assertion, timed out on a character-level diff,
+and rejected an absolute Git object path. The final validation checks exact
+Markdown literal regions and uses repository-relative Git paths; none of the
+production checks were disabled or weakened.
+
+The transient `chain-check-0557f175b.json` is removed after its result was captured;
+no unrelated volatile output is retained. Scratch stays in auto-created tempfile
+directories under `/tmp/fgos-work/` and is removed at completion. No git writes,
+fgOS CLI, private state, native addons, product/full-suite tests, forbidden audit
+or pair accounting ran. No config/env default or new infrastructure component
+was added: Node and the anchor extractor already serve the required proof doors.
+Impact-analysis remains **degraded** under the no-CLI/no-MCP task boundary;
+static callers are the F door, premise/G9 wiring and owning controls, not a
+certified complete blast radius. Markdown preview is not started because this
+records-only task forbids extra state/service writes. Final-F acceptance,
+independent review and cutover-guard wiring remain open.
+
+---
+
+# Previous link-retarget and work-state rebase receipt (historical)
 
 Status: **all required mechanical records proofs pass; no product application,
 semantic approval, lease, gate closure or cutover authorization.** Authority:
