@@ -40,9 +40,10 @@ import { CODEX_FEATURES_OFF, writeCodexConfig } from '../../scripts/lib/mailbox-
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const MODULE = path.join(REPO, 'scripts', 'lib', 'mailbox-live-confined.mjs');
 const STUB = path.join(REPO, 'test', 'live', 'mailbox-behaviour-stub.mjs');
-// The real machine's home, where this checkout, the login stores and the planted secret live: the
-// test process's own HOME is an empty one (process-tmp-root.mjs), which the mask must not be aimed at.
-const HOME = os.userInfo().homedir;
+// The real machine's home, where this checkout, the login stores and the planted secret live. Only
+// the mask plans and the probe targets use it; everything this test runs outside a sandbox keeps the
+// process's own empty HOME (process-tmp-root.mjs).
+const REAL_HOME = os.userInfo().homedir;
 
 function hasWorkingBwrap(binary = '/usr/bin/bwrap') {
   if (os.platform() !== 'linux') return false;
@@ -64,7 +65,7 @@ function shim() {
 /** The pinned Codex release directory, when Codex is installed here. */
 function codexRelease() {
   try {
-    return path.dirname(path.dirname(fs.realpathSync(path.join(HOME, '.local', 'bin', 'codex'))));
+    return path.dirname(path.dirname(fs.realpathSync(path.join(REAL_HOME, '.local', 'bin', 'codex'))));
   } catch {
     return null;
   }
@@ -99,7 +100,7 @@ function world() {
   fs.writeFileSync(planted, 'PLANTED\n');
   const sibling = path.join(base, 'run-sibling');
   fs.mkdirSync(sibling, { recursive: true });
-  const masks = maskPlan({ home: HOME, allow: ALLOW() });
+  const masks = maskPlan({ home: REAL_HOME, allow: ALLOW() });
   return { base, release, loginHome, login, secret, planted, sibling, masks };
 }
 
@@ -133,18 +134,18 @@ function writeTargets(w, runId) {
     base: path.join(w.base, 'probe.txt'),
     repo: path.join(REPO, '.fgos', 'runtime', `mbx-confined-probe-${process.pid}.txt`),
     planted: w.planted,
-    realClaude: path.join(HOME, '.claude', `mbx-confined-probe-${process.pid}.txt`),
+    realClaude: path.join(REAL_HOME, '.claude', `mbx-confined-probe-${process.pid}.txt`),
   };
 }
 
 function readTargets(w, runId) {
   const targets = {
-    claudeJson: path.join(HOME, '.claude.json'),
+    claudeJson: path.join(REAL_HOME, '.claude.json'),
     secret: w.secret,
     ownCopy: path.join(w.base, runId, 'home', '.claude', '.credentials.json'),
   };
-  if (fs.existsSync(path.join(HOME, '.claude'))) targets.claudeLogin = path.join(HOME, '.claude', '.credentials.json');
-  const tetnu = path.join(HOME, '.codex-tetnu', 'auth.json');
+  if (fs.existsSync(path.join(REAL_HOME, '.claude'))) targets.claudeLogin = path.join(REAL_HOME, '.claude', '.credentials.json');
+  const tetnu = path.join(REAL_HOME, '.codex-tetnu', 'auth.json');
   if (fs.existsSync(path.dirname(tetnu))) targets.codexLogin = tetnu;
   return targets;
 }
@@ -226,7 +227,7 @@ async function waitFor(fn, ms = 20_000) {
 
 /** The harness's own send, from outside every sandbox, through the run's shim. */
 function harnessSend(ws, to, body) {
-  const out = cp.spawnSync(path.join(ws, '.fgos', 'installation', 'bin', 'fgos'), ['mailbox', 'send', '--to', to, '--', body], { cwd: ws, env: { PATH: process.env.PATH, HOME, FGOS_SESSION_ID: 'mailbox-behaviour-harness' }, encoding: 'utf8' });
+  const out = cp.spawnSync(path.join(ws, '.fgos', 'installation', 'bin', 'fgos'), ['mailbox', 'send', '--to', to, '--', body], { cwd: ws, env: { PATH: process.env.PATH, HOME: os.homedir(), FGOS_SESSION_ID: 'mailbox-behaviour-harness' }, encoding: 'utf8' });
   return { status: out.status, text: `${out.stdout}${out.stderr}` };
 }
 
@@ -494,7 +495,7 @@ test('a confined Codex run lists no MCP server and has its connectors off, and t
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'mbx-mcp-'));
   const loginHome = makeFixtureDir('mbx-mcp-login-');
   fs.writeFileSync(path.join(loginHome, 'auth.json'), '{"tokens":{"access_token":"SCRATCH-NOT-A-TOKEN"}}');
-  const masks = maskPlan({ home: HOME, allow: ALLOW() });
+  const masks = maskPlan({ home: REAL_HOME, allow: ALLOW() });
   const codex = path.join(release, 'bin', 'codex');
   const zeroModel = async (runId, args, config) => {
     const prepared = prepareConfinedRun({ base, runId, command: codex, args, env: baseEnv(), masks, login: { cli: 'codex', home: loginHome } });
@@ -543,12 +544,12 @@ test('a confined pi or omp run cannot read the real account stores, starts from 
   const install = piOmpInstall();
   if (!install) return t.skip('pi and omp are not installed');
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'mbx-piomp-'));
-  const masks = maskPlan({ home: HOME, allow: [...install.allow, path.dirname(path.dirname(process.execPath))] });
+  const masks = maskPlan({ home: REAL_HOME, allow: [...install.allow, path.dirname(path.dirname(process.execPath))] });
   // Every account store of both CLIs, by the real paths the owner's accounts use.
   const stores = Object.fromEntries([
-    ...['.pi/accounts', '.omp/profiles'].flatMap((dir) => (fs.existsSync(path.join(HOME, dir)) ? fs.readdirSync(path.join(HOME, dir)).map((a) => [`${dir}/${a}`, path.join(HOME, dir, a)]) : [])),
-    ['.pi/agent/auth.json', path.join(HOME, '.pi', 'agent', 'auth.json')],
-    ['.omp/agent/agent.db', path.join(HOME, '.omp', 'agent', 'agent.db')],
+    ...['.pi/accounts', '.omp/profiles'].flatMap((dir) => (fs.existsSync(path.join(REAL_HOME, dir)) ? fs.readdirSync(path.join(REAL_HOME, dir)).map((a) => [`${dir}/${a}`, path.join(REAL_HOME, dir, a)]) : [])),
+    ['.pi/agent/auth.json', path.join(REAL_HOME, '.pi', 'agent', 'auth.json')],
+    ['.omp/agent/agent.db', path.join(REAL_HOME, '.omp', 'agent', 'agent.db')],
   ]);
   const confinedRun = async (runId, command, args, { env = {}, accountLogin }) => {
     const prepared = prepareConfinedRun({ base, runId, command, args, env: baseEnv(env), masks, accountLogin });
