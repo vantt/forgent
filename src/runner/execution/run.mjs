@@ -24,7 +24,7 @@ import { isSeatRecord } from './legacy-seat-read.mjs';
 import { assertSeatId } from '../../convention/seat-id.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
-import { verifyCommandOf } from './patterns/reviewed.mjs';
+import { ERROR_OUTCOMES, verifyCommandOf } from './patterns/reviewed.mjs';
 import { runCommand } from '../goal-check.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { resolveMutatingCwdPosture } from '../dispatch/execution-contract.mjs';
@@ -883,12 +883,12 @@ async function runUnitBody(options, scope) {
   // adopt result is still pending; a seat whose last attempt ended without a pass is bound again
   // from the current config as a new attempt.
   if (!unitRecord.bindings || typeof unitRecord.bindings !== 'object') unitRecord.bindings = {};
-  // Read once, before this resume changes any attempt: the seats whose last attempt ended without a pass
-  // and has no commit or adopt result pending. A seat with no recorded outcome is adopted, never bound again.
+  // Read once, before this resume changes any attempt: the seats whose last attempt ended in a failure (not a
+  // pass, not findings) and has no commit or adopt result pending. A seat with no recorded outcome is adopted, never bound again.
   const rebindKeys = new Set(Object.entries(unitRecord.bindings)
     .filter(([, attempts]) => {
       const last = attempts.at(-1);
-      return options.resumeUnitRunId !== undefined && last?.outcome !== undefined && last.outcome !== 'pass'
+      return options.resumeUnitRunId !== undefined && ERROR_OUTCOMES.includes(last?.outcome)
         && !commitPending(last, unitRecord.worktree, mainRoot, scope.custody);
     })
     .map(([key]) => key));

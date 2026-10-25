@@ -16,7 +16,8 @@ export const VALID_OUTCOMES = Object.freeze([
   'blocked',
 ]);
 
-const ERROR_OUTCOMES = Object.freeze([
+/** The outcomes of a seat that did not finish its job; `pass` and `findings` are completed judgments. */
+export const ERROR_OUTCOMES = Object.freeze([
   'execution-failure',
   'policy-refusal',
   'provider-limit',
