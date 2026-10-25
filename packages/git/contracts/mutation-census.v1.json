@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "839b6cc6fbd043ef1ded0b32561fb433bbd929beea0922ea0586647f11c718e0",
+  "payloadDigest": "3d5d180b30cc1839bcf7a02a8d11a714b3fb82f811e2b011f2ce706398da16c5",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -487,7 +487,7 @@
     "packages/identity/rust/tests/attempt_writer_id.rs": "9170856b8918fbda7495ec34b37a621dae88ca4bdd58704bf0bf730a0d132f3d",
     "packages/identity/rust/tests/directory.rs": "4f7c812132216c521fb9c275d8e6b484238130d0db60df4d54d8685cd63041a7",
     "packages/identity/rust/tests/golden.rs": "f22744dd668eb261d0cb8478431c840244411b49002bdd1a1f878d4e8a74a341",
-    "packages/identity/rust/tests/machine.rs": "76155972ad73523fcfd7509c23c6feb7b06b683790c913ab7525cd9a30016f63",
+    "packages/identity/rust/tests/machine.rs": "2ab044b95b3b510cbf5b2463b9751b95eb40064fc7c834ff935fdfdea81a9303",
     "packages/identity/rust/tests/mint.rs": "65e1170c4489b9d1e954d606f7d81fc8ebbec2edc9b13805800194c521b45450",
     "packages/identity/rust/tests/project.rs": "671a08c90467def2f1cd9d41e1bee86a7256a6af4b1a1c18f1b18ff5fe0cbf98",
     "packages/identity/rust/tests/register_current.rs": "fb50c4e4605ff3d6d5d2411ad480166a0eb1224a133415348d6d58ef363d4374",

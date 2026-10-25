@@ -91,8 +91,11 @@ fn mint_refuses_and_preserves_an_invalid_or_symlinked_existing_id() {
     assert!(matches!(machine::mint(&root, "a-host"), Err(Error::Invalid(_))));
     assert_eq!(fs::read_to_string(&file).unwrap(), "INVALID");
     fs::remove_file(&file).unwrap();
-    std::os::unix::fs::symlink(root.join("elsewhere"), &file).unwrap();
-    assert!(matches!(machine::mint(&root, "a-host"), Err(Error::Invalid(_))));
+    #[cfg(unix)]
+    {
+        std::os::unix::fs::symlink(root.join("elsewhere"), &file).unwrap();
+        assert!(matches!(machine::mint(&root, "a-host"), Err(Error::Invalid(_))));
+    }
     let _ = fs::remove_dir_all(root);
 }
 
