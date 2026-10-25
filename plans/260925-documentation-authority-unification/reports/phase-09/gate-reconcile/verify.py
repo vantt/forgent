@@ -69,6 +69,25 @@ def check():
     for path, entry in review_inputs.items():
         raw = git('show', f'{review_pin}:{path}')
         require(hashlib.sha256(raw).hexdigest() == entry['sha256'], 'review follow-up fingerprint drift: ' + path)
+    catchup = receipt['catchUp']
+    catchup_pin = catchup['sourceCommit']
+    require(register['asOf']['catchUpCommit'] == catchup_pin, 'catch-up pin mismatch')
+    require(subprocess.run(['git', 'merge-base', '--is-ancestor', catchup_pin, head], cwd=ROOT,
+                           capture_output=True).returncode == 0, 'catch-up pin not ancestor of HEAD')
+    catchup_inputs = {entry['path']: entry for entry in catchup['inputs']}
+    required_catchup_paths = {str(BASE / rel) for rel in [
+        'owner-answers.md', 'w21-register-catchup-brief.md', 'g5/check.py', 'g5/check-b57e79625.json',
+        *['reviews/' + name + '.' + suffix
+          for name in ['w20-census-settlement-review', 'w21-census-rework-and-g5-review']
+          for suffix in ['md', 'json']],
+    ]}
+    require(set(catchup_inputs) == required_catchup_paths and len(catchup_inputs) == len(catchup['inputs']),
+            'catch-up input coverage')
+    for path, entry in catchup_inputs.items():
+        require(hashlib.sha256(git('show', f'{catchup_pin}:{path}')).hexdigest() == entry['sha256'],
+                'catch-up fingerprint drift: ' + path)
+    evidence_pins = {path: review_pin for path in review_inputs}
+    evidence_pins.update({path: catchup_pin for path in catchup_inputs})
     original = json.loads(git('show', f'{pin}:{BASE}/preflip-gate-status.json'))
     expected = {}
     for index, gate in enumerate(original['gates']):
@@ -105,13 +124,17 @@ def check():
         for entries in fields(document, 'clearedBy'):
             require(isinstance(entries, list) and entries, 'clearedBy must name commits')
             commits.update(entries)
-    review_commits = {commit for gate in register['gates'] for entry in gate['cleared']
-                      if any(str(BASE / p) in review_inputs for p in entry['reviews'])
-                      for commit in entry['clearedBy']}
+    commit_pins = {}
+    for gate in register['gates']:
+        for entry in gate['cleared']:
+            targets = {evidence_pins.get(str(BASE / p), pin) for p in entry['reviews']}
+            target = catchup_pin if catchup_pin in targets else review_pin if review_pin in targets else pin
+            for commit in entry['clearedBy']:
+                commit_pins[commit] = target
     for commit in sorted({*commits, pin}):
         # No user-controlled shell interpolation: git receives an argv array.
         require(len(git('rev-parse', '--verify', commit + '^{commit}').decode().strip()) == 40, 'bad commit ' + commit)
-        for target in [review_pin if commit in review_commits else pin, head]:
+        for target in [commit_pins.get(commit, pin), head]:
             result = subprocess.run(['git', 'merge-base', '--is-ancestor', commit, target], cwd=ROOT, capture_output=True)
             require(result.returncode == 0, f'clearedBy/asOf {commit} not ancestor of {target}')
 
@@ -124,11 +147,11 @@ def check():
             require(entry['reviews'] and entry['verdict'], 'cleared lacks independent review')
             quoted = False
             for path in entry['reviews']:
-                quote_pin = review_pin if str(BASE / path) in review_inputs else pin
+                quote_pin = evidence_pins.get(str(BASE / path), pin)
                 raw = git('show', f'{quote_pin}:{BASE}/{path}').decode()
                 if path.endswith('.json'):
                     data = json.loads(raw)
-                    for row in data.get('verdicts', data.get('findings', data.get('rows', []))):
+                    for row in data.get('verdicts', data.get('findings', data.get('rows', data.get('items', [])))):
                         text = row.get('reason', row.get('summary', ''))
                         if row.get('verdict', '') + ': ' + text == entry['verdict']:
                             quoted = True
@@ -141,7 +164,8 @@ def check():
             require(not gate['blockers'] and not gate['remaining'], gate['g'] + ' has before-F local work')
         require(gate['evidence'], gate['g'] + ' lacks provenance')
         if gate['commit'] is not None:
-            require(subprocess.run(['git', 'merge-base', '--is-ancestor', gate['commit'], pin], cwd=ROOT,
+            require(subprocess.run(['git', 'merge-base', '--is-ancestor', gate['commit'],
+                                    commit_pins.get(gate['commit'], pin)], cwd=ROOT,
                                    capture_output=True).returncode == 0, 'gate commit outside snapshot')
     require([gate['g'] for gate in register['gates']] == [f'G{i}' for i in range(12)], 'gate coverage')
     require([gate['gateId'] for gate in register['gates']] == [gate['gateId'] for gate in original['gates']], 'gate ids changed')
@@ -190,19 +214,21 @@ def check():
     require(log['lines'] == len(expected_log.splitlines()), 'plan-branch log count differs')
     for entry in paths:
         if not entry.startswith('gate-reconcile/'):
-            require(str(BASE / entry) in inputs or str(BASE / entry) in review_inputs, 'cited evidence not fingerprinted: ' + entry)
+            require(str(BASE / entry) in inputs or str(BASE / entry) in evidence_pins, 'cited evidence not fingerprinted: ' + entry)
     return {'status': 'passed', 'exit': 0, 'asOf': pin, 'checkedAtHead': head,
             'originalOccurrences': len(decisions), 'gates': len(register['gates']),
             'reviewFiles': len(review_paths), 'snapshotInputs': len(inputs),
             'followUpPin': followup_pin, 'followUpInputs': len(followup['inputs']),
             'reviewFollowUpPin': review_pin, 'reviewFollowUpInputs': len(review_inputs),
+            'catchUpPin': catchup_pin, 'catchUpInputs': len(catchup_inputs),
             'evidenceAndReviewPaths': len(paths), 'clearedEntries': cleared_count,
             'exactVerdictQuotes': quotes, 'clearedByCommits': sorted(commits),
             'checks': ['original occurrence coverage and text', 'path existence',
                        'clearedBy ancestry at snapshot and HEAD', 'committed exact review quotes',
                        'before/after counts', 'met-local has no local before-F blockers',
                        'immutable input fingerprints and all-review coverage',
-                       'separate immutable follow-up input fingerprints', 'separate committed W19 review fingerprints and quotes'],
+                       'separate immutable follow-up input fingerprints', 'separate committed W19 review fingerprints and quotes',
+                       'separate W20/W21/ruling fingerprints, quotes and ancestry'],
             'limits': 'Record integrity only. No independent semantic approval, F gate execution or full product-suite claim.'}
 
 

@@ -47,8 +47,13 @@
       "name": "False W19 review fingerprint is rejected",
       "result": "rejected",
       "error": "review follow-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/reviews/w19-live-parity-and-rebinds-review.json"
+    },
+    {
+      "name": "False catch-up review or ruling fingerprint is rejected",
+      "result": "rejected",
+      "error": "catch-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/g5/check-b57e79625.json"
     }
   ],
-  "count": 9,
+  "count": 10,
   "method": "In-memory copies at the read_json test seam; real owning check(), path inspection and read-only git; no source file or assertion weakened."
 }

@@ -1,0 +1,229 @@
+{
+  "pin": "cf13e2bd22ce390344837560b35b41adf7da1238",
+  "scope": "Records-only catch-up under L13-18–19; no product tests, git writes or native addons.",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+        "--pin",
+        "cf13e2bd22ce390344837560b35b41adf7da1238"
+      ],
+      "exit": 0,
+      "stdoutSha256": "40fd028b010a52a65e75dd93495030f795a96a1aa40496536f72f0c22002c9ee",
+      "stderr": "",
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 54, \"joined-by-citation\": 4, \"joined-owning-test\": 779}}\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+        "--pin",
+        "cf13e2bd22ce390344837560b35b41adf7da1238"
+      ],
+      "exit": 0,
+      "stdoutSha256": "40fd028b010a52a65e75dd93495030f795a96a1aa40496536f72f0c22002c9ee",
+      "stderr": "",
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 54, \"joined-by-citation\": 4, \"joined-owning-test\": 779}}\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g5/check.py",
+        "--pin",
+        "b57e79625"
+      ],
+      "exit": 0,
+      "stdoutSha256": "c3c1fee220269c470e005e40ba5eaf711fdaca3850c714410cd7a47724188b0f",
+      "stderr": "",
+      "stdoutRef": "g5/check-b57e79625.json"
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/citations.py",
+        "--pin",
+        "cf13e2bd22ce390344837560b35b41adf7da1238"
+      ],
+      "exit": 0,
+      "stdoutSha256": "2a2f069fc65e2da5caef1487b21ae10289a1b2f9c3ada075bba756fd298aa189",
+      "stdout": "{\"bindings\": 5, \"checkOnly\": false, \"citations\": 4, \"sourceCommit\": \"cf13e2bd22ce390344837560b35b41adf7da1238\", \"status\": \"passed\", \"unappliedPatches\": 4, \"zeroFuzzReplays\": 8}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/reconcile.py"
+      ],
+      "exit": 0,
+      "stdoutSha256": "88063a6f9436fd97badc8d6ea952161d3235ec5837ac67788b74b32a5b57b03b",
+      "stdout": "{\n  \"gates\": 12,\n  \"originalOccurrences\": 87,\n  \"reviewsRead\": 110,\n  \"inputs\": 169\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/reconcile.py"
+      ],
+      "exit": 0,
+      "stdoutSha256": "88063a6f9436fd97badc8d6ea952161d3235ec5837ac67788b74b32a5b57b03b",
+      "stdout": "{\n  \"gates\": 12,\n  \"originalOccurrences\": 87,\n  \"reviewsRead\": 110,\n  \"inputs\": 169\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py"
+      ],
+      "exit": 0,
+      "stdoutSha256": "79b03785c1071b91e5fa6fc4af2b614ada4934a6dd794199d226d5b54dd775be",
+      "stdout": "{\n  \"status\": \"passed\",\n  \"exit\": 0,\n  \"asOf\": \"53de2207e1ea8a9417ac131f785704d6ab72ba2c\",\n  \"checkedAtHead\": \"cf13e2bd22ce390344837560b35b41adf7da1238\",\n  \"originalOccurrences\": 87,\n  \"gates\": 12,\n  \"reviewFiles\": 110,\n  \"snapshotInputs\": 169,\n  \"followUpPin\": \"a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6\",\n  \"followUpInputs\": 4,\n  \"reviewFollowUpPin\": \"98d9201f1905e433a40b94d8d8b0fb9fefda1452\",\n  \"reviewFollowUpInputs\": 3,\n  \"catchUpPin\": \"cf13e2bd22ce390344837560b35b41adf7da1238\",\n  \"catchUpInputs\": 8,\n  \"evidenceAndReviewPaths\": 118,\n  \"clearedEntries\": 24,\n  \"exactVerdictQuotes\": 24,\n  \"clearedByCommits\": [\n    \"0fe6c4381\",\n    \"25aa41510\",\n    \"25e8842d3\",\n    \"33cc5539d\",\n    \"408078b9a\",\n    \"4c9e1f31e\",\n    \"4f08d504d\",\n    \"53499dc9d\",\n    \"5a3f7580a\",\n    \"5c3b57347\",\n    \"5fe778624\",\n    \"63c3db9c6\",\n    \"63c884240\",\n    \"6f5b9419d\",\n    \"83916a31f\",\n    \"928f5cc14\",\n    \"984829939\",\n    \"a8ea05c50\",\n    \"b57e79625\",\n    \"bc2a6a014\",\n    \"c25e8cf6a\",\n    \"c5586146c\",\n    \"d22072da2\",\n    \"d786e305e\",\n    \"daa87810b\",\n    \"db023f065\",\n    \"f67e0f676\"\n  ],\n  \"checks\": [\n    \"original occurrence coverage and text\",\n    \"path existence\",\n    \"clearedBy ancestry at snapshot and HEAD\",\n    \"committed exact review quotes\",\n    \"before/after counts\",\n    \"met-local has no local before-F blockers\",\n    \"immutable input fingerprints and all-review coverage\",\n    \"separate immutable follow-up input fingerprints\",\n    \"separate committed W19 review fingerprints and quotes\",\n    \"separate W20/W21/ruling fingerprints, quotes and ancestry\"\n  ],\n  \"limits\": \"Record integrity only. No independent semantic approval, F gate execution or full product-suite claim.\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py"
+      ],
+      "exit": 0,
+      "stdoutSha256": "82d70aee84b5b91d62dec2ff33aacd0443f4f9bc77a2d1fdd7ab02088ffbbcc5",
+      "stdout": "{\n  \"status\": \"passed\",\n  \"asOf\": \"53de2207e1ea8a9417ac131f785704d6ab72ba2c\",\n  \"positive\": \"passed\",\n  \"negativeControls\": [\n    {\n      \"name\": \"Missing evidence path is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"missing evidence path: gate-reconcile/absent-negative-control.json\"\n    },\n    {\n      \"name\": \"Existing commit outside the snapshot ancestry is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"clearedBy/asOf 42c5a0a55 not ancestor of 53de2207e1ea8a9417ac131f785704d6ab72ba2c\"\n    },\n    {\n      \"name\": \"Invented verdict quotation is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"not an exact review verdict quote: The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F.\"\n    },\n    {\n      \"name\": \"Met-local with local before-F work is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"G3 has before-F local work\"\n    },\n    {\n      \"name\": \"Omitted original occurrence is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"missing/extra/altered original occurrence\"\n    },\n    {\n      \"name\": \"False before/after counts are rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"before/after counts drift\"\n    },\n    {\n      \"name\": \"False snapshot fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"snapshot hash drift: plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md\"\n    },\n    {\n      \"name\": \"False follow-up fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"follow-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md\"\n    },\n    {\n      \"name\": \"False W19 review fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"review follow-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/reviews/w19-live-parity-and-rebinds-review.json\"\n    },\n    {\n      \"name\": \"False catch-up review or ruling fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"catch-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/g5/check-b57e79625.json\"\n    }\n  ],\n  \"count\": 10,\n  \"method\": \"In-memory copies at the read_json test seam; real owning check(), path inspection and read-only git; no source file or assertion weakened.\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "earlierAttempt": "Initial pair of joins exited 0 and was byte-identical, but a subsequent record assertion caught stale automatic owningProofs on the new REJECT. The existing REJECT update now clears those proofs and inferred custody. Final pair below proves the correction; the earlier wrapper exited 1 and is not counted as passing evidence.",
+  "scratch": {
+    "kind": "tempfile.TemporaryDirectory",
+    "parent": "/tmp/fgos-work/",
+    "removedOnExit": true
+  },
+  "joinReplay": {
+    "runs": 2,
+    "byteIdentical": true,
+    "outputs": {
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.json": "c195d07315a029f7955fae782e759af258ac0938c1d333e8d92e57892e6b91c0",
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/residue.json": "ee4b88309064d35ea7b2513a3bade1a095df05bf11a0a53c676e4646b526cedd",
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/settlement.json": "fe7dace7fa4ebbc42b07056b0d76892f6862001f1b5073f6e437c24fbfc09400",
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/citation-bindings.json": "c0040cc11716b16099494ad4f44abdce482334697a2b2eed7719ded7d526bad1",
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/pointer-patches.json": "65b10247e42bebb627dbb5c36b658bfc53ef7c9eacc60be71049dc047f4a78f2"
+    }
+  },
+  "g5Replay": {
+    "byteIdenticalTo": "g5/check-b57e79625.json",
+    "sha256": "c3c1fee220269c470e005e40ba5eaf711fdaca3850c714410cd7a47724188b0f",
+    "controls": 31,
+    "reproductionAssertionsExit": 0
+  },
+  "generatorReplay": {
+    "runs": 2,
+    "byteIdentical": true,
+    "outputs": {
+      "plans/260925-documentation-authority-unification/reports/phase-09/preflip-gate-status.json": "39acc3565f22c35f8776f189a305da22356f0c070b69c7c3afa68327f86aa778",
+      "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.json": "f293ab1d8b3cea235d40eac5247482c80a22cfc0e43e4c4e3729b3c2e7a7ef2d",
+      "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.md": "150a7f67fe88831715aa08850e1a599f64260b3e2979043f2fdb3a6bacab8862",
+      "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/sources.json": "a01e36251707e446088715cb6a8084cda6a753e7f90d5e336ac329090c239bb4",
+      "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/plan-branch-log.txt": "abcd3b28e1d719145cb6081f472a1c82134f3d4f8bed02b4cb060c5d2b30e2b4"
+    }
+  },
+  "volatileFields": {
+    "gate-reconcile/verification.json": {
+      "checkedAtHead": {
+        "observed": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "restored": "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
+      }
+    }
+  },
+  "verificationSha256AfterVolatileRestore": "74ea7e4c7e50943376f1dd8c237ef3b5fed988f44b889478d5347d483aa6d6f7",
+  "controlsSha256": "82d70aee84b5b91d62dec2ff33aacd0443f4f9bc77a2d1fdd7ab02088ffbbcc5",
+  "recordAssertions": {
+    "exit": 0,
+    "censusCounts": {
+      "files": 140,
+      "sites": 1126,
+      "statuses": {
+        "confirmed-grade-record-REJECT": 289,
+        "confirmed-settlement-REJECT": 54,
+        "joined-by-citation": 4,
+        "joined-owning-test": 779
+      }
+    },
+    "openJudgments": 0,
+    "diagnosticReject": "pc-d-0288",
+    "rejectProofsEmpty": true,
+    "allOtherCensusRowsUnchangedExceptPinMetadata": true,
+    "allSourceDigestsUnchanged": true,
+    "originalSourcesInventoryByteUnchanged": true,
+    "g5ScriptAndHistoricalOutputsByteUnchanged": true,
+    "g2FinalPinDutiesUnchanged": true,
+    "metLocalGates": [
+      "G0",
+      "G1",
+      "G2",
+      "G3",
+      "G4",
+      "G5",
+      "G6",
+      "G7",
+      "G8",
+      "G9"
+    ],
+    "finalPinF": null
+  },
+  "codeSha256": {
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py": "375db05cc1a264df165fc8084f53acbfbbf029a6be066a0d2e78aa7e0d921715",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/reconcile.py": "1d283d9f18d4e66ea8b8a44a6c0dd5f2bb97f783558116c459fae1f407374f5d",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py": "c0abd83b1f85760d0b0451f29dbcbad254e7b742e824c21f62df24ad5ff87b5e",
+    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py": "145233f3a3ab47eb15d868bf0c89e8efdba2533f237d17af02d8c73cd65898a0"
+  },
+  "citationReplay": {
+    "exit": 0,
+    "byteIdentical": true,
+    "zeroFuzzReplays": 8
+  },
+  "scopeValidation": {
+    "exit": 0,
+    "changedPaths": [
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/citation-bindings.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/pointer-patches.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/receipt.md",
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/residue.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/settlement-decisions.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/settlement.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g5/receipt.md",
+      "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/catchup-proof.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py",
+      "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.md",
+      "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/reconcile.py",
+      "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verification.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py",
+      "plans/260925-documentation-authority-unification/reports/phase-09/preflip-gate-status.json"
+    ],
+    "allInsideExactGrant": true,
+    "jsonArtifactsParsed": 11,
+    "uniqueG5Sections": 4,
+    "noNeedsWrites": true
+  }
+}

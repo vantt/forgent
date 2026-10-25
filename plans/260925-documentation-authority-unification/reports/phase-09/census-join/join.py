@@ -295,7 +295,8 @@ def main():
                     assert decision['deletingCommit'] == row['deletingCommit']
                     detail['deletingCommit'] = row['deletingCommit']
                     grade['retiredSource'] = True
-                row.update(status='confirmed-settlement-REJECT', settlementGrade=grade)
+                row.update(status='confirmed-settlement-REJECT', owningProofs=[], settlementGrade=grade)
+                row.pop('custody', None)  # Do not retain an inferred test-join claim on a REJECT.
                 detail['gradeRecord'] = grade
             else:
                 assert disposition == 'owned park' and decision['owner'] and decision['nextAction']

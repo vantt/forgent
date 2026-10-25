@@ -11,13 +11,17 @@
   "followUpInputs": 4,
   "reviewFollowUpPin": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
   "reviewFollowUpInputs": 3,
-  "evidenceAndReviewPaths": 113,
-  "clearedEntries": 20,
-  "exactVerdictQuotes": 20,
+  "catchUpPin": "cf13e2bd22ce390344837560b35b41adf7da1238",
+  "catchUpInputs": 8,
+  "evidenceAndReviewPaths": 118,
+  "clearedEntries": 24,
+  "exactVerdictQuotes": 24,
   "clearedByCommits": [
     "0fe6c4381",
+    "25aa41510",
     "25e8842d3",
     "33cc5539d",
+    "408078b9a",
     "4c9e1f31e",
     "4f08d504d",
     "53499dc9d",
@@ -27,16 +31,19 @@
     "63c3db9c6",
     "63c884240",
     "6f5b9419d",
+    "83916a31f",
     "928f5cc14",
     "984829939",
     "a8ea05c50",
+    "b57e79625",
     "bc2a6a014",
     "c25e8cf6a",
     "c5586146c",
     "d22072da2",
     "d786e305e",
     "daa87810b",
-    "db023f065"
+    "db023f065",
+    "f67e0f676"
   ],
   "checks": [
     "original occurrence coverage and text",
@@ -47,7 +54,8 @@
     "met-local has no local before-F blockers",
     "immutable input fingerprints and all-review coverage",
     "separate immutable follow-up input fingerprints",
-    "separate committed W19 review fingerprints and quotes"
+    "separate committed W19 review fingerprints and quotes",
+    "separate W20/W21/ruling fingerprints, quotes and ancestry"
   ],
   "limits": "Record integrity only. No independent semantic approval, F gate execution or full product-suite claim."
 }

@@ -60,6 +60,8 @@ results = [
              lambda d: d['followUp']['inputs'][0].update(sha256='0' * 64), 'follow-up fingerprint drift'),
     exercise('False W19 review fingerprint is rejected', receipt_path,
              lambda d: d['reviewFollowUp']['inputs'][0].update(sha256='0' * 64), 'review follow-up fingerprint drift'),
+    exercise('False catch-up review or ruling fingerprint is rejected', receipt_path,
+             lambda d: d['catchUp']['inputs'][0].update(sha256='0' * 64), 'catch-up fingerprint drift'),
 ]
 result = {'status': 'passed', 'asOf': positive['asOf'], 'positive': positive['status'],
           'negativeControls': results, 'count': len(results),

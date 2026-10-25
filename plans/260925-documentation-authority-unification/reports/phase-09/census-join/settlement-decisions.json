@@ -19,6 +19,9 @@
     "rust-helper-callers": {
       "reason": "The construction is in a same-file Rust fixture helper. The named non-ignored #[test] calls that helper (possibly through another explicit same-file helper); the proof locator names the test attribute and function line, not the helper."
     },
+    "test-diagnostic-rendering": {
+      "reason": "Confirmed REJECT / non-document rendering under owner-answers.md L13-19.1: an assert.fail message template is test diagnostic output, not a document citation or data read by a product path. No deliberately failing test is needed to own this occurrence."
+    },
     "same-file-helper-audit": {
       "reason": "Audit the exact helper/closure expression and branch, not just a helper name or enclosing fixture declaration. Unproved branches stay owned parks."
     },
@@ -43,14 +46,12 @@
       ]
     },
     {
-      "id": "pc-d-0288", "file": "test/event-store/migrate-cutover-grant.test.mjs", "group": "same-file-helper-audit", "disposition": "owned park",
+      "id": "pc-d-0288", "file": "test/event-store/migrate-cutover-grant.test.mjs", "group": "test-diagnostic-rendering", "disposition": "confirmed REJECT",
       "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e",
-      "detail": "The :34 template runs only in hostScan's assert.fail arm, after clean returns at :30 and namespace-refusal skips at :31-32. All seven named callers use real baseline scans; none deliberately takes :34. The blocked-child checks do not call hostScan. No owning test for this branch is proved.",
-      "owner": "Documentation integration Lead / independent census reviewer (L13-17)",
-      "nextAction": "Before F, independently rejudge this assertion-message occurrence as non-document rendering, or bind a test deliberately reaching hostScan's failure arm. No product test is added or run in this records slice.",
+      "detail": "test/event-store/migrate-cutover-grant.test.mjs:34 is hostScan's assert.fail message template, evaluated only on failure after clean returns at :30 and namespace-refusal skips at :31-32. It renders a test diagnostic, not a documentation citation or product-path input. L13-19.1 settles the W21 A pc-d-0288 park as confirmed REJECT; no branch-owning test is claimed or added.",
       "proofs": [],
       "evidence": [
-        {"file": "test/event-store/migrate-cutover-grant.test.mjs", "line": 34, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e", "text": "  assert.fail(`a process is working inside the fixture workspace before migration: ${JSON.stringify(scan)}`);"},
+        {"file": "test/event-store/migrate-cutover-grant.test.mjs", "line": 34, "pin": "cf13e2bd22ce390344837560b35b41adf7da1238", "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e", "text": "  assert.fail(`a process is working inside the fixture workspace before migration: ${JSON.stringify(scan)}`);"},
         {"file": "test/event-store/migrate-cutover-grant.test.mjs", "line": 30, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e", "text": "  if (scan.status === 'clean') return true;"},
         {"file": "test/event-store/migrate-cutover-grant.test.mjs", "line": 31, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e", "text": "  if (scan.status === 'needs-attest' && scan.blockers.length === 0 && scan.scans.every(s => s.result === 'unavailable' && s.detail === namespaceRefusal)) {"},
         {"file": "test/event-store/migrate-cutover-grant.test.mjs", "line": 42, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e", "text": "  if (scan.status !== 'clean' && typeof gitPorts.createGitScopedCommit === 'function') { hostScan(t, scan); return; }"}
@@ -5891,5 +5892,5 @@
       "sourceSha256": null
     }
   ],
-  "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
+  "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238"
 }

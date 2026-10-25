@@ -1,6 +1,6 @@
-# Census join rework receipt
+# Census join catch-up receipt
 
-Pin: `5820ca6780ff6eec28afe09a128ac95fcd11d06c` (HEAD at start). Authority: `w20-census-join-rework-brief.md`, L12-137 / L13-17, after `reviews/w20-census-settlement-review.{md,json}`. **Records rework complete; G2 remains `partial`, pending independent review.** One newly identified failure-branch occurrence is explicitly parked. No product test ran.
+Pin: `cf13e2bd22ce390344837560b35b41adf7da1238` (HEAD at catch-up start). Authority: `w21-register-catchup-brief.md`, L12-137 / L13-17–19. W20 reviews the settlement and citations; W21 A independently approves the caller/description rework. **G2 is met-local with zero open original-census judgments** after the L13-19.1 REJECT ruling below, not final-met. No product test ran. The detailed caller audit below remains historical at `5820ca6780ff6eec28afe09a128ac95fcd11d06c`; source bytes for its files are unchanged at the current pin.
 
 ## Corrected owning-test joins
 
@@ -33,36 +33,34 @@ Description/evidence corrections:
 **4 rows fixed:** the two requested worktree rows plus two additional rows. Equivalently, **127 other rows audited, 2 additional rows fixed**; the remaining 125 retain their joins.
 
 - `pc-d-0245`: restrict `rawCli` to the test at `test/e2e/documentation-cutover-lease-hooks.test.mjs:155`: `f.setupLease()` :157 → `cli` :106 → `rawCli` :100 → body :96. The old broad fixture join also named :122, :688 and :713, which never invoke this closure.
-- `pc-d-0288`: **owned park**, `test/event-store/migrate-cutover-grant.test.mjs:34`. The template is evaluated only in `hostScan`'s `assert.fail` arm. Its seven callers perform real baseline scans; clean returns at :30 and namespace-refusal skips at :31–32 never evaluate it. No test deliberately takes the cited failure arm. The park has no owning proofs in either `join.json` or `residue.json`.
+- `pc-d-0288`: **confirmed REJECT / non-document rendering**, under `owner-answers.md` **L13-19.1**, superseding the W21 A approved owned park. Locator: `cf13e2bd22ce390344837560b35b41adf7da1238:test/event-store/migrate-cutover-grant.test.mjs:34`, the `hostScan` helper's `assert.fail` message template. It renders only when the test fails, after clean returns at :30 and namespace-refusal skips at :31–32. It is neither a document citation nor data read by a product path. Adding a deliberately failing test would add nothing. The decision and settlement carry this reason and source-bound evidence; `join.json` has no owning proofs for this REJECT, and `residue.json` is empty. No owner action remains on this row and no product test was added or executed.
 
-Park owner: **Documentation integration Lead / independent census reviewer (L13-17)**. Before F, independently rejudge this assertion-message occurrence as non-document rendering, or bind a genuine branch-owning test. No product test was added or executed.
-
-Reuse: the existing pinned settlement layer already supports explicit owning-test overrides and owned parks. Its admission check now also admits an explicitly listed correction of an existing same-file automatic join; unrelated ids still fail. The existing park update clears superseded automatic proofs. `additionalDrift` stays 4; the two audit corrections are counted separately, not relabeled as grade drift. No scanner grammar or product mechanism was added.
+Reuse: the existing pinned settlement layer supports explicit owning-test overrides, confirmed REJECTs and owned parks, including explicitly listed corrections of same-file automatic joins. Unrelated ids still fail. The REJECT update now clears superseded automatic proofs, just as the park branch already did: no false branch-owning test is retained on 0288. `additionalDrift` stays 4; the two audit corrections stay separate. No scanner grammar or product mechanism was added.
 
 ## Census and historical custody
 
-All **1,126 ids / 140 files** are retained: **779 owning-test joins + 289 unchanged grade confirmations + 53 settlement REJECTs + 4 citation joins + 1 owned park = 1,126**. The original 187 dispositions are unchanged in number: 134 joined, 49 REJECT, four citation joins. The four additional drifted grades remain REJECT. Two separate helper corrections bring the settlement packet to **193 rows**.
+All **1,126 ids / 140 files** are retained: **779 owning-test joins + 289 unchanged grade confirmations + 54 settlement REJECTs + 4 citation joins = 1,126**; **zero owned parks/open original judgments**. The original 187 dispositions are unchanged in number: 134 joined, 49 REJECT, four citation joins. The four additional drifted grades remain REJECT. Two separate helper corrections bring the settlement packet to **193 rows**.
 
-The four citation bindings and unapplied comment patches were reproduced at this pin using the unchanged `citations.py`; only their pin metadata changed. They remain pending review/shared-file composition, not applied code edits or runtime proofs. Historical `post-pin-literals.json` / `post-pin-dynamics.json` remain at `3d0169f39`; no fresh delta or final-F coverage is claimed. Original grade records, register and ledgers were not edited.
+The four citation bindings and unapplied comment patches were reproduced at this pin using unchanged `citations.py`; only pin metadata changed. W20 B independently approved their holders and zero-fuzz retargets. Their existing packet fields still say `reviewStatus: pending` / `independentApproval: false` because the generator does not mint approval; the review is linked by the gate register. Shared-file composition remains at F; no code patch is applied or runtime parity claimed. Historical `post-pin-literals.json` / `post-pin-dynamics.json` remain at `3d0169f39`; no fresh delta or final-F coverage is claimed. Original grade records and ledgers were not edited. The gate register is generated only by `gate-reconcile/reconcile.py`.
 
-`archive/receipt.json` changes **only `postMeasurementEdits`**, adding commit `25e8842d3dcc2e359dc930de086484629a275357` and its exact receipt-status/proof-summary changes after the Lead measurement. Existing historical sandbox custody and all other fields remain unchanged.
+Historical custody: the prior rework added the `25e8842d3dcc2e359dc930de086484629a275357` entry to `archive/receipt.json /postMeasurementEdits`; W21 A approved it. This catch-up makes **no archive write**. Likewise `helper-audit.json`, old `replay.json`, `receipt.json` and the other earlier verification artifacts retain their historical pins; current replay evidence is `gate-reconcile/catchup-proof.json`.
 
 ## Proofs
 
-Let `P=plans/260925-documentation-authority-unification/reports/phase-09`. `replay.json` contains exact argv, stdout/stderr, output hashes, the output-only adapter source and historical replay custody.
+Let `P=plans/260925-documentation-authority-unification/reports/phase-09`. Current exact argv, exits, stdout/stderr and output hashes are in **`gate-reconcile/catchup-proof.json`**.
 
 | Command | Exit | Evidence |
 |---|---:|---|
-| `python3 -B P/census-join/join.py --pin 5820ca6780ff6eec28afe09a128ac95fcd11d06c` — final run 1 | 0 | `replay.json` |
-| Same command — final run 2 | 0 | stdout, stderr and all three outputs (`join.json`, `residue.json`, `settlement.json`) byte-identical |
-| `python3 -B P/gate-reconcile/verify.py` through the output-only scratch adapter | 0 | `gate-verification.json`; unchanged checker, real input reads and read-only git |
-| `python3 -B P/gate-reconcile/controls.py` through the same adapter | 0 | `gate-controls.json`; positive proof and all 9 rejecting controls |
-| `python3 -B P/census-join/citations.py --pin 5820ca6780ff6eec28afe09a128ac95fcd11d06c --check` | 0 | byte-identical bindings/patches, eight zero-fuzz forward/rollback replays |
-| Record assertions after final replay | 0 | `replay.json /recordAssertions`: requested owners, separate counts, empty proofs on the park |
-| `git diff --check` and scoped artifact validation | 0 | `validation.json` |
+| `python3 -B P/census-join/join.py --pin cf13e2bd22ce390344837560b35b41adf7da1238` — final run 1 | 0 | catch-up log |
+| Same command — final run 2 | 0 | stdout, stderr and all five join/citation outputs byte-identical |
+| `python3 -B P/g5/check.py --pin b57e79625` | 0 | byte-identical to `g5/check-b57e79625.json`; 31 controls |
+| `python3 -B P/gate-reconcile/verify.py` | 0 | current `gate-reconcile/verification.json`; volatile `checkedAtHead` restored afterward |
+| `python3 -B P/gate-reconcile/controls.py` | 0 | current `gate-reconcile/controls.json`; positive proof and 10 rejecting controls |
+| `python3 -B P/census-join/citations.py --pin cf13e2bd22ce390344837560b35b41adf7da1238` | 0 | existing generator; every join also runs its `--check` and eight zero-fuzz forward/rollback replays |
+| Record assertions after final replay | 0 | zero residue; all 54 settlement REJECTs have empty proofs; expected status counts |
 
-The adapter executes each unmodified gate script with `runpy` as `__main__`, redirecting **only its final result write** to a tempfile; the emitted bytes are copied into `census-join`. It changes no check, input, assertion or git behavior. This avoids even a transient out-of-scope write. The existing `gate-reconcile/verification.json` and `controls.json`, including volatile fields, remain byte-identical; their preserved hashes are in `replay.json`. G2 remains `partial` in the untouched register.
+To reproduce from the repository root, first regenerate the existing citation packet with the command above, then run the pinned join twice with `NODE_OPTIONS=--no-addons`; compare `join.json`, `residue.json`, `settlement.json`, `citation-bindings.json`, `pointer-patches.json`, stdout and stderr. These are the five outputs recorded by hash in the catch-up proof. No delta rescan or final-F claim is made.
 
-One earlier join attempt correctly rejected the review-suggested T:508 evidence line; it was corrected to T:510. A subsequent record inspection found and removed stale automatic proofs from the new park; the final two runs and empty-proof assertions cover that correction. These attempts are disclosed separately in `replay.json`, not counted as the final deterministic proof.
+An initial pair of joins exited 0 and matched byte-for-byte, but a subsequent record assertion caught stale automatically inferred proofs on 0288's new REJECT. The existing REJECT update now clears them. The final two runs above and the empty-proof assertions prove that correction; the initial wrapper exited 1 and is disclosed separately in the catch-up log, not counted as passing evidence.
 
-Prior art: `bade6b6b3` introduced the join, `b25dadae2` added pin/delta custody, `4e49c3008` added the settlement layer, and `408078b9a` bound citations. Reused the Node-bundled Acorn locator, existing Rust grammar, original register/grades and gate verifier/controls. Impact-analysis: **degraded/unqueried**, because the brief forbids fgOS CLI and no impact-analysis MCP is exposed; direct source/history review was used. No Git mutation, fgOS/lifecycle command, pair accounting, product suite/test, native addon, docs/source/test/ledger/register edit or preview service. Every Node child in the proofs inherited `--no-addons` and a scratch `process.dlopen` block. Scratch was restricted to tempfile directories under `/tmp/fgos-work/` and removed. `needsWrites: []`.
+Prior art: `bade6b6b3` introduced the join, `b25dadae2` pin/delta custody, `4e49c3008` the settlement layer, `408078b9a` citation bindings, and `25aa41510` branch-taking corrections approved by W21. Reused the Node-bundled Acorn locator, Rust grammar, original register/grades and gate verifier/controls. Impact-analysis: **degraded/unqueried** under the no-fgOS-CLI/no-MCP boundary; direct source/history review was used. No git mutation, fgOS/lifecycle command, pair accounting, product test/suite, native addon, docs/source/test/ledger edit or preview service. Every Node descendant inherited `--no-addons`. Scratch tempfile directories were confined to `/tmp/fgos-work/` and removed. `needsWrites: []`.

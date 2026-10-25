@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "authority": "L12-137; w17-gate-register-reconcile-brief",
+  "authority": "L12-137; w17-gate-register-reconcile-brief; w21-register-catchup-brief; L13-18–19",
   "asOf": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
   "status": "reconciled-not-cutover-approval",
   "followUp": {
@@ -44,7 +44,7 @@
         "sha256": "0b7cf20fe752f4e142b139a7a1b5bfdac74498e919394a861cb1f83197ad5050"
       }
     ],
-    "scope": "W19 exact live-parity, 25 current rebinds and receipt-count approvals only; this turn and turn 707 remain unreviewed."
+    "scope": "W19 exact live-parity, 25 current rebinds and receipt-count approvals only; W20/W21 are a separate catchUp layer."
   },
   "evidencePathBase": "plans/260925-documentation-authority-unification/reports/phase-09",
   "method": "Every required original occurrence is keyed by its JSON pointer and original text. Mixed sentences are decomposed into independently decided parts. Counts below count list entries, not unique defects or underlying claim populations; remaining is one original prose entry per gate and may overlap its blockers.",
@@ -102,16 +102,15 @@
         "cleared": 0
       },
       "after": {
-        "status": "partial",
-        "blockers": 1,
-        "remainingEntries": 1,
-        "cleared": 0,
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 2,
         "atFinalPinUnderLease": 2,
         "external": 0
       },
       "originalDecisions": {
-        "moved to F": 4,
-        "still open": 1
+        "moved to F": 5
       }
     },
     {
@@ -164,15 +163,15 @@
         "cleared": 0
       },
       "after": {
-        "status": "partial",
-        "blockers": 1,
-        "remainingEntries": 1,
-        "cleared": 0,
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 1,
         "atFinalPinUnderLease": 1,
         "external": 1
       },
       "originalDecisions": {
-        "still open": 1
+        "moved to F": 1
       }
     },
     {
@@ -226,17 +225,17 @@
         "cleared": 0
       },
       "after": {
-        "status": "partial",
-        "blockers": 2,
-        "remainingEntries": 1,
-        "cleared": 1,
-        "atFinalPinUnderLease": 1,
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 2,
+        "atFinalPinUnderLease": 2,
         "external": 1
       },
       "originalDecisions": {
         "cleared": 1,
-        "moved to F": 1,
-        "still open": 3
+        "moved to F": 3,
+        "still open": 1
       }
     },
     {
@@ -306,11 +305,11 @@
   "readinessCounts": {
     "beforeFinalPin": {
       "before": 6,
-      "after": 4
+      "after": 0
     },
     "atFinalPinUnderLease": {
       "before": 19,
-      "after": 25
+      "after": 26
     },
     "external": {
       "before": 6,
@@ -318,9 +317,9 @@
     }
   },
   "decisionCounts": {
-    "cleared": 22,
-    "moved to F": 44,
-    "still open": 21
+    "cleared": 24,
+    "moved to F": 48,
+    "still open": 15
   },
   "decisions": [
     {
@@ -665,7 +664,9 @@
         "reviews/w17-parity-rework-review.json",
         "import3/receipt.md",
         "reviews/w19-live-parity-and-rebinds-review.md",
-        "reviews/w19-live-parity-and-rebinds-review.json"
+        "reviews/w19-live-parity-and-rebinds-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w20-census-settlement-review.json"
       ]
     },
     {
@@ -705,7 +706,9 @@
         "reviews/w17-parity-rework-review.json",
         "import3/receipt.md",
         "reviews/w19-live-parity-and-rebinds-review.md",
-        "reviews/w19-live-parity-and-rebinds-review.json"
+        "reviews/w19-live-parity-and-rebinds-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w20-census-settlement-review.json"
       ]
     },
     {
@@ -745,7 +748,9 @@
         "reviews/w17-parity-rework-review.json",
         "import3/receipt.md",
         "reviews/w19-live-parity-and-rebinds-review.md",
-        "reviews/w19-live-parity-and-rebinds-review.json"
+        "reviews/w19-live-parity-and-rebinds-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w20-census-settlement-review.json"
       ],
       "parts": [
         {
@@ -813,7 +818,9 @@
         "reviews/w17-parity-rework-review.json",
         "import3/receipt.md",
         "reviews/w19-live-parity-and-rebinds-review.md",
-        "reviews/w19-live-parity-and-rebinds-review.json"
+        "reviews/w19-live-parity-and-rebinds-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w20-census-settlement-review.json"
       ]
     },
     {
@@ -853,7 +860,9 @@
         "reviews/w17-parity-rework-review.json",
         "import3/receipt.md",
         "reviews/w19-live-parity-and-rebinds-review.md",
-        "reviews/w19-live-parity-and-rebinds-review.json"
+        "reviews/w19-live-parity-and-rebinds-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w20-census-settlement-review.json"
       ]
     },
     {
@@ -892,7 +901,9 @@
         "import3/receipt.md",
         "owner-answers.md",
         "reviews/w19-live-parity-and-rebinds-review.md",
-        "reviews/w19-live-parity-and-rebinds-review.json"
+        "reviews/w19-live-parity-and-rebinds-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w20-census-settlement-review.json"
       ],
       "parts": [
         {
@@ -1012,7 +1023,11 @@
         "reviews/w3-g2g6-delta-review.json",
         "reviews/w6-misc-rework-review.md",
         "preserve-premise/verification.json",
-        "w19-cleanup-brief.md"
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w21-census-rework-and-g5-review.json",
+        "w19-cleanup-brief.md",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.md"
       ]
     },
     {
@@ -1032,7 +1047,11 @@
         "reviews/w3-g2g6-delta-review.json",
         "reviews/w6-misc-rework-review.md",
         "preserve-premise/verification.json",
-        "w19-cleanup-brief.md"
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w21-census-rework-and-g5-review.json",
+        "w19-cleanup-brief.md",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.md"
       ]
     },
     {
@@ -1052,7 +1071,11 @@
         "reviews/w3-g2g6-delta-review.json",
         "reviews/w6-misc-rework-review.md",
         "preserve-premise/verification.json",
-        "w19-cleanup-brief.md"
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w21-census-rework-and-g5-review.json",
+        "w19-cleanup-brief.md",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.md"
       ]
     },
     {
@@ -1072,14 +1095,18 @@
         "reviews/w3-g2g6-delta-review.json",
         "reviews/w6-misc-rework-review.md",
         "preserve-premise/verification.json",
-        "w19-cleanup-brief.md"
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w21-census-rework-and-g5-review.json",
+        "w19-cleanup-brief.md",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.md"
       ]
     },
     {
       "sourcePointer": "/gates/2/remaining",
       "item": "At F, re-run join.py with --pin F and --rescan, refresh the 33 moved Rust locators, settle the 8 open literal judgments, get preserve-premise/verify.py to exit 0 and get a delta review.",
-      "decision": "still open",
-      "resolution": "Independently review this turn’s four citation joins/unapplied retargets and turn 707’s pinned census settlement. G2 stays partial until both are reviewed (L13-17.1; w19-cleanup-brief.md).",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
       "gates": [
         "G2"
       ],
@@ -1092,9 +1119,35 @@
         "preserve-premise/verification.json",
         "owner-answers.md",
         "preflip-execution-plan.md",
-        "w19-cleanup-brief.md"
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w21-census-rework-and-g5-review.json",
+        "w19-cleanup-brief.md",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.md"
       ],
       "parts": [
+        {
+          "decision": "cleared",
+          "item": "Four citation holders and their unapplied retargets independently reviewed in W20 B.",
+          "clearedBy": [
+            "408078b9a"
+          ],
+          "reviews": [
+            "reviews/w20-census-settlement-review.json"
+          ],
+          "verdict": "APPROVE: The four citation holders own the cited text: seat-binding 5.4 and 6.3 and the distribution \"Entry Points & Triggers\" section are byte-identical to the 244a04354 source sections. The RUL-WF-27 block is byte-identical and contains the \"binding is a rebuildable view\" clause. Holder sha256s, ledger pointers (s14 /bindingRefresh/207, 220, 348; s12 /unitCarries/29, 42, 170; s4 /claims/3) and anchors (#6-business-rules, #entry-points-triggers) all resolve."
+        },
+        {
+          "decision": "cleared",
+          "item": "Seven W20 REWORK helper/closure joins repaired and replayed in 25aa41510; W21 A independently approves the rework.",
+          "clearedBy": [
+            "25aa41510"
+          ],
+          "reviews": [
+            "reviews/w21-census-rework-and-g5-review.json"
+          ],
+          "verdict": "APPROVE: Ran join.py --pin 5820ca6780ff… twice in a scratch git clone --shared at 25aa41510 (NODE_OPTIONS=--no-addons). Both exit 0. stdout and stderr are byte-identical across runs. After both runs the clone shows no git status change, so join.json, residue.json, settlement.json, citation-bindings.json and pointer-patches.json equal the committed bytes. Counts: 779 joined + 289 + 53 + 4 + 1 park = 1,126."
+        },
         {
           "decision": "moved to F",
           "item": "Re-run census-join/join.py --pin F --rescan; refresh the 33 moved Rust locators, settle/review the 8 open post-pin literal judgments plus any new F delta, and obtain current-pin delta review (execution plan §2 G2 / §3 W3; L13-9.4). The original 187 judgments belong before F under L13-17.1.",
@@ -1109,21 +1162,6 @@
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
-          ]
-        },
-        {
-          "decision": "still open",
-          "item": "Independently review this turn’s four citation joins/unapplied retargets and turn 707’s pinned census settlement. G2 stays partial until both are reviewed (L13-17.1; w19-cleanup-brief.md).",
-          "evidence": [
-            "census-join/receipt.md",
-            "reviews/w2-g2-census-review.json",
-            "reviews/w2-g2-dyn-delta.json",
-            "reviews/w3-g2g6-delta-review.json",
-            "reviews/w6-misc-rework-review.md",
-            "preserve-premise/verification.json",
-            "owner-answers.md",
-            "preflip-execution-plan.md",
-            "w19-cleanup-brief.md"
           ]
         }
       ]
@@ -1311,8 +1349,8 @@
     {
       "sourcePointer": "/gates/5/remaining",
       "item": "Extend g5/check.py to the surviving docs/reading-map.md: banner lines 3-9 are restated in English in §3, line 34 survives only with a Truth correction suffix (line 156), line 37 is exact (line 159); the restatement and suffix need owner acceptance (cutover packet), then rerun at F.",
-      "decision": "still open",
-      "resolution": "Extend g5/check.py with per-span surviving docs/reading-map.md locations and explicit proposed text for the banner restatement and Truth-correction suffix; obtain an independent check of that complete clause. The current 10-span legacy check is insufficient.",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
       "gates": [
         "G5"
       ],
@@ -1320,13 +1358,28 @@
         "g5/check.py",
         "g5/check-b726d44ed.json",
         "reviews/w8-lead-fixes-review.json",
+        "reviews/w21-census-rework-and-g5-review.json",
+        "g5/check-b57e79625.json",
+        "reviews/w21-census-rework-and-g5-review.md",
         "owner-answers.md",
         "preflip-execution-plan.md"
       ],
       "parts": [
         {
+          "decision": "cleared",
+          "item": "Complete surviving-map clause check and independent review.",
+          "clearedBy": [
+            "b57e79625",
+            "83916a31f"
+          ],
+          "reviews": [
+            "reviews/w21-census-rework-and-g5-review.json"
+          ],
+          "verdict": "APPROVE: Apart from owner acceptance of the 8 restatements (external, L13-10), G5 can be met-local. Both clauses are proved at b57e79625, exactly and with real negative controls. The F rerun stays in atFinalPinUnderLease. The register still reads partial, with old evidence and remaining text. The Lead needs to update it to cite check-b57e79625.json and this review."
+        },
+        {
           "decision": "moved to F",
-          "item": "Re-run the full retention/accepted-surviving-span check at F (execution plan §2 G5 / §3 W3); do not treat the historical ten-span check as satisfying both clauses.",
+          "item": "Re-run g5/check.py --pin F for both retention and accepted surviving-map spans; record output and exits (W21 B; execution plan §2 G5 / §3 W3).",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -1334,22 +1387,14 @@
         },
         {
           "decision": "still open",
-          "item": "Extend g5/check.py with per-span surviving docs/reading-map.md locations and explicit proposed text for the banner restatement and Truth-correction suffix; obtain an independent check of that complete clause. The current 10-span legacy check is insufficient.",
+          "item": "Owner acceptance of exactly 8 restatements (legacy map lines 3–9 and 34, with exact old/new text in g5/check-b57e79625.json /ownerAcceptance) is required in the cutover approval packet under L13-10; includes the banner and the full Truth-correction line, not just its suffix.",
           "evidence": [
             "g5/check.py",
             "g5/check-b726d44ed.json",
             "reviews/w8-lead-fixes-review.json",
-            "owner-answers.md",
-            "preflip-execution-plan.md"
-          ]
-        },
-        {
-          "decision": "still open",
-          "item": "Owner acceptance of the surviving reading-map English banner restatement and the compounding/knowledge line’s Truth-correction suffix is required in the cutover packet (L13-10; w8-lead-fixes g5-check-implements-gate).",
-          "evidence": [
-            "g5/check.py",
-            "g5/check-b726d44ed.json",
-            "reviews/w8-lead-fixes-review.json",
+            "reviews/w21-census-rework-and-g5-review.json",
+            "g5/check-b57e79625.json",
+            "reviews/w21-census-rework-and-g5-review.md",
             "owner-answers.md",
             "preflip-execution-plan.md"
           ]
@@ -1950,6 +1995,9 @@
         "reviews/w5-d5c-archive-review.json",
         "reviews/w14-g8-retention-timing-review.json",
         "reviews/w8-lead-fixes-review.json",
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.json",
         "archive/receipt.json"
       ]
     },
@@ -1957,7 +2005,7 @@
       "sourcePointer": "/gates/8/blockers/1",
       "item": "Partition bound to d3efc70c5; rebuild required at F",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
+      "resolution": "Retained as an explicit F duty, not cleared: Create the repository-local archive ref from the F rebuild before G10, with commit, partition hash, path, blob, size and SHA256 agreement (L13-18); a disposable rehearsal ref is not custody. Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
       "gates": [
         "G8"
       ],
@@ -1975,14 +2023,17 @@
         "reviews/w5-d5c-archive-review.json",
         "reviews/w14-g8-retention-timing-review.json",
         "reviews/w8-lead-fixes-review.json",
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.json",
         "archive/receipt.json"
       ]
     },
     {
       "sourcePointer": "/gates/8/blockers/2",
       "item": "No local archive ref in the repository (rehearsal clone only)",
-      "decision": "still open",
-      "resolution": "Still open with corrected scope/owner: Provide the authorized LOCAL archive ref with pinned custody evidence; archive/design.md says it existed only in the disposable rehearsal, whose scratch was removed. No repository-local archive ref was found. No push/main publication is authorized by this task. Independently re-review f67e0f676’s records-only fix for W14 w8-archive-receipt-json-stale; do not infer independent approval from the Lead’s edit. Keep the separate low documentation note about retained JSON path-string recovery visible. Owner cutover approval S2 is required for archive ref publication and main manifest merge; local rehearsal is not that permission.",
+      "decision": "moved to F",
+      "resolution": "Retained as an explicit F duty, not cleared: Create the repository-local archive ref from the F rebuild before G10, with commit, partition hash, path, blob, size and SHA256 agreement (L13-18); a disposable rehearsal ref is not custody. Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
       "gates": [
         "G8"
       ],
@@ -2000,6 +2051,9 @@
         "reviews/w5-d5c-archive-review.json",
         "reviews/w14-g8-retention-timing-review.json",
         "reviews/w8-lead-fixes-review.json",
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.json",
         "archive/receipt.json"
       ]
     },
@@ -2007,7 +2061,7 @@
       "sourcePointer": "/gates/8/blockers/3",
       "item": "Publication (S2) needs owner cutover approval",
       "decision": "still open",
-      "resolution": "Still open with corrected scope/owner: Provide the authorized LOCAL archive ref with pinned custody evidence; archive/design.md says it existed only in the disposable rehearsal, whose scratch was removed. No repository-local archive ref was found. No push/main publication is authorized by this task. Independently re-review f67e0f676’s records-only fix for W14 w8-archive-receipt-json-stale; do not infer independent approval from the Lead’s edit. Keep the separate low documentation note about retained JSON path-string recovery visible. Owner cutover approval S2 is required for archive ref publication and main manifest merge; local rehearsal is not that permission.",
+      "resolution": "Still open with corrected scope/owner: Owner cutover approval S2 is required for archive ref publication and main manifest merge; local rehearsal is not that permission.",
       "gates": [
         "G8"
       ],
@@ -2025,14 +2079,17 @@
         "reviews/w5-d5c-archive-review.json",
         "reviews/w14-g8-retention-timing-review.json",
         "reviews/w8-lead-fixes-review.json",
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.json",
         "archive/receipt.json"
       ]
     },
     {
       "sourcePointer": "/gates/8/remaining",
       "item": "At F: rebuild the partition keeping register evidence (L13-13.4), re-enumerate readers to 0 unresolved and retime from a cold cache.",
-      "decision": "still open",
-      "resolution": "Finish local archive-ref custody and the independent receipt-fix check; rebuild/readers/timing stay at F, publication stays owner-gated.",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
       "gates": [
         "G8"
       ],
@@ -2048,6 +2105,9 @@
         "reviews/w5-d5c-archive-review.json",
         "reviews/w14-g8-retention-timing-review.json",
         "reviews/w8-lead-fixes-review.json",
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.json",
         "archive/receipt.json",
         "owner-answers.md",
         "preflip-execution-plan.md"
@@ -2067,51 +2127,30 @@
           "verdict": "APPROVE: Committed audit/rehearsal-commands.json.gz worktree-add rows equal rehearsal.json runs: 2.9292/2.7071/2.9036 s and 41.7036/10.5524/12.4394 s, exit 0; medians 2.904 and 12.439 s; eviction 704,667,648 -> 0; residency chain 0 -> 230,699,008 / 382,160,896 holds; per-file sums equal totals. Evidence unchanged since w8 (git diff --quiet f2162d9ff HEAD)."
         },
         {
+          "decision": "cleared",
+          "item": "Independent re-review of f67e0f676 records-only archive receipt correction.",
+          "clearedBy": [
+            "f67e0f676"
+          ],
+          "reviews": [
+            "reviews/w20-census-settlement-review.json"
+          ],
+          "verdict": "APPROVE: Records-only: all four files are under plans/. The old proofs, coldRunImplementation, blocker and deferred values moved verbatim under historicalSandboxAttempt, and no other key changed. Current values match archive data: verification.json exit 0/verified; rehearsal.json 6 timing runs with cold run 1 at 2.93 s (after-final-pin-without-gates) and 41.70 s (before-final-pin-with-gates). design.md line 3 now states the verified Lead run. Info: postMeasurementEdits lists only this commit's edits; 25e8842d3 had already changed receipt.json after measurement, which postMeasurementNote covers only generically."
+        },
+        {
           "decision": "moved to F",
-          "item": "Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
+          "item": "Create the repository-local archive ref from the F rebuild before G10, with commit, partition hash, path, blob, size and SHA256 agreement (L13-18); a disposable rehearsal ref is not custody.",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
           ]
         },
         {
-          "decision": "still open",
-          "item": "Provide the authorized LOCAL archive ref with pinned custody evidence; archive/design.md says it existed only in the disposable rehearsal, whose scratch was removed. No repository-local archive ref was found. No push/main publication is authorized by this task.",
+          "decision": "moved to F",
+          "item": "Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
           "evidence": [
-            "archive/receipt.md",
-            "archive/design.md",
-            "archive/manifest.json",
-            "archive/verification.json",
-            "archive/rehearsal.json",
-            "archive/link-closure.json",
-            "reviews/w2-g8-archive-review.json",
-            "reviews/w4-g8-archive-review.json",
-            "reviews/w5-d5c-archive-review.json",
-            "reviews/w14-g8-retention-timing-review.json",
-            "reviews/w8-lead-fixes-review.json",
-            "archive/receipt.json",
-            "owner-answers.md",
-            "preflip-execution-plan.md"
-          ]
-        },
-        {
-          "decision": "still open",
-          "item": "Independently re-review f67e0f676’s records-only fix for W14 w8-archive-receipt-json-stale; do not infer independent approval from the Lead’s edit. Keep the separate low documentation note about retained JSON path-string recovery visible.",
-          "evidence": [
-            "archive/receipt.md",
-            "archive/design.md",
-            "archive/manifest.json",
-            "archive/verification.json",
-            "archive/rehearsal.json",
-            "archive/link-closure.json",
-            "reviews/w2-g8-archive-review.json",
-            "reviews/w4-g8-archive-review.json",
-            "reviews/w5-d5c-archive-review.json",
-            "reviews/w14-g8-retention-timing-review.json",
-            "reviews/w8-lead-fixes-review.json",
-            "archive/receipt.json",
-            "owner-answers.md",
-            "preflip-execution-plan.md"
+            "preflip-execution-plan.md",
+            "owner-answers.md"
           ]
         },
         {
@@ -2129,6 +2168,9 @@
             "reviews/w5-d5c-archive-review.json",
             "reviews/w14-g8-retention-timing-review.json",
             "reviews/w8-lead-fixes-review.json",
+            "reviews/w20-census-settlement-review.json",
+            "reviews/w20-census-settlement-review.md",
+            "reviews/w21-census-rework-and-g5-review.json",
             "archive/receipt.json",
             "owner-answers.md",
             "preflip-execution-plan.md"
@@ -2658,7 +2700,7 @@
         },
         {
           "decision": "moved to F",
-          "item": "claim_2e2bc926 successor must be re-decided after final main import (L13-15.2); current new candidate-row review debt is a separate before-F item.",
+          "item": "claim_2e2bc926 successor must be re-decided after final main import (L13-15.2); W19 cleared the separate candidate-row review debt.",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -2669,7 +2711,7 @@
     {
       "sourcePointer": "/cutoverReadiness/beforeFinalPin/1",
       "item": "Get independent re-reviews of the Lead REWORK fixes: c5586146c (G6), 6f5b9419d (G0/G7), 53499dc9d (G4 spec sentence), 984829939 and 5c3b57347 (G8)",
-      "decision": "still open",
+      "decision": "cleared",
       "resolution": "Original review/run demand reconciled by its parts below; existing reviews do not close new rebinds, owner actions or final-pin work.",
       "gates": [
         "G0",
@@ -2755,6 +2797,9 @@
         "reviews/w4-g8-archive-review.json",
         "reviews/w5-d5c-archive-review.json",
         "reviews/w14-g8-retention-timing-review.json",
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.json",
         "archive/receipt.json"
       ],
       "parts": [
@@ -2809,8 +2854,19 @@
           "verdict": "APPROVE: Committed audit/rehearsal-commands.json.gz worktree-add rows equal rehearsal.json runs: 2.9292/2.7071/2.9036 s and 41.7036/10.5524/12.4394 s, exit 0; medians 2.904 and 12.439 s; eviction 704,667,648 -> 0; residency chain 0 -> 230,699,008 / 382,160,896 holds; per-file sums equal totals. Evidence unchanged since w8 (git diff --quiet f2162d9ff HEAD)."
         },
         {
+          "decision": "cleared",
+          "item": "Independent re-review of f67e0f676 records-only archive receipt correction.",
+          "clearedBy": [
+            "f67e0f676"
+          ],
+          "reviews": [
+            "reviews/w20-census-settlement-review.json"
+          ],
+          "verdict": "APPROVE: Records-only: all four files are under plans/. The old proofs, coldRunImplementation, blocker and deferred values moved verbatim under historicalSandboxAttempt, and no other key changed. Current values match archive data: verification.json exit 0/verified; rehearsal.json 6 timing runs with cold run 1 at 2.93 s (after-final-pin-without-gates) and 41.70 s (before-final-pin-with-gates). design.md line 3 now states the verified Lead run. Info: postMeasurementEdits lists only this commit's edits; 25e8842d3 had already changed receipt.json after measurement, which postMeasurementNote covers only generically."
+        },
+        {
           "decision": "moved to F",
-          "item": "claim_2e2bc926 successor must be re-decided after final main import (L13-15.2); current new candidate-row review debt is a separate before-F item.",
+          "item": "claim_2e2bc926 successor must be re-decided after final main import (L13-15.2); W19 cleared the separate candidate-row review debt.",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -2876,8 +2932,8 @@
     {
       "sourcePointer": "/cutoverReadiness/beforeFinalPin/3",
       "item": "Run and commit the G5 retention hash check (G5)",
-      "decision": "still open",
-      "resolution": "Legacy hash run exists, but W8 REWORK keeps the full surviving-target check open.",
+      "decision": "cleared",
+      "resolution": "W21 B approves the complete G5 check; owner acceptance and F rerun remain explicit separate parts.",
       "gates": [
         "G5"
       ],
@@ -2885,17 +2941,43 @@
         "g5/check.py",
         "g5/check-b726d44ed.json",
         "reviews/w8-lead-fixes-review.json",
+        "reviews/w21-census-rework-and-g5-review.json",
+        "g5/check-b57e79625.json",
+        "reviews/w21-census-rework-and-g5-review.md",
         "owner-answers.md",
         "preflip-execution-plan.md"
       ],
       "parts": [
         {
+          "decision": "cleared",
+          "item": "Complete surviving-map clause check and independent review.",
+          "clearedBy": [
+            "b57e79625",
+            "83916a31f"
+          ],
+          "reviews": [
+            "reviews/w21-census-rework-and-g5-review.json"
+          ],
+          "verdict": "APPROVE: Apart from owner acceptance of the 8 restatements (external, L13-10), G5 can be met-local. Both clauses are proved at b57e79625, exactly and with real negative controls. The F rerun stays in atFinalPinUnderLease. The register still reads partial, with old evidence and remaining text. The Lead needs to update it to cite check-b57e79625.json and this review."
+        },
+        {
+          "decision": "moved to F",
+          "item": "Re-run g5/check.py --pin F for both retention and accepted surviving-map spans; record output and exits (W21 B; execution plan §2 G5 / §3 W3).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
           "decision": "still open",
-          "item": "Extend g5/check.py with per-span surviving docs/reading-map.md locations and explicit proposed text for the banner restatement and Truth-correction suffix; obtain an independent check of that complete clause. The current 10-span legacy check is insufficient.",
+          "item": "Owner acceptance of exactly 8 restatements (legacy map lines 3–9 and 34, with exact old/new text in g5/check-b57e79625.json /ownerAcceptance) is required in the cutover approval packet under L13-10; includes the banner and the full Truth-correction line, not just its suffix.",
           "evidence": [
             "g5/check.py",
             "g5/check-b726d44ed.json",
             "reviews/w8-lead-fixes-review.json",
+            "reviews/w21-census-rework-and-g5-review.json",
+            "g5/check-b57e79625.json",
+            "reviews/w21-census-rework-and-g5-review.md",
             "owner-answers.md",
             "preflip-execution-plan.md"
           ]
@@ -3005,7 +3087,9 @@
         "reviews/w13-misc-pin-and-gloss-review.json",
         "reviews/w14-import3-binding-review.json",
         "reviews/w14-import3-binding-review.md",
-        "import3/receipt.md"
+        "import3/receipt.md",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w20-census-settlement-review.json"
       ],
       "parts": [
         {
@@ -3401,7 +3485,11 @@
         "reviews/w3-g2g6-delta-review.json",
         "reviews/w6-misc-rework-review.md",
         "preserve-premise/verification.json",
-        "w19-cleanup-brief.md"
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w21-census-rework-and-g5-review.json",
+        "w19-cleanup-brief.md",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.md"
       ],
       "parts": [
         {
@@ -3515,12 +3603,15 @@
         "owner-answers.md",
         "g5/check.py",
         "g5/check-b726d44ed.json",
-        "reviews/w8-lead-fixes-review.json"
+        "reviews/w8-lead-fixes-review.json",
+        "reviews/w21-census-rework-and-g5-review.json",
+        "g5/check-b57e79625.json",
+        "reviews/w21-census-rework-and-g5-review.md"
       ],
       "parts": [
         {
           "decision": "moved to F",
-          "item": "Re-run the full retention/accepted-surviving-span check at F (execution plan §2 G5 / §3 W3); do not treat the historical ten-span check as satisfying both clauses.",
+          "item": "Re-run g5/check.py --pin F for both retention and accepted surviving-map spans; record output and exits (W21 B; execution plan §2 G5 / §3 W3).",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -3572,9 +3663,20 @@
         "reviews/w5-d5c-archive-review.json",
         "reviews/w14-g8-retention-timing-review.json",
         "reviews/w8-lead-fixes-review.json",
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.json",
         "archive/receipt.json"
       ],
       "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Create the repository-local archive ref from the F rebuild before G10, with commit, partition hash, path, blob, size and SHA256 agreement (L13-18); a disposable rehearsal ref is not custody.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
         {
           "decision": "moved to F",
           "item": "Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
@@ -3878,9 +3980,20 @@
         "reviews/w5-d5c-archive-review.json",
         "reviews/w14-g8-retention-timing-review.json",
         "reviews/w8-lead-fixes-review.json",
+        "reviews/w20-census-settlement-review.json",
+        "reviews/w20-census-settlement-review.md",
+        "reviews/w21-census-rework-and-g5-review.json",
         "archive/receipt.json"
       ],
       "parts": [
+        {
+          "decision": "moved to F",
+          "item": "Create the repository-local archive ref from the F rebuild before G10, with commit, partition hash, path, blob, size and SHA256 agreement (L13-18); a disposable rehearsal ref is not custody.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
         {
           "decision": "moved to F",
           "item": "Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
@@ -4030,36 +4143,45 @@
       ]
     }
   ],
-  "newlyVisibleOpenItems": [
-    {
-      "gates": [
-        "G2"
-      ],
-      "item": "Independently review this turn’s four citation joins/unapplied retargets and turn 707’s pinned census settlement. G2 stays partial until both are reviewed (L13-17.1; w19-cleanup-brief.md).",
-      "evidence": [
-        "census-join/receipt.md",
-        "reviews/w2-g2-census-review.json",
-        "reviews/w2-g2-dyn-delta.json",
-        "reviews/w3-g2g6-delta-review.json",
-        "reviews/w6-misc-rework-review.md",
-        "preserve-premise/verification.json",
-        "owner-answers.md",
-        "preflip-execution-plan.md",
-        "w19-cleanup-brief.md"
-      ]
-    },
-    {
-      "gates": [
-        "G8"
-      ],
-      "item": "Independently re-review f67e0f676’s records-only fix for W14 w8-archive-receipt-json-stale; do not infer independent approval from the Lead’s edit. Keep the separate low documentation note about retained JSON path-string recovery visible.",
-      "evidence": [
-        "reviews/w14-g8-retention-timing-review.json",
-        "archive/receipt.json",
-        "archive/design.md"
-      ]
-    }
-  ],
+  "catchUp": {
+    "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+    "inputs": [
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g5/check-b57e79625.json",
+        "sha256": "c3c1fee220269c470e005e40ba5eaf711fdaca3850c714410cd7a47724188b0f"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g5/check.py",
+        "sha256": "ed191f42441940dc528c34dfd7510d25e5f0b6bb83e906031d35e3c5851b037e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md",
+        "sha256": "030b57206830f680560b79801469488c21ad94e09656dd126741fbe785b27132"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w20-census-settlement-review.json",
+        "sha256": "82771cb75f59181f9fbca1a7d76d0cd23837c09e07f40a52afb4317af28d6969"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w20-census-settlement-review.md",
+        "sha256": "283b2da61c354dbc963e45b2fcc43d48135f615c978d4df6b13c3dab87588a0f"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w21-census-rework-and-g5-review.json",
+        "sha256": "f669a5fc0644b5416eb1196c91bebbf6ae8be59f085c2ea48a11423c5270567c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w21-census-rework-and-g5-review.md",
+        "sha256": "192ad9439c935166a6b0ba16c4ce97177e0dcf3eac5f913c433faf981a7ebaa2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w21-register-catchup-brief.md",
+        "sha256": "7e577484aec8e6f21e73976d084d703508eaaac4becc8e41f4cefe368a6f129a"
+      }
+    ],
+    "scope": "W20/W21 independent reviews and L13-18–19; 0288 REJECT is a Lead ruling, not a new reviewer verdict. Current replay is gate-reconcile/catchup-proof.json."
+  },
+  "newlyVisibleOpenItems": [],
   "scopeLimits": [
     "No parallel uncommitted carries/g0rework content read; original inputs come from git show at asOf, W18 and W19 from their separately fingerprinted committed layers.",
     "This is evidence reconciliation, not new independent review of the prior Doers, not proof that F work ran.",
@@ -4068,15 +4190,16 @@
     "Historical receipt status/counts are used only at their own pins and subordinate to the later scoped review/ruling."
   ],
   "checks": {
+    "currentCatchUpProofs": "gate-reconcile/catchup-proof.json",
     "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py",
     "exit": 0,
     "output": "gate-reconcile/verification.json",
     "controlsCommand": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py",
     "controlsExit": 0,
     "controlsOutput": "gate-reconcile/controls.json",
-    "nativeAddons": "All Node descendants inherited --no-addons and a scratch process.dlopen blocker.",
+    "nativeAddons": "Current Node descendants inherited --no-addons; historical cleanup logs additionally record a scratch process.dlopen blocker.",
     "scopedCleanupProofs": "gate-reconcile/reproduction.json",
-    "initialFailure": "The first verification exited 1 because its own not-yet-created verification.json was listed as input evidence. The output is now named as output, not self-referential input; no missing source path or ancestry check was bypassed."
+    "initialFailure": "Historical first reconciliation: verification exited 1 because its own not-yet-created verification.json was listed as input evidence. The output is now named as output, not self-referential input; no missing source path or ancestry check was bypassed."
   },
   "planBranchLog": {
     "command": "git log --oneline 8a9385eca^..53de2207e1ea8a9417ac131f785704d6ab72ba2c",
