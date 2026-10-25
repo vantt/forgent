@@ -1,4 +1,5 @@
 """Read-only replay of both committed ownership/checks recipes; scratch outputs only.
+Failing rows are the drift rows the rebind check does not account for.
 Run from repository root. Exit 1 means a real failing audit, not a reporter error.
 """
 import json
@@ -39,7 +40,7 @@ for stem, key, lib in [('step10-round5', 'scripts', 'step10-sync287-lib.mjs'),
     helper = dest / 'report-current.mjs'
     helper.write_text("import fs from 'node:fs';\n"
                       + "import {unitsOf} from './" + lib + "';\n"
-                      + "const rows=JSON.parse(fs.readFileSync(process.argv[2])).targetDigestDrift;\n"
+                      + "const rows=JSON.parse(fs.readFileSync(process.argv[2])).unaccountedTargetDigestDrift;\n"
                       + "console.log(JSON.stringify(rows.map(r=>({...r,currentDigests:unitsOf(r.targetOwner).filter(u=>u.anchor===r.targetAnchor).map(u=>u.textDigest)}))));\n")
     if ownpath.exists():
         current = subprocess.check_output(['node', str(helper), str(ownpath),
