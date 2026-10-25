@@ -71,7 +71,7 @@ Fields:
 
 ## 3. Declaring Confinement Policies
 
-Confinement policies are declared in `.fgos/config.json` under `runner.capabilities` and `runner.confinementPolicies`.
+Confinement policies are declared in the project config (`fgos config show --path runner`) under `runner.capabilities` and `runner.confinementPolicies`.
 
 ### Built-in Policies
 
@@ -81,7 +81,7 @@ fgOS ships two immutable built-in policies:
 
 ### Capability Confinement Declarations
 
-In `.fgos/config.json`, each capability can declare its confinement posture:
+In the project config, each capability can declare its confinement posture:
 
 ```json
 {
@@ -280,14 +280,10 @@ to actually dispatch once config loads (separately fail-closed with `confinement
 
 ### Checklist Before Enabling Strict Mode
 
-1. Run `fgos doctor` and verify `confinement-strict-readiness` reports no missing policies. Note: on
-   a repo where `doctor` is run without merging the operator's global `~/.fgos/config.json`, its count
-   of "missing" capabilities can be wider than what the strict validator itself will actually see at
-   dispatch time (the validator merges project + global config; `doctor`'s confinement checks
-   currently read the project file only) — cross-check against the merged config if the two disagree.
-2. In `.fgos/config.json`, verify all canonical capabilities (`advise`, `execute`, `code:implement`, `code:review`, `code:test`, `code:debug`, `code:refactor`) are explicitly declared with valid `mode` settings.
+1. Run `fgos doctor` and verify `confinement-strict-readiness` reports no missing policies. `doctor` reads the effective config (project over global over the standard), the same value the strict validator sees.
+2. In the project config (`fgos config show --path runner.capabilities`), verify all canonical capabilities (`advise`, `execute`, `code:implement`, `code:review`, `code:test`, `code:debug`, `code:refactor`) are explicitly declared with valid `mode` settings.
 3. If any capability declares a `required`-mode policy, verify `bwrap` is ready (`fgos doctor` check `confinement-bwrap-platform` is passing) — strict mode itself won't check this, but a required dispatch will refuse without it.
-4. Set strict mode in `.fgos/config.json`:
+4. Set strict mode with `fgos config set` (shown here as JSON):
    ```json
    {
      "runner": {

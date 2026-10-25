@@ -15,8 +15,8 @@ Point at this file from a consumer `SKILL.md` by relative path (e.g.
 `../_shared/executor-dispatch-fallback.md`), filling in these three
 parameters where the consuming skill's own reasoning step lives:
 
-- **`<EXECUTOR_ID>`** — the `.fgos/config.json`
-  `runner.executors.<id>` key this step dispatches through (no live
+- **`<EXECUTOR_ID>`** — the config's
+  `runner.executors.<id>` key (`fgos config show`) this step dispatches through (no live
   consumer of this fragment's own Steps A-C exists today, tsk-4ns — see
   Precedent below).
 - **`<PROMPT_TEMPLATE>`** — the fixed prompt text to send (so every

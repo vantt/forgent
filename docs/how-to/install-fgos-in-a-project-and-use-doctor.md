@@ -53,8 +53,9 @@ restaged. `active-release-matches-checkout` compares only the Node payload
 against doctor's source directory, not HEAD or Rust binary freshness.
 
 Separately from both layers, the config has two levels: a project file
-`<project>/.fgos/config.json` and a global file `~/.fgos/config.json`. The
-project file wins over the global one.
+`<project>/.fgos/config.yaml` and a global file `~/.fgos/config.yaml`, over the
+release's standard. The project file wins over the global one; `fgos config show`
+prints the effective value with where each came from.
 
 ## 2. Order of operations for a new project
 
@@ -229,18 +230,16 @@ file or key in their message; the message always names the exact target.
 
 | Id | Checks | Typical failing message | Who | Fix |
 |---|---|---|---|---|
-| `config-not-stale` | `.fgos/config.json` exists and has every current default key | `not yet configured -- run fgos setup`; `stale config -- missing keys: ...` | setup | `fgos setup` (only adds missing keys, never overwrites yours) |
 | `runner-patterns-config` | `runner.patterns` is present, well formed and cumulative | `runner.patterns missing -- falling back to setup defaults` | setup | `fgos setup` |
 | `runner-generated-paths` | `runner.generatedPaths` maps a generated source to its render targets with well-formed write-scope entries | `runner.generatedPaths missing -- write scopes are not widened to generated trees` | setup | `fgos setup` |
 | `tier-vocabulary-dead-keys` | No retired tier keys (`runner.models`, `minTier`, `rigorOverrides`) | names the dead key | you | Delete or migrate the named key |
-| `seat-binding-config` | The project `runner` section has no tier ladder `$comment`, or its `$comment` matches the tier ladder (a difference is noted, not failed); an unreadable config fails | `.fgos/config.json#runner $comment differs from the tier ladder: run fgos setup to refresh it` | setup | `fgos setup` refreshes the `$comment` |
 | `executor-family-unique` | Each agent family has one executor | `one family, several executors: claude (claude, claude-herdr)` | you | Merge them: keep one executor and move the other's transports into it as invocations |
 | `executor-skills-installed` | Every skill an executor declares in `supports.skills` exists in the skill directory of each CLI the executor invokes (claude, codex, omp, pi, grok) in the main checkout | `claude declares ak:cook but .claude/skills/ak-cook/SKILL.md is missing in /path/repo` | you | Install the skill for that runtime, or remove it from `executors.<id>.supports.skills` |
 | `tier-fallback` | Every family `runner.tierFallback` lists for a tier has a `modelPolicies` cell at that tier and an agent executor | `warning: tier fallback entries the walk skips: advanced: z-ai has no modelPolicies cell at advanced` | you | Add the cell, or remove the family from that tier's list |
 | `model-policy-pools` | Every pool a tier cell names (`model@pool`) has accounts in `runner.llmAccounts` (the walk skips an entry whose pool has none) | `warning: tier cells name pools runner.llmAccounts does not declare: deepseek.standard@openrouter; the walk skips these entries until the pool has an enabled account holding a login store for the CLI of the invocation (fgos dispatch explain shows each)` | you | Declare the pool's accounts under `runner.llmAccounts` in `~/.fgos/config.json` |
-| `llm-accounts-shape` | `runner.llmAccounts` is in the global config only and well formed | `runner.llmAccounts.codex: "codex" is another spelling of the family "openai"` | you | Fix the named key in `~/.fgos/config.json` |
+| `llm-accounts-shape` | `runner.llmAccounts` is in the global config only and well formed | `runner.llmAccounts.codex: "codex" is another spelling of the family "openai"` | you | Fix the named key (`fgos config explain <path>` says where it belongs) |
 | `llm-accounts-vs-legacy` | `runner.llmAccounts` and `runner.providers` list the same accounts and login directories (the lease reads `runner.llmAccounts` for a pool it declares and `runner.providers` for the rest) | `warning: the lease reads runner.llmAccounts for a pool it declares and runner.providers for the rest; only in runner.providers: gemini/tetcu72` | you | Add the missing account to the side that lacks it |
-| `global-model-policies-portable` | Global `runner.modelPolicies` uses plain model names | `~/.fgos/config.json runner.modelPolicies has list or "model@pool" cells (deepseek.standard)` | you | Move those cells to the project config |
+| `global-model-policies-portable` | Global `runner.modelPolicies` uses plain model names | `runner.modelPolicies in the global config has list or "model@pool" cells (deepseek.standard)` | you | Move those cells to the project config |
 | `advise-execute-capabilities-configured` | `runner.capabilities` declares `advise`, `execute`, `code:implement` | `runner.capabilities section missing -- run fgos setup` | setup | `fgos setup` |
 | `workflow-capabilities-configured` | Every capability a Workflow unit names is declared, and has a `prefer` pool | `no entry for Workflow capabilities: ...`; `warning: ... no "prefer" pool, so a headless run of those units is refused` | setup, you | `fgos setup` declares the capabilities. The `prefer` pool is yours to fill (section 5.2) |
 | `capability-serves-valid` | The `serves` sets are well formed, distinct and include `review` | `runner.capabilities section missing -- run fgos setup` | setup | `fgos setup` |
@@ -250,7 +249,7 @@ file or key in their message; the message always names the exact target.
 | `worktree-setup-configured` | `worktreeSetup.commands` is a list of non-empty shell commands | names the bad entry | you | Edit `worktreeSetup.commands` |
 | `gate-bypass-configured` | `gateBypass.level` is one of off, light, standard, heavy | `gateBypass.level missing or not a recognized level ... -- run fgos doctor --fix` | tool | `fgos doctor --fix` |
 | `iron-law-configured` | `ironLaw.level` is ask or warn | `ironLaw.level missing ... -- run fgos doctor --fix` | tool | `fgos doctor --fix` |
-| `gateway-token-configured` | `gateway.token` is present in `~/.fgos/config.json` | `gateway.token missing from ~/.fgos/config.json` | tool | `fgos doctor --fix` (never rotates an existing token) |
+| `gateway-token-configured` | the machine files under `~/.fgos/private/` (accounts file, `gateway-token`) exist and are valid | the row names the missing or invalid file | tool | `fgos doctor --fix` (never rotates an existing token) |
 | `herdr-launcher-configured` | `herdrOrchestrator` toggles are present booleans | `herdrOrchestrator section missing -- run fgos setup` | setup | `fgos setup` |
 | `herdr-web-dashboard-configured` | `herdrWebDashboard.staticServing` is a boolean | `herdrWebDashboard section missing -- run fgos setup` | setup | `fgos setup` |
 | `doc-registry-enforce` | `docRegistry.enforce` is a boolean | `docRegistry section missing -- run fgos setup` | setup | `fgos setup` |
@@ -372,8 +371,8 @@ registry (no events log yet).
 ### 5.2. Pools and independence
 
 A Workflow unit names a capability, for example `nominal-group:generate`. The
-runner picks executors from that capability's pool in
-`<project>/.fgos/config.json`:
+runner picks executors from that capability's pool in the project config
+(`fgos config show --path runner.capabilities`; the file is `<project>/.fgos/config.yaml`). Shown as JSON for brevity:
 
 ```json
 "runner": { "capabilities": { "nominal-group:generate": {

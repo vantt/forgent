@@ -135,11 +135,12 @@ source /path/to/forgent/scripts/fgos-shell-integration.sh
 ### Setup
 
 `fgos setup` wires the shell-integration source line into every shell
-profile you actually have (bash and/or zsh) and brings your local
-`.fgos/config.json` up to date with the current default keys, without
-ever touching a setting you already customized. It does the same for your
-global `~/.fgos/config.json` (optional, shared across every project — a
-value set there is used wherever a project doesn't set its own). It always
+profile you actually have (bash and/or zsh) and creates a header-only
+`.fgos/config.yaml` when the project has no config file. It does the same
+for your global `~/.fgos/config.yaml` (optional, shared across every project
+— a value set there is used wherever a project doesn't set its own). It
+never writes default values into either file: the release ships the standard
+and your files hold only what you change. It always
 does the work and reports exactly what changed — running it again with
 nothing new to do says so plainly instead of repeating itself.
 
@@ -167,11 +168,13 @@ must fix by hand, see
 
 ### Config
 
-Setup and doctor share one local file, `.fgos/config.json`. `fgos setup`
-fills in any default key missing from it; `fgos doctor` reports when it's
-stale relative to the current defaults but never edits it itself.
-Settings you've already customized are never overwritten, at any nesting
-depth.
+Config lives in `.fgos/config.yaml` (project) and `~/.fgos/config.yaml`
+(global); the release's own standard sits under both. Read the effective
+values with `fgos config show`, ask what a key means with
+`fgos config explain <path>`, and change one with
+`fgos config set <path> <value> --reason <text>`. `fgos doctor` reports
+config problems and, with `--fix`, repairs the ones it names. Details:
+`docs/platform/config/spec.md`.
 
 ### Uninstall
 
