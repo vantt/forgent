@@ -158,3 +158,12 @@ Decided by the Lead under A42. The w17 review approved the 704 parity rework, wi
 The ruling refines L13-13.2. A check that is a *permanent* proof, not a one-shot authoring check, verifies both the authoring pin and the live tree. Known live drift that belongs to the final pin is listed by name in a machine-readable duty list, and any drift not on that list fails.
 
 So the 4 heading rows and the block-17 row are fixed now. The 2 drifted patches (`bin/fgos.mjs`, `docs/backlog.md`) stay a final-pin duty. Brief: `w17-parity-live-brief.md`.
+
+## L13-17 — Gate register review follow-up (Lead, 2026-10-25 09:20)
+
+Decided by the Lead under A42, from the w18 review (5 APPROVE / 1 REWORK).
+
+1. **G2's 187 owned judgments are settled before F, not at F.** G2 requires every census id to be joined to a proof or to a confirmed REJECT. Moving 187 open judgments to F would leave the final pin with judgment work the plan places before it, and no ruling allowed it. G2 goes back to `partial` until those judgments are settled and independently reviewed. Brief: `w18-g2-judgments-brief.md`.
+2. **Owned-park actions are co-composed at F.** The 163 dated wrapper notes, the owned-park actions and the 6 repoint proposals all need the actual flip date and placement, and those exist only at F. Their judgments were reviewed before F (w8, w9). Only their composition is an F duty.
+3. **Rule-level approval of a mechanical reclassification is accepted.** W9 approved db023f065's reclassification of 319 parks and 20 operand rows by rule, with a 56-row spot check. That is enough, because `proof.py` replays the rule byte-identically and the review checked positive and negative controls for each rule. The G6 note must say so instead of implying a row-by-row review.
+4. The remaining w18 Low and Info findings are register corrections. They go in the same turn. 25e8842d3 (misc-fix receipt counts) gets an independent re-review.
