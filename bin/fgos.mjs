@@ -2908,7 +2908,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const ctx = { cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) };
       if (sub === 'sync') {
         const { syncUseCase } = await import('../src/verbs/events/sync.mjs');
-        return syncUseCase(ctx, { remote: flags.remote, noPush: flags['no-push'] });
+        return syncUseCase(ctx, { remote: flags.remote, noPush: flags['no-push'], opportunistic: flags.opportunistic });
       }
       if (sub === 'status') {
         const { statusUseCase } = await import('../src/verbs/events/status.mjs');
@@ -4760,11 +4760,13 @@ function handSealsToChild() {
     spawnDetachedCli({ cwd: root, args: ['events', 'seal', '--stream', stream, ...(checkpointPath ? ['--history', checkpointPath] : []), '--dir', root] });
   }
 }
-function opensEventStore(entry, verb, positional) {
+function opensEventStore(entry, verb, positional, flags) {
   // `events migrate` imports the tracked history under its own quiesce check: no trigger may open the store around it.
   if (verb === 'events' && positional[0] === 'migrate') return false;
   // The seal child does exactly one seal: no start or end trigger (no second seal sweep, no publish) around it.
   if (verb === 'events' && positional[0] === 'seal') return false;
+  // The publish child does one opportunistic sync and nothing around it, or its own end trigger would start another child.
+  if (verb === 'events' && positional[0] === 'sync' && flags.opportunistic) return false;
   return !!(entry?.requiresExistingStore || STORE_MISSING_WARNING_VERBS.has(verb) || EVENT_STORE_LIFECYCLE_VERBS.has(verb));
 }
 
@@ -5169,7 +5171,7 @@ async function main() {
     // comes from `runVerb` unchanged.
     faultClass = entry ? null : 'unknown-verb';
     // The main checkout is resolved (it runs git) only for a verb that opens the store; the other verbs never pay for it.
-    if (opensEventStore(entry, verb, positional)) {
+    if (opensEventStore(entry, verb, positional, flags)) {
       eventStoreLifecycle = { trustedMain: path.dirname(getMainFgosDir(dir)), dispatched: currentDispatchDepth() > 0 };
       sweepsLand = landsWork(verb, positional);
       // `init` creates the store, so only its end trigger has anything to maintain. A command outside a dispatched worker

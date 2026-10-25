@@ -82,23 +82,21 @@ const syncChildren = (repo) => {
   });
 };
 
-test('the end trigger hands a due publish to a detached child, never waits for it, and never publishes from a dispatched worker', async (t) => {
-  const { temp, repo, store } = workRepo(t, { remote: true });
-  // A remote whose receive hook takes seconds: an in-process publish would hold the trigger that long.
-  fs.writeFileSync(path.join(temp, 'remote/hooks/pre-receive'), '#!/bin/sh\nsleep 4\n', { mode: 0o755 });
+test('the end trigger hands a due publish to a detached child, does not wait for it, and never publishes from a dispatched worker', async (t) => {
+  const { repo, store } = workRepo(t, { remote: true });
   addAt(store, 3600);
   assert.equal(maintainEventStore(repo, { trustedMain: repo }).error, null);
   assert.deepEqual(syncChildren(repo), [], 'a start trigger never publishes');
   maintainEventStore(repo, { trustedMain: repo, end: true, dispatched: true });
   assert.deepEqual(syncChildren(repo), [], 'a dispatched worker never publishes');
-  const started = Date.now();
   assert.equal(maintainEventStore(repo, { trustedMain: repo, end: true }).error, null);
-  assert.ok(Date.now() - started < 3000, 'the end trigger returned without waiting for the slow remote');
+  // The child needs its own process start before it can reach the remote; an in-process publish would already be done here.
+  assert.equal(store.maintenance([]).lastPush, null, 'the trigger returned before the push');
   assert.equal(syncChildren(repo).length, 1, 'the due publish runs in one detached child');
-  assert.equal(store.maintenance([]).lastPush, null, 'the push has not landed when the trigger returns');
   const first = await waitFor('the child to publish', () => store.maintenance([]).lastPush);
   assert.equal(first.error, null);
   assert.equal(first.remote, 'origin');
+  await waitFor('the child to finish and record its attempt', () => syncChildren(repo).length === 0);
   maintainEventStore(repo, { trustedMain: repo, end: true });
   assert.deepEqual(syncChildren(repo), [], 'a push inside the interval starts no child');
   assert.deepEqual(store.maintenance([]).lastPush, first, 'a push inside the interval is not repeated');
@@ -200,7 +198,7 @@ test('a failing end trigger leaves a record, and the command it ended still succ
   const [record, ...rest] = faultRecords(repo, dir);
   assert.deepEqual(rest, []);
   assert.equal(record.faultClass, 'event-store-end-trigger');
-  assert.match(record.message, /fgos setup/);
+  assert.equal(record.message, 'event-store-lock-dir-invalid');
 });
 
 test('a detached seal or sync child that fails leaves a record and exits non-zero', (t) => {

@@ -446,6 +446,8 @@ Settled with the phase 05 review (2026-10-18):
 
 Triggers: the explicit verb; and the opportunistic check of section 16 when the last successful push is older than `eventStore.sync.intervalSec` (default 300; 0 means explicit only). Network calls never run inside the Work gate.
 
+Update, 2026-10-25: the opportunistic publish of a command's end trigger no longer runs in the command's own process. The end trigger decides that a push is due from the maintenance facts, starts one detached `fgos events sync --opportunistic` child through the same door as the seal child (`src/cli/detached-child.mjs`) and exits; the command's result never waits on the network or on the seal lock a sync holds. Publication of a command's events therefore lags by at most the child's runtime: a few seconds on a healthy remote and up to about 120 s on a slow one (the longest network call), as before but off the reader's path. No event is at risk in that window, because events are durable and readable locally before any sync. The child tries the seal lock and skips when another process holds it, runs no start or end trigger, and returns no status. A dispatched worker never starts it, and a child that cannot be started is the trigger's error.
+
 Offline: append, seal and read work fully; fetch and push fail, the failure is recorded, `status` shows "unpublished since", the next trigger retries; Work is never blocked by the network. A clone with no remote keeps everything local.
 
 Two clones on one machine share a machine id by default (one `stateRoot`), so both write `refs/fgos/events/<id>` in their own repositories with different store ids. The first push wins; the second sync finds a diverged mirror and writes a merge commit, so both chains converge on the remote with nothing lost and no shared sequence (store ids differ). Doctor warns `event-store-machine-ref-shared` when the mirror of the own id carries another store id, and names the fix: `git config fgos.machineId <other-id>` in one of the clones.
@@ -491,7 +493,7 @@ The usual verbs (`fgos list`, `show`, `ready` and the others) read the consumer'
 
 | Verb | Does |
 |---|---|
-| `fgos events sync` | Section 14 |
+| `fgos events sync [--opportunistic]` | Section 14; `--opportunistic` is the detached publish child's mode (try the seal lock, no status) |
 | `fgos events status [--json]` | Store id, machine id, every ref and tip, per stream unsealed count and oldest unsealed age, closed segments pending, last receipt, last fetch and push with result, own ref ahead/behind its mirror, a missing fetch refspec, orphan branch streams, deferred events and their missing predecessors (section 12), the guarantee level of the open root |
 | `fgos events seal --stream <s> [--history <file>]` | Certify the open events of one stream now, waiting at most 5 s for the seal lock (busy after that: exits 0); `--history` names the consumer's history checkpoint under `.fgos/cache` that the seal extends. The detached child of a CLI Work command runs it (section 16) |
 | `fgos events export [--stream <s>] [--since <cursor>] [--format jsonl|legacy-layout] --out <dir>` | Canonical-order JSONL, or the legacy file layout with a parity report (section 18) |
