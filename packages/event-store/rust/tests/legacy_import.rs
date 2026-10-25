@@ -293,6 +293,7 @@ fn a_cutover_operation_directory_without_an_intent_does_not_block_the_next_attem
     }
     assert_eq!(import().unwrap()["operationId"], id);
 }
+
 /// After the cutover a write is admitted only while every legacy mirror still
 /// names the pinned import: a mirror that moved away from the pin refuses with
 /// refspec-missing, the same answer as a pin that was never fetched.

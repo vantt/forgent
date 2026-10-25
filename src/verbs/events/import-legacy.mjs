@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { isExactIsoTime } from '../../state/hot-lock.mjs';
 import { withMainState } from '../../state/runtime-coordination.mjs';
 import { prepareWorkStore, readWorkState } from '../../state/work-event-store.mjs';
 
@@ -50,7 +51,7 @@ export function importLegacyUseCase(ctx, { file, check = false } = {}) {
     if (!event || typeof event !== 'object' || typeof event.type !== 'string' || typeof event.ts !== 'string'
       || !event.payload || typeof event.payload !== 'object') throw refusal(`${source}:${index + 1} is not a legacy event`);
     // The Work door keeps an imported time only when it is an exact ISO time, so --check refuses the same lines.
-    if (Number.isNaN(Date.parse(event.ts)) || new Date(event.ts).toISOString() !== event.ts) throw refusal(`${source}:${index + 1} has ts ${event.ts}, which is not an exact ISO time`);
+    if (!isExactIsoTime(event.ts)) throw refusal(`${source}:${index + 1} has ts ${event.ts}, which is not an exact ISO time`);
     if (!TYPES.has(event.type)) throw refusal(`${source}:${index + 1} has type ${event.type}, which the Work stream does not register`);
     return { line: index + 1, event };
   });
