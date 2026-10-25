@@ -1217,13 +1217,6 @@
   },
   "sites": [
     {
-      "path": "apps/fgos/examples/mailbox-ident-cost.rs",
-      "line": 85,
-      "spawn": "Command::new",
-      "binary": "git",
-      "family": "rust"
-    },
-    {
       "path": "bin/fgos.mjs",
       "line": 3436,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
@@ -1761,6 +1754,20 @@
       "line": 345,
       "spawn": "Command::new",
       "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/examples/mailbox-ident-cost.rs",
+      "line": 85,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/examples/mailbox-ident-cost.rs",
+      "line": 160,
+      "spawn": "Command::new",
+      "binary": "/bin/sh",
       "class": "rust-test"
     },
     {

@@ -1771,7 +1771,7 @@ function rustTestRanges(code) {
 
 function rustModel(name, source) {
   const code = lexRust(source);
-  const testFile = /(^|\/)tests\//.test(name) || /(^|\/)benches\//.test(name);
+  const testFile = /(^|\/)(tests|benches|examples)\//.test(name);
   const tests = rustTestRanges(code);
   const block = (open) => { let depth = 0; let end = open; for (; end < code.length; end++) { if (code[end] === '{') depth++; else if (code[end] === '}' && --depth === 0) break; } return end; };
   // Generic parameters may nest one level (`fn run<S: AsRef<OsStr>>(..)`).
