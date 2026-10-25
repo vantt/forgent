@@ -35,9 +35,9 @@ test('doctor --fix recovers an interrupted Land through the Recovery door and th
     land.close();
     const fixed = fixLandRecovery(f.repo,f.loader,f.options);
     assert.equal(fixed.changed,true,fixed.message);
-    assert.match(fixed.message,/recovered interrupted Land operations: interrupted-fix/);
+    assert.match(fixed.message,/recovered interrupted Git operations: interrupted-fix/);
     assert.equal(createGitRecovery(f.options,f.loader).inspectOperation({operationId:'interrupted-fix'}).terminal,true);
-    assert.deepEqual(fixLandRecovery(f.repo,f.loader,f.options),{changed:false,message:'no interrupted Land operation'});
+    assert.deepEqual(fixLandRecovery(f.repo,f.loader,f.options),{changed:false,message:'no interrupted Land or ScopedCommit operation'});
   } finally { f.close(); }
 });
 test('the journal row warns, never fails, about a finished Land whose candidate is still retained', async () => {

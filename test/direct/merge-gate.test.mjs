@@ -449,7 +449,7 @@ test('an unclassified failure while publishing claims no abandoned result: the l
   assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore);
   const fixed = fixLandRecovery(cwd);
   assert.equal(fixed.changed, true, fixed.message);
-  assert.match(fixed.message, new RegExp(`recovered interrupted Land operations: ${err.operationId}`));
+  assert.match(fixed.message, new RegExp(`recovered interrupted Git operations: ${err.operationId}`));
 });
 
 test('approve releases the published Land candidate once Work has recorded the delivery', async () => {
