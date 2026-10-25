@@ -112,22 +112,22 @@ Accepted as stated risks (not blockers): F-1 the landing fence (risk 1); A-3 the
 
 ### Lead decisions on the questions (COOK, 2026-10-24 20:35)
 
-- **U1:** Branch B is accepted: it reuses the existing `mergeConfigDefaults` and adds no merger, and landing C deletes it. If CFG's landing C is on `origin/main` when phase 03 starts, Branch A is used instead. CFG is asked on the board. Reversal: CFG says the fill semantics differ from Config's merge.
+- **U1:** CFG answered 2026-10-25 13:3x: **Branch A only; Branch B is dropped.** Slice C lands today, and after it setup no longer merges defaults into a config file; `mergeConfigDefaults` stays only for agy settings. Phase 03 therefore starts after Slice C is on origin/main. The `runner` section owner writes its schema and standard (Config spec section 2): COOK adds `runner.patterns.*` and `runner.loops.*` to `core/config-schema/runner.schema.yaml` and `core/config-standard/runner.yaml`, agrees them with SEAT (shared `runner` section), and updates in the same change any fixture they move (`repo-differences.v1.json`, `registry-defaults.v1.json`, `golden_migrate.rs` counts); CFG reviews the mechanism (lint, `authoring_equivalence.rs`). Gate G1: until C lands, decide by the facade hits only; the dead `DEFAULT_RUNNER_CONFIG` copy at `src/runner/dispatch/config.mjs:259` is deleted in the C landing. Reversal: Slice C does not land, then ask the owner whether phase 03 waits or Part A pauses after phase 02.
 - **U2:** move to the resolved loop, as spec 9.2 reads. Reversal: a shipped workflow changes behaviour in a test that the spec did not intend.
 - **U3:** `param:<slot>` is accepted as the provenance class.
 - **U4:** no; a solo run with no verify command reports nothing new.
 - **U5:** decided at slice time; a small fixture of its own is allowed only if no existing CLI conductor-case fixture fits.
-- **U6:** asked of CFG with U1; Branch A only.
+- **U6:** CFG answered 2026-10-25 13:3x (from code reading, not run): the write door validates the whole snapshot an edit would produce (`write.rs:384` `validate`, `snapshot_with`), so any refused key, retired keys included, refuses every write, while an `unset` of the bad key itself passes. No separate repair row is needed. A key retired in a JSON file before migration has its path added to the `retired` list of `packages/config/contracts/migration.v1.json`. Phase 09 proves the unset path by a run.
 - **U7:** the slice first checks for an existing host verb that lists releases and uses it; only if none exists does the warning stay unconditional, worded as advice.
 - **U8:** owner answered (b) at 2026-10-24 20:37: the lead stops and asks before landing phase 12.
 
 ## Unresolved questions
 
-1. **U1 (CFG, owner):** Branch B puts the bundled standard under the project and global layers with the existing fill-missing merge (same documented semantics, one function, deleted by landing C). RR-P4 says a JS merger must not appear: confirm this is acceptable, or the catalog waits for landing C and phases 04 to 12 queue behind it.
+1. **U1 (CFG, owner):** answered, see the U1 decision above (Branch A only).
 2. **U2 (owner):** the literal loop-name comparisons in `seats.mjs`, `unit-handoff.mjs` and `definition.mjs` move to the resolved loop (spec 9.2 followed literally, so a pattern whose loop is `panel` counts as a panel), or stay loop-name checks with no behavior change?
 3. **U3:** the spec's checker provenance has no class for a `minCheckers` value that wins from a non-invariant pattern or selector default; the plan adds `param:<slot>`.
 4. **U4:** should a solo run with no verify command also report `verify: { ran: false, reason }`? Default no (the spec amends only the "solo runs a supplied verify" sentence).
 5. **U5:** if no CLI-level conductor-case fixture can host the S1 wiring proof in one file, the wiring proof needs a small fixture of its own.
-6. **U6 (CFG, Branch A only):** does the Config write door accept a file whose only fault is the retired keys? If not, CFG owns a repair row for them.
+6. **U6 (CFG, Branch A only):** answered, see the U6 decision above.
 7. **U7:** doctor cannot enumerate installed releases from Node (Rust has `list_releases` in `packages/distribution`), so "while an older release exists" becomes an unconditional warning for catalog or `runner.loops` entries in the global file.
 8. **U8 (owner):** consent to the landing moment of phase 12, which makes every older activated release refuse the repository's converted config until upgraded.
