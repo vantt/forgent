@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f6e4442cb84aa36efb3d2ea488b555758118997a8f54d23c088f8fe86c29ec08",
+  "payloadDigest": "b5a781be20fdae0a43d8fede311cf8fa7305717d0ffd154d0d8c6c43c28b76c3",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -92,7 +92,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "fe8cac0ffb92d6bf8c6f8c001df35b66aeea4518192b2e22df060cd3266f9f83",
-    "bin/fgos.mjs": "684549e7505eb37a3585eb0f87e06be4d764add889a6bbf4488ac67ccb63df81",
+    "bin/fgos.mjs": "ce25f156faf786c174b5c4fb16b216632cb1b3c49b8f806d698b1985147a763f",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -1002,7 +1002,7 @@
     "src/setup/run-supervisor-checks.mjs": "b5919215aaa5f3910306a6f6edb53aa2eb9d60382c6505d46975776d44c369e9",
     "src/setup/seat-binding-checks.mjs": "8eb709c6ef91ea0c4e24d1ad15adb3231f5d1441ebb260a42f0934e994b136f6",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
-    "src/setup/skill-wrappers.mjs": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+    "src/setup/skill-wrappers.mjs": "a2679d1eb6106e42cf39ac3a79b8a6c496523cf0b42a1cace2f83c61afa78217",
     "src/setup/terminal-control-checks.mjs": "1e0544f88559b91a8b6e1549844528be27055a4a98fb89b8f8e936987f65be43",
     "src/setup/workflow-case-checks.mjs": "de600986a2325b0a3653835bed153a11ffc447aa31212db8cd4e9d90dd67ed59",
     "src/setup/workflow-definition-files.mjs": "40dc0e0550959c84c34e58c70947859d58baad69f7ffd4fcfa630ee57bdd0e1e",

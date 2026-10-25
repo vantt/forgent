@@ -199,6 +199,13 @@ of it).
   the `terminal` section of row 5h is one of the defaults the
   fill-missing-only merge adds; `<stateRoot>/terminal` is not set up here: the
   terminal allocation store creates it with mode 0700 on first use.
+  The release's skills are copied into the project's `.agents/skills` and
+  their `.claude/skills` wrappers regenerated, except that a project file is
+  kept as it is when it is tracked with uncommitted changes since HEAD, or
+  when its skill's `SKILL.md` declares a newer `version` than the release's
+  copy; untracked and clean tracked files are still refreshed. Each kept
+  file is named in the setup output (a failed check line). A checkout that
+  is the release's own source regenerates its wrappers without this guard.
 - **Side effects:** the caller's own shell profile file(s), local project
   config file, global config file (`~/.fgos/config.json`), and the two lock
   directories may be created or modified; nothing outside the caller's own
