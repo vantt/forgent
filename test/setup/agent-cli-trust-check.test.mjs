@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { checkAgentCliProjectTrusted } from '../../src/setup/agent-cli-trust.mjs';
@@ -11,12 +12,12 @@ import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const SECRET_LINE = 'api_key = "sk-do-not-print-this-value"';
 
-// A fake HOME and a fake git project, both under the temp dir: the user's real agent CLI configs are
+// A fake HOME and a real git repository (the config door needs one), both under the temp dir: the user's real agent CLI configs are
 // never read.
 function mkFixture() {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-agent-trust-home-'));
   const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-agent-trust-project-'));
-  fs.mkdirSync(path.join(project, '.git'));
+  execFileSync('git', ['init', '-q'], { cwd: project });
   return { home, project: fs.realpathSync(project) };
 }
 
@@ -163,7 +164,7 @@ test('the registered check reads the project config and the overridden HOME, nev
   try {
     const dir = codexHome(fixture.home, '.codex-reg');
     fs.mkdirSync(path.join(fixture.project, '.fgos'), { recursive: true });
-    writeProjectConfig(fixture.project, { runner: { executor: { command: 'claude', args: [] }, timeoutMs: 1000, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, modelPolicies: { openai: { nano: 'm', mini: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' } }, executors: { openai: { kind: 'agent', providerModel: 'openai', invocations: [{ id: 'codex-cli', via: 'cli', command: 'codex', args: [], env: { CODEX_HOME: dir } }] } } } });
+    writeProjectConfig(fixture.project, { runner: { executor: { command: 'claude', args: [] }, timeoutMs: 1000, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, modelPolicies: { openai: { nano: 'm', mini: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' } }, executors: { 'codex-trust': { kind: 'agent', providerModel: 'openai', invocations: [{ id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: [], env: { CODEX_HOME: dir } }] } } } });
     process.env.HOME = fixture.home;
     const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-cli-project-trusted');
     const result = entry.check(fixture.project);

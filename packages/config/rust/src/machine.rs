@@ -7,9 +7,10 @@ use std::sync::OnceLock;
 use fgos_yaml_doc::Profile;
 use serde_json::{json, Map, Value};
 
-use crate::detect::Detectors;
+use crate::detect::{Detectors, NoDetectors};
 use crate::files::{read_beneath, FileError, PRIVATE_FILE_MODE};
 use crate::schema::Schemas;
+use crate::session::session_class;
 use crate::snapshot::{accounts_source, machine_sources, split_global, SnapshotError};
 use crate::snapshot::{build, Context, SessionClass, Snapshot, SnapshotRequest};
 use crate::standard::Standard;
@@ -89,6 +90,24 @@ pub fn snapshot(
         class,
     };
     build(ctx, &req, &machine_sources(&req)?)
+}
+
+/// The effective value for one project, for an in-process reader that holds only its root and the
+/// process environment (`lookup`, like `session_class`): the global directory is `$HOME/.fgos` and the
+/// class comes from the confined marker. The root is also the trusted root: the caller passes the
+/// main checkout.
+pub fn project_snapshot(
+    root: &Path,
+    lookup: impl Fn(&str) -> Option<String>,
+) -> Result<Snapshot, SnapshotError> {
+    let home = lookup("HOME").ok_or_else(|| std::io::Error::other("HOME is not set"))?;
+    let req = SnapshotRequest {
+        project_root: root.into(),
+        trusted_root: root.into(),
+        global_dir: Path::new(&home).join(".fgos"),
+        class: session_class(lookup),
+    };
+    crate::snapshot::snapshot(&context(&NoDetectors)?, &req)
 }
 
 /// A token or other secret value carried in process: no `Display`, and `Debug` shows none of it.

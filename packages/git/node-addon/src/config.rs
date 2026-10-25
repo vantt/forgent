@@ -46,6 +46,7 @@ struct Request {
     ids: Vec<String>,
     acknowledge: bool,
     target: Option<String>,
+    path: Option<String>,
 }
 
 fn detailed(id: &str, more: More) -> Failure {
@@ -305,6 +306,19 @@ pub fn snapshot_entry(args: Value) -> Result<String> {
     })
 }
 
+/// The bundled standard's value at one path, with no file read: `{ present, value }`; a path the standard does
+/// not hold is `{ present: false, value: null }`. `{ path }`, a dotted path such as `runner.modelPolicies.claude.advanced`.
+#[napi(namespace = "config", js_name = "standardValue")]
+pub fn standard_value_entry(args: Value) -> Result<String> {
+    entry(args, |a| {
+        let path = parse_path(a.path.as_deref().ok_or_else(|| invalid("path"))?)
+            .map_err(|_| invalid("path"))?;
+        let ctx = context(&NoDetectors)?;
+        let found = ctx.standard.value_at(&path);
+        Ok(json!({ "present": found.is_some(), "value": found }))
+    })
+}
+
 /// The account pools alone, readable with no valid project or global file: `{ present, state, revision,
 /// runner }`. `{ globalDir, class }`.
 #[napi(namespace = "config", js_name = "accounts")]
@@ -382,7 +396,7 @@ mod unix {
             &fgos_holder_lock::state_root::lock_root(),
             LOCK_WAIT_MS,
         )?;
-        Ok(json!({ "created": made.created, "revision": made.revision }))
+        Ok(json!({ "created": made.created, "file": made.file, "revision": made.revision }))
     }
 }
 
@@ -414,7 +428,7 @@ pub fn fix_config(args: Value) -> Result<String> {
     entry(args, unix::fix_entry)
 }
 
-/// Creates the header-only file of a scope that has none: `{ created, revision }`; an existing file, legacy
+/// Creates the header-only file of a scope that has none: `{ created, file, revision }`; an existing file, legacy
 /// JSON included, is kept. `{ projectRoot?, globalDir, class, target: "project" | "global" }`.
 #[napi(namespace = "config", js_name = "init")]
 pub fn init_config(args: Value) -> Result<String> {

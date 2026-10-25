@@ -8,7 +8,7 @@
 // `.fgos/gateway.json` (a single object, not an array — one gateway
 // process makes sense per repo checkout, since the bound port is a
 // per-machine config value the Rust binary itself reads from
-// `~/.fgos/config.json`, not from anything this module owns).
+// the machine config (`~/.fgos`), not from anything this module owns).
 //
 // tsk-2n2 (real gap found reviewing tsk-31v): `start`/`stop` run their
 // whole read-check-write sequence under the `gateway` kernel lock
@@ -25,13 +25,13 @@
 // bypasses the lock.
 
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { resolveLogsDir, resolveMainCheckoutRoot } from './paths.mjs';
 import { observe, judge, signalByIdentity } from './dispatch/process-identity.mjs';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 import { replaceDurably } from '../native/door.mjs';
+import { isConfigRefusal, readMachineConfig } from '../config/facade.mjs';
 import { maintainEventStore } from '../event-store/maintenance.mjs';
 
 const REGISTRY_FILE = 'gateway.json';
@@ -148,20 +148,17 @@ function writeRegistry(fgosDir, entry) {
   replaceDurably(fgosDir, path.basename(rp), `${JSON.stringify(entry, null, 2)}\n`, 0o644);
 }
 
-/** Real port this repo's gateway would bind, read the SAME way the Rust
- * binary itself does (`gateway.rs`'s `load_gateway_config`: `~/.fgos/
- * config.json`'s `gateway.port`, default 4170) — never re-guessed or
- * hardcoded independently of the actual authority. */
+/** Real port this repo's gateway would bind, read from the same machine
+ * config the Rust binary reads (`gateway.port` of the effective machine view,
+ * default 4170) — never re-guessed or hardcoded independently of the actual
+ * authority. A machine config the door refuses names the documented default
+ * (`DEFAULT_PORT` matches gateway.rs's own `DEFAULT_PORT`), never a guess. */
 function resolveConfiguredPort() {
-  const configPath = path.join(os.homedir(), '.fgos', 'config.json');
   try {
-    const raw = fs.readFileSync(configPath, 'utf8');
-    const parsed = JSON.parse(raw);
-    const port = parsed?.gateway?.port;
+    const port = readMachineConfig({ sections: ['gateway'] }).value.gateway?.port;
     if (Number.isInteger(port) && port > 0) return port;
-  } catch {
-    // missing/corrupt/no port set — DEFAULT_PORT below matches gateway.rs's
-    // own DEFAULT_PORT constant.
+  } catch (err) {
+    if (!isConfigRefusal(err)) throw err;
   }
   return DEFAULT_PORT;
 }

@@ -9,6 +9,7 @@ fgos-git = { path = "../../git/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
 fgos-host-runtime = { path = "../../host-runtime/rust" }
 fgos-observe = { path = "../../observe/rust" }
+fgos-config = { path = "../../config/rust" }
 tokio = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order", "arbitrary_precision"] }

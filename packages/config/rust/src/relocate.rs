@@ -23,7 +23,7 @@ use crate::schema::{descend, json_at, load};
 use crate::scope::SourceKind;
 use crate::snapshot::{accounts_source, carries, split_global, Context, SnapshotError};
 use crate::snapshot::{SessionClass, SnapshotRequest};
-use crate::write::{commit_observed, Edit, WriteRequest};
+use crate::write::{commit_observed, without_project, Edit, WriteRequest};
 use crate::ConfigRefusal;
 
 const REASON: &str = "[migrate] carried over from ~/.fgos/config.json, reason never recorded";
@@ -234,7 +234,8 @@ fn confined(req: &MoveRequest) -> Result<(), SnapshotError> {
 
 /// Stage 1: write the account pools through the write transaction and the token through the
 /// create-only install, then verify both by reading them back. The source is not touched. A
-/// destination that holds different data for a key is refused before anything is written.
+/// destination that holds different data for a key is refused before anything is written. The
+/// write reads the machine files alone, so a project file cannot refuse the copy half-way.
 pub fn copy(
     ctx: &Context,
     req: &MoveRequest,
@@ -264,7 +265,7 @@ pub fn copy(
     }
     if !edits.is_empty() {
         let write = WriteRequest {
-            roots: req.roots.clone(),
+            roots: without_project(&req.roots),
             lock_root: req.lock_root.clone(),
             target: SourceKind::Accounts,
             expected: dest.revision,

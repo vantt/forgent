@@ -20,15 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../../src/setup/checks.mjs';
-import { DEFAULT_RUNNER_CONFIG } from '../../../src/runner/dispatch.mjs';
 import { DEFAULT_LEVEL } from '../../../src/state/gate-bypass.mjs';
-import {
-  DEFAULT_CLEANUP_TTL_DAYS,
-  DEFAULT_CLEANUP_LEAF_TTL_DAYS,
-  DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
-  DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
-} from '../../../src/setup/registrations.mjs';
-import { DEFAULT_INVARIANT_CHECK_COMMANDS } from '../../../src/config/shared-config-file.mjs';
 import { initStore, addWork } from '../../../src/state/store.mjs';
 import { appendEvent } from '../../helpers/legacy-event-fixture.mjs';
 import { initFixtureRepo } from '../../helpers/git-fixture.mjs';
@@ -79,14 +71,6 @@ function writeEnduserManifest(tmp, entries) {
   fs.writeFileSync(path.join(tmp, 'docs', 'enduser-docs-index.json'), `${JSON.stringify(entries, null, 2)}\n`);
 }
 
-// ─── config-awareness (docs/history/global-project-config-awareness/ ──────
-// CONTEXT.md D1): always passes (informational, read-only, same contract as
-// tool-registry-configured) -- only the message and `active` distinguish
-// which level is in play. Every case overrides HOME (same pattern the
-// shell-integration-sourced tests above already use) so this never touches
-// the real ~/.fgos/config.json; project config is checked at the temp cwd's
-// own .fgos/config.json, matching describeConfigAwareness's real defaults.
-
 function withHome(homeDir, fn) {
   const prevHome = process.env.HOME;
   const prevUserProfile = process.env.USERPROFILE;
@@ -110,13 +94,7 @@ function initRepo(prefix) {
   return initFixtureRepo(mkTemp(prefix), { branch: 'main' });
 }
 export {
-  DEFAULT_CLEANUP_LEAF_TTL_DAYS,
-  DEFAULT_CLEANUP_TTL_DAYS,
-  DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
-  DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
-  DEFAULT_INVARIANT_CHECK_COMMANDS,
   DEFAULT_LEVEL,
-  DEFAULT_RUNNER_CONFIG,
   DOCTOR_CHECKS,
   FGOS,
   FIX_REGISTRATIONS,

@@ -8,7 +8,7 @@ import { loadWorkflow, startWorkflow, answerWorkflow } from '../../src/workflow/
 import { withProviderFamilies } from '../helpers/provider-families.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { capabilityServedBy, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // The validate-plan and implement-item unit templates the coding workflow carried before its
 // lifecycle file dropped its runner fields; the reviewed pattern is what these tests exercise.
@@ -67,7 +67,7 @@ function fixture(t, mode) {
     'group-cognition:explore', 'group-cognition:critique', 'group-cognition:synthesize',
     'coding:validate', 'coding:implement', 'marketing:research', 'marketing:write',
     'marketing:publish',
-  ]) capabilities[name] = { prefer: [{ executor: 'test-node' }], rigor: 'standard' };
+  ]) capabilities[name] = capabilityServedBy('test-node', name);
   const cfg = withProviderFamilies({ runner: {
     defaultExecutor: 'test-node',
     defaults: { tier: 'standard' },

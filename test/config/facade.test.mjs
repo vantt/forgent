@@ -11,7 +11,7 @@ import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { CONFINED_MARKER_ENV as DRIVER_MARKER } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import {
-  CONFINED_MARKER_ENV, ConfigDoorError, checkConfig, initConfigFile, isConfigRefusal, projectConfigPresent, readConfig, readMachineAccounts, readMachineConfig,
+  CONFINED_MARKER_ENV, ConfigDoorError, checkConfig, initConfigFile, isConfigRefusal, projectConfigPresent, readConfig, readMachineAccounts, readMachineConfig, readStandardValue,
 } from '../../src/config/facade.mjs';
 
 process.env.FGOS_STATE_HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'config-facade-state-'));
@@ -86,14 +86,11 @@ test('only a refusal about a config file is a refusal: a door failure and a fore
   assert.throws(() => readConfig({ globalDir: dir.global }), TypeError, 'the project read names its project');
 });
 
-test('a legacy config.json still reads and a migration tombstone is no source', () => {
+// A legacy config.json that still reads and a migration tombstone that is no source are owned by
+// packages/config/rust/tests/files_select.rs (source choice), golden_migrate.rs (the legacy read) and golden_init.rs.
+test('projectConfigPresent is false for an empty project and true once the project has a config file', () => {
   const dir = fixture();
-  lay(path.join(dir.project, '.fgos/config.json'), JSON.stringify({ invariantChecks: { commands: ['legacy-check'] } }));
-  assert.deepEqual(readConfig({ projectRoot: dir.project, globalDir: dir.global, sections: ['invariantChecks'] }).value.invariantChecks.commands, ['legacy-check']);
-  assert.equal(projectConfigPresent(dir.project, { globalDir: dir.global }), true);
-  lay(path.join(dir.project, '.fgos/config.json'), 'moved to .fgos/config.yaml; upgrade fgOS\n');
   assert.equal(projectConfigPresent(dir.project, { globalDir: dir.global }), false);
-  assert.deepEqual(readConfig({ projectRoot: dir.project, globalDir: dir.global, sections: ['invariantChecks'] }).value.invariantChecks.commands, []);
   lay(path.join(dir.project, '.fgos/config.yaml'), '# @fgos:v1\n');
   assert.equal(projectConfigPresent(dir.project, { globalDir: dir.global }), true);
 });
@@ -105,6 +102,15 @@ test('the accounts, check and init functions reach the door with their defaults'
   const rows = checkConfig({ projectRoot: dir.project, globalDir: dir.global }).findings.map((f) => f.row);
   assert.equal(rows.includes('config-format-legacy-json'), true);
   assert.deepEqual(initConfigFile({ projectRoot: dir.project, globalDir: dir.global, target: 'project' }).created, true);
+});
+
+test('the standard value reaches the door by dotted path, reads no file, and says plainly when the standard has none', () => {
+  const held = readStandardValue('runner.modelPolicies.claude');
+  assert.equal(held.present, true);
+  assert.equal(typeof held.value, 'object');
+  const none = readStandardValue('runner.modelPolicies.no-such-family.standard');
+  assert.deepEqual([none.present, none.value], [false, null]);
+  assert.throws(() => readStandardValue('runner..x'), (err) => err instanceof ConfigDoorError && err.code === 'config-request-invalid');
 });
 
 test('the marker variable is the one the launch driver sets', () => {

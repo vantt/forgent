@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { runUnitWithPort as runUnit } from './run-unit-with-port.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from './fixture-dir.mjs';
-import { writeGlobalConfig, writeProjectConfig } from './config-fixture.mjs';
+import { writeAccountsFile, writeProjectConfig } from './config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -76,6 +76,8 @@ if (match) {
   fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' }, stance: { choice: 'a' } }));
 }
 `;
+
+const TIERS = ['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier'];
 
 /**
  * A repo with a linked worktree and one executor per entry of `providers`
@@ -142,9 +144,10 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
         const cell = cells[family] ?? 'fake';
         return [family, { nano: cell, mini: cell, standard: cell, advanced: cell, flagship: cell, frontier: cell }];
       })),
-      ...(tierFallback ? { tierFallback } : {}),
+      // The walk after a failure follows the families listed here, so the fixture lists the families it serves.
+      tierFallback: tierFallback ?? Object.fromEntries(TIERS.map((tier) => [tier, [...new Set(Object.values(providers).map(({ family }) => family))]])),
       executors,
-      capabilities: { 'docs:write': { prefer: poolEntries, rigor: 'standard' } },
+      capabilities: { 'docs:write': { prefer: poolEntries, rigor: 'standard', tier: 'standard' } },
       patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' } },
     },
   };
@@ -159,7 +162,12 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
     fs.writeFileSync(path.join(accountHome, 'login'), login);
     return [accountId, { credentialStore: { [family]: accountHome } }];
   }))]));
-  writeGlobalConfig(home, { runner: { providers: globalProviders, ...(globalPools ? { llmAccounts: globalPools } : {}) } });
+  // An empty container is not an account entry: the accounts file holds only what has accounts.
+  const accountPools = {
+    ...(Object.keys(globalProviders).length > 0 ? { providers: globalProviders } : {}),
+    ...(globalPools ? { llmAccounts: globalPools } : {}),
+  };
+  if (Object.keys(accountPools).length > 0) writeAccountsFile(path.join(home, '.fgos'), accountPools);
   process.env.HOME = home;
 
   // Accounts that ran recently rank last, so the account a test leaves out is tried first.

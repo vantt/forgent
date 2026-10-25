@@ -20,7 +20,7 @@ import { workUnitFor } from './work-dispatch.mjs';
 import { isReadOnlyAssignment, validateAgentResultClaim } from './dispatch/assignment.mjs';
 import { isSubstantiveReportText, resolveRunWorkerArtifactPath } from './dispatch/assignment-runner.mjs';
 import { runUnit } from './execution/run.mjs';
-import { ensureRunnerConfigForDir } from './dispatch/config.mjs';
+import { loadRunnerConfigForDir } from './dispatch/config.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { interpretRunResult, runOutcome } from './dispatch/run-result.mjs';
 import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
@@ -2304,7 +2304,7 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
     // item into unit data, the declared operation and the plan file its verdict is bound to;
     // the runner binds, dispatches and (for a mutating operation) commits.
     const stateRoot = opts.repoRoot ?? opts.cwd;
-    const cfg = opts.runnerConfig ?? ensureRunnerConfigForDir(stateRoot);
+    const cfg = opts.runnerConfig ?? loadRunnerConfigForDir(stateRoot);
     const stage = choice.stage ?? work.workflowStep;
     const built = workUnitFor(work, {
       cfg,

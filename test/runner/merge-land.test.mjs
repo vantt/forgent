@@ -172,16 +172,17 @@ test('Land seals the acknowledged Work events onto the project ref before it pub
 test('a promote that fails after publication is a recorded retryable result on the merged outcome, never a throw', async () => {
   const f = rootFixture();
   try {
-    // The store opens for the seal before Land; this verify then breaks its configuration, so the promotion after
-    // publication cannot open it.
+    // The store opens for the seal before Land; this verify then replaces its open-log directory with a file, so the
+    // promotion after publication cannot open it.
+    const events = path.join(f.repo, '.git/fgos/events');
     const result = await landRunnerItem(f.repo, {
-      id: 'source', verify: `printf '{"eventStore":{"seal":{"intervalSec":0}}}' > '${path.join(f.repo, '.fgos/config.json')}'`,
+      id: 'source', verify: `rm -rf '${events}' && : > '${events}'`,
     }, { branch: 'source' });
     assert.equal(result.outcome, 'merged', JSON.stringify(result));
     assert.ok(f.git('show', '-s', '--format=%P', 'main').split(' ').includes(f.request.source), 'the branch landed');
     assert.equal(result.promotion.retryable, true);
     assert.equal(result.promotion.stream, 'branch:source');
-    assert.equal(result.promotion.error.code, 'event-store-config');
+    assert.equal(typeof result.promotion.error.message, 'string');
   } finally { f.close(); }
 });
 

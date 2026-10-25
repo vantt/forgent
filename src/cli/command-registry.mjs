@@ -510,7 +510,6 @@ export const COMMAND_REGISTRY = [
       properties: {
         worktree: { type: 'string', description: "Worktree path when resuming an existing discovery run." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
-        config: { type: 'string', description: 'Path to the runner config (default .fgos/config.json in cwd).' },
         verdict: { type: 'string', description: 'Optional caller-supplied verdict: "clear" or "unclear". Omit it only when the item already carries a committed, non-empty CONTEXT.md under its docsRef -- that readLockedContext trust signal advances the item without a verdict. With neither, the call refuses: no subprocess judge stands behind this verb anymore.' },
         verify: { type: 'string', description: 'Required with --verdict clear: the real, runnable verify command for this item.' },
         question: { type: 'string', description: 'Required with --verdict unclear: the question to park the item on in awaiting-human.' },
@@ -540,7 +539,6 @@ export const COMMAND_REGISTRY = [
       properties: {
         worktree: { type: 'string', description: "Worktree path when resuming an existing planning run." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
-        config: { type: 'string', description: 'Path to the runner config (default .fgos/config.json in cwd).' },
         verdict: { type: 'string', description: 'Optional caller-supplied verdict: "pass-through", "need-human", or "decompose" (this value name is unchanged, tsk-403 D11 -- it names an outcome, not a stage). Omit it only when the item\'s plan.md declares tiny/small mode -- that skip-and-advance trust signal passes the item through without a verdict. With neither, the call refuses: no subprocess judge stands behind this verb anymore.' },
         reason: { type: 'string', description: 'Required with --verdict need-human or --verdict decompose (optional with pass-through): why this call is verdicting the way it is.' },
         children: { type: 'string', description: 'Required with --verdict decompose: JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?}).', multiValueFormat: 'json-array' },
@@ -1395,7 +1393,7 @@ export const COMMAND_REGISTRY = [
             cwd: { type: 'string', description: '"plan" only: the working directory whose per-cwd dispatch lock clear-cwd-lock reports on (default: the current directory).' },
             plan: { type: 'string', description: '"apply" only: JSON-encoded plan returned by `dispatch reconcile plan`.' },
             provider: { type: 'string', description: 'provider-capacity: provider id as `inspect --provider-capacity` lists it, e.g. openai-codex.' },
-            account: { type: 'string', description: 'provider-capacity: account id from ~/.fgos/config.json.' },
+            account: { type: 'string', description: 'provider-capacity: account id from ~/.fgos/private/accounts.yaml.' },
             reason: { type: 'string', description: 'provider-capacity: operator reason, e.g. token refreshed or quota exhausted.' },
             until: { type: 'string', description: 'quarantine only: ISO date-time (in the future) when the account is selectable again.' },
             force: { type: 'boolean', description: 'clear-quarantine only: permit clearing an account that is not currently quarantined.' },
@@ -1453,7 +1451,7 @@ export const COMMAND_REGISTRY = [
           type: 'object',
           properties: {
             provider: { type: 'string', description: 'Provider id, e.g. openai.' },
-            account: { type: 'string', description: 'Account id from ~/.fgos/config.json.' },
+            account: { type: 'string', description: 'Account id from ~/.fgos/private/accounts.yaml.' },
             executor: { type: 'string', description: 'Limit the probe to one executor id (default: every executor of the provider).' },
             invocation: { type: 'string', description: 'Comma-separated invocation ids to limit the probe to (default: every invocation that runs as the account).' },
             'timeout-ms': { type: 'string', description: 'Per-call timeout in milliseconds.' },
@@ -1503,7 +1501,7 @@ export const COMMAND_REGISTRY = [
         override: { type: 'string', description: 'JSON-encoded array or object of overrides.' },
         effort: { type: 'string', description: 'Reasoning effort for this run (low, medium, high, max), rendered into the provider CLI\'s own flag; a level the bound executor does not declare refuses the binding.' },
         timeout: { type: 'string', description: 'Time each seat of this run may take instead of runner.timeoutMs: a whole number and a unit (ms, s, m, h), e.g. 90m or 5400s, from 1m to 4h (same as "timeoutMs" in --override, or a Unit\'s own timeoutMs, which it overrides). Kept in unit.json for resume; not with --resume.' },
-        account: { type: 'string', description: 'Pin an account, written pool/account (for example openai/work; pools and accounts are in runner.llmAccounts of ~/.fgos/config.json; same as "account" in --override). It pins each seat whose chosen model entry is served by that pool (a checker on another family binds unpinned) and does not choose the executor: pair it with --provider. A bare account id is refused. Refused before the unit run exists when no seat takes it or it is quarantined; the lease still takes it, and a provider limit on it ends the seat instead of rotating or failing over. Not with --resume.' },
+        account: { type: 'string', description: 'Pin an account, written pool/account (for example openai/work; pools and accounts are in runner.llmAccounts of ~/.fgos/private/accounts.yaml; same as "account" in --override). It pins each seat whose chosen model entry is served by that pool (a checker on another family binds unpinned) and does not choose the executor: pair it with --provider. A bare account id is refused. Refused before the unit run exists when no seat takes it or it is quarantined; the lease still takes it, and a provider limit on it ends the seat instead of rotating or failing over. Not with --resume.' },
         resume: { type: 'string', description: 'Unit run ID to resume.' },
         case: { type: 'string', description: 'Admit this run into a Workflow case (its id) as an activity of its guide, before anything exists: entry milestones, the guide\'s MUST rules, write overlap with the case\'s live reservations and its frame are all checked, and a refusal names the condition. A Playbook case admits through its own proposer only. Needs --activity. Without --case a read-only run is standalone and uncounted, and a writing run needs a worktree no case owns.' },
         activity: { type: 'string', description: 'With --case: the activity of the case\'s guide this run is.' },
@@ -2097,7 +2095,6 @@ export const COMMAND_REGISTRY = [
           type: 'object',
           properties: {
             name: { type: 'string', description: 'Optional filter: a declared tool\'s executor id; omitted checks every tool-capable executor.' },
-            config: { type: 'string', description: 'Read executors from this runner config file instead of the project\'s.' },
           },
           required: [],
         },
@@ -2110,7 +2107,6 @@ export const COMMAND_REGISTRY = [
           properties: {
             capability: { type: 'string', description: 'Optional filter: free-text capability label, normalized to kebab-case.' },
             status: { type: 'string', description: 'Optional filter: one of present/missing/unknown/stale ("stale" is mcp/skill-only: the tool is installed but its own on-disk metadata records a commit behind the repo\'s current HEAD, tsk-j7y).' },
-            config: { type: 'string', description: 'Read executors from this runner config file instead of the project\'s.' },
           },
           required: [],
         },

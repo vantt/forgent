@@ -32,7 +32,7 @@ import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { accountInventoryConfigOf, auditLeaseReceipt } from '../dispatch/provider-capacity.mjs';
 import { LEASE_CONFLICT_FAILURE_CODE } from '../dispatch/run-result.mjs';
-import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs, stripConfigComments } from '../dispatch/config.mjs';
+import { loadRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { AgentNotFoundError, resolveAgentDefinition } from '../agent-definitions.mjs';
@@ -147,11 +147,11 @@ export function assertRepositoryForWrites(roots, cwd, { writes = false } = {}) {
  * Capture snapshot of runner config from the main checkout root.
  */
 export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
-  const cfg = runnerConfig ?? ensureRunnerConfigForDir(mainCheckoutRoot);
+  const cfg = runnerConfig ?? loadRunnerConfigForDir(mainCheckoutRoot);
   // What the hash covers is what seat choice and the run read: the tier defaults and ceiling, the
   // fallback order, the cells, the capability taste, the patterns (with the schema marker), the
-  // executors and governance. `$comment` is documentation and never changes the hash.
-  const filtered = stripConfigComments({
+  // executors and governance.
+  const filtered = {
     defaults: cfg.defaults || {},
     maxTier: cfg.maxTier ?? null,
     tierFallback: cfg.tierFallback || {},
@@ -160,7 +160,7 @@ export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
     modelPolicies: cfg.modelPolicies || {},
     executors: cfg.executors || {},
     governance: cfg.governance || null,
-  });
+  };
   const serialized = JSON.stringify(filtered);
   const hash = crypto.createHash('sha256').update(serialized).digest('hex');
   // The account inventory (`llmAccounts`, `providers`) holds the places logins are kept. It is machine
@@ -583,7 +583,7 @@ async function runUnitBody(options, scope) {
   // run snapshots the rest of it.
   // Read at first use, so a resume that is refused for its record never needs the config.
   let liveConfigRead;
-  const liveConfig = () => (liveConfigRead ??= options.runnerConfig ?? ensureRunnerConfigForDir(mainRoot));
+  const liveConfig = () => (liveConfigRead ??= options.runnerConfig ?? loadRunnerConfigForDir(mainRoot));
   const withAccounts = (runner) => ({ ...runner, ...accountInventoryConfigOf(liveConfig()) });
 
   let unit;

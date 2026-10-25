@@ -55,3 +55,5 @@ pub mod session;
 pub mod write;
 
 pub use error::ConfigRefusal;
+/// The path segment type of `Origin` and the inspect verbs, so a reader names it without a second dependency.
+pub use fgos_yaml_doc::Segment;

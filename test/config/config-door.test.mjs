@@ -11,6 +11,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { combinedAbiMatches, fromDoorJson, nativeDoor } from '../../src/native/door.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
+import { readRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // The door resolves the main checkout through a Git driver that keeps its directories under the state root.
 process.env.FGOS_STATE_HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'config-door-state-'));
@@ -33,9 +34,9 @@ const mode = (file) => (fs.statSync(file).mode & 0o777).toString(8);
 
 test('the addon marker names the config namespace at the version this payload calls', () => {
   const v = nativeDoor().versions();
-  assert.equal(v.config, 2);
+  assert.equal(v.config, 3);
   assert.equal(combinedAbiMatches(v, v.napi), true);
-  assert.equal(combinedAbiMatches({ ...v, config: 1 }, v.napi), false, 'an addon before snapshot and init');
+  assert.equal(combinedAbiMatches({ ...v, config: 2 }, v.napi), false, 'an addon before standardValue');
   assert.equal(combinedAbiMatches({ ...v, config: undefined }, v.napi), false, 'an addon with no config namespace');
 });
 
@@ -103,17 +104,8 @@ test('snapshot is the standard under a project value, narrowed to the sections a
   assert.equal(origin.file.endsWith('config.yaml'), true);
 });
 
-test('snapshot without a project root is the machine view and a confined session has no accounts layer', () => {
-  const d = dirs('machine');
-  lay(path.join(d.project, '.fgos/config.yaml'), 'gateway:\n  port: 1\n');
-  lay(path.join(d.global, 'config.yaml'), 'gateway:\n  port: 5555\n');
-  const machine = call('snapshot', { globalDir: d.global, class: 'unconfined', sections: ['gateway'] });
-  assert.equal(machine.value.gateway.port, 5555, 'the project file beside it is never read');
-  assert.equal('project' in machine.revisions, false);
-  fs.rmSync(path.join(d.project, '.fgos/config.yaml'));
-  const confined = call('snapshot', { projectRoot: d.project, globalDir: d.global, class: 'confined', sections: [] }).accounts;
-  assert.equal(confined, 'unavailable-confined');
-});
+// The machine view (no project root, never a project file, no accounts layer when confined) is owned by
+// packages/config/rust/tests/machine_view.rs.
 
 test('a linked worktree takes command values from the main checkout and a plain directory is its own root', () => {
   const d = dirs('trusted');
@@ -145,16 +137,13 @@ test('snapshot refuses by failure id, listing every refusal with its position an
   assert.equal(refusal('snapshot', { globalDir: d.global, class: 'unconfined', surprise: 1 }).id, 'config-request-invalid');
 });
 
-test('init creates the header-only file once and keeps an existing file', () => {
+// The header-only file, keeping an existing yaml or legacy json file and the other refusals of init are owned by
+// packages/config/rust/tests/golden_init.rs; this proves only the door's wiring: the entry, no prototype, one refusal by id.
+test('init reaches the crate through the door, answers with no prototype and refuses a confined session by id', () => {
   const d = dirs('init');
   const args = { projectRoot: d.project, globalDir: d.global, class: 'unconfined', target: 'project' };
   const made = call('init', args);
-  assert.equal(made.created, true);
-  const text = fs.readFileSync(path.join(d.project, '.fgos/config.yaml'), 'utf8');
-  assert.match(text, /^# @fgos:v1\n/);
-  assert.equal(text.split('\n').every((line) => line === '' || line.startsWith('#')), true);
-  assert.deepEqual({ ...call('init', args) }, { created: false, revision: made.revision });
-  assert.equal(call('init', { globalDir: d.global, class: 'unconfined', target: 'global' }).created, true);
+  assert.deepEqual([made.created, made.file, Object.getPrototypeOf(made)], [true, 'config.yaml', null]);
+  assert.match(readRawProjectConfig(d.project), /^# @fgos:v1\n/);
   assert.equal(refusal('init', { ...args, class: 'confined' }).id, 'config-write-confined');
-  assert.equal(refusal('init', { ...args, target: 'accounts' }).keyword, 'target');
 });

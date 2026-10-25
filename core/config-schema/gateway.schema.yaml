@@ -8,7 +8,7 @@ properties:
   port:
     description: TCP port the gateway listens on.
     type: integer
-    minimum: 1
+    minimum: 0
     maximum: 65535
   bind:
     description: IP address the gateway binds; 0.0.0.0 is reachable on the LAN and Tailscale by design.

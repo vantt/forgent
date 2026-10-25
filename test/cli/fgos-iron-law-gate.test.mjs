@@ -17,7 +17,7 @@
 
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 import {
   assert,
   fs,
@@ -41,8 +41,7 @@ import {
 const GATED_MODULE = 'src/runner/iron-law-gate-probe.mjs';
 
 function writeIronLawLevel(cwd, level) {
-  const configPath = path.join(cwd, '.fgos', 'config.json');
-  const existing = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+  const existing = readProjectConfig(cwd);
   writeProjectConfig(cwd, { ...existing, ironLaw: { level } });
   commitPending(cwd, `config: ironLaw.level = ${level}`);
 }
@@ -194,9 +193,8 @@ test("sync-root discriminates on !item.parent, NOT resolveRoot: a root whose par
 test('a missing ironLaw key fails closed to ask — the root approve above still refuses (D7)', () => {
   const cwd = initGitCwdMainFast();
   makeGatedRoot(cwd, 'gate-level-absent');
-  const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.ok(
-    !fs.existsSync(configPath) || JSON.parse(fs.readFileSync(configPath, 'utf8')).ironLaw === undefined,
+    readProjectConfig(cwd).ironLaw === undefined,
     'this case only means anything while the key is genuinely absent',
   );
 
@@ -205,14 +203,16 @@ test('a missing ironLaw key fails closed to ask — the root approve above still
   assert.match(result.stderr, /Iron Law/);
 });
 
-test('an unrecognized ironLaw.level fails closed to ask rather than reading as warn (D7)', () => {
+test('an unrecognized ironLaw.level is refused by name and the approve never proceeds, so it never reads as warn (D7)', () => {
   const cwd = initGitCwdMainFast();
   makeGatedRoot(cwd, 'gate-level-bogus');
   writeIronLawLevel(cwd, 'whatever');
 
   const result = run(cwd, ['approve', 'gate-level-bogus']);
+  // A refused config file is a validation refusal (exit 4), never the permissive level.
   assert.equal(result.status, 4, `an unknown level is never the permissive one: ${result.stdout}${result.stderr}`);
-  assert.match(result.stderr, /Iron Law/);
+  assert.match(result.stderr, /config-schema .*ironLaw\.level/, 'the refusal names the config file path that holds the bad level');
+  assert.notEqual(stateView(cwd).work['gate-level-bogus'].status, 'delivered', 'the approve did not go through');
 });
 
 // ─── D8: the warn-level record ─────────────────────────────────────────────

@@ -10,7 +10,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { BIN_FGOS, bwrapUsable, createProject, readJson, startRun, waitUntil } from '../run-supervisor/support/direct-harness.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { readProjectConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
 import { scan, judge } from '../../src/runner/dispatch/process-identity.mjs';
 
@@ -19,8 +19,7 @@ const skip = !bwrapUsable() && 'bwrap with a pid namespace is not usable on this
 const AGENT = path.resolve(import.meta.dirname, 'fixtures/seal-handoff-agent.mjs');
 
 function useAgent(project, options) {
-  const file = path.join(project.repoDir, '.fgos', 'config.json');
-  const config = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const config = readProjectConfig(project.repoDir);
   const invocation = config.runner.executors.noisy.invocations[0];
   invocation.args = [AGENT, '{prompt}'];
   invocation.env = { AGENT_OPTS: JSON.stringify(options) };

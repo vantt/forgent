@@ -26,7 +26,9 @@ export function fixture(t, { remote = false, machine = true } = {}) {
     ...['local', 'branch'].map(scope => ({ type: `private.${scope}`, domain: 'private', schemaVersion: 1, scope, sealOnWrite: false })),
   ] }));
   if (remote) { execFileSync('git', ['init', '--bare', '-q', path.join(temp, 'remote')]); git('remote', 'add', 'origin', path.join(temp, 'remote')); }
-  const ctx = { cwd: repo, stateRoot, loaderOptions, globalConfigPath: path.join(temp, 'global.json') };
+  // The config door reads the global file as `config.json` of this directory, so the path keeps that name.
+  fs.mkdirSync(path.join(temp, 'global'));
+  const ctx = { cwd: repo, stateRoot, loaderOptions, globalConfigPath: path.join(temp, 'global', 'config.json') };
   const store = machine ? openStore(addon.resolveEventStore(repo, stateRoot, repo), 'phase-seven', [contracts], loaderOptions) : null;
   return { temp, repo, git, stateRoot, locks, store, ctx };
 }

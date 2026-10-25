@@ -17,13 +17,11 @@ import { spawnSync } from 'node:child_process';
 
 import { hostBin, routeEnv } from '../holder-lock/driver.mjs';
 import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from '../run-supervisor/protocol.mjs';
-import { readSharedConfig } from '../config/shared-config-file.mjs';
-import { loadGlobalConfig } from '../config/global-config.mjs';
 import { resolveRuntimeSocketDir, ensureRuntimeSocketDir, RuntimeDirError, SOCKET_PATH_MAX_BYTES } from '../run-supervisor/runtime-dir.mjs';
 import { adoptRun, adoptScan, listOpenAttemptDirs } from '../run-supervisor/client.mjs';
 import { sweepAttempts } from '../run-supervisor/sweep.mjs';
 import { findLegacyStuck, judgeLegacyHolders, sweepLegacy } from '../run-supervisor/legacy-sweep.mjs';
-import { GATE_KILL_GRACE_KEY, resolveGateKillGrace, gateKillGraceProblem, CANCEL_WAIT_KEY, resolveCancelWait, cancelWaitProblem } from '../run-supervisor/gate-kill-grace.mjs';
+import { GATE_KILL_GRACE_KEY, readDispatchConfig, resolveGateKillGrace, gateKillGraceProblem, CANCEL_WAIT_KEY, resolveCancelWait, cancelWaitProblem } from '../run-supervisor/gate-kill-grace.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { fgosDirFromRoot } from '../runner/paths.mjs';
 import { deriveUnitState, unitDirOfAssignment } from '../runner/execution/unit-state.mjs';
@@ -328,15 +326,13 @@ export function fixRunAttemptsStuck(repoRoot) {
 
 /** `dispatch.gateKillGraceMs` after the config merge (project over global): value and source; below 1000 ms fails. */
 export function checkGateKillGrace(repoRoot, { globalConfigPath } = {}) {
-  let project;
-  let global;
+  let snapshot;
   try {
-    project = readSharedConfig(path.resolve(repoRoot));
-    global = globalConfigPath ? loadGlobalConfig(globalConfigPath) : loadGlobalConfig();
+    snapshot = readDispatchConfig({ projectRoot: path.resolve(repoRoot), globalConfigPath });
   } catch (err) {
     return { passed: false, message: `${GATE_KILL_GRACE_KEY} unreadable: ${err.message}` };
   }
-  const { value, source } = resolveGateKillGrace({ project, global });
+  const { value, source } = resolveGateKillGrace(snapshot);
   const problem = gateKillGraceProblem(value);
   if (problem) return { passed: false, message: `${problem} (${source})` };
   return { passed: true, message: `${GATE_KILL_GRACE_KEY} = ${value} (${source})` };
@@ -425,15 +421,13 @@ export function checkUnitsAwaitingResume(repoRoot, { bin: binOverride } = {}) {
  * could finish stopping the agent.
  */
 export function checkCancelWait(repoRoot, { globalConfigPath } = {}) {
-  let project;
-  let global;
+  let snapshot;
   try {
-    project = readSharedConfig(path.resolve(repoRoot));
-    global = globalConfigPath ? loadGlobalConfig(globalConfigPath) : loadGlobalConfig();
+    snapshot = readDispatchConfig({ projectRoot: path.resolve(repoRoot), globalConfigPath });
   } catch (err) {
     return { passed: false, message: `${CANCEL_WAIT_KEY} unreadable: ${err.message}` };
   }
-  const { value, source, grace } = resolveCancelWait({ project, global });
+  const { value, source, grace } = resolveCancelWait(snapshot);
   const problem = cancelWaitProblem(value);
   if (problem) return { passed: false, message: `${problem} (${source})` };
   if (Number.isInteger(grace) && value < grace) {

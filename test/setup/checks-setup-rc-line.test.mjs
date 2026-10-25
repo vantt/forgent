@@ -5,12 +5,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import {
-  DEFAULT_CLEANUP_LEAF_TTL_DAYS,
-  DEFAULT_CLEANUP_TTL_DAYS,
-  DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
-  DEFAULT_INVARIANT_CHECK_COMMANDS,
   DEFAULT_LEVEL,
-  DEFAULT_RUNNER_CONFIG,
   DOCTOR_CHECKS,
   FGOS,
   FIX_REGISTRATIONS,
@@ -37,6 +32,7 @@ import {
   writeEnduserDoc,
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
+import { projectConfigExists } from '../helpers/config-fixture.mjs';
 
 
 test('fgos setup --pretty prints colored ANSI text describing what it did, not JSON', () => {
@@ -48,7 +44,7 @@ test('fgos setup --pretty prints colored ANSI text describing what it did, not J
   assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
   assert.ok(result.stdout.includes('legacy compatibility command'), 'expected --pretty output to disclose setup deprecation');
   assert.ok(result.stdout.includes('fgctl init'), 'expected --pretty output to point at replacement onboarding');
-  assert.ok(result.stdout.includes('.fgos/config.json'), 'expected --pretty output to describe the config file it touched');
+  assert.ok(result.stdout.includes('.fgos/config.yaml'), 'expected --pretty output to describe the config file it touched');
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
@@ -59,12 +55,20 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   // profile leaves a `source` line that outlives the directory.
   const copyRoot = mkTemp('checks-nongit-copy-');
   const repoRoot = path.resolve(__dirname, '../..');
-  // The parts of the npm package `setup` reads; the tier ladder contract loads with the runner config.
-  for (const entry of ['bin', 'src', 'scripts', 'domains', 'packages/seat-binding/contracts', 'package.json']) {
+  // The parts of the npm package `setup` reads; the tier ladder contract loads with the runner config and the config doctor rows with the registry.
+  for (const entry of ['bin', 'src', 'scripts', 'domains', 'packages/seat-binding/contracts', 'packages/config/contracts/doctor-rows.v1.json', 'package.json']) {
+    fs.mkdirSync(path.dirname(path.join(copyRoot, entry)), { recursive: true });
     fs.cpSync(path.join(repoRoot, entry), path.join(copyRoot, entry), { recursive: true });
   }
   fs.cpSync(path.join(repoRoot, 'packages/work-state/contracts'), path.join(copyRoot, 'packages/work-state/contracts'), { recursive: true });
   assert.equal(fs.existsSync(path.join(copyRoot, '.git')), false);
+  // Setup reads and writes config through the native door, which a payload outside a release finds by its own
+  // `native-addon.json`: give the copy the staged addon the way the npm package ships it.
+  const stagedManifest = JSON.parse(fs.readFileSync(process.env.FGOS_ACTIVE_MANIFEST_PATH, 'utf8'));
+  const addonRecord = stagedManifest.components.nativeAddon;
+  fs.mkdirSync(path.join(copyRoot, 'native'));
+  fs.copyFileSync(path.resolve(repoRoot, addonRecord.path), path.join(copyRoot, 'native', 'fgos.node'));
+  fs.writeFileSync(path.join(copyRoot, 'native-addon.json'), JSON.stringify({ components: { nativeAddon: { ...addonRecord, path: 'native/fgos.node' } } }));
 
   const homeDir = mkTemp('checks-nongit-home-');
   const rcFile = path.join(homeDir, '.bashrc');
@@ -89,7 +93,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   // The whole point: nothing was appended to the profile.
   assert.equal(fs.readFileSync(rcFile, 'utf8'), 'echo hi\n');
   // Setup's other work still happened.
-  assert.equal(fs.existsSync(path.join(copyRoot, '.fgos', 'config.json')), true);
+  assert.equal(projectConfigExists(copyRoot), true);
 
   fs.rmSync(copyRoot, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });

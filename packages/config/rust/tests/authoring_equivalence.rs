@@ -240,6 +240,34 @@ fn standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config() 
     assert_eq!(effective, expected);
 }
 
+/// Tool executors are a project's choice: this repository's differences resolve `impact-analysis` to the gitnexus
+/// tool executor, and a project with no differences has no tool executor and no pool for it.
+#[test]
+fn impact_analysis_resolves_to_gitnexus_here_and_to_no_provider_in_a_fresh_project() {
+    let fixture = fixture();
+    let source: Value = serde_json::from_str(&source_bytes()).unwrap();
+    let mut layer = json!({});
+    for path in paths(&fixture, "differences") {
+        put(&mut layer, &path, at(&source, &path).unwrap().clone());
+    }
+    let here = read_back("impact-here", Some(&layer), None).unwrap();
+    assert_eq!(here["runner"]["capabilities"]["impact-analysis"]["prefer"], "gitnexus");
+    let tool = &here["runner"]["executors"]["gitnexus"];
+    assert_eq!(tool["kind"], "tool");
+    assert_eq!(tool["for"], json!(["impact-analysis"]));
+
+    let fresh = read_back("impact-fresh", None, None).unwrap();
+    let tools: Vec<&String> = fresh["runner"]["executors"]
+        .as_object()
+        .unwrap()
+        .iter()
+        .filter(|(_, e)| e["kind"] == "tool")
+        .map(|(id, _)| id)
+        .collect();
+    assert!(tools.is_empty(), "the standard declares tool executors: {tools:?}");
+    assert!(fresh["runner"]["capabilities"]["impact-analysis"].get("prefer").is_none());
+}
+
 #[test]
 fn each_exclusion_is_explained_by_a_named_behaviour() {
     let source: Value = serde_json::from_str(&source_bytes()).unwrap();

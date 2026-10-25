@@ -17,8 +17,8 @@
 # project-local install (tier 2, `node_modules/.bin/fgos`, walking up from $PWD the same
 # way Node's own module resolution does -- kept as a real mode for
 # cross-project version pinning) > global install (tier 3, the only tier
-# needing a PATH lookup). Tier 3 reads the config-cache
-# (`~/.fgos/config.json`'s `bin.globalFgosPath`, populated by `fgos setup`/
+# needing a PATH lookup). Tier 3 reads the bin cache
+# (`~/.fgos/runtime/bin-cache.json`'s `globalFgosPath`, populated by `fgos setup`/
 # `doctor --fix` -- see src/setup/bin-discovery.mjs) before ever shelling
 # out to `command -v`, and self-heals: a stale/missing cached path falls
 # straight through to the live PATH probe, same as before this cache
@@ -47,9 +47,9 @@ _fgos_tier2_bin() {
 }
 
 _fgos_tier3_cached_bin() {
-  # Tier 3, cache-first (D4): extract bin.globalFgosPath via grep/sed --
+  # Tier 3, cache-first (D4): extract globalFgosPath via grep/sed --
   # never spawns node just to parse a small JSON file on a hot shell path.
-  local cache_file="$HOME/.fgos/config.json" cached
+  local cache_file="$HOME/.fgos/runtime/bin-cache.json" cached
   [ -f "$cache_file" ] || return 1
   cached=$(grep -o '"globalFgosPath"[[:space:]]*:[[:space:]]*"[^"]*"' "$cache_file" 2>/dev/null | sed -E 's/.*:[[:space:]]*"([^"]*)"/\1/')
   [ -n "$cached" ] && [ -f "$cached" ] || return 1
