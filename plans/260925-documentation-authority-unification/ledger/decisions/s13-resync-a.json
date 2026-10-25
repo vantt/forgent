@@ -316,7 +316,7 @@
         ]
       },
       "reviewStatus": "pending",
-      "rationale": "\nNavigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Immediate placement neighbour witness refreshed; target digest unchanged via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
+      "rationale": "Navigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Immediate placement neighbour witness refreshed; target digest unchanged via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
     },
     {
       "sourcePath": "docs/specs/work-state.md",
@@ -453,7 +453,7 @@
         ]
       },
       "reviewStatus": "pending",
-      "rationale": "\nNavigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Complete target digest rebound via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
+      "rationale": "Navigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Complete target digest rebound via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
     },
     {
       "sourcePath": "docs/specs/work-state.md",
@@ -4098,7 +4098,7 @@
         "evidence": []
       },
       "reviewStatus": "pending",
-      "rationale": "\nNavigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Immediate placement neighbour witness refreshed; target digest unchanged via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
+      "rationale": "Navigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Immediate placement neighbour witness refreshed; target digest unchanged via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
     },
     {
       "sourcePath": "docs/specs/work-state.md",
@@ -4165,7 +4165,7 @@
         "evidence": []
       },
       "reviewStatus": "pending",
-      "rationale": "\nNavigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Complete target digest rebound via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
+      "rationale": "Navigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Complete target digest rebound via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
     },
     {
       "sourcePath": "docs/specs/work-state.md",
@@ -4231,7 +4231,7 @@
         "evidence": []
       },
       "reviewStatus": "pending",
-      "rationale": "\nNavigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Immediate placement neighbour witness refreshed; target digest unchanged via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
+      "rationale": "Navigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Immediate placement neighbour witness refreshed; target digest unchanged via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
     },
     {
       "sourcePath": "docs/specs/work-state.md",
@@ -4752,7 +4752,7 @@
         "evidence": []
       },
       "reviewStatus": "pending",
-      "rationale": "\nNavigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Immediate placement neighbour witness refreshed; target digest unchanged via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
+      "rationale": "Navigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Immediate placement neighbour witness refreshed; target digest unchanged via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
     },
     {
       "sourcePath": "docs/specs/work-state.md",
@@ -4814,11 +4814,11 @@
       },
       "disposition": {
         "kind": "current-source-content-present",
-        "reason": "Only heading depth, link destination or whitespace adaptation; full current source content is present in the named holder.",
+        "reason": "Navigation label and destination adaptation: the quoted Vietnamese references \"Khai việc\"/\"Nộp vấn đề tự do\" become the English link labels [Add Verb](#add-verb)/[Submit Verb](#submit-verb). The rest of the complete current source unit is present unchanged in the named holder; no behavior is discarded.",
         "evidence": []
       },
       "reviewStatus": "pending",
-      "rationale": "\nNavigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Complete target digest rebound via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
+      "rationale": "Navigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Complete target digest rebound via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
     },
     {
       "sourcePath": "docs/specs/work-state.md",
@@ -4884,7 +4884,7 @@
         "evidence": []
       },
       "reviewStatus": "pending",
-      "rationale": "\nNavigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Immediate placement neighbour witness refreshed; target digest unchanged via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
+      "rationale": "Navigation reference correction: Heading references \"Khai việc\" / \"Nộp vấn đề tự do\" now explicitly link to Add Verb (#add-verb) / Submit Verb (#submit-verb); behavior unchanged. Immediate placement neighbour witness refreshed; target digest unchanged via rebind.py locate/binding against HEAD preimage and working-tree dual extraction; no approval carried."
     },
     {
       "sourcePath": "docs/specs/work-state.md",
