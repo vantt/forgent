@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ffb6bd96636f2e5db2b1bade405342f81129b20db35da4a1f30aa22084bb07e7",
+  "payloadDigest": "13263e7a75d650d45faf87f025e4336d7c04c7d856e65398ab65a9256e3d4294",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -303,7 +303,7 @@
     "packages/event-store/rust/src/locks.rs": "036ea2964887e1c91bb4683002ff61f2ec6e49179d2f21d75a278e0bb7c18dd2",
     "packages/event-store/rust/src/open_read.rs": "0f348c1d2aad6e2fcbcbf2a36c5c37a1f255ff843a563b53aa773427c45d0102",
     "packages/event-store/rust/src/order.rs": "3f474bd2d008e33692e0a3064ce169a4b4ec0797ebb99664a809e644b73a022c",
-    "packages/event-store/rust/src/promote.rs": "4eb7dfa98662e18632456e0e402108aaed3b74ebf218ab57abf9099139f3d8e9",
+    "packages/event-store/rust/src/promote.rs": "1aef1a9a66de1f1fe8c112baaff5491bf2d9e6cf41b23d7bca74088e828aae92",
     "packages/event-store/rust/src/publish.rs": "0071535631226889304e0229a6551885d82af835f37657924eb940276ca71ef3",
     "packages/event-store/rust/src/read.rs": "3fca072cc087811fa574711a76e117318a13bd71516bb474173520f06a6a9b07",
     "packages/event-store/rust/src/receipt.rs": "9c9f25ece26274d210898401a1089f97a30ebd9dd94cd5eef50c73f7ab101170",
@@ -317,7 +317,7 @@
     "packages/event-store/rust/src/validation.rs": "9410d9665f97aeadff6eafe8855a92a36f189f3ae5523e39c8e4ece57a266390",
     "packages/event-store/rust/src/walk.rs": "429928b27ac16e6bc1cb14dbbd56e30e02aafda1b140a479c78502c913b2e392",
     "packages/event-store/rust/tests/append_recovery.rs": "4675e16ad6005544d860cb5f7ce1437e20c8d7cf5891735283beb47f1f84dbb0",
-    "packages/event-store/rust/tests/branch_local_refs.rs": "51dad4f4f7f228c363cf5f7076f61fd5a8528adb31419fed8cb202fce712e862",
+    "packages/event-store/rust/tests/branch_local_refs.rs": "a139b6034b7b9a5fc6fe97592b68d995791157ee9cb39ff3f597e85696132bf8",
     "packages/event-store/rust/tests/checkpoint.rs": "2e326ce391c3feffedc3165cd3b6d792642a6a66883138c8c1f650c2177e6a62",
     "packages/event-store/rust/tests/common/mod.rs": "e624f9a261ae17eb1fbcba629523ad971c7124891525e7040e2aedca8efdf9ab",
     "packages/event-store/rust/tests/cursor_incremental.rs": "873f06dfa27baa155ba2a8169c4bc276d8f80d93a72398b3981a2dfb2ee531cf",

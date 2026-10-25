@@ -2,20 +2,15 @@
 use crate::{
     append::{append, Ack, AppendRequest, EventInput, Positions},
     envelope::Scope,
-    errors::{invalid, io, Error, ErrorCode},
-    fsio::{sync_dir, OsFileSystem},
-    identity::StoreIdentity,
+    errors::{invalid, Error},
+    fsio::OsFileSystem,
     layout::{Layout, StreamId},
-    locks::{acquire_append, acquire_seal},
+    locks::acquire_seal,
     receipt::Receipt,
-    refs::own_ref,
     registry::Registry,
-    seal::{operation_id, SealRequest},
-    walk::git_error,
+    seal::SealRequest,
 };
-use fgos_git::{
-    ExpectedTip, GitDriver, HolderAuthority, Publication, PublicationPort, RefValue, RepoHandle,
-};
+use fgos_git::{GitDriver, RepoHandle};
 pub struct PromoteRequest<'a> {
     pub layout: &'a Layout,
     pub machine: &'a str,
@@ -113,82 +108,4 @@ pub fn promote(
         None,
     )?;
     Ok(a.ack)
-}
-pub fn abandon(
-    driver: &GitDriver,
-    repo: &RepoHandle,
-    layout: &Layout,
-    machine: &str,
-    stream: &StreamId,
-    held_ranks: &[u32],
-    hot_lock_depth: u32,
-) -> Result<(), Error> {
-    if stream.scope() != Scope::Branch {
-        return Err(invalid("only a branch can be abandoned"));
-    }
-    let mut guard = acquire_seal(layout, held_ranks, hot_lock_depth, false)?.expect("waited seal");
-    let identity = StoreIdentity::open(layout, machine)?;
-    // Promote and abandon share event-seal. Refuse to drop the only root
-    // while a previously interrupted promote still needs it for publication.
-    {
-        let _append = acquire_append(layout, &[58], &OsFileSystem)?;
-        let project = StreamId::parse("project")?;
-        let receipt = Receipt::read(&layout.stream(&project).sealed())?;
-        let pending = crate::open_read::read_own(layout, &identity.store_id, &project)?;
-        if pending.events.iter().any(|e| {
-            e.seq > receipt.last_seq
-                && e.event_type == "store.promote"
-                && e.payload.get("stream").and_then(|v| v.as_str()) == Some(stream.as_str())
-        }) {
-            return Err(invalid("branch has an unsealed store.promote"));
-        }
-    }
-    let reference = own_ref(machine, stream)?;
-    let port = PublicationPort::new(
-        driver,
-        HolderAuthority::new(
-            repo,
-            &mut guard.handle,
-            &layout.seal_lock(),
-            reference.clone(),
-            &identity.store_id,
-        )
-        .map_err(git_error)?,
-    );
-    port.recover_publications(repo).map_err(git_error)?;
-    match port.read_ref(repo, &reference).map_err(git_error)? {
-        RefValue::Direct(oid) => {
-            let id = operation_id()?;
-            let cas = port.compare_and_swap(
-                repo,
-                &reference,
-                &ExpectedTip::Oid(oid),
-                &ExpectedTip::Absent,
-                &id,
-            );
-            if cas
-                .as_ref()
-                .is_err_and(|e| e.code == fgos_git::ResultCode::Stale)
-            {
-                port.release_pin_and_compact(repo, &id).map_err(git_error)?;
-            }
-            cas.map_err(git_error)?;
-            port.release_pin_and_compact(repo, &id).map_err(git_error)?;
-        }
-        RefValue::Absent => (),
-        RefValue::Symbolic(_) => {
-            return Err(Error::new(
-                ErrorCode::EventStoreRefMoved,
-                "symbolic branch ref",
-            ))
-        }
-    }
-    // Appenders cannot race the local deletion after the ref's durable CAS.
-    let _append = acquire_append(layout, &[58], &OsFileSystem)?;
-    match std::fs::remove_dir_all(layout.stream(stream).root) {
-        Ok(()) => (),
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-        Err(e) => return Err(io(e)),
-    }
-    sync_dir(&layout.root)
 }
