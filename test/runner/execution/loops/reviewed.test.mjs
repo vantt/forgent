@@ -5,7 +5,7 @@ import {
   runReviewed,
   reviewedHistoryOutcome as historyOutcomeOf,
   verifyCommandOf,
-} from '../../../../src/runner/execution/patterns/reviewed.mjs';
+} from '../../../../src/runner/execution/loops/reviewed.mjs';
 import {
   checkerSeatsOf as resolveCheckers,
   DEFAULT_CHECKERS_BY_RIGOR,

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const PATTERNS_DIR = path.resolve('src/runner/execution/patterns');
+const LOOPS_DIR = path.resolve('src/runner/execution/loops');
 
 const FORBIDDEN_IMPORT_PATTERNS = [
   /from\s+['"][^'"]*\/state\//,
@@ -20,11 +20,11 @@ const FORBIDDEN_IMPORT_PATTERNS = [
 ];
 
 test('architecture-guard: pattern modules do not import forbidden modules (A4 boundary)', () => {
-  const files = fs.readdirSync(PATTERNS_DIR).filter((f) => f.endsWith('.mjs') || f.endsWith('.js'));
+  const files = fs.readdirSync(LOOPS_DIR).filter((f) => f.endsWith('.mjs') || f.endsWith('.js'));
   assert.ok(files.length >= 5, `Expected at least 5 pattern files, found ${files.length}`);
 
   for (const file of files) {
-    const filePath = path.join(PATTERNS_DIR, file);
+    const filePath = path.join(LOOPS_DIR, file);
     const content = fs.readFileSync(filePath, 'utf8');
 
     for (const pattern of FORBIDDEN_IMPORT_PATTERNS) {

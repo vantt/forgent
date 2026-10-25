@@ -2,7 +2,7 @@ import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { PRESETS, resolvePattern } from '../../../../src/runner/execution/patterns/presets.mjs';
-import { roleUnit } from '../../../../src/runner/execution/patterns/role-tasks.mjs';
+import { roleUnit } from '../../../../src/runner/execution/loops/role-tasks.mjs';
 
 const FAN_OUT_SEATS = [
   { seat: 'researcher-1', role: 'producer' },

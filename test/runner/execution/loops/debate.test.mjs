@@ -1,10 +1,10 @@
 import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runDebate } from '../../../../src/runner/execution/patterns/debate.mjs';
-import { patternHistoryOutcome } from '../../../../src/runner/execution/patterns/history-outcome.mjs';
+import { runDebate } from '../../../../src/runner/execution/loops/debate.mjs';
+import { patternHistoryOutcome } from '../../../../src/runner/execution/loops/history-outcome.mjs';
 import { resolveSeats, seatLaunchesOf } from '../../../../src/runner/execution/seat-resolver.mjs';
-import { runPattern } from '../../../../src/runner/execution/patterns/index.mjs';
+import { runPattern } from '../../../../src/runner/execution/loops/index.mjs';
 
 const seats = [
   { seat: 'thesis', role: 'producer' },

@@ -4,7 +4,7 @@
 // seat runner that only calls bind().
 
 import { bind } from './bind.mjs';
-import { runPattern } from './patterns/index.mjs';
+import { runPattern } from './loops/index.mjs';
 import { createSeatLedger } from './seat-ledger.mjs';
 import { workflowTierOf } from './seat-resolver.mjs';
 

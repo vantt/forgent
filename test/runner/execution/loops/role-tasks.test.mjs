@@ -4,7 +4,7 @@ import '../../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { DEFAULT_ROLE_TASKS, roleUnit } from '../../../../src/runner/execution/patterns/role-tasks.mjs';
+import { DEFAULT_ROLE_TASKS, roleUnit } from '../../../../src/runner/execution/loops/role-tasks.mjs';
 
 const unit = Object.freeze({ id: 'u1', capability: 'docs:write', objective: 'Replace the placeholder line in AGENTS.md', writes: ['AGENTS.md'] });
 

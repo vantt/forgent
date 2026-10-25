@@ -10,7 +10,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import { runUnit } from '../../../src/runner/execution/run.mjs';
-import { runReviewed } from '../../../src/runner/execution/patterns/reviewed.mjs';
+import { runReviewed } from '../../../src/runner/execution/loops/reviewed.mjs';
 import { seatLaunchesOf, CaseAdmissionRefusedError } from '../../../src/runner/execution/case-admission-port.mjs';
 import { dispatchCwdHolder } from '../../../src/runner/dispatch/cwd-lock.mjs';
 import { createCaseAdmissionPort } from '../../../src/workflow/case-admission-port.mjs';

@@ -7,7 +7,7 @@ import path from 'node:path';
 import { buildUnitSummary, writeUnitSummary, extractStance } from '../../../src/runner/execution/unit-summary.mjs';
 import { readUnitRunHistory } from '../../../src/runner/execution/unit-run-history.mjs';
 import { backfillUnitSummaries } from '../../../scripts/backfill-unit-summaries.mjs';
-import { runPattern } from '../../../src/runner/execution/patterns/index.mjs';
+import { runPattern } from '../../../src/runner/execution/loops/index.mjs';
 
 const startedAt = '2026-10-05T01:00:00Z';
 const settledAt = '2026-10-05T01:01:00Z';

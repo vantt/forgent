@@ -1,7 +1,7 @@
 import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runPanel } from '../../../../src/runner/execution/patterns/panel.mjs';
+import { runPanel } from '../../../../src/runner/execution/loops/panel.mjs';
 
 const SEATS = [
   { seat: 'member-1', role: 'producer' },
@@ -177,6 +177,6 @@ test('a thrown member waits for the other seat to settle before the unit can be 
 
 test('panel.mjs declares seat intent only: no executor, family or tier names', async () => {
   const fs = await import('node:fs/promises');
-  const source = await fs.readFile(new URL('../../../../src/runner/execution/patterns/panel.mjs', import.meta.url), 'utf8');
+  const source = await fs.readFile(new URL('../../../../src/runner/execution/loops/panel.mjs', import.meta.url), 'utf8');
   assert.doesNotMatch(source, /\b(claude|openai|codex|gemini|xai|glm|nano|flagship|frontier)\b/i);
 });

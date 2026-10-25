@@ -1,7 +1,7 @@
 import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runSolo, VALID_OUTCOMES } from '../../../../src/runner/execution/patterns/solo.mjs';
+import { runSolo, VALID_OUTCOMES } from '../../../../src/runner/execution/loops/solo.mjs';
 
 test('runSolo dispatches the producer seat and returns outcome', async () => {
   const calls = [];

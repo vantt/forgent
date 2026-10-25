@@ -1,7 +1,7 @@
 import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runPattern, VALID_OUTCOMES } from '../../../../src/runner/execution/patterns/index.mjs';
+import { runPattern, VALID_OUTCOMES } from '../../../../src/runner/execution/loops/index.mjs';
 
 const PANEL_SEATS = [
   { seat: 'member-1', role: 'producer' },

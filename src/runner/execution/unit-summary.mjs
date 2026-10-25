@@ -5,8 +5,8 @@ import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
 import { readUnitRunSeats } from './unit-run-history.mjs';
 import { normalizeWorkflowLink } from './unit.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
-import { patternHistoryOutcome } from './patterns/history-outcome.mjs';
-import { VALID_OUTCOMES } from './patterns/panel.mjs';
+import { patternHistoryOutcome } from './loops/history-outcome.mjs';
+import { VALID_OUTCOMES } from './loops/panel.mjs';
 import { seatsOfRecord } from './legacy-seat-read.mjs';
 import { seatKind, VERIFY_SEAT } from './seat-resolver.mjs';
 

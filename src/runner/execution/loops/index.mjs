@@ -7,13 +7,13 @@ import { runSolo } from './solo.mjs';
 import { runReviewed } from './reviewed.mjs';
 import { runPanel } from './panel.mjs';
 import { runDebate } from './debate.mjs';
-import { resolvePattern, PRESETS } from './presets.mjs';
+import { resolvePattern, PRESETS } from '../patterns/presets.mjs';
 
 export { runSolo } from './solo.mjs';
 export { runReviewed } from './reviewed.mjs';
 export { runPanel } from './panel.mjs';
 export { runDebate } from './debate.mjs';
-export { resolvePattern, PRESETS } from './presets.mjs';
+export { resolvePattern, PRESETS } from '../patterns/presets.mjs';
 
 export const VALID_OUTCOMES = Object.freeze([
   'pass',
