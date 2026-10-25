@@ -1,6 +1,6 @@
 {
   "status": "passed",
-  "asOf": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
+  "asOf": "f498ebded83ba5789e730adc74bb637b80e2f536",
   "positive": "passed",
   "negativeControls": [
     {
@@ -64,6 +64,51 @@
       "error": "generated evidence fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md"
     },
     {
+      "name": "False current input fingerprint is rejected",
+      "result": "rejected",
+      "error": "current fingerprint drift: plans/260925-documentation-authority-unification/ledger/decisions/carries-current-rebindings.json"
+    },
+    {
+      "name": "Omitted current review is rejected",
+      "result": "rejected",
+      "error": "current review inventory coverage"
+    },
+    {
+      "name": "Current G0 gap is rejected",
+      "result": "rejected",
+      "error": "current G0 proof not green"
+    },
+    {
+      "name": "Moved-path link regression is rejected",
+      "result": "rejected",
+      "error": "current F composition proof not green"
+    },
+    {
+      "name": "Unreviewed premise count is rejected",
+      "result": "rejected",
+      "error": "F-window source counts drift"
+    },
+    {
+      "name": "Unsourced retarget patch count is rejected",
+      "result": "rejected",
+      "error": "F-window source counts drift"
+    },
+    {
+      "name": "Missing conditional overlay duty is rejected",
+      "result": "rejected",
+      "error": "conditional G0 F duty drift"
+    },
+    {
+      "name": "Unproven audit execution is rejected",
+      "result": "rejected",
+      "error": "ownership audit provenance drift"
+    },
+    {
+      "name": "Unsourced follow-up is rejected",
+      "result": "rejected",
+      "error": "outside-plan follow-up provenance drift"
+    },
+    {
       "name": "Packet moved after the lease is rejected",
       "result": "rejected",
       "error": "cutover order drift"
@@ -74,6 +119,6 @@
       "error": "F-window source counts drift"
     }
   ],
-  "count": 14,
+  "count": 23,
   "method": "In-memory copies at the read_json test seam; real owning check(), path inspection and read-only git; no source file or assertion weakened."
 }

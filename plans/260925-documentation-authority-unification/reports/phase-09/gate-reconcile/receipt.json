@@ -1,7 +1,8 @@
 {
   "version": 1,
-  "authority": "L12-137; w17-gate-register-reconcile-brief; w21-register-catchup-brief; w23-register-corrections-brief; L13-18–20",
-  "asOf": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
+  "authority": "L12-137; w17-gate-register-reconcile-brief; w21-register-catchup-brief; w23-register-corrections-brief; w32-register-catchup-brief; L13-16–27",
+  "asOf": "f498ebded83ba5789e730adc74bb637b80e2f536",
+  "originalSnapshotCommit": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
   "status": "reconciled-not-cutover-approval",
   "followUp": {
     "sourceCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
@@ -60,17 +61,16 @@
         "cleared": 0
       },
       "after": {
-        "status": "partial",
-        "blockers": 1,
-        "remainingEntries": 1,
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
         "cleared": 2,
-        "atFinalPinUnderLease": 3,
+        "atFinalPinUnderLease": 4,
         "external": 0
       },
       "originalDecisions": {
         "cleared": 2,
-        "moved to F": 4,
-        "still open": 1
+        "moved to F": 5
       }
     },
     {
@@ -143,7 +143,7 @@
         "cleared": 0
       },
       "after": {
-        "status": "met-local",
+        "status": "external",
         "blockers": 0,
         "remainingEntries": 0,
         "cleared": 1,
@@ -184,17 +184,16 @@
         "cleared": 0
       },
       "after": {
-        "status": "partial",
-        "blockers": 1,
-        "remainingEntries": 1,
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
         "cleared": 3,
         "atFinalPinUnderLease": 2,
         "external": 0
       },
       "originalDecisions": {
         "cleared": 2,
-        "moved to F": 2,
-        "still open": 1
+        "moved to F": 3
       }
     },
     {
@@ -249,17 +248,16 @@
         "cleared": 0
       },
       "after": {
-        "status": "partial",
-        "blockers": 1,
-        "remainingEntries": 1,
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
         "cleared": 3,
-        "atFinalPinUnderLease": 3,
+        "atFinalPinUnderLease": 4,
         "external": 1
       },
       "originalDecisions": {
-        "moved to F": 1,
-        "cleared": 3,
-        "still open": 1
+        "moved to F": 2,
+        "cleared": 3
       }
     },
     {
@@ -308,11 +306,11 @@
   "readinessCounts": {
     "beforeFinalPin": {
       "before": 6,
-      "after": 3
+      "after": 0
     },
     "atFinalPinUnderLease": {
       "before": 19,
-      "after": 27
+      "after": 29
     },
     "external": {
       "before": 6,
@@ -321,8 +319,8 @@
   },
   "decisionCounts": {
     "cleared": 24,
-    "moved to F": 45,
-    "still open": 18
+    "moved to F": 48,
+    "still open": 15
   },
   "decisions": [
     {
@@ -364,7 +362,33 @@
         "g0join/receipt.md",
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
-        "reviews/w22-register-met-local-review.json"
+        "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md"
       ]
     },
     {
@@ -406,14 +430,40 @@
         "g0join/receipt.md",
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
-        "reviews/w22-register-met-local-review.json"
+        "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md"
       ]
     },
     {
       "sourcePointer": "/gates/0/blockers/2",
       "item": "73/257 changedBindings rows in phase-08/step-08-preflip-gates.json not current at 77db6ed2b; register not re-joined since fd161a8c2 (w4-ledger-d7b REWORK HEAD-gate-changedBindings, LF-claim_af89c4e6-current)",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it). Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
       "gates": [
         "G0"
       ],
@@ -448,14 +498,40 @@
         "g0join/receipt.md",
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
-        "reviews/w22-register-met-local-review.json"
+        "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md"
       ]
     },
     {
       "sourcePointer": "/gates/0/blockers/3",
       "item": "Earlier approvals were bound to pre-migration hashes and M1 digests; no current-digest verdict file exists",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it). Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
       "gates": [
         "G0"
       ],
@@ -490,14 +566,40 @@
         "g0join/receipt.md",
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
-        "reviews/w22-register-met-local-review.json"
+        "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md"
       ]
     },
     {
       "sourcePointer": "/gates/0/blockers/4",
       "item": "Final pin F not recorded",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it). Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
       "gates": [
         "G0"
       ],
@@ -532,14 +634,40 @@
         "g0join/receipt.md",
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
-        "reviews/w22-register-met-local-review.json"
+        "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md"
       ]
     },
     {
       "sourcePointer": "/gates/0/blockers/5",
       "item": "661 bindings unresolved after full patch chain; final-pin post-apply rebind required (reviews/w9-composition-fix-review.md)",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+      "resolution": "Retained as an explicit F duty, not cleared: Record F and join every frozen changedBindings row plus every later rebind/re-decision to its effective ledger row and an independent APPROVE at matching bindingSha256/targetUnitDigest; zero missing, mismatched or open REWORK (execution plan §2 G0, §3 W3). Duplicate rows /bindingRefresh/124..126 must follow any later rebind of /6, /20 and /21 respectively (W16 F5). The 73/257 mismatch count is historical at 77db6ed2b, not a current count. After applying the full composed chain, resolve/rebind all affected ownership rows, not only GAP-05. W10 measured 407 distinct unresolved bindings (361 chain-caused + 46 pre-existing), 556 assertions; W9’s 661 is an earlier full-chain assertion count, not an additive population (w10-composition-rework F7). Re-enumerate at F. After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it). Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
       "gates": [
         "G0"
       ],
@@ -574,14 +702,40 @@
         "g0join/receipt.md",
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
-        "reviews/w22-register-met-local-review.json"
+        "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md"
       ]
     },
     {
       "sourcePointer": "/gates/0/remaining",
       "item": "Re-review the 124 pending content rebind rows and the 3 rows corrected in 6f5b9419d, then at F re-join every changedBindings row to its ledger row and produce a verdict join with 0 missing, 0 mismatched and 0 open REWORK.",
-      "decision": "still open",
-      "resolution": "Lead / independent reviewers must supply or correct missing, mismatched and open-REWORK per-row verdict evidence identified in g0join/join-608a4ada5.json before the packet; aggregate prose cannot supply the two required digests. F-only target changes remain delta review at F.",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
       "gates": [
         "G0"
       ],
@@ -616,7 +770,33 @@
         "g0join/receipt.md",
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
-        "reviews/w22-register-met-local-review.json"
+        "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md"
       ],
       "parts": [
         {
@@ -671,40 +851,11 @@
           ]
         },
         {
-          "decision": "still open",
-          "item": "Lead / independent reviewers must supply or correct missing, mismatched and open-REWORK per-row verdict evidence identified in g0join/join-608a4ada5.json before the packet; aggregate prose cannot supply the two required digests. F-only target changes remain delta review at F.",
+          "decision": "moved to F",
+          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
           "evidence": [
-            "review-batches.json",
-            "reviews/g0-b1-review.json",
-            "reviews/g0-b2-review.json",
-            "reviews/g0-b3-review.json",
-            "reviews/g0-b4-review.json",
-            "reviews/g0-b5-review.json",
-            "reviews/w2-g0-delta-review.json",
-            "reviews/w4-ledger-d7b-review.json",
-            "reviews/w7-rebind-review.json",
-            "g0fix/receipt.md",
-            "ledgerfix/receipt.md",
-            "ledgerfix/recipe-migration.json",
-            "rebind/receipt.md",
-            "rebind/rereview-claim-ids.json",
-            "reviews/w16-g0-rework-and-park-rule-review.json",
-            "reviews/w14-g0-content-rereview.json",
-            "reviews/w17-parity-rework-review.json",
-            "g0rework/receipt.md",
-            "g0rework/receipt.json",
-            "carries/current-binding-refresh.json",
-            "reviews/w17-parity-rework-review.md",
-            "owner-answers.md",
             "preflip-execution-plan.md",
-            "reviews/w19-live-parity-and-rebinds-review.md",
-            "reviews/w19-live-parity-and-rebinds-review.json",
-            "g0join/join.py",
-            "g0join/join-608a4ada5.json",
-            "g0join/receipt.md",
-            "reviews/w9-composition-fix-review.json",
-            "reviews/w10-composition-rework-review.json",
-            "reviews/w22-register-met-local-review.json"
+            "owner-answers.md"
           ]
         }
       ]
@@ -1544,7 +1695,14 @@
         "preserve-premise/proof.json",
         "preserve-premise/park-judgments/shard-1.json",
         "preserve-premise/park-judgments/shard-2.json",
-        "preserve-premise/park-judgments/shard-3.json"
+        "preserve-premise/park-judgments/shard-3.json",
+        "reviews/w23-g6-shard-1-review.json",
+        "reviews/w23-g6-shard-2-review.json",
+        "reviews/w23-g6-shard-3-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/link-retargets.json",
+        "fchain/manifest.json",
+        "gate-reconcile/current-proofs.json"
       ],
       "parts": [
         {
@@ -1602,14 +1760,21 @@
         "preserve-premise/proof.json",
         "preserve-premise/park-judgments/shard-1.json",
         "preserve-premise/park-judgments/shard-2.json",
-        "preserve-premise/park-judgments/shard-3.json"
+        "preserve-premise/park-judgments/shard-3.json",
+        "reviews/w23-g6-shard-1-review.json",
+        "reviews/w23-g6-shard-2-review.json",
+        "reviews/w23-g6-shard-3-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/link-retargets.json",
+        "fchain/manifest.json",
+        "gate-reconcile/current-proofs.json"
       ]
     },
     {
       "sourcePointer": "/gates/6/blockers/2",
       "item": "186 G6 rows and 86 wrapper successor digests to refresh at F",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Bind/judge the 137 park-current-passage-unbound rows against actual F bytes and obtain independent delta review. Refresh all G6 evidence at the shared G2/G6 F pin, replay twice byte-identically and pass the combined verifier; unchanged digest-bound judgments do not get re-judged by batch (L13-20.1). Compose/apply the reviewed 163 dated notes, 6 existing repoint proposals and reviewed park-judgment actions with the full F chain, using the real flip date/placement. Only application/composition is deferred, not the 787 premise judgments, exhaustive reviews or the 36 owned placement decisions. Stop on any changed source/target and review its delta before Land.",
+      "resolution": "Retained as an explicit F duty, not cleared: Bind/judge the 137 park-current-passage-unbound rows against actual F bytes and obtain independent delta review. Refresh all G6 evidence at the shared G2/G6 F pin, replay twice byte-identically and pass the combined verifier; unchanged digest-bound judgments do not get re-judged by batch (L13-20.1). Apply the reviewed 163 dated notes, 6 existing repoint proposals and premise actions ONLY through fchain/manifest.json and fchain/check.py at actual F, using the real flip date; no separate retarget pass. Stop and delta-review any changed source/target. The 787 judgments and 36 keep-unchanged decisions are already settled before F (L13-21/24/26).",
       "gates": [
         "G6"
       ],
@@ -1635,14 +1800,21 @@
         "preserve-premise/proof.json",
         "preserve-premise/park-judgments/shard-1.json",
         "preserve-premise/park-judgments/shard-2.json",
-        "preserve-premise/park-judgments/shard-3.json"
+        "preserve-premise/park-judgments/shard-3.json",
+        "reviews/w23-g6-shard-1-review.json",
+        "reviews/w23-g6-shard-2-review.json",
+        "reviews/w23-g6-shard-3-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/link-retargets.json",
+        "fchain/manifest.json",
+        "gate-reconcile/current-proofs.json"
       ]
     },
     {
       "sourcePointer": "/gates/6/blockers/3",
       "item": "Combined verifier blocked on the G2 census pin",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Bind/judge the 137 park-current-passage-unbound rows against actual F bytes and obtain independent delta review. Refresh all G6 evidence at the shared G2/G6 F pin, replay twice byte-identically and pass the combined verifier; unchanged digest-bound judgments do not get re-judged by batch (L13-20.1). Compose/apply the reviewed 163 dated notes, 6 existing repoint proposals and reviewed park-judgment actions with the full F chain, using the real flip date/placement. Only application/composition is deferred, not the 787 premise judgments, exhaustive reviews or the 36 owned placement decisions. Stop on any changed source/target and review its delta before Land.",
+      "resolution": "Retained as an explicit F duty, not cleared: Bind/judge the 137 park-current-passage-unbound rows against actual F bytes and obtain independent delta review. Refresh all G6 evidence at the shared G2/G6 F pin, replay twice byte-identically and pass the combined verifier; unchanged digest-bound judgments do not get re-judged by batch (L13-20.1). Apply the reviewed 163 dated notes, 6 existing repoint proposals and premise actions ONLY through fchain/manifest.json and fchain/check.py at actual F, using the real flip date; no separate retarget pass. Stop and delta-review any changed source/target. The 787 judgments and 36 keep-unchanged decisions are already settled before F (L13-21/24/26).",
       "gates": [
         "G6"
       ],
@@ -1668,14 +1840,21 @@
         "preserve-premise/proof.json",
         "preserve-premise/park-judgments/shard-1.json",
         "preserve-premise/park-judgments/shard-2.json",
-        "preserve-premise/park-judgments/shard-3.json"
+        "preserve-premise/park-judgments/shard-3.json",
+        "reviews/w23-g6-shard-1-review.json",
+        "reviews/w23-g6-shard-2-review.json",
+        "reviews/w23-g6-shard-3-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/link-retargets.json",
+        "fchain/manifest.json",
+        "gate-reconcile/current-proofs.json"
       ]
     },
     {
       "sourcePointer": "/gates/6/remaining",
       "item": "Get c5586146c independently checked, get an APPROVE on every overturn/judgment row (the reviews so far were sampled), then refresh the proof at F and replay it twice.",
-      "decision": "still open",
-      "resolution": "Independent reviewers exhaustively review all 787 premise judgments in preserve-premise/park-judgments/shard-{1,2,3}.json, binding verdicts to their exact evidence; resolve any REWORK before the packet (L13-20.1/4).",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
       "gates": [
         "G6"
       ],
@@ -1700,7 +1879,14 @@
         "preserve-premise/proof.json",
         "preserve-premise/park-judgments/shard-1.json",
         "preserve-premise/park-judgments/shard-2.json",
-        "preserve-premise/park-judgments/shard-3.json"
+        "preserve-premise/park-judgments/shard-3.json",
+        "reviews/w23-g6-shard-1-review.json",
+        "reviews/w23-g6-shard-2-review.json",
+        "reviews/w23-g6-shard-3-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/link-retargets.json",
+        "fchain/manifest.json",
+        "gate-reconcile/current-proofs.json"
       ],
       "parts": [
         {
@@ -1749,64 +1935,10 @@
         },
         {
           "decision": "moved to F",
-          "item": "Compose/apply the reviewed 163 dated notes, 6 existing repoint proposals and reviewed park-judgment actions with the full F chain, using the real flip date/placement. Only application/composition is deferred, not the 787 premise judgments, exhaustive reviews or the 36 owned placement decisions. Stop on any changed source/target and review its delta before Land.",
+          "item": "Apply the reviewed 163 dated notes, 6 existing repoint proposals and premise actions ONLY through fchain/manifest.json and fchain/check.py at actual F, using the real flip date; no separate retarget pass. Stop and delta-review any changed source/target. The 787 judgments and 36 keep-unchanged decisions are already settled before F (L13-21/24/26).",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
-          ]
-        },
-        {
-          "decision": "still open",
-          "item": "Independent reviewers exhaustively review all 787 premise judgments in preserve-premise/park-judgments/shard-{1,2,3}.json, binding verdicts to their exact evidence; resolve any REWORK before the packet (L13-20.1/4).",
-          "evidence": [
-            "preserve-premise/receipt.md",
-            "preserve-premise/sentence-delta.json",
-            "preserve-premise/sentence-replay.json",
-            "misc-fix/receipt.md",
-            "reviews/w2-g6-preserve-review.json",
-            "reviews/w3-g2g6-delta-review.json",
-            "reviews/w5-misc-fix-review.json",
-            "reviews/w6-misc-rework-review.json",
-            "reviews/w7-header-sentence-review.json",
-            "reviews/w8-lead-fixes-review.json",
-            "reviews/w9-g6-fix-review.json",
-            "reviews/w8-g6-parks-review.json",
-            "reviews/w8-g6-judgments-review.json",
-            "preserve-premise/receipt.json",
-            "owner-answers.md",
-            "reviews/w19-live-parity-and-rebinds-review.md",
-            "reviews/w19-live-parity-and-rebinds-review.json",
-            "preserve-premise/proof.json",
-            "preserve-premise/park-judgments/shard-1.json",
-            "preserve-premise/park-judgments/shard-2.json",
-            "preserve-premise/park-judgments/shard-3.json"
-          ]
-        },
-        {
-          "decision": "still open",
-          "item": "Documentation Lead (A42) + coding-domain documentation owner: settle the live coding-artifact placement convention before F for 36 owned parks: f08458, f08460, f08461, f08462, f08463, f08464, f08466, f08467, f08468, f08469, f08470, f08472, f08474, f08475, f08476, f08477, f08478, f08481, f08482, f08483, f08484, f08485, f08487, f08488, f08489, f08490, f08491, f08492, f08495, f08548, f08557, f08618, f08720, f08724, f08727, f08803; exact nextAction/reason lives in shard-3.json. Do not defer these choices into the lease window.",
-          "evidence": [
-            "preserve-premise/receipt.md",
-            "preserve-premise/sentence-delta.json",
-            "preserve-premise/sentence-replay.json",
-            "misc-fix/receipt.md",
-            "reviews/w2-g6-preserve-review.json",
-            "reviews/w3-g2g6-delta-review.json",
-            "reviews/w5-misc-fix-review.json",
-            "reviews/w6-misc-rework-review.json",
-            "reviews/w7-header-sentence-review.json",
-            "reviews/w8-lead-fixes-review.json",
-            "reviews/w9-g6-fix-review.json",
-            "reviews/w8-g6-parks-review.json",
-            "reviews/w8-g6-judgments-review.json",
-            "preserve-premise/receipt.json",
-            "owner-answers.md",
-            "reviews/w19-live-parity-and-rebinds-review.md",
-            "reviews/w19-live-parity-and-rebinds-review.json",
-            "preserve-premise/proof.json",
-            "preserve-premise/park-judgments/shard-1.json",
-            "preserve-premise/park-judgments/shard-2.json",
-            "preserve-premise/park-judgments/shard-3.json"
           ]
         }
       ]
@@ -2361,7 +2493,7 @@
       "sourcePointer": "/gates/9/blockers/0",
       "item": "Final pin F not recorded",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: After final main import record F, run g9/sweep.py --check --pin F, rejudge every changed evidence row, recompose drifted bodies (including deferred G7/predecessor specs), and get source-delta review (execution plan §2 G9 / §3 W3). Fix/materialize the supersession source join or explicitly carry the 2 prepared-shard legacy scan gaps (README, repo-layout-vision), then rerun post-apply scan at F (w11-import3 F3; import3/receipt.md). Retain keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a until track end under L13-13.3; completed SHA re-pinning is not permission to delete their historical witnesses.",
+      "resolution": "Retained as an explicit F duty, not cleared: After final main import record F, run g9/sweep.py --check --pin F, rejudge every changed evidence row, recompose drifted bodies (including deferred G7/predecessor specs), and get source-delta review (execution plan §2 G9 / §3 W3). Fix/materialize the supersession source join or explicitly carry the 2 prepared-shard legacy scan gaps (README, repo-layout-vision), then rerun post-apply scan at F (w11-import3 F3; import3/receipt.md). Retain keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a until track end under L13-13.3; completed SHA re-pinning is not permission to delete their historical witnesses. Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and linkIntoMoveSet. Current replay is preparation only, not F execution (L13-24/26).",
       "gates": [
         "G9"
       ],
@@ -2386,7 +2518,12 @@
         "reviews/w14-check-hardening-review.json",
         "g9/receipt.md",
         "reviews/w11-import3-review.json",
-        "g9/phase9-decisions.json"
+        "g9/phase9-decisions.json",
+        "reviews/w25-g9-dependencies-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/manifest.json",
+        "fchain/link-retargets.json",
+        "gate-reconcile/current-proofs.json"
       ]
     },
     {
@@ -2418,7 +2555,12 @@
         "reviews/w14-check-hardening-review.json",
         "g9/receipt.md",
         "reviews/w11-import3-review.json",
-        "g9/phase9-decisions.json"
+        "g9/phase9-decisions.json",
+        "reviews/w25-g9-dependencies-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/manifest.json",
+        "fchain/link-retargets.json",
+        "gate-reconcile/current-proofs.json"
       ],
       "parts": [
         {
@@ -2471,7 +2613,12 @@
         "reviews/w14-check-hardening-review.json",
         "g9/receipt.md",
         "reviews/w11-import3-review.json",
-        "g9/phase9-decisions.json"
+        "g9/phase9-decisions.json",
+        "reviews/w25-g9-dependencies-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/manifest.json",
+        "fchain/link-retargets.json",
+        "gate-reconcile/current-proofs.json"
       ]
     },
     {
@@ -2503,14 +2650,19 @@
         "reviews/w14-check-hardening-review.json",
         "g9/receipt.md",
         "reviews/w11-import3-review.json",
-        "g9/phase9-decisions.json"
+        "g9/phase9-decisions.json",
+        "reviews/w25-g9-dependencies-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/manifest.json",
+        "fchain/link-retargets.json",
+        "gate-reconcile/current-proofs.json"
       ]
     },
     {
       "sourcePointer": "/gates/9/remaining",
       "item": "At F: rerun sweep.py --check --pin F and judge every row whose evidence changed since d786e305e; recompose drifted specs; the 338 owned parks are mechanical (5 fixed rules, generic next action) and need the Lead re-judgment or an owner before F; source review of the F delta.",
-      "decision": "still open",
-      "resolution": "Independent reviewer exhaustively reviews the 33 local dependencies and exact dispositions in g9/phase9-decisions.json before the packet; resolve any REWORK (L13-20.2/4).",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
       "gates": [
         "G9"
       ],
@@ -2535,7 +2687,12 @@
         "reviews/w11-import3-review.json",
         "owner-answers.md",
         "preflip-execution-plan.md",
-        "g9/phase9-decisions.json"
+        "g9/phase9-decisions.json",
+        "reviews/w25-g9-dependencies-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/manifest.json",
+        "fchain/link-retargets.json",
+        "gate-reconcile/current-proofs.json"
       ],
       "parts": [
         {
@@ -2612,35 +2769,16 @@
           ]
         },
         {
-          "decision": "still open",
-          "item": "Independent reviewer exhaustively reviews the 33 local dependencies and exact dispositions in g9/phase9-decisions.json before the packet; resolve any REWORK (L13-20.2/4).",
+          "decision": "moved to F",
+          "item": "Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and linkIntoMoveSet. Current replay is preparation only, not F execution (L13-24/26).",
           "evidence": [
-            "late-areas/receipt.md",
-            "late-areas/legacy-drift.json",
-            "import2/receipt.md",
-            "resync-a/receipt.md",
-            "resync-b/receipt.md",
-            "w0-deferred-rebinds.json",
-            "w0-prior-overlap-replay.json",
-            "composition/w2-predecessor-recomposition.json",
-            "reviews/w4-import2-review.json",
-            "reviews/w16-g0-rework-and-park-rule-review.json",
-            "reviews/w10-g9-interim-review.json",
-            "reviews/w11-g9-rework-review.json",
-            "reviews/w12-g9-followup-review.json",
-            "reviews/w15-g9-parks-review.json",
-            "reviews/w13-misc-pin-and-gloss-review.json",
-            "reviews/w14-check-hardening-review.json",
-            "g9/receipt.md",
-            "reviews/w11-import3-review.json",
-            "owner-answers.md",
             "preflip-execution-plan.md",
-            "g9/phase9-decisions.json"
+            "owner-answers.md"
           ]
         },
         {
           "decision": "still open",
-          "item": "WORK and registry owners supply the bounded knowledge/registry exports still required by the inherited phase-08 parked records. The 33 Phase-9 dependencies are local decisions, not external blockers; exact untouched exports stay in their original records (L13-20.2; g9/phase9-decisions.json).",
+          "item": "WORK and registry owners supply the bounded knowledge/registry exports still required by inherited phase-08 parked records. All 158 local Phase-9 dependencies are decided; original external exports stay in their owning records (L13-21/24; g9/phase9-decisions.json).",
           "evidence": [
             "late-areas/receipt.md",
             "late-areas/legacy-drift.json",
@@ -2662,7 +2800,12 @@
             "reviews/w11-import3-review.json",
             "owner-answers.md",
             "preflip-execution-plan.md",
-            "g9/phase9-decisions.json"
+            "g9/phase9-decisions.json",
+            "reviews/w25-g9-dependencies-review.json",
+            "reviews/w28-fchain-and-premise-rework-review.json",
+            "fchain/manifest.json",
+            "fchain/link-retargets.json",
+            "gate-reconcile/current-proofs.json"
           ]
         },
         {
@@ -2689,7 +2832,12 @@
             "reviews/w11-import3-review.json",
             "owner-answers.md",
             "preflip-execution-plan.md",
-            "g9/phase9-decisions.json"
+            "g9/phase9-decisions.json",
+            "reviews/w25-g9-dependencies-review.json",
+            "reviews/w28-fchain-and-premise-rework-review.json",
+            "fchain/manifest.json",
+            "fchain/link-retargets.json",
+            "gate-reconcile/current-proofs.json"
           ]
         }
       ]
@@ -2883,6 +3031,32 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md",
         "reviews/g7-c1-review.json",
         "reviews/g7-c2-review.json",
         "reviews/g7-c3-review.json",
@@ -2969,6 +3143,32 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md",
         "git-one-door/receipt.md",
         "git-one-door/exemption-proposal.md",
         "git-one-door/declared-exemptions/receipt.md",
@@ -2997,6 +3197,12 @@
         "preserve-premise/park-judgments/shard-1.json",
         "preserve-premise/park-judgments/shard-2.json",
         "preserve-premise/park-judgments/shard-3.json",
+        "reviews/w23-g6-shard-1-review.json",
+        "reviews/w23-g6-shard-2-review.json",
+        "reviews/w23-g6-shard-3-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/link-retargets.json",
+        "fchain/manifest.json",
         "reviews/g7-c1-review.json",
         "reviews/g7-c2-review.json",
         "reviews/g7-c3-review.json",
@@ -3140,7 +3346,14 @@
         "preserve-premise/proof.json",
         "preserve-premise/park-judgments/shard-1.json",
         "preserve-premise/park-judgments/shard-2.json",
-        "preserve-premise/park-judgments/shard-3.json"
+        "preserve-premise/park-judgments/shard-3.json",
+        "reviews/w23-g6-shard-1-review.json",
+        "reviews/w23-g6-shard-2-review.json",
+        "reviews/w23-g6-shard-3-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/link-retargets.json",
+        "fchain/manifest.json",
+        "gate-reconcile/current-proofs.json"
       ],
       "parts": [
         {
@@ -3242,7 +3455,12 @@
         "reviews/w11-import3-review.json",
         "owner-answers.md",
         "preflip-execution-plan.md",
-        "g9/phase9-decisions.json"
+        "g9/phase9-decisions.json",
+        "reviews/w25-g9-dependencies-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/manifest.json",
+        "fchain/link-retargets.json",
+        "gate-reconcile/current-proofs.json"
       ],
       "parts": [
         {
@@ -3301,6 +3519,32 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md",
         "carries/receipt.md",
         "composition/receipt.md",
         "composition/member-joins.json",
@@ -3381,6 +3625,32 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md",
         "late-areas/receipt.md",
         "late-areas/legacy-drift.json",
         "import2/receipt.md",
@@ -3398,7 +3668,11 @@
         "reviews/w14-check-hardening-review.json",
         "g9/receipt.md",
         "reviews/w11-import3-review.json",
-        "g9/phase9-decisions.json"
+        "g9/phase9-decisions.json",
+        "reviews/w25-g9-dependencies-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/manifest.json",
+        "fchain/link-retargets.json"
       ],
       "parts": [
         {
@@ -3427,6 +3701,14 @@
         },
         {
           "decision": "moved to F",
+          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
           "item": "After final main import record F, run g9/sweep.py --check --pin F, rejudge every changed evidence row, recompose drifted bodies (including deferred G7/predecessor specs), and get source-delta review (execution plan §2 G9 / §3 W3).",
           "evidence": [
             "preflip-execution-plan.md",
@@ -3444,6 +3726,14 @@
         {
           "decision": "moved to F",
           "item": "Retain keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a until track end under L13-13.3; completed SHA re-pinning is not permission to delete their historical witnesses.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and linkIntoMoveSet. Current replay is preparation only, not F execution (L13-24/26).",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -3480,7 +3770,12 @@
         "reviews/w14-check-hardening-review.json",
         "g9/receipt.md",
         "reviews/w11-import3-review.json",
-        "g9/phase9-decisions.json"
+        "g9/phase9-decisions.json",
+        "reviews/w25-g9-dependencies-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/manifest.json",
+        "fchain/link-retargets.json",
+        "gate-reconcile/current-proofs.json"
       ],
       "parts": [
         {
@@ -3551,7 +3846,12 @@
         "reviews/w13-misc-pin-and-gloss-review.json",
         "g9/receipt.md",
         "reviews/w11-import3-review.json",
-        "g9/phase9-decisions.json"
+        "g9/phase9-decisions.json",
+        "reviews/w25-g9-dependencies-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/manifest.json",
+        "fchain/link-retargets.json",
+        "gate-reconcile/current-proofs.json"
       ],
       "parts": [
         {
@@ -3589,6 +3889,14 @@
         {
           "decision": "moved to F",
           "item": "Retain keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a until track end under L13-13.3; completed SHA re-pinning is not permission to delete their historical witnesses.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and linkIntoMoveSet. Current replay is preparation only, not F execution (L13-24/26).",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -3635,7 +3943,33 @@
         "g0join/receipt.md",
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
-        "reviews/w22-register-met-local-review.json"
+        "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md"
       ],
       "parts": [
         {
@@ -3657,6 +3991,14 @@
         {
           "decision": "moved to F",
           "item": "After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -3800,7 +4142,14 @@
         "preserve-premise/proof.json",
         "preserve-premise/park-judgments/shard-1.json",
         "preserve-premise/park-judgments/shard-2.json",
-        "preserve-premise/park-judgments/shard-3.json"
+        "preserve-premise/park-judgments/shard-3.json",
+        "reviews/w23-g6-shard-1-review.json",
+        "reviews/w23-g6-shard-2-review.json",
+        "reviews/w23-g6-shard-3-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/link-retargets.json",
+        "fchain/manifest.json",
+        "gate-reconcile/current-proofs.json"
       ],
       "parts": [
         {
@@ -3813,7 +4162,7 @@
         },
         {
           "decision": "moved to F",
-          "item": "Compose/apply the reviewed 163 dated notes, 6 existing repoint proposals and reviewed park-judgment actions with the full F chain, using the real flip date/placement. Only application/composition is deferred, not the 787 premise judgments, exhaustive reviews or the 36 owned placement decisions. Stop on any changed source/target and review its delta before Land.",
+          "item": "Apply the reviewed 163 dated notes, 6 existing repoint proposals and premise actions ONLY through fchain/manifest.json and fchain/check.py at actual F, using the real flip date; no separate retarget pass. Stop and delta-review any changed source/target. The 787 judgments and 36 keep-unchanged decisions are already settled before F (L13-21/24/26).",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -3995,6 +4344,32 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md",
         "reviews/g7-c1-review.json",
         "reviews/g7-c2-review.json",
         "reviews/g7-c3-review.json",
@@ -4031,6 +4406,14 @@
         {
           "decision": "moved to F",
           "item": "After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -4095,6 +4478,32 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md",
         "reviews/g7-c1-review.json",
         "reviews/g7-c2-review.json",
         "reviews/g7-c3-review.json",
@@ -4131,6 +4540,14 @@
         {
           "decision": "moved to F",
           "item": "After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -4183,7 +4600,12 @@
         "reviews/w14-check-hardening-review.json",
         "g9/receipt.md",
         "reviews/w11-import3-review.json",
-        "g9/phase9-decisions.json"
+        "g9/phase9-decisions.json",
+        "reviews/w25-g9-dependencies-review.json",
+        "reviews/w28-fchain-and-premise-rework-review.json",
+        "fchain/manifest.json",
+        "fchain/link-retargets.json",
+        "gate-reconcile/current-proofs.json"
       ],
       "parts": [
         {
@@ -4205,6 +4627,14 @@
         {
           "decision": "moved to F",
           "item": "Retain keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a until track end under L13-13.3; completed SHA re-pinning is not permission to delete their historical witnesses.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Replay every prepared source through fchain/check.py --pin F using fchain/manifest.json (including rebased-patches.json and link-retargets.json); require zero conflicts, duplicate owners and linkIntoMoveSet. Current replay is preparation only, not F execution (L13-24/26).",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -4308,7 +4738,33 @@
         "g0join/receipt.md",
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
-        "reviews/w22-register-met-local-review.json"
+        "reviews/w22-register-met-local-review.json",
+        "g0rework/final-pin-duties.json",
+        "gate-reconcile/current-proofs.json",
+        "reviews/w24-g0-verdicts-b1.json",
+        "reviews/w24-g0-verdicts-b1.md",
+        "reviews/w24-g0-verdicts-b2.json",
+        "reviews/w24-g0-verdicts-b2.md",
+        "reviews/w24-g0-verdicts-b3.json",
+        "reviews/w24-g0-verdicts-b3.md",
+        "reviews/w24-g0-verdicts-b4.json",
+        "reviews/w24-g0-verdicts-b4.md",
+        "reviews/w24-g0-verdicts-b5.json",
+        "reviews/w24-g0-verdicts-b5.md",
+        "reviews/w24-g0-verdicts-b6.json",
+        "reviews/w24-g0-verdicts-b6.md",
+        "reviews/w26-g0-rework-verdicts.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w27-g0-stale-verdicts-b7.json",
+        "reviews/w27-g0-stale-verdicts-b7.md",
+        "reviews/w27-g0-stale-verdicts-b8.json",
+        "reviews/w27-g0-stale-verdicts-b8.md",
+        "reviews/w28-g0-verdicts-b9.json",
+        "reviews/w28-g0-verdicts-b9.md",
+        "reviews/w29-g0-verdicts-b10.json",
+        "reviews/w29-g0-verdicts-b10.md",
+        "reviews/w30-g0-verdicts-b11.json",
+        "reviews/w30-g0-verdicts-b11.md"
       ],
       "parts": [
         {
@@ -4330,6 +4786,14 @@
         {
           "decision": "moved to F",
           "item": "After final main import, re-decide claim_2e2bc926 against Work Event Store cutover 42c5a0a55; the withStateTx/appendEventCore successor is plan-pin scoped only (L13-15.2, W16 F2; W17-4 clause-source refinement travels with it).",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.",
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
@@ -4530,13 +4994,2099 @@
         "sha256": "1b68caf3efb816d3a6b6c572cd7e384e3bc085fa619b3a41ba47b98baf9df3b2"
       }
     ],
-    "scope": "W22/L13-20 corrections only; G6/G9 packets are authored, not independently approved. Generated evidence is uncommitted, not an independent review."
+    "scope": "Historical W22/L13-20 layer only; its then-authored G6/G9 packets were not independent approvals. Generated evidence is preserved from committed d7126c5b9, not from current working-tree files."
   },
-  "newlyVisibleOpenItems": [
-    "G0: Lead / independent reviewers must supply or correct missing, mismatched and open-REWORK per-row verdict evidence identified in g0join/join-608a4ada5.json before the packet; aggregate prose cannot supply the two required digests. F-only target changes remain delta review at F.",
-    "G6: Independent reviewers exhaustively review all 787 premise judgments in preserve-premise/park-judgments/shard-{1,2,3}.json, binding verdicts to their exact evidence; resolve any REWORK before the packet (L13-20.1/4).",
-    "G9: Independent reviewer exhaustively reviews the 33 local dependencies and exact dispositions in g9/phase9-decisions.json before the packet; resolve any REWORK (L13-20.2/4)."
-  ],
+  "currentCatchUp": {
+    "sourceCommit": "f498ebded83ba5789e730adc74bb637b80e2f536",
+    "generatedHistoricalPin": "d7126c5b9",
+    "inputs": [
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/carries-current-rebindings.json",
+        "sha256": "928d0aebc4dec1c904b0ab7d747e959b26a3e8d0d8e26f47810350a70f53b740"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "sha256": "c42c085ae96b13b67eafd819224f3862eebb8d2f3cee9ff96937bf7ee68bae21"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+        "sha256": "ea4b7e161e068f2ab25bc8ebf7f1208dbc093ef6c5434486298e1ee47c25967b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-confinement-binding.json",
+        "sha256": "80bdc23844e9bfebba1cdba3651a7c51a8ebbe3c21bbfe131eafbb21b3130df0"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-reading-map-global-gaps.json",
+        "sha256": "6eae2191cfa43e48b3f51c8b56eb1427968979380f59b6eed8944610af4476dc"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json",
+        "sha256": "618eebf65f70a075bdf8fbd201e889372a79a0650813b8967f3ced645392f08e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round4-native-predecessors.json",
+        "sha256": "459d7354536ecd0adcfb90213220c163816e2e35a37464b8211fcee4c8fbcb5d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+        "sha256": "0cf443febeccd1dff85abe4038bf9e17dfd11dfbcb9f6758c2fb9b16364cf461"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "sha256": "69cc51e2c7ab32fece07f1aa579eaea1ca0c38e07f136f59cb98719b818b0476"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+        "sha256": "966766248c4afcbf65d78b0c5a15e1b14db0bfad8983f798b4ef479d572ad04c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+        "sha256": "0bf1c4ae0c2018610961c0ed2cb3a2e953bb981519074c9215afd72b9b8b0994"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+        "sha256": "c15c5d88b96f439349aea531315cf1b1fd2359e60bc6a7889f8ee4b1afac7eaf"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s15-navigation-review-fixes.json",
+        "sha256": "e6377da83bf45b19b9438ce0dc68940bd6716daea01ed4b8ebc747cb6101a446"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
+        "sha256": "e2408778f7a6cfa1cd45c0243ac941351794f2c35503e0f80377da136fa972d8"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
+        "sha256": "f56b872539445673191c30a1267c516f1e39d3a4de7556ce248d6e201d834a73"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json",
+        "sha256": "47858cadc3e2f6a0cd6afe710ada2d7aab2b60fe847fa7ff635f22ccb1db9331"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-carriage-label-classifications.json",
+        "sha256": "a7d0b9279fc96a703847ac4e4a95ebdd6a262e45c00d994adda66f8465f4862c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "sha256": "99fb33393b20d41819b328d6e85275f2f5c22a4124b0b683700269db463327b9"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-closure-successors.json",
+        "sha256": "8d40a44c38142319c388fab1b576160a005a742770404c4fc21065e30fe06a4c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-current-closure-classifications.json",
+        "sha256": "94c25de7efad5bfd9d2f4638e40140df722e3ce6a11523a753dd15eaeabb2c35"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+        "sha256": "78f40ab3827ef85de04490ea8e333a1338ffbd4ab9acd523f18ba0c1d5d968a1"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-02.json",
+        "sha256": "c3f1f7613c7aaee002e563a1102693a79f698967c7a1545bb8305faaed89746c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+        "sha256": "07ec7d7ebc7c86cdf58a67d74838913c442cab7d2706e798d4fd0b29cc899408"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+        "sha256": "c726219adc50963180e8d7f105d97a855b8cf8cbe37e2a3381f369245d19d2dc"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-05.json",
+        "sha256": "7a99917dcbb315f33bcb387eff4e127ec0e04f5b0cebe5ab01eb6055eff77256"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+        "sha256": "848be9d5a53685e37a85f19f4f2f89f459dddfff7c57d20a1231e0422709ca60"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-files.json",
+        "sha256": "bd0ae638207fffb435433bf91fde3db28f13a0291656b3be27743773a238c6ab"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-history-closure-classifications.json",
+        "sha256": "b75e978b4256d25134ab9b2deddfb0f64395bce15b6c51eb956349858234706c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+        "sha256": "1546d18607ddf3339109f37e07dbec8b46da4a6a3df159a523860e92f78bc914"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+        "sha256": "b29f07ad884255432bbc49c199f80ed7de46b1363ed8449fbea9c52c99294fee"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+        "sha256": "4fe305b49e0403944fa0c7433d94c721b6072ea07d249a553978b5128dc55733"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-log-duplicates.json",
+        "sha256": "b9f069516b0ac58bb6dc16a15370db523c86613a0ea185e12c27abe10eb437d7"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge-pending.json",
+        "sha256": "e85d2d1a2e6ccf5433fdeb65115e16b211d3b5c194147e7d5b775a8072ce2cf0"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge.json",
+        "sha256": "05c303d8b356e21975c74b2be976cd04fa43d140a4db00c36ddc94d14064b782"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-01.json",
+        "sha256": "6b22f2e27b977d799e985d959bdfb6656949857b56bf0f7bf98eddac6b351511"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-02.json",
+        "sha256": "79e58af9416a61461a1b84639157c1e196e6f42ec96caeca383b7811ec04d97a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-03.json",
+        "sha256": "188b7925e006f9e5a6e89179226f523fab067050532f83f3e7dc343ea0747e0f"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-04.json",
+        "sha256": "cdf0f17dd5089268db74af83b136aac5ae45ab49041cb71ab748a32a2f034b18"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-05.json",
+        "sha256": "bbea328a9f233892e024a8a9a59bcf54b91b96b1881677d2c0db94cc4915205a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-06.json",
+        "sha256": "c48871a3fdf6ee869f00cb551c28462a6fb6e76500120c6a60d99bc5ce66cd19"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-07.json",
+        "sha256": "452b7e0b4af9d93cc75f0291e7bdbd598906e7007cecb19764f47d7bd17ef8c1"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-08.json",
+        "sha256": "4ac644e6256fee9e0511060463ae329cbc4273eff914b63f566dfa380854ab78"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-09.json",
+        "sha256": "dbacaee7512ae65f5d35ec5b5bf93ca790941489dfd30eb7c0563e27f6a06d3e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-10.json",
+        "sha256": "2952c890f9ee4699b1d61d36194c192f2162fcdb1d3e981ad8fcde9f8abf83c2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-11.json",
+        "sha256": "c73f02d1e3e8ef414b3302008b409b3042e38bbc796604deeaaea3d7552b9de3"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-12.json",
+        "sha256": "2548cccda4418b78d1c347d6817a3e8094eafc38c67a99d03e9454e2e984d2db"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-13.json",
+        "sha256": "b2d2c3f51c151759f3afbdc1623cf7d12583a9e5e67bd4227cecd6ef588a703d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-14.json",
+        "sha256": "bf5754435d46a8dbfe5ed24cf1d51ac10a4fe87310f7e2c498c0e0a06e623352"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+        "sha256": "4031a69366f36b450b6f3f42033fe67e865fcc18724dca135aa82b8f3b81f15a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-16.json",
+        "sha256": "8bab4fbf7f1d8c171aeaf54ea10df7cb73aafa31db8278e291943e041277dcc0"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-17.json",
+        "sha256": "37d71928969fdbd2e52d3f692f1ea177e8e483b7e8e62b1482162f33f8764171"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-18.json",
+        "sha256": "36f96c74df1e6035c8f69b2c3af9b5eb71e73662cbf7b07ceb6f16d4e3560901"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-19.json",
+        "sha256": "2282ec301a9866cafffb1e273db6b2153869ca9ed196ffb9e21a091bad82481e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-20.json",
+        "sha256": "21cdacd5fdbf0940e306246fccdf0a2dcb3183577af24de44e4ff334858c6ce3"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-21.json",
+        "sha256": "f3017d60b35ef6ed6e03267932e450f4c38e6ae657a266c65c9632c10bca36c0"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-22.json",
+        "sha256": "cc6bfbe67da3742cb860589a35393e749b7a91860b89a7961f3b78d4f9210383"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-23.json",
+        "sha256": "4d5fd04e04d72eee6dbebf012c299b08be3723e89ab121a627c2e5aa205d0c01"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-24.json",
+        "sha256": "95757d16f07a374b6c6b57d1973a0a02a9164cf25df96ec8fe72b1d5569d36d7"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-25.json",
+        "sha256": "f0c1dde0e5a9ae62fed3dfd2a9a33d5be81b32f9c8e2007638d54555ee9e5844"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-26.json",
+        "sha256": "f80ded5de8dbc14312f0c12668aceb89d2277354fbee97b2ddbf4e7e6c22868e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-27.json",
+        "sha256": "044b09264ada197133d254511f72c65cc73c952c579698da7a43c25d853d696b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-28.json",
+        "sha256": "d43e363ae2048be05f7896f1ece8da8e62208cd06d018660dc5b2efac0e6e652"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json",
+        "sha256": "a9a7e56d21008076d6d9f3bd711ca8b2205b18b51c28a9ac10c8c0144bcf04d8"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-reopened-exact.json",
+        "sha256": "3741b9f89fa506db3c75c0366996600db7334fefdefd643c96fd98d5f7e213ff"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-step6-repin-classifications.json",
+        "sha256": "44a2ced81a62a0ff33c775a21db91549e79cddb5f5db3603f0bdb025384e79b9"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-binding.json",
+        "sha256": "677e1b7db0c8cb8476577d88a6ea059909b3e050928a3d28093d02c0b6e3e972"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+        "sha256": "28b11774b1c5419c98286bcf5be865ced85e4c92e369b9998f7a9b9c2bddbbcc"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "sha256": "d59ed031b9738cf98d44078ca8ec780e14d039bbcea1705ee4f55ffff3300e98"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-consumer-project.json",
+        "sha256": "d1363a2fb1400458d8f6b4600d172ffb20ccaa27f14ec9eb41d7079efba36626"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-history-evidence.json",
+        "sha256": "6e29c1972334ac04155058b5c1138f0861319c5591f27b37e722b83ff51679c2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-user-knowledge.json",
+        "sha256": "aa3cd3a79e575e02298c2e383368a21391645747c8c51ad9cc1ce3917895574d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-generated-projections.json",
+        "sha256": "6331c4be904d82bc3130b3b2878e18d09eb54cf69fc00f908feae68e86914207"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+        "sha256": "78bc005592ac09c371fa7513deea9120f2499d0a22b38d49aae52197c7cb09a3"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+        "sha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+        "sha256": "684618d9990f3bfd7407c24716b5b39d1d5bd1bce70a8193c68b520178ec4554"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+        "sha256": "2cb9b83a0e898743c66437faba6a3ffc5fac66cf775d1338ee3b6d335055f9d2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-resolution.json",
+        "sha256": "4edb7460fd62803d8fe04e0ffd443d14967ac694552f3033d16c2813006d4254"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+        "sha256": "0f015f52a1d0cd3ef9138219278f09a3e8c63163f4226a4aaff5fd0ba93b1f65"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+        "sha256": "9bcbae00dd65d3184a22b965bf60af59a77cba8322764ab0299def85a35f9ba9"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+        "sha256": "ad1b2ed2d733ead7e9ca88ddff94a1695ab34fb6837cf7709e6e4ac67a08f6ea"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+        "sha256": "86f31e3c6e3919663993ec2038f0850afab815328a1c0858e126df88556b7bca"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+        "sha256": "754093569178332d7b0c7863f039ee669d33425e5aaa343a2b3d512137aafc9d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+        "sha256": "f409d142bc4408da0264e976aed2d9c2a628652860e1a5b5d3dfb14b351a2272"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+        "sha256": "a89c6e12b5bea70316355033e4ee7cf4fb5ce6999a4ec32bdeb0a97e38f19937"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json",
+        "sha256": "84cfeb77ecb76e9fa5ee22d416dee11fb054a2dc56e1c732df9388dae5e85a6d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+        "sha256": "ee71b8a7c4f594e9fc25bfbe0819e28318f801340cbc56afa842b813c60f2b43"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+        "sha256": "21624bacd888fbcd3b52c628c47ba4c1d7bdb630d26119db0f17e64532de454b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+        "sha256": "ac461ef818dc0eeae00bacfecd820f73386ec73b2767df83ecf06a7f5d84b8c0"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+        "sha256": "568255044f40063112d42b9d9d4a0c9448e17621cf85916d841951bf9e5aa8f7"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-native-successors.json",
+        "sha256": "6a954ad30dc9aa9004c5fdefc25988d7c13ce0c073e187e35a7d507c49236a9b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-switchboard-gap-successor.json",
+        "sha256": "484cd0880c8e9040ccb7604276998a5902b5faef4c56fb9199c19bcbc085dccf"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-template-conservation.json",
+        "sha256": "0daff68911159922151ffdfc369bc9320969b986d03df1884ff39737f7e90177"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+        "sha256": "4556035f091cc1b11b3b21d8b0a7d0325076556e60ec0d28fc8db9693c6967a5"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architect-portal.json",
+        "sha256": "518d1ae3d9885d68d16e6549b21feed045036b74824087f09a5d3f1d566459f2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architecture-intent.json",
+        "sha256": "b06ff2557c66940d3dcd4ebece5d114aa9154785dff2beb20de9cf5e369b4c58"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architecture-map.json",
+        "sha256": "427f44a5c03e830c19e59e7f26551077a8f5fb8a75a3f0a958ec2eb6b67e472e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+        "sha256": "8890682d213960966e637abd056161412d086d49386c4b17f0cb5a9ca04c372d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+        "sha256": "9061bb4574928c364326f9052931b833a052261cfffd3b961cf73b0cd49ef208"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+        "sha256": "f439827863289932293662615b8cdaa30caa6171430d31fc2b61749bc4cf77cf"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-portal-classifications.json",
+        "sha256": "af4741590a9e3f9d6b7f35ec1acd1e3df1be0b3159bbf6251b7c5bb7051a230a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-portal-evidence-rework.json",
+        "sha256": "c4b9486a10c92799a252f050426c08aeaf11fa128a2c006f17257c34c9ee8150"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-roadmap.json",
+        "sha256": "3319f4654968cfee78fc3fb733378355149c4b20820d6d9c236abfcdacd1f9a2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json",
+        "sha256": "7d2400d1209505e40d3341ac744b70c121396fa9b7f301dfc588400491a1727c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-vision-trong-mem-ngoai-cung.json",
+        "sha256": "7287335133c8920ea563c3f563bf05d5042535218797cc2a6d457b890968070d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology-audit.json",
+        "sha256": "24f8719fb3189c454c0907d2b6130fe6232649085f1e80e858c285cc534c2eeb"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology-roadmap.json",
+        "sha256": "f382a1aee149577d2e3fc72421fc6c500a48883b60cba005f8bd008e046e70d2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology.json",
+        "sha256": "715b8f24ace8def301f1e18f6c0a3c744ad17c0ab06fb9b65f2469b4b31e5af4"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-01-dispatch-control-plane-redesign.json",
+        "sha256": "5efbad1adc8d8afa133f61d180f0ccc1e611b2a968c7fe48962a5b84f7d63917"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-02-documentation-system-design.json",
+        "sha256": "9b5931986c09b538f50dcddf72bee491f423edd15ba2de295c175b92e885c6a9"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-03-documentation-system-discussion.json",
+        "sha256": "0338df4911c733c94dc9b92a88a686b6493541c93ea64df80c4d2dcf0139fa76"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-04-doing-coordination-redesign.json",
+        "sha256": "03745ce49d82db73b1217f35ecd19f2afb4b0c83ad211a83a5ffede502519a78"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-05-readme.json",
+        "sha256": "881254d7b3bc34b74e89c278b14690de459a232c5dbd6d1ed5058748330f17f6"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-06-knowledge-registry-redesign.json",
+        "sha256": "48c615751d50eb68682604df8a0f0c9ffda5c9b531fa283d23e31e02a5b1c96c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-07-architecture-advisory-panel.json",
+        "sha256": "1cc1a8f4d6cc9711f5513e20dfa66dbffad8a0cc9c95c71e08484dde5030c993"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-08-component-authority-boundary-map.json",
+        "sha256": "f0fc16afc168c19713602cd8e420101df865f1ed2670474006d08c6cf42a099b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-09-coordination-capability-envelope.json",
+        "sha256": "2a44b4350757794ebd928c4b8d41b1544f7f5677809de4eacae9399e48db64fe"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-10-coordination-dispatch-contract.json",
+        "sha256": "58aa31118903c923daded2dc6788a204d1a3bca7c01ede7a7edf04bf594d800b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-11-coordination-envelope-probe-contract.json",
+        "sha256": "b648f6362f6b5c851a4820c7e52a040ca24338e4c3a6c047f4b127671bfa3997"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-12-coordination-envelope-progress.json",
+        "sha256": "efbb20b224b1a2c18c62795b0d785940b1eda27e850d9043a1f69d18fc1c410e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-13-coordination-worker-provider-boundary.json",
+        "sha256": "3f192ebfba0a5015ed7ed4e985483ca7047d748340f5cc4b86b6ae70165224d2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-14-group-thinking-plan-loop.json",
+        "sha256": "07f513f2f79ac304ebbf74fd911f5a64d2159ccd0b5a86cc25e770ce6ca9227d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-15-readme.json",
+        "sha256": "b121f17b615bdbcbe12a97337133aa738d6a75f5bdac7f8006db0d1f1923e7b9"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-16-step-09-group-thinking-substrate.json",
+        "sha256": "2c3c2ae8abbbc4d9a1a5b5f274d439d5addb64840657d5efcf7eab9a6e2f741e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-17-step-09-step-10-replan-handoff-prompt.json",
+        "sha256": "5424afa82b331a83cfe19587add0823bb91cea17f520dedcf975c2537270e6ff"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-18-step-10-a0-coding-domain-boundary-facade-plan.json",
+        "sha256": "7b7bd52e63db62b7c92953be9e6093783810ce4ef291750ff6b7392244e6e581"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-19-step-10-coding-domain-adoption.json",
+        "sha256": "af36b2a84919354d4360ee0ab69e6b0c5fc7208af98a3bf34ea062a39129bb26"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-20-visibility-and-interactive-contact-herdr-spawn.json",
+        "sha256": "c56f2a2e7e882e17dc618e39e33374340f3ace0173a3ba5a644b0617ce6b2322"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+        "sha256": "77f1685be51013b484cca0d6cdf7c61ba28003c14dc5fd74244819afc9f968ee"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-assignment-predecessor.json",
+        "sha256": "acb16546811ae7f129d384f0ea6fce3dbd0010716f7d96d8d7a09820bba58b21"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-holder-lock-predecessor.json",
+        "sha256": "1e99a70a081c497adcde61c0d9f95c1b6785c4ab71f1c589798785a69c26833a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-r03-assignment-predecessors.json",
+        "sha256": "03ccc32fd28817a9662159650a52eb5bdfaa604b9978ac0e5055b12472518613"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+        "sha256": "49f83b5d45e7c6978f4ce5ba505df88d00f0f57d94a498422caf8e1c2d30b3cf"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+        "sha256": "e76c9590cd761ffce7d8da48360140998d683a329f25ad150338de6ac6e8a790"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json",
+        "sha256": "a9f1005810e5170d22a81bbd1201eea7be2a1a0be02818f4072efc65a8ea2d9b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json",
+        "sha256": "1ac888483caa650440161c8a4730368fd9266a9e39403aa8f320eaaa07aa74a3"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+        "sha256": "1f80b605a771905fb376ec351cf6fea90aa31647fe58c1a4aa5c8512fc755182"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+        "sha256": "71be6a83fcc8247f2647847facc1fd88b2b52f49ca146afc040fad077c92baef"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-predecessor.json",
+        "sha256": "b9759fc3b609765d3311d862905d2cb685ae79b63b1b55ee4de3170c6c704a1d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "sha256": "0462656c5afd92533609ed3a94afb202fc17a7ee5ce788a16904dca50cd63d27"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "sha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "sha256": "501caad9cb3dcfc0572ab6fea0c020538507a998e3d44576cb6ad58481b7a8e4"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/w8-component-carriage-heading-overlays.json",
+        "sha256": "f5b22edcf27215c602363c4bf7d2d1d1d641718e9db3d07b3c8780846b8d17a3"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/w9-component-carriage-body-overlays.json",
+        "sha256": "ca6b27cceb744afcb6ee4edba1c0bb9d8ce0e0dc50cb8c5f2d146e592c412e0b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+        "sha256": "2a3c66216ff3bf9c1b8eeb32017b1b7a97179e0d71283be107c12d2ccbb71ef7"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+        "sha256": "266f587a5a14ce4c40e91e2d5c2f3610abb9e14e0e0cb139826ada1df3c6b876"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+        "sha256": "89fbae8ca878f26f394200994c5f977c76715c4975d6652e61fa6cbab54a104f"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+        "sha256": "b8b716f46be68f25b2d10b42ef06fc7c47c369999c8bce736227c2f8315e0586"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+        "sha256": "4e1ff54f300bd586f1820cb003091facd0d024d44227a124c4cc83f310efdbd5"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+        "sha256": "a03cab97f0c054fb463eb48990a5d277dc128d7e11b0382b693d708ddddc55b5"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+        "sha256": "056d0a130ba084e5c946db233a5e38a7bac0c07a1f151b29c1e6de5dd79d8829"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-cutover-move-set.json",
+        "sha256": "3b8f1999d1e2b4b32e5219185ab61493569b8ade135ebebd784ceef5ab2cf5db"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-assemble.py",
+        "sha256": "13e66d59ded62c6a8de9c99e989c8d5eb0f5cb5afa5d039ea014364ce987cdd1"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json",
+        "sha256": "d50338a51ab65582c8130041ab105ec126a377e16d64f65d27b02e24b263e292"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-consumer-cutover-matrix.json",
+        "sha256": "1add06ac19d62862ffc353352cce01c2e3b28ba5305a3cb457b47a02ac27b1cb"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-patch-order.json",
+        "sha256": "8f09d07982289e50c713b78c3c8b15109b52a7627deb9d1cbbe502b6180aaa36"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json",
+        "sha256": "bd41a9823ea64d4c01e075d802b78c25b945d754bf17ca1161bf99987235c7cb"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/claim-carries.json",
+        "sha256": "fdd4d239cdadaff2e84a2104d1a233fb9465e2a102dfd86ebb22996404cbf706"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json",
+        "sha256": "fe87c638a814a93024d1fc55c6ecf77c601c80110ee84d7d81feff38697c169b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/source-parity.json",
+        "sha256": "aaedf40862ffa2a9c4a4cd136524fda8989a6de0aed0100c45b8606a0f34533c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/citation-bindings.json",
+        "sha256": "1c53980dff3e8d08f54353dc4a539d730627a287d241ddb6a092845993a23273"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/pointer-patches.json",
+        "sha256": "ba6bc185541a1999601feec3d57c6838eceb59d58de496208264e8d675936e38"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/compose.py",
+        "sha256": "95b088002cf4fc5fa4dd585401eccf99dc870e68e39aebcdd0f090c888f0728a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/gap05-placement-proposal.json",
+        "sha256": "133e94ac452c0ed7928e6945fbd80eb0f746219d6634d0758381d068c7d23e59"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/generator-all-output-deltas.json",
+        "sha256": "24fdcdaa259830bc2186ccf4f2a7ad89a92e8d5b3d04cdf5431fac7e77a2992d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
+        "sha256": "4c62b118ec5c92fe967362f1c3bdb2a58c2097b202b16bb99f2b9acbcae194d0"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/skill-regeneration.json",
+        "sha256": "bb9e1590e87502d566a0f7b00d3950bd99824f238ce5872607d88c3103c73248"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w2-gap05-verification.json",
+        "sha256": "1b66b5483c53ab43eee1eb28dbe459b4a053ef0478b2cf0050416b88ffcede4f"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w2-skill-regeneration.json",
+        "sha256": "a724f895e9d3df4e1b8849f0f655fbe3d0a164071d82cb5dfeb55590ada094e6"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/check.py",
+        "sha256": "1f98b41ca2d3bd028d51d88bf202584ad9a8a0f74722b0e2691c589cc872d214"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json",
+        "sha256": "568d401ab9815f458f597f8a22761c0f8c01ccf5113dcfd1c8f6d8022fc0f40e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/links.py",
+        "sha256": "91ef503bda8c1d2f8c07d27e9e2bca847ee628fb3db8e748aedf1874250e672c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/manifest.json",
+        "sha256": "6a2318d709edf1740658d2435dae5af2fde4224f469ce3a800b8e57ee775ff91"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json",
+        "sha256": "39d89b2ff93051d8d35bb8b778c6d705bc783656bc5a577e8133624e9c1008ab"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/join.py",
+        "sha256": "974a7e3e1001b3b03f995a04b2aac87a48617f975946dca314b051220e5bbaba"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/final-pin-duties.json",
+        "sha256": "98e4406c846dfe3d1c995736b1de9f492d4f2ea3929e6b514f498c7b19914a21"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/ownership-reader-proof.json",
+        "sha256": "c8a29b47e60b44158991509893928d349275d278fafc3a046929f36499cc23b3"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json",
+        "sha256": "f20e4c74e05564abf5fb2a8e09e384952183b4ee5b48cdc849da33531dded1df"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-review-evidence.json",
+        "sha256": "72657e3d1389ace306d93e4aa3aa78f10c7349f55921a4aaf8ed6dcd16d27510"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-supplemental-specs.json",
+        "sha256": "4affda2c2bf1ecc31376aca5d0f622e60042944f859619b62353ba4ee3051253"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/phase9-decisions.json",
+        "sha256": "7de11aa32cd35f76c09b8448721468afefb62b10c354d6c3edd5c474af9d9a33"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+        "sha256": "b2e9d39f69b843a87f783eaa7b839ca62ab99eb0e46431eeffe1b1b900633924"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/ledgerfix/bindings.py",
+        "sha256": "d2c66896ba5fb77063152d3c0b3e08612946f58b0d32c81c124f954c53d818f2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md",
+        "sha256": "7901b976ff3bc5e502347bbac6201c779e544d6013fbd7de90182d98c5856c59"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/preflip-gate-status.json",
+        "sha256": "f53be95a454b228a0fd354d5408992cc6fd2488fcb1084b15230ab48c4ef4279"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/judgments.json",
+        "sha256": "679e550c715322a2aa3232864b36c1c90bb2e7fdf9e7a4ffba9b119bb47e7d65"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard.py",
+        "sha256": "f7aa1a30296f34db6c5b503f19b6bb62118368130f20c6b1d8f945a2dafc566f"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-1-ids.json",
+        "sha256": "f708ac2cd470fb5286e066d774c7d2b857693de34bd0ce1dc267f80f0a95f9e5"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-1.json",
+        "sha256": "fd3806d3ad22acce8070fb056198c205608546f80abf42de6b31f8563819fbf6"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2-ids.json",
+        "sha256": "e2ae0ec220de06c55d6dc3e26022ed07b514f0906dc1f7fae7d4d4811947a16d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json",
+        "sha256": "e1a2a7ded6326020dfd98a8f2a1c79df38423dcc9b57318b6428ebc12adf8138"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3-ids.json",
+        "sha256": "ccd97a2198779c74da7647d50a9343200602b88561f3a5c3b9638d0e6b629eba"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json",
+        "sha256": "ee9d330aa6887d4597fd5b665f73338535ef9ca7240b9a44c56cbb6bc06597bc"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/prepared-patches.json",
+        "sha256": "56f51603d5cd65c1af2a8d17e11dc72408693a4e526b14a4423ec57abc1e4b5a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b1-review.json",
+        "sha256": "acfe29b8c2ce6aeaaa7d87ebb9a97034e813b96cdc9894401a5325e85a3c2cd0"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b2-review.json",
+        "sha256": "f83dc0cdbcf8829128cf4f5e34f1c729fa03e793bd6b8066fe98a5a9ceb3ae9d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b3-review.json",
+        "sha256": "5b2d0f09ab349d60a29f584734b08dbbd5224377f2c00e6f0319435d8e9d0295"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b4-review.json",
+        "sha256": "85fa7e6735640f1e9b9a178cd08d7889ac3317c4a5d9072c3b96b63330faeca7"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b5-review.json",
+        "sha256": "f0334c409ae837943f8478e7489f44ebef21c9406b770cc1fb35eacb363db5d9"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c1-review.json",
+        "sha256": "2995a47b200e072b020bb5d6868fedb06d4f4560d33c204eec2ace34d9c2189b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c2-review.json",
+        "sha256": "a6c2328abb38e9b1b703b8d8979d1352557eefbb3e48b7a917fcf024dfe266f2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c3-review.json",
+        "sha256": "9d8d1e8ebe8cbd18c1cf98367368d3f7a7e887e2e46424173b449951d8411ed4"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c4-review.json",
+        "sha256": "f9fbcdc6fa88054e24d01b7966a6ef9a6e51f90892608b8ac44b079f7c1d1128"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c5-review.json",
+        "sha256": "9f2ea7615d95d565853ae387bdf08ae09ad7160482dc1aca5bd00167ba09dff3"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c6-review.json",
+        "sha256": "436a7582874ca1318e572e4f09b44e107c1d1024937bf39c8b3315f1f8f83ae1"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g7-c7-review.json",
+        "sha256": "170cfd21b7316af5501037d92ea08276229b3b320ec2d4574f1d7e669c0ce157"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w10-composition-rework-review.json",
+        "sha256": "efcf1c93a1aa67692bce387191350fa796574c0a230ef69005076e1915ef23b8"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w10-g9-interim-review.json",
+        "sha256": "b380e3f52102f4f7f42f8b1d6c63ddeb566e48c9cf2a973c58ce47533bfec949"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w11-g9-rework-review.json",
+        "sha256": "feaab9e6ea8dd2431e6ffa6a52f0ba95a120900aea3bfed73b99f22ebfe6facf"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w11-import3-review.json",
+        "sha256": "c5414051b1afa29ad5ccdbaf4cb18d77b7931084a5f868de725feea1ee9d38e2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w12-g9-followup-review.json",
+        "sha256": "c2df6aed9d55dbaf7aeec0b9f239fcb1d57c51da43f3161b649a330ebd016344"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w13-misc-pin-and-gloss-review.json",
+        "sha256": "3f2de0933fce23bb886a49d2f7c14d14cc8428873e82b8d8aca418a307c7cd1e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-check-hardening-review.json",
+        "sha256": "2d65e74b9571ff8c5accee835724d3f090a1844343419adf741c7cabf021e813"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-g0-content-rereview.json",
+        "sha256": "80c3a500bab01ec0f02961e50d2253c3a1b27928a613afc69dda578edf6a21f6"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-g8-retention-timing-review.json",
+        "sha256": "73754841b871a00b3afa8a63c84496540e1dd37d00c76a2ffa14af1b45fe3747"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w14-import3-binding-review.json",
+        "sha256": "932505078ab932843684ef5e2544221d40815d5960a4fe95ad67694fad1b5d46"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w15-g9-parks-review.json",
+        "sha256": "410e5c09cd36781f49cea606bca650b425ecb084dfc2ba2c185f844943f30b23"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w16-g0-rework-and-park-rule-review.json",
+        "sha256": "9b098ffb7d02f3b7200e9e63b8f2131257f6f185995afda40521079cb363164a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w17-parity-rework-review.json",
+        "sha256": "abd60a48105d2c697e03539345c46372a8f6380037942ba9d49a8fd9a200d1d1"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w18-gate-reconcile-review.json",
+        "sha256": "588644090022d2b35e3ae871d2606274b54c2020b30049079b7da28f49bff919"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w19-live-parity-and-rebinds-review.json",
+        "sha256": "b7dbaf6196b3692c8c71361be13b91f95122dab391bde77744551419ef572cee"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g0-delta-review.json",
+        "sha256": "9fd2f63eb9aaf5b8b15b72c6db3a836db08082ffd723ca4448d2a15af8027fc2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g1-carries-review.json",
+        "sha256": "392c49db19416b4e012ddff50305c0f80ea095d66e25f2d243349c7b6e1dfe42"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g2-census-review.json",
+        "sha256": "35959ea0b06ccf6bbc13466cc1811783fcdd4e44373539e868268f101f8d60b0"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g2-dyn-delta.json",
+        "sha256": "613802f108315f1ed3d87dc7eb3e94f85b5cb69f58ea6a9697515effa5c5e9a7"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g3-packaging-review.json",
+        "sha256": "f150831b7f68f95ccc9081f4ebba1042a280687ec148978ec45be300fd75ab14"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g4-code-review.json",
+        "sha256": "78925fc6deb663c523da72d217064840d85f2c1992bf9d8490c7c9601d171c72"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g6-preserve-review.json",
+        "sha256": "bc087c5afa2f6449c9ab99c565cd35373cb9c2ad76ed30d31496f825afedcbe2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-g8-archive-review.json",
+        "sha256": "0ad67163696226d1df79335fd0fcfb7f58fe4e4193b8d573133fdb7f908e4959"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w2-late-areas-review.json",
+        "sha256": "5cf92d63d6a32c1c237f72b87aecfad19b798b3a13d31cc6d54166f6c7e1d153"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w20-census-settlement-review.json",
+        "sha256": "82771cb75f59181f9fbca1a7d76d0cd23837c09e07f40a52afb4317af28d6969"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w21-census-rework-and-g5-review.json",
+        "sha256": "f669a5fc0644b5416eb1196c91bebbf6ae8be59f085c2ea48a11423c5270567c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w22-register-met-local-review.json",
+        "sha256": "d8dbd51a09c8bb5f2dfeb40ab1d2b39cbf27e45129c2706b5f3dbcf3e10f907b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-1-review.json",
+        "sha256": "13971635259cf05a64b30786fb40e5703f42abb56b3b003031eaf01239cfc6f4"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-1-review.md",
+        "sha256": "1dbc192aab77c6fe55cfc427a71fca3801d0d55c58ad3e7b3cba3e1ccb58b4cf"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-2-review.json",
+        "sha256": "280bb5d075d30ce54e93635fa8239f47762a39fec55b3ce2093553f03fa46d34"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-2-review.md",
+        "sha256": "06b1f6fe44f3014e1be4214a641bb16c508013e80ab3b260f89733d639bbb1cf"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-3-review.json",
+        "sha256": "2f41b218a497debee221aaf8a25da78b576b0f0df8b8113c0b653d751317c595"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-3-review.md",
+        "sha256": "50f8ff49793b7bfc6219b3460778e04884b19cfd600737669f289e0d8724213f"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g9-phase9-decisions-review.json",
+        "sha256": "5f8bf334fb3122c4db333ba588158964634c593eb91cfb83ce7ffb6eb8a6346f"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g9-phase9-decisions-review.md",
+        "sha256": "e7e3983ecfe3ee2b73f2ba27fd7d46db6756c26256cbeff3de32f1305cc38432"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b1.json",
+        "sha256": "9d02e0089573edaeb16b1f7838a3555c808f81f0e12792cd3f181256988c145d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b1.md",
+        "sha256": "4bbc7a8a6e16759c1c6ba4478b240906bf6546f799bc2b78e43e02735d2e8215"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b2.json",
+        "sha256": "669d80b40b3e03cd48e4c9e2e7eed1b4b6c3aec17e4bed2dac86b158236abd45"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b2.md",
+        "sha256": "52a36d349d0f47ab0694e875f49101c7ab2ecb5a8190cee0a46c973d8ae8b3de"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b3.json",
+        "sha256": "5de903888fc30ec91a4ab69757f09f75fca9354eea98bb044ad508053f70698a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b3.md",
+        "sha256": "ca934633ef7517b9e5d6bc9e96ec8513f2078cb33a523d8944fc73d7eda86431"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b4.json",
+        "sha256": "d2c0499a441a27c3b6bce8a89e829cd54f7ef1c5710709eaea6ccc4e6d8ed3d2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b4.md",
+        "sha256": "2edc5630d8871f78069becf98d08ac562f6da3be5806ba7228ce1db7d992091b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b5.json",
+        "sha256": "bf3f2053627e92e4e94b3eeb7a85fae5e389b30aa53d017c23620459545e52a3"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b5.md",
+        "sha256": "b8718e9e982fda2ee4d47b880dd6b01ae2a3ab013b103ffbfa8eec7b07eeee68"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b6.json",
+        "sha256": "6aefa41b82390096a7c38ddadd0a77c163eddb2f49538e159e556c823c4fde66"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b6.md",
+        "sha256": "3183192a249b929255ad3d7dbe2dad28849f0ed4a3420359ae9a4f28a051ab57"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w25-g9-dependencies-review.json",
+        "sha256": "b9f8e76c882d4cb75e847979d1197ff3af1c5bd883a6914dbf34e52f8a7b88dd"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w25-g9-dependencies-review.md",
+        "sha256": "82887a2948229d6c43161c9c858f91d9c80d1d9beb84ab98961892d85e4d818a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w26-g0-rework-verdicts.json",
+        "sha256": "72d04d4e8a8e6bc3be09ba511c483fbfcb6a45a18baf7e93cba61ea38483644c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w26-g0-rework-verdicts.md",
+        "sha256": "270d84bf9a0086707f84265a18366a8169001cd8d9472cec42bb925187c07134"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w27-g0-stale-verdicts-b7.json",
+        "sha256": "8672e091f5528e799848bdfc2ba5a6c895d3b6e4b1930a13bc38ebba80e85067"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w27-g0-stale-verdicts-b7.md",
+        "sha256": "1616890ddd8cf2b89e106160a6610728e2aa18d144ebc4d27c353f60d93a5a3d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w27-g0-stale-verdicts-b8.json",
+        "sha256": "652914d389fa63da87b3bc27e72cf2e9719943dada8348348d6265327d81a96a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w27-g0-stale-verdicts-b8.md",
+        "sha256": "1e0b5c9f1436ec4ed048829490ae41725db2837b672ed4df8d79064bd2793b10"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w28-fchain-and-premise-rework-review.json",
+        "sha256": "c0118b3b88ed11ec4bc50b424101a142eaea8e5ef45810c76653431fb99403ac"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w28-fchain-and-premise-rework-review.md",
+        "sha256": "12985ac2213c16f6fd82f6356acdc8e31ab16c5a865c94a6385aa62ce5269ee9"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w28-g0-verdicts-b9.json",
+        "sha256": "977da1c5284c83476eb1fd4fc16712d99b40acf71ff98ae3bca7fe65f44245d7"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w28-g0-verdicts-b9.md",
+        "sha256": "ab73efa1c3985d37bc53be104b506572fb846fc2d65f9410c086a5a3fce0a881"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w29-g0-verdicts-b10.json",
+        "sha256": "305e70aa5a3f00fb53268f4148a4e3e19d6c76ada19ff98c6e582c66919ec99e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w29-g0-verdicts-b10.md",
+        "sha256": "90b4cf15ecfbc109f7f974c77f566f8fa6cc0c4ea52e5b926dc38beae7e13bf0"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-d1b-resync-review.json",
+        "sha256": "bc33c6da5e57159a9021a8cfd3015ff9b7a377ad218944157db2b38b144759e8"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-d7-resync-review.json",
+        "sha256": "490b338c5350e59cf09b85a0d7120c7fd977a105e88edc6013ec1bf691fbd5b0"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w3-g2g6-delta-review.json",
+        "sha256": "0d14aa16f03a707e1d1f811c99620a746163cc5dc00761080c8adabac69af0fc"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w30-g0-verdicts-b11.json",
+        "sha256": "bef55fdc8c3a751e96c07d5807c01cbd3017cbf06b287b73685a884d5b331032"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w30-g0-verdicts-b11.md",
+        "sha256": "0062e38844338cb29627861219abbc7866e22a968828b03dc23ff1adb1701ed7"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-g4-declare-review.json",
+        "sha256": "64970be3264f68e4d267dadfdbee81a8013206c4582bbefa6030a18850ee1096"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-g8-archive-review.json",
+        "sha256": "28d29d272a071902e4c4ad51f154a7a448f5981eeaf70c208759e0dda0880580"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-import2-review.json",
+        "sha256": "5d5a039258b79ffe81ea837048a68dcbd62eb7d7124d73d2ee333b519bdd0c2b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-ledger-d7b-review.json",
+        "sha256": "3d766273e76328b1796615b72ce33963cab5bd9ca1e3171935be7cb1b266645b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-d5c-archive-review.json",
+        "sha256": "1f9d71e5b60483377acb387868904b53829149add52d8b8ab3cd0c13bc288758"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-g4-wrapper-review.json",
+        "sha256": "cc775d5e7d88166aa70a21125bc0b3c39a4a7a66db5bd9188ff8e09010776496"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-misc-fix-review.json",
+        "sha256": "cceb5deefb3f481c26bf81ff5917461b069586270b2c9fab55e0eb732da9895d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w5-suite-fix-review.json",
+        "sha256": "dc2eeacae63ec4f6ba0817c6b6b21dd76dd028a5ed4bf71153133de58d530562"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w6-g4-escape-review.json",
+        "sha256": "6c883b2e671d8a6d2ad7ccf9a9d4a99a494630da601cb2b863be43d19bb65dc6"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w6-misc-rework-review.json",
+        "sha256": "331dda17e83c77ea6fc52295308b3d128e80834129a250f94d959f03f96f389d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w7-header-sentence-review.json",
+        "sha256": "fac7293c55398146d9d415e16980c668de365b60b45da45f798fcc302886e27c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w7-rebind-review.json",
+        "sha256": "bbf284cff157aa4acb9574ae6d1287673e1b73267c4e6539b820099bb92123ec"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-composition-review.json",
+        "sha256": "c88e7aa695f4aecc1022870b91f01fa31a161bb35693d9b54475072ee47bdf49"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-g6-judgments-review.json",
+        "sha256": "9b2c00795128cee6832be378a63f222a5727c61aff556d42e5ddc5144bd769d2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-g6-parks-review.json",
+        "sha256": "628903357ff0a64578de8477ad4d33df672bdb576c9945857d08ce396ec4fc6d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w8-lead-fixes-review.json",
+        "sha256": "275f0469b5923c6feccba6882a75c7382e1972cf9738c84a3200e146dede4c28"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w9-composition-fix-review.json",
+        "sha256": "05558a07c42170fbe30b54940929f854160bee6a66692ba1123bfe76cfdff172"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w9-g6-fix-review.json",
+        "sha256": "44dbec4cce835fdb1559608e5df7b34ec01a8bde1f85fede71f5c1844b886c90"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w32-register-catchup-brief.md",
+        "sha256": "120a8d5acc4f87ebc1f5a168448eb9aeb373757186163dadb65100951ecafbc5"
+      }
+    ],
+    "reviewInventory": [
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-1-review.json",
+        "sha256": "13971635259cf05a64b30786fb40e5703f42abb56b3b003031eaf01239cfc6f4",
+        "verdictCounts": {
+          "APPROVE": 229,
+          "REWORK": 34
+        },
+        "nonApproveRows": [
+          {
+            "rowId": "f00148",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00156",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00158",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00161",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00162",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00163",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00175",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00177",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00178",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00181",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00183",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00187",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00189",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00191",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00193",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00477",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f00478",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03127",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03134",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03136",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03139",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03143",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03144",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03170",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03171",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03177",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03178",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03202",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03210",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03219",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03250",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03294",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03352",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f03404",
+            "verdict": "REWORK"
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-1-review.md",
+        "sha256": "1dbc192aab77c6fe55cfc427a71fca3801d0d55c58ad3e7b3cba3e1ccb58b4cf"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-2-review.json",
+        "sha256": "280bb5d075d30ce54e93635fa8239f47762a39fec55b3ce2093553f03fa46d34",
+        "verdictCounts": {
+          "APPROVE": 256,
+          "REWORK": 7
+        },
+        "nonApproveRows": [
+          {
+            "rowId": "f04047",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f04287",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f06461",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f06790",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f06791",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f06920",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f06933",
+            "verdict": "REWORK"
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-2-review.md",
+        "sha256": "06b1f6fe44f3014e1be4214a641bb16c508013e80ab3b260f89733d639bbb1cf"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-3-review.json",
+        "sha256": "2f41b218a497debee221aaf8a25da78b576b0f0df8b8113c0b653d751317c595",
+        "verdictCounts": {
+          "APPROVE": 217,
+          "REWORK": 44
+        },
+        "nonApproveRows": [
+          {
+            "rowId": "f07667",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f07871",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f07886",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f07889",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08458",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08460",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08461",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08462",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08463",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08464",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08466",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08467",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08468",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08469",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08470",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08472",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08474",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08475",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08476",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08477",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08478",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08481",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08482",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08483",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08484",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08485",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08487",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08488",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08489",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08490",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08491",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08492",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08495",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08496",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08548",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08557",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08618",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08634",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08665",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08668",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08720",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08724",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08727",
+            "verdict": "REWORK"
+          },
+          {
+            "rowId": "f08803",
+            "verdict": "REWORK"
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-3-review.md",
+        "sha256": "50f8ff49793b7bfc6219b3460778e04884b19cfd600737669f289e0d8724213f"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g9-phase9-decisions-review.json",
+        "sha256": "5f8bf334fb3122c4db333ba588158964634c593eb91cfb83ce7ffb6eb8a6346f",
+        "verdictCounts": {
+          "APPROVE": 31,
+          "REWORK": 3
+        },
+        "nonApproveRows": [
+          {
+            "id": "reference-000200",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "dynamic-000767",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "dynamic-000768",
+            "verdict": "REWORK"
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g9-phase9-decisions-review.md",
+        "sha256": "e7e3983ecfe3ee2b73f2ba27fd7d46db6756c26256cbeff3de32f1305cc38432"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b1.json",
+        "sha256": "9d02e0089573edaeb16b1f7838a3555c808f81f0e12792cd3f181256988c145d",
+        "verdictCounts": {
+          "APPROVE": 285
+        },
+        "nonApproveRows": []
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b1.md",
+        "sha256": "4bbc7a8a6e16759c1c6ba4478b240906bf6546f799bc2b78e43e02735d2e8215"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b2.json",
+        "sha256": "669d80b40b3e03cd48e4c9e2e7eed1b4b6c3aec17e4bed2dac86b158236abd45",
+        "verdictCounts": {
+          "APPROVE": 294,
+          "REWORK": 6
+        },
+        "nonApproveRows": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "pointer": "/claims/11",
+            "verdict": "REWORK",
+            "reason": "Disposition \"move\" with rationale \"Full native unit digest equal\", but sourceUnitDigest != targetUnitDigest and the target rewrites the claim: source says Runner maps rigor through runner.rigorToTier to tier and derives reasoningEffort from rigor; target says rigor never decides tier or effort (Seat Binding, D-ADR0072). Record as supersede citing the resync-a adjudication (runner.md unheaded-block-10)."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "pointer": "/claims/133",
+            "verdict": "REWORK",
+            "reason": "Disposition \"move\" with rationale \"Full native unit digest equal\", but sourceUnitDigest != targetUnitDigest and the target rewrites the claim: the vocabulary table changes the tier cell from \"configured via runner.rigorToTier\" to \"declared directly; rigorToTier deleted\" and renumbers every runner.md line citation. This is a correction (resync-a unheaded-block-104), not a move. Record as supersede."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "pointer": "/claims/14",
+            "verdict": "REWORK",
+            "reason": "Disposition \"move\" with rationale \"Full native unit digest equal\", but sourceUnitDigest != targetUnitDigest and the target rewrites the claim: source (explicit `tier` channel may only raise above the rigor-derived tier; legacy tier field migrated at load) is bound to unheaded-block-4, the rigor paragraph, which says --tier raises are refused. The rationale itself names unheaded-block-7. The migration sentence is lost. Rebind or record as supersede/retire with evidence."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "pointer": "/claims/15",
+            "verdict": "REWORK",
+            "reason": "Disposition \"move\" with rationale \"Full native unit digest equal\", but sourceUnitDigest != targetUnitDigest and the target rewrites the claim: source says a capability must not declare model or tier (only a rigor floor); target says a capability declares its own tier and maxTier. This contradicts the source; record as supersede with D-ADR0072/Seat Binding evidence."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "pointer": "/claims/154",
+            "verdict": "REWORK",
+            "reason": "Disposition \"move\" with rationale \"Full native unit digest equal\", but sourceUnitDigest != targetUnitDigest and the target rewrites the claim: the source claim \"Workflow uses DAG steps + integrates the Work lifecycle\" becomes \"historical DAG model; Workflow does not know Work\", and debate and the two doors are added (resync-a unheaded-block-123/124, D-ADR0070). This contradicts the source; record as supersede."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "pointer": "/claims/250",
+            "verdict": "REWORK",
+            "reason": "Disposition \"move\" with rationale \"Full native unit digest equal\", but sourceUnitDigest != targetUnitDigest and the target rewrites the claim: a dated decision-history record (choke-point audit) has its single locked write door changed from withEventsLock/appendEventLocked (src/state/events.mjs) to withStateTx (src/state/hot-lock.mjs) without a label. The historical citation is lost; label the correction and record it as supersede, or restore the original text."
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b2.md",
+        "sha256": "52a36d349d0f47ab0694e875f49101c7ab2ecb5a8190cee0a46c973d8ae8b3de"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b3.json",
+        "sha256": "5de903888fc30ec91a4ab69757f09f75fca9354eea98bb044ad508053f70698a",
+        "verdictCounts": {
+          "APPROVE": 280,
+          "REWORK": 5
+        },
+        "nonApproveRows": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "pointer": "/registryGaps/37",
+            "verdict": "REWORK",
+            "reason": "Target unit's link rebase corrupted a code span: `d['executeAssignment'](a)` now reads `d['executeAssignment'](../../../../specs/a)` (h-6979005beaf7/spec.md:191); the claim's code example is altered, legacy runner.md keeps `(a)`."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
+            "pointer": "/bindingRefresh/13",
+            "verdict": "REWORK",
+            "reason": "Disposition says only heading/link/whitespace adaptation with current source content present, but the target replaces the claim's `git rev-parse --git-common-dir` mechanism with on-disk .git/commondir parsing (true per scripts/fgos-shell-integration.sh, legacy distribution.md still says rev-parse); relabel as a truth-correction supersede."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "pointer": "/registryGaps/33",
+            "verdict": "REWORK",
+            "reason": "Supersede drops the source clause that the discovery priority write runs in its own try/catch so store/lock errors never block the clear/unclear result (true per src/intake/discovery.mjs:383-416); the restored target speaks of swallowed intent writes instead, and no remainder names the lost clause."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+            "pointer": "/registryGaps/0",
+            "verdict": "REWORK",
+            "reason": "Line citations `runner.md:2416/2354/2590/2897` are stale at HEAD: ADR 0029/0028/0031/0034 headings are now at runner.md:2442/2380/2616/2923 and the cited lines are blank or unrelated, so the citation repair this row binds no longer holds."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+            "pointer": "/registryGaps/1",
+            "verdict": "REWORK",
+            "reason": "Line citations `runner.md:2477,2609` and `runner.md:2897` are stale at HEAD (ADR 0031 tables and ADR 0034 shifted by 26 lines; 2897 is now unrelated text), so the citation repair this row binds no longer holds."
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b3.md",
+        "sha256": "ca934633ef7517b9e5d6bc9e96ec8513f2078cb33a523d8944fc73d7eda86431"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b4.json",
+        "sha256": "d2c0499a441a27c3b6bce8a89e829cd54f7ef1c5710709eaea6ccc4e6d8ed3d2",
+        "verdictCounts": {
+          "APPROVE": 283,
+          "REWORK": 2
+        },
+        "nonApproveRows": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+            "pointer": "/sourceBindings/453",
+            "verdict": "REWORK",
+            "reason": "Target block-36 corrupts inline code in the RUL95 clause (line 191): `d['executeAssignment'](a)` became `d['executeAssignment'](../../../../specs/a)` through link rewriting. The disposition also says only depth/link/whitespace adaptation, but the bound source still says \"24 hours by default\" while the target says nothing closes the pane."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+            "pointer": "/registryGaps/3",
+            "verdict": "REWORK",
+            "reason": "Target block-36 corrupts inline code in the RUL95 clause (line 191): `d['executeAssignment'](a)` became `d['executeAssignment'](../../../../specs/a)` through link rewriting, so the bound unit misstates the code example."
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b4.md",
+        "sha256": "2edc5630d8871f78069becf98d08ac562f6da3be5806ba7228ce1db7d992091b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b5.json",
+        "sha256": "bf3f2053627e92e4e94b3eeb7a85fae5e389b30aa53d017c23620459545e52a3",
+        "verdictCounts": {
+          "APPROVE": 282,
+          "REWORK": 2
+        },
+        "nonApproveRows": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+            "pointer": "/bindingRefresh/8",
+            "verdict": "REWORK",
+            "reason": "reference-004047 (0032 collision test) reads only runner.md and work-state.md; the platform-foundations retired-decision heading holds neither 0032 topic, so this family-copied binding does not carry the claim (bindings/2-3 do); drop or justify it."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+            "pointer": "/registryGaps/4",
+            "verdict": "REWORK",
+            "reason": "Rationale and reviewNote account only for bin/fgos.mjs:4373->4415, but bound unit a943adf3 also replaces the rigorToTier/required modelPolicies text with family->tier->cell plus Seat Binding migration and moves provider state to the holder-lock mutex; re-decide with those clauses accounted."
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b5.md",
+        "sha256": "b8718e9e982fda2ee4d47b880dd6b01ae2a3ab013b103ffbfa8eec7b07eeee68"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b6.json",
+        "sha256": "6aefa41b82390096a7c38ddadd0a77c163eddb2f49538e159e556c823c4fde66",
+        "verdictCounts": {
+          "APPROVE": 284
+        },
+        "nonApproveRows": []
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w24-g0-verdicts-b6.md",
+        "sha256": "3183192a249b929255ad3d7dbe2dad28849f0ed4a3420359ae9a4f28a051ab57"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w25-g9-dependencies-review.json",
+        "sha256": "b9f8e76c882d4cb75e847979d1197ff3af1c5bd883a6914dbf34e52f8a7b88dd",
+        "verdictCounts": {
+          "APPROVE": 158,
+          "REWORK": 12
+        },
+        "nonApproveRows": [
+          {
+            "id": "reference-000177",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "dynamic-000664",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "dynamic-000665",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "reference-000200",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "dynamic-000767",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "dynamic-000768",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "reference-004035",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "gateway-g6-ownership",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "carries-supersession",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "governance-map-reader-census",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "checker-current-head-drift",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "checker-coverage-gaps",
+            "verdict": "REWORK"
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w25-g9-dependencies-review.md",
+        "sha256": "82887a2948229d6c43161c9c858f91d9c80d1d9beb84ab98961892d85e4d818a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w26-g0-rework-verdicts.json",
+        "sha256": "72d04d4e8a8e6bc3be09ba511c483fbfcb6a45a18baf7e93cba61ea38483644c",
+        "verdictCounts": {
+          "APPROVE": 65,
+          "REWORK": 7
+        },
+        "nonApproveRows": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+            "pointer": "/registryGaps/0",
+            "verdict": "REWORK",
+            "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Re-cites are correct at HEAD, but the changedClauses oldWording (runner.md:2416/2354/2590/2897) is the intermediate N1-repaired text, not the bound source unit d631e41b, which cites runner.md:1958/1959/1871/1986/1995/2172/2890. The new rationale also dropped the N1 provenance (repair at b919e2b9b, native successor claim_79fd3ee6). Fix: name the source citations as old wording (or keep the N1 step explicitly) so source->target is accounted."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+            "pointer": "/registryGaps/1",
+            "verdict": "REWORK",
+            "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Same defect: oldWording quotes runner.md:2477,2609 and 2897, but the bound source unit 59d3caa3 says runner.md:2470,2602 and 2890; N1 provenance (b919e2b9b, claim_f4dd6219) removed from the live rationale. Fix as for /registryGaps/0."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+            "pointer": "/bindingRefresh/8",
+            "verdict": "REWORK",
+            "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. The erroneous platform-foundations locus is gone, but binding 0 now has exactly the same effective target (work-state retired-decision-history 0032 heading, f617f1c0) as s11 conservedClaims/7/bindings/2. That recreates the duplicate-effective-row defect item 4 of the brief removed for 124/125/126, and join counts it twice. Fix: record binding 0 as an explicit drop/retirement, or link it so only one effective row remains."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+            "pointer": "/registryGaps/22",
+            "verdict": "REWORK",
+            "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Rebinding is right and the residual text is unaffected (the restored line is outside RUL77-80), but the residualRef proof import2/partial-carry-residuals.json#/rows/0 still binds primaryTarget 299c5b49 and placement fileSha256 8a974e88 (pre-restore). The current target is e8167a0a and the file sha is 85a7a1f8. That file was outside the Doer write set and is not disclosed in rework-blockers.json. Fix: refresh rows 0 and 1 of that residual record."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+            "pointer": "/registryGaps/3",
+            "verdict": "REWORK",
+            "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Code-span corruption fixed, but the partial-carry residual record import2/partial-carry-residuals.json#/rows/1 still binds the pre-restore target 299c5b49 and file sha 8a974e88. Same fix as s4 /registryGaps/22."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "pointer": "/bindingRefresh/125",
+            "verdict": "REWORK",
+            "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. The supersedesBinding link to /20 is right, but the rationale still says \"Supersede obsolete overlay s14-resync-b.json#/bindingRefresh/574; current decision is ... /bindingRefresh/20\". After the relink this row supersedes /20 and is current. Text correction needed."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "pointer": "/bindingRefresh/126",
+            "verdict": "REWORK",
+            "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Same stale lineage text: the rationale says it supersedes s14 /bindingRefresh/577 and that /21 is current, contradicting the new supersedesBinding to /21. Text correction needed."
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w26-g0-rework-verdicts.md",
+        "sha256": "270d84bf9a0086707f84265a18366a8169001cd8d9472cec42bb925187c07134"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w27-g0-stale-verdicts-b7.json",
+        "sha256": "8672e091f5528e799848bdfc2ba5a6c895d3b6e4b1930a13bc38ebba80e85067",
+        "verdictCounts": {
+          "APPROVE": 92,
+          "REWORK": 3
+        },
+        "nonApproveRows": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "pointer": "/bindingRefresh/125",
+            "verdict": "REWORK",
+            "reason": "Rationale says only link destinations changed and all register text is unchanged, but two link labels also changed (\"Enduser Docs Authoring Spec\"/\"Enduser Docs Index Spec\" -> \"... Contract\")."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "pointer": "/bindingRefresh/126",
+            "verdict": "REWORK",
+            "reason": "Rationale says only link destinations changed and every row text is unchanged, but two link labels also changed (\"Enduser Docs Authoring Spec\"/\"Enduser Docs Index Spec\" -> \"... Contract\")."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "pointer": "/bindingRefresh/45",
+            "verdict": "REWORK",
+            "reason": "Rationale says it names the corrected clauses but omits the implementation-pointer change \"(9 file)\" -> \"trong nhiều file (ví dụ ...)\" that sibling /bindingRefresh/46 names for the same add-verb payload."
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w27-g0-stale-verdicts-b7.md",
+        "sha256": "1616890ddd8cf2b89e106160a6610728e2aa18d144ebc4d27c353f60d93a5a3d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w27-g0-stale-verdicts-b8.json",
+        "sha256": "652914d389fa63da87b3bc27e72cf2e9719943dada8348348d6265327d81a96a",
+        "verdictCounts": {
+          "APPROVE": 92,
+          "REWORK": 4
+        },
+        "nonApproveRows": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+            "pointer": "/claims/214",
+            "verdict": "REWORK",
+            "reason": "Digests recompute, but the corrected rationale still names release-manifest.md:220#unheaded-block-17 under 'Retained Runtime Identity And Activation Source Detail' and a Legacy CLI link to docs/architect with 0 destination changes; the bound unit is unheaded-block-23 (line 258) under 'Canonical Release Tree Rules', and the link now resolves to docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "pointer": "/registryGaps/35",
+            "verdict": "REWORK",
+            "reason": "Digests recompute, but the rationale's Target line (SHA-only correction) and its L12-44 note still name runner.md:1219-1269#unheaded-block-102; the bound unit is unheaded-block-101 at lines 1244-1294, and unheaded-block-102 is now a different unit (289d09c0)."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "pointer": "/claims/12",
+            "verdict": "REWORK",
+            "reason": "Supersede and target are right (target equals current legacy runner.md unheaded-block-11), but the new rationale cites the resync-a adjudication of runner.md unheaded-block-10; this paragraph's adjudication is unheaded-block-11 (s13-resync-a /sourceBindings/343). Block-10 is the rigor paragraph carried at target unheaded-block-4."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "pointer": "/registryGaps/0",
+            "verdict": "REWORK",
+            "reason": "Digests recompute, but the rationale's Target line (SHA-only correction) and its L12-44 note still name runner.md:1219-1269#unheaded-block-102; the bound unit is unheaded-block-101 at lines 1244-1294, and unheaded-block-102 is now a different unit (289d09c0)."
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w27-g0-stale-verdicts-b8.md",
+        "sha256": "1e0b5c9f1436ec4ed048829490ae41725db2837b672ed4df8d79064bd2793b10"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w28-fchain-and-premise-rework-review.json",
+        "sha256": "c0118b3b88ed11ec4bc50b424101a142eaea8e5ef45810c76653431fb99403ac",
+        "verdictCounts": {
+          "APPROVE": 104,
+          "REWORK": 2
+        },
+        "nonApproveRows": [
+          {
+            "id": "fchain-dead-platform-links",
+            "verdict": "REWORK"
+          },
+          {
+            "id": "gateway-yaml-x-specs",
+            "verdict": "REWORK"
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w28-fchain-and-premise-rework-review.md",
+        "sha256": "12985ac2213c16f6fd82f6356acdc8e31ab16c5a865c94a6385aa62ce5269ee9"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w28-g0-verdicts-b9.json",
+        "sha256": "977da1c5284c83476eb1fd4fc16712d99b40acf71ff98ae3bca7fe65f44245d7",
+        "verdictCounts": {
+          "APPROVE": 24,
+          "REWORK": 3
+        },
+        "nonApproveRows": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "pointer": "/bindingRefresh/45",
+            "verdict": "REWORK",
+            "reason": "Still omits a changed label: the bound heading title changes from \"Khai việc (add) — bề mặt nội bộ\" (docs/specs/work-state.md:864, digest e5aec62d) to \"Add Verb\" (spec.md:713). The (9 file) clause is now named correctly. Name the title change too; rationale-only fix."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+            "pointer": "/registryGaps/22",
+            "verdict": "REWORK",
+            "reason": "selected.textDigest now e8167a0a, which matches. But placement.content still holds the pre-restore text (sha256 299c5b49, `d['executeAssignment'](../../../../specs/a)`), so the record contradicts itself and fails ledgerfix/verify.py's content==unit check. Refresh placement.content; the rationale is correct."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+            "pointer": "/registryGaps/3",
+            "verdict": "REWORK",
+            "reason": "Same as s4 /22: selected digest refreshed to e8167a0a, but placement.content is still the pre-restore text (sha256 299c5b49) with the code-span corruption. The rationale (lines 1/2/5/9/10, item 4 not verbatim, import2 residualRef) is correct."
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w28-g0-verdicts-b9.md",
+        "sha256": "ab73efa1c3985d37bc53be104b506572fb846fc2d65f9410c086a5a3fce0a881"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w29-g0-verdicts-b10.json",
+        "sha256": "305e70aa5a3f00fb53268f4148a4e3e19d6c76ada19ff98c6e582c66919ec99e",
+        "verdictCounts": {
+          "APPROVE": 14,
+          "REWORK": 2
+        },
+        "nonApproveRows": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "pointer": "/bindingRefresh/117",
+            "verdict": "REWORK",
+            "reason": "Title change \"Business Rules\" -> \"11. Business Rules\" is now named, but the section diff vs source 8ea4a467 (cd8c1cc01) shows substantive rule changes the rationale list (moveStep, size, dep-open states, claim overlay, priority and intent, one RUL10 note) does not name: RUL18 add now defaults to the entry step via entryStepFor (discovery for coding), only legacy records read lazily as executing; RUL19 the sweep now dispatches the fgos-researching worker and resolveDiscovery may move items to planning/exploring (source: sweep never decides a verdict); RUL26 human-gate conditions widened from \"only ambiguous or risk heavy\" to five triggers (judgment needs human, risk keyword gate, blast-radius gate, second-check verify dispute, unordered child footprint overlap); RUL53 compound deprecated (fgos doc), path must be committed at main HEAD and a registered currentPath under docRegistry.enforce (source said no shape check, free path). RUL60 is rewritten beyond a size rename (--tier retired and refused). Name each; rationale-only fix."
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+            "pointer": "/bindingRefresh/47",
+            "verdict": "REWORK",
+            "reason": "Title change \"Nop van de tu do (submit)\" (work-state.md:888) -> \"Submit Verb\" (spec.md:737) is now named, and the id, tier->size and --rigor clauses are named. But the rationale still says \"every other clause is unchanged\", while the section diff vs source 8bd05d09 also changes the rule gloss \"(per RUL60 (submit - ba co ghi-de tier/kind/risk, doc lap tung truong) duoi)\" -> \"(per RUL60 (submit - co phan loai hien hanh) duoi)\". Name that gloss change (it follows the RUL60 retitle recorded on s5-root-truth-successors /registryGaps/4) or drop the \"every other clause\" claim; rationale-only fix."
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w29-g0-verdicts-b10.md",
+        "sha256": "90b4cf15ecfbc109f7f974c77f566f8fa6cc0c4ea52e5b926dc38beae7e13bf0"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w30-g0-verdicts-b11.json",
+        "sha256": "bef55fdc8c3a751e96c07d5807c01cbd3017cbf06b287b73685a884d5b331032",
+        "verdictCounts": {
+          "APPROVE": 3
+        },
+        "nonApproveRows": []
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w30-g0-verdicts-b11.md",
+        "sha256": "0062e38844338cb29627861219abbc7866e22a968828b03dc23ff1adb1701ed7"
+      }
+    ],
+    "proofs": "gate-reconcile/current-proofs.json",
+    "countsPerGate": [
+      {
+        "g": "G0",
+        "before": "partial",
+        "after": "met-local"
+      },
+      {
+        "g": "G1",
+        "before": "met-local",
+        "after": "met-local"
+      },
+      {
+        "g": "G2",
+        "before": "met-local",
+        "after": "met-local"
+      },
+      {
+        "g": "G3",
+        "before": "met-local",
+        "after": "met-local"
+      },
+      {
+        "g": "G4",
+        "before": "met-local",
+        "after": "external"
+      },
+      {
+        "g": "G5",
+        "before": "met-local",
+        "after": "met-local"
+      },
+      {
+        "g": "G6",
+        "before": "partial",
+        "after": "met-local"
+      },
+      {
+        "g": "G7",
+        "before": "met-local",
+        "after": "met-local"
+      },
+      {
+        "g": "G8",
+        "before": "met-local",
+        "after": "met-local"
+      },
+      {
+        "g": "G9",
+        "before": "partial",
+        "after": "met-local"
+      },
+      {
+        "g": "G10",
+        "before": "external",
+        "after": "external"
+      },
+      {
+        "g": "G11",
+        "before": "external",
+        "after": "external"
+      }
+    ],
+    "scope": "Committed W23–W30 reviews and L13-16–27. Historical occurrence accounting remains at its original pin; this separate table compares current turn-start register statuses."
+  },
+  "newlyVisibleOpenItems": [],
   "scopeLimits": [
     "No parallel uncommitted carries/g0rework content read; original inputs come from git show at asOf, W18 and W19 from their separately fingerprinted committed layers.",
     "This is evidence reconciliation, not new independent review of the prior Doers, not proof that F work ran.",
@@ -4545,7 +7095,8 @@
     "Historical receipt status/counts are used only at their own pins and subordinate to the later scoped review/ruling."
   ],
   "checks": {
-    "currentCorrectionProofs": "gate-reconcile/corrections-proof.json",
+    "currentProofs": "gate-reconcile/current-proofs.json",
+    "historicalCorrectionProofs": "gate-reconcile/corrections-proof.json",
     "historicalCatchUpProofs": "gate-reconcile/catchup-proof.json",
     "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py",
     "exit": 0,

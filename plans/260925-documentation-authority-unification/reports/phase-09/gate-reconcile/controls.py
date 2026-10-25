@@ -17,6 +17,7 @@ read_json = verifier.read_json
 register_path = verifier.ROOT / verifier.BASE / 'preflip-gate-status.json'
 receipt_path = HERE / 'receipt.json'
 sources_path = HERE / 'sources.json'
+proofs_path = HERE / 'current-proofs.json'
 
 
 def exercise(name, path, mutate, expected):
@@ -32,6 +33,14 @@ def exercise(name, path, mutate, expected):
     finally:
         verifier.read_json = read_json
     raise AssertionError(name + ': invalid record unexpectedly passed')
+
+
+def remove_overlay_duty(document):
+    duties = document['gates'][0]['atFinalPinUnderLease']
+    duty = duties[-1]
+    duties[-1] = 'Control: conditional approval requirements omitted.'
+    projection = document['cutoverReadiness']['atFinalPinUnderLease']
+    projection[projection.index('G0: ' + duty)] = 'G0: ' + duties[-1]
 
 
 positive = verifier.check()
@@ -66,6 +75,24 @@ results = [
              lambda d: d['corrections']['inputs'][0].update(sha256='0' * 64), 'correction fingerprint drift'),
     exercise('False generated artifact fingerprint is rejected', receipt_path,
              lambda d: d['corrections']['generatedEvidence'][0].update(sha256='0' * 64), 'generated evidence fingerprint drift'),
+    exercise('False current input fingerprint is rejected', receipt_path,
+             lambda d: d['currentCatchUp']['inputs'][0].update(sha256='0' * 64), 'current fingerprint drift'),
+    exercise('Omitted current review is rejected', receipt_path,
+             lambda d: d['currentCatchUp']['reviewInventory'].pop(), 'current review inventory coverage'),
+    exercise('Current G0 gap is rejected', proofs_path,
+             lambda d: d['commands'][0]['counts'].update(stale=1), 'current G0 proof not green'),
+    exercise('Moved-path link regression is rejected', proofs_path,
+             lambda d: d['commands'][1].update(linkIntoMoveSet=1), 'current F composition proof not green'),
+    exercise('Unreviewed premise count is rejected', register_path,
+             lambda d: d['cutoverReadiness']['fWindowSize']['g6BeforeF'].update(reviewPending=1), 'F-window source counts drift'),
+    exercise('Unsourced retarget patch count is rejected', register_path,
+             lambda d: d['cutoverReadiness']['fWindowSize']['fComposition'].update(linkRetargetPatches=0), 'F-window source counts drift'),
+    exercise('Missing conditional overlay duty is rejected', register_path,
+             remove_overlay_duty, 'conditional G0 F duty drift'),
+    exercise('Unproven audit execution is rejected', register_path,
+             lambda d: d['ownershipAudit'].update(status='passed'), 'ownership audit provenance drift'),
+    exercise('Unsourced follow-up is rejected', register_path,
+             lambda d: d['followUps'][0].update(sourceReview='reviews/absent.json'), 'outside-plan follow-up provenance drift'),
     exercise('Packet moved after the lease is rejected', register_path,
              lambda d: d['cutoverReadiness']['order'].reverse(), 'cutover order drift'),
     exercise('Unsourced F-window size is rejected', register_path,

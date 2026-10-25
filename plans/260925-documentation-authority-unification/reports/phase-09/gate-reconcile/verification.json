@@ -1,8 +1,9 @@
 {
   "status": "passed",
   "exit": 0,
-  "asOf": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
-  "checkedAtHead": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+  "asOf": "f498ebded83ba5789e730adc74bb637b80e2f536",
+  "originalSnapshotCommit": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
+  "checkedAtHead": "f498ebded83ba5789e730adc74bb637b80e2f536",
   "originalOccurrences": 87,
   "gates": 12,
   "reviewFiles": 110,
@@ -16,7 +17,10 @@
   "correctionPin": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
   "correctionInputs": 12,
   "generatedEvidence": 6,
-  "evidenceAndReviewPaths": 129,
+  "currentPin": "f498ebded83ba5789e730adc74bb637b80e2f536",
+  "currentInputs": 290,
+  "currentReviews": 36,
+  "evidenceAndReviewPaths": 162,
   "clearedEntries": 24,
   "exactVerdictQuotes": 24,
   "clearedByCommits": [
@@ -60,7 +64,8 @@
     "separate committed W19 review fingerprints and quotes",
     "separate W20/W21/ruling fingerprints, quotes and ancestry",
     "W22/L13-20 correction fingerprints and explicit generated evidence",
-    "packet-before-lease order, owner/external/F projections and source-derived F-window counts"
+    "packet-before-lease order, owner/external/F projections and source-derived F-window counts",
+    "current committed catch-up inputs, exhaustive review inventory, owning proofs, conditional overlays and outside-plan follow-ups"
   ],
   "limits": "Record integrity only. No independent semantic approval, F gate execution or full product-suite claim."
 }

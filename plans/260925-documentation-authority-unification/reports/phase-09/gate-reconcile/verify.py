@@ -6,6 +6,7 @@ The only write is verification.json beside this script.
 """
 import collections
 import hashlib
+import functools
 import json
 import pathlib
 import subprocess
@@ -16,6 +17,7 @@ BASE = pathlib.Path('plans/260925-documentation-authority-unification/reports/ph
 OUT = ROOT / BASE / 'gate-reconcile'
 
 
+@functools.lru_cache(maxsize=None)
 def git(*args):
     return subprocess.check_output(['git', *args], cwd=ROOT, stderr=subprocess.PIPE)
 
@@ -51,8 +53,8 @@ def check():
     register = read_json(ROOT / BASE / 'preflip-gate-status.json')
     receipt = read_json(OUT / 'receipt.json')
     sources = read_json(OUT / 'sources.json')
-    pin = register['asOf']['commit']
-    require(pin == receipt['asOf'] == sources['asOf'], 'snapshot pins differ')
+    pin = register['asOf']['originalSnapshotCommit']
+    require(pin == receipt['originalSnapshotCommit'] == sources['asOf'], 'snapshot pins differ')
     require(len(pin) == 40, 'asOf must name the full immutable turn-start HEAD')
     require(register['asOf']['finalPinF'] is None, 'this reconciliation cannot invent F')
     require(register['asOf']['evidencePathBase'] == receipt['evidencePathBase'] == str(BASE), 'path convention drift')
@@ -111,12 +113,65 @@ def check():
     ]}
     require(set(generated_inputs) == required_generated and len(generated_inputs) == len(corrections['generatedEvidence']),
             'generated evidence coverage')
+    current = receipt['currentCatchUp']
+    current_pin = current['sourceCommit']
+    require(register['asOf']['currentCommit'] == register['asOf']['commit'] == receipt['asOf'] == current_pin and len(current_pin) == 40,
+            'current catch-up pin mismatch')
+    require(subprocess.run(['git', 'merge-base', '--is-ancestor', current_pin, head], cwd=ROOT,
+                           capture_output=True).returncode == 0, 'current catch-up pin not ancestor')
     for path, entry in generated_inputs.items():
-        require(hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == entry['sha256'],
+        require(hashlib.sha256(git('show', f"{current['generatedHistoricalPin']}:{path}")).hexdigest() == entry['sha256'],
                 'generated evidence fingerprint drift: ' + path)
+    current_inputs = {entry['path']: entry for entry in current['inputs']}
+    require(len(current_inputs) == len(current['inputs']), 'duplicate current inputs')
+    for path, entry in current_inputs.items():
+        require(hashlib.sha256(git('show', f'{current_pin}:{path}')).hexdigest() == entry['sha256'],
+                'current fingerprint drift: ' + path)
+    new_review_paths = set(git('diff', '--name-only', current['generatedHistoricalPin'], current_pin,
+                              '--', str(BASE / 'reviews')).decode().splitlines())
+    require({r['path'] for r in current['reviewInventory']} == new_review_paths <= set(current_inputs),
+            'current review inventory coverage')
+    for entry in current['reviewInventory']:
+        require(entry['sha256'] == current_inputs[entry['path']]['sha256'], 'current review fingerprint drift')
+        if entry['path'].endswith('.json'):
+            data = json.loads(git('show', f"{current_pin}:{entry['path']}"))
+            rows = data.get('verdicts', data.get('rows', data.get('items', [])))
+            require(entry['verdictCounts'] == dict(collections.Counter(r.get('verdict', 'unspecified') for r in rows)) and
+                    entry['nonApproveRows'] == [{k: r[k] for k in ('id', 'rowId', 'file', 'pointer', 'verdict', 'reason') if k in r}
+                                               for r in rows if r.get('verdict') == 'REWORK'],
+                    'current review scope/verdict drift')
+    proofs = read_json(OUT / 'current-proofs.json')
+    require(proofs['sourceCommit'] == current_pin and len(proofs['commands']) == 2,
+            'current proof pin/coverage drift')
+    g0, chain = proofs['commands']
+    require(g0['exit'] == 0 and g0['counts']['approved'] == g0['counts']['effectiveRows'] == 1929 and
+            all(g0['counts'][key] == 0 for key in ['missing', 'mismatched', 'stale', 'openRework', 'invalidBindings', 'unresolved']),
+            'current G0 proof not green')
+    require(chain['exit'] == 0 and chain['counts'] == {} and chain['linkIntoMoveSet'] == 0,
+            'current F composition proof not green')
+    for source in chain['sources']:
+        require(source['path'] in current_inputs and source['sha256'] == current_inputs[source['path']]['sha256'],
+                'current chain source fingerprint drift')
+    current_before = json.loads(git('show', f'{current_pin}:{BASE}/preflip-gate-status.json'))
+    require(current['countsPerGate'] == [dict(g=new['g'], before=old['status'], after=new['status'])
+        for old, new in zip(current_before['gates'], register['gates'])], 'current status table drift')
+    require([gate['status'] for gate in register['gates']] == [
+        'met-local', 'met-local', 'met-local', 'met-local', 'external', 'met-local',
+        'met-local', 'met-local', 'met-local', 'met-local', 'external', 'external'],
+            'current gate statuses drift')
+    require(len(register['followUps']) == 4 and all(str(BASE / row['sourceReview']) in current_inputs
+            for row in register['followUps']), 'outside-plan follow-up provenance drift')
+    require(register['ownershipAudit']['status'] == 'reported-ok' and
+            register['ownershipAudit']['commit'] == git('rev-parse', '4a4fefbe8').decode().strip(),
+            'ownership audit provenance drift')
+    for entry in register['ownershipAudit']['inputs']:
+        require(hashlib.sha256(git('show', f"{register['ownershipAudit']['commit']}:{entry['path']}")).hexdigest() == entry['sha256'],
+                'ownership audit input drift')
     evidence_pins = {path: review_pin for path in review_inputs}
     evidence_pins.update({path: catchup_pin for path in catchup_inputs})
     evidence_pins.update({path: correction_pin for path in correction_inputs})
+    for path in current_inputs:
+        evidence_pins.setdefault(path, current_pin)
     original = json.loads(git('show', f'{pin}:{BASE}/preflip-gate-status.json'))
     expected = {}
     for index, gate in enumerate(original['gates']):
@@ -225,22 +280,47 @@ def check():
             require(all(f"{gate['g']}: {item}" in readiness[field] for item in gate[field]),
                     field + ' gate projection drift')
     window = readiness['fWindowSize']
-    premise = json.loads(git('show', f'{correction_pin}:{BASE}/preserve-premise/proof.json'))
+    premise = json.loads(git('show', f'{current_pin}:{BASE}/preserve-premise/proof.json'))
     residual = json.loads(git('show', f'{correction_pin}:{BASE}/composition/w9-unresolved-bindings.json'))['assertions']
     glosses = json.loads(git('show', f'{correction_pin}:{BASE}/composition/w8-citation-glosses.json'))['witnesses']
-    shards = [json.loads(git('show', f'{correction_pin}:{BASE}/preserve-premise/park-judgments/shard-{i}.json')) for i in range(1, 4)]
+    shards = [json.loads(git('show', f'{current_pin}:{BASE}/preserve-premise/park-judgments/shard-{i}.json')) for i in range(1, 4)]
     judgments = [r for shard in shards for r in shard['rows']]
-    require(window['sourcePin'] == correction_pin and
+    require(window['sourcePin'] == current_pin and
             window['g6UnboundRows']['count'] == sum(r['result'] == 'park-current-passage-unbound' for r in premise['rows']) and
-            window['g6BeforeF']['authoredJudgments'] == window['g6BeforeF']['reviewPending'] == len(judgments) and
+            window['g6BeforeF']['authoredJudgments'] == len(judgments) and
+            window['g6BeforeF']['reviewPending'] == 0 and
+            window['g6BeforeF']['dispositions'] == dict(collections.Counter(r['disposition'] for r in judgments)) and
             window['g6BeforeF']['ownedPlacementDecisions'] == sum(r['disposition'] == 'owned-park' for r in judgments) and
             window['g6BeforeF']['insideFWindow'] is False and
             window['postApplyBindings']['distinct'] == len({(r['effectiveRecord'], r['effectivePointer']) for r in residual}) and
             window['postApplyBindings']['assertions'] == len(residual) and
             window['glosses']['mainOwnedSites'] == sum(len(r['ids']) for r in glosses if r['ownership'] == 'main-at-F'),
             'F-window source counts drift')
-    require(register['gates'][6]['status'] == 'partial' and register['gates'][6]['blockers'],
-            'G6 cannot be met-local with exhaustive reviews pending')
+    require(register['gates'][6]['status'] == 'met-local' and not register['gates'][6]['blockers'] and
+            not register['gates'][6]['ownerItems'], 'G6 current review/placement projection drift')
+    manifest = json.loads(git('show', f'{current_pin}:{BASE}/fchain/manifest.json'))
+    retargets = json.loads(git('show', f'{current_pin}:{BASE}/fchain/link-retargets.json'))
+    rebased = json.loads(git('show', f'{current_pin}:{BASE}/fchain/rebased-patches.json'))
+    dependencies = json.loads(git('show', f'{current_pin}:{BASE}/g9/phase9-decisions.json'))
+    composition = window['fComposition']
+    require(composition['manifestSources'] == len(manifest['sources']) and
+            composition['baseChainFiles'] == len(chain['baseChain']['files']) and
+            composition['basePatchSteps'] == sum(len(row['steps']) for row in chain['baseChain']['files']) and
+            composition['rebasedEntries'] == len(rebased['patches']) and
+            composition['linkRetargetPatches'] == len(retargets['patches']) and
+            composition['linkRetargetRows'] == len(retargets['rows']) and
+            composition['additionalExecutedPatches'] == chain['executed'] and composition['composedFiles'] == chain['files'] and
+            composition['linkIntoMoveSet'] == 0 and
+            set(s['path'] for s in manifest['sources']) == set(s['path'] for s in chain['sources']) and
+            window['deltaReviewsPerGate']['G0']['effectiveBindingsAtSourcePin'] == g0['counts']['effectiveRows'] and
+            window['deltaReviewsPerGate']['G9']['localDependencies'] == len(dependencies['entries']) == 158 and
+            window['g6Composition']['parkJudgmentRepoints'] == sum(r['disposition'] == 'repoint' for r in judgments),
+            'F-window source counts drift')
+    duties = json.loads(git('show', f'{current_pin}:{BASE}/g0rework/final-pin-duties.json'))['conditionalOverlayApprovals']
+    duty_text = ' '.join(register['gates'][0]['atFinalPinUnderLease'])
+    require(duties['relocation']['selectedId'] in duty_text and duties['relocation']['expectedAfterSha256'] in duty_text and
+            duties['pairedHistoryId'] in duty_text and str(duties['total']) in duty_text,
+            'conditional G0 F duty drift')
     require(set(window['deltaReviewsPerGate']) == {'G0', 'G2', 'G6', 'G7', 'G9'}, 'F-window delta review gate coverage')
     for field in ['beforeFinalPin', 'atFinalPinUnderLease', 'external']:
         require(receipt['readinessCounts'][field] == {'before': len(original['cutoverReadiness'][field]),
@@ -276,7 +356,7 @@ def check():
     for entry in paths:
         if not entry.startswith('gate-reconcile/'):
             require(str(BASE / entry) in inputs or str(BASE / entry) in evidence_pins or str(BASE / entry) in generated_inputs, 'cited evidence not fingerprinted: ' + entry)
-    return {'status': 'passed', 'exit': 0, 'asOf': pin, 'checkedAtHead': head,
+    return {'status': 'passed', 'exit': 0, 'asOf': current_pin, 'originalSnapshotCommit': pin, 'checkedAtHead': head,
             'originalOccurrences': len(decisions), 'gates': len(register['gates']),
             'reviewFiles': len(review_paths), 'snapshotInputs': len(inputs),
             'followUpPin': followup_pin, 'followUpInputs': len(followup['inputs']),
@@ -284,6 +364,7 @@ def check():
             'catchUpPin': catchup_pin, 'catchUpInputs': len(catchup_inputs),
             'correctionPin': correction_pin, 'correctionInputs': len(correction_inputs),
             'generatedEvidence': len(generated_inputs),
+            'currentPin': current_pin, 'currentInputs': len(current_inputs), 'currentReviews': len(new_review_paths),
             'evidenceAndReviewPaths': len(paths), 'clearedEntries': cleared_count,
             'exactVerdictQuotes': quotes, 'clearedByCommits': sorted(commits),
             'checks': ['original occurrence coverage and text', 'path existence',
@@ -293,7 +374,8 @@ def check():
                        'separate immutable follow-up input fingerprints', 'separate committed W19 review fingerprints and quotes',
                        'separate W20/W21/ruling fingerprints, quotes and ancestry',
                        'W22/L13-20 correction fingerprints and explicit generated evidence',
-                       'packet-before-lease order, owner/external/F projections and source-derived F-window counts'],
+                       'packet-before-lease order, owner/external/F projections and source-derived F-window counts',
+                       'current committed catch-up inputs, exhaustive review inventory, owning proofs, conditional overlays and outside-plan follow-ups'],
             'limits': 'Record integrity only. No independent semantic approval, F gate execution or full product-suite claim.'}
 
 
