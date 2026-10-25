@@ -1,0 +1,25 @@
+{
+  "verdict": "REWORK-NARROW",
+  "commit": "a8ea05c50735d1290fdebc103382ec50cf23b531",
+  "findings": [
+    {"id": "W17-1", "severity": "Medium", "verdict": "REWORK", "summary": "verify-carries.mjs now checks source-heading-parity.json and direct-block coverage only at witnessPin f534aeaea, not live. That hides 4 stale distribution.md heading rows and 1 current source block that no parity row covers.", "evidence": "Live replay at HEAD: data-dictionary 5778eb04->ea2e6b86, setup 3100ba97->3ddc0439, business-rules f15d85de->2bf8f761, lich-su-quyet-dinh 47bfb367->d71c624b. distribution.md#unheaded-block-17 (45ccc798, 'Terminal setup loses a row and a fix') has no parity row; its text is present in docs/platform/packaging-distribution/spec.md."},
+    {"id": "W17-2", "severity": "Low", "verdict": "ACCEPT-DISCLOSED", "summary": "The pointer-patch beforeSha256 drift check also moved to witnessPin. Live, 2 of the 24 unapplied patches have drifted. The receipt says patch recomposition is not certified.", "evidence": "Live hash mismatch: bin/fgos.mjs, docs/backlog.md."},
+    {"id": "F1", "severity": "High", "verdict": "FIXED", "summary": "All 345 parity rows pass the carries checker (exit 0, dlopen blocked). No row was dropped. 97 rows were changed: 35 source refreshes and 62 target-only repairs. Each keeps its old row in previousParityRow and oldLegacyAnchor/oldLegacyDigest.", "evidence": "The parent's parity loop fails 97 rows against the current tree (35 nosrc, 62 notarget). 9 rows spot-checked against git show HEAD with extractMarkdownConservationUnits: source digest, target digest and inclusion all hold."},
+    {"id": "F3", "severity": "Low", "verdict": "FIXED", "summary": "claim_5ba6768e now has clause-specific changeSources.", "evidence": "id clause: identity#4a, 63b777873, 11733af37. rigor clause: seat-binding#5.2, e0e52312a, bd8d64fdd. verify.py asserts both."},
+    {"id": "F4", "severity": "Low", "verdict": "FIXED", "summary": "The claim_320ba622 rationale names the change from (9 file) to trong nhieu file (vi du ...).", "evidence": "Shard diff. All 127 bindingSha256 recompute with 0 mismatches."},
+    {"id": "F6", "severity": "Info", "verdict": "FIXED", "summary": "verify.py reports status partial with ok false, and names checks.mjs as not run for both manifests. It no longer calls audit-report.py. The carries checker and refresh-carries --check are among its proofs.", "evidence": "verify.py exit 0; output status=partial, ok=false, fullAuditPassed=false; 10 commands all exit 0."},
+    {"id": "F8", "severity": "Low", "verdict": "FIXED", "summary": "The parity base is receipt.json.sourceHead 568a11f21 (= c25e8cf6a^), and the check stays strict.", "evidence": "The check asserts 324 base rows, byte-equality for every row outside the refreshed and target-only sets, previousParityRow equal to the pinned row, and exactly 21 appended rows."},
+    {"id": "I3", "severity": "Low", "verdict": "FIXED", "summary": "Scripts run by current checks use tempfile directories that are removed on exit. Only scratch handling changed.", "evidence": "/tmp/fgos-work held only the reviewer's own directory before and after rebind --check, verify.py, resync --check, refresh-carries --check, misc-fix, sweep and the carries checker. The 4 composition scripts parse; they were not run."},
+    {"id": "W17-3", "severity": "Info", "verdict": "PASS", "summary": "62 target-only repairs and 25 candidate rebinds go beyond the 35 named rows. They were needed, are disclosed, are pending and are inside the writable list.", "evidence": "carries-current-rebindings.json: 25 pending, 0 reviewedBy. 8 change the target digest, with before and after witnesses in current-binding-refresh.json."},
+    {"id": "W17-4", "severity": "Info", "verdict": "NOTE", "summary": "claim_2e2bc926 still repeats the nine-source union for each of its three clauses. This is the F3 pattern, but the claim belongs to the deferred F2.", "evidence": "changedClauses[*].changeSources are identical for all three clauses."}
+  ],
+  "proofs": {
+    "rebind --check": 0,
+    "g0rework/verify.py": 0,
+    "carries/verify-carries.mjs": 0,
+    "misc-fix/verify.py": 0,
+    "g9/sweep.py --check --pin HEAD": 0,
+    "import3/resync.py --check": 0,
+    "g0rework/refresh-carries.py --check": 0
+  }
+}
