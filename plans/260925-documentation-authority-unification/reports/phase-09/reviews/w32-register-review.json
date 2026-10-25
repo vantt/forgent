@@ -1,0 +1,245 @@
+{
+  "pin": "c50b78db9a9b2b3b6b30ebe56a9112d0fb6e32b9",
+  "reviewer": "w32 independent register review (read-only)",
+  "commandsRun": [
+    "python3 -B P/g0join/join.py --pin HEAD -> 0 (1929/1929)",
+    "python3 -B P/fchain/check.py --pin HEAD -> 0 (0 findings, 0 linkIntoMoveSet); check.json restored",
+    "python3 -B P/preserve-premise/park-judgments/check_shard.py --all -> 0 (24 resolved duplicateOfChain, unresolved 0); chain-check-c50b78db9.json deleted",
+    "python3 -B P/g9/check_phase9_decisions.py -> 0",
+    "node P/carries/verify-carries.mjs -> 0",
+    "python3 -B P/g0rework/verify.py -> 0 (status partial, ok false: native-dependent checks not run, by design)",
+    "python3 -B P/rebind/rebind.py --check -> 0 (drift 0)",
+    "python3 -B P/g5/check.py --pin b57e79625 -> 0",
+    "python3 -B P/gate-reconcile/verify.py -> 0; verification.json checkedAtHead restored",
+    "python3 -B P/gate-reconcile/controls.py -> 0 (23 controls)",
+    "node scripts/check-legacy-docs-ratchet.mjs -> 0 (clean)"
+  ],
+  "notReproduced": "phase-08/audit-report.py (forbidden): the ok at 4a4fefbe8 is taken as a Lead-reported fact.",
+  "items": [
+    {
+      "id": "G0",
+      "verdict": "APPROVE",
+      "severity": "Low",
+      "summary": "met-local follows: join.py --pin HEAD exits 0 with 1,929/1,929 effective rows approved; 0 missing/mismatched/stale/openRework/invalid/unresolved. L13-23.4 overlay duty matches g0rework/final-pin-duties.json (44 heading + 90 body = 134; selected rebased:w8:gap05:relocation at patch-specs /patches/138, after-hash 6b457550..., link-retargets /patches/4 is component-boundary.md). Low: gate commit field still a8ea05c50 although the basis is now W24-W30; the duty text names relocation+history but not the selected component-boundary predecessor step that final-pin-duties.json also requires (covered by \"Replay final-pin-duties.json\"). final-pin-duties.json gained finalComposedFile in a319902ab, which no review covers (see post-review-commits).",
+      "evidence": [
+        "python3 -B P/g0join/join.py --pin HEAD: exit 0, counts.effectiveRows=1929 approved=1929 perRowVerdicts=2695 reviewFiles=78 stale=0",
+        "g0rework/final-pin-duties.json conditionalOverlayApprovals headingRows=44 bodyRows=90 total=134",
+        "composition/patch-specs.json patches[138].id=rebased:w8:gap05:relocation expectedAfterSha256=6b457550...",
+        "owner-answers.md L13-23.4, L13-25.2"
+      ]
+    },
+    {
+      "id": "G1",
+      "verdict": "APPROVE",
+      "severity": "Info",
+      "summary": "met-local holds. verify-carries.mjs exits 0: 24 pointer files, 91 live heading rows, 321 live section blocks; live drift is exactly the 2 listed final-pin duties (bin/fgos.mjs, docs/backlog.md), matching the G1 F duty and L13-16. Cited W8/W9/W10/W14/W19 verdict quotes are verified by gate-reconcile/verify.py.",
+      "evidence": [
+        "node P/carries/verify-carries.mjs: exit 0, status pass, livePointerPatchDrift=2 both with finalPinDuty",
+        "owner-answers.md L13-16"
+      ]
+    },
+    {
+      "id": "G2",
+      "verdict": "APPROVE",
+      "severity": "Info",
+      "summary": "met-local holds. 779 + 289 + 54 + 4 = 1,126 reconciles with W21 A (779 + 289 + 53 + 4 + 1 park) after the L13-19.1 REJECT of pc-d-0288. The L13-20.3 G2 duty (compose 4 census pointer patches through the F chain) is present; census-join/pointer-patches.json is a fchain manifest source. The join.py locator fallback flagged in W22 is fixed (settlement_locator picks the newest same-file witness by ancestry). Info: the 8 judgment-required post-pin literal rows in census-join/post-pin-literals.json (pin 3d0169f39) stay at F; plan section 2 G2 places post-pin literals at F, so this is consistent.",
+      "evidence": [
+        "census-join/locator-proof.json sites=1126; pointer-patches.json patches=4",
+        "census-join/post-pin-literals.json rows: 8 judgment-required / 8 joined-fixture-contract",
+        "census-join/join.py:89-120 settlement_locator",
+        "fchain/manifest.json sources include census-join/pointer-patches.json"
+      ]
+    },
+    {
+      "id": "G3",
+      "verdict": "APPROVE",
+      "severity": "Info",
+      "summary": "w2-g3-packaging-review.json has per-id APPROVE for dropped-001..017 (dropped-010 superseded) and G3-ties APPROVE at cffe725b9. The F re-check duty is correct.",
+      "evidence": [
+        "reviews/w2-g3-packaging-review.json verdicts dropped-001..017 APPROVE, G3-ties APPROVE"
+      ]
+    },
+    {
+      "id": "G4",
+      "verdict": "APPROVE",
+      "severity": "Info",
+      "summary": "external is correct. origin/review/doc-git-one-door exists (L13-12 A' push done, board 2026-10-24 21:30), and origin/main board log has no HARDEN verdict on the 25 declarations or the alias-export gap. The W22 claim that design-lap imported main is quoted correctly. The L13-20.3 G4 F duty (rerun git-one-door-scan after the final import) is present.",
+      "evidence": [
+        "git branch -a: remotes/origin/review/doc-git-one-door",
+        "origin/main plans/261017-1313-fgos-platform-program-board/log.md: only the DOC push line mentions doc-git-one-door",
+        "reviews/w22-register-met-local-review.md:53,80"
+      ]
+    },
+    {
+      "id": "G5",
+      "verdict": "APPROVE",
+      "severity": "Info",
+      "summary": "Reproduced: g5/check.py --pin b57e79625 exits 0, ok, 10 spans, 31 negative controls ok, ownerAcceptance 8 pending, gateApproved false. The 8 rows are reading-map.md lines 3-9 and 34, as the owner item says. met-local plus owner item follows L13-19.2 and L13-10.",
+      "evidence": [
+        "python3 -B P/g5/check.py --pin b57e79625: exit 0",
+        "ownerAcceptance recordedLine 3,4,5,6,7,8,9,34 status pending-owner-acceptance"
+      ]
+    },
+    {
+      "id": "G6",
+      "verdict": "REWORK",
+      "severity": "High",
+      "summary": "met-local rests on \"W28 2 REWORK answered by L13-26 and the committed fchain/link-retargets.json\". That record (a319902ab: 41 patches, 162 rows, the linkIntoMoveSet finding in check.py/links.py, and rebases of shard-3 rows f08069/f08076/f08084 and g9/recomposed.json) has no independent review. No review file postdates 20:38 (W30), and fchain/receipt.md itself says \"Independent review, final-F current-truth acceptance and cutover duties remain open\". The register treats the W28 REWORK as resolved while its fix is unreviewed: the same met-local-hides-unreviewed-work pattern W18 and W22 caught. My partial check: 159/159 retarget rows match their move-set alias destination and resolve relatively; the 3 rebased shard-3 rows keep identical replacements (only base hashes changed). One semantic doubt: L13-26:link:125 turns \"Read [Reading Map](../../specs/reading-map.md) first\" in coordination-capability-envelope.md into a code span because the move set has no destination for docs/specs/reading-map.md. But docs/reading-map.md is that file's surviving holder (G5), so a retarget may be the right call. Fix: obtain an independent review of a319902ab, or set G6 (and the F-composition readiness) to partial with that review as the named before-F blocker.",
+      "evidence": [
+        "git log 2c5093b57..HEAD -- P/reviews: only a780ec8c6 (W30, 20:38) and ea89d667a (W29); a319902ab is 20:39",
+        "grep link-retargets P/reviews/*: no hits",
+        "P/fchain/receipt.md:113 and :250 \"Independent review ... remain open\"",
+        "scratch check: 159/159 retarget newPath == move-set alias \"to\"; posixpath(file dir + newTarget) == newPath",
+        "shard-3 diff a319902ab: f08069/f08076/f08084 patch.replacements unchanged; only sourceSha256/proposedSha256/chainEntryIds changed"
+      ]
+    },
+    {
+      "id": "G7",
+      "verdict": "APPROVE",
+      "severity": "Low",
+      "summary": "Status follows from W8/W9/W10/W14 for the 423-spec population; 36 deferred is reproducible. Low: a new effective spec rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md (a319902ab, independentVerdict pending, \"historical approval does not transfer\") is not mentioned. I checked that its +/- change set equals its predecessor's (2 lines, identical), so it is a pure rebase. The register should name it with that basis.",
+      "evidence": [
+        "composition/patch-specs.json effectiveSpecIds includes rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md",
+        "scratch: changed lines of predecessor == changed lines of rebased-current (True, 2 == 2)"
+      ]
+    },
+    {
+      "id": "G8",
+      "verdict": "APPROVE",
+      "severity": "Info",
+      "summary": "met-local follows L13-18/L13-19.2: no before-F item; the local ref is created from the F rebuild before G10. archive/design.md:13 now carries the retained-JSON-path recovery sentence (L13-20.3). The W20 C and W21 A claims match those reviews. The owner item for S2 publication is correct.",
+      "evidence": [
+        "archive/design.md:13 \"For a retained JSON path string pointing into the archive ...\"",
+        "reviews/w21-census-rework-and-g5-review.md:70",
+        "owner-answers.md L13-18"
+      ]
+    },
+    {
+      "id": "G9",
+      "verdict": "APPROVE",
+      "severity": "Low",
+      "summary": "check_phase9_decisions.py exits 0 (158 entries: 24 moved / 96 retained / 38 retired; 572 chain files; status pass). The W25 counts (158/12; 151/7 entries, 7/5 checks) are quoted correctly; note that L13-24 itself misstates W25 as \"approved all 158\". W28 confirms the overlap REWORKs are resolved through the single door. Low: (a) the note says the 12 REWORKs are resolved \"through L13-24 and W28\", but the governance-map-reader-census REWORK was answered by the checker's root-document census, and W28 found 138 vs 136 recorded occurrences (2 history-only misses); the register does not record this. (b) The rewritten note drops the earlier disclosure that W15 sampled only 60 of 288 still-valid rows and says \"scoped reviews\". (c) phase9-decisions.json still reports leadDecisionProposed=2 after L13-23.1 accepted both proposals. W25 explains why, and it is not a defect.",
+      "evidence": [
+        "python3 -B P/g9/check_phase9_decisions.py: exit 0",
+        "reviews/w25-g9-dependencies-review.json 12 REWORK ids",
+        "reviews/w28-fchain-and-premise-rework-review.md Low notes (136 vs 138)",
+        "git show c50b78db9^:P/preflip-gate-status.json G9 note"
+      ]
+    },
+    {
+      "id": "G10",
+      "verdict": "APPROVE",
+      "severity": "Info",
+      "summary": "external is correct: owner-answers has no section 7 consent, the board has no HARDEN section 7 verdict, and no G10 receipt exists.",
+      "evidence": [
+        "grep consent owner-answers.md: only L13-12 push text"
+      ]
+    },
+    {
+      "id": "G11",
+      "verdict": "APPROVE",
+      "severity": "Info",
+      "summary": "external is correct. The stale design-lap no-pull wording is retired as W22 asked.",
+      "evidence": [
+        "reviews/w22-register-met-local-review.md:80"
+      ]
+    },
+    {
+      "id": "f-composition",
+      "verdict": "REWORK",
+      "severity": "High",
+      "summary": "The mechanics hold: fchain/check.py --pin HEAD exits 0 with zero findings, including linkIntoMoveSet. There are 572 files, 182 executed and 20 manifest sources, including link-retargets.json and rebased-patches.json. A negative control injects a link into a moved path, and it is rejected by linkIntoMoveSet. But the register presents the F-composition record as reviewed preparation, and the newest content in it (a319902ab) has no independent review; see G6. The control also raises an unrelated \"conflict\" finding, so it is not isolated (Low).",
+      "evidence": [
+        "python3 -B P/fchain/check.py --pin HEAD: exit 0, counts {}, files 572, executed 182, links 20 (check.json restored)",
+        "fchain/controls.json case \"injected clickable link into a moved path fails the F door\": findings conflict 1 + linkIntoMoveSet 1"
+      ]
+    },
+    {
+      "id": "ownership-audit",
+      "verdict": "APPROVE",
+      "severity": "Medium",
+      "summary": "The register correctly says \"reported-ok\" and Lead-reported; input hashes match HEAD. I did NOT reproduce audit-report.py (forbidden); the ok at 4a4fefbe8 is a Lead-reported fact. A code read of the L13-27 implementation matches the ruling. ownership.mjs calls rebind.py --check and authenticates only authenticatedSupersededOrigins (by originBinding) and authenticatedIdenticalUnitGroups. Groups count only when every member matches (rebind.py matches() requires memberCount members). unaccountedTargetDigestDrift still fails, raw targetDigestDrift is kept, and the ledger and checks.mjs are untouched. rebind --check reports drift 0, 7 superseded origins and 16 groups, matching the ruling's 7 + 16 = 23. Medium: the implementation commits 98d71bef2, ca3179b3c (rebind.py, phase-06 embedded scripts) and c3882df26 (phase-08/audit-report.py) have no independent review. They change gate-relevant checks, and localCorrectionReview does not name them.",
+      "evidence": [
+        "python3 -B P/rebind/rebind.py --check: exit 0, drift 0, authenticatedSupersededOrigins 7, authenticatedIdenticalUnitGroups 16",
+        "sha256 audit-report.py 71d6c0c2..., round5 b257d2cb..., sync4d 80b397ff... == register inputs",
+        "git show c3882df26: targetDigestDrift -> unaccountedTargetDigestDrift",
+        "python3 -B P/g0rework/verify.py: exit 0, status partial, ok false (2 native-dependent checks not run), recordProofsPassed true"
+      ]
+    },
+    {
+      "id": "cutoverReadiness.order",
+      "verdict": "APPROVE",
+      "severity": "Info",
+      "summary": "The order matches L13-6 and L13-20.3: complete+review, packet at met-local, owner approval, lease, F import, F duties, final ledger review, Land. The summary infers no approval, F, lease, publication or Land. gate-reconcile/controls.py rejects a packet moved after the lease.",
+      "evidence": [
+        "python3 -B P/gate-reconcile/controls.py: exit 0, 23 controls, \"Packet moved after the lease is rejected\""
+      ]
+    },
+    {
+      "id": "cutoverReadiness.summary-and-localCorrectionReview",
+      "verdict": "REWORK",
+      "severity": "Medium",
+      "summary": "The summary says \"Local preparation is met-local\", and localCorrectionReview names only \"this register catch-up and its proofs\". Step 1 of the order (independent review of local work) is not satisfied for a319902ab (link retargets/F door), the ownership-audit commits (98d71bef2, ca3179b3c, c3882df26) and 73e89962e (rebind edge records; rebind/g0-rework-rebindings.json status \"authored-pending-independent-review\"). Name these as pending independent review before the packet goes out (L13-20.4). Low: the last F duty says \"the owner packet was already sent at met-local\" in the present perfect, before any packet exists; reword it as a precondition.",
+      "evidence": [
+        "P/rebind/g0-rework-rebindings.json status authored-pending-independent-review",
+        "reviews/w30-g0-verdicts-b11.md:18 notes 73e89962e touches only reports (not a content review)",
+        "owner-answers.md L13-20.4"
+      ]
+    },
+    {
+      "id": "cutoverReadiness.ownerItems",
+      "verdict": "APPROVE",
+      "severity": "Info",
+      "summary": "Complete. G5 restatements, G8 S2 publication, G9 backlog intent (2 parks) and the separate cutover/lease/Land approval; external G4/G9 exports/G10/G11. No closed item is listed as open: the 36 history parks were correctly dropped under L13-21.3, and the 33/158 G9 decisions are no longer owner/external. Gate-level ownerItems equal the readiness projection.",
+      "evidence": [
+        "preflip-gate-status.json gates[*].ownerItems vs cutoverReadiness.ownerItems"
+      ]
+    },
+    {
+      "id": "cutoverReadiness.atFinalPinUnderLease",
+      "verdict": "APPROVE",
+      "severity": "Low",
+      "summary": "Each L13-16..27 F duty is present: G0 overlays (L13-23.4), claim_2e2bc926 (L13-15.2), G1 2 drifted patches (L13-16), G2 4 census retargets (L13-20.3), G4 rescan (L13-20.3), G6 137 unbound + composition through the fchain only (L13-20.1/24/26), G8 archive ref at F before G10 (L13-18), G9 fchain replay (L13-24/26), and the explicit --pin plus live check (L13-13.2/16). See G0 Low for the predecessor-step wording.",
+      "evidence": [
+        "owner-answers.md L13-16..L13-27"
+      ]
+    },
+    {
+      "id": "cutoverReadiness.fWindowSize",
+      "verdict": "APPROVE",
+      "severity": "Low",
+      "summary": "All counts reproduce from the named files: 137, 787 (465/158/164), 163/6/158, 407/556, 130/95, 1929/257, 1126/4, 423/36, 158, and fchain 20/465/497/182/572/5/41/162/0. Low: fComposition.source names fchain/manifest.json, but baseChainFiles/basePatchSteps/executed/composedFiles come from the composed replay (check.json/current-proofs), not from the manifest.",
+      "evidence": [
+        "scratch recompute: w9 distinct (effectiveRecord,effectivePointer)=407 of 556; glosses main-at-F ids=130 passages=95; check.json baseChain files 465 steps 497 executed 182 files 572; rebased 5; link-retargets patches 41 rows 162"
+      ]
+    },
+    {
+      "id": "followUps",
+      "verdict": "APPROVE",
+      "severity": "Low",
+      "summary": "All 4 entries are sourced correctly (W29:59, W29:58 \"About 15 distinct titles\", W30:59, W30:48 \"36 rationale/reason strings\"). Low: none names an owner or a backlog/work-item destination, and W29 says under RUL11 they \"should be gathered into a separate item\".",
+      "evidence": [
+        "reviews/w29-g0-verdicts-b10.md:58-59",
+        "reviews/w30-g0-verdicts-b11.md:48,59"
+      ]
+    },
+    {
+      "id": "concurrent-packet-draft",
+      "verdict": "APPROVE",
+      "severity": "Info",
+      "summary": "During this review, an untracked P/cutover-approval-packet.md (Lead draft, mtime 22:52) appeared in the worktree. It asserts G0-G9 met-local. I did not write or modify it. Under L13-20.4 it should not go out until the REWORK items above are resolved and reviewed.",
+      "evidence": [
+        "git status --short: ?? P/cutover-approval-packet.md, not created by this review"
+      ]
+    }
+  ],
+  "counts": {
+    "APPROVE": 18,
+    "REWORK": 3,
+    "total": 21,
+    "reworkBySeverity": {
+      "High": 2,
+      "Medium": 1
+    }
+  }
+}
