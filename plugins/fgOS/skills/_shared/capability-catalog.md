@@ -77,7 +77,7 @@ Each capability may declare a `serves` attribute set — the machine-readable pr
 
 Every entry above is either already registered in
 `src/setup/registrations.mjs`'s `DEFAULT_CAPABILITY_SLOTS` or already
-live in `.fgos/config.json`'s `runner.capabilities` (with the generic
+live in the config's `runner.capabilities` (`fgos config show`) (with the generic
 `review` slot introduced in doctrine and pending config schema
 registration; `decide --for review` currently returns the default
 mechanism). Do not treat this table as exhaustive forever,
