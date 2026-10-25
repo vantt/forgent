@@ -51,18 +51,20 @@ export function unlinkSharedDirs(worktreePath) {
 }
 
 /**
- * Throwaway detached checkouts of HEAD through the runner's own verify
+ * Throwaway detached checkouts of `repoRoot`'s HEAD through the runner's own verify
  * checkout door (Worktree port). Removal is guarded: a checkout that still
  * holds bytes the run left behind is preserved and reported, never forced.
  */
-export const headCheckouts = {
-  create: () => { ensureScriptAddon(); return createVerifyCheckout(REPO_ROOT, 'HEAD'); },
-  remove: (worktreePath) => {
-    unlinkSharedDirs(worktreePath);
-    try { removeWorktree(REPO_ROOT, worktreePath); }
-    catch (err) { errFn(`Checkout preserved at ${worktreePath}: ${err.message}`); }
-  },
-};
+export function headCheckouts(repoRoot = REPO_ROOT) {
+  return {
+    create: () => { ensureScriptAddon(); return createVerifyCheckout(repoRoot, 'HEAD'); },
+    remove: (worktreePath) => {
+      unlinkSharedDirs(worktreePath);
+      try { removeWorktree(repoRoot, worktreePath); }
+      catch (err) { errFn(`Checkout preserved at ${worktreePath}: ${err.message}`); }
+    },
+  };
+}
 
 export function computeRuleHash(rule) {
   if (!rule) return null;
@@ -267,7 +269,7 @@ export function runNightlyMutations(options = {}) {
   const ledgerOut = options.ledgerOut || 'nightly-ledger.json';
   const runRelated = options.runRelated || runRelatedCaptured;
   const runFull = options.runFull || runFullSuite;
-  const checkouts = options.checkouts || headCheckouts;
+  const checkouts = options.checkouts || headCheckouts();
 
   // Failing test names of the full suite on the clean HEAD, computed once and
   // only if some mutant survives its related tests. `null` = the baseline run

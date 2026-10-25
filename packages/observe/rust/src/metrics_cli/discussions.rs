@@ -62,7 +62,6 @@ struct Totals {
     seats: usize,
     seats_passed: usize,
     attempts: usize,
-    inline_seats: usize,
     fallback_seats: usize,
     fallback_attempts: usize,
     durations: Vec<f64>,
@@ -81,12 +80,11 @@ impl Totals {
     fn seat(&mut self, seat: &Value) {
         self.seats += 1;
         self.seats_passed += usize::from(seat["final"]["outcome"] == "pass");
-        self.inline_seats += usize::from(seat["final"]["runId"].is_null());
         self.fallback_seats += usize::from(!seat["final"]["fallbackFrom"].is_null());
     }
 
     fn attempt(&mut self, attempt: &Value) {
-        // Inline records are seats, not dispatch runs. Keep the run cross-check honest.
+        // An attempt without a run id is not a dispatch run. Keep the run cross-check honest.
         if attempt["runId"].as_str().is_some() {
             self.attempts += 1;
             self.fallback_attempts += usize::from(!attempt["fallbackFrom"].is_null());
@@ -116,7 +114,6 @@ impl Totals {
             "seatsFailed": self.seats - self.seats_passed,
             "seatPassRate": ratio(self.seats_passed, self.seats),
             "attempts": self.attempts,
-            "inlineSeats": self.inline_seats,
             "fallbackSeats": self.fallback_seats,
             "fallbackAttempts": self.fallback_attempts,
             "fallbackRate": ratio(self.fallback_seats, self.seats),
@@ -268,7 +265,6 @@ fn compute_discussions(
             "outcome",
             "startedAt",
             "settledAt",
-            "inline",
             "stanceOptions",
             "seats",
         ] {
@@ -308,7 +304,7 @@ mod tests {
         let Value::Object(attrs) = json!({
             "unitRunId": id, "workflow": null, "pattern": "panel", "capability": null,
             "outcome": "pass", "startedAt": null, "settledAt": ts,
-            "inline": false, "stanceOptions": [], "seats": []
+            "stanceOptions": [], "seats": []
         }) else {
             unreachable!()
         };

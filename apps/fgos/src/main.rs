@@ -252,9 +252,10 @@ fn main() {
         fgos_identity::IDENTITY_READ_DESCRIPTOR,
         fgos_identity::IDENTITY_WRITE_DESCRIPTOR,
     ] {
-        service.register_provider(Arc::new(fgos_identity::IdentityProvider::for_descriptor(
-            descriptor,
-        )));
+        service.register_provider(Arc::new(
+            fgos_identity::IdentityProvider::for_descriptor(descriptor)
+                .with_log_door(Arc::new(wiring::identity_log::StoreLogDoor)),
+        ));
     }
     for descriptor in [
         fgos_config::provider::CONFIG_READ_DESCRIPTOR,

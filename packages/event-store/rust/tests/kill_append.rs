@@ -1,3 +1,4 @@
+#![cfg(target_os = "linux")]
 mod common;
 use common::{batch, Repo};
 use fgos_event_store::{append::Positions, open_read::read_own, rotate::rotate};

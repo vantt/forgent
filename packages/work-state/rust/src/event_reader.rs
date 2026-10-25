@@ -51,6 +51,7 @@ pub(crate) fn events(root: &Path) -> Result<Vec<(String, Value)>, SourceError> {
         ReadRequest {
             layout: &layout,
             origin: &origin,
+            machine: &machine,
             streams: &streams,
             cursor: &Cursor::default(),
             folded: &[],

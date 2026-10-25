@@ -29,6 +29,7 @@
     "packages/event-store/contracts",
     "packages/work-state/contracts/event-streams.v1.json",
     "packages/work-state/contracts/porting-event-streams.v1.json",
+    "packages/identity/contracts/identity-event-streams.v1.json",
     "packages/git/contracts/mutation-census.v1.json"
   ],
   "scripts": {

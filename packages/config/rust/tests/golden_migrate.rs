@@ -164,9 +164,9 @@ fn this_repositorys_project_file_migrates_with_the_same_effective_value() {
     let opts = common::migrate_options(&dir, false, false);
     let writer = common::writer(&json!({"session": "vantt"}));
     let report = project(&ctx, &roots, &writer, &opts, |_| Ok(())).unwrap();
-    // The one-key sections `gateway` and `lock` go, the tier ladder `$comment` converts, 28 values stay (the two tool executors and the impact-analysis pool are this repository's own).
-    assert_eq!(report.kept.len(), 28);
-    assert_eq!(report.dropped_redundant.len(), 244);
+    // The one-key sections `gateway` and `lock` go, the tier ladder `$comment` converts, 37 values stay (the two tool executors, the impact-analysis pool and nine pools that never fall back to Codex are this repository's own).
+    assert_eq!(report.kept.len(), 37);
+    assert_eq!(report.dropped_redundant.len(), 235);
     assert_eq!(report.dropped_retired, ["lock.predecessorKillWaitMs"]);
     assert_eq!(
         report.dropped_out_of_scope,
@@ -176,8 +176,9 @@ fn this_repositorys_project_file_migrates_with_the_same_effective_value() {
     assert!(report.machine_overrides.is_empty() && report.unknown_kept.is_empty());
     let yaml = fs::read_to_string(dir.join("project/.fgos/config.yaml")).unwrap();
     assert!(
-        yaml.lines().count() < 200,
-        "the file shrinks to the project's own differences"
+        yaml.lines().count() * 5 < source.split(|b| *b == b'\n').count(),
+        "the file shrinks to the project's own differences: {} lines",
+        yaml.lines().count()
     );
     assert_eq!(
         fs::read_to_string(dir.join("project/.fgos/config.json")).unwrap(),

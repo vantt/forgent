@@ -1,3 +1,4 @@
+#![cfg(target_os = "linux")]
 mod sync_support;
 use fgos_event_store::{errors::ErrorCode, sync::SyncRecord};
 use sync_support::*;

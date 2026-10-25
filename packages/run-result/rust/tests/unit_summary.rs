@@ -130,7 +130,7 @@ fn unit(id: &str, choices: &[Option<&str>]) -> Value {
         "pattern": "panel", "capability": "analysis", "outcome": "pass",
         "startedAt": "2026-10-05T12:00:00.000Z", "settledAt": "2026-10-05T12:01:00.000Z",
         "seats": choices.iter().enumerate().map(|(i, choice)| seat(&format!("member-{}", i + 1), "panelist", *choice)).collect::<Vec<_>>(),
-        "inline": false, "stanceOptions": ["a", "b", "c"],
+        "stanceOptions": ["a", "b", "c"],
     })
 }
 
@@ -156,25 +156,24 @@ fn consumer_separates_all_attempts_final_seats_groups_and_refusals() {
     refusal["outcome"] = json!("policy-refusal");
     refusal["settledAt"] = json!("2026-10-05T12:02:00.000Z");
     root.summary(&refusal);
-    let mut inline = unit("unit-run-inline", &[]);
-    inline["inline"] = json!(true);
-    inline["workflow"] = Value::Null;
-    let mut inline_seat = seat("producer", "producer", None);
-    inline_seat["final"]["runId"] = Value::Null;
-    inline_seat["attempts"][0]["runId"] = Value::Null;
-    inline["seats"] = json!([inline_seat]);
-    root.summary(&inline);
+    // A seat whose attempt never got a run id is a seat, not a dispatch attempt.
+    let mut unlinked = unit("unit-run-unlinked", &[]);
+    unlinked["workflow"] = Value::Null;
+    let mut unrun_seat = seat("producer", "producer", None);
+    unrun_seat["final"]["runId"] = Value::Null;
+    unrun_seat["attempts"][0]["runId"] = Value::Null;
+    unlinked["seats"] = json!([unrun_seat]);
+    root.summary(&unlinked);
     let report = root.metrics(&["--since=2026-10-05"]);
     assert_eq!(report["totals"]["unitRuns"], 3);
     assert_eq!(report["totals"]["passRate"], json!(2.0 / 3.0));
     assert_eq!(report["totals"]["seats"], 3);
     assert_eq!(report["totals"]["attempts"], 4);
-    assert_eq!(report["totals"]["inlineSeats"], 1);
     assert_eq!(report["totals"]["fallbackSeats"], 1);
     assert_eq!(report["totals"]["fallbackRate"], json!(1.0 / 3.0));
     assert_eq!(report["totals"]["medianDurationSec"], 60.0);
     assert_eq!(report["groups"]["workflow-synthetic"]["unitRuns"], 2);
-    assert_eq!(report["groups"]["unlinked"]["inlineSeats"], 1);
+    assert_eq!(report["groups"]["unlinked"]["seats"], 1);
     let units = report["units"].as_array().unwrap();
     let refusal = units
         .iter()

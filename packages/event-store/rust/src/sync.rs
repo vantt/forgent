@@ -118,21 +118,6 @@ pub fn sync_status(layout: &Layout) -> Result<SyncRecord, Error> {
         Err(e) => Err(io(e)),
     }
 }
-fn streams(layout: &Layout) -> Result<Vec<StreamId>, Error> {
-    let mut out = Vec::new();
-    for entry in fs::read_dir(&layout.root).map_err(io)? {
-        let entry = entry.map_err(io)?;
-        if entry.file_type().map_err(io)?.is_dir() {
-            if let Some(name) = entry.file_name().to_str() {
-                if let Ok(stream) = StreamId::parse(name) {
-                    out.push(stream);
-                }
-            }
-        }
-    }
-    out.sort_by(|a, b| a.as_str().cmp(b.as_str()));
-    Ok(out)
-}
 fn tip(port: &dyn Publication, repo: &RepoHandle, reference: &str) -> Result<Option<Oid>, Error> {
     match port
         .read_ref(
@@ -297,7 +282,7 @@ pub fn sync_with_fs(
     let mut unpublished = false;
     let result = (|| {
         let mut seal_errors = Vec::new();
-        for stream in streams(req.layout)? {
+        for stream in req.layout.streams()? {
             if let Err(error) = seal_guarded(
                 driver,
                 repo,
@@ -568,7 +553,7 @@ pub fn unpublished_summary(
 ) -> Result<Vec<Unpublished>, Error> {
     let mirror = tip(port, repo, &crate::refs::mirror_event(remote, machine))?;
     let mut out = Vec::new();
-    for stream in streams(layout)? {
+    for stream in layout.streams()? {
         let own = tip(port, repo, own_ref(machine, &stream)?.as_str())?;
         let sealed_pushed = if stream.scope() != Scope::Project {
             true

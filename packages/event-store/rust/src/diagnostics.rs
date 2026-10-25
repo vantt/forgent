@@ -8,26 +8,6 @@ use fgos_git::{GitDriver, Inspect, RefPrefix, RefValue, RepoHandle};
 use serde_json::{json, Value};
 use std::{collections::BTreeSet, fs};
 
-pub fn streams(layout: &Layout) -> Result<Vec<StreamId>, Error> {
-    let entries = match fs::read_dir(&layout.root) {
-        Ok(e) => e,
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(vec![]),
-        Err(e) => return Err(io(e)),
-    };
-    let mut streams = Vec::new();
-    for entry in entries {
-        let entry = entry.map_err(io)?;
-        if entry.file_type().map_err(io)?.is_dir() {
-            if let Some(name) = entry.file_name().to_str() {
-                if let Ok(s) = StreamId::parse(name) {
-                    streams.push(s);
-                }
-            }
-        }
-    }
-    streams.sort_by(|a, b| a.as_str().cmp(b.as_str()));
-    Ok(streams)
-}
 pub fn facts(
     driver: &GitDriver,
     repo: &RepoHandle,
@@ -75,7 +55,7 @@ pub fn facts(
 /// Never inspects refs, worktrees or legacy history; this is not integrity status.
 pub fn maintenance(layout: &Layout) -> Result<Value, Error> {
     let mut rows = Vec::new();
-    for stream in streams(layout)? {
+    for stream in layout.streams()? {
         let age = crate::seal::oldest_unsealed_age_sec(layout, std::slice::from_ref(&stream))?;
         rows.push(json!({"stream":stream.as_str(),"oldestUnsealedAgeSec":age}));
     }
@@ -98,24 +78,24 @@ pub fn status(
         Err(e) => return Err(io(e)),
     };
     let origin = identity.as_ref().map(|i| i.store_id.as_str()).unwrap_or("");
-    let mut streams = streams(layout)?;
+    let mut streams = layout.streams()?;
     let refs = crate::refs::list(
         driver,
         repo,
         &[RefPrefix::parse("refs/fgos/").map_err(|e| crate::errors::invalid(e.to_string()))?],
     )?;
     // Project refs may carry streams absent from this clone's open root. Walk them
-    // to discover those names; verification is repeated by the reader below.
+    // to discover those names; the reader below verifies every ref again, and
+    // fails or names the skipped mirror, so a ref that fails here adds nothing.
     for entry in &refs {
         let name = entry.name.as_str();
-        let suffix = if let Some(rest) = name.strip_prefix("refs/fgos/remotes/") {
-            crate::read::mirror_suffix(rest)?
-        } else {
-            name.strip_prefix("refs/fgos/")
+        let suffix = match name.strip_prefix("refs/fgos/remotes/") {
+            Some(rest) => crate::read::mirror_suffix(rest).ok().flatten(),
+            None => name.strip_prefix("refs/fgos/"),
         };
         if let Some(machine) = suffix.and_then(|s| s.strip_prefix("events/")) {
             if let RefValue::Direct(oid) = &entry.value {
-                let walked = crate::walk::walk_verified(
+                let Ok(walked) = crate::walk::walk_verified(
                     driver,
                     repo,
                     oid,
@@ -123,7 +103,9 @@ pub fn status(
                     &Default::default(),
                     machine,
                     crate::envelope::Scope::Project,
-                )?;
+                ) else {
+                    continue;
+                };
                 for event in walked.events {
                     let s = StreamId::parse(&event.stream)?;
                     if !streams.contains(&s) {
@@ -164,6 +146,7 @@ pub fn status(
         crate::read::ReadRequest {
             layout,
             origin,
+            machine,
             streams: &streams,
             cursor: &Default::default(),
             folded: &[],
@@ -254,7 +237,7 @@ pub fn status(
         })
         .collect();
     Ok(
-        json!({"v":1,"storeId":identity.map(|i|i.store_id),"machineId":machine,"refs":tips,"streams":rows,"lastFetch":sync.last_fetch,"lastPush":sync.last_push,"sync":sync,"aheadBehind":ahead_behind,"orphanBranches":orphan,"integrityErrors":integrity_errors,"deferred":read.deferred,"missing":missing,"machineRefShared":shared,"guarantee":fgos_holder_lock::guarantee(&layout.common_dir).to_json()}),
+        json!({"v":1,"storeId":identity.map(|i|i.store_id),"machineId":machine,"refs":tips,"streams":rows,"lastFetch":sync.last_fetch,"lastPush":sync.last_push,"sync":sync,"aheadBehind":ahead_behind,"orphanBranches":orphan,"integrityErrors":integrity_errors,"deferred":read.deferred,"missing":missing,"skippedMirrors":read.skipped_mirrors,"machineRefShared":shared,"guarantee":fgos_holder_lock::guarantee(&layout.common_dir).to_json()}),
     )
 }
 

@@ -119,7 +119,7 @@ export function keptBindingOf(unitRecord, seat, round) {
     const [keySeat, keyRound] = [key.slice(0, key.lastIndexOf('/')), Number(key.slice(key.lastIndexOf('/') + 1))];
     if (keySeat !== seat || !Number.isFinite(keyRound) || keyRound >= current || !Array.isArray(attempts)) continue;
     const binding = attempts.at(-1)?.binding;
-    if (binding && !binding.refused && binding.mechanism !== 'inline' && (latest === null || keyRound > latest.round)) latest = { round: keyRound, binding };
+    if (binding && !binding.refused && (latest === null || keyRound > latest.round)) latest = { round: keyRound, binding };
   }
   return latest?.binding ?? null;
 }

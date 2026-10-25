@@ -29,6 +29,12 @@ fn fgos() -> PathBuf {
     PathBuf::from(env!("CARGO_BIN_EXE_fgos"))
 }
 
+/// Kill a child that leads its own process group, with everything it started, and reap it.
+fn end_group(child: &mut std::process::Child) {
+    unsafe { libc::kill(-(child.id() as i32), libc::SIGKILL) };
+    let _ = child.wait();
+}
+
 fn temp_dir(tag: &str) -> PathBuf {
     let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
     let dir = std::env::temp_dir().join(format!("fgos-internal-routes-{tag}-{}-{nanos}", std::process::id()));
@@ -196,9 +202,9 @@ fn quiesce_scan_lists_a_process_working_in_the_workspace() {
     let dir = temp_dir("quiesce");
     // A cwd in the workspace counts only for a process that could be fgOS (the
     // scan reads argv[0]'s basename): a shell named `fgos` that does not exec away.
-    let mut sleeper = Command::new("bash").arg0("fgos").args(["-c", "sleep 30; :"]).current_dir(&dir).stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null()).spawn().unwrap();
-    // The argv the scan reads is the exec'd one, so let the child finish its exec first.
-    std::thread::sleep(Duration::from_millis(50));
+    // `spawn` returns after the child's exec, so the scan reads the exec'd argv. Each child leads its own
+    // process group, so ending the group also ends the `sleep` it started.
+    let mut sleeper = Command::new("bash").arg0("fgos").args(["-c", "sleep 30; :"]).current_dir(&dir).process_group(0).stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null()).spawn().unwrap();
     let root = dir.to_string_lossy().into_owned();
     let out = route(&["quiesce-scan", "--protocol", "1", "--root", &root]);
     assert_eq!(out.status.code(), Some(10));
@@ -211,27 +217,25 @@ fn quiesce_scan_lists_a_process_working_in_the_workspace() {
     let out = route(&["quiesce-scan", "--protocol", "1", "--root", &root, "--exclude-pid", &pid]);
     let v = json_line(&out);
     assert!(v["processes"].as_array().unwrap().iter().all(|p| p["pid"] != sleeper.id()), "{v}");
-    let _ = sleeper.kill();
-    let _ = sleeper.wait();
+    end_group(&mut sleeper);
     // A process elsewhere whose argv points into the workspace.
     let file_in_root = dir.join("payload.mjs");
     let mut runner = Command::new("sh")
         .args(["-c", "sleep 30; :", "runner"])
         .arg(&file_in_root)
         .current_dir("/")
+        .process_group(0)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()
         .unwrap();
-    std::thread::sleep(Duration::from_millis(50));
     let v = json_line(&route(&["quiesce-scan", "--protocol", "1", "--root", &root]));
     let hit: Vec<&Value> = v["processes"].as_array().unwrap().iter().filter(|p| p["pid"] == runner.id()).collect();
     assert_eq!(hit.len(), 1, "{v}");
     assert_eq!(hit[0]["matched"], "cmdline");
     assert_eq!(hit[0]["root"], root.as_str());
-    let _ = runner.kill();
-    let _ = runner.wait();
+    end_group(&mut runner);
     let _ = fs::remove_dir_all(&dir);
 }
 

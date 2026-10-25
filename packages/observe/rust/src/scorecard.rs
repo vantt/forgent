@@ -51,18 +51,6 @@ pub struct RunsSection {
     pub by_role: BTreeMap<String, RunStatusBuckets>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct SessionsSection {
-    pub estimate: bool,
-    pub total_evaluated: u64,
-    pub active_count: u64,
-    pub assignments_p50: f64,
-    pub assignments_p90: f64,
-    pub duration_sec_p50: f64,
-    pub duration_sec_p90: f64,
-    pub first_pass_count: u64,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 pub struct TokensSection {
     pub input_tokens: u64,
@@ -110,38 +98,14 @@ pub struct WorkSection {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct ComplexitySection {
-    pub lines_of_code: LocBreakdown,
-    pub protocols_used: u64,
-    pub protocols_defined: u64,
-    pub native_routes: usize,
-    pub total_routes: usize,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
-pub struct LocBreakdown {
-    pub total: u64,
-    pub runner: u64,
-    pub packages: u64,
-    pub apps: u64,
-    pub herdr_plugin: u64,
-    pub tests: u64,
-    pub other: u64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Scorecard {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub case: Option<CaseSection>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub runs: Option<Value>, // Value::String("n/a") or RunsSection
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub sessions: Option<Value>, // Value::String("n/a") or SessionsSection
     pub tokens: TokensSection,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub commits: Option<CommitsSection>,
-    pub friction: Value, // "n/a (pre-F5)"
-    pub complexity: ComplexitySection,
     pub work: Option<Value>, // Value::String("n/a") or WorkSection
     pub faults: FaultsSection,
     pub warnings: Vec<String>,
@@ -288,98 +252,6 @@ fn percentile(mut vals: Vec<f64>, p: f64) -> f64 {
         vals[0]
     } else {
         vals[(idx - 1).min(vals.len() - 1)]
-    }
-}
-
-/// Compute sessions section (#3, estimate: true)
-pub fn compute_sessions(observations: &[Observation]) -> SessionsSection {
-    // 1. Group observations by session id
-    let mut session_obs: HashMap<String, Vec<&Observation>> = HashMap::new();
-    for obs in observations {
-        if (obs.source == "coordination" || obs.source == "workflow")
-            && obs.subject.kind == crate::contract::SubjectKind::Session
-        {
-            session_obs
-                .entry(obs.subject.id.clone())
-                .or_default()
-                .push(obs);
-        }
-    }
-
-    let mut total_evaluated = 0u64;
-    let mut active_count = 0u64;
-    let mut first_pass_count = 0u64;
-    let mut assignments_counts = Vec::new();
-    let mut durations_sec = Vec::new();
-
-    for (_sess_id, events) in session_obs {
-        let result_linked_events: Vec<&&Observation> = events
-            .iter()
-            .filter(|e| e.kind == "session.result_linked")
-            .collect();
-
-        if result_linked_events.is_empty() {
-            // "Session có result-linked trong khung"
-            continue;
-        }
-
-        total_evaluated += 1;
-
-        // Check if session is active or terminal
-        let terminal_event = events.iter().find(|e| e.kind == "session.closed");
-        let is_active = terminal_event.is_none();
-        if is_active {
-            active_count += 1;
-        }
-
-        // Assignment count
-        let asgn_count = events
-            .iter()
-            .filter(|e| e.kind == "session.assignment")
-            .count() as f64;
-        assignments_counts.push(asgn_count);
-
-        // Duration: from first result-linked to last result-linked
-        let mut rl_ts: Vec<i64> = result_linked_events
-            .iter()
-            .filter_map(|e| parse_iso_prefix_secs(&e.ts))
-            .collect();
-        rl_ts.sort_unstable();
-        if let (Some(&first), Some(&last)) = (rl_ts.first(), rl_ts.last()) {
-            let diff = (last - first).max(0) as f64;
-            durations_sec.push(diff);
-        }
-
-        // firstPass = không có assignment của actor fixer và status completed hoặc partial
-        let has_fixer = events.iter().any(|e| {
-            e.kind == "session.assignment"
-                && e.attrs.get("actorId").and_then(|v| v.as_str()) == Some("fixer")
-        });
-
-        let status = terminal_event
-            .and_then(|e| e.attrs.get("status"))
-            .and_then(|v| v.as_str());
-        let is_completed_or_partial = matches!(status, Some("completed") | Some("partial"));
-
-        if !has_fixer && is_completed_or_partial {
-            first_pass_count += 1;
-        }
-    }
-
-    let assignments_p50 = percentile(assignments_counts.clone(), 50.0);
-    let assignments_p90 = percentile(assignments_counts, 90.0);
-    let duration_sec_p50 = percentile(durations_sec.clone(), 50.0);
-    let duration_sec_p90 = percentile(durations_sec, 90.0);
-
-    SessionsSection {
-        estimate: true,
-        total_evaluated,
-        active_count,
-        assignments_p50,
-        assignments_p90,
-        duration_sec_p50,
-        duration_sec_p90,
-        first_pass_count,
     }
 }
 
@@ -793,118 +665,6 @@ mod tests {
         assert_eq!(runs.by_executor.get("agy").unwrap().total, 2);
         assert_eq!(runs.by_adapter.get("herdr-spawn").unwrap().total, 2);
         assert_eq!(runs.by_role.get("implementer").unwrap().total, 1);
-    }
-
-    #[test]
-    fn test_compute_sessions() {
-        let mut obs = Vec::new();
-        // Session 1: completed, no fixer -> firstPass = true
-        obs.push(Observation {
-            ts: "2026-09-01T10:00:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s1".to_string(),
-            },
-            kind: "session.opened".to_string(),
-            attrs: Default::default(),
-            source: "coordination",
-        });
-        obs.push(Observation {
-            ts: "2026-09-01T10:05:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s1".to_string(),
-            },
-            kind: "session.assignment".to_string(),
-            attrs: serde_json::from_value(json!({ "actorId": "doer", "assignmentId": "a1" }))
-                .unwrap(),
-            source: "coordination",
-        });
-        obs.push(Observation {
-            ts: "2026-09-01T10:10:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s1".to_string(),
-            },
-            kind: "session.result_linked".to_string(),
-            attrs: Default::default(),
-            source: "coordination",
-        });
-        obs.push(Observation {
-            ts: "2026-09-01T10:20:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s1".to_string(),
-            },
-            kind: "session.result_linked".to_string(),
-            attrs: Default::default(),
-            source: "coordination",
-        });
-        obs.push(Observation {
-            ts: "2026-09-01T10:25:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s1".to_string(),
-            },
-            kind: "session.closed".to_string(),
-            attrs: serde_json::from_value(json!({ "status": "completed" })).unwrap(),
-            source: "coordination",
-        });
-
-        // Session 2: active, has fixer -> firstPass = false
-        obs.push(Observation {
-            ts: "2026-09-01T11:00:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s2".to_string(),
-            },
-            kind: "session.opened".to_string(),
-            attrs: Default::default(),
-            source: "coordination",
-        });
-        obs.push(Observation {
-            ts: "2026-09-01T11:01:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s2".to_string(),
-            },
-            kind: "session.assignment".to_string(),
-            attrs: serde_json::from_value(json!({ "actorId": "fixer", "assignmentId": "a2" }))
-                .unwrap(),
-            source: "coordination",
-        });
-        obs.push(Observation {
-            ts: "2026-09-01T11:02:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s2".to_string(),
-            },
-            kind: "session.result_linked".to_string(),
-            attrs: Default::default(),
-            source: "coordination",
-        });
-
-        // Session 3: no result-linked -> should be ignored
-        obs.push(Observation {
-            ts: "2026-09-01T12:00:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s3".to_string(),
-            },
-            kind: "session.opened".to_string(),
-            attrs: Default::default(),
-            source: "coordination",
-        });
-
-        let sec = compute_sessions(&obs);
-        assert!(sec.estimate);
-        assert_eq!(sec.total_evaluated, 2);
-        assert_eq!(sec.active_count, 1);
-        assert_eq!(sec.first_pass_count, 1);
-        assert_eq!(sec.assignments_p50, 1.0);
-        // duration for s1 is 10:20 - 10:10 = 10m = 600s; s2 is single result-linked so 0s
-        assert_eq!(sec.duration_sec_p50, 0.0);
-        assert_eq!(sec.duration_sec_p90, 600.0);
     }
 
     #[test]

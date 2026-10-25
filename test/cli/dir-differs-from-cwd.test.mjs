@@ -142,15 +142,12 @@ test('workflow resume and answer warn before they act', () => {
   assert.ok(answer.stderr.includes('dir-differs-from-cwd'), answer.stderr);
 });
 
-test('fgos run warns for another project but not for run record or status', () => {
+test('fgos run warns for another project but not for workflow status', () => {
   const here = makeRepo('fgos-dir-run-here-');
   const there = makeRepo('fgos-dir-run-there-');
 
   const run = fgos(['run', '--unit', path.join(there, 'missing-unit.yaml'), '--dir', there], here);
   assert.ok(run.stderr.includes('dir-differs-from-cwd'), run.stderr);
-
-  const record = fgos(['run', 'record', '--dir', there], here);
-  assert.ok(!record.stderr.includes('dir-differs-from-cwd'), record.stderr);
 
   const status = fgos(['workflow', 'status', 'wf-run-missing', '--dir', there], here);
   assert.ok(!status.stderr.includes('dir-differs-from-cwd'), status.stderr);

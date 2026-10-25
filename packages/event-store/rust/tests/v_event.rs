@@ -1,3 +1,4 @@
+#![cfg(target_os = "linux")]
 mod reader_support;
 mod sync_support;
 use fgos_event_store::{
@@ -244,6 +245,7 @@ fn legacy_is_distributed_only_at_the_tracked_fence_pin() {
         fgos_event_store::read::ReadRequest {
             layout: &a.layout,
             origin: &origin,
+            machine: &a.machine,
             streams: &[fgos_event_store::layout::StreamId::parse("project").unwrap()],
             cursor: &Default::default(),
             folded: &[],

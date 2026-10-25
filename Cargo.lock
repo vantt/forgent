@@ -218,6 +218,8 @@ dependencies = [
  "fgos-config",
  "fgos-convention",
  "fgos-distribution",
+ "fgos-event-store",
+ "fgos-git",
  "fgos-holder-lock",
  "fgos-host-runtime",
  "fgos-identity",
@@ -366,6 +368,7 @@ dependencies = [
 name = "fgos-identity"
 version = "0.2.0"
 dependencies = [
+ "fgos-canonical-json",
  "fgos-convention",
  "fgos-durable-file",
  "fgos-git",
@@ -410,7 +413,6 @@ dependencies = [
  "fgos-holder-lock",
  "fgos-host-runtime",
  "fgos-identity",
- "fgos-yaml-doc",
  "libc",
  "serde",
  "serde_json",
