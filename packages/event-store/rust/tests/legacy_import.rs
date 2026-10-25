@@ -293,3 +293,47 @@ fn a_cutover_operation_directory_without_an_intent_does_not_block_the_next_attem
     }
     assert_eq!(import().unwrap()["operationId"], id);
 }
+/// After the cutover a write is admitted only while every legacy mirror still
+/// names the pinned import: a mirror that moved away from the pin refuses with
+/// refspec-missing, the same answer as a pin that was never fetched.
+#[test]
+fn a_migrated_write_is_refused_when_a_legacy_mirror_differs_from_the_pin() {
+    let f = Fixture::new();
+    legacy(&f, false);
+    let head = inventory(&f.driver, &f.repo).unwrap().from_commit;
+    let pin = import_legacy(&f.driver, &f.repo, &f.layout, head.as_str(), &[], 0).unwrap();
+    let root = f.repo.trusted_main_root();
+    git(&f, &["rm", "-q", ".fgos/events.jsonl"]);
+    fs::create_dir_all(root.join(".fgos")).unwrap();
+    let fence = serde_json::json!({"legacyRefOid": pin["legacyRefOid"], "sealDigest": pin["sealDigest"], "fromCommit": pin["fromCommit"]});
+    fs::write(
+        root.join(".fgos/events"),
+        serde_json::to_vec(&fence).unwrap(),
+    )
+    .unwrap();
+    git(&f, &["add", ".fgos/events"]);
+    git(&f, &["commit", "-qm", "cutover fence"]);
+    fgos_event_store::refspec::ensure_refspecs(&f.driver, &f.repo, "origin").unwrap();
+    write_readiness(&f.driver, &f.repo, "origin").unwrap();
+    let legacy_ref = pin["legacyRefOid"].as_str().unwrap();
+    git(
+        &f,
+        &["update-ref", "refs/fgos/remotes/origin/legacy", legacy_ref],
+    );
+    write_readiness(&f.driver, &f.repo, "origin").unwrap();
+    git(
+        &f,
+        &[
+            "update-ref",
+            "refs/fgos/remotes/origin/legacy",
+            head.as_str(),
+        ],
+    );
+    assert_eq!(
+        write_readiness(&f.driver, &f.repo, "origin")
+            .unwrap_err()
+            .code
+            .to_string(),
+        "event-store-refspec-missing"
+    );
+}

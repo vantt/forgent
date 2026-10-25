@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f33bbc8ca761c4d8076811cdbedc884e095cf16e9979b1c0b2b696a8092863d1",
+  "payloadDigest": "010736fd6978169fb132dad81a564f2a18f59f1dd6d11efe4c488942a88872f6",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -85,7 +85,7 @@
     "apps/fgos/src/wiring/metrics_sources.rs": "504e2c72b52a5da8d8d23a862403d47986811234809f364ee6006c6957f6c583",
     "apps/fgos/src/wiring/mod.rs": "08deb28466bf1e41ba1508e317fa4f3ef9ec56b782d1ba4478ead92b1eb0a276",
     "apps/fgos/tests/cli_tests.rs": "df9396c38982431e4c9d013cb8768979a0a9c98529bfd5cbd7800cf66a642df5",
-    "apps/fgos/tests/internal_lock_routes.rs": "d0306679d51ce2bf9afce4c3414ff58b11b9410673ffc354f2e60cd4409bd449",
+    "apps/fgos/tests/internal_lock_routes.rs": "c00e9f06cc092ca8892886f25cdabe148fdce3909c933fdf9ec92e9f8ffe298d",
     "apps/fgos/tests/windows_borrow.rs": "59258d09ea0b2420b7cecfe73fd9b67d61f83bb3a4d97feaa770aa6d26a05521",
     "apps/fgos/tests/windows_lock_hold_route.rs": "fe11272fb65d947366300770cd5765c1604c800eeac7f052fad57320db7e8530",
     "apps/fgos/tests/windows_predecessor_stress.rs": "0bf5b06644fdb212a693fb2a12979c8e3fb1c88800ae96a7494c00434e01c6c0",
@@ -311,7 +311,7 @@
     "packages/event-store/rust/tests/distribution_compatibility.rs": "27a73fa86d90395fb62b98bc7dbc5779538cccae607023ee9e1675235d8b6ac9",
     "packages/event-store/rust/tests/framing_prefixes.rs": "f55b6b0377994d8f71841d666d3f84eae63f4655d001f0e3fe4e0e1b688f98ff",
     "packages/event-store/rust/tests/kill_append.rs": "e569f3337c68909f41ac7bc9fcb4963f0d5b724987bb43171fcbfe2910f22c58",
-    "packages/event-store/rust/tests/legacy_import.rs": "485cf643e9845caec7055401ae2029e8fdd20ce61b7a1f8d9a5a2c19dab67b05",
+    "packages/event-store/rust/tests/legacy_import.rs": "f862b234dc8f567fddaa496b125d2d4c2c11b309176b3e892e27dd7bbcbbd4b4",
     "packages/event-store/rust/tests/legacy_reader.rs": "1d359ca1cac64604fcdeaeac42cb502bc1f2325694b978062b11c61c53c9f385",
     "packages/event-store/rust/tests/offline_sync.rs": "d0cac51d4e8402051c5d9c8785bc0ebd3ba1e3c1e8169f52d6f4d339bb91b459",
     "packages/event-store/rust/tests/order_kahn.rs": "c2b1004b8772de30aace61b1f8279c2131b1678a3be45f64b15b171c1728b6e1",
@@ -1825,14 +1825,14 @@
     },
     {
       "path": "apps/fgos/tests/internal_lock_routes.rs",
-      "line": 199,
+      "line": 207,
       "spawn": "Command::new",
       "binary": "bash",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/internal_lock_routes.rs",
-      "line": 218,
+      "line": 223,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"
