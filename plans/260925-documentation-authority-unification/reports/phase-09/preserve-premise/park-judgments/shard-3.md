@@ -1,6 +1,17 @@
 # Shard 3 — premise rework against the F chain
 
-**Status: blocked on checker support, not accepted.** Row judgments and post-chain proposals are prepared; the required stale-only checker outcome is **not** achieved. No patch was applied, and no review acceptance, gate closure, authority promotion or cutover readiness is claimed.
+**Current status: mechanical chain proof passes; independent acceptance still pending.**
+All proposals now use `premise-patch.v1`. See [current contract and proof](chain-check.md)
+and [chain-check-b005d4eba.json](chain-check-b005d4eba.json): 261 rows, 34 source-file and
+2 successor-holder proposals, 3 exact chain markers, zero unresolved findings.
+No judgment or original evidence changed. No patch was applied; no review acceptance,
+gate closure, authority promotion or cutover readiness is claimed.
+
+**Historical rework narrative below:** `chainRebases`, `successorPatches`,
+`postChainReplay`, diagnostic-chain counts and checker blockers describe the earlier
+proposal format only. Those side doors are removed from the current JSON: every sole
+executable proposal is attached as `rows[].patch`, including the two named holders.
+Five frozen pin replacement proofs remain non-executable `frozenPinEvidence`.
 
 - Rework pin: `c58f2b230e14e73db42cb8ccc965ef8967bb085a`.
 - Frozen source-evidence pin retained: `c94545de5b45873cb2eb419f10124283fd730a2e`. Source passages and digests are unchanged; new Lead authority is separately pinned in `decisionRefs`.

@@ -1,0 +1,52 @@
+{
+  "exit": 0,
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard.py",
+        "--shard",
+        "1"
+      ],
+      "exit": 0,
+      "stdout": "{\"counts\": {\"duplicateOfChain\": 17}, \"exit\": 0, \"report\": \"plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/chain-check-b005d4eba.json\", \"sourceCommit\": \"b005d4eba8d89a28f4b7cbd66f75354708aeb23c\", \"unresolved\": 0}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard.py",
+        "--shard",
+        "2"
+      ],
+      "exit": 0,
+      "stdout": "{\"counts\": {\"duplicateOfChain\": 4}, \"exit\": 0, \"report\": \"plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/chain-check-b005d4eba.json\", \"sourceCommit\": \"b005d4eba8d89a28f4b7cbd66f75354708aeb23c\", \"unresolved\": 0}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard.py",
+        "--shard",
+        "3"
+      ],
+      "exit": 0,
+      "stdout": "{\"counts\": {\"duplicateOfChain\": 3}, \"exit\": 0, \"report\": \"plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/chain-check-b005d4eba.json\", \"sourceCommit\": \"b005d4eba8d89a28f4b7cbd66f75354708aeb23c\", \"unresolved\": 0}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard.py",
+        "--all"
+      ],
+      "exit": 0,
+      "stdout": "{\"counts\": {\"duplicateOfChain\": 24}, \"exit\": 0, \"report\": \"plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/chain-check-b005d4eba.json\", \"sourceCommit\": \"b005d4eba8d89a28f4b7cbd66f75354708aeb23c\", \"unresolved\": 0}\n",
+      "stderr": ""
+    }
+  ]
+}
