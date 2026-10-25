@@ -1,137 +1,213 @@
-# Shard 2 — owned-park premise judgments
+# Shard 2 — rework against the F chain
 
-Pin at turn start: **`c94545de5b45873cb2eb419f10124283fd730a2e`**.
-Input proof source: `4178dcc6e3445d5d9b8ffd55963cdd02a418af73`.
-Scope: exactly the **263 IDs** in [shard-2-ids.json](shard-2-ids.json).
+**Status: blocked on checker support, not accepted.** All seven review REWORKs have prepared fixes, but the required checker does not accept F-chain patch preimages. No source patch has been applied; no authority, gate closure or cutover-readiness claim is made.
 
-Read [the brief](../../w22-g6-park-judgments-brief.md), the W22 register review (Markdown and JSON), W8 parks review, W9 fix review, preserve-premise receipt, and owner rulings L13-10/L13-20. This settles producer judgments, **not independent approval, gate acceptance, cutover readiness or authority**. Neither the original proof nor any source document was edited.
+- Evidence pin remains `c94545de5b45873cb2eb419f10124283fd730a2e`.
+- F-chain replay pin: `c58f2b230e14e73db42cb8ccc965ef8967bb085a`.
+- Scope: exactly 263 assigned IDs; only [shard-2.json](shard-2.json) and this report changed.
+- Inputs read: the complete w25 brief, both shard-2 review files, L13-21, `chain-check.md` including the Lead correction, and shard-2 findings in `chain-check-c804a3213.json`.
+- Reused the existing patch record, `check_shard.py` custody/marker helpers, `composition/compose.py` replay, and Step 7 hunk handling. Read-only history identifies `926000dbd` as the consolidated checker's introduction. No replacement checker or parallel bare-pin executable patch is shipped.
 
-Machine record: [shard-2.json](shard-2.json). Checker: [check_shard_2.py](check_shard_2.py). The assignment deliberately gives this checker a shard-specific filename to avoid parallel-turn collisions.
+## Before and after
 
-## Dispositions
+| Measure | Before | After |
+|---|---:|---:|
+| Assigned rows | 263 | 263 |
+| preserve-confirmed | 229 | 226 |
+| repoint | 28 | 31 |
+| successor-bound | 6 | 6 |
+| owned-park / retire-with-source | 0 / 0 | 0 / 0 |
+| Distinct prepared file patches | 16 | 42 |
+| Replacement records | 28 | 67 |
+| Verified `alreadyComposed` rows | 0 | 4 |
+| Changed / unchanged rows | — | 73 / 190 |
 
-| Disposition | Count |
-|---|---:|
-| preserve-confirmed | 229 |
-| repoint | 28 |
-| successor-bound | 6 |
-| retire-with-source | 0 |
-| owned-park | 0 |
-| **Total** | **263** |
+The 64 patch-owning rows share **42** complete file patches; execute each file patch once. All 263 original source/evidence bindings are unchanged. Six removed-law successor bindings remain unchanged, including the disclosed non-identical opening provenance in the law carrier.
 
-Input kinds: **257** unconfirmed-premise parks and **6** removed-by-cutover parks; no absent-source row belongs to this shard. Every row has its own source binding, evidence spans, file and unit digests, reason, group, pin and `needsFlipDate: false`. There is no flip-date dependency and no unresolved owned park requiring an owner/action.
+### Required checker: still blocked
 
-## Shared-cause groups
+The unmodified `check_shard.py` main was executed with `--shard 2`. Its report-write destination alone was redirected to an auto-cleaned tempfile because its default output is outside this assignment's writable list. No validation was changed or skipped.
 
-The JSON `groups` partition lists every member ID explicitly, and every row names its group. Grouping does not replace per-row evidence or disposition.
-
-| Group | Rows | Explanation |
-|---|---:|---|
-| completed-work | 111 | The bound passage records a completed incident, source capture, prior decision or quoted verification input. Preserve the original event identity, not a current-reader redirect. The actual sentence/section supplies the premise; the knowledge-directory location alone does not. |
-| literal-input | 7 | Diagnostic output, a regex prefix, a variable filename pattern, path grammar, or a fenced implementation comment. These are literal operands, not authority documents to follow. |
-| migration-inventory | 18 | f05117–f05134 are Phase 0 evidence-only inventory rows. The header limits the file to migration bookkeeping; the surrounding note says it records the earlier migration. Target-path cells are historical classifications. |
-| history-wrapper | 8 | Historical templates and explicitly conservation-only source wrappers preserve their original header/source references. Their stated use excludes current canonical authority; placeholders remain placeholders. |
-| audit-history | 15 | The ID audit is explicitly History, records the July audit/closure and forbids current canonical use. Its old decision/file coordinates identify that audit's evidence. |
-| source-relationship | 29 | Promoted-from/preserved-from and source architecture/protocol/plan/design relationships are lineage. Current target links are separately available; a clickable source relationship does not by itself delegate current authority. |
-| frozen-metadata | 3 | f06711/f06780/f06802 occur inside `Source Metadata (Added in candidate)`, the fenced original header, not the active wrapper's Related list. |
-| restored-host-source | 24 | Verbatim-restoration notes pin the original commit; restored fenced excerpts and the literal old side of navigation mappings preserve source bytes. This does not approve an unassigned live mapping destination. |
-| correction-evidence | 3 | f06828/f06830/f06831 record inputs to the earlier A40/A19 truth correction. The note expressly withholds carried approval and says rebindings remain pending. |
-| distribution-history | 11 | The baseline expressly rejects old sources as current authority. Its old-source table, vision lineage, displaced-unit notes and the portal's Source type conserve promotion inputs. |
-| law-successor | 6 | The removed root law claims have actual units in the surviving law carrier. Bind those current units instead of inheriting preserve from the deleted file. |
-| live-route | 28 | Current reader/consumer instructions, cross-contract dependencies, placement prescriptions and active Related routes must use their successor holders. Prepare a co-composed patch per file; do not apply it. |
-
-### Distinctions that mattered
-
-- **f03773/f03775:** `NNNN-*.md` and `^docs/decisions/00[0-9]+-` are a pattern and a regex input, not literal authority files. Preserving them does **not** certify the surrounding old manual-ID-allocation recipe as current. The same file's real-incident rows preserve the original incident identities.
-- **f03897 versus f03898:** a completed rename's footprint is historical; the later Related entry calling the map canonical is live navigation and is repointed.
-- **f04255 versus f04271:** the former reports an already-made FSM/CONTEXT judgment; the latter presents the existing completion ladder as current authority and is repointed.
-- **f06461:** only the active Related entry is repointed. The architecture map's separately labelled Provenance origin is not rewritten.
-- **f06785 versus f06786/f06787:** Event Store's Supersedes entry is decision lineage. Its Related laws and operative L7 durability citation are current dependencies and are repointed.
-- **f06790/f06791:** `Target platform docs` is a placement prescription, not a labelled old inventory. The two entries become docs-relative successor paths in the tree; no unrelated subtree is redesigned.
-- **f06811 versus the YAML I/O references:** the Research path is inside the comment recording the original schema correction and real `fgos show` observation. The envelope/error/parity requirements and `x-specs` entries import a current contract and are repointed.
-- **f06915–f06917/f06932:** imperative language inside a fenced, expressly restored source excerpt is still the original source, with a separate navigation mapping. It is not silently converted into current authority.
-- **f07112:** use the carried **0035 narrative**, not just the foundations law summary. `carries/claim-carries.json` names this holder/anchor; the output separately binds its current section bytes rather than reusing the old carry digest.
-
-## Prepared repoints
-
-There are **16 distinct per-file patches**, containing **28 exact line replacements**. Rows sharing a file carry the same complete patch and list all affected shard repoint IDs. The existing prepared-patch format is reused: `file`, `status: prepared-not-applied`, `rowIds`, `sourceSha256`, `proposedSha256`, `replacements` and unified `patch`.
-
-| Successor holder | Shard rows |
-|---|---|
-| `docs/platform/architecture-map.md` | f03898, f06461, f06550 |
-| `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml` | f03917, f04357, f06837 |
-| `docs/platform/platform-foundations.md` | f04271, f06786, f06787, f07112 |
-| `docs/platform/herdr-web-dashboard/operations/operator-runbook.md` | f04427 |
-| `docs/platform/governance.md` | f04443, f06791, f07111, f07121, f07134, f07135 |
-| `docs/platform/runner/contracts/routing-handoff.md` | f04479 |
-| `docs/platform/work-state/contracts/cli-io-contract.md` | f06551, f06805, f06808, f06817, f06821, f06833, f06835, f06843 |
-| `docs/platform/documentation/operations/portals/docs-portal.md` | f06790, f07115 |
-
-Every row names its successor **section and current unit digest** in the JSON, with quoted evidence at this pin. Placement evidence comes from `ledger/area-map-root-authorities.md`, `ledger/area-map-whole-system-architecture.md` or the explicit 0035 binding in `carries/claim-carries.json`. The f06787 patch replaces the old numeric line locator with `#l7-durability-ladder`.
-
-The f04479 source unit has moved from the proof's old line 611 to **line 661**. Its complete unit still binds uniquely at this pin; the output uses the actual current line and digest, not the stale locator. No F bytes are needed to settle it.
-
-These patches have **not been applied** to the repository. Composition with other shards, existing prepared patches, and later source drift remains Lead work. Do not apply duplicate copies of a shared patch; compose once per file and recheck its preimage. Nothing here authorizes changes to unassigned occurrences elsewhere in the same document.
-
-## Removed-source claims
-
-All six belong to removed `docs/platform-foundations.md`; their successor is **`docs/platform/platform-foundations.md`**.
-
-| Rows | Successor unit at pin | Current unit SHA-256 |
+| Actual checker result | Before | After |
 |---|---|---|
-| f04437, f04438, f04439, f04440 | opening law/provenance paragraph, lines 99–106 | `ede22a666bfbe3cdd200ebb7027f69d42d3453ff3ac727d12a1b0ffd55c6c239` |
-| f04441 | L1 log/state section, lines 113–136 | `ab9580104ceee633a3fa85986cdfbe4e9c6d5c5b4ee8e060334993f868f19210` |
-| f04442 | L6 maturity section, lines 239–266 | `61804494df677de20e2b98df372c2ed5f5fc39ab90d4dc36cf4b6ffe8d2b3286` |
+| Exit | 1 | 1 |
+| Findings | 12 conflictsWithChain + 4 duplicateOfChain + 15 staleChainEntry | 1 invalidShard + 15 staleChainEntry |
+| Shard row inspection | 16 unresolved row findings | **Not reached**; do not infer zero row findings |
 
-The opening is **non-identical**: the carrier replaces the old `.bee/decisions.jsonl`/report provenance with the generated decision index and spec narratives, while retaining the deep-dive source identity. This is disclosed, not treated as verbatim conservation. L1 retains its State example. L6 retains the expressly dated **Claimed F4 — 2026-07-16** measurement and original benchmark coordinate; no fresh benchmark execution is claimed.
+The after error is:
 
-## Verification and commands
-
-Run from the worktree root:
-
-```sh
-python3 -B plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard_2.py --shard 2
-python3 -B plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard_2.py --shard 2 --self-test
+```text
+patch preimage: docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md
 ```
 
-The checker reads source/evidence from **git blobs at the recorded pin**, not mutable working-tree content. It checks exact shard membership/order/no duplicates, proof and ID-file digests, kind, source-unit custody, evidence lines/text/file and span digests, successor sections/unit digests, group partition/counts, and per-file patch ownership. Every unique patch is replayed **forward and backward with `patch --batch --fuzz=0 -p1`**, without offsets, in a `TemporaryDirectory` under `/tmp/fgos-work/`; expected proposed and restored bytes must match exactly. Context-manager cleanup also runs on failed replay.
+`validate_shard()` requires `sourceSha256 == sha(blob(document.pin, file))` and rebuilds the diff from that bare evidence pin. L13-21.1 instead requires the strict F-chain result as the preimage. Fifteen of the 42 file preimages differ from the evidence pin. Restoring the old hashes/diffs to satisfy this check would undo the requested rebase.
 
-Eight negative controls reject a missing row, duplicate row, fabricated evidence text, wrong evidence digest, invalid line, wrong source-unit digest, per-row pin drift and a malformed patch. Mechanical success proves custody/replay, **not independent semantic approval**.
+Additionally, `inspect_rows()` selects replacements with original evidence ordinals, not the rebased ordinal or explicit `sourceLine`. Examples: f04479 is evidence line 661 / chain line 697; f06799 is evidence line 476 / chain line 478. It also treats any changed line in a preserved source span as an operand conflict; the five cases below demonstrate why that is overbroad.
 
-### Command ledger
+**Needed write, not performed:** `preserve-premise/park-judgments/check_shard.py` (full repo-relative path is recorded in JSON `verification.needsWrites`). Its owner needs to validate the declared F-chain base and source-to-chain ordinal binding while retaining all custody/replay checks, compare preserved bound operands, and provide a report output option usable under exact shard scopes. Until then the required proof is **not met**. No stale-only or passing official result is claimed.
 
-Inline Python commands below were `python3 -B - <<'PY' … PY` unless noted; descriptions identify the executed probes rather than pretending the exploratory snippets are reusable verifier files.
+### Supplemental proof, not a substitute for that gate
 
-| Command / probe | Exit | Observation |
-|---|---:|---|
-| Required acknowledgement: Python timestamp/JSON write to outbox `.tmp`, then `os.replace`; `pwd` | 0 | Protocol acknowledgement only; outside-workspace runner artifact. |
-| `git rev-parse HEAD`; `git status --short`; `git log -5 --oneline -- …/preserve-premise`; `ls …/park-judgments` | 0 | Start pin above; initially clean; only shard ID files existed. |
-| Python: inspect proof shape, select shard IDs, print first two complete rows and per-file population | 0 | 263 assigned identities and current source bindings. |
-| Python: inspect units before f05100 | 0 | Tool output truncated; reran the early slice separately. |
-| Python: inspect units before f04015 | 0 | Completed the early slice without relying on truncated output. |
-| Python: inspect units f05100–f06799 | 0 | Inventory, source wrappers and metadata. |
-| Python: inspect units f06800–f07068 | 0 | API/spec dependencies and host restoration sources. |
-| Python: inspect units f07069 onward | 0 | Host source audit/vision, ledger, authoring rules and baseline. |
-| Python: print knowledge file headers/section headings | 0 | Checked surrounding framing; early truncated portion was reread by the later header probe. |
-| Python: count input kinds and locate every current unit in the actual source | 0 | 257 unconfirmed / 6 removed; repeated restoration notes located by their row coordinates. |
-| Python: list removed-source rows/successors | 0 | All six have the law carrier as an explicit successor. |
-| `git log -5 --oneline -S'prepared-not-applied' -- …/preserve-premise`; Python inspect carries shapes | 0 | Reused db023f065's prepared-patch structure, not a new patch mechanism. |
-| Python: search document operations for root-holder mappings | 0 | No relevant root mappings; used the frozen ledger maps instead. |
-| Python: print source headers for rows before f03868 | 0 | Completed the earlier truncated header inspection. |
-| Python: inspect prior reasons for pattern/tree/source-link edge cases | 0 | Rejudged their semantics rather than inheriting old preserve assertions. |
-| Python: list successor headings; inspect carries mission bindings | 0 | Located L1/L6/L7/L9, CLI sections, hard rule and 0035 narrative. |
-| Python: exploratory repoint-heading validation | 1 | Found the actual governance heading is `## 5. Metadata`, not guessed `Metadata Discipline`; no artifact/source was written by this failed probe. |
-| Python: build per-row judgments from pinned source bytes, explicit semantic choices, ledger spans and co-composed patch preimages | 0 | Wrote only `shard-2.json`; 263 rows / 12 groups / 16 patches. |
-| Checker `--shard 2 --self-test` | 0 | Passed; 263 rows, 16 bidirectional patch replays, 8 rejected negative controls. |
-| Python: inspect all prepared replacements and current source positions | 0 | 28 replacements, f04479 at current line 661. |
-| Python: summarize successor digests and repoint members | 0 | Matches the tables above. |
-| Python: double replay, AST parse, then initial new-file whitespace wrapper | 1 | Both checker runs passed with identical stdout/empty stderr and unchanged artifacts. The wrapper incorrectly expected `git diff --no-index` to return 0 for an added file; it returned normal difference code 1 with no diagnostics. No whitespace defect was reported. |
-| Checker `--shard 2` | 0 | Required invocation passed: 263 rows, 12 groups, 16 patches. |
-| Python: double `--self-test` replay and corrected new-file checks | 0 | Identical stdout, empty stderr, unchanged three artifacts; AST valid; explicit trailing-whitespace/EOF checks pass. Each `git diff --no-index --check /dev/null <new-file>` returns 1 (new content differs) with empty stdout/stderr. No checker scratch directory or pycache remains. |
-| `GIT_OPTIONAL_LOCKS=0 git diff --check` | 0 | No tracked whitespace errors. |
-| `GIT_OPTIONAL_LOCKS=0 git diff --name-only HEAD -- docs src scripts test packages apps` | 0 | Empty: no product/source changes. |
-| `GIT_OPTIONAL_LOCKS=0 git status --short --untracked-files=all` | 0 | Exactly the three assigned shard output files are new. |
+Exit **0** for the separate read-only custody/replay probe:
 
-File reads, path searches and content greps also inspected the named briefs, reviews, rulings, source headers, target sections and ledger maps; no source-changing command was used. The exploratory lookup `docs/platform/io/README.md` was absent; the actual CLI contract was discovered under `work-state/contracts/` before any successor judgment was written.
+- 263 exact IDs, group partition and disposition counts; proof/ID input digests; every original source/evidence span and successor span checked with the existing `check_span()` helper.
+- 42/42 file bases strict, with exact chain IDs/input hashes; zero stale source dependencies.
+- 42/42 prepared diffs reconstruct exactly from their replacement records, reach `proposedSha256`, and replay forward/reverse with `patch --batch --fuzz=0 -p1`, restoring the exact chain bytes.
+- All four duplicate markers independently pass the existing `inspect_rows()` marker checks, with no parallel patch.
+- Repoint operands are removed/moved and successor-bound source files are removed, using the corrected Lead rule. All 36 X1 rows plus f06461 have non-clickable lineage patches.
 
-No git add/commit, fgOS CLI/lifecycle, product tests, native addons, secret access, source writes, register/proof edits or pair accounting. Impact-analysis: **degraded/unqueried** because the brief forbids the CLI and no live impact-analysis tool is exposed; this is a new report-local checker, not an existing product-symbol edit. No Markdown preview service was launched under the exact write boundary.
+Every patch now declares `base.kind: F-chain`, its source commit and effective chain entry IDs. `replacements.line` is the chain-result ordinal; `sourceLine` retains the original evidence ordinal. These are explicit patch-base facts, not a waiver of the evidence pin. Pinned checker/chain input digests are in `rework.inputs`.
+
+## Changed rows and reasons
+
+The table enumerates all 73 changed rows. JSON `reworkNotes`, `chainReview`, and `rework.changes` retain individual details.
+
+| Row | Change and reason |
+|---|---|
+| f03781 | Preserve historical Iron Law collision identities; chain line 134 changes a different explanatory link, not either 0032 operand. Record exact overlapping edit. |
+| f03782 | Preserve historical multi-role collision identities; the same line-134 explanatory-link edit does not change either bound 0032 operand. |
+| f03783 | Preserve the historical distribution conflict footprint on line 130; chain only retargets the explanatory link on line 134. |
+| f03898 | Regenerate shared file patch on strict chain; approved architecture successor unchanged. |
+| f03913 | Preserve launcher-vocabulary source on line 66; chain edits the sibling merge-block example on line 67, not this operand. |
+| f03917 | Regenerate gateway-contract pointer patch on strict chain, retaining intervening chain edits. |
+| f04047 | R1 / L13-21.2: banner is current framing; decision 0062 citation now targets `docs/platform/runner/decisions/h-36d872fbb0e5.md`. |
+| f04271 | Rebase law pointer; approved successor unchanged. |
+| f04287 | R1 / L13-21.2: same current banner locator fix as f04047. |
+| f04357 | Rebase gateway-contract pointer; approved successor unchanged. |
+| f04427 | Rebase runbook pointer; approved successor unchanged. |
+| f04443 | Replace failed bare-pin context with strict-chain context; keep the chain's changed Supersedes text. |
+| f04479 | Rebase handoff pointer from original line 661 to chain line 697. |
+| f06461 | R2: preserve the architecture map's own legacy-source identity, not a self-link. L13-21.4 code-span patch; remove successor claim. |
+| f06504 | L13-21.4: code-format own-source Related path; preserve lineage. |
+| f06508 | Preserve canary source at line 112; chain adds an ADR0009 gloss on line 108, not a canary-source retarget. |
+| f06550 | Rebase architecture-manifest pointer; approved successor unchanged. |
+| f06551 | Rebase CLI I/O pointer; approved successor unchanged. |
+| f06591 | L13-21.4: code-format audit own-source Related path. |
+| f06697 | L13-21.4: code-format architecture-template source Related path. |
+| f06699 | L13-21.4: code-format area-template source Related path. |
+| f06700 | L13-21.4: code-format contract-template source Related path. |
+| f06702 | L13-21.4: code-format docs-portal own-source Related path. |
+| f06786 | Rebase shared Event Store patch on chain; preserve its durability/gloss edits. |
+| f06787 | Rebase L7 citation onto the chain's rewritten ack sentence, without restoring old D5/D2 prose. |
+| f06790 | R3: coherent tree edit, not a slash-containing root filename. Remove moved root README/governance and archived templates; show actual platform/documentation destinations. |
+| f06791 | R3: same shared tree edit; place `governance.md` under `platform/`. |
+| f06794 | L13-21.4: code-format governance own-source Related path. |
+| f06799 | L13-21.4: source-design link becomes code spans; preserve distinct visible label and destination; rebase to chain line 478. |
+| f06805 | `alreadyComposed: file:docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`; remove duplicate patch. |
+| f06808 | Same verified chain entry; no parallel x-specs patch. |
+| f06817 | Same verified chain entry; remove duplicate refusal-contract patch. |
+| f06821 | Same verified chain entry; remove duplicate refusal-contract patch. |
+| f06823 | L13-21.4: code-format runbook own-source Related path. |
+| f06833 | Rebase shared dashboard patch; preserve chain's work-state pointer edits. |
+| f06835 | Rebase dashboard authorization-boundary citation on chain. |
+| f06837 | L13-21.5: retain explicit gateway-yaml successor patch on chain; it is not already composed. |
+| f06843 | Rebase dashboard I/O Related pointer beside the chain-repointed work-state entry. |
+| f06861 | L13-21.4: source protocol link becomes code span, not successor authority. |
+| f06871 | L13-21.4: host-use-cases source architecture link becomes code span. |
+| f06875 | L13-21.4: invocation-kernel source architecture link becomes code span. |
+| f06883 | L13-21.4: legacy-transition source link becomes code span. |
+| f06900 | L13-21.4: Node/Rust migration source link becomes code span. |
+| f06913 | L13-21.4: provider-routing source architecture link becomes code span. |
+| f06920 | R4 / L13-21.5: change only right-hand advisory destination to `../../component-boundary.md`; literal mapping input and fenced excerpts stay unchanged. |
+| f06924 | L13-21.4: release-boundaries source-plan link becomes code span. |
+| f06933 | R4 / L13-21.5: same right-hand-only advisory destination repair in component-protocol. |
+| f06951 | L13-21.4: legacy-payload source-transition link becomes code span. |
+| f06953 | L13-21.4: operation-catalog source architecture link becomes code span. |
+| f06956 | L13-21.4: request/outcome source architecture link becomes code span. |
+| f07069 | L13-21.4: compatibility-harness source-plan link becomes code span. |
+| f07075 | L13-21.4: R1 proof source-plan link becomes code span. |
+| f07081 | L13-21.4: R2 proof source-plan link becomes code span. |
+| f07084 | L13-21.4: R3 proof source-migration link becomes code span. |
+| f07086 | L13-21.4: coverage-matrix standardization source becomes code spans; current coverage links untouched. |
+| f07087 | L13-21.4: coverage-matrix host architecture source becomes code spans. |
+| f07091 | L13-21.4: coverage-matrix external protocol source becomes code spans. |
+| f07094 | L13-21.4: coverage-matrix legacy transition source becomes code spans. |
+| f07097 | L13-21.4: coverage-matrix Node/Rust source becomes code spans. |
+| f07098 | L13-21.4: coverage-matrix Rust plan source becomes code spans. |
+| f07105 | L13-21.4: vision's preserved host architecture source becomes code spans; proof link retained. |
+| f07106 | L13-21.4: vision's preserved legacy-transition source becomes code spans. |
+| f07107 | L13-21.4: vision's preserved external-protocol source becomes code spans. |
+| f07108 | L13-21.4: vision's preserved Node/Rust source becomes code spans. |
+| f07109 | L13-21.4: vision Related source architecture link becomes code span. |
+| f07110 | L13-21.4: vision Related source migration link becomes code span. |
+| f07111 | Rebase intent-ledger governance pointer; approved successor unchanged. |
+| f07112 | Rebase mission-decision pointer; retain the approved carried 0035 narrative/anchor. |
+| f07115 | Rebase intent-ledger portal pointer; approved successor unchanged. |
+| f07121 | Rebase authoring-rules governance Related pointer. |
+| f07134 | Rebase placement-map instruction; governance tree patch now agrees with this live route. |
+| f07135 | Rebase metadata instruction; approved successor unchanged. |
+| f07205 | L13-21.4: code-format distribution baseline's own-source Related path. |
+
+The five preserved-span findings above remain checker-owner disputes, **not resolved mechanical findings**. Changing their dispositions to silence the checker would misstate their bound operands. Exact chain before/after edits are embedded in each row's `chainReview`.
+
+## Live-pointer scope and unchanged exceptions
+
+- Of L13-21.5's named files, shard 2 owns `herdr-web-dashboard/spec.md` (f06837) and the two component-boundary mapping files (f06920/f06933). Their patches are included.
+- `config/spec.md`, `ui-spec/architecture/screens/S03-task-detail.md`, `ui-spec/contracts/15-system-events.md`, `identity/spec.md`, and `workflow/spec.md` under `docs/platform/` have no source file in shard 2. No extra rows or patches are claimed for them.
+- `packages/yaml-doc` is excluded: it is an implementation/package path, not a removed documentation authority root, and no shard-2 row binds it.
+- f06698 is the already-broken history-template placeholder `../contracts/`; it is not one of the 36 removed-source X1 rows and remains unchanged. This does not certify the eventual platform link guard as green.
+- No shard-3 `docs/history/` convention park was touched (L13-21.3). Source paths *inside* `docs/platform/documentation/history/templates/` above are distinct assigned shard-2 lineage rows, explicitly covered by L13-21.4.
+
+## Stale chain entries left for the separate rebase turn
+
+None touches a shard-2 source file or a prepared patch base. The main checker nevertheless includes all 15 globally; all have `chainEntryId: file:<path>`:
+
+1. `.githooks/pre-commit`
+2. `docs/io-contract.md`
+3. `docs/platform/agent-confinement/contracts/confinement-authority-v1.md`
+4. `docs/platform/agent-confinement/decisions/confinement-authority-decisions.md`
+5. `docs/platform/agent-confinement/history/rollout-and-settled-facts.md`
+6. `docs/platform/agent-coordination/decisions/README.md`
+7. `docs/platform/runner/architecture/h-69197b459754.md`
+8. `docs/platform/runner/architecture/h-7af1f0242611.md`
+9. `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`
+10. `docs/reading-map.md`
+11. `plugins/fgOS/skills/terminal/SKILL.md`
+12. `src/runner/dispatch/assignment-runner.mjs`
+13. `src/runner/dispatch/confinement/policies.mjs`
+14. `src/runner/dispatch/herdr-round.mjs`
+15. `test/runner/dispatch-worker-session.test.mjs`
+
+## Reproduce supplemental patch and custody proof
+
+From the repository root; this prints results and writes only auto-cleaned checker scratch under `/tmp/fgos-work/`. It does **not** replace the blocked official checker:
+
+```sh
+python3 -B - <<'PY'
+import importlib.util, json, pathlib
+h = pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments').resolve()
+s = importlib.util.spec_from_file_location('c', h / 'check_shard.py')
+c = importlib.util.module_from_spec(s); s.loader.exec_module(c)
+d = c.load(h / 'shard-2.json'); rp = c.load_replayer()
+states, findings, _ = c.replay_chain(d['rework']['sourceCommit'], rp)
+patches = {}
+assert [r['rowId'] for r in d['rows']] == c.load(h / 'shard-2-ids.json')['rowIds']
+for row in d['rows']:
+    c.check_span(d['pin'], row['source'])
+    for evidence in row['evidence']: c.check_span(d['pin'], evidence)
+    if 'successor' in row:
+        successor = row['successor']
+        c.check_span(d['pin'], successor.get('unit', successor))
+        if 'sectionEvidence' in successor: c.check_span(d['pin'], successor['sectionEvidence'])
+        for holder in successor.get('relatedHolders', []):
+            c.check_span(d['pin'], holder['unit']); c.check_span(d['pin'], holder['sectionEvidence'])
+    if 'patch' in row:
+        p = row['patch']; assert patches.setdefault(p['file'], p) == p
+for file, p in patches.items():
+    state = states.get(file, {'text': c.blob(d['rework']['sourceCommit'], file).decode(), 'strict': True})
+    assert state['strict'] and c.sha(state['text']) == p['sourceSha256']
+    after = rp.apply_diff(file, state['text'], p['patch'])
+    assert c.sha(after) == p['proposedSha256']
+    assert c.patch_roundtrip(file, state['text'], p['patch'])['ok']
+assert len(d['rows']) == 263 and len(patches) == 42
+print('263 custody bindings; 42 strict-chain postimages and fuzz-zero roundtrips pass; official gate remains blocked')
+PY
+```
+
+## Command/scope notes
+
+- The before and after main-checker runs returned the nonpassing results above. An initial report-redirection wrapper mistakenly rejected the replayer's legitimate tempfile writes; it was corrected before collecting the stated baseline. A supplemental-probe marker subdocument initially omitted `pin`; that fixture was corrected and the full probe rerun successfully. Neither exploratory failure changed any checker/source file or supplies passing evidence.
+- The strict-chain preparation probe initially used governance line 64 instead of 65; its assertion stopped before any shard write. The corrected tree was replayed both ways.
+- `git diff --check` passes; worktree diff contains only the two assigned files. No git add/commit, fgOS CLI/lifecycle, product test, addon, source/chain/ledger/register edit, or pair accounting.
+- Impact-analysis: **degraded/unqueried**; task forbids the CLI and no impact-analysis tool is exposed. No existing product symbol changed. No Markdown preview service was started under this exact write boundary.
+- Scratch scripts/reports were confined to an auto-created `/tmp/fgos-work/` tempfile directory and removed at the end. The persistent evidence is the two assigned records, their pinned inputs, and the reproducible probes above.
