@@ -1,0 +1,1620 @@
+{
+ "review": "w23 G6 park-judgments shard 1",
+ "shardCommit": "8313bfa5e",
+ "pin": "c94545de5b45873cb2eb419f10124283fd730a2e",
+ "reviewedAt": "587222468",
+ "items": [
+  {
+   "rowId": "f00093",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (generic-scaffold): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": ".claude/skills/ui-spec/CONVENTION.md:173 token 'docs/ui-spec/tools'. Framing: .claude/skills/ui-spec/CONVENTION.md:157 '## 6. Compiler pipeline'; .claude/skills/ui-spec/SKILL.md:20 '### `generate <prd-path> [--output docs/ui-spec]`'"
+  },
+  {
+   "rowId": "f00097",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (generic-scaffold): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": ".claude/skills/ui-spec/SKILL.md:246 token 'docs/ui-spec/tools/'. Framing: .claude/skills/ui-spec/SKILL.md:228 '### Mode 1 — Generate spec from a PRD'; .claude/skills/ui-spec/SKILL.md:20 '### `generate <prd-path> [--output docs/ui-spec]`'"
+  },
+  {
+   "rowId": "f00098",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (generic-scaffold): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": ".claude/skills/ui-spec/references/CONVENTION.md:173 token 'docs/ui-spec/tools'. Framing: .claude/skills/ui-spec/references/CONVENTION.md:157 '## 6. Compiler pipeline'; .claude/skills/ui-spec/SKILL.md:20 '### `generate <prd-path> [--output docs/ui-spec]`'"
+  },
+  {
+   "rowId": "f00101",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (source-provenance): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": ".github/workflows/ci.yml:63 token 'docs/distribution-vision.md'. Framing: .github/workflows/ci.yml:1 'name: CI'; .github/workflows/ci.yml:63 '      # Full suite (docs/distribution-vision.md tsk-49r D1): already'"
+  },
+  {
+   "rowId": "f00102",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin. Note: this AGENTS.md hunk fails after the chain AGENTS.md patch (phase-08 file:AGENTS.md, hunk overlap at lines 6-20); compose it at F.",
+   "evidence": "AGENTS.md:8 token 'docs/platform-foundations.md' -> docs/platform/platform-foundations.md; patch AGENTS.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f00106",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin. Note: this AGENTS.md hunk fails after the chain AGENTS.md patch (phase-08 file:AGENTS.md, hunk overlap at lines 6-20); compose it at F.",
+   "evidence": "AGENTS.md:13 token 'docs/routing-handoff-contract.md' -> docs/platform/runner/contracts/routing-handoff.md; patch AGENTS.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f00117",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin. Note: this AGENTS.md hunk fails after the chain AGENTS.md patch (phase-08 file:AGENTS.md, hunk overlap at lines 6-20); compose it at F.",
+   "evidence": "AGENTS.md:60 token 'docs/routing-handoff-contract.md' -> docs/platform/runner/contracts/routing-handoff.md; patch AGENTS.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f00118",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin. Note: this AGENTS.md hunk fails after the chain AGENTS.md patch (phase-08 file:AGENTS.md, hunk overlap at lines 6-20); compose it at F.",
+   "evidence": "AGENTS.md:63 token 'docs/platform-foundations.md' -> docs/platform/platform-foundations.md; patch AGENTS.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f00148",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/Cargo.toml:44 token 'docs/contracts/fgos-gateway-api-v1.yaml'. Existing chain entry: composition/patch-specs.json w2:predecessor:apps/fgos-gateway/Cargo.toml (also phase-08 step-07 file:apps/fgos-gateway/Cargo.toml) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00156",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/src/gateway.rs:2 token 'docs/contracts/fgos-gateway-api-v1.yaml'. Existing chain entry: phase-08/step-07-composed-patches.json file:apps/fgos-gateway/src/gateway.rs (beforeSha256 == current file) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00158",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/src/gateway.rs:40 token 'docs/contracts/fgos-gateway-api-v1.yaml'. Existing chain entry: phase-08/step-07-composed-patches.json file:apps/fgos-gateway/src/gateway.rs (beforeSha256 == current file) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00161",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/src/gateway.rs:188 token 'docs/contracts/fgos-gateway-api-v1.yaml'. Existing chain entry: phase-08/step-07-composed-patches.json file:apps/fgos-gateway/src/gateway.rs (beforeSha256 == current file) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00162",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/src/gateway.rs:254 token 'docs/contracts/fgos-gateway-api-v1.yaml'. Existing chain entry: phase-08/step-07-composed-patches.json file:apps/fgos-gateway/src/gateway.rs (beforeSha256 == current file) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00163",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/src/gateway.rs:555 token 'docs/contracts/fgos-gateway-api-v1.yaml'. Existing chain entry: phase-08/step-07-composed-patches.json file:apps/fgos-gateway/src/gateway.rs (beforeSha256 == current file) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00166",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (native-file-contract): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "apps/fgos-gateway/src/gateway.rs:837 token '/docs/history/'. Framing: apps/fgos-gateway/src/gateway.rs:1 '//! tsk-7l9-2: fgOS gateway — the REST surface `docs/history/fgos-inte'; apps/fgos-gateway/src/gateway.rs:835 '/// `docsRef` is untrusted input (an item's own field, editable via'"
+  },
+  {
+   "rowId": "f00175",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/src/mcp.rs:22 token 'docs/contracts/fgos-gateway-api-v1.yaml'. Existing chain entry: composition/patch-specs.json w2:predecessor:apps/fgos-gateway/src/mcp.rs (also phase-08 step-07 file:apps/fgos-gateway/src/mcp.rs) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00177",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/web/src/App.tsx:24 token 'docs/ui-spec/screens/S01-sign-in.md'. Existing chain entry: phase-08/step-07-composed-patches.json file:apps/fgos-gateway/web/src/App.tsx (beforeSha256 == current file) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00178",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/web/src/api/client.ts:76 token 'docs/contracts/fgos-gateway-api-v1.yaml'. Existing chain entry: phase-08/step-07-composed-patches.json file:apps/fgos-gateway/web/src/api/client.ts (beforeSha256 == current file) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00181",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/web/src/api/types.ts:1 token 'docs/contracts/fgos-gateway-api-v1.yaml'. Existing chain entry: phase-08/step-07-composed-patches.json file:apps/fgos-gateway/web/src/api/types.ts (beforeSha256 == current file) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00183",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint is right, but the F chain already retargets this operand in network.ts with a different line wrap (lines 1-4 rewrapped, also retargeting docs/specs/herdr-web-dashboard.md). The shard patch conflicts with it. Record as already composed by the chain; drop the patch.",
+   "evidence": "apps/fgos-gateway/web/src/lib/network.ts:3,4. phase-08/step-07-composed-patches.json file:apps/fgos-gateway/web/src/lib/network.ts and phase-09/carries/pointer-patches.json network.ts both have beforeSha256 == current; after either, shard patch --dry-run --fuzz=0 -> 'Hunk #1 FAILED at 1'."
+  },
+  {
+   "rowId": "f00185",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx:7,8 token 'docs/ui-spec/screens/S04-questions- // needing-answer.md' -> docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md; patch apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f00187",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx:9 token 'docs/ui-spec/screens/S03-task-detail.md'. Existing chain entry: phase-08/step-07-composed-patches.json file:apps/fgos-gateway/web/src/screens/TaskDetail.tsx (beforeSha256 == current file) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00189",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx:487 token 'docs/ui-spec/modals/M03-add-edit-item.md'. Existing chain entry: phase-08/step-07-composed-patches.json file:apps/fgos-gateway/web/src/screens/TaskDetail.tsx (beforeSha256 == current file) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00191",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/web/src/screens/Taskboard.tsx:9 token 'docs/ui-spec/screens/S02-taskboard.md'. Existing chain entry: phase-08/step-07-composed-patches.json file:apps/fgos-gateway/web/src/screens/Taskboard.tsx (beforeSha256 == current file) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00193",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "apps/fgos-gateway/web/src/screens/Taskboard.tsx:439 token 'docs/ui-spec/modals/M03-add-edit-item.md'. Existing chain entry: phase-08/step-07-composed-patches.json file:apps/fgos-gateway/web/src/screens/Taskboard.tsx (beforeSha256 == current file) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00430",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (native-file-contract): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "bin/fgos.mjs:252 token 'docs/history/<id>/iron-law-evidence.md'. Framing: bin/fgos.mjs:1 '#!/usr/bin/env node'"
+  },
+  {
+   "rowId": "f00433",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (native-file-contract): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "bin/fgos.mjs:322 token 'docs/history/<feature>/RESEARCH.md'. Framing: bin/fgos.mjs:1 '#!/usr/bin/env node'"
+  },
+  {
+   "rowId": "f00446",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (source-provenance): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "bin/fgos.mjs:2622,2623 token 'docs/history/merge-standardization/     // CONTEXT.md/plan.md'. Framing: bin/fgos.mjs:1 '#!/usr/bin/env node'; bin/fgos.mjs:2621 '    // Request-class per D1 (same contract as `ready`/`triage`/`confli'"
+  },
+  {
+   "rowId": "f00475",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (native-file-contract): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "core/skills/_shared/citation-format.md:7 token 'docs/history/<feature>/CONTEXT.md'. Framing: core/skills/_shared/citation-format.md:1 '# Shared fragment: citation-format'"
+  },
+  {
+   "rowId": "f00477",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Preserve contradicts the verified F chain, which already retargets this exact line to docs/platform/documentation/history/id-systems-audit.md. The parenthetical is a locator for where the older convention is written, the same shape the shard repoints in f00478 two paragraphs down. Change to repoint (already composed by the chain), or record an explicit decision to remove that chain hunk.",
+   "evidence": "core/skills/_shared/citation-format.md:34 '(docs/id-systems-audit.md) but not this'. phase-08/step-07-composed-patches.json file:core/skills/_shared/citation-format.md hunk @@ -31,7 replaces it with '(docs/platform/documentation/history/id-systems-audit.md) but not this'."
+  },
+  {
+   "rowId": "f00478",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Repoint judgment is right, but the prepared patch duplicates a retarget the verified F chain already makes; after the chain, this patch is rejected as 'Reversed (or previously applied)'. Record the row as repoint already composed by the chain entry and drop the second patch.",
+   "evidence": "core/skills/_shared/citation-format.md:51 token 'docs/id-systems-audit.md'. Existing chain entry: phase-08/step-07-composed-patches.json file:core/skills/_shared/citation-format.md (beforeSha256 == current file) removes the same line and adds the identical replacement. Probe: apply chain diff to a temp copy, then shard patch --dry-run --fuzz=0 -> rc 1 'Reversed (or previously applied) patch detected'."
+  },
+  {
+   "rowId": "f00479",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (native-file-contract): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "core/skills/_shared/citation-format.md:53 token 'docs/history/<feature>/CONTEXT.md'. Framing: core/skills/_shared/citation-format.md:22 '## The rule'"
+  },
+  {
+   "rowId": "f00497",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (native-file-contract): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "core/skills/distill/references/deep-dive-protocol.md:27 token 'docs/distillery/deep-dives/<topic-slug>.md'. Framing: core/skills/distill/references/deep-dive-protocol.md:27 '## Output — `docs/distillery/deep-dives/<topic-slug>.md`'"
+  },
+  {
+   "rowId": "f00507",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (native-file-contract): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "core/skills/fgos-researching/SKILL.md:77 token 'docs/history/<feature>/RESEARCH.md'. Framing: core/skills/fgos-researching/SKILL.md:26 '## Hard rules'"
+  },
+  {
+   "rowId": "f00511",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (native-file-contract): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "core/task-specs/fgos-researching.md:11 token 'docs/history/<feature>/RESEARCH.md'. Framing: core/task-specs/fgos-researching.md:9 '## Output'"
+  },
+  {
+   "rowId": "f00512",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-portal). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/README.md:16 -> docs/platform/documentation/operations/portals/docs-portal.md:77-77 unit sha f056a8f59a4f82fa; normalized text similarity 1.00 (link targets rebased only); section '## Source Metadata (Added in candidate)'."
+  },
+  {
+   "rowId": "f00513",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-portal). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/README.md:17 -> docs/platform/documentation/operations/portals/docs-portal.md:78-78 unit sha 273daf3a9e7e2910; normalized text similarity 1.00 (link targets rebased only); section '## Source Metadata (Added in candidate)'."
+  },
+  {
+   "rowId": "f00514",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-portal). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/README.md:27 -> docs/platform/documentation/operations/portals/docs-portal.md:28-28 unit sha c6f5ee01e2908e32; normalized text similarity 1.00 (link targets rebased only); section '## 1. Read First'."
+  },
+  {
+   "rowId": "f00515",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-portal). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/README.md:28 -> docs/platform/documentation/operations/portals/docs-portal.md:29-29 unit sha 61f8e7595fba1f98; normalized text similarity 1.00 (link targets rebased only); section '## 1. Read First'."
+  },
+  {
+   "rowId": "f00521",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-portal). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/README.md:41 -> docs/platform/documentation/operations/portals/docs-portal.md:42-42 unit sha 20c73023a76cb10a; normalized text similarity 1.00 (link targets rebased only); section '## 2. Main Spaces'."
+  },
+  {
+   "rowId": "f00524",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-portal). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/README.md:54 -> docs/platform/documentation/operations/portals/docs-portal.md:55-55 unit sha a21ea3990fc9b495; normalized text similarity 1.00 (link targets rebased only); section '## 4. Related Files'."
+  },
+  {
+   "rowId": "f00525",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-portal). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/README.md:55 -> docs/platform/documentation/operations/portals/docs-portal.md:56-56 unit sha ca4772298a3107ca; normalized text similarity 1.00 (link targets rebased only); section '## 4. Related Files'."
+  },
+  {
+   "rowId": "f00527",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/architecture-manifest.json:3 token 'docs/architecture-map.md' -> docs/platform/architecture-map.md; patch docs/architecture-manifest.json replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f00528",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:41 -> docs/platform/architecture-map.md:124-124 unit sha 52c91eca9b87c2be; normalized text similarity 1.00 (link targets rebased only); section '### Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, ha'."
+  },
+  {
+   "rowId": "f00529",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:41 -> docs/platform/architecture-map.md:124-124 unit sha 52c91eca9b87c2be; normalized text similarity 1.00 (link targets rebased only); section '### Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, ha'."
+  },
+  {
+   "rowId": "f00530",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:735 -> docs/platform/architecture-map.md:818-824 unit sha 3dd2969dc52132be; normalized text similarity 1.00 (link targets rebased only); section '###### Quyết định'."
+  },
+  {
+   "rowId": "f00531",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:16 -> docs/platform/architecture-map.md:98-106 unit sha 4110e9ccf179fb2e; normalized text similarity 1.00 (link targets rebased only); section '### Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, ha'."
+  },
+  {
+   "rowId": "f00532",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:17 -> docs/platform/architecture-map.md:98-106 unit sha 4110e9ccf179fb2e; normalized text similarity 1.00 (link targets rebased only); section '### Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, ha'."
+  },
+  {
+   "rowId": "f00533",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:19 -> docs/platform/architecture-map.md:98-106 unit sha 4110e9ccf179fb2e; normalized text similarity 1.00 (link targets rebased only); section '### Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, ha'."
+  },
+  {
+   "rowId": "f00534",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:21 -> docs/platform/architecture-map.md:98-106 unit sha 4110e9ccf179fb2e; normalized text similarity 1.00 (link targets rebased only); section '### Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, ha'."
+  },
+  {
+   "rowId": "f00535",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:22 -> docs/platform/architecture-map.md:98-106 unit sha 4110e9ccf179fb2e; normalized text similarity 1.00 (link targets rebased only); section '### Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, ha'."
+  },
+  {
+   "rowId": "f00536",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:43 -> docs/platform/architecture-map.md:126-126 unit sha 7ea47b34149df93b; normalized text similarity 1.00 (link targets rebased only); section '### Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, ha'."
+  },
+  {
+   "rowId": "f00537",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:57 -> docs/platform/architecture-map.md:140-140 unit sha 7769a164b97cad77; normalized text similarity 1.00 (link targets rebased only); section '### Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, ha'."
+  },
+  {
+   "rowId": "f00538",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:70 -> docs/platform/architecture-map.md:153-153 unit sha c764f5efde618d23; normalized text similarity 1.00 (link targets rebased only); section '### Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, ha'."
+  },
+  {
+   "rowId": "f00539",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:74 -> docs/platform/architecture-map.md:155-159 unit sha 1d596b13c2ceba38; normalized text similarity 1.00 (link targets rebased only); section '### Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, ha'."
+  },
+  {
+   "rowId": "f00541",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:306 -> docs/platform/architecture-map.md:386-391 unit sha 62a9eeb0380d89a1; normalized text similarity 1.00 (link targets rebased only); section '#### 6 · Sổ đăng ký component'."
+  },
+  {
+   "rowId": "f00542",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:363 -> docs/platform/architecture-map.md:446-446 unit sha 79c627bf8d96a95c; normalized text similarity 1.00 (link targets rebased only); section '#### 7 · Sổ đăng ký contract'."
+  },
+  {
+   "rowId": "f00543",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:368 -> docs/platform/architecture-map.md:451-451 unit sha 018ffdb8b0c40f23; normalized text similarity 1.00 (link targets rebased only); section '#### 7 · Sổ đăng ký contract'."
+  },
+  {
+   "rowId": "f00545",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:459 -> docs/platform/architecture-map.md:544-550 unit sha fc45e5976742479c; normalized text similarity 1.00 (link targets rebased only); section '#### 9 · Luật vận hành bản đồ'."
+  },
+  {
+   "rowId": "f00547",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:523 -> docs/platform/architecture-map.md:609-609 unit sha ca7de819d1b4d1a0; normalized text similarity 1.00 (link targets rebased only); section '#### 12 · Chỗ đứng trong hệ tài liệu'."
+  },
+  {
+   "rowId": "f00548",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:524 -> docs/platform/architecture-map.md:610-610 unit sha bceb299778e44311; normalized text similarity 1.00 (link targets rebased only); section '#### 12 · Chỗ đứng trong hệ tài liệu'."
+  },
+  {
+   "rowId": "f00549",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:525 -> docs/platform/architecture-map.md:611-611 unit sha b3eed2f5da2b9cd2; normalized text similarity 1.00 (link targets rebased only); section '#### 12 · Chỗ đứng trong hệ tài liệu'."
+  },
+  {
+   "rowId": "f00551",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:549 -> docs/platform/architecture-map.md:635-635 unit sha 8ac6fe66cae1699b; normalized text similarity 1.00 (link targets rebased only); section '#### Phụ lục B · Sổ đăng ký hệ id/tên gọi (STR47, record ADR'."
+  },
+  {
+   "rowId": "f00552",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:567 -> docs/platform/architecture-map.md:650-653 unit sha 956aab8d29798b18; normalized text similarity 1.00 (link targets rebased only); section '#### Phụ lục B · Sổ đăng ký hệ id/tên gọi (STR47, record ADR'."
+  },
+  {
+   "rowId": "f00553",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:567 -> docs/platform/architecture-map.md:650-653 unit sha 956aab8d29798b18; normalized text similarity 1.00 (link targets rebased only); section '#### Phụ lục B · Sổ đăng ký hệ id/tên gọi (STR47, record ADR'."
+  },
+  {
+   "rowId": "f00554",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:585 -> docs/platform/architecture-map.md:671-671 unit sha 7ab2f3748fd7006c; normalized text similarity 0.98 (link targets rebased only); section '#### Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-'."
+  },
+  {
+   "rowId": "f00555",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:587 -> docs/platform/architecture-map.md:673-673 unit sha 672c35bd5a15bf52; normalized text similarity 1.00 (link targets rebased only); section '#### Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-'."
+  },
+  {
+   "rowId": "f00556",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:599 -> docs/platform/architecture-map.md:682-689 unit sha f3b045e3b9a32142; normalized text similarity 1.00 (link targets rebased only); section '###### Bối cảnh'."
+  },
+  {
+   "rowId": "f00557",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:607 -> docs/platform/architecture-map.md:693-698 unit sha f900ff9cfc79e807; normalized text similarity 1.00 (link targets rebased only); section '###### Quyết định'."
+  },
+  {
+   "rowId": "f00558",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:622 -> docs/platform/architecture-map.md:708-709 unit sha 1a1ed544ce47783e; normalized text similarity 1.00 (link targets rebased only); section '###### Quyết định'."
+  },
+  {
+   "rowId": "f00559",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:638 -> docs/platform/architecture-map.md:724-732 unit sha 5db60ba6149afed5; normalized text similarity 1.00 (link targets rebased only); section '###### Bối cảnh'."
+  },
+  {
+   "rowId": "f00560",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:667 -> docs/platform/architecture-map.md:752-756 unit sha ad62ca95838f9e20; normalized text similarity 1.00 (link targets rebased only); section '###### Quyết định'."
+  },
+  {
+   "rowId": "f00561",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:667 -> docs/platform/architecture-map.md:752-756 unit sha ad62ca95838f9e20; normalized text similarity 1.00 (link targets rebased only); section '###### Quyết định'."
+  },
+  {
+   "rowId": "f00562",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:688 -> docs/platform/architecture-map.md:774-780 unit sha d5fc141eedf1aee0; normalized text similarity 1.00 (link targets rebased only); section '###### Bối cảnh'."
+  },
+  {
+   "rowId": "f00563",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:703 -> docs/platform/architecture-map.md:789-794 unit sha 477356b8934572e7; normalized text similarity 1.00 (link targets rebased only); section '###### Bối cảnh'."
+  },
+  {
+   "rowId": "f00564",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:717 -> docs/platform/architecture-map.md:798-804 unit sha ec7edf3be8dfb973; normalized text similarity 1.00 (link targets rebased only); section '###### Quyết định'."
+  },
+  {
+   "rowId": "f00565",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:717 -> docs/platform/architecture-map.md:798-804 unit sha ec7edf3be8dfb973; normalized text similarity 1.00 (link targets rebased only); section '###### Quyết định'."
+  },
+  {
+   "rowId": "f00566",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:732 -> docs/platform/architecture-map.md:818-824 unit sha 3dd2969dc52132be; normalized text similarity 1.00 (link targets rebased only); section '###### Quyết định'."
+  },
+  {
+   "rowId": "f00567",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:733 -> docs/platform/architecture-map.md:818-824 unit sha 3dd2969dc52132be; normalized text similarity 1.00 (link targets rebased only); section '###### Quyết định'."
+  },
+  {
+   "rowId": "f00568",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:745 -> docs/platform/architecture-map.md:825-833 unit sha d873df1dea826b27; normalized text similarity 1.00 (link targets rebased only); section '###### Quyết định'."
+  },
+  {
+   "rowId": "f00569",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-architecture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/architecture-map.md:751 -> docs/platform/architecture-map.md:837-840 unit sha 54748cecb7278244; normalized text similarity 1.00 (link targets rebased only); section '###### Hệ quả'."
+  },
+  {
+   "rowId": "f00577",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (dated-backlog-investigation): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/backlog.md:37 token 'platform-foundations.md:73-74'. Framing: docs/backlog.md:1 '# Product Backlog'; docs/backlog.md:37 '| STR70b | **Raw backstop cho cuộc bàn ở gate — CHỜ Q1 (chưa có nhà hợ'"
+  },
+  {
+   "rowId": "f00579",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (dated-backlog-investigation): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/backlog.md:37 token 'platform-foundations.md:17-20'. Framing: docs/backlog.md:1 '# Product Backlog'; docs/backlog.md:37 '| STR70b | **Raw backstop cho cuộc bàn ở gate — CHỜ Q1 (chưa có nhà hợ'"
+  },
+  {
+   "rowId": "f00582",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/backlog.md:19 token 'docs/coexistence.md' -> docs/platform/coexistence/spec.md; patch docs/backlog.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f00583",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/backlog.md:19 token 'docs/coexistence.md' -> docs/platform/coexistence/spec.md; patch docs/backlog.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f00592",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/backlog.md:51 token 'docs/platform-foundations.md' -> docs/platform/platform-foundations.md; patch docs/backlog.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f00631",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-coexistence). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/coexistence.md:100 -> docs/platform/coexistence/spec.md:108-114 unit sha 83bb4a6e15e98dfa; normalized text similarity 1.00 (link targets rebased only); section '## Known Gaps (thành thật, chưa flip)'."
+  },
+  {
+   "rowId": "f00633",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-coexistence). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/coexistence.md:133 -> docs/platform/coexistence/spec.md:145-145 unit sha d804d9543ca82dab; normalized text similarity 1.00 (link targets rebased only); section '## Pointers'."
+  },
+  {
+   "rowId": "f00634",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-gateway-contract). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/contracts/fgos-gateway-api-v1.yaml:44 -> docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:37-44 unit sha 19cc8feacf7bdb0b; normalized text similarity 1.00 (link targets rebased only); section 'info:'."
+  },
+  {
+   "rowId": "f00637",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-gateway-contract). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/contracts/fgos-gateway-api-v1.yaml:53 -> docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:46-55 unit sha 46a49d325405ca6e; normalized text similarity 1.00 (link targets rebased only); section '  x-specs:'."
+  },
+  {
+   "rowId": "f00641",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-gateway-contract). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/contracts/fgos-gateway-api-v1.yaml:218 -> docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:194-239 unit sha fe2065d62270edd4; normalized text similarity 1.00 (link targets rebased only); section '    patch:'."
+  },
+  {
+   "rowId": "f00642",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-gateway-contract). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/contracts/fgos-gateway-api-v1.yaml:250 -> docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:241-275 unit sha a21caae3b88f264d; normalized text similarity 1.00 (link targets rebased only); section '  /work/{id}/docs:'."
+  },
+  {
+   "rowId": "f00643",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-gateway-contract). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/contracts/fgos-gateway-api-v1.yaml:256 -> docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:241-278 unit sha aaffe08bde21800e; normalized text similarity 1.00 (link targets rebased only); section '  /work/{id}/docs:'."
+  },
+  {
+   "rowId": "f00646",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-gateway-contract). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/contracts/fgos-gateway-api-v1.yaml:681 -> docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:657-685 unit sha c31dc03dccdac94d; normalized text similarity 1.00 (link targets rebased only); section '    Error:'."
+  },
+  {
+   "rowId": "f00648",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-gateway-contract). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/contracts/fgos-gateway-api-v1.yaml:729 -> docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:706-729 unit sha 8c06e954706a8d75; normalized text similarity 1.00 (link targets rebased only); section '    WorkItem:'."
+  },
+  {
+   "rowId": "f00650",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-gateway-contract). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/contracts/fgos-gateway-api-v1.yaml:863 -> docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:839-863 unit sha 889e5f8064b7ab98; normalized text similarity 1.00 (link targets rebased only); section '    ErrorEnvelope:'."
+  },
+  {
+   "rowId": "f00936",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (dated-learning-comparison): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/distillery/deep-dives/herdr-vs-tmux-observation.md:141 token 'repo/docs/decisions/0014'. Framing: docs/distillery/deep-dives/herdr-vs-tmux-observation.md:138 '## Cập nhật 2026-07-18 — kết luận đã tiến hoá qua thảo luận (đây là ph'; docs/distillery/deep-dives/herdr-vs-tmux-observation.md:1 '---'"
+  },
+  {
+   "rowId": "f00940",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (dated-learning-comparison): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/distillery/deep-dives/parallel-decomposition-and-merge.md:46 token 'docs/specs/work-state.md'. Framing: docs/distillery/deep-dives/parallel-decomposition-and-merge.md:43 '## Giải pháp tổng hợp cho host'; docs/distillery/deep-dives/parallel-decomposition-and-merge.md:1 '---'"
+  },
+  {
+   "rowId": "f00942",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (dated-learning-comparison): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/distillery/deep-dives/parallel-decomposition-and-merge.md:88 token 'docs/decisions/0026'. Framing: docs/distillery/deep-dives/parallel-decomposition-and-merge.md:86 '### fgOS đã hội tụ độc lập vào đúng ranh giới này, từ trước'; docs/distillery/deep-dives/parallel-decomposition-and-merge.md:1 '---'"
+  },
+  {
+   "rowId": "f00945",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (upstream-coordinates): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/distillery/deep-dives/state.md:37 token 'docs/specs/'. Framing: docs/distillery/deep-dives/state.md:29 '### beehive — nguyên lý hai-vật-lý, store zero-dep'; docs/distillery/deep-dives/state.md:29 '### beehive — nguyên lý hai-vật-lý, store zero-dep'"
+  },
+  {
+   "rowId": "f01004",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (dated-learning-comparison): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/distillery/porting-log.md:27 token 'docs/history/pr-lifecycle/reports/validation-s1-gate.md'. Framing: docs/distillery/porting-log.md:1 '# Porting Log'; docs/distillery/porting-log.md:27 '| worktree-merge-semantic-gate | beehive:worktree-merge-staged-verify-'"
+  },
+  {
+   "rowId": "f01005",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (dated-learning-comparison): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/distillery/porting-log.md:93 token 'docs/history/learnings'. Framing: docs/distillery/porting-log.md:1 '# Porting Log'; docs/distillery/porting-log.md:93 '| learning-refresh-gardening | compound-engineering-plugin:learning-re'"
+  },
+  {
+   "rowId": "f01007",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (dated-learning-comparison): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/distillery/porting-log.md:106 token './repo'. Framing: docs/distillery/porting-log.md:1 '# Porting Log'; docs/distillery/porting-log.md:106 '| product-root-repo-divorce-topology | beehive:product-root-repo-divor'"
+  },
+  {
+   "rowId": "f01008",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (dated-learning-comparison): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/distillery/porting-log.md:118 token 'docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md'. Framing: docs/distillery/porting-log.md:1 '# Porting Log'; docs/distillery/porting-log.md:118 '| epoch-fence-merge-gate | repository-harness:epoch-fence-merge-gate |'"
+  },
+  {
+   "rowId": "f01096",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (upstream-coordinates): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:108 token 'docs/history/*/CONTEXT.md'. Framing: docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:86 '### Dispatch role'; docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:1 '# distill — bee inventory (group C), snapshot v1.18.3, 2026-07-28'"
+  },
+  {
+   "rowId": "f01097",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (upstream-coordinates): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:108 token 'docs/history/<slug>/CONTEXT.md'. Framing: docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:86 '### Dispatch role'; docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:1 '# distill — bee inventory (group C), snapshot v1.18.3, 2026-07-28'"
+  },
+  {
+   "rowId": "f01100",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (upstream-coordinates): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:200 token 'docs/history/<feature>/CONTEXT.md'. Framing: docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:177 '## bee-qualifying'; docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:1 '# distill — bee inventory (group C), snapshot v1.18.3, 2026-07-28'"
+  },
+  {
+   "rowId": "f01103",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (upstream-coordinates): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:300 token 'docs/history/research/<topic-slug>.md'. Framing: docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:280 '## bee-xia'; docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:1 '# distill — bee inventory (group C), snapshot v1.18.3, 2026-07-28'"
+  },
+  {
+   "rowId": "f01104",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (upstream-coordinates): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:304 token 'docs/history/research/<topic-slug>.md'. Framing: docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:280 '## bee-xia'; docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md:1 '# distill — bee inventory (group C), snapshot v1.18.3, 2026-07-28'"
+  },
+  {
+   "rowId": "f01203",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-distribution-history). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/distribution-vision.md:149 -> docs/platform/packaging-distribution/history/distribution-vision.md:168-168 unit sha 37a99b9bbb6bd336; normalized text similarity 1.00 (link targets rebased only); section '## 6. Lộ trình triển khai — milestone/MVP chính thức (2026-0'."
+  },
+  {
+   "rowId": "f01204",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-distribution-history). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/distribution-vision.md:20 -> docs/platform/packaging-distribution/history/distribution-vision.md:35-39 unit sha 53eb117e67467159; normalized text similarity 1.00 (link targets rebased only); section '# Cài đặt / Setup / Doctor của fgOS — tầm nhìn nền tảng'."
+  },
+  {
+   "rowId": "f01205",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-distribution-history). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/distribution-vision.md:59 -> docs/platform/packaging-distribution/history/distribution-vision.md:78-78 unit sha 817d7c182c7747c5; normalized text similarity 1.00 (link targets rebased only); section '## 3. Đối chiếu với quyết định đã chốt (distribution.md)'."
+  },
+  {
+   "rowId": "f01206",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-distribution-history). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/distribution-vision.md:61 -> docs/platform/packaging-distribution/history/distribution-vision.md:80-84 unit sha d571184a6fc80b38; normalized text similarity 1.00 (link targets rebased only); section '## 3. Đối chiếu với quyết định đã chốt (distribution.md)'."
+  },
+  {
+   "rowId": "f01207",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-distribution-history). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/distribution-vision.md:65 -> docs/platform/packaging-distribution/history/distribution-vision.md:80-84 unit sha d571184a6fc80b38; normalized text similarity 1.00 (link targets rebased only); section '## 3. Đối chiếu với quyết định đã chốt (distribution.md)'."
+  },
+  {
+   "rowId": "f01208",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-distribution-history). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/distribution-vision.md:66 -> docs/platform/packaging-distribution/history/distribution-vision.md:85-89 unit sha 7f2a91efee937dbd; normalized text similarity 1.00 (link targets rebased only); section '## 3. Đối chiếu với quyết định đã chốt (distribution.md)'."
+  },
+  {
+   "rowId": "f01209",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-distribution-history). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/distribution-vision.md:72 -> docs/platform/packaging-distribution/history/distribution-vision.md:90-95 unit sha ee9f1f69d75e1b76; normalized text similarity 1.00 (link targets rebased only); section '## 3. Đối chiếu với quyết định đã chốt (distribution.md)'."
+  },
+  {
+   "rowId": "f01210",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-distribution-history). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/distribution-vision.md:18 -> docs/platform/packaging-distribution/history/distribution-vision.md:35-39 unit sha 53eb117e67467159; normalized text similarity 1.00 (link targets rebased only); section '# Cài đặt / Setup / Doctor của fgOS — tầm nhìn nền tảng'."
+  },
+  {
+   "rowId": "f01211",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-distribution-history). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/distribution-vision.md:19 -> docs/platform/packaging-distribution/history/distribution-vision.md:35-39 unit sha 53eb117e67467159; normalized text similarity 1.00 (link targets rebased only); section '# Cài đặt / Setup / Doctor của fgOS — tầm nhìn nền tảng'."
+  },
+  {
+   "rowId": "f01212",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-distribution-history). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/distribution-vision.md:119 -> docs/platform/packaging-distribution/history/distribution-vision.md:135-138 unit sha 400b7480ecf2f384; normalized text similarity 1.00 (link targets rebased only); section '## 5. Câu hỏi mở (chưa quyết — cần chốt khi tới lượt thi côn'."
+  },
+  {
+   "rowId": "f01213",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-distribution-history). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/distribution-vision.md:129 -> docs/platform/packaging-distribution/history/distribution-vision.md:139-149 unit sha 3e559d456e3303ac; normalized text similarity 1.00 (link targets rebased only); section '## 5. Câu hỏi mở (chưa quyết — cần chốt khi tới lượt thi côn'."
+  },
+  {
+   "rowId": "f01214",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-distribution-history). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/distribution-vision.md:176 -> docs/platform/packaging-distribution/history/distribution-vision.md:194-195 unit sha 8f147ac4f6b54930; normalized text similarity 1.00 (link targets rebased only); section '## 7. Backlog liên quan'."
+  },
+  {
+   "rowId": "f01215",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-distribution-history). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/distribution-vision.md:184 -> docs/platform/packaging-distribution/history/distribution-vision.md:198-203 unit sha 4c3fc6e70c7c0026; normalized text similarity 1.00 (link targets rebased only); section '## 7. Backlog liên quan'."
+  },
+  {
+   "rowId": "f01216",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-governance). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/doc-governance.md:49 -> docs/platform/governance.md:48-53 unit sha 943dcdef49d1f508; normalized text similarity 1.00 (link targets rebased only); section '## 2. Placement Map'."
+  },
+  {
+   "rowId": "f01217",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-governance). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/doc-governance.md:50 -> docs/platform/governance.md:48-53 unit sha 943dcdef49d1f508; normalized text similarity 1.00 (link targets rebased only); section '## 2. Placement Map'."
+  },
+  {
+   "rowId": "f01218",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-governance). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/doc-governance.md:51 -> docs/platform/governance.md:48-53 unit sha 943dcdef49d1f508; normalized text similarity 1.00 (link targets rebased only); section '## 2. Placement Map'."
+  },
+  {
+   "rowId": "f01219",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-governance). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/doc-governance.md:9 -> docs/platform/governance.md:482-494 unit sha f2f2cecade53e4fb; normalized text similarity 1.00 (link targets rebased only); section '## Source Metadata (Added in candidate)'."
+  },
+  {
+   "rowId": "f01220",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-governance). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/doc-governance.md:16 -> docs/platform/governance.md:495-495 unit sha 273daf3a9e7e2910; normalized text similarity 1.00 (link targets rebased only); section '## Source Metadata (Added in candidate)'."
+  },
+  {
+   "rowId": "f01224",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-governance). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/doc-governance.md:470 -> docs/platform/governance.md:471-471 unit sha c5cb2a3320456aa9; normalized text similarity 1.00 (link targets rebased only); section '## 14. Related Files'."
+  },
+  {
+   "rowId": "f01225",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-governance). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/doc-governance.md:471 -> docs/platform/governance.md:472-472 unit sha 650a9092d4de45e4; normalized text similarity 1.00 (link targets rebased only); section '## 14. Related Files'."
+  },
+  {
+   "rowId": "f01226",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-governance). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/doc-governance.md:475 -> docs/platform/governance.md:476-476 unit sha 73e5e030d166f8f6; normalized text similarity 1.00 (link targets rebased only); section '## 14. Related Files'."
+  },
+  {
+   "rowId": "f03068",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/citation-baseline-cleanup-calibration-slice.md:28 token 'docs/specs/work-state.md'. Framing: docs/explanation/citation-baseline-cleanup-calibration-slice.md:26 '## Why \"top 2-3 files\" from the item's own description got narrowed fu'; docs/explanation/citation-baseline-cleanup-calibration-slice.md:24 '  read-and-rewrite per occurrence, not a template insert.'"
+  },
+  {
+   "rowId": "f03069",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/citation-baseline-cleanup-calibration-slice.md:61 token 'docs/specs/work-state.md'. Framing: docs/explanation/citation-baseline-cleanup-calibration-slice.md:57 '## What actually landed, and current state'; docs/explanation/citation-baseline-cleanup-calibration-slice.md:55 'after code was already written.'"
+  },
+  {
+   "rowId": "f03072",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md:37 token 'docs/specs/*.md'. Framing: docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md:34 '## The resulting split'; docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md:32 'correct fix for that scope moved entirely to `tsk-56w`.'"
+  },
+  {
+   "rowId": "f03074",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md:40 token 'docs/specs/work-state.md'. Framing: docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md:34 '## The resulting split'; docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md:36 '`tsk-2sp` narrowed to exactly the 12 non-skill baseline files (1019'"
+  },
+  {
+   "rowId": "f03075",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md:43 token 'docs/specs/runner.md'. Framing: docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md:34 '## The resulting split'; docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md:39 ''"
+  },
+  {
+   "rowId": "f03080",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/citation-drift-runner-md-cleanup.md:2 token 'docs/specs/runner.md'. Framing: docs/explanation/citation-drift-runner-md-cleanup.md:1 '---'; docs/explanation/citation-drift-runner-md-cleanup.md:7 '`tsk-2sp-2` applied the same citation-format fix contract to'"
+  },
+  {
+   "rowId": "f03081",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/citation-drift-runner-md-cleanup.md:5 token 'docs/specs/runner.md'. Framing: docs/explanation/citation-drift-runner-md-cleanup.md:5 '# `docs/specs/runner.md`'s citation-format cleanup'; docs/explanation/citation-drift-runner-md-cleanup.md:7 '`tsk-2sp-2` applied the same citation-format fix contract to'"
+  },
+  {
+   "rowId": "f03082",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/citation-drift-runner-md-cleanup.md:8 token 'docs/specs/runner.md'. Framing: docs/explanation/citation-drift-runner-md-cleanup.md:5 '# `docs/specs/runner.md`'s citation-format cleanup'; docs/explanation/citation-drift-runner-md-cleanup.md:3 '---'"
+  },
+  {
+   "rowId": "f03083",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/citation-drift-runner-md-cleanup.md:10 token 'docs/specs/work-state.md'. Framing: docs/explanation/citation-drift-runner-md-cleanup.md:5 '# `docs/specs/runner.md`'s citation-format cleanup'; docs/explanation/citation-drift-runner-md-cleanup.md:3 '---'"
+  },
+  {
+   "rowId": "f03099",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/compound-learn-artifact-registry.md:65 token 'docs/specs/'. Framing: docs/explanation/compound-learn-artifact-registry.md:54 '## The registry itself'; docs/explanation/compound-learn-artifact-registry.md:59 'Markdown (human-skim) — plus a doctor check for staleness. The structu'"
+  },
+  {
+   "rowId": "f03101",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/compound-learn-artifact-registry.md:336 token 'docs/architect/knowledge-registry-redesign.md'. Framing: docs/explanation/compound-learn-artifact-registry.md:330 '## The gate went from built to live: `docRegistry.enforce: true` (`tsk'; docs/explanation/compound-learn-artifact-registry.md:328 'they were fixed here.'"
+  },
+  {
+   "rowId": "f03105",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/core-foundation-domain-boundary.md:65 token 'docs/specs/'. Framing: docs/explanation/core-foundation-domain-boundary.md:49 '## The decisions, grouped by theme'; docs/explanation/core-foundation-domain-boundary.md:52 'event-log — no per-domain fgOS install. Top-level work-item fields sta'"
+  },
+  {
+   "rowId": "f03107",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:2 token 'docs/specs/runner.md'. Framing: docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:1 '---'; docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:6 ''"
+  },
+  {
+   "rowId": "f03108",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:2 token 'docs/architect/dispatch-control-plane-redesign.md'. Framing: docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:1 '---'; docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:6 ''"
+  },
+  {
+   "rowId": "f03109",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:7 token 'docs/specs/runner.md'. Framing: docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:5 '# A doc's own opening paragraph contradicted its own table two screens'; docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:3 '---'"
+  },
+  {
+   "rowId": "f03110",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:53 token 'docs/architect/dispatch-control-plane-redesign.md'. Framing: docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:51 '## The newest architecture doc didn't know this history existed'; docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:49 'a more complex AI-judgment layer was still missing.'"
+  },
+  {
+   "rowId": "f03112",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:65 token 'docs/specs/runner.md'. Framing: docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:63 '## What shipped'; docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:61 'already the mechanism that closed the D0026 gap.'"
+  },
+  {
+   "rowId": "f03113",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:78 token 'docs/architect/dispatch-control-plane-redesign.md'. Framing: docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:63 '## What shipped'; docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:74 '  `decideExecutorDispatchMechanism` as evidence.'"
+  },
+  {
+   "rowId": "f03114",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:93 token 'docs/specs/runner.md'. Framing: docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:89 '## A follow-up added the current-vocabulary overlay this reconciliatio'; docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md:87 'not reopened for debate — only accurately reflected in the docs.'"
+  },
+  {
+   "rowId": "f03115",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/d3-goal-check-rationale-trace.md:2 token 'docs/routing-handoff-contract.md'. Framing: docs/explanation/d3-goal-check-rationale-trace.md:1 '---'; docs/explanation/d3-goal-check-rationale-trace.md:6 ''"
+  },
+  {
+   "rowId": "f03116",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/d3-goal-check-rationale-trace.md:2 token 'docs/history/phase-2-routing/CONTEXT.md'. Framing: docs/explanation/d3-goal-check-rationale-trace.md:1 '---'; docs/explanation/d3-goal-check-rationale-trace.md:6 ''"
+  },
+  {
+   "rowId": "f03117",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/d3-goal-check-rationale-trace.md:7 token 'docs/routing-handoff-contract.md'. Framing: docs/explanation/d3-goal-check-rationale-trace.md:5 '# D3's rationale outlived its own citation, and pointed to the wrong t'; docs/explanation/d3-goal-check-rationale-trace.md:3 '---'"
+  },
+  {
+   "rowId": "f03118",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/d3-goal-check-rationale-trace.md:9 token 'docs/history/phase-2-routing/CONTEXT.md'. Framing: docs/explanation/d3-goal-check-rationale-trace.md:5 '# D3's rationale outlived its own citation, and pointed to the wrong t'; docs/explanation/d3-goal-check-rationale-trace.md:3 '---'"
+  },
+  {
+   "rowId": "f03122",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/d3-goal-check-rationale-trace.md:51 token 'docs/specs/runner.md'. Framing: docs/explanation/d3-goal-check-rationale-trace.md:49 '## What shipped'; docs/explanation/d3-goal-check-rationale-trace.md:47 'independent re-verify catches drift a human isn't watching for.'"
+  },
+  {
+   "rowId": "f03123",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/d3-goal-check-rationale-trace.md:55,56 token 'docs/routing- handoff-contract.md:81'. Framing: docs/explanation/d3-goal-check-rationale-trace.md:49 '## What shipped'; docs/explanation/d3-goal-check-rationale-trace.md:47 'independent re-verify catches drift a human isn't watching for.'"
+  },
+  {
+   "rowId": "f03125",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/discover-stage-graph-post-audit-cleanup.md:74 token 'docs/specs/'. Framing: docs/explanation/discover-stage-graph-post-audit-cleanup.md:72 '## Documentation and spec drift (F2-F4), closed by the remaining child'; docs/explanation/discover-stage-graph-post-audit-cleanup.md:70 '  structurally blind to this bug.'"
+  },
+  {
+   "rowId": "f03126",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/discover-stage-graph-post-audit-cleanup.md:78 token 'docs/specs/'. Framing: docs/explanation/discover-stage-graph-post-audit-cleanup.md:72 '## Documentation and spec drift (F2-F4), closed by the remaining child'; docs/explanation/discover-stage-graph-post-audit-cleanup.md:70 '  structurally blind to this bug.'"
+  },
+  {
+   "rowId": "f03127",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/dispatch-activation-and-handoff-redesign.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03132",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/dispatch-config-cache-scope-narrowed.md:16 token 'docs/history/dispatch-config-cache/RESEARCH.md'. Framing: docs/explanation/dispatch-config-cache-scope-narrowed.md:14 '## What research confirmed and what it didn't'; docs/explanation/dispatch-config-cache-scope-narrowed.md:12 '~70-150ms cumulative).\"'"
+  },
+  {
+   "rowId": "f03134",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/dispatch-execute-concurrency-guard.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03136",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/dispatch-execute-lost-uncommitted-paths-warning.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03139",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/dispatch-execute-prompt-file-flag.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03143",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/dispatch-execute-repo-root-cwd-separation.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03144",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/dispatch-execute-unsignaled-outcome.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03151",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/enduser-docs-index-stale-orphan-detection-gap.md:24 token 'docs/decisions/*.md'. Framing: docs/explanation/enduser-docs-index-stale-orphan-detection-gap.md:12 '## The gap'; docs/explanation/enduser-docs-index-stale-orphan-detection-gap.md:20 'measured drift on 2026-08-08 and 2026-08-09 showed zero orphans in'"
+  },
+  {
+   "rowId": "f03152",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/enduser-docs-index-stale-orphan-detection-gap.md:26 token 'docs/specs'. Framing: docs/explanation/enduser-docs-index-stale-orphan-detection-gap.md:12 '## The gap'; docs/explanation/enduser-docs-index-stale-orphan-detection-gap.md:20 'measured drift on 2026-08-08 and 2026-08-09 showed zero orphans in'"
+  },
+  {
+   "rowId": "f03170",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/executor-dispatch-manual-log-gap-and-step-b5-fix.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03171",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/fanout-batch-background-execution-and-orphan-recovery.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03177",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/fanout-execute-consolidation.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03178",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/fgos-fanout-out-of-process-dispatch.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03188",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/footprint-diff-research-md-noise.md:26 token 'docs/specs/distribution.md'. Framing: docs/explanation/footprint-diff-research-md-noise.md:13 '## Why it always fired'; docs/explanation/footprint-diff-research-md-noise.md:11 '`fgos-researching` during discovery/planning/validating.'"
+  },
+  {
+   "rowId": "f03202",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/glm-openrouter-executor.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03205",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/explanation/herdr-orchestrator-terminology-boundary.md:2 token 'docs/architect' -> docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md; patch docs/explanation/herdr-orchestrator-terminology-boundary.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f03210",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/herdr-spawn-adapter-fresh-pane.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03219",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/main-checkout-lock-scope-audit.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03228",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/no-stuck-merge-abort-doctor-check.md:65 token 'docs/specs/distribution.md'. Framing: docs/explanation/no-stuck-merge-abort-doctor-check.md:63 '## A follow-up: `tsk-40a` shipped the check/fix but never updated its '; docs/explanation/no-stuck-merge-abort-doctor-check.md:61 'particular failure mode is now rare or prevented.'"
+  },
+  {
+   "rowId": "f03250",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/root-resolution-two-call-split-propagation.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03252",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/rul11-anchor-test-citation-gloss-update.md:8 token 'docs/specs/platform-foundations.md'. Framing: docs/explanation/rul11-anchor-test-citation-gloss-update.md:5 '# Why the RUL11 anchor-phrase test needed updating for a citation glos'; docs/explanation/rul11-anchor-test-citation-gloss-update.md:3 '---'"
+  },
+  {
+   "rowId": "f03253",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/rul11-anchor-test-citation-gloss-update.md:26 token 'docs/specs/platform-foundations.md'. Framing: docs/explanation/rul11-anchor-test-citation-gloss-update.md:24 '## What changed'; docs/explanation/rul11-anchor-test-citation-gloss-update.md:7 '`tsk-2sp-5`'s citation-format cleanup pass hit a real blocker on'"
+  },
+  {
+   "rowId": "f03254",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/rul11-tum-lum-doctrine.md:8 token 'docs/specs/platform-foundations.md'. Framing: docs/explanation/rul11-tum-lum-doctrine.md:5 '# RUL11 — why \"heavy\" was the wrong diagnosis'; docs/explanation/rul11-tum-lum-doctrine.md:3 '---'"
+  },
+  {
+   "rowId": "f03257",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/runtime-claim-doing-separation.md:122 token 'docs/specs/runner.md'. Framing: docs/explanation/runtime-claim-doing-separation.md:120 '## The prose docs still described the old durable-doing model (`tsk-4k'; docs/explanation/runtime-claim-doing-separation.md:118 'retry.'"
+  },
+  {
+   "rowId": "f03258",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/runtime-claim-doing-separation.md:123 token 'docs/specs/work-state.md'. Framing: docs/explanation/runtime-claim-doing-separation.md:120 '## The prose docs still described the old durable-doing model (`tsk-4k'; docs/explanation/runtime-claim-doing-separation.md:118 'retry.'"
+  },
+  {
+   "rowId": "f03261",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/settleclaim-revision-drift-self-caused.md:41 token 'docs/architect/doing-coordination-redesign.md:666'. Framing: docs/explanation/settleclaim-revision-drift-self-caused.md:24 '## Confirmed live, reproduced deterministically, twice'; docs/explanation/settleclaim-revision-drift-self-caused.md:36 '  twice identically (`exit 3`). Confirmed this wasn't tied to one spec'"
+  },
+  {
+   "rowId": "f03285",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/explanation/tsk-397-post-merge-review-remediation.md:53 token 'docs/specs/reading-map.md'. Framing: docs/explanation/tsk-397-post-merge-review-remediation.md:25 '## The 10 findings and their fixes'; docs/explanation/tsk-397-post-merge-review-remediation.md:49 '   `resolveMainCheckoutRoot`, why `extractSkillsFromYamlText`'"
+  },
+  {
+   "rowId": "f03288",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-lifecycle-learning). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/explanation/work-item-lifecycle-and-domain-model.md:112 -> docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md:114-131 unit sha a7ef129fa34e6fe6; normalized text similarity 1.00 (link targets rebased only); section '## Two edges landing on the same status can still mean diffe'."
+  },
+  {
+   "rowId": "f03289",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-lifecycle-learning). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/explanation/work-item-lifecycle-and-domain-model.md:128 -> docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md:114-131 unit sha a7ef129fa34e6fe6; normalized text similarity 1.00 (link targets rebased only); section '## Two edges landing on the same status can still mean diffe'."
+  },
+  {
+   "rowId": "f03294",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/explanation/worktree-isolation-existing-path-hazard.md:11: '> **Removed door (2026-10-14).** The raw dispatch CLI doors this document'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03297",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/generated/README.md:16 token 'docs/doc-governance.md' -> docs/platform/governance.md; patch docs/generated/README.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f03300",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (native-file-contract): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/generated/README.md:31 token 'docs/ui-spec/generated/**'. Framing: docs/generated/README.md:1 '# Generated Documentation'; docs/platform/ui-spec/README.md:48 'The functioning compiler root remains `docs/ui-spec/` with `spec.confi'"
+  },
+  {
+   "rowId": "f03301",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (captured-proof): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:8 token 'docs/architect/agent-coordination/verification/'. Framing: docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:1 '# CONTEXT: throwaway planning Work — guard `--work <id>` lookup agains'; docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:4 'R5, coding consult supporting a planning Work) — see'"
+  },
+  {
+   "rowId": "f03302",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (captured-proof): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:36 token 'docs/architect/agent-coordination/verification/'. Framing: docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:31 '## Scout evidence'; docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:4 'R5, coding consult supporting a planning Work) — see'"
+  },
+  {
+   "rowId": "f03303",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (captured-proof): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:33 token 'docs/architect/agent-coordination/verification/'. Framing: docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:31 '## Scout evidence'; docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:4 'R5, coding consult supporting a planning Work) — see'"
+  },
+  {
+   "rowId": "f03304",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (captured-proof): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:27 token 'docs/architect/agent-coordination/verification/'. Framing: docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:23 '## Locked decisions'; docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:4 'R5, coding consult supporting a planning Work) — see'"
+  },
+  {
+   "rowId": "f03305",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (captured-proof): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:5 token 'docs/architect/agent-coordination/verification/'. Framing: docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:1 '# CONTEXT: throwaway planning Work — guard `--work <id>` lookup agains'; docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md:4 'R5, coding consult supporting a planning Work) — see'"
+  },
+  {
+   "rowId": "f03306",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (captured-proof): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/history/tsk-43q/iron-law-evidence.md:64 token 'docs/architect/agent-coordination/verification/'. Framing: docs/history/tsk-43q/iron-law-evidence.md:42 '## Real evidence in place of failing-test-first proof'; docs/history/tsk-43q/iron-law-evidence.md:43 ''"
+  },
+  {
+   "rowId": "f03310",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-rollup-capture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/how-to/check-rollup-progress.md:210 -> docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md:212-214 unit sha 313fde34e48920cf; normalized text similarity 1.00 (link targets rebased only); section '## Document history (compound-learn capture linkage)'."
+  },
+  {
+   "rowId": "f03311",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-rollup-capture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/how-to/check-rollup-progress.md:212 -> docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md:212-214 unit sha 313fde34e48920cf; normalized text similarity 1.00 (link targets rebased only); section '## Document history (compound-learn capture linkage)'."
+  },
+  {
+   "rowId": "f03312",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-rollup-capture). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/how-to/check-rollup-progress.md:220 -> docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md:216-225 unit sha 87de386c3223b7b9; normalized text similarity 1.00 (link targets rebased only); section '## Document history (compound-learn capture linkage)'."
+  },
+  {
+   "rowId": "f03342",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/how-to/fix-bare-citation-findings.md:9 token 'docs/specs/work-state.md'. Framing: docs/how-to/fix-bare-citation-findings.md:5 '# Fix a `bare-citation` finding'; docs/how-to/fix-bare-citation-findings.md:3 '---'"
+  },
+  {
+   "rowId": "f03349",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/how-to/fix-d-local-outside-home-findings.md:13 token 'docs/specs/*.md'. Framing: docs/how-to/fix-d-local-outside-home-findings.md:5 '# Fix a `d-local-outside-home` finding'; docs/how-to/fix-d-local-outside-home-findings.md:3 '---'"
+  },
+  {
+   "rowId": "f03352",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Not history. The 2026-10-14 note is a present-tense orientation added on top of the history. It routes the reader to the current doors and cites 'decision 0062 in docs/specs/runner.md' as the record behind the removal. docs/specs/runner.md is removed at cutover. Decision 0062 lives at docs/platform/runner/decisions/h-36d872fbb0e5.md '### 0062 — Xoá cửa thô...' (line 1722). Repoint the locator. The chain already retargets the same shape in AGENTS.md: '(D-ADR0030, docs/specs/runner.md)' becomes runner decisions h-36d872fbb0e5.md.",
+   "evidence": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md:8: '> Updated 2026-10-14: Step B used to run `node src/runner/dispatch.mjs execute`;'. Move set docs/specs/runner.md -> docs/platform/runner/decisions/h-36d872fbb0e5.md (step10-runner-0002). No test or script reads the banner text (grep of test/ scripts/ src/ found none)."
+  },
+  {
+   "rowId": "f03361",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (native-file-contract): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/how-to/measure-a-real-case.md:113 token './target/release/fgctl'. Framing: docs/how-to/measure-a-real-case.md:100 '## 5. Staging & Verifying the Host Runtime'; docs/how-to/measure-a-real-case.md:100 '## 5. Staging & Verifying the Host Runtime'"
+  },
+  {
+   "rowId": "f03362",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (native-file-contract): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/how-to/measure-a-real-case.md:114 token './target/release/fgctl'. Framing: docs/how-to/measure-a-real-case.md:100 '## 5. Staging & Verifying the Host Runtime'; docs/how-to/measure-a-real-case.md:100 '## 5. Staging & Verifying the Host Runtime'"
+  },
+  {
+   "rowId": "f03363",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (native-file-contract): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/how-to/measure-a-real-case.md:118 token './target/release/fgctl'. Framing: docs/how-to/measure-a-real-case.md:100 '## 5. Staging & Verifying the Host Runtime'; docs/how-to/measure-a-real-case.md:100 '## 5. Staging & Verifying the Host Runtime'"
+  },
+  {
+   "rowId": "f03364",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (native-file-contract): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/how-to/measure-a-real-case.md:119 token './target/release/fgctl'. Framing: docs/how-to/measure-a-real-case.md:100 '## 5. Staging & Verifying the Host Runtime'; docs/how-to/measure-a-real-case.md:100 '## 5. Staging & Verifying the Host Runtime'"
+  },
+  {
+   "rowId": "f03371",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/how-to/run-a-coordination-session.md:252 token 'docs/architect/agent-coordination/contracts/coordination-session.md'. Framing: docs/how-to/run-a-coordination-session.md:230 '## What gets rejected, and why'; docs/how-to/run-a-coordination-session.md:1 '# How to run a coordination session with `fgos coordination`'"
+  },
+  {
+   "rowId": "f03404",
+   "verdict": "REWORK",
+   "severity": "low",
+   "summary": "The outcome (keep literal) is fine, but the reason is wrong. This is a live '## Related' pointer in a present-tense guide, not a completed change or a capture. The operand is not moved: docs/how-to/coordination-examples/group-thinking-*.json exists and is not in the move set. Regroup it as a retained live operand, as L13-10 warns against calling live pointers history.",
+   "evidence": "docs/how-to/use-fgos-group-thinking.md:214 under '## Related' (line 202). 5 matching files present in docs/how-to/coordination-examples/; no coordination-examples path in step-05-cutover-move-set.json."
+  },
+  {
+   "rowId": "f03407",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:147 -> docs/platform/documentation/history/id-systems-audit.md:154-159 unit sha c2450adadf0a168a; normalized text similarity 1.00 (link targets rebased only); section '## 5 · #7 D-hex và #8 D-local — của lĩnh vực gì, ai dùng, và'."
+  },
+  {
+   "rowId": "f03408",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:164 -> docs/platform/documentation/history/id-systems-audit.md:175-175 unit sha bbed5edca03c3212; normalized text similarity 1.00 (link targets rebased only); section '## 6 · Câu hỏi đã đóng'."
+  },
+  {
+   "rowId": "f03409",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:49 -> docs/platform/documentation/history/id-systems-audit.md:60-60 unit sha d57310282f0e481b; normalized text similarity 1.00 (link targets rebased only); section '### fgOS (sản phẩm — vĩnh viễn, đã migrate)'."
+  },
+  {
+   "rowId": "f03410",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:11 -> docs/platform/documentation/history/id-systems-audit.md:22-27 unit sha 11d382080aeaa764; normalized text similarity 1.00 (link targets rebased only); section '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'."
+  },
+  {
+   "rowId": "f03411",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:14 -> docs/platform/documentation/history/id-systems-audit.md:22-27 unit sha 11d382080aeaa764; normalized text similarity 1.00 (link targets rebased only); section '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'."
+  },
+  {
+   "rowId": "f03412",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:16 -> docs/platform/documentation/history/id-systems-audit.md:22-27 unit sha 11d382080aeaa764; normalized text similarity 1.00 (link targets rebased only); section '# Audit: loại-hình công việc + hệ đặt tên/đánh mã'."
+  },
+  {
+   "rowId": "f03413",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:30 -> docs/platform/documentation/history/id-systems-audit.md:40-48 unit sha 3d3adc6c49927c46; normalized text similarity 1.00 (link targets rebased only); section '## Bối cảnh (STR47)'."
+  },
+  {
+   "rowId": "f03414",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:32 -> docs/platform/documentation/history/id-systems-audit.md:40-48 unit sha 3d3adc6c49927c46; normalized text similarity 1.00 (link targets rebased only); section '## Bối cảnh (STR47)'."
+  },
+  {
+   "rowId": "f03415",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:47 -> docs/platform/documentation/history/id-systems-audit.md:58-58 unit sha 418faf3f8576dc3c; normalized text similarity 1.00 (link targets rebased only); section '### fgOS (sản phẩm — vĩnh viễn, đã migrate)'."
+  },
+  {
+   "rowId": "f03416",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:48 -> docs/platform/documentation/history/id-systems-audit.md:59-59 unit sha 01c900d36862760c; normalized text similarity 1.00 (link targets rebased only); section '### fgOS (sản phẩm — vĩnh viễn, đã migrate)'."
+  },
+  {
+   "rowId": "f03417",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:49 -> docs/platform/documentation/history/id-systems-audit.md:60-60 unit sha d57310282f0e481b; normalized text similarity 1.00 (link targets rebased only); section '### fgOS (sản phẩm — vĩnh viễn, đã migrate)'."
+  },
+  {
+   "rowId": "f03418",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:50 -> docs/platform/documentation/history/id-systems-audit.md:61-61 unit sha 4df981bebe202c17; normalized text similarity 1.00 (link targets rebased only); section '### fgOS (sản phẩm — vĩnh viễn, đã migrate)'."
+  },
+  {
+   "rowId": "f03419",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:57 -> docs/platform/documentation/history/id-systems-audit.md:68-68 unit sha ce526516a66f7dc0; normalized text similarity 1.00 (link targets rebased only); section '### bee (xưởng — giàn giáo tạm, giữ nguyên)'."
+  },
+  {
+   "rowId": "f03420",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:107 -> docs/platform/documentation/history/id-systems-audit.md:118-118 unit sha 97abc5886518b415; normalized text similarity 1.00 (link targets rebased only); section '## 4 · Trạng thái quyết định theo từng hệ (chốt — xem `docs/'."
+  },
+  {
+   "rowId": "f03421",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:124 -> docs/platform/documentation/history/id-systems-audit.md:134-135 unit sha fc8ef072789f63b2; normalized text similarity 1.00 (link targets rebased only); section '## 4 · Trạng thái quyết định theo từng hệ (chốt — xem `docs/'."
+  },
+  {
+   "rowId": "f03422",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:150 -> docs/platform/documentation/history/id-systems-audit.md:161-167 unit sha 7b93bfa4feafbd3f; normalized text similarity 1.00 (link targets rebased only); section '## 5 · #7 D-hex và #8 D-local — của lĩnh vực gì, ai dùng, và'."
+  },
+  {
+   "rowId": "f03423",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:160 -> docs/platform/documentation/history/id-systems-audit.md:171-171 unit sha 76e725ec64de6f99; normalized text similarity 1.00 (link targets rebased only); section '## 6 · Câu hỏi đã đóng'."
+  },
+  {
+   "rowId": "f03424",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:164 -> docs/platform/documentation/history/id-systems-audit.md:175-175 unit sha bbed5edca03c3212; normalized text similarity 1.00 (link targets rebased only); section '## 6 · Câu hỏi đã đóng'."
+  },
+  {
+   "rowId": "f03425",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:170 -> docs/platform/documentation/history/id-systems-audit.md:181-189 unit sha 620cc5608fb805e0; normalized text similarity 1.00 (link targets rebased only); section '## 6 · Câu hỏi đã đóng'."
+  },
+  {
+   "rowId": "f03426",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:171 -> docs/platform/documentation/history/id-systems-audit.md:181-189 unit sha 620cc5608fb805e0; normalized text similarity 1.00 (link targets rebased only); section '## 6 · Câu hỏi đã đóng'."
+  },
+  {
+   "rowId": "f03427",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:174 -> docs/platform/documentation/history/id-systems-audit.md:181-189 unit sha 620cc5608fb805e0; normalized text similarity 1.00 (link targets rebased only); section '## 6 · Câu hỏi đã đóng'."
+  },
+  {
+   "rowId": "f03428",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:175 -> docs/platform/documentation/history/id-systems-audit.md:181-189 unit sha 620cc5608fb805e0; normalized text similarity 1.00 (link targets rebased only); section '## 6 · Câu hỏi đã đóng'."
+  },
+  {
+   "rowId": "f03429",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:175 -> docs/platform/documentation/history/id-systems-audit.md:181-189 unit sha 620cc5608fb805e0; normalized text similarity 1.00 (link targets rebased only); section '## 6 · Câu hỏi đã đóng'."
+  },
+  {
+   "rowId": "f03430",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:176 -> docs/platform/documentation/history/id-systems-audit.md:181-189 unit sha 620cc5608fb805e0; normalized text similarity 1.00 (link targets rebased only); section '## 6 · Câu hỏi đã đóng'."
+  },
+  {
+   "rowId": "f03431",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:176 -> docs/platform/documentation/history/id-systems-audit.md:181-189 unit sha 620cc5608fb805e0; normalized text similarity 1.00 (link targets rebased only); section '## 6 · Câu hỏi đã đóng'."
+  },
+  {
+   "rowId": "f03432",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-id-audit). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/id-systems-audit.md:178 -> docs/platform/documentation/history/id-systems-audit.md:181-189 unit sha 620cc5608fb805e0; normalized text similarity 1.00 (link targets rebased only); section '## 6 · Câu hỏi đã đóng'."
+  },
+  {
+   "rowId": "f03442",
+   "verdict": "APPROVE",
+   "summary": "Claim conserved in the mapped holder (carried-cli-contract). Successor unit matches pin bytes and digest; the source file's move-set destination is this holder.",
+   "evidence": "docs/io-contract.md:219 -> docs/platform/work-state/contracts/cli-io-contract.md:435-441 unit sha 7fddf59545c800c1; normalized text similarity 1.00 (link targets rebased only); section '## 12. References'."
+  },
+  {
+   "rowId": "f03444",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/journals/260728-2038-claim-port-str46-parallel-merge.md:32 token 'docs/decisions/0019-mien-tru-viet-lai-nhat-ky.md'. Framing: docs/journals/260728-2038-claim-port-str46-parallel-merge.md:24 '## Technical Details'; docs/journals/260728-2038-claim-port-str46-parallel-merge.md:28 '1. **ClaimError missing `.category`**: Lock-held/lock-ambiguous transi'"
+  },
+  {
+   "rowId": "f03446",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md:108 token '0000-index.md'. Framing: docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md:99 '## The twice-superseded record's own index row was still missing (`tsk'; docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md:102 'Running the checker for real afterward still reported findings — not n'"
+  },
+  {
+   "rowId": "f03447",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md:122 token '0000-index.md'. Framing: docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md:99 '## The twice-superseded record's own index row was still missing (`tsk'; docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md:118 '> was superseded TWICE — by 0028 (pinned-term rename to `launcher`, ST'"
+  },
+  {
+   "rowId": "f03448",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md:15 token 'docs/decisions/0026-...md'. Framing: docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md:11 '## The trap (tsk-5wf)'; docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md:9 '# A decision doc can be superseded twice — superseded_by becomes a lis'"
+  },
+  {
+   "rowId": "f03452",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md:134 token 'docs/decisions/NNNN-*.md'. Framing: docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md:128 '## A `supersedes:` target can be a capture hash, not just a decision i'; docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md:126 'finding count.'"
+  },
+  {
+   "rowId": "f03555",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/design-safeguards-in-fgos-s-runner-anti-loop-breakers-model/runner-execution-safety.md:68 token 'docs/history/learnings/critical-patterns.md'. Framing: docs/knowledge/design-safeguards-in-fgos-s-runner-anti-loop-breakers-model/runner-execution-safety.md:47 '## Relocating one guard can silently reorder another'; docs/knowledge/design-safeguards-in-fgos-s-runner-anti-loop-breakers-model/runner-execution-safety.md:64 'they get relocated as one unit.'"
+  },
+  {
+   "rowId": "f03558",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md:59 token 'system-overview.md'. Framing: docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md:55 '## What this item did — and didn't — fix'; docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md:53 'and the older prose side by side would ever catch.'"
+  },
+  {
+   "rowId": "f03560",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md:31 token 'docs/specs/system-overview.md'. Framing: docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md:9 '## Three real lines caught contradicting a locked D-ID (tsk-15d)'; docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md:27 '   (JSON-RPC over stdio vs. a markdown file loaded straight into the'"
+  },
+  {
+   "rowId": "f03573",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md:29 token 'docs/io-contract.md' -> docs/platform/work-state/contracts/cli-io-contract.md; patch docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f03576",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md:77 token 'docs/io-contract.md' -> docs/platform/work-state/contracts/cli-io-contract.md; patch docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f03577",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md:98 token 'docs/io-contract.md' -> docs/platform/work-state/contracts/cli-io-contract.md; patch docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f03579",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md:128 token 'docs/io-contract.md' -> docs/platform/work-state/contracts/cli-io-contract.md; patch docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f03580",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin. Note: the successor renamed the section to \"## 5. Reasoned Envelope Exceptions\"; the kept quote \"Ngoại lệ có lý do\" plus its English gloss still locates it.",
+   "evidence": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md:189 token 'docs/io-contract.md' -> docs/platform/work-state/contracts/cli-io-contract.md; patch docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f03582",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md:246 token 'docs/io-contract.md' -> docs/platform/work-state/contracts/cli-io-contract.md; patch docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f03588",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md:87 token 'docs/history/learnings/critical-patterns.md'. Framing: docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md:51 '## A fifth recurrence, one commit later (`tsk-1kh`)'; docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md:83 'default drop to `kernel`.'"
+  },
+  {
+   "rowId": "f03619",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:17 token 'docs/ui-spec/00-overview.md' -> docs/platform/ui-spec/spec.md; patch docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f03621",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:39 token 'docs/ui-spec/flows/' -> docs/platform/ui-spec/operations/F01-answer-a-parked-question.md; patch docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f03622",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:194 token 'docs/ui-spec/30-states-and-errors.md' -> docs/platform/ui-spec/contracts/30-states-and-errors.md; patch docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f03625",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md:391 token 'docs/history/learnings/critical-patterns.md'. Framing: docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md:349 '## The same load-flake, a third time — and the fix converged on an exi'; docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md:387 'from \"the infrastructure/a flaky dependency broke.\"'"
+  },
+  {
+   "rowId": "f03630",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md:80 token 'docs/history/learnings/critical-patterns.md'. Framing: docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md:65 '## Concurrency at the log's write door'; docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md:76 'red one.'"
+  },
+  {
+   "rowId": "f03656",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md:24 token 'docs/decisions/0020-chan-fgos-khoi-worktree-worker.md'. Framing: docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md:17 '## Before this existed'; docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md:19 'There was no honest terminal status for this. The only reachable park '"
+  },
+  {
+   "rowId": "f03657",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md:32 token 'docs/how-to/handle-a-duplicate-work-item.md'. Framing: docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md:17 '## Before this existed'; docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md:26 '  outright on every worktree creation, so the bug can no longer reprod'"
+  },
+  {
+   "rowId": "f03664",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md:196 token 'docs/specs/distribution.md'. Framing: docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md:193 '## Real-world lesson: a target sitting in `cleanup` has already delive'; docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md:191 '  `aheadCount: 1`.'"
+  },
+  {
+   "rowId": "f03681",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md:79 token 'docs/specs/work-state.md'. Framing: docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md:50 '## Steps'; docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md:71 '   dogfood/fixture directory the repo has. A grep scoped only to `test'"
+  },
+  {
+   "rowId": "f03682",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md:80 token 'docs/how-to/fgos-terminal-pane-rename.md'. Framing: docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md:50 '## Steps'; docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md:71 '   dogfood/fixture directory the repo has. A grep scoped only to `test'"
+  },
+  {
+   "rowId": "f03690",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md:239 token 'docs/how-to/fix-fgos-write-rejected-merge-block.md'. Framing: docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md:223 '## Example: `tsk-5ge` — the follow-up item that lands the config chang'; docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md:230 'and deleting the `executors.judge` key, applied \"as a direct, single-p'"
+  },
+  {
+   "rowId": "f03711",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md:123 token 'docs/history/*/'. Framing: docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md:117 '## No new index file'; docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md:115 '`brainstorm` skill).'"
+  },
+  {
+   "rowId": "f03716",
+   "verdict": "APPROVE",
+   "summary": "Live citation of a maintained source that moves at cutover; successor holder/section verified; patch is a one-token path retarget and replays forward/back at the pin.",
+   "evidence": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md:20 token 'docs/operator-runbook-herdr-cockpit.md' -> docs/platform/herdr-web-dashboard/operations/operator-runbook.md; patch docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md replays with patch --fuzz=0 (checker exit 0)."
+  },
+  {
+   "rowId": "f03717",
+   "verdict": "APPROVE",
+   "summary": "Preserve confirmed (completed-change-or-capture): framing makes the operand a source/history coordinate or a retained native path, not a current-authority route.",
+   "evidence": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md:104 token 'docs/decisions/0020-chan-fgos-khoi-worktree-worker.md'. Framing: docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md:14 '## Recipe'; docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md:97 '   ```text'"
+  }
+ ]
+}
