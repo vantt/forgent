@@ -206,6 +206,22 @@ runner:
   # @fgos:doc Milliseconds of silence after which a worker is stopped; absent leaves idle stopping off.
   # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
   idleTimeoutMs: 5400000
+  # @fgos:doc The model each family uses at each tier, by family then tier.
+  # @fgos:doc Tier ladder, weakest first:
+  # @fgos:doc nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote
+  # @fgos:doc mini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ
+  # @fgos:doc standard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả
+  # @fgos:doc advanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan
+  # @fgos:doc flagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel
+  # @fgos:doc frontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng
+  modelPolicies:
+    # @fgos:doc The tiers of one family; a tier it omits has no model.
+    deepseek:
+      # @fgos:doc The model a family uses at one tier: a model id, model@pool, an object with model, pool and effort, or a non-empty list of those in the order they are tried. A cell is replaced whole by a higher layer, never merged. Default: deepseek/deepseek-v4-pro@openrouter.
+      # @fgos:why [e0397c00-5319-463e-8e23-86031fbc824b] Owner 2026-10-25: run deepseek's advanced seat on v4.1-flash through thehive first, OpenRouter as fallback; v4-pro on OpenRouter ran out of credit (402) on a plan-driven review
+      advanced:
+        - thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive
+        - deepseek/deepseek-v4.1-flash@openrouter
 # @fgos:doc How far agent work may skip human approval gates.
 gateBypass:
   # @fgos:doc Gate bypass level for agent work; off approves nothing automatically and each higher level approves work up to that size. Values: off | light | standard | heavy. Default: off.
