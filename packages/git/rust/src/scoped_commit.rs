@@ -114,6 +114,14 @@ pub(crate) fn paths(bytes: &[u8]) -> Result<Vec<String>> {
         })
         .collect()
 }
+/// The commit id, the first NUL-ended field of that same observation.
+fn observation_oid(bytes: &[u8]) -> Result<String> {
+    let invalid = || recovery("commit-header-invalid");
+    let end = bytes.iter().position(|b| *b == 0).ok_or_else(invalid)?;
+    std::str::from_utf8(&bytes[..end])
+        .map(str::to_owned)
+        .map_err(|_| invalid())
+}
 /// Splits `show --raw -t -r -z --format=%H%x00%T%x00%P%x00`: three NUL-ended
 /// header fields, the format's own terminator, then (only when the commit
 /// changed anything) Git's single newline separator and the raw diff records.
@@ -1610,8 +1618,10 @@ impl GitDriver {
                     "HEAD",
                 ],
             )?;
-            let (observed, actual_tree, parents, shown) = split_observation(&observation)?;
-            if observed == baseline.head {
+            // A commit that git refused leaves HEAD on the baseline, and a merge
+            // baseline prints `show --raw` in the combined-diff shape that
+            // `split_observation` does not read, so the oid is compared first.
+            if observation_oid(&observation)? == baseline.head {
                 // Keep the attempt durable. Retrying uses a new id after a fresh preflight.
                 if !out.success {
                     let error = self.checkout_commit_failure(repo, scope, out)?;
@@ -1623,6 +1633,7 @@ impl GitDriver {
                 }
                 return Err(recovery("commit-effect-unknown"));
             }
+            let (observed, actual_tree, parents, shown) = split_observation(&observation)?;
             let entries = if parents.split_whitespace().collect::<Vec<_>>()
                 == vec![baseline.head.as_str()]
             {
