@@ -35,7 +35,14 @@ export function mailboxOptIn(repoRoot) {
   }
 }
 
+/** The refused config of a refused opt-in, as a person reads it: the scope Config names in
+ * `file` (`project:config.yaml` is the project config, `global:config.yaml` the global one). */
+export function refusedConfigName(optIn) {
+  const scope = optIn.file?.split(':')[0];
+  return scope === 'project' || scope === 'global' ? `the ${scope} config` : 'a config file';
+}
+
 /** The line setup prints for a refused opt-in: the reason word and the refused file. */
 export function mailboxRefusalLine(optIn) {
-  return `mailbox hook rows left as they are: ${optIn.reason}${optIn.file ? ` in ${optIn.file}` : ''} (the project config is refused, so the opt-in is unknown)`;
+  return `mailbox hook rows left as they are: ${optIn.reason}${optIn.file ? ` in ${optIn.file}` : ''} (${refusedConfigName(optIn)} is refused, so the opt-in is unknown)`;
 }

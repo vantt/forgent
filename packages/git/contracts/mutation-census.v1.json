@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f3e1fc78ed4d09d9fbda6c9ae97f0313133d46219ccb8ab54a4b715e5422cf15",
+  "payloadDigest": "80f668ba11a8d9393b27fed5884172a93efa1a20958fb2cf2b6bb6f577d8789a",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -1099,10 +1099,10 @@
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
     "src/setup/instruction-projections.mjs": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
     "src/setup/instruction-registry.mjs": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-    "src/setup/mailbox-limits.mjs": "a5457a9a84936b58d099de98bdebaeeb0a6889bbca0e6f8aeefb8b3bbcbee2f3",
+    "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
     "src/setup/model-pool-checks.mjs": "a770f17808c6a02cd2d5e50e145711635587f78eddf0639eb5525a7d442a9246",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "9abfc9e62b0a32b0337e301156f6dfd4130e213cf4e9fc36c0a6d90657d3a4e7",
+    "src/setup/registrations.mjs": "dc7309dfc50f4bd0b71f92befeab6fe7658da86f38490ff9b43df83f9e1e7c55",
     "src/setup/run-supervisor-checks.mjs": "b5919215aaa5f3910306a6f6edb53aa2eb9d60382c6505d46975776d44c369e9",
     "src/setup/seat-binding-checks.mjs": "8eb709c6ef91ea0c4e24d1ad15adb3231f5d1441ebb260a42f0934e994b136f6",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",

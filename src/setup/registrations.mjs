@@ -51,7 +51,7 @@ import {
   installPiHook,
 } from './agent-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
-import { mailboxOptIn } from './mailbox-limits.mjs';
+import { mailboxOptIn, refusedConfigName } from './mailbox-limits.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import {
   readWorkflowDefinitionFiles,
@@ -1995,7 +1995,7 @@ function checkMailboxHook(cwd) {
   const optIn = mailboxOptIn(cwd);
   // The config rows already fail and name a refused config; this row only says why it cannot tell.
   if (optIn.state === 'refused') {
-    return { passed: true, message: `opt-in unknown: the project config is refused (${optIn.reason}); the config rows name it, and fgos setup leaves the mailbox hook rows as they are` };
+    return { passed: true, message: `opt-in unknown: ${refusedConfigName(optIn)} is refused (${optIn.reason}${optIn.file ? ` in ${optIn.file}` : ''}); the config rows name it, and fgos setup leaves the mailbox hook rows as they are` };
   }
   if (optIn.state === 'off') {
     return { passed: true, message: 'not enabled: set mailbox.enabled: true in the project config (fgos config set), then run fgos doctor --fix, to install the mailbox hook rows (provisional opt-in, spec §16 item 23)' };
