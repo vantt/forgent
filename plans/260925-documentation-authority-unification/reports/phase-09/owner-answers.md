@@ -250,3 +250,11 @@ These patches live in five places:
 Each record has its own checker, and none of them sees the others. That is the mess itself, not a size problem.
 
 Ruling: one ordered F composition manifest names every prepared-patch source, and one checker composes them all on the pin. It fails on two patches for the same lines, on a conflict, and on a patch without one owning row. Each changed line has exactly one owning patch. Every other record that mentions that change links to it by id, and carries no second copy. The per-record checkers keep their record-level checks, and their replay goes through this one door. This consolidates the existing replay code (`composition/compose.py` `apply_diff` and `check_shard.py`'s chain builder) rather than adding a new engine. The G9 checker reads `plans/` evidence from the pin, not from disk, so later record edits do not break it.
+
+## L13-25 — G0 rework review follow-up (Lead, 2026-10-25 15:05)
+
+Decided by the Lead under A42, from the w26 review (65 of 72 rows APPROVE, 7 REWORK).
+
+1. **Code inside a fence is literal, like an inline code span.** The link rewriter also retargeted paths inside two fenced code blocks: `workflow/spec.md:420` and `component-boundary.md:549`. Code text is copied byte for byte from its source. A path inside code is not a link, so a reader gains nothing from the retarget. Restore both, and record the scan over fenced code as well as inline spans.
+2. **A verdict binds the row as it was reviewed, not only its two digests.** w26 found about 70 rows whose rationale, disposition or review status changed after their approval. The join still counts those approvals, because it reacts only to digest changes. `g0join/join.py` now also requires the verdict to postdate the last commit that changed the row's decision fields (by git ancestry), or to carry a matching row-content fingerprint. Rows that fail this check go back to review.
+3. The 7 REWORK rows are fixed as the review says. `import2/partial-carry-residuals.json` becomes writable for the two stale residual records. The duplicate binding in s14 `/bindingRefresh/8` becomes an explicit drop.

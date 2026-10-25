@@ -1,0 +1,701 @@
+{
+  "pin": "39528fa211f9a7e558b1e95467eeae1f66b68a3d",
+  "reviewedCommit": "594fe4194693d1a6026ed7801168002f89e6c85e",
+  "mergedAt": "3f225cfe7421ad9eb3da276fc70c14798fef3cde",
+  "verdicts": [
+    {
+      "claimId": "claim_62d9996e5897714517de064047f1ff83",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/11",
+      "bindingSha256": "3217bb4542b6d20af2fe1717a9cd912042a8c0a3e26f0082c9c0ccb0a5da58a7",
+      "targetUnitDigest": "5a6a28507ce8fe1d6df98cd239c61f9d9dbf6e320621f21459fba8174c108939",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Rigor paragraph block-4: old rigorToTier/effort wording replaced by Seat Binding rigor/tier split; changedClauses old wording equals frozen source unit, new wording equals target, no residual difference; change sources real (7be0cbc52, seat-binding 5.2). Claim now correctly supersede."
+    },
+    {
+      "claimId": "claim_ec3f286e81c31817022a1caa3eebda54",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/14",
+      "bindingSha256": "adc69f36a7118cdeb7c8bb5bde0fba74e9602f2ca6708b46de91ca3ba2551974",
+      "targetUnitDigest": "a8bf93ec2567af2434702019c1658d02480d403ef4be9666fb28bb6c81f14746",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Anchor corrected from rigor block-4 to capability tier/maxTier block-7. Old explicit raise-only tier channel replaced by direct config tier/maxTier; Phase-2 load-time migration sentence explicitly dropped with a reason (obsolete bridge, D-ADR0072 refusal/migration replaces it). Old wording equals frozen source; new equals target. Raise refusal itself lives in block-4 (bound by /claims/11)."
+    },
+    {
+      "claimId": "claim_e9802a0cf16dad3c227c5159d457e3dd",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/15",
+      "bindingSha256": "adc69f36a7118cdeb7c8bb5bde0fba74e9602f2ca6708b46de91ca3ba2551974",
+      "targetUnitDigest": "a8bf93ec2567af2434702019c1658d02480d403ef4be9666fb28bb6c81f14746",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Capability model/tier prohibition replaced by capability tier/maxTier/roles/personas/seats and rigorToTier refusal; old/new wording verified against frozen source and target; text equals current legacy runner.md."
+    },
+    {
+      "claimId": "claim_e212e87da06a0a552cc1ccde10b5aaab",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/133",
+      "bindingSha256": "c1b907e4fe26f6f3deeef5257b5a3be6e3d286de99ac835ddec7961edf16d0ac",
+      "targetUnitDigest": "83c4ce05b5d6a9b14dccd5a2365bec12ee589a80b555dec26a5a7275106b45ec",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Vocabulary table: tier cell rigorToTier -> Seat Binding (rigorToTier deleted) and every runner.md citation re-cited to current ADR headings (0028 2380, 0029 2442, 0031 2616, 0034 2923, verified at HEAD). Both changed clauses verified; no residual."
+    },
+    {
+      "claimId": "claim_c71a4a589ecddc5c1ccc30f983c45d9f",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/154",
+      "bindingSha256": "477661f702e37a9252670a9642ff0b30aa121613dc802f7f0ce6cd2bf947c92e",
+      "targetUnitDigest": "a696f244df3709c995c6a5d8a35ec2083a12d72b54ddba980e58c1d556c623e4",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Historical DAG narrative: Workflow no longer integrates Work lifecycle, debate and two doors added; only candidate addition vs legacy is the label phrase \"Trong mo hinh DAG lich su\", recorded in newWording. Verified."
+    },
+    {
+      "claimId": "claim_3eb8339e6534b30ba7e1214255a11800",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/250",
+      "bindingSha256": "b9da875bbfaf5e2ec94ba5fac0e5e69bf8afc2f051470f6f3744eae8e7531751",
+      "targetUnitDigest": "f1dec519dfc928f2992606822417a8aa677796a14914454c1794b1900b8021ed",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Dated audit citation withEventsLock/appendEventLocked (events.mjs) -> withStateTx (hot-lock.mjs); target equals current legacy runner.md text (changed on main in dc8acf9bf); withStateTx is the store write door (src/state/store.mjs, src/state/hot-lock.mjs:316). Old wording kept in changedClauses. The docs text itself carries no label; the record carries it."
+    },
+    {
+      "claimId": "claim_ce394d3198a3ef11d4ccf9f12f6faa4b",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/97",
+      "bindingSha256": "a073ccc4d33222a19881bc63bd7580c4b4edf455d1a6f672c2f0ce5e43a09514",
+      "targetUnitDigest": "be7eed6375cbeea35577d9d6fc9cfa8c6c24314b3ec71c52d1405e92c5ebb2f6",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Account-first retry now per candidate pool/enabled accounts (RUL106/Seat Binding); clause verified, target equals current legacy text."
+    },
+    {
+      "claimId": "claim_cbdb1b45324e09cc15d67abf3193f88a",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/248",
+      "bindingSha256": "208960e9350d7d3095e673f8fa0e4d68154ef88dcd43bce98f268348ec948192",
+      "targetUnitDigest": "83c14a937143634c17008b10bddbfb2657bc4377adadd84f6886d486aa293bd1",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Same withEventsLock -> withStateTx citation correction inside the choke-point heading section; verified against source and target."
+    },
+    {
+      "claimId": "claim_e79647f02e8a3507c31e2e57c75b929c",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/439",
+      "bindingSha256": "e7c267d16676e1c5087c07ae09e1222ed8e9d214174c47e987584b443bba6f5e",
+      "targetUnitDigest": "0a6915d3d53788e9d70de92159d89758b13182872f5a7ee48020efc0ffacf620",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. ADR 0043 heading gains the D-ADR0056 partial-supersession label and note; clause verified; target equals current legacy text."
+    },
+    {
+      "claimId": "claim_8f31a4f2f6b6f91fcbf89cace7be6bff",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/452",
+      "bindingSha256": "51939a41c7810ade8177b04e51ee6c125ab1efca737571a4a06cd18b9f5827d3",
+      "targetUnitDigest": "8eb6fc7fa7239f55dc32f5aff96506fdb14e1dab2dcc19646c88f9c35d022dcc",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. ADR 0048 gains the D-ADR0070 partial-supersession note (pure insertion recorded with empty oldWording); remainder byte-equal."
+    },
+    {
+      "claimId": "claim_5f10674a9a170a84bfd02d6b1462ea18",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/454",
+      "bindingSha256": "81c3dbd6e6931d21e6ac5ee3fdbd630c376bbb1f3ea0925d04291186df0ce768",
+      "targetUnitDigest": "a53cd6b5733054d5303010da8b1c661ba5322563d115210eb26ba3a6986cd7f8",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. ADR 0049 gains the D-ADR0070 partial-supersession note (pure insertion); remainder byte-equal."
+    },
+    {
+      "claimId": "claim_dc5adc3445b7c6d46b566976d00e0e6c",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/34",
+      "bindingSha256": "324a7c37891a6c7569d2a045119552bf8346795809ef9da6dbd3d23e5b7dd983",
+      "targetUnitDigest": "15552c5b68b2777e889665f33506890672ed3f4b1fb915f3f5d340258732c5c7",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Kernel-lock/RUL106 correction; clause verified against frozen source and target, no residual; target equals current legacy text."
+    },
+    {
+      "claimId": "claim_9a50fb3e9a7b6df8a765442284b567b6",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/35",
+      "bindingSha256": "6dabcd3a70cd673fa4f82c0aa668a7c557ce1722181381333e1fd18c8e9955d1",
+      "targetUnitDigest": "61bc67dec5cee3602d8c1d736fe05e7af5b5ce4774ee6c010c672e716e6f4638",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Kernel-lock/RUL106 correction; clause verified, no residual; target equals current legacy text."
+    },
+    {
+      "claimId": "claim_f90bfbcb40720cb854dbd54aa96ca471",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/36",
+      "bindingSha256": "0d013ac540efc4a29763c0b6e56828b2f63f7f2d6ed97c7b80e4088d8a29d54d",
+      "targetUnitDigest": "39bbcfde57b174abbe25c6c158d20a7a36b743f36b3ed31d926cc0f1f3ef1ea3",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Kernel-lock correction; clause verified, no residual; target equals current legacy text."
+    },
+    {
+      "claimId": "claim_64858c3adb9ca1d1eae38e1c9bc63e10",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/37",
+      "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+      "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Block-36 now carries the restored code span; seven clauses (incl. RUL101 insertion) cover every source->target change, no residual; target line 191 is byte-equal to legacy runner.md:1123."
+    },
+    {
+      "claimId": "claim_266411b5687c45ccfcaf394c32117cb2",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/38",
+      "bindingSha256": "091e411192d054deaa6a839c8d15fdd16e1f2fbf4c765a042c850a8d8d381127",
+      "targetUnitDigest": "ab5f847e13a581815d3843c93ab1083c090e81c1e517c1fe3354a572ee15b8f9",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Clause verified, no residual; target equals current legacy text."
+    },
+    {
+      "claimId": "claim_5f3ad073a39ac476da56045883f4e852",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/39",
+      "bindingSha256": "221a6632a1423e036b4a86106a86cbd568e0796da0e2963548c1fbc9f1b2dd2f",
+      "targetUnitDigest": "252ea6dbb0e5e764ac177a1d694964a20df0735fe0588f2a889e8b7f9205f170",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Four main-checkout kernel-lock clauses verified, no residual vs frozen source. Note (not caused by this commit): target still says sessions.lock/runner.lock/events.lock where legacy runner.md:905 now says mutex nong state (dc8acf9bf); the resync left this clause behind legacy. Follow-up for the resync/parity owner."
+    },
+    {
+      "claimId": "claim_bbfca84de55fe9dfa387cd027bb818f7",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/41",
+      "bindingSha256": "a28e24f2f5711f5895523be3028d0aab24a0078bc9b7385da75512eec550085f",
+      "targetUnitDigest": "7955b70c0fe3dc2879965b9a6a8c6337a14359ce269e0132720511e74e4c4e50",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Clause verified, no residual; target equals current legacy text."
+    },
+    {
+      "claimId": "claim_8af62b949d9d3e77433b7fc8f72917cc",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/42",
+      "bindingSha256": "a7bd1b1c5d937d1a8c84ae1f1d403ec82f53af23a3716032aa3f4660f36b5705",
+      "targetUnitDigest": "56a203322113e54bb34ffac50e1e5588f789eb0272f8e7f261512c3a1a95f427",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Clause verified, no residual; target equals current legacy text."
+    },
+    {
+      "claimId": "claim_32d366486b72925c171d9fefc84179e2",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/86",
+      "bindingSha256": "19116044cb8471edc311128a1536b03046fb9cdaab8f04a65c835183ff5e992f",
+      "targetUnitDigest": "e4af416abe40eaf70f1f910b5a777c293eaaa6907bae3c0c18d84d04f7d0bd63",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Rebound only because this commit edited the bound section (code-span restore in h-6979005beaf7 Business Rules / citation re-cites in h-7af1f0242611); the delta is the labelled restore or re-cite, both verified; earlier supersede accounting unchanged and still accurate."
+    },
+    {
+      "claimId": "claim_532692d4c5ebdea48d2a8352129cc843",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/132",
+      "bindingSha256": "114c99ce477587056021daf42d7b367187f641ee1c9b45428abd14288e622cf3",
+      "targetUnitDigest": "da06863c06dece6df978e96d9877c1608a30257865d153626d4473b7beca532f",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Rebound only because this commit edited the bound section (code-span restore in h-6979005beaf7 Business Rules / citation re-cites in h-7af1f0242611); the delta is the labelled restore or re-cite, both verified; earlier supersede accounting unchanged and still accurate."
+    },
+    {
+      "claimId": "claim_17f27ab085e951c529afff07f099e25b",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/134",
+      "bindingSha256": "17f0d5dccecee97be0c49787102db666c401f15719fdb33fb8cce0ee11c98f73",
+      "targetUnitDigest": "40414b50fe1dc4e6f041fd0fde8ca68afb2519c25ce3de0d798ba58b59bfc491",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Rebound only because this commit edited the bound section (code-span restore in h-6979005beaf7 Business Rules / citation re-cites in h-7af1f0242611); the delta is the labelled restore or re-cite, both verified; earlier supersede accounting unchanged and still accurate."
+    },
+    {
+      "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/2",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_69311391fbb9b1cf924197e6063e5cad",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/4",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/5",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/6",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/7",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/8",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/9",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/10",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/11",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/12",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/13",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_cad110bd532badff055f69c0a236644a",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/14",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/15",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/16",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_33c41de79cf4a52288035a9656c09735",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/17",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/18",
+      "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held identical-unit group row: all eight successorGroup members (decision footer in ADRs 0005/0008/0020/0021/0028/0029/0031/0032 of legacy runner.md) authenticate by anchor, digest and ancestry; restored targetUnitDigest equals the common member digest and the frozen sourceUnitDigest; anchor stays null; old hash/null digest kept in priorReview.g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_c9cc1ff2abdd7adf91641d4c8b240523",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/0",
+      "bindingSha256": "e1e8196fc047eee129ac2d200f62cf22901672e08ac9a4142ae04bfd98fd17d2",
+      "targetUnitDigest": "4d4c1b5f2a290762fd6921a907d31e21e2dce776ea157119f963959606d94de9",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held row: missing hash computed with the canonical recipe, digest unchanged, prior row in g0ReworkBefore. Meaning: H1 heading text unchanged; composite digest differs only because candidate metadata follows it."
+    },
+    {
+      "claimId": "claim_a1ef5e3f7d16b7ab938e8ac6eb2209c3",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/2",
+      "bindingSha256": "54da3b096b0c8ce617a331637fa71217cddb90e827a81ea0a30fbd424557a994",
+      "targetUnitDigest": "3c5f074f9b5cfbd5f02d866cbcd9eac50b3c9e5f4ba8ad5d430bf42a0d598c65",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held row: missing hash computed with the canonical recipe, digest unchanged, prior row in g0ReworkBefore. Meaning: Supersede: plan path corrected to archive/plans/260929-1501-metrics-friction-rust-native (exists; plans/ path does not)."
+    },
+    {
+      "claimId": "claim_908fe7d610c47ed8348c6b10768539c9",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/10",
+      "bindingSha256": "0b633c81fb6df9e6067944c11f0d9d6a7204ff346c46ba14a0c18966bc49dd08",
+      "targetUnitDigest": "48ada5d895788c31e0cfc7f9dc44b26c62ca362a58d42791af1d1faae52c5567",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held row: missing hash computed with the canonical recipe, digest unchanged, prior row in g0ReworkBefore. Meaning: Supersede: friction subcommands gain migrate, true per packages/observe/rust/src/friction_cli.rs:8,38."
+    },
+    {
+      "claimId": "claim_12da781dbd66869bbf765410d887c7f0",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/18",
+      "bindingSha256": "b4e4e53efac1701be56b9ce50a6a1f000ddcc1c4fae6c304dd242a325d833018",
+      "targetUnitDigest": "2e58e1822dc58b46b60193348bdfef8dcba3ca8621bbd845c2ed61c95c720917",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held row: missing hash computed with the canonical recipe, digest unchanged, prior row in g0ReworkBefore. Meaning: Only two relative link destinations rebased (../ -> ../../); both resolve to docs/reference and docs/how-to files."
+    },
+    {
+      "claimId": "claim_fde5bf697a74032ae96b87746d5f5f25",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/5",
+      "bindingSha256": "e7e554459652c5f1e519c0d301777cd09297585338b76e0b6ed84164cf66370b",
+      "targetUnitDigest": "24eb30e7b62ea4e840780b81f404e924c679dbc4002866fca5077bccb2b92b6e",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held row: missing hash computed with the canonical recipe, digest unchanged, prior row in g0ReworkBefore. Meaning: Verbatim (source digest equals target digest)."
+    },
+    {
+      "claimId": "claim_0494c6c790b6a6cb8aaaa6822467772e",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/7",
+      "bindingSha256": "c40d67824b8deb3d2aa102ffdd4ba9417e71519148a7b13258e4d2fc8df7edd8",
+      "targetUnitDigest": "f3c03447025b806dfd933bff337de6626a77b8838d4fff1036b24bcab85a93ff",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held row: missing hash computed with the canonical recipe, digest unchanged, prior row in g0ReworkBefore. Meaning: Verbatim (source digest equals target digest)."
+    },
+    {
+      "claimId": "claim_33ce1e718f0906ee1a5f76fb4907b417",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/9",
+      "bindingSha256": "4487ecc707e6bc71ae436f5fd676a9a0da4d09044b6e3bddcbc4b857ef06743f",
+      "targetUnitDigest": "a63475b5baf9f8c247d09d757e17fd86c697eb67a12036ce5d1dad24e6407251",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held row: missing hash computed with the canonical recipe, digest unchanged, prior row in g0ReworkBefore. Meaning: Verbatim (source digest equals target digest)."
+    },
+    {
+      "claimId": "claim_7e870015f558a75e65adab6d1b3230d2",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/13",
+      "bindingSha256": "ead7507e1874e8a8543c27d104d90d28e48c011ea64c473b64f180fe5a6362ff",
+      "targetUnitDigest": "bdac824aa1ded5a576aeca01899a159abcc604b48cfa2e31ad3f660415e78cd3",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held row: missing hash computed with the canonical recipe, digest unchanged, prior row in g0ReworkBefore. Meaning: Verbatim (source digest equals target digest)."
+    },
+    {
+      "claimId": "claim_b0e62ed94ed2770d0225ff91b34cbadf",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/14",
+      "bindingSha256": "e83c60601d726560cd57662be18590ac828182807caae43c243fc2a6fa119d4c",
+      "targetUnitDigest": "2ded62db9d6370e17b2cc65f35e45d117ee7b94c792128d359eb1229e628986f",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held row: missing hash computed with the canonical recipe, digest unchanged, prior row in g0ReworkBefore. Meaning: Verbatim (source digest equals target digest)."
+    },
+    {
+      "claimId": "claim_3c03309b66efa4925f1255511ed80e22",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "pointer": "/claims/16",
+      "bindingSha256": "3fc8072fd3d07d504e8b317f6e26dcf975d4d2a367925518a42628af4e8da74d",
+      "targetUnitDigest": "beb19f3cb48940ebb818fbbd587c431842314f1d66534d641baa04d9a48396ae",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held row: missing hash computed with the canonical recipe, digest unchanged, prior row in g0ReworkBefore. Meaning: Verbatim (source digest equals target digest)."
+    },
+    {
+      "claimId": "claim_59d4d57deb98003edbed72c8b85465a1",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+      "pointer": "/claims/14",
+      "bindingSha256": "f9022a0baf72cf1f87da4f984a4f12e51859ffb71a6dd269954995e63a67812f",
+      "targetUnitDigest": "ded31e658f6b1c1816df565939e71e41ba27723124035f0cf9c118fed1c5a415",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Held row: missing hash computed; merge row whose source unit observe.md#unheaded-block-6 digest equals the target unit digest."
+    },
+    {
+      "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/117",
+      "bindingSha256": "ef29b87a1d635380b165a13b95cda8bebbbd2b342bece6492b4572eab5cd033a",
+      "targetUnitDigest": "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Overlay of pilot claim 7 rebound after the RUL59 restore changed the Business Rules section; rationale (54 rules carried, priority/intent corrections) still accurate; rebind --check authenticates the drifted pilot origin through this live successor."
+    },
+    {
+      "claimId": "claim_e0fc704182450d959f8452cc09da5f20",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "pointer": "/registryGaps/4",
+      "bindingSha256": "aa03e06d0e01701e543241265265b1649063d3614607c8a419d73366be648e39",
+      "targetUnitDigest": "a943adf388f96e583638dab0a1b4278a0faf2b869916ed16b2d4c77416dffbf8",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Re-decided: the withdrawn \"no other word differs\" note replaced by four named deltas with line-level old/new wording (evolve citation, family->tier->cell + Seat Binding migration, llmAccounts pool reading, holder-lock provider-state mutex); both clauses match witness source and target, no residual."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/152",
+      "bindingSha256": "585c8ced08d8d465f51d753c67a463988c8a935ac2a0ec5afd1e19ed4ed01881",
+      "targetUnitDigest": "d22dd54866fede529fd68604e083f5f8ec6eb9524d5e3f9bca5bff89227815df",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. RUL block rebound after the priority try/catch restore; restored sentence is true (src/intake/discovery.mjs:383-416)."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/419",
+      "bindingSha256": "19116044cb8471edc311128a1536b03046fb9cdaab8f04a65c835183ff5e992f",
+      "targetUnitDigest": "e4af416abe40eaf70f1f910b5a777c293eaaa6907bae3c0c18d84d04f7d0bd63",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Business Rules heading row; heading carried, body changes owned by the block rows; rebound for the code-span restore."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/453",
+      "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+      "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Relabelled supersede: 24-hour default replaced by retain-until-closed (terminal-control default retainFailedPaneMs null, src/terminal-control/config.mjs:18) and terminal-config check removed; six clauses cover every source->target change (no residual); code span restored byte-equal to the carried sourceContent and legacy runner.md:1123."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/468",
+      "bindingSha256": "114c99ce477587056021daf42d7b367187f641ee1c9b45428abd14288e622cf3",
+      "targetUnitDigest": "da06863c06dece6df978e96d9877c1608a30257865d153626d4473b7beca532f",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Vocabulary heading row rebound after citation re-cites; heading carried."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/469",
+      "bindingSha256": "c1b907e4fe26f6f3deeef5257b5a3be6e3d286de99ac835ddec7961edf16d0ac",
+      "targetUnitDigest": "83c4ce05b5d6a9b14dccd5a2365bec12ee589a80b555dec26a5a7275106b45ec",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Block-4 re-cited to current ADR heading lines (verified at HEAD); reason already names corrected citations and removed rigorToTier."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/470",
+      "bindingSha256": "17f0d5dccecee97be0c49787102db666c401f15719fdb33fb8cce0ee11c98f73",
+      "targetUnitDigest": "40414b50fe1dc4e6f041fd0fde8ca68afb2519c25ce3de0d798ba58b59bfc491",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Block-5 re-cited (2503/2635 tables, 2923 ADR 0034), verified at HEAD."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
+      "pointer": "/sourceBindings/15",
+      "bindingSha256": "19116044cb8471edc311128a1536b03046fb9cdaab8f04a65c835183ff5e992f",
+      "targetUnitDigest": "e4af416abe40eaf70f1f910b5a777c293eaaa6907bae3c0c18d84d04f7d0bd63",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Business Rules heading rebound for the code-span restore; disposition (failed-pane lifetime, two-check inventory) unchanged and accurate."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
+      "pointer": "/sourceBindings/16",
+      "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+      "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Block-36 rebound; restored code span equals legacy bytes; disposition accurate."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
+      "pointer": "/bindingRefresh/13",
+      "bindingSha256": "b614859c5d9ec2c4111a94133eef0f8d37d91c16731af31bedbdf2dd1a8a2972",
+      "targetUnitDigest": "eb95a58af38313457ad6b2291a30070ab9931c046294b2a22b428c3ec126fcaa",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Relabelled truth-correction supersede: git rev-parse --git-common-dir replaced by on-disk .git/commondir parsing, true per scripts/fgos-shell-integration.sh:65-77,161-173; one clause, no residual."
+    },
+    {
+      "claimId": "claim_3d2d87a2a9582e2faebabc79470d8ee8",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "pointer": "/registryGaps/33",
+      "bindingSha256": "585c8ced08d8d465f51d753c67a463988c8a935ac2a0ec5afd1e19ed4ed01881",
+      "targetUnitDigest": "d22dd54866fede529fd68604e083f5f8ec6eb9524d5e3f9bca5bff89227815df",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Dropped true priority-write try/catch clause restored (verified in src/intake/discovery.mjs:383-416). Note: the new rationale replaced the A31/A35 R5-4 explanation for the restored RUL59 intent sentences and the RUL10/RUL55 main updates; that text survives only in g0ReworkBefore."
+    },
+    {
+      "claimId": "claim_9be8a10fa3ce503d2ebc2ffe6ffc76ad",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "pointer": "/registryGaps/43",
+      "bindingSha256": "585c8ced08d8d465f51d753c67a463988c8a935ac2a0ec5afd1e19ed4ed01881",
+      "targetUnitDigest": "d22dd54866fede529fd68604e083f5f8ec6eb9524d5e3f9bca5bff89227815df",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Rebound after the true RUL59 priority try/catch restore; rationale (A35 restore) still accurate."
+    },
+    {
+      "claimId": "claim_8ffb36c0af7a1f88517179b8b1adb0a4",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-native-successors.json",
+      "pointer": "/registryGaps/3",
+      "bindingSha256": "585c8ced08d8d465f51d753c67a463988c8a935ac2a0ec5afd1e19ed4ed01881",
+      "targetUnitDigest": "d22dd54866fede529fd68604e083f5f8ec6eb9524d5e3f9bca5bff89227815df",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Restore re-conserves the source clause (source 5c61302d has the try/catch sentence). Note: rationale now says \"unit SHA256 d22dd548\" but keeps \"Target unchanged since last reviewed digest 9098a0e9\", which is no longer true; same stale phrase exists on 37 ledger rows, so not blocking here."
+    },
+    {
+      "claimId": "claim_8d273e8328dac53565eb0286c6a91d65",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "pointer": "/registryGaps/4",
+      "bindingSha256": "585c8ced08d8d465f51d753c67a463988c8a935ac2a0ec5afd1e19ed4ed01881",
+      "targetUnitDigest": "d22dd54866fede529fd68604e083f5f8ec6eb9524d5e3f9bca5bff89227815df",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Rebound after the true RUL59 try/catch restore (an addition vs this source). Same stale \"Target unchanged since 9098a0e9\" sentence as the native-successor row; non-blocking note."
+    },
+    {
+      "claimId": "claim_6dba574d27eb8f35739cfedf140d4775",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+      "pointer": "/registryGaps/0",
+      "bindingSha256": "c1b907e4fe26f6f3deeef5257b5a3be6e3d286de99ac835ddec7961edf16d0ac",
+      "targetUnitDigest": "83c4ce05b5d6a9b14dccd5a2365bec12ee589a80b555dec26a5a7275106b45ec",
+      "verdict": "REWORK",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Re-cites are correct at HEAD, but the changedClauses oldWording (runner.md:2416/2354/2590/2897) is the intermediate N1-repaired text, not the bound source unit d631e41b, which cites runner.md:1958/1959/1871/1986/1995/2172/2890. The new rationale also dropped the N1 provenance (repair at b919e2b9b, native successor claim_79fd3ee6). Fix: name the source citations as old wording (or keep the N1 step explicitly) so source->target is accounted."
+    },
+    {
+      "claimId": "claim_9175095c05d2486024a13dedc4ee6f8d",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+      "pointer": "/registryGaps/1",
+      "bindingSha256": "17f0d5dccecee97be0c49787102db666c401f15719fdb33fb8cce0ee11c98f73",
+      "targetUnitDigest": "40414b50fe1dc4e6f041fd0fde8ca68afb2519c25ce3de0d798ba58b59bfc491",
+      "verdict": "REWORK",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Same defect: oldWording quotes runner.md:2477,2609 and 2897, but the bound source unit 59d3caa3 says runner.md:2470,2602 and 2890; N1 provenance (b919e2b9b, claim_f4dd6219) removed from the live rationale. Fix as for /registryGaps/0."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/bindingRefresh/8",
+      "bindingSha256": "8ef7e89155f83c0a385269c971ebfeef8a702b1310c1eaceacc0a0d487d02afc",
+      "targetUnitDigest": "f617f1c06417c2f7984c2c37a8b6d06c85bdc662faa1bb373adac1858eb519d8",
+      "verdict": "REWORK",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. The erroneous platform-foundations locus is gone, but binding 0 now has exactly the same effective target (work-state retired-decision-history 0032 heading, f617f1c0) as s11 conservedClaims/7/bindings/2. That recreates the duplicate-effective-row defect item 4 of the brief removed for 124/125/126, and join counts it twice. Fix: record binding 0 as an explicit drop/retirement, or link it so only one effective row remains."
+    },
+    {
+      "claimId": "claim_40aafcee52b22eda087c5f85eacb9392",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "pointer": "/registryGaps/22",
+      "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+      "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+      "verdict": "REWORK",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Rebinding is right and the residual text is unaffected (the restored line is outside RUL77-80), but the residualRef proof import2/partial-carry-residuals.json#/rows/0 still binds primaryTarget 299c5b49 and placement fileSha256 8a974e88 (pre-restore). The current target is e8167a0a and the file sha is 85a7a1f8. That file was outside the Doer write set and is not disclosed in rework-blockers.json. Fix: refresh rows 0 and 1 of that residual record."
+    },
+    {
+      "claimId": "claim_f033905b059f073c62ec27f0ee6da620",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "pointer": "/registryGaps/3",
+      "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+      "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+      "verdict": "REWORK",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Code-span corruption fixed, but the partial-carry residual record import2/partial-carry-residuals.json#/rows/1 still binds the pre-restore target 299c5b49 and file sha 8a974e88. Same fix as s4 /registryGaps/22."
+    },
+    {
+      "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/124",
+      "bindingSha256": "2c48bb9d4d9424ac0a3633701df88efee6794dad4ca0f9d340daeb06f6e79ca0",
+      "targetUnitDigest": "afe8743b9a9643e0b93ed4fed196aa476a500be2ddd7303cf1c963185f51ae96",
+      "verdict": "APPROVE",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Now supersedes /6 and is the effective endpoint; the rationale names the Workflow rename, foundation additions, Execution Core to Seat Binding, Dispatch Transport and Domain changes, as the batch-5 note required."
+    },
+    {
+      "claimId": "claim_ae69ca82e388b03292f8c25fe9c998c0",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/125",
+      "bindingSha256": "4c43c2fb546005229ad28e9b6881ac1737afee4c90a7ca5f4afd51b91ff7adf4",
+      "targetUnitDigest": "539e4336c8f12cd426751dbf3dd0fba533a0767d7f654edc1881aed4a559ea26",
+      "verdict": "REWORK",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. The supersedesBinding link to /20 is right, but the rationale still says \"Supersede obsolete overlay s14-resync-b.json#/bindingRefresh/574; current decision is ... /bindingRefresh/20\". After the relink this row supersedes /20 and is current. Text correction needed."
+    },
+    {
+      "claimId": "claim_ab73231bdd37667748e73f92da406a7b",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/126",
+      "bindingSha256": "38de637ff86cdcabe8f4c90c65e27557ec6bf5056508758ac961ec9f7d6137aa",
+      "targetUnitDigest": "5f4a17570b16c371d6e0e17c52b6f72acdd363faa4ed92c9c3fc125c446915ba",
+      "verdict": "REWORK",
+      "reason": "Stored bindingSha256 recomputes with ledgerfix digest(); anchor resolves to one unit at HEAD with textDigest equal to targetUnitDigest and matching self-inclusive ancestry. Same stale lineage text: the rationale says it supersedes s14 /bindingRefresh/577 and that /21 is current, contradicting the new supersedesBinding to /21. Text correction needed."
+    }
+  ],
+  "items": [
+    {
+      "id": "s9-move-redecisions",
+      "verdict": "APPROVE",
+      "summary": "All 19 s9-runner-01 move rows with unequal digests are now supersede with legacyWordingWitness (commit/anchor/digest authenticated) and changedClauses whose old wording is in the frozen source unit and new wording in the current target; applying the clauses leaves no unaccounted difference. No unequal-digest move remains in s9. 12 of the 19 (/claims/97,248,439,452,454, /registryGaps/34-36,38,39,41,42) are not join errors, because old digest-bound approvals still match; /registryGaps/34,35,36,39,42 are not join obligations at all. Verdicts for all 19 are recorded here.",
+      "evidence": "python replay of changedClauses vs src.find(sourceUnitDigest) and extractor target text; ledger-wide unequal-digest move scan."
+    },
+    {
+      "id": "claims-14-anchor",
+      "verdict": "APPROVE",
+      "summary": "s9 /claims/14 moved from unheaded-block-4 to unheaded-block-7 (capability tier/maxTier paragraph); hash and ancestry recomputed; Phase-2 migration sentence explicitly dropped with reason.",
+      "evidence": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md blocks 4-7"
+    },
+    {
+      "id": "held-row-repairs",
+      "verdict": "APPROVE",
+      "summary": "All 27 held rows: 11 missing hashes (10 s8-observe, s7 /claims/14) computed with the canonical recipe; 16 s9 null-anchor group rows get the common member digest, verified by matches() over all 8 members; old values are kept in priorReview.g0ReworkBefore, which ledgerfix excludes from traversal.",
+      "evidence": "rebind.py matches(), bindings.digest()"
+    },
+    {
+      "id": "duplicate-links-124-126",
+      "verdict": "REWORK",
+      "summary": "The chains are continuous and single-ended: s3/rg2 -> s12/364 -> s14/475 -> s15/0 -> g0/6 -> g0/124, s6/27 -> s14/574 -> s15/3 -> g0/20 -> g0/125, s6/30 -> s14/577 -> s15/4 -> g0/21 -> g0/126. The splice rewrote historical supersedesBinding preimage digests (s12/364 17b94e60->afe8743b, s14/574 e086f839->539e4336, s14/577 57f9ce14->5f4a1757, plus the predecessors of g0/6, /20 and /21); the originals survive only in g0ReworkBefore. The 125/126 rationales still describe the pre-link topology (REWORK on those rows).",
+      "evidence": "supersessions()/effective() trace at HEAD"
+    },
+    {
+      "id": "docs-edits",
+      "verdict": "APPROVE",
+      "summary": "docs/platform diff in 594fe4194 touches 3 files. (1) h-6979005beaf7/spec.md:191: only the code span changed; the line is byte-equal to legacy runner.md:1123. (2) h-7af1f0242611.md: 11 runner.md citations re-cited (0028 2380, 0029 2442, 0031 2616, 0034 2923, tables 2503/2635; all checked at HEAD), and the metadata note sentence was rewritten to label the re-cite. (3) work-state/spec.md: one restored RUL59 sentence, true per src/intake/discovery.mjs:383-416. (2) and (3) are not code-span edits but were authorized by brief item 1. Nit: the rewritten note now sits next to the A19/A35 sentence that says runner.md:<line> text is kept verbatim.",
+      "evidence": "git show 594fe4194 --word-diff -- docs/"
+    },
+    {
+      "id": "code-span-scan",
+      "verdict": "APPROVE",
+      "summary": "g0-code-span-scan.json lists all 1198 docs/platform files at ee2ce49c4 (627 markdown) and uses the marked lexer codespan walk. My independent marked-lexer scan, covering both inline spans and fenced code blocks, found no further corrupted inline span. It did find two rewriter edits inside FENCED blocks that the codespan-only scan cannot see: docs/platform/workflow/spec.md:420 (yaml comment [seat-binding.md](seat-binding.md) -> ../seat-binding/spec.md) and docs/platform/component-boundary.md:549 (diagram link ../proposals/... -> ../architect/proposals/...). Both are path retargets of pseudo-links that resolve to existing files, so no code meaning is lost. The Lead should decide whether code-block bytes must stay verbatim.",
+      "evidence": "marked 18.0.11 lexer, walkTokens codespan+code, compared modulo link destination with docs/specs and docs/architect at HEAD and 5e03159"
+    },
+    {
+      "id": "rebind-tool-extension",
+      "verdict": "APPROVE",
+      "summary": "matches() group path authenticates every member (path, anchor, digest, ancestry, distinct anchors, memberCount); single-anchor path unchanged. --check now accepts a drifted origin only when its exact effective successor matches live bytes, and reports it under authenticatedSupersededOrigins. Tests cover complete/missing/duplicate/wrong-field groups, the unchanged single path, and live/stale/wrong-preimage successors. Reran: test_rebind 3/3 OK; rebind.py --check exit 0, drift 0, one authenticated pilot origin (b-entry-actors-rules-pointers /claims/7 via g0 /bindingRefresh/117). No check removed. The relaxation does not check when or why the successor was created.",
+      "evidence": "python3 -B rebind/test_rebind.py; python3 -B rebind/rebind.py --check"
+    },
+    {
+      "id": "residual-records-stale",
+      "verdict": "REWORK",
+      "summary": "import2/partial-carry-residuals.json rows 0 and 1 (s4 /registryGaps/22, s5-authorities /registryGaps/3) still bind primaryTarget 299c5b49 and fileSha256 8a974e88. The rework moved both rows to e8167a0a (file 85a7a1f8). The residual text is still valid, but the proof is not bound to the current target, and rework-blockers.json does not disclose this.",
+      "evidence": "residualRef primaryTarget vs ledger targetUnitDigest"
+    },
+    {
+      "id": "out-of-scope-observations",
+      "verdict": "INFO",
+      "summary": "(a) The join only sees digest changes: about 70 rows whose rationale, disposition or reviewStatus changed in this commit (for example s8-agent-confinement /claims/145-160 reviewed->pending, s2/s3/s4/s7 rationale rewrites) keep their older digest-bound approvals. (b) Pre-existing and not caused by 594fe4194: five effective s13-resync-a rows (/sourceBindings/8,9,10,115,121) drift on docs/platform/work-state/contracts/non-transitioning-records.md, changed in 30ed2bbf4; s9 /registryGaps/27 residualRef targetUnitDigest no longer matches its row; s9 /registryGaps/39 target lags legacy runner.md:905 (events.lock vs the hot state mutex).",
+      "evidence": "live extractor audit of all 12531 effective rows; residualRef scan"
+    }
+  ]
+}
