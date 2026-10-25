@@ -590,6 +590,18 @@ test('mailbox rows install only when the project opts in, and opting out removes
   const shim = path.join(fs.realpathSync(repoRoot), '.fgos', 'installation', 'bin', 'fgos');
   assert.equal(ours.find((r) => r.cli === 'codex' && r.event === 'Stop').command, `'${shim}' hook mailbox --cli codex --event stop`);
 
+  // Refused: a config the Config door refuses leaves the opt-in unknown, so the installed rows stay
+  // exactly as they are (nothing added, nothing removed) and the installer names the refusal.
+  const installedClaude = fs.readFileSync(path.join(repoRoot, '.claude', 'settings.json'), 'utf8');
+  const installedCodex = fs.readFileSync(path.join(repoRoot, '.codex', 'hooks.json'), 'utf8');
+  writeProjectConfig(repoRoot, { mailbox: { enabled: 'yes' } });
+  const refused = installClaudeHook(repoRoot);
+  assert.match(refused.mailbox, /config:config-schema in project:config\.yaml/);
+  assert.match(installCodexHook(repoRoot).mailbox, /config:config-schema/);
+  assert.equal(fs.readFileSync(path.join(repoRoot, '.claude', 'settings.json'), 'utf8'), installedClaude, 'Claude Code rows untouched');
+  assert.equal(fs.readFileSync(path.join(repoRoot, '.codex', 'hooks.json'), 'utf8'), installedCodex, 'Codex rows untouched');
+  mailboxOptIn(repoRoot, true);
+
   // A user's own command that merely runs the same kind stays when the project opts out.
   const settingsFile = path.join(repoRoot, '.claude', 'settings.json');
   const settings = readFile(repoRoot, 'claude');

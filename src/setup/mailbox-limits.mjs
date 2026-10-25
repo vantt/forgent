@@ -15,16 +15,27 @@ export function mailboxHookTimeoutSec() {
   return Math.ceil(value / 1000) + 2;
 }
 
-/** Whether the project opted in to the mailbox hook rows: the effective
- * `mailbox.enabled` (spec §16 item 23, option (b)). Provisional until the owner
- * answers that item: false, or a project config the Config door refuses, means
- * not enabled, so a broken file never installs hook rows; a failure of the door
- * itself is thrown. */
-export function mailboxEnabled(repoRoot) {
+/** The project's mailbox opt-in (spec §16 item 23, option (b); provisional until the
+ * owner answers that item), as one of three outcomes:
+ * - `{ state: 'on' }`: the effective `mailbox.enabled` is true;
+ * - `{ state: 'off' }`: it is false or absent;
+ * - `{ state: 'refused', reason, code, file }`: the Config door refused the project's config, so
+ *   the opt-in is unknown. `reason` is `config:<code>`, the word the Rust mailbox names the same
+ *   refusal by; `file` is the refused source as Config names it (`project:config.yaml`), or null.
+ * Setup leaves the mailbox hook rows exactly as they are on a refusal: a broken file never
+ * installs them and never removes them. A failure of the door itself is thrown. */
+export function mailboxOptIn(repoRoot) {
   try {
-    return readConfig({ projectRoot: repoRoot, sections: ['mailbox'] }).value.mailbox?.enabled === true;
+    const on = readConfig({ projectRoot: repoRoot, sections: ['mailbox'] }).value.mailbox?.enabled === true;
+    return { state: on ? 'on' : 'off' };
   } catch (err) {
-    if (isConfigRefusal(err)) return false;
-    throw err;
+    if (!isConfigRefusal(err)) throw err;
+    const file = err.refusals.find((r) => r.file)?.file ?? null;
+    return { state: 'refused', reason: `config:${err.code}`, code: err.code, file };
   }
+}
+
+/** The line setup prints for a refused opt-in: the reason word and the refused file. */
+export function mailboxRefusalLine(optIn) {
+  return `mailbox hook rows left as they are: ${optIn.reason}${optIn.file ? ` in ${optIn.file}` : ''} (the project config is refused, so the opt-in is unknown)`;
 }

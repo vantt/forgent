@@ -15,7 +15,7 @@
 import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { mailboxEnabled, mailboxHookTimeoutSec } from './mailbox-limits.mjs';
+import { mailboxHookTimeoutSec, mailboxOptIn, mailboxRefusalLine } from './mailbox-limits.mjs';
 
 export const SUPPORTED_AGENTS = ['claude', 'codex', 'agy', 'omp', 'pi'];
 
@@ -138,15 +138,21 @@ const HOOK_FILES = {
 };
 
 /** The rows a project gets for one CLI: the mailbox rows only when the project opted in. */
-function rowsOf(repoRoot, cli) {
-  const mailbox = mailboxEnabled(repoRoot);
-  return hookRows(repoRoot).filter((row) => row.cli === cli && (mailbox || row.kind !== HOOK_KINDS.MAILBOX));
+function rowsOf(repoRoot, cli, optIn = mailboxOptIn(repoRoot)) {
+  return hookRows(repoRoot).filter((row) => row.cli === cli && (optIn.state === 'on' || row.kind !== HOOK_KINDS.MAILBOX));
 }
 
-/** The table's rows a project does not get (the mailbox rows of a project that has not opted in). */
-function withheldRowsOf(repoRoot, cli) {
-  if (mailboxEnabled(repoRoot)) return [];
+/** The table's rows a project does not get: the mailbox rows of a project that opted out. A refused
+ * config withholds nothing, so the rows it has stay. */
+function withheldRowsOf(repoRoot, cli, optIn = mailboxOptIn(repoRoot)) {
+  if (optIn.state !== 'off') return [];
   return hookRows(repoRoot).filter((row) => row.cli === cli && row.kind === HOOK_KINDS.MAILBOX);
+}
+
+/** The line naming a refused opt-in, for a CLI the table gives mailbox rows; null otherwise. */
+function mailboxNotice(repoRoot, cli, optIn) {
+  if (optIn.state !== 'refused') return null;
+  return hookRows(repoRoot).some((row) => row.cli === cli && row.kind === HOOK_KINDS.MAILBOX) ? mailboxRefusalLine(optIn) : null;
 }
 
 /** Takes out the hook objects whose command is exactly a withheld row's, never a user's lookalike;
@@ -234,11 +240,12 @@ function installRows(repoRoot, cli) {
   const filePath = path.join(repoRoot, spec.file);
   const config = readJsonSafe(filePath);
   if (config === null) return { wired: false, skippedExisting: 'malformed' };
+  const optIn = mailboxOptIn(repoRoot);
   let changed = false;
   if (config.hooks && typeof config.hooks === 'object') {
-    for (const row of withheldRowsOf(repoRoot, cli)) changed = removeNestedRow(config.hooks, row) || changed;
+    for (const row of withheldRowsOf(repoRoot, cli, optIn)) changed = removeNestedRow(config.hooks, row) || changed;
   }
-  for (const row of rowsOf(repoRoot, cli)) {
+  for (const row of rowsOf(repoRoot, cli, optIn)) {
     if (row.group) {
       changed = installGroupRow(config, row) || changed;
     } else {
@@ -247,7 +254,8 @@ function installRows(repoRoot, cli) {
     }
   }
   if (changed) writeJsonPretty(filePath, config);
-  return { wired: true, skippedExisting: null };
+  const mailbox = mailboxNotice(repoRoot, cli, optIn);
+  return { wired: true, skippedExisting: null, ...(mailbox && { mailbox }) };
 }
 
 /** Whether a row is in its file in the shape the CLI reads. */
@@ -459,16 +467,21 @@ export default function (api: any) {
 }
 
 /** The extension source of a project for `cli` (`omp` or `pi`), as the installer writes it and the check expects it. */
-export function extensionSourceFor(repoRoot, cli) {
-  return generateInProcessExtensionSource({ cli, mailbox: mailboxEnabled(repoRoot) });
+export function extensionSourceFor(repoRoot, cli, optIn = mailboxOptIn(repoRoot)) {
+  return generateInProcessExtensionSource({ cli, mailbox: optIn.state === 'on' });
 }
 
-/** The in-process extension of OMP or Pi (`dir` is `.omp` or `.pi`): one generated file. */
+/** The in-process extension of OMP or Pi (`dir` is `.omp` or `.pi`): one generated file. A refused
+ * config keeps an existing file as it is, whichever mailbox handlers it carries; a missing one is
+ * written without them. */
 function installExtension(repoRoot, dir) {
   const extPath = path.join(repoRoot, dir, 'extensions', 'fgos-hooks.ts');
+  const optIn = mailboxOptIn(repoRoot);
+  const mailbox = optIn.state === 'refused' ? mailboxRefusalLine(optIn) : null;
+  if (mailbox && existsSync(extPath)) return { wired: true, skippedExisting: null, mailbox };
   mkdirSync(path.dirname(extPath), { recursive: true });
-  writeFileSync(extPath, extensionSourceFor(repoRoot, dir.slice(1)), 'utf8');
-  return { wired: true, skippedExisting: null };
+  writeFileSync(extPath, extensionSourceFor(repoRoot, dir.slice(1), optIn), 'utf8');
+  return { wired: true, skippedExisting: null, ...(mailbox && { mailbox }) };
 }
 
 /**
@@ -485,10 +498,16 @@ function checkExtension(cwd, dir, label) {
   if (!existsSync(extPath)) {
     return { passed: false, message: `${shown} not found — run fgos doctor --fix` };
   }
-  if (readFileSync(extPath, 'utf8') !== extensionSourceFor(cwd, dir.slice(1))) {
+  const optIn = mailboxOptIn(cwd);
+  const cli = dir.slice(1);
+  // A refused config leaves the opt-in unknown: either generated form is ours (the config rows name the refusal).
+  const accepted = optIn.state === 'refused'
+    ? [generateInProcessExtensionSource({ cli, mailbox: true }), generateInProcessExtensionSource({ cli, mailbox: false })]
+    : [extensionSourceFor(cwd, cli, optIn)];
+  if (!accepted.includes(readFileSync(extPath, 'utf8'))) {
     return { passed: false, message: `${shown} differs from the generated extension — run fgos doctor --fix` };
   }
-  const probe = isShimRunnable(cwd, { mailboxCli: mailboxEnabled(cwd) ? dir.slice(1) : null });
+  const probe = isShimRunnable(cwd, { mailboxCli: optIn.state === 'on' ? cli : null });
   if (!probe.runnable) {
     return { passed: false, message: `${label} extension present but local shim not runnable (${probe.reason})` };
   }

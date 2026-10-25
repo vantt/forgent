@@ -51,7 +51,7 @@ import {
   installPiHook,
 } from './agent-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
-import { mailboxEnabled } from './mailbox-limits.mjs';
+import { mailboxOptIn } from './mailbox-limits.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import {
   readWorkflowDefinitionFiles,
@@ -1316,7 +1316,7 @@ registerFix({
   id: 'dispatch-decide-hook-wired',
   fix: (cwd) => {
     const res = installClaudeHook(cwd);
-    return { fixed: res.wired, message: res.wired ? 'wired Claude Code hooks in .claude/settings.json' : `skipped: ${res.skippedExisting}` };
+    return { fixed: res.wired, message: res.wired ? `wired Claude Code hooks in .claude/settings.json${res.mailbox ? `; ${res.mailbox}` : ''}` : `skipped: ${res.skippedExisting}` };
   },
 });
 
@@ -1330,7 +1330,7 @@ registerFix({
   id: 'codex-hook-wired',
   fix: (cwd) => {
     const res = installCodexHook(cwd);
-    return { fixed: res.wired, message: res.wired ? 'wired Codex CLI hooks in .codex/hooks.json' : `skipped: ${res.skippedExisting}` };
+    return { fixed: res.wired, message: res.wired ? `wired Codex CLI hooks in .codex/hooks.json${res.mailbox ? `; ${res.mailbox}` : ''}` : `skipped: ${res.skippedExisting}` };
   },
 });
 
@@ -1358,7 +1358,7 @@ registerFix({
   id: 'omp-hook-wired',
   fix: (cwd) => {
     const res = installOmpHook(cwd);
-    return { fixed: res.wired, message: res.wired ? 'wired OMP extension hook in .omp/extensions/fgos-hooks.ts' : `skipped: ${res.skippedExisting}` };
+    return { fixed: res.wired, message: res.wired ? `wired OMP extension hook in .omp/extensions/fgos-hooks.ts${res.mailbox ? `; ${res.mailbox}` : ''}` : `skipped: ${res.skippedExisting}` };
   },
 });
 
@@ -1372,7 +1372,7 @@ registerFix({
   id: 'pi-hook-wired',
   fix: (cwd) => {
     const res = installPiHook(cwd);
-    return { fixed: res.wired, message: res.wired ? 'wired Pi extension hook in .pi/extensions/fgos-hooks.ts' : `skipped: ${res.skippedExisting}` };
+    return { fixed: res.wired, message: res.wired ? `wired Pi extension hook in .pi/extensions/fgos-hooks.ts${res.mailbox ? `; ${res.mailbox}` : ''}` : `skipped: ${res.skippedExisting}` };
   },
 });
 
@@ -1992,7 +1992,12 @@ function mailboxRecordVerdict(cwd) {
 }
 
 function checkMailboxHook(cwd) {
-  if (!mailboxEnabled(cwd)) {
+  const optIn = mailboxOptIn(cwd);
+  // The config rows already fail and name a refused config; this row only says why it cannot tell.
+  if (optIn.state === 'refused') {
+    return { passed: true, message: `opt-in unknown: the project config is refused (${optIn.reason}); the config rows name it, and fgos setup leaves the mailbox hook rows as they are` };
+  }
+  if (optIn.state === 'off') {
     return { passed: true, message: 'not enabled: set mailbox.enabled: true in the project config (fgos config set), then run fgos doctor --fix, to install the mailbox hook rows (provisional opt-in, spec §16 item 23)' };
   }
   const enabled = 'enabled: the Claude Code and Codex hook checks require the mailbox rows; limits: fgos config show --path mailbox (the standard is fgos config standard --path mailbox)';
