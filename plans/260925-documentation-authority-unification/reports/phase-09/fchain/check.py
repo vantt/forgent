@@ -103,7 +103,7 @@ def apply_one(entry, state, replayer, signatures):
     # on the same line are competing owners and fail.
     composed = entry.get('composesChain', [])
     if composed and (sha(before) != entry.get('beforeSha256') or
-                     composed != [t.get('chainEntryId') for t in state['trace']]):
+                     composed != [t['chainEntryId'] for t in state['trace'] if 'chainEntryId' in t]):
         issue('conflict', reason='co-composition must name the complete exact base chain')
     if overlaps and not (composed and overlaps == {'chain:' + file}):
         issue('sameLinesTwice', previous=sorted(overlaps))
@@ -147,13 +147,14 @@ def compose(pin, manifest=None, additions=None):
     manifest = manifest or load(HERE / 'manifest.json')
     kinds = Counter(source['reader'] for source in manifest['sources'])
     if (manifest.get('contract') != 'fchain-manifest.v1' or
-            any(kinds[kind] != 1 for kind in ('step7', 'composition', 'prepared', 'recomposed', 'additions')) or
+            any(kinds[kind] != 1 for kind in ('step7', 'composition', 'prepared', 'recomposed', 'additions', 'link-retargets')) or
             kinds['premise'] != 3 or kinds['pointer'] < 3):
         raise ValueError('manifest omits or duplicates a required prepared-patch reader')
     for reader, path in [('step7', P8 / 'step-07-composed-patches.json'), ('composition', PHASE / 'composition/patch-specs.json')]:
         if next(s['path'] for s in manifest['sources'] if s['reader'] == reader) != str(path.relative_to(ROOT)):
             raise ValueError('delegated reader does not name the owning engine input: ' + reader)
     shard = module('fchain_premise', PHASE / 'preserve-premise/park-judgments/check_shard.py')
+    link_reader = module('fchain_links', HERE / 'links.py')
     replayer = shard.load_replayer()
     states, base_findings, base_inventory = shard.replay_chain(pin, replayer, check_checkout=False)
     findings = [dict(kind='conflict', file=f['file'], patch=f.get('chainEntryId'), reason=f) for f in base_findings]
@@ -233,6 +234,12 @@ def compose(pin, manifest=None, additions=None):
         for ref in row['patchRefs']:
             if ref.get('artifact') == 'f-composition-additions.json':
                 owner_files[row['id']].add(pointer(load(PHASE / 'g9/f-composition-additions.json'), ref['pointer'])['path'])
+    for source in manifest['sources']:
+        if source['reader'] == 'link-retargets':
+            for row in load(ROOT / source['path'])['rows']:
+                if row['ruling'] != 'L13-26':
+                    raise ValueError('link retarget lacks owning ruling')
+                owner_files.setdefault(row['id'], set()).add(shard.safe_path(row['file']))
     for number in (1, 2, 3):
         for row in load(PHASE / f'preserve-premise/park-judgments/shard-{number}.json')['rows']:
             bound = row.get('source') or next((e for e in row.get('evidence', []) if e.get('role') == 'source-unit'), {})
@@ -255,6 +262,11 @@ def compose(pin, manifest=None, additions=None):
                 findings.append(dict(kind='ownerless', file=file, patch=ident, reason='canonical owner lacks generated-source binding'))
         if not entry['owners'] or any(owner_file not in owner_files.get(owner, set()) for owner in entry['owners']):
             findings.append(dict(kind='ownerless', file=file, patch=ident, reason='no matching owning record row'))
+        if ('composedBy' in entry['original'] and 'composedBy' in resolution and
+                entry['original']['composedBy'] != resolution['composedBy']):
+            findings.append(dict(kind='conflict', file=file, patch=ident,
+                reason='record and manifest composedBy disagree'))
+            continue
         link = entry['original'].get('composedBy') or resolution.get('composedBy')
         if link:
             targets = link if isinstance(link, list) else [link]
@@ -301,7 +313,7 @@ def compose(pin, manifest=None, additions=None):
                     raise ValueError('pointer authoring postimage hash differs')
             except (ValueError, AssertionError) as exc:
                 findings.append(dict(kind='conflict', file=file, patch=ident, reason=str(exc)))
-        entry['exactBase'] = entry['source'].endswith(('/g9/f-composition-additions.json', '/fchain/rebased-patches.json'))
+        entry['exactBase'] = entry['source'].endswith(('/g9/f-composition-additions.json', '/fchain/rebased-patches.json', '/fchain/link-retargets.json'))
         findings.extend(apply_one(entry, state, replayer, signatures)); executed.append(ident)
     for witness in body_witnesses:
         if witness['mode'] == 'composedBy-residual':
@@ -349,6 +361,7 @@ def compose(pin, manifest=None, additions=None):
                 if not shard.preserved_line_survives(expected_line, states[file]['text']):
                     findings.append(dict(kind='sameLinesTwice', file=file, patch='preserve:' + row['rowId'], reason='preserved occurrence changed'))
                     break
+    findings.extend(link_reader.scan(pin, states, shard, ROOT))
     files = [dict(file=file, afterSha256=sha(state['text']), steps=[
         {k: v for k, v in trace.items() if k not in {'before', 'after'}} for trace in state['trace']]) for file, state in sorted(states.items())]
     report = dict(contract='fchain-check.v1', sourceCommit=pin, exit=int(bool(findings)),

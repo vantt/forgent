@@ -23,7 +23,27 @@
           "kind": "conflict",
           "file": "sample.md",
           "patch": "one",
-          "reason": "exact composed preimage hash differs"
+          "reason": "patching file sample.md\nHunk #1 FAILED at 1.\n1 out of 1 hunk FAILED -- saving rejects to file sample.md.rej\n"
+        }
+      ]
+    },
+    {
+      "case": "non-exact authoring hash permits a pure line offset, not fuzz",
+      "passed": true
+    },
+    {
+      "case": "exact named base chain co-composes after disjoint residuals",
+      "passed": true
+    },
+    {
+      "case": "co-composition rejects the wrong base-chain edge",
+      "rejectedBy": "conflict",
+      "findings": [
+        {
+          "kind": "conflict",
+          "file": "sample.md",
+          "patch": "final",
+          "reason": "co-composition must name the complete exact base chain"
         }
       ]
     },
@@ -87,6 +107,37 @@
       ]
     },
     {
+      "case": "clickable links exclude code, comments, escapes and unused definitions",
+      "passed": true
+    },
+    {
+      "case": "injected clickable link into a moved path fails the F door",
+      "rejectedBy": "linkIntoMoveSet",
+      "findings": [
+        {
+          "kind": "conflict",
+          "file": "bin/fgos.mjs",
+          "patch": "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/0",
+          "reason": "record and manifest composedBy disagree"
+        },
+        {
+          "kind": "linkIntoMoveSet",
+          "start": 0,
+          "end": 32,
+          "targetStart": 13,
+          "targetEnd": 31,
+          "target": "../specs/runner.md",
+          "file": "docs/platform/injected-link-control.md",
+          "line": 1,
+          "oldPath": "docs/specs/runner.md"
+        }
+      ]
+    },
+    {
+      "case": "record composedBy cannot silently override the manifest",
+      "passed": true
+    },
+    {
       "case": "plans evidence edited after pin still scans frozen bytes",
       "passed": true
     },
@@ -111,6 +162,6 @@
       "passed": true
     }
   ],
-  "count": 13,
+  "count": 19,
   "reuse": "Real apply_one with compose.apply_diff; real G9 scan_gateway with immutable Git fixture replies."
 }

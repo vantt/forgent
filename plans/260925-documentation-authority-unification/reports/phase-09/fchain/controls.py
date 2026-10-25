@@ -30,8 +30,26 @@ def main():
     assert not c.apply_one(one, live, engine, signatures)
     test('second independent owner changes the same original line',
          c.apply_one(entry('two', 'b\n', 'c\n'), live, engine, signatures), 'sameLinesTwice')
+    non_exact = {**one, 'exactBase': False}
+    command_start = len(engine.COMMANDS)
     test('zero-fuzz conflict on actual patch boundary',
-         c.apply_one(one, state('not-a\n'), engine, {}), 'conflict')
+         c.apply_one(non_exact, state('not-a\n'), engine, {}), 'conflict')
+    assert len(engine.COMMANDS) == command_start + 1
+    assert engine.COMMANDS[-1]['exit'] != 0 and '--fuzz=0' in engine.COMMANDS[-1]['argv']
+    offset = state('prefix\na\n')
+    assert not c.apply_one(non_exact, offset, engine, {}) and offset['text'] == 'prefix\nb\n'
+    results.append(dict(case='non-exact authoring hash permits a pure line offset, not fuzz', passed=True))
+    # The exact base-chain edge remains usable after a disjoint residual.
+    base = state('b\nx\n')
+    base['labels'][0] = {'chain:sample.md'}
+    base['trace'] = [dict(chainEntryId='base-step'), dict(id='disjoint-residual')]
+    final = entry('final', 'b\nx\n', 'c\nx\n')
+    final['composesChain'] = ['base-step']
+    assert not c.apply_one(final, base, engine, {})
+    results.append(dict(case='exact named base chain co-composes after disjoint residuals', passed=True))
+    wrong = {**final, 'composesChain': ['other-step']}
+    wrong_state = state('b\nx\n'); wrong_state['trace'] = [dict(chainEntryId='base-step')]
+    test('co-composition rejects the wrong base-chain edge', c.apply_one(wrong, wrong_state, engine, {}), 'conflict')
     test('patch without an owning row',
          c.apply_one(entry('orphan', 'a\n', 'b\n', []), state('a\n'), engine, {}), 'ownerless')
     signatures = {}; assert not c.apply_one(one, state('a\n'), engine, signatures)
@@ -45,6 +63,45 @@ def main():
     assert any('auto-reversed' in finding.get('reason', '') for finding in reversed_findings)
     escaped = copy.deepcopy(one); escaped['diff'] = escaped['diff'].replace('a/sample.md', 'a/../escape.md')
     test('second path cannot escape the named file', c.apply_one(escaped, state('a\n'), engine, {}), 'conflict')
+
+    # One owning scanner proof: literals stay literal, clickable destinations
+    # retain coordinates, reference definitions count only when used.
+    links = c.module('control_links', c.HERE / 'links.py')
+    file = 'docs/platform/control.md'; old = '../specs/runner.md'
+    sample = ('```md\n[x](' + old + ')\n```\n~~~\n[x](' + old + ')\n~~~\n'
+        + '`[x](' + old + ')`\n`` `[x](' + old + ')` ``\n'
+        + '<!-- [x](' + old + ') -->\n'
+        + '[label `code`](' + old + ' "title")\n'
+        + '[ref][used]\n[used]: ' + old + '\n[unused]: ' + old + '\n'
+        + '[escaped](../specs/%72unner.md#section)\n'
+        + '[external](https://example.com/docs/specs/runner.md)\n'
+        + '\\[not-a-link](' + old + ')\n')
+    hits = list(links.into_move_set(file, sample, {'docs/specs/runner.md'}))
+    assert len(hits) == 3, hits
+    assert all(sample[h['targetStart']:h['targetEnd']] == h['target'] for h in hits)
+    results.append(dict(case='clickable links exclude code, comments, escapes and unused definitions', passed=True))
+
+    # Real compose() regression: both reader/manifest edges and the final
+    # platform scan are checked, not a synthetic list of finding kinds.
+    pin = c.subprocess.check_output(['git', '--no-optional-locks', 'rev-parse', 'HEAD'], cwd=c.ROOT, text=True).strip()
+    record_path = c.HERE / 'link-retargets.json'
+    record = copy.deepcopy(c.load(record_path))
+    injected_file = 'docs/platform/injected-link-control.md'
+    injected_text = '[new reader](../specs/runner.md)\n'
+    injected_patch = entry('injected', '', injected_text)
+    injected_patch['diff'] = injected_patch['diff'].replace('sample.md', injected_file)
+    injected_patch.update(path=injected_file, rowIds=['injected-link'], forwardDiff=injected_patch.pop('diff'))
+    record['patches'].append(injected_patch)
+    record['rows'].append(dict(id='injected-link', file=injected_file, ruling='L13-26'))
+    additions = copy.deepcopy(c.load(c.PHASE / 'g9/f-composition-additions.json'))
+    additions['patches'][0]['composedBy'] = ['bogus-record-edge']
+    original_load = c.load
+    with patch.object(c, 'load', side_effect=lambda path: record if path == record_path else original_load(path)):
+        report, _ = c.compose(pin, additions=additions)
+    test('injected clickable link into a moved path fails the F door', report['findings'], 'linkIntoMoveSet')
+    assert report['exit'] == 1
+    assert any(f.get('reason') == 'record and manifest composedBy disagree' for f in report['findings'])
+    results.append(dict(case='record composedBy cannot silently override the manifest', passed=True))
 
     # W25 regression: plans evidence changed/deleted after pin. No real record
     # is mutated. Both cases exercise the real scanner with pinned Git replies.

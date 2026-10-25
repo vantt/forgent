@@ -1,7 +1,7 @@
 {
   "contract": "fchain-manifest.v1",
   "authority": "L13-24",
-  "order": "Source array is apply order: Step 7 -> selected composition -> exact replacement carry roots -> carries -> census -> premise shards -> confirmed G6 patch -> G9 additions; witness-only readers do not apply twice.",
+  "order": "Source array is apply order: Step 7 -> selected composition -> exact replacement carry roots -> carries -> census -> premise shards -> confirmed G6 patch -> G9 additions -> L13-26 link retargets; witness-only readers do not apply twice.",
   "sources": [
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json",
@@ -52,6 +52,11 @@
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json",
       "reader": "additions",
       "read": "patches[].diff; composedBy tombstones have no payload; linked residuals name an exact predecessor"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json",
+      "reader": "link-retargets",
+      "read": "rows[] own L13-26 clickable-link/x-specs replacements; patches[] apply exactly once after G9 additions, on the composed preimage"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
@@ -669,6 +674,24 @@
         "w8:gloss:docs/platform/event-store/spec.md"
       ],
       "reason": "Co-compose the existing exact chain and the section-specific pointer on one final line; no second apply owner."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/0": {
+      "composesChain": [
+        "w2:status:docs/platform/README.md"
+      ],
+      "reason": "L13-26 retargets a still-legacy destination on a status-framing line changed by the exact base chain. Co-compose that named base input into this single final patch; no earlier source retargets this link. Other intervening patches change distinct lines and retain their ownership."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/38": {
+      "composesChain": [
+        "w2:status:docs/platform/vision.md"
+      ],
+      "reason": "L13-26 retargets a still-legacy destination on a status-framing line changed by the exact base chain. Co-compose that named base input into this single final patch; no earlier source retargets this link. Other intervening patches change distinct lines and retain their ownership."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/39": {
+      "composesChain": [
+        "w2:status:docs/platform/work-state/README.md"
+      ],
+      "reason": "L13-26 retargets a still-legacy destination on a status-framing line changed by the exact base chain. Co-compose that named base input into this single final patch; no earlier source retargets this link. Other intervening patches change distinct lines and retain their ownership."
     }
   }
 }

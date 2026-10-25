@@ -1,0 +1,22 @@
+{
+  "exit": 0,
+  "sourceCommit": "2c5093b57954790cda1639b36821f71bd2a00c08",
+  "historicalSpecsUnchanged": 143,
+  "appendedSpecs": 1,
+  "premiseJudgmentsUnchanged": 787,
+  "g9DecisionsUnchanged": 158,
+  "changedBodyWitnesses": [
+    "docs/platform/work-state/spec.md"
+  ],
+  "linkRows": 162,
+  "patches": 41,
+  "roundtrips": 41,
+  "distinctExistingTargetFiles": 49,
+  "anchors": {
+    "checked": 64,
+    "missing": []
+  },
+  "remainingMoveSetLinks": 0,
+  "changedSourceFiles": 0,
+  "qualification": "Records-only replay; all decisions, frozen evidence and historical spec objects conserved. No semantic approval, product application, lease or gate closure."
+}

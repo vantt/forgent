@@ -1,0 +1,199 @@
+{
+  "exit": 0,
+  "env": {
+    "NODE_OPTIONS": "--no-addons"
+  },
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/check.py",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "{\"exit\": 0, \"counts\": {}, \"files\": 572, \"executed\": 182, \"links\": 20}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/controls.py"
+      ],
+      "exit": 0,
+      "stdout": "{\"exit\": 0, \"controls\": 19}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard.py",
+        "--all"
+      ],
+      "exit": 0,
+      "stdout": "{\"counts\": {\"duplicateOfChain\": 24}, \"exit\": 0, \"report\": \"plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/chain-check-2c5093b57.json\", \"sourceCommit\": \"2c5093b57954790cda1639b36821f71bd2a00c08\", \"unresolved\": 0}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/check_phase9_decisions.py"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"chainFiles\": 572,\n  \"chainRebasesReplayed\": 0,\n  \"counts\": {\n    \"moved\": 24,\n    \"retained-in-place\": 96,\n    \"retired\": 38\n  },\n  \"entries\": 158,\n  \"gatewayActiveReaders\": 12,\n  \"gatewayScanFiles\": 473,\n  \"leadDecisionProposed\": 2,\n  \"limits\": \"Complete shared prepared-byte F-chain replay and pinned record bindings only; not product parity, approval, F or gate closure.\",\n  \"linkedAdditions\": 15,\n  \"pin\": \"56b3c3ebffddca273154e482e581591113c394da\",\n  \"preparedAdditions\": 23,\n  \"records\": 29,\n  \"rootDocumentOccurrences\": 136,\n  \"sharedCompositionFiles\": 572,\n  \"status\": \"pass\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"status\": \"pass\",\n  \"claims\": 44,\n  \"candidateUnits\": 1009,\n  \"refreshedDecisions\": 121,\n  \"droppedClaims\": 17,\n  \"pointerFiles\": 24,\n  \"currentSourceUnits\": 346,\n  \"historicalHeadingWitnesses\": 91,\n  \"liveHeadingRows\": 91,\n  \"liveSectionBlocks\": 321,\n  \"livePointerPatchDrift\": [\n    {\n      \"path\": \"bin/fgos.mjs\",\n      \"beforeSha256\": \"4ad9ed0cb07518ae19774ddcf058d78484b53de25b850ae641b7b53011010d5f\",\n      \"liveSha256\": \"1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e\",\n      \"finalPinDuty\": {\n        \"path\": \"bin/fgos.mjs\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    },\n    {\n      \"path\": \"docs/backlog.md\",\n      \"beforeSha256\": \"344552da9931e8c5ca9f946e49e0a25c40ff42b61dbf6d99c73310d5e14b7c33\",\n      \"liveSha256\": \"d0fb356de66a0bdfffac2f9835678bd4001d68779003c381e34a4f2bc9e49306\",\n      \"finalPinDuty\": {\n        \"path\": \"docs/backlog.md\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    }\n  ],\n  \"finalPinDuties\": {\n    \"version\": 1,\n    \"pointerPatchDrift\": [\n      {\n        \"path\": \"bin/fgos.mjs\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      },\n      {\n        \"path\": \"docs/backlog.md\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    ]\n  },\n  \"witnessPin\": \"f534aeaea59ebdc39613aab02c109dbd30fd36b8\",\n  \"currentLedgerSuccessors\": {\n    \"status\": \"pass\",\n    \"origins\": 1208,\n    \"currentBindings\": 1208\n  },\n  \"sourceParityQualification\": \"Current rows require exact source anchor/digest and normalized full-source inclusion at a named current target. Split/adapted rows also check target digests; explicit zero-fuzz adaptations are not false equality. Original heading census, placement and unapplied patch witnesses replay at witnessPin. Live heading census, direct-section block coverage and pointer-patch drift also check working-tree bytes; only explicitly listed final-pin duties permit drift. Patch recomposition and authority/cutover acceptance are not certified.\",\n  \"reviewStatus\": \"pending; no gate accepted\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/prove.py",
+        "--census"
+      ],
+      "exit": 0,
+      "stdout": "{\"exit\": 0, \"pin\": \"608a4ada5f195b0d0b9d3568a71b8dde4954aacb\", \"sourceSha256\": \"525bb4ed313141459b6dad8f7aaf798e5997f76ecaa2c4c07445ff6668819c99\", \"identicalReplays\": true, \"outputs\": {\"residue.json\": {\"sha256\": \"8c71faf6d077318d8ce5ca646edc12d5fa70f885cade300247e7612bce3643bc\", \"bytes\": 93}, \"join.json\": {\"sha256\": \"d7cd97ec0597f69df53f85f713d3bc48f547cbf82516a16293b548389e287d9b\", \"bytes\": 2271427}, \"settlement.json\": {\"sha256\": \"4e1cc0248daadff70c8639f5ea388184d35acdaf931e48d45b1107121d80a7c4\", \"bytes\": 574539}}, \"counts\": {\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 54, \"joined-by-citation\": 4, \"joined-owning-test\": 779}}, \"relocation\": \"Only dump output sink redirected to auto-cleaned tempfile; original input checks, main and citations --check unchanged.\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard_controls.py"
+      ],
+      "exit": 0,
+      "stdout": "{\"exit\": 0, \"passed\": 82, \"failed\": 0}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import sys\nsys.dont_write_bytecode=True\nfrom pathlib import Path\nimport json,subprocess,copy,collections\nP=Path.cwd()/'plans/260925-documentation-authority-unification/reports/phase-09';sys.path.insert(0,str(P/'fchain'))\nimport check as c,links\npin=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()\ndef original(path):return json.loads(subprocess.check_output(['git','show','HEAD:'+str(path.relative_to(Path.cwd()))]))\npacket=c.load(P/'composition/patch-specs.json');old=original(P/'composition/patch-specs.json')\nassert packet['patches'][:-1]==old['patches'];assert len(packet['patches'])==len(old['patches'])+1\nassert packet['finalPinFSpecIds']==old['finalPinFSpecIds']\nassert [(a,b) for a,b in zip(old['effectiveSpecIds'],packet['effectiveSpecIds']) if a!=b]==[('rebased:w8:gloss:docs/platform/work-state/spec.md','rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md')]\nfor n in [1,2,3]:\n path=P/f'preserve-premise/park-judgments/shard-{n}.json';a=original(path);b=c.load(path)\n assert {k:v for k,v in a.items() if k!='rows'}=={k:v for k,v in b.items() if k!='rows'}\n for x,y in zip(a['rows'],b['rows']):\n  assert {k:v for k,v in x.items() if k not in ['patch','reworkNotes']}=={k:v for k,v in y.items() if k not in ['patch','reworkNotes']}\n  if x.get('patch')!=y.get('patch'):assert n==3 and y['rowId'] in ['f08069','f08076','f08084']\n  if x.get('reworkNotes')!=y.get('reworkNotes'):assert y['rowId'] in ['f07667','f07871']\na=original(P/'g9/recomposed.json');b=c.load(P/'g9/recomposed.json');changed=[x['path'] for x,y in zip(a['specs'],b['specs']) if x!=y]\nassert changed==['docs/platform/work-state/spec.md']\nwitness=next(s for s in b['specs'] if s['path']=='docs/platform/work-state/spec.md')\nassert witness['sourceCommit']==pin\nassert witness['predecessorChain'][0]['specId']==packet['patches'][-1]['id']\nassert witness['predecessorChain'][0]['beforeSha256']==packet['patches'][-1]['beforeSha256']\nassert witness['predecessorChain'][0]['expectedAfterSha256']==packet['patches'][-1]['expectedAfterSha256']\nassert witness['predecessorChain'][0]['diffSha256']==c.sha(packet['patches'][-1]['diff'])\nfor path in [P/'g9/phase9-decisions.json',P/'carries/pointer-patches.json',P/'census-join/pointer-patches.json',P.parent/'phase-08/step-07-composed-patches.json']:\n assert path.read_bytes()==subprocess.check_output(['git','show','HEAD:'+str(path.relative_to(Path.cwd()))])\nassert not subprocess.check_output(['git','diff','--name-only','--','docs/'])\nreport,states=c.compose(pin);assert report['exit']==0,report['findings']\nsh=c.module('sh',P/'preserve-premise/park-judgments/check_shard.py');engine=sh.load_replayer();record=c.load(P/'fchain/link-retargets.json');moving={r['oldPath']:r for r in sh.load(sh.P8/'step-05-cutover-move-set.json')['paths']}\nassert record['moveSetSha256']==c.sha((sh.P8/'step-05-cutover-move-set.json').read_bytes())\nassert record['counts']==dict(markdownLinks=160,markdownFiles=40,xSpecs=2,patches=41,codeSpans=1)\nassert len(record['rows'])==162 and len({r['id'] for r in record['rows']})==162\n# Reconstruct exact composed preimages via the packet's inverse, then re-scan\n# each source. This also proves that earlier retargets were not patched again.\nanchor_inputs=[];checked_targets=set()\nfor patch in record['patches']:\n file=patch['path'];after=states[file]['text'];before=engine.apply_diff(file,after,patch['rollbackDiff'])\n assert c.sha(before)==patch['beforeSha256'] and c.sha(after)==patch['expectedAfterSha256']\n rows=[r for r in record['rows'] if r['file']==file];assert patch['rowIds']==[r['id'] for r in rows]\n if file.endswith('.md'):\n  hits=list(links.into_move_set(file,before,moving));assert len(hits)==len(rows)\n  assert {(h['targetStart'],h['targetEnd'],h['target']) for h in hits}=={(r['start'],r['end'],r['oldTarget']) for r in rows if r['action']=='retarget'} | {(h['targetStart'],h['targetEnd'],h['target']) for h in hits if any(r['action']=='code-span' and r['start']==h['start'] for r in rows)}\n result=before\n for row in sorted(rows,key=lambda r:r['start'],reverse=True):\n  assert row['ruling']=='L13-26' and before[row['start']:row['end']]==row['before']\n  assert row['newPath'] in {m['to'] for m in moving[row['oldPath']]['moves']}\n  result=result[:row['start']]+row['after']+result[row['end']:]\n  if row['newPath']:\n   target=row['newPath'];raw=states[target]['text'] if target in states else sh.blob(pin,target)\n   assert raw is not None, row\n   checked_targets.add(target)\n   if '#' in row['newTarget']:\n    anchor_inputs.append(dict(path=target,content=raw if isinstance(raw,str) else raw.decode(),anchor=row['newTarget'].partition('#')[2]))\n  else:assert all(m['to'] is None for m in moving[row['oldPath']]['moves'])\n assert result==after\n# Reuse the repository's real heading/anchor reader; no native modules.\njs=\"import {anchorExists} from './scripts/list-doc-anchors.mjs'; let s='';for await(const b of process.stdin)s+=b; const rows=JSON.parse(s);const bad=rows.filter(r=>!anchorExists(r.content,r.anchor)).map(({path,anchor})=>({path,anchor}));console.log(JSON.stringify({checked:rows.length,missing:bad}));process.exitCode=bad.length?1:0;\"\ncp=subprocess.run(['node','--no-addons','--input-type=module','-e',js],input=json.dumps(anchor_inputs),text=True,capture_output=True)\nassert cp.returncode==0,(cp.stdout,cp.stderr)\nduties=c.load(P/'g0rework/final-pin-duties.json');r=duties['conditionalOverlayApprovals']['relocation'];step=c.pointer(packet,r['selector']);assert step['id']==r['selectedId'] and step['beforeSha256']==r['beforeSha256'] and step['expectedAfterSha256']==r['expectedAfterSha256']\nassert states[step['path']]['text'] and c.sha(states[step['path']]['text'])==duties['conditionalOverlayApprovals']['finalComposedFile']['afterSha256']\nout=dict(exit=0,sourceCommit=pin,historicalSpecsUnchanged=len(old['patches']),appendedSpecs=1,premiseJudgmentsUnchanged=787,g9DecisionsUnchanged=158,changedBodyWitnesses=changed,linkRows=162,patches=41,roundtrips=41,distinctExistingTargetFiles=len(checked_targets),anchors=json.loads(cp.stdout),remainingMoveSetLinks=0,changedSourceFiles=0,qualification='Records-only replay; all decisions, frozen evidence and historical spec objects conserved. No semantic approval, product application, lease or gate closure.')\n(P/'fchain/link-validation.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\\n');print(json.dumps(out))\n"
+      ],
+      "exit": 0,
+      "stdout": "{\"exit\": 0, \"sourceCommit\": \"2c5093b57954790cda1639b36821f71bd2a00c08\", \"historicalSpecsUnchanged\": 143, \"appendedSpecs\": 1, \"premiseJudgmentsUnchanged\": 787, \"g9DecisionsUnchanged\": 158, \"changedBodyWitnesses\": [\"docs/platform/work-state/spec.md\"], \"linkRows\": 162, \"patches\": 41, \"roundtrips\": 41, \"distinctExistingTargetFiles\": 49, \"anchors\": {\"checked\": 64, \"missing\": []}, \"remainingMoveSetLinks\": 0, \"changedSourceFiles\": 0, \"qualification\": \"Records-only replay; all decisions, frozen evidence and historical spec objects conserved. No semantic approval, product application, lease or gate closure.\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "censusReplay": {
+    "exit": 0,
+    "pin": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
+    "sourceSha256": "525bb4ed313141459b6dad8f7aaf798e5997f76ecaa2c4c07445ff6668819c99",
+    "adapter": "import runpy,sys,pathlib\nscript,output,pin=sys.argv[1:]\nns=runpy.run_path(script)\nmain=ns['main']; original=ns['dump']; target=pathlib.Path(output)\nmain.__globals__['dump']=lambda path,data: original(target/path.name,data)\nsys.argv=[script,'--pin',pin]\nmain()\n",
+    "commands": [
+      {
+        "argv": [
+          "python3",
+          "-B",
+          "-c",
+          "import runpy,sys,pathlib\nscript,output,pin=sys.argv[1:]\nns=runpy.run_path(script)\nmain=ns['main']; original=ns['dump']; target=pathlib.Path(output)\nmain.__globals__['dump']=lambda path,data: original(target/path.name,data)\nsys.argv=[script,'--pin',pin]\nmain()\n",
+          "/home/vantt/projects/forgentX-p9-w1-d1/plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+          "/tmp/fgos-work/fchain-census-ghpy8c07/1",
+          "608a4ada5f195b0d0b9d3568a71b8dde4954aacb"
+        ],
+        "exit": 0,
+        "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 54, \"joined-by-citation\": 4, \"joined-owning-test\": 779}}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "python3",
+          "-B",
+          "-c",
+          "import runpy,sys,pathlib\nscript,output,pin=sys.argv[1:]\nns=runpy.run_path(script)\nmain=ns['main']; original=ns['dump']; target=pathlib.Path(output)\nmain.__globals__['dump']=lambda path,data: original(target/path.name,data)\nsys.argv=[script,'--pin',pin]\nmain()\n",
+          "/home/vantt/projects/forgentX-p9-w1-d1/plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+          "/tmp/fgos-work/fchain-census-ghpy8c07/2",
+          "608a4ada5f195b0d0b9d3568a71b8dde4954aacb"
+        ],
+        "exit": 0,
+        "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 54, \"joined-by-citation\": 4, \"joined-owning-test\": 779}}\n",
+        "stderr": ""
+      }
+    ],
+    "identicalReplays": true,
+    "outputs": {
+      "residue.json": {
+        "sha256": "8c71faf6d077318d8ce5ca646edc12d5fa70f885cade300247e7612bce3643bc",
+        "bytes": 93
+      },
+      "join.json": {
+        "sha256": "d7cd97ec0597f69df53f85f713d3bc48f547cbf82516a16293b548389e287d9b",
+        "bytes": 2271427
+      },
+      "settlement.json": {
+        "sha256": "4e1cc0248daadff70c8639f5ea388184d35acdaf931e48d45b1107121d80a7c4",
+        "bytes": 574539
+      }
+    },
+    "counts": {
+      "files": 140,
+      "sites": 1126,
+      "statuses": {
+        "confirmed-grade-record-REJECT": 289,
+        "confirmed-settlement-REJECT": 54,
+        "joined-by-citation": 4,
+        "joined-owning-test": 779
+      }
+    },
+    "relocation": "Only dump output sink redirected to auto-cleaned tempfile; original input checks, main and citations --check unchanged."
+  },
+  "safety": {
+    "exit": 0,
+    "allChangedPathsWithinScope": true,
+    "changedPaths": [
+      "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/fchain/check.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/fchain/check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-09/fchain/controls.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/fchain/controls.py",
+      "plans/260925-documentation-authority-unification/reports/phase-09/fchain/manifest.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/fchain/receipt.md",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/receipt.md",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-commands.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-rebase-history.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-scan-before.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-validation.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/fchain/links.py",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/final-pin-duties.json"
+    ],
+    "allChangedJsonParsed": true,
+    "allChangedFilesNoTrailingWhitespace": true,
+    "volatileOutputsRestored": [
+      "fchain/census-replay.json",
+      "preserve-premise/park-judgments/chain-contract-controls.json"
+    ],
+    "transientShardReportRemoved": true,
+    "ownedScratchRemoved": true,
+    "remainingScratchEntries": [],
+    "gitWrites": false,
+    "productFilesChanged": false,
+    "nativeAddonsLoaded": false
+  }
+}

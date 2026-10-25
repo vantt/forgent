@@ -1979,7 +1979,7 @@
       "group": "source-carriage-note",
       "reworkNotes": [
         "The coordination-examples glob is unaffected by the move set. Preserve the carried CLI paragraph verbatim under its line-23 stale-carriage note; the former patch changed a historical truth claim without a cutover trigger (review finding 2).",
-        "Depends on stale F-chain input(s): file:docs/platform/runner/architecture/h-69197b459754.md. Rebase belongs to the separate chain turn; no diagnostic bytes are certified here."
+        "The selected recomposed-predecessor chain is strict and executable; this preserved row has no independent patch (463077c3b, L13-21.1)."
       ],
       "staleChainDependencies": [
         "file:docs/platform/runner/architecture/h-69197b459754.md"
@@ -3959,7 +3959,7 @@
       },
       "reworkNotes": [
         "Retarget the plural historical contracts directory to the full retired-engine contracts directory, not coordination-session.md alone. The collection README lists all four contracts (review finding 4).",
-        "The post-chain proposal is in chainRebases for this file; it roundtrips at fuzz zero. The row.patch diff is retained only as frozen pin replacement evidence required by validate_shard, not as an additional executable proposal. Checker support for this distinction is blocked outside scope."
+        "The row.patch is the executable basis: chain proposal selected by the single F door; frozenPinPatchEvidence retains the original pin witness (463077c3b, L13-21.1)."
       ]
     },
     {
@@ -9490,8 +9490,8 @@
           "f08076",
           "f08084"
         ],
-        "sourceSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597",
-        "proposedSha256": "30be7cddba2ecfa79f9ba78581fc75b1131cdcdbf17918a5029a073cd7479fe3",
+        "sourceSha256": "05877684d20439a82df922f40eff00afe49e9008e9cab1ecc2c5bfb86489e92b",
+        "proposedSha256": "4d4188f64c457d3f2f1250a26dec4c61498d55343babe0fcbe070851c3fff8c8",
         "replacements": [
           {
             "line": 16,
@@ -9523,9 +9523,9 @@
         ],
         "patch": "--- a/docs/platform/work-state/spec.md\n+++ b/docs/platform/work-state/spec.md\n@@ -13,7 +13,7 @@\n - docs/platform/work-state/decisions/retired-decision-history.md\n - docs/platform/work-state/history/multi-role-harness-distill-record.md\n - docs/specs/work-state.md\n-- docs/io-contract.md\n+- docs/platform/work-state/contracts/cli-io-contract.md\n Implementation: Carried source material; current implementation truth unverified\n Provenance: Retained work-state candidate carriage from docs/specs/work-state.md; existing Related references retained\n Writer type: Original writer attribution not recorded; retained source provenance\n@@ -708,7 +708,7 @@\n   lỗi vào manifest, `init` vẫn thành công (fail-safe).\n - **Afterwards:** re-init trên cùng project ghi lại manifest nhất quán\n   (idempotent — không tích lũy/trùng lặp entry qua nhiều lần chạy). Doctrine\n-  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/coexistence.md`.\n+  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/platform/coexistence/spec.md`.\n \n ### Add Verb\n \n@@ -1200,4 +1200,4 @@\n - [decisions/retired-decision-history.md](decisions/retired-decision-history.md)\n - [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md)\n - [docs/specs/work-state.md](../../specs/work-state.md)\n-- [docs/io-contract.md](../../io-contract.md)\n+- [docs/platform/work-state/contracts/cli-io-contract.md](contracts/cli-io-contract.md)\n",
         "chainEntryIds": [
-          "rebased:w8:gloss:docs/platform/work-state/spec.md"
+          "rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md"
         ],
-        "chainResultSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597"
+        "chainResultSha256": "05877684d20439a82df922f40eff00afe49e9008e9cab1ecc2c5bfb86489e92b"
       }
     },
     {
@@ -9639,8 +9639,8 @@
           "f08076",
           "f08084"
         ],
-        "sourceSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597",
-        "proposedSha256": "30be7cddba2ecfa79f9ba78581fc75b1131cdcdbf17918a5029a073cd7479fe3",
+        "sourceSha256": "05877684d20439a82df922f40eff00afe49e9008e9cab1ecc2c5bfb86489e92b",
+        "proposedSha256": "4d4188f64c457d3f2f1250a26dec4c61498d55343babe0fcbe070851c3fff8c8",
         "replacements": [
           {
             "line": 16,
@@ -9672,9 +9672,9 @@
         ],
         "patch": "--- a/docs/platform/work-state/spec.md\n+++ b/docs/platform/work-state/spec.md\n@@ -13,7 +13,7 @@\n - docs/platform/work-state/decisions/retired-decision-history.md\n - docs/platform/work-state/history/multi-role-harness-distill-record.md\n - docs/specs/work-state.md\n-- docs/io-contract.md\n+- docs/platform/work-state/contracts/cli-io-contract.md\n Implementation: Carried source material; current implementation truth unverified\n Provenance: Retained work-state candidate carriage from docs/specs/work-state.md; existing Related references retained\n Writer type: Original writer attribution not recorded; retained source provenance\n@@ -708,7 +708,7 @@\n   lỗi vào manifest, `init` vẫn thành công (fail-safe).\n - **Afterwards:** re-init trên cùng project ghi lại manifest nhất quán\n   (idempotent — không tích lũy/trùng lặp entry qua nhiều lần chạy). Doctrine\n-  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/coexistence.md`.\n+  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/platform/coexistence/spec.md`.\n \n ### Add Verb\n \n@@ -1200,4 +1200,4 @@\n - [decisions/retired-decision-history.md](decisions/retired-decision-history.md)\n - [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md)\n - [docs/specs/work-state.md](../../specs/work-state.md)\n-- [docs/io-contract.md](../../io-contract.md)\n+- [docs/platform/work-state/contracts/cli-io-contract.md](contracts/cli-io-contract.md)\n",
         "chainEntryIds": [
-          "rebased:w8:gloss:docs/platform/work-state/spec.md"
+          "rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md"
         ],
-        "chainResultSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597"
+        "chainResultSha256": "05877684d20439a82df922f40eff00afe49e9008e9cab1ecc2c5bfb86489e92b"
       }
     },
     {
@@ -9788,8 +9788,8 @@
           "f08076",
           "f08084"
         ],
-        "sourceSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597",
-        "proposedSha256": "30be7cddba2ecfa79f9ba78581fc75b1131cdcdbf17918a5029a073cd7479fe3",
+        "sourceSha256": "05877684d20439a82df922f40eff00afe49e9008e9cab1ecc2c5bfb86489e92b",
+        "proposedSha256": "4d4188f64c457d3f2f1250a26dec4c61498d55343babe0fcbe070851c3fff8c8",
         "replacements": [
           {
             "line": 16,
@@ -9821,9 +9821,9 @@
         ],
         "patch": "--- a/docs/platform/work-state/spec.md\n+++ b/docs/platform/work-state/spec.md\n@@ -13,7 +13,7 @@\n - docs/platform/work-state/decisions/retired-decision-history.md\n - docs/platform/work-state/history/multi-role-harness-distill-record.md\n - docs/specs/work-state.md\n-- docs/io-contract.md\n+- docs/platform/work-state/contracts/cli-io-contract.md\n Implementation: Carried source material; current implementation truth unverified\n Provenance: Retained work-state candidate carriage from docs/specs/work-state.md; existing Related references retained\n Writer type: Original writer attribution not recorded; retained source provenance\n@@ -708,7 +708,7 @@\n   lỗi vào manifest, `init` vẫn thành công (fail-safe).\n - **Afterwards:** re-init trên cùng project ghi lại manifest nhất quán\n   (idempotent — không tích lũy/trùng lặp entry qua nhiều lần chạy). Doctrine\n-  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/coexistence.md`.\n+  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/platform/coexistence/spec.md`.\n \n ### Add Verb\n \n@@ -1200,4 +1200,4 @@\n - [decisions/retired-decision-history.md](decisions/retired-decision-history.md)\n - [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md)\n - [docs/specs/work-state.md](../../specs/work-state.md)\n-- [docs/io-contract.md](../../io-contract.md)\n+- [docs/platform/work-state/contracts/cli-io-contract.md](contracts/cli-io-contract.md)\n",
         "chainEntryIds": [
-          "rebased:w8:gloss:docs/platform/work-state/spec.md"
+          "rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md"
         ],
-        "chainResultSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597"
+        "chainResultSha256": "05877684d20439a82df922f40eff00afe49e9008e9cab1ecc2c5bfb86489e92b"
       }
     },
     {
