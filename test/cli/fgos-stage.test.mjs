@@ -269,15 +269,16 @@ test('discover with no id is rejected as validation, exit 4', () => {
 });
 
 
-// A fresh cwd with no runner config and no assistant CLI on PATH: the loader refuses by name and says how
-// to set an executor; `discover` writes no config file and never touches the item.
-test('discover on a fresh cwd with no runner config and no assistant CLI refuses naming the fix and writes no config', () => {
+// A fresh cwd with no runner config and no assistant CLI on PATH: the config still loads (a missing default
+// executor is refused only where it is used, proven in test/runner/dispatch.test.mjs), so `discover` with no
+// verdict refuses for its own reason and names that fix; it writes no config file and never touches the item.
+test('discover on a fresh cwd with no runner config and no assistant CLI refuses naming its own fix and writes no config', () => {
   const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing with no config yet']).stdout).data.id;
 
   const result = run(cwd, ['discover', id], { PATH: '/usr/bin:/bin' });
   assert.equal(result.status, 4, result.stderr);
-  assert.match(result.stderr, /fgos config set runner\.executor/);
+  assert.match(result.stderr, /no --verdict was given/);
 
   for (const name of ['config.yaml', 'config.json']) {
     assert.equal(fs.existsSync(path.join(cwd, '.fgos', name)), false, `discover must not write .fgos/${name}`);
