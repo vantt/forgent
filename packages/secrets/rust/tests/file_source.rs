@@ -1,3 +1,5 @@
+#![cfg(unix)]
+// FileSource is a Unix adapter (lib.rs gates it), so this file is too.
 mod common;
 use common::FAKE;
 use fgos_secrets::{CheckFailure, FileSource, Lookup, SecretSource};

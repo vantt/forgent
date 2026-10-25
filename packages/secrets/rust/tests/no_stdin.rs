@@ -1,5 +1,6 @@
 //! Every adapter operation finishes while stdin is an open pipe nobody writes
 //! to: an adapter that read stdin (a prompt) would hang past the time limit.
+#![cfg(unix)]
 use fgos_secrets::{FileSource, SecretSource};
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
