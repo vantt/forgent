@@ -267,3 +267,20 @@ Decided by the Lead under A42 and RUL11, from the w28 review (104 APPROVE, 2 REW
 2. **The door checks for this itself.** `fchain/check.py` gains one finding, `linkIntoMoveSet`. It reports any clickable link in the composed `docs/platform/**` that still resolves to a move-set source path. That way a later docs edit cannot bring these links back unseen.
 3. **Gateway contract list.** The `x-specs` entries for `docs/specs/work-state.md` and `docs/specs/runner.md` in the moved `fgos-gateway-api-v1.yaml` are repointed in the same record.
 4. The work-state chain entries made stale by the `work-state/spec.md` edit are rebased in the same turn. No decision changes.
+
+## L13-27 — The ownership audit judges drift through the rebind door (Lead, 2026-10-25 21:30)
+
+Decided by the Lead under A42, RUL11 and RUL104, from turn 733's evidence (`g0rework/ownership-drift-proof.json`).
+
+The Phase 6 ownership audit (`ownership.mjs`, `audit-ownership.mjs`, embedded in both `phase-06/step10-*-reproduction.json`) fails at the plan HEAD on 23 `targetDigestDrift` rows. Its real invariants still hold: there are 0 native duplicates and 0 new active pairs. All 23 rows are false positives of an old reader:
+- **7 rows** are original rows whose effective successors already match the live document.
+- **16 rows** are group rows, with a null anchor and eight members each. Commit 594fe4194 filled in their digest. Before that fill, the audit's digest guard skipped them.
+
+The audit's drift test (`u.anchor===r.targetAnchor && u.textDigest.startsWith(r.targetUnitDigest)`) predates both supersession and identical-unit groups. `rebind/rebind.py --check` already owns that judgment: it reports 0 unresolved drift, authenticates the 7 superseded origins, and authenticates the 128 group members.
+
+Ruling: the audit's drift test asks the one door that already decides drift, instead of copying its logic.
+- A raw drift row counts as accounted only when `rebind.py --check` authenticates it: either as a superseded origin whose effective successor matches the live unit, or as a group whose members all match.
+- Every other drift row still fails.
+- Raw diagnostics stay in the audit's output.
+- Ledger history is not rewritten.
+- The pair-accounting exception list in `checks.mjs` is not touched.
