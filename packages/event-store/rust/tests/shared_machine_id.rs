@@ -1,3 +1,4 @@
+#![cfg(target_os = "linux")]
 mod sync_support;
 use sync_support::*;
 #[test]
