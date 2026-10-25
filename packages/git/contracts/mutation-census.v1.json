@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "70989af4617c5f4cb8d422ba0794757afb928a606307ba0bde89847f0c0b9e7c",
+  "payloadDigest": "24cf52960911306873ea163416df347c364c68e122357c094a4859c825aa433f",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -1023,7 +1023,7 @@
     "src/state/graph-harness.mjs": "0c4aa4d924401927595d41f42155159c0f3dcc1121c5c416ab096f146dc58fb6",
     "src/state/graph-metrics.mjs": "ce0c9112f0a22ae408a442773fc91628eb225ef103bc9024a16ce926c1f0f167",
     "src/state/handoff.mjs": "352dbce5f607f2ad478bf0119fbf875bf640142f3438a745ebcead4804dd4d38",
-    "src/state/hot-lock.mjs": "a559bcd1847667ddee47d50b2a5a47a24304832088e41743267d64f3d263daab",
+    "src/state/hot-lock.mjs": "0124c6b8a16245f5545d069dc0bf22756c58a57ba011f5828fe14605a8752508",
     "src/state/impact.mjs": "c0324c2b1e0498fcee28418c43deb820f8c7e2a36f9035b7b72fad986c446185",
     "src/state/knowledge-registry.mjs": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
     "src/state/plan-pool.mjs": "20c667909048853fa2dddf239b27467c29dbe8551cd7c90fef88c241143483ad",
