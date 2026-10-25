@@ -256,7 +256,7 @@ fn failed(text: String, json: bool, warning: Option<String>) -> MailboxAnswer {
 fn locate(json: bool) -> Result<(PathBuf, Loaded, Option<String>), Box<MailboxAnswer>> {
     let fgos_dir = record_dir(json)?;
     let loaded = super::mailbox_config::project_limits(&fgos_dir)
-        .map_err(|f| failed(format!("mailbox config: {}", f.detail), json, None))?;
+        .map_err(|f| failed(format!("mailbox config: {}", f.detail()), json, None))?;
     let warning = ignored_keys_warning(&loaded);
     Ok((fgos_dir, loaded, warning))
 }
@@ -374,8 +374,8 @@ fn status(json: bool) -> MailboxAnswer {
     let ok = answer.record_ok && config_failure.is_none();
     data["ok"] = Value::from(ok);
     if let Some(failure) = &config_failure {
-        data["config"] = Value::from(failure.reason.clone());
-        text = format!("config: {} ({})\n{text}", failure.reason, failure.detail);
+        data["config"] = Value::from(failure.reason());
+        text = format!("config: {} ({})\n{text}", failure.reason(), failure.detail());
     }
     // A head whose handle does not name it alone (Identity holds it for
     // another session, or another head derives it too) is named with the

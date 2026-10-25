@@ -280,7 +280,11 @@ fn ours_only(candidates: &[Candidate], ours: &[(&HeadView, SessionInfo)]) -> Vec
                 IdentityLiveness::Unknown => Liveness::Unknown,
                 IdentityLiveness::Remote => return None,
             };
-            Some(AliasCandidate { id: c.id.clone(), handle: c.handle.clone(), liveness })
+            Some(AliasCandidate {
+                id: c.id.clone(),
+                handle: c.handle.clone(),
+                liveness,
+            })
         })
         .collect()
 }

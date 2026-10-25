@@ -6,8 +6,9 @@
 //! dependency is serde). The crate-local `clippy.toml` narrows rule 3 to a
 //! list of forbidden entry points; review still owns the rule.
 //!
-//! Authority: the spec above for behaviour, and
-//! `packages/mailbox/contracts/limits.v1.json` for every number.
+//! Authority: the spec above for behaviour, and the Config standard layer
+//! (`core/config-standard/mailbox.yaml`, equal to
+//! `packages/mailbox/contracts/limits.v1.json`) for every number.
 #![forbid(unsafe_code)]
 #![deny(clippy::print_stdout, clippy::print_stderr)]
 

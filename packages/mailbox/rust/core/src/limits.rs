@@ -1,7 +1,9 @@
 //! The core's configuration, in the exact shape of the `mailbox` config
-//! section. Every field is required and none has a default: the values live
-//! only in `packages/mailbox/contracts/limits.v1.json` (spec §5.3, "not in
-//! code constants"). Byte and second values are `u64`, counts are `u32`.
+//! section. Every field is required and none has a default (spec §5.3, "not in
+//! code constants"): a project reads the values from the Config standard
+//! layer, `core/config-standard/mailbox.yaml`, and the crates' own tests from
+//! `packages/mailbox/contracts/limits.v1.json`, which a host test keeps
+//! equal. Byte and second values are `u64`, counts are `u32`.
 use serde::{Deserialize, Serialize};
 
 /// The `mailbox` section. Unknown top-level keys are accepted because later

@@ -1,13 +1,10 @@
 //! The limits loader: the embedded contract's defaults overlaid by the
-//! `mailbox` section of the project config (plan decision 4), and the
-//! capped read of that config file.
+//! effective `mailbox` section the host hands it.
 #![cfg(unix)]
 mod common;
 
-use fgos_mailbox::limits::{load, read_project_config, LimitsError};
+use fgos_mailbox::limits::{load, LimitsError};
 use serde_json::{json, Value};
-use std::fs;
-use std::path::PathBuf;
 
 fn defaults() -> fgos_mailbox::limits::Loaded {
     load(None).expect("the embedded contract loads")
@@ -130,51 +127,4 @@ fn the_harness_only_key_is_dropped_before_deserialising() {
         loaded.ignored_keys.is_empty(),
         "a contract key is never reported as unknown"
     );
-}
-
-/// A fresh `.fgos` directory under the target's temporary space.
-fn fgos_dir(tag: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("mbx-limits-{tag}-{}", std::process::id()));
-    let _ = fs::remove_dir_all(&dir);
-    fs::create_dir_all(&dir).unwrap();
-    dir
-}
-
-#[test]
-fn the_project_config_is_read_only_as_a_capped_regular_json_object() {
-    let dir = fgos_dir("read");
-    assert_eq!(
-        read_project_config(&dir, 1024),
-        Ok(None),
-        "a missing file is no config"
-    );
-
-    fs::write(
-        dir.join("config.json"),
-        r#"{"mailbox":{"queue":{"cap":7}}}"#,
-    )
-    .unwrap();
-    assert_eq!(
-        read_project_config(&dir, 1024),
-        Ok(Some(json!({ "mailbox": { "queue": { "cap": 7 } } })))
-    );
-    assert!(matches!(
-        read_project_config(&dir, 10),
-        Err(LimitsError::Unreadable(_))
-    ));
-
-    fs::write(dir.join("config.json"), "[1]").unwrap();
-    assert!(matches!(
-        read_project_config(&dir, 1024),
-        Err(LimitsError::Unreadable(_))
-    ));
-
-    fs::remove_file(dir.join("config.json")).unwrap();
-    fs::write(dir.join("elsewhere.json"), "{}").unwrap();
-    std::os::unix::fs::symlink(dir.join("elsewhere.json"), dir.join("config.json")).unwrap();
-    assert!(matches!(
-        read_project_config(&dir, 1024),
-        Err(LimitsError::Unreadable(_))
-    ));
-    fs::remove_dir_all(&dir).unwrap();
 }

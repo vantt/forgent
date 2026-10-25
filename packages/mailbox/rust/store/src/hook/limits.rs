@@ -1,7 +1,7 @@
 //! The hook's configuration, read from the same `mailbox` config section as
 //! the core's `Limits`. Every field is required and none has a default: the
-//! values live only in `packages/mailbox/contracts/limits.v1.json`, under the
-//! keys whose reader is `hook`.
+//! values are the Config standard layer's, equal to the keys of
+//! `packages/mailbox/contracts/limits.v1.json` whose reader is `hook`.
 use serde::{Deserialize, Serialize};
 
 /// The hook's keys of the `mailbox` section. Unknown top-level keys are

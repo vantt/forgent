@@ -888,9 +888,15 @@ fn a_pi_or_omp_head_registers_with_identity_under_its_own_cli_and_is_reached_by_
         let root = identity_root(&scene);
         let head = ExtensionHead::start(&scene, cli, WRITER);
         let entries = || {
-            fgos_identity::directory::list(&root, None, false, &fgos_process::facts::judge_here, None)
-                .map(|listed| listed.sessions)
-                .unwrap_or_default()
+            fgos_identity::directory::list(
+                &root,
+                None,
+                false,
+                &fgos_process::facts::judge_here,
+                None,
+            )
+            .map(|listed| listed.sessions)
+            .unwrap_or_default()
         };
         let deadline = std::time::Instant::now() + std::time::Duration::from_secs(20);
         while (entries().is_empty() || !scene.mailbox_dir().join("record/snapshot.json").exists())
@@ -1359,8 +1365,7 @@ fn status_json(scene: &Scene) -> (Option<i32>, serde_json::Value) {
 }
 
 #[test]
-fn a_project_migrated_to_config_yaml_names_the_migration_in_the_hook_outcome_status_and_the_verbs()
-{
+fn a_project_migrated_to_config_yaml_has_its_mailbox_section_applied_through_the_config_door() {
     let scene = Scene::new("config-migrated");
     identity_root(&scene);
     scene.claude_hook("post-tool-use", &post_tool_use());
@@ -1368,7 +1373,7 @@ fn a_project_migrated_to_config_yaml_names_the_migration_in_the_hook_outcome_sta
     // What `fgos config migrate` leaves: the section in config.yaml, the tombstone in config.json.
     fs::write(
         scene.main().join(".fgos/config.yaml"),
-        "mailbox:\n  hook:\n    budgetMs: 4000\n",
+        "mailbox:\n  maxBodyBytes: 4\n",
     )
     .unwrap();
     fs::write(
@@ -1379,17 +1384,9 @@ fn a_project_migrated_to_config_yaml_names_the_migration_in_the_hook_outcome_sta
     let out = scene.claude_hook("post-tool-use", &post_tool_use());
     assert_eq!(out.status.code(), Some(0), "{out:?}");
     assert!(out.stdout.is_empty() && out.stderr.is_empty(), "{out:?}");
-    assert_eq!(hook_outcome(&scene).as_deref(), Some("config:migrated"));
-
+    assert_eq!(hook_outcome(&scene), None, "the migrated config reads");
     let (code, data) = status_json(&scene);
-    assert_eq!(
-        code,
-        Some(1),
-        "a config the mailbox cannot read fails status"
-    );
-    assert_eq!(data["config"], "config:migrated");
-    assert_eq!(data["record"], "ok", "the record is still read: {data}");
-    assert_eq!(data["hookOutcome"]["reason"], "config:migrated");
+    assert_eq!((code, &data["config"]), (Some(0), &serde_json::Value::Null));
 
     let sent = scene.run(
         &scene.main(),
@@ -1397,15 +1394,16 @@ fn a_project_migrated_to_config_yaml_names_the_migration_in_the_hook_outcome_sta
         &["mailbox", "send", "--to", &name, "hello"],
         b"",
     );
-    assert_eq!(sent.status.code(), Some(1));
+    assert_eq!(sent.status.code(), Some(1), "{sent:?}");
     assert!(
-        String::from_utf8_lossy(&sent.stdout).contains("config.yaml"),
-        "{sent:?}"
+        String::from_utf8_lossy(&sent.stdout).contains("too-large"),
+        "config.yaml's body cap applies: {sent:?}"
     );
 }
 
 #[test]
-fn a_pre_migration_config_json_with_a_wrong_mailbox_value_leaves_its_reason_until_it_is_fixed() {
+fn a_pre_migration_config_json_with_a_wrong_mailbox_value_leaves_the_config_doors_reason_until_it_is_fixed(
+) {
     let scene = Scene::new("config-wrong");
     identity_root(&scene);
     scene.claude_hook("post-tool-use", &post_tool_use());
@@ -1414,11 +1412,15 @@ fn a_pre_migration_config_json_with_a_wrong_mailbox_value_leaves_its_reason_unti
     let out = scene.claude_hook("post-tool-use", &post_tool_use());
     assert_eq!(out.status.code(), Some(0), "{out:?}");
     assert!(out.stdout.is_empty(), "{out:?}");
-    assert_eq!(hook_outcome(&scene).as_deref(), Some("config:wrong-type"));
+    // The schema refuses the read as a whole; the mailbox uses none of it.
+    assert_eq!(
+        hook_outcome(&scene).as_deref(),
+        Some("config:config-schema")
+    );
     let (code, data) = status_json(&scene);
     assert_eq!(
         (code, &data["config"]),
-        (Some(1), &serde_json::json!("config:wrong-type"))
+        (Some(1), &serde_json::json!("config:config-schema"))
     );
 
     fs::write(&config, r#"{"mailbox":{"hook":{"budgetMs":4000}}}"#).unwrap();

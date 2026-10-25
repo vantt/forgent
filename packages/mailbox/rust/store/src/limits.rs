@@ -1,8 +1,10 @@
-//! The limits loader (spec §12, plan decision 4): the one production path
-//! from configuration to the core's `Limits` and the hook's `HookLimits`.
-//! The defaults are the limits contract embedded at build time; the
-//! project's `.fgos/config.json` may override any of them in its `mailbox`
-//! section, keyed by the contract's dotted names.
+//! The limits loader (spec §12): the one production path from configuration
+//! to the core's `Limits` and the hook's `HookLimits`. The caller hands it
+//! the effective `mailbox` section, which the host reads through the Config
+//! door (project over global over the bundled standard); this crate never
+//! opens a config file. Each key the section does not hold takes the limits
+//! contract's value, embedded at build time and keyed by the same dotted
+//! names.
 //!
 //! A key the contract does not name is ignored and reported, as the Config
 //! spec treats an unknown key. A value of the wrong type, or one the
@@ -11,11 +13,9 @@
 //! is dropped before anything is deserialised. Range limits are not added:
 //! a tracked config file has the trust of tracked code.
 use crate::hook::HookLimits;
-use crate::record::read_regular_capped;
 use fgos_mailbox_core::Limits;
 use serde_json::{Map, Value};
 use std::collections::BTreeMap;
-use std::path::Path;
 
 const LIMITS_CONTRACT: &str = include_str!("../../../contracts/limits.v1.json");
 
@@ -43,8 +43,7 @@ pub enum LimitsError {
     WrongType(String),
     /// The limits' own types refused the value at this key.
     Rejected(String),
-    /// The config file is not a readable regular JSON object within the
-    /// read cap.
+    /// The embedded limits contract cannot be read.
     Unreadable(String),
 }
 
@@ -53,7 +52,7 @@ impl std::fmt::Display for LimitsError {
         match self {
             Self::WrongType(key) => write!(f, "{key} has the wrong type"),
             Self::Rejected(key) => write!(f, "{key} has a value out of range"),
-            Self::Unreadable(why) => write!(f, "the project config cannot be read: {why}"),
+            Self::Unreadable(why) => write!(f, "the limits contract cannot be read: {why}"),
         }
     }
 }
@@ -80,7 +79,7 @@ struct Contract {
 
 fn contract() -> Result<Contract, LimitsError> {
     let doc: Value = serde_json::from_str(LIMITS_CONTRACT)
-        .map_err(|e| LimitsError::Unreadable(format!("limits contract: {e}")))?;
+        .map_err(|e| LimitsError::Unreadable(e.to_string()))?;
     let mut defaults = BTreeMap::new();
     let mut other_readers = Vec::new();
     for entry in doc["keys"].as_array().into_iter().flatten() {
@@ -199,21 +198,4 @@ fn parse(values: &BTreeMap<String, Value>) -> Result<(Limits, HookLimits), ()> {
     let limits = serde_json::from_value(section.clone()).map_err(|_| ())?;
     let hook = serde_json::from_value(section).map_err(|_| ())?;
     Ok((limits, hook))
-}
-
-/// `<fgos_dir>/config.json` as a JSON object, read without following a
-/// symlink, as a regular file of at most `max_bytes`; `None` when it does
-/// not exist.
-pub fn read_project_config(fgos_dir: &Path, max_bytes: u64) -> Result<Option<Value>, LimitsError> {
-    let path = fgos_dir.join("config.json");
-    let bytes = match read_regular_capped(&path, max_bytes) {
-        Ok(bytes) => bytes,
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
-        Err(e) => return Err(LimitsError::Unreadable(e.to_string())),
-    };
-    match serde_json::from_slice(&bytes) {
-        Ok(value @ Value::Object(_)) => Ok(Some(value)),
-        Ok(_) => Err(LimitsError::Unreadable("not a JSON object".to_string())),
-        Err(e) => Err(LimitsError::Unreadable(e.to_string())),
-    }
 }

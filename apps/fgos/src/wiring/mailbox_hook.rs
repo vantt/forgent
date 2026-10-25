@@ -94,7 +94,7 @@ fn run(args: &[OsString]) {
     let loaded = match project_limits(&fgos_dir) {
         Ok(loaded) => loaded,
         Err(failure) => {
-            outcome_log::record_reason(&paths, adapter, event, &failure.reason, now());
+            outcome_log::record_reason(&paths, adapter, event, &failure.reason(), now());
             return;
         }
     };

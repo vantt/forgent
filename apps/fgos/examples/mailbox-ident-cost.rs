@@ -130,7 +130,7 @@ impl Scene {
         if !directory(&self.state).exists() {
             return 0;
         }
-        list(&self.state, None, false, &judge_here)
+        list(&self.state, None, false, &judge_here, None)
             .unwrap_or_else(|r| fail(&r.detail))
             .sessions
             .len()
