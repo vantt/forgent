@@ -32,11 +32,11 @@ Success-criteria `rg -n "total_routes|native_routes|compute_sessions|n/a \(pre-F
 - `node scripts/git-one-door-scan.mjs --root . --write-census` (hook asked): only digests changed.
 - `node scripts/regenerate-observe-fixtures.mjs`: ran the coordination-free steps, then failed at step 6 with `metrics case: unknown option --name`. This is the regenerator calling `metrics case open --name`, which the host rejects. It is independent of this change (that step comes after the removed one) and I did not touch it; the deleted fixture tree is the only fixture diff. Needs its own fix (not in this phase's scope).
 
-## Timings (`metrics harness`, no sources, cwd = this worktree: about 5000 tracked files)
+## Timings (`metrics harness`, no sources, cwd = this worktree: 10043 tracked files)
 Method: temporary integration test (deleted) calling `dispatch_harness` 7 times on the worktree root, `cargo test --release`, p50 of 7, warm file cache. Installed `fgos` could not be used (no activation in a worktree), and a release host build was not worth its cost.
 - Before: p50 55 ms (min 53, max 327 first-run outlier); load average 0.68 to 1.78.
 - After: p50 about 7 microseconds; load average 1.50 to 1.55.
-The removed work (tracked-file listing, reading every js/mjs/ts/rs file twice-counted, protocol scan) was the whole cost of the call without sources. Real runs also read observations from the sources, unchanged by this work. The plan's "about 0.3 s" matches the cold-cache outlier (327 ms), not the warm p50.
+The removed work (tracked-file listing, reading every js, mjs, ts and rs file, plus the newline count over all files, protocol scan) was the whole cost of the call without sources. Real runs also read observations from the sources, unchanged by this work. The plan's "about 0.3 s" matches the cold-cache outlier (327 ms), not the warm p50.
 
 ## Concerns
 - Regenerator breakage above (pre-existing).
