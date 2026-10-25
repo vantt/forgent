@@ -49,6 +49,9 @@ pub struct SkippedMirror {
     pub detail: String,
 }
 pub struct ReadRequest<'a> {
+    /// This machine's id. Its mirror is its own history: a failure there
+    /// refuses the read, where a peer's mirror is skipped and named.
+    pub machine: &'a str,
     pub layout: &'a Layout,
     pub origin: &'a str,
     /// Include all streams the view observes in `seen`; a predecessor outside
@@ -227,25 +230,21 @@ fn ref_machine(name: &str) -> &str {
     };
     rest.split('/').nth(1).unwrap_or("")
 }
-/// What one listing observed. `own` holds the machines this clone publishes
-/// as: its own refs are the only event refs outside `refs/fgos/remotes/`.
+/// What one listing observed.
 struct Listed {
     tips: Vec<Tip>,
     legacy: BTreeMap<String, Oid>,
     /// The HEAD the same listing observed (when attached).
     head: Option<HeadFact>,
-    own: BTreeSet<String>,
     skipped: Vec<SkippedMirror>,
 }
 impl Listed {
-    /// A peer's mirror that fails is skipped and named; an own ref, the mirror
-    /// of an own machine, or a mirror that names no machine fails the read.
-    fn skip(&mut self, name: &str, error: Error) -> Result<(), Error> {
+    /// A peer's mirror that fails is skipped and named; a ref outside
+    /// `refs/fgos/remotes/`, the mirror of `own` (this machine), or a mirror
+    /// that names no machine fails the read.
+    fn skip(&mut self, own: &str, name: &str, error: Error) -> Result<(), Error> {
         let machine = ref_machine(name);
-        if !name.starts_with("refs/fgos/remotes/")
-            || machine.is_empty()
-            || self.own.contains(machine)
-        {
+        if !name.starts_with("refs/fgos/remotes/") || machine.is_empty() || machine == own {
             return Err(error);
         }
         self.skipped.push(SkippedMirror {
@@ -306,7 +305,7 @@ fn listing(name: &str, value: &RefValue, streams: &[StreamId]) -> Result<Option<
 }
 /// The listing that reads the event refs also lists `refs/heads/`, so the branch HEAD names, with
 /// its own listed value, comes with it (see `refs::list_with_head`).
-fn tips(port: &dyn Inspect, repo: &RepoHandle, streams: &[StreamId]) -> Result<Listed, Error> {
+fn tips(port: &dyn Inspect, repo: &RepoHandle, req: &ReadRequest<'_>) -> Result<Listed, Error> {
     let prefixes = [
         "refs/fgos/events/",
         "refs/fgos/branch-events/",
@@ -322,22 +321,16 @@ fn tips(port: &dyn Inspect, repo: &RepoHandle, streams: &[StreamId]) -> Result<L
         tips: Vec::new(),
         legacy: BTreeMap::new(),
         head,
-        own: entries
-            .iter()
-            .map(|e| e.name.as_str())
-            .filter(|n| !n.starts_with("refs/fgos/remotes/") && !ref_machine(n).is_empty())
-            .map(|n| ref_machine(n).to_owned())
-            .collect(),
         skipped: Vec::new(),
     };
     for e in &entries {
-        match listing(e.name.as_str(), &e.value, streams) {
+        match listing(e.name.as_str(), &e.value, req.streams) {
             Ok(Some(Listing::Tip(tip))) => listed.tips.push(tip),
             Ok(Some(Listing::Legacy(oid))) => {
                 listed.legacy.insert(e.name.as_str().into(), oid);
             }
             Ok(None) => {}
-            Err(error) => listed.skip(e.name.as_str(), error)?,
+            Err(error) => listed.skip(req.machine, e.name.as_str(), error)?,
         }
     }
     Ok(listed)
@@ -652,7 +645,7 @@ fn read_from(
     for stream in req.streams {
         local.extend(read_own(req.layout, req.origin, stream)?.events);
     }
-    let mut listed = tips(port, repo, req.streams)?;
+    let mut listed = tips(port, repo, req)?;
     let observed_tips = listed.tips.clone();
     let legacy_refs = std::mem::take(&mut listed.legacy);
     let mut listed_head = listed.head.take();
@@ -702,7 +695,7 @@ fn read_from(
             }),
         };
         let Err(error) = checked else { continue };
-        listed.skip(name, error)?;
+        listed.skip(req.machine, name, error)?;
         let baseline = Oid::parse(old, repo.object_format()).map_err(|e| invalid(e.to_string()))?;
         match at {
             Some(i) => listed.tips[i].oid = baseline,
@@ -782,15 +775,17 @@ fn read_from(
     }
     // Each mirror is verified on its own (spec section 14).
     let mut rejected = Vec::new();
+    let no_stops = BTreeSet::new();
     for tip in listed.tips.iter().filter(|t| t.mirror && !unchanged(t)) {
-        let checked = verify(tip, &certificates).and_then(|part| {
-            // A mirror this history has not seen is checked from its roots.
-            if !retained_cursor.mirror_tips.contains_key(&tip.name) && !certificates.is_empty() {
-                let full = verify(tip, &BTreeSet::new())?;
-                walk::own_origin_bounded(&full.published, req.origin, &bounds)?;
-            } else {
-                walk::own_origin_bounded(&part.published, req.origin, &bounds)?;
-            }
+        // A mirror this history has not seen is walked from its roots, so its
+        // whole claim on the own origin is bounded; one walk serves both.
+        let stops = if retained_cursor.mirror_tips.contains_key(&tip.name) {
+            &certificates
+        } else {
+            &no_stops
+        };
+        let checked = verify(tip, stops).and_then(|part| {
+            walk::own_origin_bounded(&part.published, req.origin, &bounds)?;
             Ok(part)
         });
         match checked {
@@ -803,7 +798,7 @@ fn read_from(
     }
     for (name, error) in rejected {
         listed.tips.retain(|t| t.name != name);
-        listed.skip(&name, error)?;
+        listed.skip(req.machine, &name, error)?;
     }
     let tips = &listed.tips;
     let oids: Vec<_> = tips.iter().map(|t| t.oid.clone()).collect();

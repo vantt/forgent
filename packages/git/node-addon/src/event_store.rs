@@ -495,6 +495,7 @@ impl EventStore {
         let request = fgos_event_store::read::ReadRequest {
             layout: &self.layout,
             origin: &origin,
+            machine,
             streams: &stream_ids(&streams)?,
             cursor: &cursor,
             folded: &folded,
@@ -666,6 +667,7 @@ impl EventStore {
         let request = fgos_event_store::export::ExportRequest {
             layout: &self.layout,
             origin: &origin,
+            machine,
             streams: &streams,
             since: &since,
             out: Path::new(&out),

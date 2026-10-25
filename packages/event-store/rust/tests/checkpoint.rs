@@ -22,6 +22,7 @@ fn request<'a>(
     ReadRequest {
         layout: &f.layout,
         origin,
+        machine: "test-aa",
         streams,
         cursor,
         folded: &[],
@@ -318,8 +319,9 @@ fn a_read_that_defers_an_event_writes_no_checkpoint() {
 /// and the mirror is named. It lives here because only the checkpointed read
 /// falls back to a walk from zero, which would drop them; the retained-cursor
 /// case is owned by `cursor_incremental.rs`. The mirror is planted, not
-/// published: publishing through this fixture also writes an own ref of the
-/// same machine, and the own machine's history stays fail-closed.
+/// published: publishing through this fixture also writes and rewinds the
+/// local `refs/fgos/events/test-bb`, and a ref outside `refs/fgos/remotes/`
+/// stays fail-closed.
 #[test]
 fn a_rewound_peer_mirror_does_not_silently_drop_the_events_it_already_authenticated() {
     let f = Fixture::new();

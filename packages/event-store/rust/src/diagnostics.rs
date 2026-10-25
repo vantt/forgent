@@ -146,6 +146,7 @@ pub fn status(
         crate::read::ReadRequest {
             layout,
             origin,
+            machine,
             streams: &streams,
             cursor: &Default::default(),
             folded: &[],

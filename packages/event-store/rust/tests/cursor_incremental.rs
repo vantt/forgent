@@ -19,6 +19,7 @@ fn request<'a>(
     ReadRequest {
         layout: &f.layout,
         origin,
+        machine: "test-aa",
         streams,
         cursor,
         folded,
@@ -427,48 +428,43 @@ fn a_ref_hole_is_not_silently_skipped_and_input_cursor_stays_unchanged() {
 /// A long-lived reader holding its cursor sees a mirror rewind. A peer's
 /// mirror keeps the tip the cursor authenticated: the read answers with the
 /// same history, names the mirror, and the next read from that answer does the
-/// same. The own machine's mirror (published through this fixture, which also
-/// writes the own ref) refuses and leaves the caller's cursor unchanged.
+/// same. The mirror of the reader's own machine refuses and leaves the
+/// caller's cursor unchanged.
 #[test]
 fn a_rewound_mirror_keeps_the_peer_baseline_and_refuses_for_the_own_machine() {
-    for own_machine in [false, true] {
+    for machine in ["test-aa", "test-bb"] {
         let f = Fixture::new();
         let mut h = f.handle();
         let streams = [StreamId::parse("project").unwrap()];
         let own = "d".repeat(32);
         let name = "refs/fgos/remotes/origin/events/test-bb";
-        let p = f.port(&mut h, name);
+        let p = f.port(&mut h, "refs/fgos/events/test-aa");
         let a = seal(&p, &f.repo, vec![], &[event('b', 1, 1)], "test-bb");
         let b = seal(&p, &f.repo, vec![a.clone()], &[event('b', 2, 2)], "test-bb");
-        if own_machine {
-            publish(&p, &f.repo, name, None, b.clone(), "advance");
-        } else {
-            plant_foreign_mirror(&f, "test-bb", &b);
-        }
-        let first = read(
-            &p,
-            &f.repo,
-            request(&f, &own, &streams, &Cursor::default(), &[]),
-        )
-        .unwrap();
-        let saved = first.cursor.canonical_bytes().unwrap();
-        if own_machine {
-            publish(&p, &f.repo, name, Some(b), a, "rewind");
-            let error = read(
+        plant_foreign_mirror(&f, "test-bb", &b);
+        let at = |cursor: &Cursor, folded: &[fgos_event_store::envelope::Envelope]| {
+            read(
                 &p,
                 &f.repo,
-                request(&f, &own, &streams, &first.cursor, &first.sequence),
+                ReadRequest {
+                    machine,
+                    ..request(&f, &own, &streams, cursor, folded)
+                },
             )
-            .unwrap_err();
+        };
+        let first = at(&Cursor::default(), &[]).unwrap();
+        let saved = first.cursor.canonical_bytes().unwrap();
+        plant_foreign_mirror(&f, "test-bb", &a);
+        if machine == "test-bb" {
+            let error = at(&first.cursor, &first.sequence).unwrap_err();
             assert_eq!(error.code.as_str(), "event-store-mirror-rewound");
             assert_eq!(first.cursor.canonical_bytes().unwrap(), saved);
             continue;
         }
-        plant_foreign_mirror(&f, "test-bb", &a);
         let mut cursor = first.cursor.clone();
         let mut folded = first.sequence.clone();
         for _ in 0..2 {
-            let next = read(&p, &f.repo, request(&f, &own, &streams, &cursor, &folded)).unwrap();
+            let next = at(&cursor, &folded).unwrap();
             assert_eq!(
                 next.sequence, first.sequence,
                 "the authenticated history stays"

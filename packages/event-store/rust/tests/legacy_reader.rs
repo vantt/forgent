@@ -12,6 +12,7 @@ fn request<'a>(f: &'a Fixture, streams: &'a [StreamId], c: &'a Cursor) -> ReadRe
     ReadRequest {
         layout: &f.layout,
         origin: "dddddddddddddddddddddddddddddddd",
+        machine: "test-aa",
         streams,
         cursor: c,
         folded: &[],

@@ -21,6 +21,7 @@ fn try_read(
         ReadRequest {
             layout: &f.layout,
             origin: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            machine: "test-aa",
             streams: &[StreamId::parse("project").unwrap()],
             cursor,
             folded,
@@ -186,6 +187,7 @@ fn spliced_ancestor_machine_and_scope_are_refused() {
             ReadRequest {
                 layout: &f.layout,
                 origin: &"d".repeat(32),
+                machine: "test-aa",
                 streams: &[StreamId::parse("project").unwrap()],
                 cursor: &Cursor::default(),
                 folded: &[],
@@ -247,6 +249,7 @@ fn tracked_fence_without_fetched_legacy_is_refspec_missing() {
         ReadRequest {
             layout: &f.layout,
             origin: &"d".repeat(32),
+            machine: "test-aa",
             streams: &[StreamId::parse("project").unwrap()],
             cursor: &Cursor::default(),
             folded: &[],
@@ -459,6 +462,7 @@ fn certified_commit_cannot_be_reused_under_a_different_machine_ref() {
         ReadRequest {
             layout: &f.layout,
             origin: &"a".repeat(32),
+            machine: "test-aa",
             streams: &[StreamId::parse("project").unwrap()],
             cursor: &first.cursor,
             folded: &first.sequence,
@@ -808,4 +812,20 @@ fn foreign_mirror_with_an_oversized_segment_is_skipped_not_fatal() {
             ],
         )
     });
+}
+/// A fresh clone on this machine has no own ref yet, but its first sync seals
+/// onto the remote's history of this machine id, so the mirror of its own
+/// machine is never skipped: a tampered one fails the read.
+#[test]
+fn a_tampered_mirror_of_the_own_machine_fails_a_clone_with_no_own_ref() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let bad = {
+        let p = f.port(&mut h, "refs/fgos/events/test-aa");
+        seal(&p, &f.repo, vec![], &[event('c', 1, 1)], "test-dd")
+    };
+    drop(h);
+    plant_foreign_mirror(&f, "test-aa", &bad);
+    let error = try_read(&f, &Cursor::default(), &[]).unwrap_err();
+    assert_eq!(error.code.as_str(), "event-store-ref-tampered", "{error}");
 }
