@@ -1215,43 +1215,7 @@
     "src/workflow/unit-handoff.mjs": "af84e939515499624ded2e37a628f6486e7cb425249eacf7f7d93cfcf0e2494b",
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3"
   },
-  "sites": [
-    {
-      "path": "bin/fgos.mjs",
-      "line": 3436,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "bin/fgos.mjs",
-      "line": 3580,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/merge.mjs",
-      "line": 943,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? elements of readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/merge.mjs",
-      "line": 973,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? elements of readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/worktree.mjs",
-      "line": 147,
-      "spawn": "execFileSync",
-      "binary": "? readConfig({ projectRoot: repoRoot, sections: ['worktreeSetup'] })",
-      "family": "unresolved-binary"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
@@ -2063,6 +2027,20 @@
       "spawn": "Command::new",
       "binary": "? exe of start_with",
       "class": "rust-test"
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "line": 3436,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "line": 3580,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
+      "class": "configured-binary"
     },
     {
       "path": "core/skills/distill/scripts/distill.mjs",
@@ -3447,6 +3425,27 @@
       "line": 165,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (item.verify))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "line": 943,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "line": 973,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/worktree.mjs",
+      "line": 147,
+      "spawn": "execFileSync",
+      "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['worktreeSetup'] })))",
       "class": "configured-binary"
     },
     {

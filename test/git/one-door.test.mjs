@@ -65,9 +65,10 @@ test('the static scan reports a Git spawn in each shape a literal search misses'
   assert.deepEqual(site.callers, ['src/caller.mjs:4']);
 });
 
-test('a command read through the config door is one unknown configured value, never a number', () => {
-  const unresolved = scan({ root: path.join(PROBES, 'config-door-value') }).sites.filter((s) => s.family === 'unresolved-binary');
-  assert.deepEqual(unresolved.map((s) => [s.path, s.binary]), [['src/run.mjs', "? readConfig({ projectRoot: root, sections: ['setup'] })"]]);
+test('a command read through the config door is one configured binary, never a site and never a number', () => {
+  const { sites, classes } = scan({ root: path.join(PROBES, 'config-door-value') });
+  assert.deepEqual(sites, []);
+  assert.deepEqual(classes.filter((c) => c.path === 'src/run.mjs').map((c) => c.class), ['configured-binary']);
 });
 
 test('a declared standalone skill and text quoted into a data command are not sites', () => {
