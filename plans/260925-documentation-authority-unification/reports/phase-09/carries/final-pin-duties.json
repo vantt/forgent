@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "pointerPatchDrift": [
+    {
+      "path": "bin/fgos.mjs",
+      "reason": "main changed after authoring; recompose at the final main import"
+    },
+    {
+      "path": "docs/backlog.md",
+      "reason": "main changed after authoring; recompose at the final main import"
+    }
+  ]
+}

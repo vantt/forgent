@@ -41,6 +41,11 @@ def main():
     current = [effective(origin, p, r, docs, links) for p, r in rows(docs[origin])]
     paths = {p for r in parity for p in [r['sourcePath'], *[t['path'] for t in r['targets']]]}
     paths.update(r['targetOwner'] for f, p, r in current)
+    heading_path = R / 'carries/source-heading-parity.json'
+    heading_pin = 'f534aeaea'
+    headings = json.loads(subprocess.check_output(['git', 'show', heading_pin + ':' + str(heading_path)]))
+    paths.update(h['sourcePath'] for h in headings)
+    paths.update(t['path'] for h in headings for t in h['targets'])
     cat = rebind['extract'](dict(paths=sorted(paths)))['catalog']
     normalize = lambda t: re.sub(r'\s+', ' ', re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', re.sub(r'^#{1,6} ', '', t))).strip()
     def adapt(row, source, owner, target, reason):
@@ -146,16 +151,57 @@ def main():
         overlays.append(out)
         changes.append(dict(shard=f, pointer=pointer, before=row, after=out, beforeCommit=version['commit'],
             method=method, beforeWitness=rebind['witness'](version['units'], old), afterWitness=rebind['witness'](cat[owner]['units'], new)))
-    outputs = {PARITY: parity,
+    # Refresh the live heading census from immutable full-row preimages. Body
+    # insertions move ordinals even when the heading digest itself is unchanged.
+    for h in headings:
+        before = copy.deepcopy(h)
+        us = cat[h['sourcePath']]['units']
+        source = next(u for u in us if u['unitKind'] == 'heading' and u['anchor'] == h['sourceAnchor'])
+        members = []
+        for u in us[us.index(source) + 1:]:
+            if u['unitKind'] == 'heading':
+                break
+            members.append(u['anchor'])
+        h.update(sourceUnitDigest=source['textDigest'], sourceLevel=source['level'],
+                 sourceDirectPayloadDigest=source['sectionPayloadDigest'], directSourceBlocks=members)
+        for t in h['targets']:
+            candidates = [u for u in cat[t['path']]['units'] if u['unitKind'] == 'heading' and u['title'] == h['title']]
+            exact = [u for u in candidates if u['anchor'] == t['anchor']]
+            selected = exact or candidates
+            assert len(selected) == 1, (h['sourcePath'], h['sourceAnchor'], t)
+            target = selected[0]
+            t.update(anchor=target['anchor'], targetUnitDigest=target['textDigest'],
+                     level=target['level'], directPayloadDigest=target['sectionPayloadDigest'])
+        if h != before:
+            h['accounting'] = dict(previousParityRow=before, historicalSourcePin=heading_pin,
+                oldLegacyAnchor=before['sourceAnchor'], oldLegacyDigest=before['sourceUnitDigest'],
+                rationale='Refresh live source/target heading digests and ordered direct-block locators from current bytes. The complete authoring row remains historical; no review approval carried.',
+                reviewStatus='pending')
+
+    # This later source addition has no rewrite claim: conserve the exact
+    # complete current paragraph, not a fabricated historical re-decision.
+    source_path = 'docs/specs/distribution.md'
+    source = next(u for u in cat[source_path]['units'] if u['anchor'] == 'unheaded-block-17')
+    assert source['textDigest'] == '45ccc7989661f3fd7109d1e585b79ebbdf1223d00279819149037540bdc2ab2a'
+    owner = 'docs/platform/packaging-distribution/spec.md'
+    hits = [u for u in cat[owner]['units'] if u['textDigest'] == source['textDigest']]
+    assert len(hits) == 1
+    parity.append(dict(sourcePath=source_path, sourceAnchor=source['anchor'], sourceUnitDigest=source['textDigest'],
+        status='current-complete-unit-present',
+        targets=[dict(path=owner, anchor=hits[0]['anchor'], targetUnitDigest=hits[0]['textDigest'])],
+        comparisonRecipe='Exact current legacy/target whole-unit digest parity; complete paragraph retained.',
+        accounting=dict(sourceAdditionCommit='f06b30fa3f9cad5f3f437acf6101f28605f634ce',
+            rationale='Terminal setup loses a row and a fix: later source addition previously absent from the parity census. No source rewrite or approval claimed.', reviewStatus='pending')))
+    outputs = {PARITY: parity, heading_path: headings,
         SHARD: dict(version=1, authority='Records-only current carry rebind; independent review pending, no gate accepted', bindingRefresh=overlays),
         R / 'carries/current-binding-refresh.json': dict(historicalParityCommit='c25e8cf6a', parityRowsRefreshed=35, targetOnlyParityRows=target_only, candidateBindingsRefreshed=25, changes=changes)}
     for path, value in outputs.items():
         text = json.dumps(value, ensure_ascii=False, indent=2) + '\n'
         if args.check:
             assert path.read_text() == text, str(path)
-        else:
+        elif path.read_text() != text:
             path.write_text(text)
-    print(json.dumps(dict(status='pass', mode='check' if args.check else 'author', parityRows=345, refreshedParityRows=35, targetOnlyParityRows=len(target_only), refreshedCandidateBindings=25)))
+    print(json.dumps(dict(status='pass', mode='check' if args.check else 'author', parityRows=len(parity), liveHeadingRows=len(headings), refreshedParityRows=35, targetOnlyParityRows=len(target_only), refreshedCandidateBindings=25)))
 
 
 if __name__ == '__main__':
