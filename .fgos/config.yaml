@@ -38,10 +38,92 @@ runner:
       # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
       prefer: gitnexus
     # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    advise:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"claude","invocation":"claude-cli-bwrap"},{"executor":"openai","invocation":"codex-cli-bwrap"}].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: claude
+          invocation: claude-cli-bwrap
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    execute:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"gemini"},{"executor":"deepseek"},{"executor":"glm"},"claude","openai"].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: gemini
+        - executor: deepseek
+        - executor: glm
+        - claude
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
     fgos-coding-implement:
       # @fgos:doc What the capability is for.
       # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
       description: code-implement work for the coding domain executing stage -- preferred executor gemini through omp (omp-gemini-tetcu72), claude as fallback.
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"gemini","invocation":"omp-herdr"},{"executor":"deepseek"},{"executor":"glm"},"claude","openai"].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: gemini
+          invocation: omp-herdr
+        - executor: deepseek
+        - executor: glm
+        - claude
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    code:implement:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"gemini","invocation":"omp-herdr"},{"executor":"deepseek"},{"executor":"glm"},"claude","openai"].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: gemini
+          invocation: omp-herdr
+        - executor: deepseek
+        - executor: glm
+        - claude
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    code:test:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"gemini"},{"executor":"deepseek"},{"executor":"glm"},"claude","openai"].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: gemini
+        - executor: deepseek
+        - executor: glm
+        - claude
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    code:refactor:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"gemini"},{"executor":"deepseek"},{"executor":"glm"},"claude","openai"].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: gemini
+        - executor: deepseek
+        - executor: glm
+        - claude
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    coding:implement:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"gemini","invocation":"omp-herdr"},{"executor":"deepseek"},{"executor":"glm"},"claude","openai"].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: gemini
+          invocation: omp-herdr
+        - executor: deepseek
+        - executor: glm
+        - claude
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    code:*:
+      # @fgos:doc Per-role tier and executor taste; a role is producer, synthesizer, reviewer, red-team or judge.
+      roles:
+        # @fgos:doc The tier and executors one role, persona or seat prefers.
+        red-team:
+          # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: ["xai","claude","openai"].
+          # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+          prefer:
+            - xai
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    marketing:*:
+      # @fgos:doc Per-role tier and executor taste; a role is producer, synthesizer, reviewer, red-team or judge.
+      roles:
+        # @fgos:doc The tier and executors one role, persona or seat prefers.
+        red-team:
+          # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: ["claude","openai"].
+          # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+          prefer:
+            - claude
   # @fgos:doc The executor registry: every executor a seat can be bound to, by id.
   executors:
     # @fgos:doc One executor: an agent that runs work or a tool that is only present, with the invocations that start it.
