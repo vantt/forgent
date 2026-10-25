@@ -1,0 +1,116 @@
+{
+  "review": "w38-register-update-review",
+  "commit": "e7e6c129ca141e1dc4d548a7bee3eb95ab5dedc3",
+  "worktreeHeadAtReview": "23e3c34b7d9d01cb30279e98cbdae1bad8733c95",
+  "brief": "w35-register-update-brief.md",
+  "authority": ["L13-6", "L13-20", "L13-26", "L13-27", "L13-28"],
+  "commandsRun": [
+    {"argv": "python3 -B P/gate-reconcile/reconcile.py (scratch git clone --shared, tree e7e6c129c, HEAD soft-reset to a734c3f47)", "exit": 0, "result": "git diff empty: register, receipt.json/md, current-proofs, register-update-proof, sources byte-identical to the committed e7e6c129c outputs"},
+    {"argv": "python3 -B P/gate-reconcile/verify.py (scratch, HEAD e7e6c129c)", "exit": 0, "result": "only verification.json checkedAtHead changed"},
+    {"argv": "python3 -B P/gate-reconcile/controls.py (scratch, HEAD e7e6c129c)", "exit": 0, "result": "controls.json unchanged"},
+    {"argv": "python3 -B P/rebind/rebind.py --check (scratch, HEAD e7e6c129c)", "exit": 0, "result": "drift 0; 7 superseded origins, 16 identical-unit groups"},
+    {"argv": "python3 -B P/g0join/join.py --pin HEAD (scratch, HEAD e7e6c129c)", "exit": 0, "result": "1929/1929 approved; missing, mismatched, stale, openRework, invalidBindings, unresolved all 0"},
+    {"argv": "python3 -B P/fchain/check.py --pin HEAD (scratch, HEAD e7e6c129c)", "exit": 0, "result": "counts {}, 595 files, 229 executed, 20 links; check.json differs only in sourceCommit"},
+    {"argv": "python3 -B P/gate-reconcile/verify.py and P/rebind/rebind.py --check (scratch, HEAD 23e3c34b7)", "exit": 0, "result": "both pass at the current worktree HEAD; rebind drift 0"}
+  ],
+  "notRun": "phase-08/audit-report.py, scripts/run-tests.mjs, npm test (forbidden). All reruns were in a /tmp/fgos-work scratch clone, now removed; the worktree was never written apart from these two files.",
+  "items": [
+    {
+      "id": "w38-1",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "Generated, not hand-edited",
+      "evidence": "reconcile.py has no dry-run mode, so it was rerun in a scratch clone at the e7e6c129c tree with HEAD at a734c3f47 (its turn-start pin). The run exited 0 and left git diff empty, so preflip-gate-status.json and every gate-reconcile output equal the committed bytes.",
+      "fix": "none"
+    },
+    {
+      "id": "w38-2",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "Brief item 1: localCorrectionReview coverage and counts",
+      "evidence": "There are five entries. Their verdict counts match each review file: w33-link-retargets has 4 APPROVE, 1 REWORK and 3 NOTE; w35 has 7/3; w37 has 10/1; w33-ownership-audit has 5/0; w32 has 18/3. Every REWORK id has a resolution, and openRework is empty everywhere. Each named commit exists and touches the files claimed: a319902ab, 8ea185bfd and b467e09fe touch fchain/**; edf816838 touches check.py, link-retargets, link-validation and check.json; 73e89962e touches rebind edges 149-154; 98d71bef2 and ca3179b3c touch g0rework/verify.py, rebind.py and the phase-06 reproductions; c3882df26 touches audit-report.py. git log c50b78db9..e7e6c129c has no other record-changing commit; the rest are briefs, reviews and plan.md.",
+      "fix": "none"
+    },
+    {
+      "id": "w38-3",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "Lead fix edf816838 (w37-6), independently checked here",
+      "evidence": "The diff is minimal. The coexistence row L13-28:related:86 becomes L13-28:related:118 in link-retargets.json and link-validation.json. check.py compose() now raises 'link retarget row ids are not unique' before it builds owner_files. At HEAD, link-retargets.json has 377 rows and 377 distinct ids. related:86 is now the architect-readme row only, and related:118 is docs/platform/coexistence/spec.md line 17. The remaining related:86 hits are that row, check.json owners of the architect-readme patch, and historical stdout in link-commands.json. fchain/check.py --pin HEAD exits 0 with counts {}. current-proofs records the duplicate probe with exit 1 and result rejected. This independent check closes the 'not a new independent review' caveat on w37-6.",
+      "fix": "none"
+    },
+    {
+      "id": "w38-4",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "Brief items 2-4: G6 note, guard-3 F duty, shard-2 delta duty, last F duty",
+      "evidence": "The G6 note cites L13-28, linkGuard = 0 over the composed docs/platform/**, Related headers included, and the w33/w35/w37 chain. The guard-3 duty matches L13-28.4: it requires agreement with fchain/links.py linkGuard on the composed tree at F, the same population, fence/code-span and unit-extractor anchor semantics, and 0 from both. It names both product-reader disagreements: 398 = 394 fenced + 4 multi-line inline code (w35-5), and relatedPaths() on 44 '#anchor' Related entries (w37-9), with w37-9's fix ('align or keep out'). The shard-2 duty lists f06461/f06591/f07205 and the 10 row copies f06504, f06697, f06699, f06700, f06702, f06790/91/94/99 and f06823. That equals fchain/link-retargets.json finalFDuties premise-patch-delta-review plus rework-premise-patch-delta-review, and it cites w35-10 and w37-8/11. The last cutoverReadiness F duty now reads 'precondition: the owner has approved the cutover packet (L13-6)'. Nothing says the packet was sent.",
+      "fix": "none"
+    },
+    {
+      "id": "w38-5",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "w32 REWORK 1-3 and low notes",
+      "evidence": "REWORK 1 (G6, unreviewed a319902ab) and REWORK 2 (f-composition) are now covered by w33/w35/w37, with no open REWORK. REWORK 3 (summary and localCorrectionReview) is fixed: the full correction inventory is listed. The low notes are fixed too. The G0 commit is now the current pin, and the duty names predecessor rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md (#/patches/137). G7 names the rebased-current work-state spec as pending, with its basis (w33-link-retargets item work-state-rebase: APPROVE, diff/rollbackDiff byte-identical). G9 records 138 vs 136 (2 history-only) and the W15 sample of 60 of 288. W28 104/2 and W25 158/12 match their files. The last F duty is now a precondition. fComposition's source is the composed replay, and its counts reproduce: 595 files, 229 executed, 20 sources, 88 patches, 377 rows, linkGuard 0. followUps have 4 items, each with owner lead:DOC, the brief's destination and its original sourceReview.",
+      "fix": "none"
+    },
+    {
+      "id": "w38-6",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "Brief item 6: rebind record status only",
+      "evidence": "git diff a734c3f47 e7e6c129c on rebind/g0-rework-rebindings.json is one line: status changes from 'authored-pending-independent-review' to 'reviewed; reviews/w33-ownership-audit-review.json (5 APPROVE / 0 REWORK)'. All 155 records keep their bytes, verify.py asserts byte conservation, and rebind.py --check drift is 0.",
+      "fix": "none"
+    },
+    {
+      "id": "w38-7",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "Rebind status cites only w33",
+      "evidence": "w33-ownership-audit reviewed only records 149-154, the 73e89962e edges. Records 0-148 came from 594fe4194, which W26 reviewed (reviews/w26-g0-rework-verdicts.md). The new status names w33 alone, so it reads as if w33 covers the whole file.",
+      "fix": "At the next regeneration, cite w26 for 594fe4194 and w33 for records 149-154. Optional."
+    },
+    {
+      "id": "w38-8",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "fComposition.linkIntoMoveSet is a defaulted value, not a measurement",
+      "evidence": "L13-28.4 renamed the finding to linkGuard. reconcile.py writes linkIntoMoveSet=composed['counts'].get('linkIntoMoveSet', 0), so the field is always 0. verify.py still requires it, and the control 'Moved-path link regression is rejected' mutates a field that no code path can raise. linkGuard covers the population, so nothing is unproven.",
+      "fix": "Drop linkIntoMoveSet from current-proofs, fComposition, verify.py and that control, or mark it as the historical name of linkGuard."
+    },
+    {
+      "id": "w38-9",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "Ownership audit after 23e3c34b7",
+      "evidence": "After the reviewed commit, the Lead's pair-accounting commit 23e3c34b7 dropped the allowed-path exceptions (w33-ownership follow-up 1). That changes both phase-06 reproduction inputs: round5 b257d2cb.. becomes 4260a32e.., and sync4d 80b397ff.. becomes 72baad4d... The register's ownershipAudit is explicitly pinned to 4a4fefbe8 with the old hashes, so it is not false. It no longer describes HEAD, and there is no committed audit-report outcome at 23e3c34b7. verify.py and rebind.py --check still exit 0 at 23e3c34b7. w33-ownership follow-ups 2 (raw drift count in report.json) and 3 (file/pointer keying of records 149/150) are not carried anywhere.",
+      "fix": "In the packet, state the ownership audit outcome at the latest accounting commit, or say it is Lead-reported at 4a4fefbe8 only. Carry w33-ownership follow-ups 2-3 into followUps, or decline them explicitly."
+    },
+    {
+      "id": "w38-10",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "Citation precision",
+      "evidence": "The G7 note cites 'w33-work-state-rebase', which is not a file. It is item work-state-rebase in reviews/w33-link-retargets-review.json. affectedGates lists only G6 for w35/w37, although the G9 note and G9 F duty also rely on linkGuard. For w32 it lists only G6, although REWORK 2 concerned cutoverReadiness.",
+      "fix": "Cite reviews/w33-link-retargets-review.json#work-state-rebase, and widen affectedGates at the next regeneration. Optional."
+    },
+    {
+      "id": "w38-11",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "Summary text",
+      "evidence": "Most of the summary is accurate. One sentence goes stale once this review is committed: 'This register update still needs independent records review before the packet'. The same holds for the w32 localCorrectionReview note, 'Independently review this register update and its proofs before sending the owner packet'. Nothing else in the summary is stale: the G0/G2/G6/G9 counts, the open owner and external items, and the 'no F ... inferred' boundary all match. The untracked P/cutover-approval-packet.md draft is still in the worktree; it should cite this review before it goes out.",
+      "fix": "When the packet is prepared, regenerate with a localCorrectionReview entry for e7e6c129c -> reviews/w38-register-update-review.json and remove the 'still needs independent records review' clause. Do not hand-edit."
+    }
+  ],
+  "counts": {
+    "items": 11,
+    "APPROVE": 11,
+    "REWORK": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 5,
+    "none": 6
+  }
+}
