@@ -6,6 +6,7 @@ import { loadNativeAddon, nativeError } from '../git/native.mjs';
 import { createGitRecovery } from '../git/recovery.mjs';
 import { gitPortOptions } from '../git/inspect.mjs';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
+import { acquireSync, createLockScope } from '../holder-lock/index.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import fs from 'node:fs';
 import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
@@ -65,7 +66,7 @@ export function checkGit(cwd, kind, loaderOptions, portOptions) {
           !journal.initialized && 'the Git WAL is not initialized; run `fgos doctor --fix` (git-wal-dir)',
           journal.initialized && !journal.complete && 'the Git WAL listing is incomplete; inspect it with `fgos doctor --json`',
           journal.errors.length && `${journal.errors.length} Git WAL error(s); inspect them with \`fgos doctor --json\``,
-          journal.pendingCount > 0 && `${journal.pendingCount} Git operation(s) unresolved; run \`fgos doctor --fix\` (git-land-recovery) for interrupted Land operations`,
+          journal.pendingCount > 0 && `${journal.pendingCount} Git operation(s) unresolved; run \`fgos doctor --fix\` (git-land-recovery) for interrupted Land and ScopedCommit operations`,
         ], notes.some(n => n.startsWith('warning:')) ? notes.join('; ') : ['the Git WAL is readable with no unresolved operation', ...notes].join('; '), { journal, retainedLand: landWarning });
         return notes.length && !verdict.passed ? { ...verdict, message: `${verdict.message}; ${notes.join('; ')}` } : verdict;
       }
@@ -129,8 +130,10 @@ export const fixGitWal = (cwd) => afterDriverDirectories(cwd, undefined, initial
 export const fixGitFetchMapping = (cwd, loaderOptions) => afterDriverDirectories(cwd, loaderOptions, () => installFetchMapping(cwd, loaderOptions));
 // The Recovery port is constructed with a writer even for reads.
 const recoveryPort = (cwd, loaderOptions, portOptions) => createGitRecovery(portOptions ?? gitPortOptions(resolveMainCheckoutRoot(cwd) ?? cwd, { mutation: true }), loaderOptions);
+const RECOVERABLE_KINDS = ['Land', 'ScopedCommit'];
+const AUTHORITY_MISMATCH_CAUSES = ['land-authority-mismatch', 'commit-authority-mismatch'];
 /**
- * Recover every interrupted Land through the one Recovery door, under Land's own locks (Git spec §9, §10 rule 4b).
+ * Recover every interrupted Land and ScopedCommit through the one Recovery door, under each kind's own locks (Git spec §9, §10 rule 4b).
  * A chain without a TargetAttempt closes `abandonedBeforeAttempt` whoever runs it; an attempted chain is recovered
  * only by the writer that started it. Nothing is merged, re-published or deleted: candidates stay until Work acknowledges them.
  */
@@ -139,15 +142,27 @@ export function fixLandRecovery(cwd, loaderOptions, portOptions) {
     const recovery = recoveryPort(cwd, loaderOptions, portOptions);
     const recovered = [];
     const kept = [];
-    for (const operation of recovery.listPending().operations.filter(o => o.kind === 'Land')) {
-      try { recovery.reconcile({ operationId: operation.operationId }); recovered.push(operation.operationId); }
-      catch (err) {
+    const keep = (operation, reason) => kept.push(`${operation.operationId} (${reason})`);
+    for (const operation of recovery.listPending().operations.filter(o => RECOVERABLE_KINDS.includes(o.kind))) {
+      let custody = null;
+      try {
+        if (operation.kind === 'ScopedCommit') {
+          // A scoped commit recovers only while its checkout's custody is held: taken here per operation, never waited for.
+          const { worktree } = operation.intent.kind.ScopedCommit;
+          if (!fs.existsSync(worktree)) { keep(operation, `checkout ${worktree} is gone`); continue; }
+          const answer = acquireSync(createLockScope(), 'dispatch-cwd', { fgosDir: path.join(resolveMainCheckoutRoot(cwd) ?? cwd, '.fgos'), cwd: worktree });
+          if (answer.result !== 'acquired') { keep(operation, `checkout busy: ${worktree}`); continue; }
+          custody = answer.handle;
+        }
+        recovery.reconcile({ operationId: operation.operationId }, custody ? [custody] : []);
+        recovered.push(operation.operationId);
+      } catch (err) {
         const { cause } = nativeError(err);
-        kept.push(`${operation.operationId} (${cause}${cause === 'land-authority-mismatch' ? `; only its writer ${operation.intent.writerIdentity} can recover it` : ''})`);
-      }
+        keep(operation, `${cause}${AUTHORITY_MISMATCH_CAUSES.includes(cause) ? `; only its writer ${operation.intent.writerIdentity} can recover it` : ''}`);
+      } finally { custody?.release(); }
     }
-    if (!recovered.length && !kept.length) return { changed: false, message: 'no interrupted Land operation' };
-    return { changed: recovered.length > 0, message: [recovered.length && `recovered interrupted Land operations: ${recovered.join(', ')}`, kept.length && `warning: Land operations kept for recovery: ${kept.join('; ')}`].filter(Boolean).join('; ') };
+    if (!recovered.length && !kept.length) return { changed: false, message: 'no interrupted Land or ScopedCommit operation' };
+    return { changed: recovered.length > 0, message: [recovered.length && `recovered interrupted Git operations: ${recovered.join(', ')}`, kept.length && `warning: Git operations kept for recovery: ${kept.join('; ')}`].filter(Boolean).join('; ') };
   });
 }
 /** Land candidates a finished Land still holds: read-only, a warning never a failure (the release sweep of a Land command frees one whose result Work recorded). */
