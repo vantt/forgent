@@ -180,3 +180,19 @@ Decided by the Lead under A42, from the w21 review (24 APPROVE / 0 REWORK).
 
 1. **pc-d-0288 is a REJECT, not a park.** The literal is the message template of an `assert.fail` inside a test helper (`hostScan`, `test/event-store/migrate-cutover-grant.test.mjs:34`). It is test diagnostic output that renders only when the test fails. It is not a document citation and not data a product path reads. So it is non-document rendering, which is the REJECT class. Adding a test that fails on purpose, just to own it, would add nothing.
 2. **The register catches up.** Settling 0288 leaves G2 with no open judgment. G5 is met-local, apart from the owner's acceptance of the 8 restatements (L13-10) and the rerun at F (w21 B). Under L13-18, G8 needs nothing more before F, because w20 C approved f67e0f676. `gate-reconcile/reconcile.py` stays the only generator of the register.
+
+## L13-20 — Register review: real pre-F work found (Lead, 2026-10-25 12:40)
+
+Decided by the Lead under A42, from the w22 review (10 APPROVE / 4 REWORK). The commit 04319c952 and the 0288 REJECT are approved.
+
+1. **G6: the 787 premise judgments are settled before F.** These are 623 unconfirmed-premise parks, plus 162 removed-by-cutover and 2 absent rows. L13-17.2 was wrong to say these judgments had been reviewed: W8 approved that the rows were classified correctly, not the premises. None of them needs the flip date. Same reasoning as L13-17.1: work that does not need F is done before F. It would otherwise widen the lease and write-freeze window that the owner's approval opens. Three shard turns, each followed by an exhaustive review. Brief: `w22-g6-park-judgments-brief.md`. The 137 current-passage-unbound rows really do need the bytes at F and stay an F duty.
+2. **G9: the 33 retention-or-move decisions that phase 08 left to phase 9 are this phase's own decisions.** They are made before F. Brief: `w22-g9-phase9-decisions-brief.md`. Only the WORK and registry exports stay external.
+3. **Register corrections, in the next register turn:**
+   - G2: add an F duty to compose the 4 unapplied comment retargets from `census-join/pointer-patches.json` into the F chain.
+   - G4: add an F duty to rerun the git one-door scan after the final main import.
+   - G8: add one recovery sentence for retained JSON path strings to `archive/design.md` now.
+   - G0: build the join tool for shards at F against the verdict file before F.
+   - Fix the `census-join/join.py:273` locator fallback, which reverted three approved locators.
+   - Remove the stale "design-lap must not pull main" text.
+   - `cutoverReadiness` states one order, consistent with L13-6: packet at met-local, then owner approval, lease, F, F duties, final ledger review, Land. It also sizes the F window the approval opens.
+4. **The cutover approval packet waits** until items 1 to 3 are done and reviewed.

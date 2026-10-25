@@ -1,0 +1,166 @@
+{
+  "review": "w22-register-met-local",
+  "commit": "04319c9522949aef987d96630b2a599b8634fdc0",
+  "verdicts": {
+    "APPROVE": 10,
+    "REWORK": 4
+  },
+  "items": [
+    {
+      "id": "commit-04319c952",
+      "verdict": "APPROVE",
+      "severity": "low",
+      "summary": "pc-d-0288 is a confirmed REJECT with an L13-19.1 reason, empty owningProofs and no custody; residue is empty. The custody pop touches only 0288. join.py replays byte-identically twice in a scratch git clone --shared, and all five outputs equal the committed bytes. The G5 receipt describes the current run and its reproduction block passes. Low: re-pinning to cf13e2bd made join.py:273 fall back to evidence[0] for three rows, which silently reverted W21-approved locators (pc-d-1101 :30 became :85@5e03159; pc-d-0924 :3868 became :3862; pc-d-0449 :184 became :183@a808bc676). The census receipt still describes the corrected lines.",
+      "evidence": [
+        "census-join/join.py:273",
+        "census-join/settlement.json rows pc-d-1101, pc-d-0924, pc-d-0449 /locator",
+        "reviews/w21-census-rework-and-g5-review.json pc-d-1101",
+        "scratch clone: citations.py exit 0, join.py exit 0 twice, cmp identical, git status clean",
+        "g5/receipt.md section 3 block: PASS"
+      ]
+    },
+    {
+      "id": "G0",
+      "gate": "changed-binding-independent-review",
+      "verdict": "APPROVE",
+      "severity": "info",
+      "summary": "191 rows are covered by g0-b1..b5 and the delta reviews. Of 124 content rows, W14 found 3 REWORK; they were fixed and passed W16, and W17 passed the follow-up. W19 approves 25 rebinds; W10 F2 (90) and W9 (44) approve the GAP-05 overlays. The L13-15.2 deferral is sound. Info: cite the W9/W10 overlay reviews under G0. No shards@F x verdict-file join tool exists yet, and many reviews did not emit per-row verdict records; building the join before F keeps it out of the lease.",
+      "evidence": [
+        "reviews/w10-composition-rework-review.md F2",
+        "reviews/w9-composition-fix-review.md",
+        "ledger/decisions/w9-component-carriage-body-overlays.json reviewStatus"
+      ]
+    },
+    {
+      "id": "G1",
+      "gate": "L12-96-uncomposed-duty",
+      "verdict": "APPROVE",
+      "summary": "All 115 members are joined. GAP-05, citation and import-3 approvals trace to W8-W14; W19 approves live parity and rebinds; the W9 dead-vocabulary scratch replay is 10/10. L13-16 F placement is sound.",
+      "evidence": [
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w9-composition-fix-review.md:10",
+        "node carries/verify-carries.mjs exit 0"
+      ]
+    },
+    {
+      "id": "G2",
+      "gate": "non-behavioral-census-join",
+      "verdict": "REWORK",
+      "severity": "medium",
+      "summary": "The census is settled: 779+289+54+4=1,126, zero open judgments. This review independently approves the 0288 REJECT (assert.fail diagnostic, non-document rendering). But the 4 composed, unapplied comment retargets in census-join/pointer-patches.json (registrations.mjs, workflow-case-checks.mjs, doctor-fresh-run.test.mjs, bind-tier-composition.test.mjs; status composed-not-applied-pending-shared-file-integration, 'Lead must compose the full approved chain at F') are in no F list and not in the composition chain. Without them the 4 citation joins point at deleted legacy docs. Add an F duty.",
+      "evidence": [
+        "census-join/pointer-patches.json /status and /patches/*/composition",
+        "composition/patch-specs.json and actions.json: 0 matches",
+        "preflip-gate-status.json G2 atFinalPinUnderLease"
+      ]
+    },
+    {
+      "id": "G3",
+      "gate": "dropped-claims-register",
+      "verdict": "APPROVE",
+      "summary": "W2-g3 approves all 17 ids (001 restored and requalified, 010 superseded, no tie). The register has 16 restored-pending-review and 1 superseded-pending-review, so 0 dropped-needs-*. The F recheck is pre-existing register text.",
+      "evidence": [
+        "dropped-claims-register.json",
+        "reviews/w2-g3-packaging-review.md"
+      ]
+    },
+    {
+      "id": "G4",
+      "gate": "git-one-door-census-widening",
+      "verdict": "APPROVE",
+      "severity": "low",
+      "summary": "Local fixes are reviewed (W4, W5, W6, W8). The owner declared the 25 sites (L13-6), and the Git/HARDEN review is external and not yet given. Low: there is no F duty to rerun git-one-door-scan after the F main import, which can add undeclared sites. Info: the note's 'design-lap must not pull main' is stale (board 11:35: design-lap on main 1c3c786c3).",
+      "evidence": [
+        "preflip-gate-status.json G4 atFinalPinUnderLease []",
+        "origin/main 1265f8bb5 board line"
+      ]
+    },
+    {
+      "id": "G5",
+      "gate": "retention-L11-23-L11-25",
+      "verdict": "APPROVE",
+      "summary": "check.py --pin b57e79625 exits 0, byte-identical to check-b57e79625.json; W21 B approves. Owner acceptance of the 8 restatements is external, and the F rerun is listed.",
+      "evidence": [
+        "g5/check-b57e79625.json",
+        "reviews/w21-census-rework-and-g5-review.md B"
+      ]
+    },
+    {
+      "id": "G6",
+      "gate": "step3-step4-preserve-premise-review",
+      "verdict": "REWORK",
+      "severity": "medium",
+      "summary": "Met-local can stand (the plan allows owned parks), but the F text 'Only composition is deferred; the judgments were reviewed before F' (L13-17.2) is false. 623 unconfirmed-premise parks say 'confirm source-bound non-dereferencing semantics ... Lead owns this row before flip'; 162 removed-by-cutover and 2 absent rows need a successor judgment. Only 137 unbound rows tie their action to F. W8 approved park classification, not the premises. That is about 787 judgments that do not need the flip date, moved into the lease window, which L13-17.1 refused for G2. Correct the text with counts, and settle before F or record a ruling with the lease cost.",
+      "evidence": [
+        "preserve-premise/proof.json rows: result/blocker counts 623/162/2/137",
+        "reviews/w8-g6-parks-review.md",
+        "owner-answers.md L13-17.1, L13-17.2, L13-10"
+      ]
+    },
+    {
+      "id": "G7",
+      "gate": "composition-independent-review",
+      "verdict": "APPROVE",
+      "summary": "385 APPROVE / 2 REWORK, both approved in W8; the 101 park actions are approved in W9/W10. The 36 deferred specs and the post-apply rebinds are W0/W3 F duties.",
+      "evidence": [
+        "reviews/g7-c1..c7",
+        "reviews/w8-composition-review.md",
+        "reviews/w9-composition-fix-review.md"
+      ]
+    },
+    {
+      "id": "G8",
+      "gate": "L12-129-archive-ref-and-checkout",
+      "verdict": "APPROVE",
+      "severity": "low",
+      "summary": "L13-18 is sound: the archive ref is create-only and refuses a different target, and the d3efc70c5 partition is rebuilt at F. W20 C approves f67e0f676. Low: the W14 json-path-strings-undocumented fix (one recovery sentence in design.md for 40,641 retained JSON path strings) is not done, has no owner and is in no F list.",
+      "evidence": [
+        "archive/design.md:17",
+        "reviews/w14-g8-retention-timing-review.md:19",
+        "gate-reconcile/sources.json json-path-strings-undocumented"
+      ]
+    },
+    {
+      "id": "G9",
+      "gate": "source-context-and-post-pin-recomposition",
+      "verdict": "REWORK",
+      "severity": "medium",
+      "summary": "The 15 carriedBlocker records are labelled external ('original owners'). But 33 of their 170 blocker entries, in 7 records, name 'Phase 9' as the dependency: retention-or-move decisions for docs/decisions/index.md (15), docs/enduser-docs-index.json (10), the gateway yaml (3) and architecture-manifest.json (1), plus 4 Phase 9 carries. These are this phase's own Lead decisions, independent of F, and no phase-09 record decides them. Decide and cite them, or list them as before-F items; keep only the WORK and registry exports external.",
+      "evidence": [
+        "phase-08/step-05-records/{tests-judgment-batch4:2,tests-judgment-batch6:1,cli-help-messages:3,gateway-contract:2,runtime-judgment-part-22:13,setup-doctor-roots:21,generators-skills-and-support:66} /parked dependency",
+        "g9/receipt.md 'All 15 carriedBlockers'",
+        "grep 'retention-or-move' reports/phase-09: 0 hits"
+      ]
+    },
+    {
+      "id": "G10",
+      "gate": "final-code-holder-land-rehearsal",
+      "verdict": "APPROVE",
+      "summary": "External status is correct: §7 consent was requested and not granted on the board; the rehearsal needs G11 and F.",
+      "evidence": [
+        "owner-answers.md L13-1",
+        "board log §7 lines"
+      ]
+    },
+    {
+      "id": "G11",
+      "gate": "cutover-release-with-docs-lease",
+      "verdict": "APPROVE",
+      "severity": "info",
+      "summary": "External status is correct. Info: the L13-12 design-lap no-pull constraint in the externals is stale.",
+      "evidence": [
+        "origin/main 1265f8bb5"
+      ]
+    },
+    {
+      "id": "cutoverReadiness",
+      "verdict": "REWORK",
+      "severity": "medium",
+      "summary": "Mechanically complete: 26 F and 9 external items, all gate items present with prefixes. Content gaps: the G2 pointer-patch duty is missing, and the 33 Phase-9 decisions are mislabelled external. The last F item ('only then assemble the owner cutover packet') contradicts L13-6, which sends the packet at met-local. State one order: approve, lease, F, duties, final ledger review, Land. The packet should also size the F window that the owner's approval opens: about 787+137 G6 parks, 407 bindings, 130 glosses, and delta reviews for G0/G2/G7/G9.",
+      "evidence": [
+        "preflip-gate-status.json /cutoverReadiness",
+        "owner-answers.md L13-6"
+      ]
+    }
+  ]
+}
