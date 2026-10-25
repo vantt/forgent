@@ -124,6 +124,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'agy-hook-wired',
       'omp-hook-wired',
       'pi-hook-wired',
+      'mailbox-hook',
       'task-specs-resolve',
       'agent-claims-resolve',
       'agent-type-names-unique',

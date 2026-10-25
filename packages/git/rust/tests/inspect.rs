@@ -561,6 +561,165 @@ fn status_lists_ignored_paths_collapsed_only_when_asked() {
     let _ = fs::remove_dir_all(&root);
 }
 
+/// Every file and directory under `root`, for an unchanged-tree check.
+fn tree_of(root: &Path) -> Vec<std::path::PathBuf> {
+    let mut found = Vec::new();
+    let mut pending = vec![root.to_path_buf()];
+    while let Some(dir) = pending.pop() {
+        for entry in fs::read_dir(&dir).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_dir() && !path.is_symlink() {
+                pending.push(path.clone());
+            }
+            found.push(path);
+        }
+    }
+    found.sort();
+    found
+}
+
+#[test]
+fn main_checkout_root_finds_the_main_checkout_from_a_linked_worktree_and_a_subdirectory_without_spawning_or_writing(
+) {
+    let root = std::env::temp_dir().join(format!("fgos-main-checkout-root-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    fs::create_dir_all(&root).unwrap();
+    git(&root, &["init", "-q", "--initial-branch=trunk", "main"]);
+    let main = fs::canonicalize(root.join("main")).unwrap();
+    git(
+        &main,
+        &[
+            "-c",
+            "user.name=F",
+            "-c",
+            "user.email=f@example.invalid",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "first",
+        ],
+    );
+    git(&main, &["worktree", "add", "-q", "../linked"]);
+    let linked = root.join("linked");
+    fs::create_dir_all(linked.join("deep/er")).unwrap();
+    fs::create_dir_all(main.join("sub")).unwrap();
+    let outside = root.join("outside");
+    fs::create_dir_all(&outside).unwrap();
+    let before = tree_of(&root);
+
+    assert_eq!(main_checkout_root(&main).unwrap(), Some(main.clone()));
+    assert_eq!(
+        main_checkout_root(&main.join("sub")).unwrap(),
+        Some(main.clone())
+    );
+    assert_eq!(main_checkout_root(&linked).unwrap(), Some(main.clone()));
+    assert_eq!(
+        main_checkout_root(&linked.join("deep/er")).unwrap(),
+        Some(main.clone())
+    );
+    assert_eq!(main_checkout_root(&outside).unwrap(), None);
+
+    // A worktree whose admin directory does not name it back is refused.
+    let admin = main.join(".git/worktrees/linked");
+    let backlink = fs::read(admin.join("gitdir")).unwrap();
+    fs::write(admin.join("gitdir"), b"/elsewhere/.git\n").unwrap();
+    assert_eq!(
+        main_checkout_root(&linked).unwrap_err().cause,
+        "untrusted-worktree"
+    );
+    fs::write(admin.join("gitdir"), backlink).unwrap();
+
+    assert_eq!(
+        tree_of(&root),
+        before,
+        "the read created or removed nothing"
+    );
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn main_checkout_root_follows_relative_worktree_links_and_refuses_a_submodule_as_unsupported() {
+    let root = std::env::temp_dir().join(format!("fgos-main-checkout-rel-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    fs::create_dir_all(&root).unwrap();
+    let commit = [
+        "-c",
+        "user.name=F",
+        "-c",
+        "user.email=f@example.invalid",
+        "commit",
+        "-q",
+        "--allow-empty",
+        "-m",
+        "first",
+    ];
+    for repo in ["main", "child"] {
+        git(&root, &["init", "-q", "--initial-branch=trunk", repo]);
+        git(&root.join(repo), &commit);
+    }
+    let main = fs::canonicalize(root.join("main")).unwrap();
+    // Git writes both links of this worktree as relative paths.
+    git(
+        &main,
+        &[
+            "-c",
+            "worktree.useRelativePaths=true",
+            "worktree",
+            "add",
+            "-q",
+            "../rel",
+        ],
+    );
+    let rel = root.join("rel");
+    let admin = main.join(".git/worktrees/rel");
+    let backlink = fs::read_to_string(admin.join("gitdir")).unwrap();
+    assert!(
+        !backlink.starts_with('/'),
+        "the back-link is relative: {backlink}"
+    );
+    let hint = fs::read_to_string(rel.join(".git")).unwrap();
+    assert!(
+        !hint["gitdir: ".len()..].starts_with('/'),
+        "the hint is relative: {hint}"
+    );
+    assert_eq!(main_checkout_root(&rel).unwrap(), Some(main.clone()));
+
+    // A relative back-link that names another worktree is still refused.
+    fs::write(admin.join("gitdir"), b"../../../elsewhere/.git\n").unwrap();
+    assert_eq!(
+        main_checkout_root(&rel).unwrap_err().cause,
+        "untrusted-worktree"
+    );
+    fs::write(admin.join("gitdir"), backlink).unwrap();
+
+    // A submodule's gitfile names a module directory with no commondir:
+    // refused, by its own permanent cause.
+    git(
+        &main,
+        &[
+            "-c",
+            "protocol.file.allow=always",
+            "submodule",
+            "add",
+            "-q",
+            "../child",
+            "sub",
+        ],
+    );
+    let before = tree_of(&root);
+    assert_eq!(
+        main_checkout_root(&main.join("sub")).unwrap_err().cause,
+        "trusted-main-gitfile-unsupported"
+    );
+    assert_eq!(
+        tree_of(&root),
+        before,
+        "the read created or removed nothing"
+    );
+    fs::remove_dir_all(root).unwrap();
+}
+
 #[test]
 fn ignored_paths_names_only_untracked_paths_the_ignore_rules_exclude() {
     use std::os::unix::fs::PermissionsExt;

@@ -104,6 +104,19 @@ test('the scan judges every file its root declares as product, whatever the dire
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
 
+test('a Rust file in a crate-root examples or benches target is test code, a product directory called examples is not', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-one-door-examples-'));
+  try {
+    const write = (file, text) => { fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true }); fs.writeFileSync(path.join(root, file), text); };
+    const push = 'pub fn push() -> std::io::Result<std::process::Output> {\n    std::process::Command::new("git").args(["push", "origin", "main"]).output()\n}\n';
+    write('packages/demo/rust/Cargo.toml', '[package]\nname = "demo"\n');
+    write('packages/demo/rust/examples/bench.rs', push);
+    write('packages/demo/rust/benches/cost.rs', push);
+    write('packages/demo/rust/src/examples/live.rs', push);
+    assert.deepEqual(scan({ root }).sites.map((s) => s.path), ['packages/demo/rust/src/examples/live.rs']);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
+
 test('doctor refuses a census that lists a site, or whose files do not match the payload it sits in', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-one-door-'));
   fs.cpSync(path.join(PROBES, 'read-verb-writes'), root, { recursive: true });

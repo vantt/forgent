@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Version pin and process probe"
-status: pending
+status: done
 depends_on: [1]
 live_calls: "5 expected (Claude 4, Codex 1); at most 7; at least 2"
 ---
@@ -69,3 +69,17 @@ Phase 5 specifies both head-finder topologies up front, so the probe only picks 
 - Claude Code updates during the phase: the recorder refuses; stop.
 - Codex login expired: the guard stops with exit 3; stop and tell the controller (the owner logs in).
 - The `.proc.json` write must not change the hook's exit or stdout (the accept run prints the candidate output): write it after the existing files, inside the same `try`, and never print.
+
+## Done on the branch (implementation lead, 2026-10-22)
+
+- Live CLI runs: **5** (Claude `dump`, `accept`, `subagent`, `dump --agent-head`; Codex `dump`), each once, all exit 0, versions unchanged during each run. Report: `plans/reports/research-261022-1751-mailbox-v4-hook-process-probe.md`.
+- 2.1.308 against 2.1.307: only `duration_ms` and the `vectors.json` source differ; `testedAgainst` lists both.
+- Probe: Claude topology **B** (one `sh` hop, dash), `procStart` equals `starttime` (13 of 13), `nameSource: derived` with a two-hex suffix, `kind: interactive`, `entrypoint: sdk-cli`; `CLAUDE_CODE_SESSION_ID` equals the payload session. Codex topology **A**.
+- Proof: `cargo test --locked -p fgos-mailbox --test fixtures_contract --test hook_payloads --test adapters`: 4 + 16 + 5 passed; `node --test test/scripts/codex-auth-guard.test.mjs`: 2 passed.
+
+### Deviations
+
+- **Allowlisted environment for the recorder too** (controller rule for phase 2 and 8 live runs): `cleanEnv` (the caller's environment minus four variables) is replaced by `cliEnv` in `scripts/lib/mailbox-live-cli.mjs` (inherited `HOME`, `USER`, `LANG`, `TERM`, `XDG_RUNTIME_DIR`, `PATH`; `SHELL=/usr/bin/zsh`, an empty `ZDOTDIR`, `DISABLE_AUTOUPDATER=1`). So the guards did not move unchanged: this one became stricter. `run.json` records `inheritedVars`.
+- The guards throw `LiveCliError` (with an exit code) instead of exiting; the recorder maps it to its `die`.
+- Two recorder fixes found by the re-recording: `redact` keeps naming the replaced recording in the `vectors.json` source (the contract test needs every listed version named there), and `redact-agent-head` no longer counts `vectors.json` when numbering placeholders.
+- Step 2: no V3 raw runs remained; `cmdRedact` reads only `callsOf`, whose regex is quoted in the report.

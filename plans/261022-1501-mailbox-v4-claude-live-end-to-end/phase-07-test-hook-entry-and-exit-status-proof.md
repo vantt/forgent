@@ -1,7 +1,7 @@
 ---
 phase: 7
 title: "Test-only entry mailbox-test-hook and the exit-status proof"
-status: pending
+status: done
 depends_on: [6]
 live_calls: 0
 ---
@@ -57,3 +57,14 @@ Green on fresh main. Commit `test(mailbox): a test-only hook entry for the live 
 
 - `print!` in the example: the crate-level `deny(print_stdout)` is set in `src/lib.rs` and applies to the library only; if clippy flags the example anyway, write through `std::io::stdout().lock()`.
 - Test 3 takes `budgetMs` (8 s) of wall time; it runs once.
+
+## Done on the branch (implementation lead, 2026-10-22)
+
+- `cargo test --locked -p fgos-mailbox -- --test-threads=4` (builds the example): exit 0, 117 passed, 6 of them in `tests/test_hook_entry.rs`; clippy (`-D warnings`) and fmt clean.
+- Phase 2 chose topology B for Claude Code, so the sixth case `the_entry_under_one_shell_hop_delivers_and_exits_zero` runs the entry through `/bin/sh -c '"$0" "$@"; :'` with `--topology one-shell-hop`.
+
+### Deviations
+
+- The ancestry reader is `tests/common/ancestry.rs`, included by path (phase 5's deviation); the limits come from `support::config_section` as planned.
+- `fgos_session_identity::resolve_current` is `fgos_identity::resolve_current` (phase 1). The Claude writer is accepted only from a session variable (`Source::Env` or `Source::Registry`); `send` and `inbox` take whatever session identity returns as attribution (a process id when no session variable is set).
+- A hook usage error after the `enter` line (unknown `--cli`, `--topology`, `--event` or `--fault`) exits 2, like every other usage error; a record that cannot be opened is logged (`outcome record-open=<code>`) and exits 0.

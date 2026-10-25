@@ -1,0 +1,1 @@
+To message another agent, run: fgos mailbox send --to <name> [--wake] "<text>". Ask agent {peer} to count the .txt files in the directory ./data and report the number. Send the request with --wake so {peer} sees it now. Tell me the number when you have it.

@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Send (plain), claim, emit, finish, inbox view"
-status: pending
+status: done
 priority: P2
 effort: "4h"
 dependencies: [2]
@@ -74,3 +74,24 @@ node scripts/git-one-door-scan.mjs --write-census
 
 - A finish that partly matches (some items moved by a sweep): handled per message, never all-or-nothing, so a stale part never blocks the live part.
 - Unbounded growth is not handled yet: phase 4 (TTL, retention) and phase 5 (queue cap) bound it.
+
+## Implementation notes (2026-10-21)
+
+- Deviations (smallest correct fix):
+  - The state enum is `MessageState` (a type named `State` would shadow the `state` module's role and read ambiguously next to `MailboxState`).
+  - `Claim.token` is `Option<AttemptToken>`: no token is minted when nothing is claimed, so an empty claim needs no finish.
+  - A claim checks the caller's generation before the clock and the sweep, so a stale claim changes nothing (test 8 compares the whole state).
+  - Claim order is the recording order (the header list is append-only and `recorded_at` never goes back, thanks to the clock high-water mark). The planned tie-break "then id" is dropped: ids are opaque hex of different lengths and do not order.
+  - `inbox` lists only mail to the key's current generation; mail of an older generation is never shown to a new process (spec §5.1 "never replayed into a stranger").
+  - `finish` also requires the header's recipient to be the finishing key, so a token cannot finish mail addressed to another head.
+  - Added proof: `tests/delivery.rs` *a sender with no head is labelled unregistered and can never pass for a head* owns the `from_label` rule, which had no owning test in the plan.
+  - `tests/snapshot.rs` gains offered, in-flight and recorded messages; a refused message is first reachable through the sweep and is added in phase 4.
+- `send` takes no `SendOutcome.wake_dropped` yet; phase 6 adds the field with its type `WakeDrop` rather than carrying an always-`None` placeholder now.
+
+## Review fixes (2026-10-21, code review of phases 1-4)
+
+- **M1 `last_drain_at`** (plan-owner decision): per address on `Binding`. A drain whose address has pending mail or notices for its current generation stamps it, whether or not it takes anything; a drain of an empty address returns before the sweep and the clock, so it changes nothing and needs no snapshot write (spec §8 item 8, §9 signal 9 use it only for "pending mail and no drain"). Owning test: `tests/delivery.rs` *a drain stamps last_drain_at when mail is pending even if it takes none and an empty drain changes nothing*.
+- **M4**: `tests/delivery.rs` *a token cannot finish mail addressed to another head* owns the recipient check in `finish`. Removing the check makes it fail (checked by mutation).
+- **L1**: the label of a sender with no head is `unregistered_<8 key characters>`, with `-` mapped to `_`; it holds no `-`, while every short name holds two, so no head name can equal it. The label test now covers a project folder named `unregistered`.
+- **L6**: `inbox` lists the address's pending notices after its messages (`kind: Notice`, label `mailbox`), matching what a step claim (`inbox --claim`) takes.
+- **L7**: `SendRequest<'a>` borrows the body (`body: &'a str`); the core reads only its size, so V2 need not clone it.

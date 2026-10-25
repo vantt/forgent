@@ -15,7 +15,8 @@ import { assessBwrap, prepareBwrap, CONFINED_MARKER_ENV } from '../../src/runner
 import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
 import { executeThroughConfinement } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { loadAttestationRecord, saveProbeCacheRecord } from '../../src/runner/dispatch/confinement/attestation-store.mjs';
-import { resolveBlindHiddenRoots } from '../../src/runner/dispatch/confinement/resources.mjs';
+import { createBlindRootsWhenMissing, resolveBlindHiddenRoots } from '../../src/runner/dispatch/confinement/resources.mjs';
+import { refIsHiddenFromBlind } from '../../src/runner/execution/handoff-refs.mjs';
 import {
   BLIND_HIDDEN_ROOTS,
   CONTROL_AXES,
@@ -78,7 +79,7 @@ function makeProject() {
 
   fs.mkdirSync(proj, { recursive: true });
   git(proj, 'init', '-q', '-b', 'main');
-  write(path.join(proj, '.gitignore'), '.fgos/assignments/\n.fgos/workflow-runs/\n.fgos/dispatch-runs/\n');
+  write(path.join(proj, '.gitignore'), '.fgos/assignments/\n.fgos/workflow-runs/\n.fgos/dispatch-runs/\n.fgos/runtime/\n');
   writeRawProjectConfig(proj, '{}\n');
   const repoFile = write(path.join(proj, 'src', 'file.txt'), 'REPO-FILE\n');
   git(proj, '-c', 'user.name=t', '-c', 'user.email=t@t', 'add', '-A');
@@ -162,13 +163,25 @@ async function prepare(project, options) {
   return { request, assessment, prepared };
 }
 
+/** Where the mailbox record keeps a message body (packages/mailbox/rust/store/src/record/paths.rs). */
+function mailboxBodyOf(project) {
+  return path.join(project.fgosDir, 'runtime', 'mailbox', 'record', 'bodies', 'm1.body');
+}
+
+/** A message body another session's mailbox wrote before the worker started. */
+function plantMailbox(project) {
+  fs.mkdirSync(path.dirname(mailboxBodyOf(project)), { recursive: true, mode: 0o700 });
+  fs.writeFileSync(mailboxBodyOf(project), 'MAILBOX-SECRET\n');
+  return project;
+}
+
 /** Everything the worker script checks, as it sees it from inside the sandbox. */
 function observationScript(project, siblingPid) {
   const paths = {
     proj: project.proj, fgos: project.fgosDir, tempRoot: project.tempRoot, socket: project.socket,
     peerReport: project.peerReport, gateAnswer: project.gateAnswer, peerHome: project.peerHome, siblingPid,
     ownBrief: project.ownBrief, ownRef: project.ownRef, outbox: path.join(project.outbox, 'out.txt'),
-    home: path.join(project.homeDir, 'h.txt'), repoFile: project.repoFile,
+    home: path.join(project.homeDir, 'h.txt'), repoFile: project.repoFile, mailboxBody: mailboxBodyOf(project),
     inMask: path.join(project.fgosDir, 'assignments', 'new.txt'),
   };
   return `
@@ -181,12 +194,13 @@ function observationScript(project, siblingPid) {
     walk(P.fgos);
     (async () => {
       const git = cp.spawnSync('git', ['status', '--porcelain'], { cwd: P.proj, encoding: 'utf8' });
-      const grep = cp.spawnSync('grep', ['-rl', 'PEER-SECRET\\\\|GATE-SECRET\\\\|DISPATCH-SECRET\\\\|PEER-HOME', P.proj, P.tempRoot], { encoding: 'utf8' });
+      const grep = cp.spawnSync('grep', ['-rl', 'PEER-SECRET\\\\|GATE-SECRET\\\\|DISPATCH-SECRET\\\\|PEER-HOME\\\\|MAILBOX-SECRET', P.proj, P.tempRoot], { encoding: 'utf8' });
       const find = cp.spawnSync('find', [P.fgos, '-name', 'report-1.md'], { encoding: 'utf8' });
       process.stdout.write(JSON.stringify({
         peerReport: code(() => fs.readFileSync(P.peerReport)),
         gateAnswer: code(() => fs.readFileSync(P.gateAnswer)),
         peerHome: code(() => fs.readFileSync(P.peerHome)),
+        mailbox: code(() => fs.readFileSync(P.mailboxBody)),
         peerProcess: code(() => fs.readFileSync('/proc/' + P.siblingPid + '/cmdline')),
         socket: await new Promise((r) => { const s = net.connect(P.socket); s.on('connect', () => { s.destroy(); r('connected'); }); s.on('error', (e) => r(e.code)); }),
         tree, grep: grep.stdout, find: find.stdout,
@@ -240,28 +254,56 @@ test('hostRead has the order deny > blind > allow, and a blind override only nar
   assert.equal(resolveConfinementPolicy('workspace-write').controls.hostRead, 'allow');
 });
 
-test('the hidden roots are data in the contract: the three run-state directories, never all of .fgos', () => {
+test('the hidden roots are data in the contract: peer run state and the mailbox record, never all of .fgos', () => {
   // herdr's sockets are machine-private: hidden from every confined dispatch, not only a blind one.
   assert.deepEqual([...BLIND_HIDDEN_ROOTS], [
     '{fgosDir}/assignments',
     '{fgosDir}/workflow-runs',
     '{fgosDir}/dispatch-runs',
+    '{fgosDir}/runtime/mailbox',
     '{confinementTempRoot}',
   ]);
 });
 
-test('hidden roots resolve to the existing ones of this project and the temp root', () => {
+test('hidden roots resolve to the existing ones of this project and the temp root, and the lookup creates nothing', () => {
   const project = makeProject();
-  const resolved = resolveBlindHiddenRoots({ fgosDir: project.fgosDir, backendConfig: { tempRoot: project.tempRoot } });
-  assert.deepEqual(resolved, [
+  const mailbox = path.join(project.fgosDir, 'runtime', 'mailbox');
+  const lookup = () => resolveBlindHiddenRoots({ fgosDir: project.fgosDir, backendConfig: { tempRoot: project.tempRoot } });
+  const existing = [
     path.join(project.fgosDir, 'assignments'),
     path.join(project.fgosDir, 'workflow-runs'),
     path.join(project.fgosDir, 'dispatch-runs'),
-    project.tempRoot,
-  ]);
+  ];
+  assert.deepEqual(lookup(), [...existing, project.tempRoot]);
+  assert.equal(fs.existsSync(path.join(project.fgosDir, 'runtime')), false, 'a lookup creates no mailbox root');
+
+  createBlindRootsWhenMissing(project.fgosDir);
+  assert.equal(fs.statSync(mailbox).mode & 0o777, 0o700, 'the mailbox root is created with mode 0700');
+  assert.deepEqual(lookup(), [...existing, mailbox, project.tempRoot]);
   fs.rmSync(path.join(project.fgosDir, 'dispatch-runs'), { recursive: true });
-  const without = resolveBlindHiddenRoots({ fgosDir: project.fgosDir, backendConfig: { tempRoot: project.tempRoot } });
-  assert.equal(without.includes(path.join(project.fgosDir, 'dispatch-runs')), false, 'a root that does not exist is skipped');
+  assert.equal(lookup().includes(path.join(project.fgosDir, 'dispatch-runs')), false, 'a root that does not exist is skipped');
+});
+
+test('creating the mailbox root is a no-op without a .fgos or under one that cannot take it, and a handoff-ref check never throws', (t) => {
+  if (process.getuid?.() === 0) return t.skip('root ignores directory modes');
+  const project = makeProject();
+  const ref = path.join(project.fgosDir, 'assignments', 'u1', 'peer', '1', 'outbox', 'report-1.md');
+  const missing = path.join(project.root, 'no-project', '.fgos');
+  createBlindRootsWhenMissing(missing);
+  assert.equal(fs.existsSync(missing), false, 'no .fgos is created');
+
+  fs.chmodSync(project.fgosDir, 0o500);
+  try {
+    assert.doesNotThrow(() => createBlindRootsWhenMissing(project.fgosDir));
+    assert.equal(fs.existsSync(path.join(project.fgosDir, 'runtime')), false);
+    assert.equal(refIsHiddenFromBlind(ref, project.proj), true, 'a read-only .fgos still answers the ref check');
+  } finally {
+    fs.chmodSync(project.fgosDir, 0o755);
+  }
+
+  fs.writeFileSync(path.join(project.fgosDir, 'runtime'), 'a plain file\n');
+  assert.doesNotThrow(() => createBlindRootsWhenMissing(project.fgosDir));
+  assert.equal(refIsHiddenFromBlind(ref, project.proj), true, 'a runtime file still answers the ref check');
 });
 
 // ---------------------------------------------------------------------------
@@ -280,10 +322,12 @@ test('the blind argv masks before it binds back, binds its own directory read-on
     assert.ok(head.includes('--unshare-pid'));
 
     const at = (flag, target) => head.findIndex((arg, i) => arg === flag && head[i + 1] === target);
+    // The launch created the mailbox root before it resolved the masks.
     const masks = [
       path.join(project.fgosDir, 'assignments'),
       path.join(project.fgosDir, 'workflow-runs'),
       path.join(project.fgosDir, 'dispatch-runs'),
+      path.join(project.fgosDir, 'runtime', 'mailbox'),
       project.herdrDir,
       project.tempRoot,
     ];
@@ -320,6 +364,7 @@ test('a non-blind dispatch\'s argv has the pid namespace but no mask, binds in r
   }
   assert.deepEqual(head, expected);
   assert.equal(assessment.resources.some((r) => r.resource === 'hidden-root' || r.resource === 'own-assignment'), false);
+  assert.equal(fs.existsSync(path.join(project.fgosDir, 'runtime')), false, 'only a blind launch creates the mailbox root');
   await prepared.cleanup();
 });
 
@@ -327,28 +372,30 @@ test('a non-blind dispatch\'s argv has the pid namespace but no mask, binds in r
 // Behaviour under real bwrap
 // ---------------------------------------------------------------------------
 
-test('a blind worker cannot read a peer, a gate answer, a peer home, a peer process or the herdr socket; unblind it still reaches files but neither processes nor the herdr socket', async (t) => {
+test('a blind worker cannot read a peer, a gate answer, a peer home, a mailbox body, a peer process or the herdr socket; unblind it still reaches files but neither processes nor the herdr socket', async (t) => {
   if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
 
-  const open = await observe(makeProject(), { blind: false });
+  const open = await observe(plantMailbox(makeProject()), { blind: false });
   assert.equal(open.peerReport, 'ok');
   assert.equal(open.gateAnswer, 'ok');
   assert.equal(open.peerHome, 'ok');
+  assert.equal(open.mailbox, 'ok');
   // Every launch has its own pid namespace now, so a peer's process is out of reach blind or not.
   assert.equal(open.peerProcess, 'ENOENT');
   // herdr's socket directory is machine-private: hidden whatever the hostRead.
   assert.equal(open.socket, 'ENOENT');
 
-  const blind = await observe(makeProject(), { blind: true });
+  const blind = await observe(plantMailbox(makeProject()), { blind: true });
   // What it must not reach.
   assert.equal(blind.peerReport, 'ENOENT');
   assert.equal(blind.gateAnswer, 'ENOENT');
   assert.equal(blind.peerHome, 'ENOENT');
+  assert.equal(blind.mailbox, 'ENOENT');
   assert.equal(blind.peerProcess, 'ENOENT');
   assert.equal(blind.socket, 'ENOENT');
   assert.equal(blind.grep, '', 'grep -r finds none of the planted peer text');
   assert.equal(blind.find, '', 'find does not list a peer report');
-  assert.ok(!blind.tree.some((entry) => /peer|wf1|d1/.test(entry)), `tree shows only its own chain: ${blind.tree.join(' ')}`);
+  assert.ok(!blind.tree.some((entry) => /peer|wf1|d1|mailbox\/record/.test(entry)), `tree shows only its own chain: ${blind.tree.join(' ')}`);
   assert.ok(blind.tree.includes('/assignments/u1/self/1/brief.md'));
   assert.ok(blind.tree.includes('/config.yaml'), 'tracked files under .fgos stay visible');
   assert.equal(blind.maskWrite, 'EROFS', 'the mask itself is not writable');

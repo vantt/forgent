@@ -43,3 +43,11 @@ live_budget: "0"
 ## Acceptance
 
 Tests green on a fresh merge; doctor on an opted-out project unchanged (`not enabled`); no threshold without a named measured source.
+
+## Plan-owner decisions after the V7 review (agent, 2026-10-23; `reports/code-review-v7abd.md`)
+
+- L2: `list` and `status` count heads by one rule (not a runner key, not judged dead).
+- L4: one platform rule for the adapters' facts (`facts`, `tier`, `stop_drains`).
+- L6: `read_existing` does not re-check the record directory's identity after opening the snapshot; documented, inside the same-user limit.
+- M1: channel roles in the adapters contract are a closed set (`user`, `developer`, `system`, `tool`, `transcript:<type>`); the `transcript:` residual for Claude Code is named in spec §7.3.
+- M4: the formatting of other lanes' code in `apps/fgos/src/cli_projector.rs` and `apps/fgos/src/main.rs` was reverted; only the `list`/`status` lines remain there.

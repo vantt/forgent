@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Effective wake, Stop drain, scripted loop replays"
-status: pending
+status: done
 priority: P2
 effort: "4h"
 dependencies: [5]
@@ -76,3 +76,12 @@ node scripts/git-one-door-scan.mjs --write-census
 
 - "Two concurrent sends cannot spend one remaining allowance": needs two processes and the mutex, rung V2 (spec §11).
 - The nudge reading the effective field: the nudge is rung V3/V5; it gets `effective_wake` from `SendOutcome` and the header.
+
+## Implementation notes (2026-10-21)
+
+- The replays reproduce the measured numbers literally: wake dropped at message 6 (`ExchangeQuota`, no refusal, `session-budget` never bumped), depths 0..=6 then `too-deep` at message 8, and with the measurement's configuration `LifetimeCap` first at message 101.
+- Deviations (smallest correct fix):
+  - The exchange key is the `String` newtype `ExchangeKey`, the wake lifetime key `WakeLifetimeKey` (`<from>@<generation>|<to>`); the recipient part is its key (a recipient always has a binding).
+  - A fresh exchange starts when `now >= last_at + exchangeGapSec` (a gap at the value starts a new allowance, as test 3 states), compared in milliseconds.
+  - `tests/snapshot.rs`: its in-flight message now carries `wake`, because a `Stop` claim takes only effective wakes; the test also asserts that `exchanges` and `wake_lifetime` hold entries.
+- `rg -n '\.wake\b' packages/mailbox/rust/core/src` shows only `limits.wake.*` and the request's `wake` at `send`; `eligible` reads `effective_wake` only.

@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Contract keys, delivery report, refusal and inbox text"
-status: pending
+status: done
 depends_on: [1]
 live_calls: 0
 ---
@@ -69,3 +69,15 @@ Green on fresh main. Commit `feat(mailbox): render the send answer, refusals and
 ## Risk
 
 - The wording is a first draft: V6 measures the frame wording with real models; these sentences go to the sender, whose behaviour after a refusal was measured once (spec §5.3: 14 of 14 forced refusals ended with no retry, with the "do not retry" text present). Changing the wording later edits only the contract.
+
+## Done on the branch (implementation lead, 2026-10-22)
+
+- `cargo test --locked -p fgos-mailbox-core -p fgos-mailbox -- --test-threads=4`: exit 0; core 106 passed (7 new in `tests/report.rs`), store 92 passed. `cargo clippy --locked … --all-targets -- -D warnings`: exit 0. `cargo fmt … -- --check`: exit 0.
+- The tests were written with the module and passed on first compile; no separate red run was recorded.
+
+### Deviations
+
+- `delivery_report`, `refusal_text` and `inbox_text` take `&Limits` too: the header escape they reuse is bounded by `frame.maxHeaderChars`.
+- `[refusal.too-large]` reads `Refused: too-large ({{limit}}). Send a path or link instead.`, so `{{limit}}` is filled the same way for every section (`max_bytes=65536`), instead of `at most {{limit}} bytes`, which would have read `at most max_bytes=… bytes`.
+- `[refusal.argument]` has no `{{limit}}`; `sender-key-too-long` therefore shows only its code.
+- The store's `limits_contract.rs` already drops each `hook` key in turn generically, so it covers the two new keys without an edit.

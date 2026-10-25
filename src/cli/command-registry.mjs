@@ -802,13 +802,13 @@ export const COMMAND_REGISTRY = [
   {
     name: 'hook',
     invoke: 'fgos hook <kind>',
-    description: 'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi). Bypasses CLI envelope and store admission to preserve hook exit codes and stdio protocols.',
+    description: 'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi). Bypasses CLI envelope and store admission to preserve hook exit codes and stdio protocols. `mailbox` is the agent mailbox\'s checkpoint (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host: it registers the calling head, prints pending mail in the shape the CLI injects, and always exits 0, printing nothing on any failure.',
     parameters: {
       type: 'object',
       properties: {
         kind: {
           type: 'string',
-          enum: ['dispatch-decide', 'decision-question'],
+          enum: ['dispatch-decide', 'decision-question', 'mailbox'],
           description: 'The specific hook guard to execute.',
         },
         format: {
@@ -816,11 +816,21 @@ export const COMMAND_REGISTRY = [
           enum: ['standard', 'agy'],
           description: 'Output protocol format (standard exit codes or AGY stdout JSON).',
         },
+        cli: {
+          type: 'string',
+          enum: ['claude', 'codex'],
+          description: 'mailbox only: the CLI whose hook calls the entry.',
+        },
+        event: {
+          type: 'string',
+          enum: ['stop', 'post-tool-use'],
+          description: 'mailbox only: the hook event the CLI fires.',
+        },
       },
       positional: ['kind'],
       required: ['kind'],
     },
-    examples: ['fgos hook dispatch-decide', 'fgos hook decision-question', 'fgos hook dispatch-decide --format=agy'],
+    examples: ['fgos hook dispatch-decide', 'fgos hook decision-question', 'fgos hook dispatch-decide --format=agy', 'fgos hook mailbox --cli claude --event post-tool-use'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,
@@ -1102,6 +1112,66 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos identity', 'fgos identity machine --json', 'fgos identity session --json', 'fgos identity project --json', 'fgos identity list --json', 'fgos identity mint work --json'],
     touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+    nativeOnly: true,
+  }),
+  withSubcommands({
+    name: 'mailbox',
+    invoke: 'fgos mailbox <send|inbox|list|status>',
+    description: 'The agent mailbox (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host from the main checkout\'s .fgos (also from a linked worktree; `--dir` is accepted and ignored). `send` records a message for another agent head of this project and answers with the delivery report or why it was refused (exit 0 recorded, 1 refused or the record failed). `inbox` lists this session\'s pending mail and changes nothing; `inbox --claim` consumes it: it prints the frames and marks them offered only after the print. `list` names the project\'s heads and `status` reports the record\'s health signals; both change nothing. A body that starts with `--` goes after `--`, and a body that is exactly `--help` or `-h` is read as a help request.',
+    subcommands: {
+      send: {
+        description: 'Record a message for the head named --to: a short name or an unambiguous prefix, or an Identity handle, full session id or lead:<LANE> role that names a head of this project. Consuming: it writes the record. Answers `recorded <id> for <name>` plus when the recipient will see it, or the refusal.',
+        parameters: {
+          type: 'object',
+          properties: {
+            to: { type: 'string', description: 'The recipient: its short name or an unambiguous prefix, or an Identity handle (`claude-5v7u@fg-server`), full session id or `lead:<LANE>` role naming a head of this project.' },
+            wake: { type: 'boolean', description: 'Ask to wake the recipient at the end of its turn; the mailbox may drop the wake (its quota), and the answer says so.' },
+            'reply-to': { type: 'string', description: 'The id of the message this one answers (from the reply line under that message).' },
+            body: { type: 'string', description: 'The message text (positional; quote it).' },
+          },
+          positional: ['body'],
+          required: ['to', 'body'],
+        },
+        examples: ['fgos mailbox send --to forgent-claude-2b "the build is green"', 'fgos mailbox send --to forgent-codex-9c --reply-to 0a1b2c "yes" --json', 'fgos mailbox send --to forgent-claude-2b -- "--looks like a flag"'],
+      },
+      inbox: {
+        description: 'Read-only unless --claim: list this session\'s pending mail with each item\'s state. `--claim` consumes it instead: it prints every pending frame and finishes the claim only after a successful write, exactly as a hook drain does.',
+        parameters: {
+          type: 'object',
+          properties: {
+            claim: { type: 'boolean', description: 'Consume: print the pending frames and mark them offered.' },
+          },
+          required: [],
+        },
+        examples: ['fgos mailbox inbox', 'fgos mailbox inbox --claim', 'fgos mailbox inbox --json'],
+      },
+      list: {
+        description: 'Read-only: one line per head of this project\'s mailbox that is not known dead, with its short name, Identity handle, CLI, tier and liveness; `--long` adds its key. Creates nothing.',
+        parameters: {
+          type: 'object',
+          properties: {
+            long: { type: 'boolean', description: 'Also show each head\'s key.' },
+          },
+          required: [],
+        },
+        examples: ['fgos mailbox list', 'fgos mailbox list --long --json'],
+      },
+      status: {
+        description: 'Read-only report of the record: its verdict (ok, none yet, or the record error) and the health signals of spec §9 (recorded-to-offered latency, refusals per reason, offers per message, queue depth and oldest age, record size, heads with mail and no drain since, offered and never answered, the last hook outcome). No signal has a threshold yet; exit 1 only when the record cannot be read. Creates nothing.',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+        examples: ['fgos mailbox status', 'fgos mailbox status --json'],
+      },
+    },
+    examples: ['fgos mailbox send --to forgent-claude-2b "hello"', 'fgos mailbox inbox', 'fgos mailbox inbox --claim'],
+    touchesState: true,
     requiresExistingStore: false,
     externalEffect: false,
     paginated: false,

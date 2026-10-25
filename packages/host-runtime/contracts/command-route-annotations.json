@@ -22,10 +22,22 @@
     "operation_id": "work.gate-bypass.show",
     "owner_path": "packages/work-state/rust"
   },
+  "hook": {
+    "route_kind": "legacy-cli",
+    "native_kinds": [
+      "mailbox"
+    ]
+  },
   "identity": {
     "route_kind": "native",
     "operation_id": "identity.writer",
     "owner_path": "packages/identity/rust"
+  },
+  "mailbox": {
+    "route_kind": "native",
+    "operation_id": "mailbox.inbox",
+    "owner_path": "packages/mailbox/rust",
+    "subcommands": true
   },
   "metrics": {
     "route_kind": "native",

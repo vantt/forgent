@@ -87,6 +87,8 @@ Ba bất biến, tách bạch rõ để không ai đọc nhầm đây là sandbo
   home và tiến trình của dispatch khác): vai blind chỉ đọc thư mục của chính nó (kết quả vai/bước trước tới nó dưới dạng bản chép nguyên byte
   trong `inputs/` của thư mục đó) và bị từ chối chạy nếu không thực thi được (`docs/specs/confinement-authority.md` §9.2).
 
+Kênh agent-tới-agent thứ hai: **Agent Mailbox** (`docs/platform/agent-mailbox/spec.md`). Tin của một phiên agent gửi tới phiên khác là input lớp `peer` trong một khung (frame) (spec §5.5, §8): không bao giờ mang quyền của người dùng, không thay câu trả lời của người (câu trả lời của người chỉ đi đường decision-question), và `from` chỉ để ghi nguồn, không phải xác thực.
+
 ## Tham chiếu
 
 `src/runner/dispatch.mjs` (prompt + trust invariant) · `src/runner/worktree.mjs`

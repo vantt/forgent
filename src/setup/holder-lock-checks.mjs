@@ -220,6 +220,7 @@ const LOCK_FILES = {
   'project-config': ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'project-config.lock')),
   activation: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'activation-v2.lock')),
   observe: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'observe.lock')),
+  mailbox: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'mailbox.lock')),
   'dispatch-cwd': ({ fgosDir }) => filesIn(path.join(fgosDir, LOCKS_DIR), (name) => name.startsWith('dispatch-cwd--') && name.endsWith('.lock')),
   advance: ({ fgosDir }) => subdirs(path.join(fgosDir, 'workflow-runs')).flatMap((runDir) => existing(path.join(runDir, LOCKS_DIR, 'advance.lock'))),
   recovery: ({ fgosDir }) => [...listAssignmentRuns(fgosDir)].flatMap(({ runDir }) => existing(path.join(runDir, LOCKS_DIR, 'recovery.lock'))),

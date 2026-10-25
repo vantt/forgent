@@ -108,3 +108,8 @@ cargo clippy --locked -p fgos-identity -p fgos-mailbox --all-targets -- -D warni
 - [ ] `inbox --claim`
 - [ ] Version clause
 - [ ] Run the gate; regenerate the census; sync and push
+
+## Notes
+
+- Commits `c2d26b518` (`is_attempt_writer_id`) and `bc4abcfee` (loader, breaker, runner heads, `inbox --claim`, version clause). Gate: 323 passed; 29 hand mutants killed, 1 equivalent (sorting ignored keys; the JSON map is already sorted).
+- No Config crate on main: the loader reads `config.json` itself. The breaker lives in `hook::shell::run` (read before stdin, counted after the call). `SendOutcome` gained the recipient's CLI and head text for the version clause.

@@ -223,6 +223,8 @@ dependencies = [
  "fgos-holder-lock",
  "fgos-host-runtime",
  "fgos-identity",
+ "fgos-mailbox",
+ "fgos-mailbox-core",
  "fgos-observe",
  "fgos-process",
  "fgos-run-result",
@@ -287,6 +289,7 @@ dependencies = [
 name = "fgos-distribution"
 version = "0.2.0"
 dependencies = [
+ "fgos-durable-file",
  "fgos-git",
  "fgos-holder-lock",
  "fgos-host-runtime",
@@ -379,6 +382,28 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+]
+
+[[package]]
+name = "fgos-mailbox"
+version = "0.2.0"
+dependencies = [
+ "fgos-durable-file",
+ "fgos-holder-lock",
+ "fgos-identity",
+ "fgos-mailbox-core",
+ "fgos-process",
+ "libc",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "fgos-mailbox-core"
+version = "0.2.0"
+dependencies = [
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

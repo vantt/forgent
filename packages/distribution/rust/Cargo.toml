@@ -6,6 +6,7 @@ edition.workspace = true
 [dependencies]
 semver = "1"
 fgos-git = { path = "../../git/rust" }
+fgos-durable-file = { path = "../../durable-file/rust" }
 fgos-host-runtime = { path = "../../host-runtime/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
 tokio = { workspace = true }

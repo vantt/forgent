@@ -1,0 +1,180 @@
+{
+  "cli": "codex",
+  "source": "recorded 2026-10-22 from codex 0.161.0 on this machine by scripts/record-mailbox-hook-fixtures.mjs (redaction rules version 1); dump run: `codex exec --dangerously-bypass-hook-trust --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check -C /run-dir/codex/dump/ws <prompt>` (exit 0); accept run: `codex exec --dangerously-bypass-hook-trust --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check -C /run-dir/codex/accept/ws <prompt>` (exit 0); subagent run: `codex exec --dangerously-bypass-hook-trust --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check -C /run-dir/codex/subagent/ws <prompt>` (exit 0); variables removed from the parent environment: FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID, CLAUDECODE; injection at PostToolUse (nested shape) matched record type response_item:message:developer; types rejected as raw hook output: none; model echoed the context canary: true; Stop block accepted by a continued Stop call: true; model echoed the Stop canary: true; hook PID namespace is the same as the recorder's; post-tool-use-subagent.json: recorded; the subagent fired no Stop of its own; user hooks that fired: none (an isolated CODEX_HOME whose hooks.json holds only the recorder's hooks); the hook processes saw none of the three id variables; the tool process saw CODEX_THREAD_ID equal to the payload's session_id, so the hook must take the writer key from the payload's session_id, not from its environment; injection record types: the rollout's model-input records (response_item message, role developer or user); the context canary was found in a developer message, and no hook-specific record type exists in the rollout; subagent: spawn_agent ran a subagent whose Bash PostToolUse carried agent_id and agent_type and the head's session_id; it fired SubagentStart and SubagentStop and no Stop of its own; its tool process saw its own CODEX_THREAD_ID, not the head's",
+  "vectors": [
+    {
+      "name": "head-stop-first-of-its-turn",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "stop",
+      "file": "stop.json",
+      "expect": {
+        "subordinate": false,
+        "firstStop": true,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "head-stop-continued-after-a-block",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "stop",
+      "file": "stop-continued.json",
+      "expect": {
+        "subordinate": false,
+        "firstStop": false,
+        "session": "00000000-0000-4000-8000-000000000003"
+      }
+    },
+    {
+      "name": "head-post-tool-use",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "expect": {
+        "subordinate": false,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "subagent-post-tool-use",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "post-tool-use",
+      "file": "post-tool-use-subagent.json",
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000006"
+      }
+    },
+    {
+      "name": "empty-input",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "stop",
+      "text": "",
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "not-json",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "text": "not json",
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "a-json-array",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "stop",
+      "json": [],
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "a-stop-sent-as-post-tool-use",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "stop.json",
+      "expect": {
+        "unparsed": "event-mismatch"
+      }
+    },
+    {
+      "name": "a-post-tool-use-cut-in-half",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "truncate": true,
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "an-empty-session-id-is-no-session",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "session_id": ""
+      },
+      "expect": {
+        "subordinate": false,
+        "firstStop": null,
+        "session": null
+      }
+    },
+    {
+      "name": "agent-id-empty",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "agent_id": ""
+      },
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "agent-id-null",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "agent_id": null
+      },
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "agent-id-a-number",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "agent_id": 7
+      },
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "agent-type-alone",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "agent_type": "worker"
+      },
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    }
+  ]
+}

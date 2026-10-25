@@ -1,0 +1,1 @@
+Do these steps in order, one command per step. 1. List the files here with ls. 2. Wait for the signal file by running: until [ -f go1.txt ]; do sleep 2; done 3. Write how many files you listed into summary.txt. 4. Wait for the second signal by running: until [ -f go2.txt ]; do sleep 2; done 5. Tell me the number.

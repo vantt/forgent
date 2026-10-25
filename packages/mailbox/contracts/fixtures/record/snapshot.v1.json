@@ -1,0 +1,176 @@
+{
+  "bindings": {
+    "fixture-head-a": {
+      "cli": "claude",
+      "generation": 1,
+      "handle": null,
+      "head": "head-of-fixture-head-a",
+      "key": "fixture-head-a",
+      "last_drain_at": null,
+      "last_seen": 1800000000000,
+      "name": "forgent-claude-69",
+      "registered_at": 1800000000000,
+      "stop_blocks": 0
+    },
+    "fixture-head-b": {
+      "cli": "claude",
+      "generation": 1,
+      "handle": null,
+      "head": "head-of-fixture-head-b",
+      "key": "fixture-head-b",
+      "last_drain_at": 1800086402000,
+      "last_seen": 1800000000000,
+      "name": "forgent-claude-32",
+      "registered_at": 1800000000000,
+      "stop_blocks": 0
+    }
+  },
+  "budget": {
+    "fixture-head-a": [
+      1800086402000,
+      1800086403000,
+      1800086404000
+    ]
+  },
+  "counters": {
+    "bumps": 2,
+    "by_party": {
+      "record-ttl|fixture-head-a|fixture-head-b": {
+        "count": 1,
+        "last_at": 1800086402000,
+        "last_bump": 1
+      },
+      "unknown-name|fixture-head-a|~unresolved": {
+        "count": 1,
+        "last_at": 1800086404000,
+        "last_bump": 2
+      }
+    },
+    "totals": {
+      "record-ttl": 1,
+      "unknown-name": 1
+    }
+  },
+  "exchanges": {
+    "fixture-head-a|fixture-head-b": {
+      "last_at": 1800086403000,
+      "wakes_spent": 0
+    }
+  },
+  "last_now": 1800086404000,
+  "lifetime": {
+    "fixture-head-a@1": 5
+  },
+  "messages": [
+    {
+      "answered": false,
+      "body_bytes": 5,
+      "body_kept": true,
+      "changed_at": 1800000000000,
+      "depth": 0,
+      "effective_wake": true,
+      "from": "fixture-head-a",
+      "from_generation": 1,
+      "id": "b908dcfdd000e95e",
+      "offers": 1,
+      "recorded_at": 1800000000000,
+      "reply_to": null,
+      "reply_to_hint": null,
+      "state": {
+        "offered": {
+          "at": 1800000000000
+        }
+      },
+      "to": "fixture-head-b",
+      "to_generation": 1,
+      "wake": true
+    },
+    {
+      "answered": false,
+      "body_bytes": 6,
+      "body_kept": true,
+      "changed_at": 1800086402000,
+      "depth": 0,
+      "effective_wake": false,
+      "from": "fixture-head-a",
+      "from_generation": 1,
+      "id": "82e8321a0fb18857",
+      "offers": 0,
+      "recorded_at": 1800000001000,
+      "reply_to": null,
+      "reply_to_hint": null,
+      "state": {
+        "refused": {
+          "at": 1800086402000,
+          "reason": "record-ttl"
+        }
+      },
+      "to": "fixture-head-b",
+      "to_generation": 1,
+      "wake": false
+    },
+    {
+      "answered": false,
+      "body_bytes": 5,
+      "body_kept": true,
+      "changed_at": 1800086402000,
+      "depth": 0,
+      "effective_wake": false,
+      "from": "fixture-head-a",
+      "from_generation": 1,
+      "id": "fbf57f4f8d9d1193",
+      "offers": 1,
+      "recorded_at": 1800086402000,
+      "reply_to": null,
+      "reply_to_hint": null,
+      "state": {
+        "in-flight": {
+          "deadline": 1800086522000,
+          "generation": 1,
+          "token": "9cf05c6a0587a54a"
+        }
+      },
+      "to": "fixture-head-b",
+      "to_generation": 1,
+      "wake": false
+    },
+    {
+      "answered": false,
+      "body_bytes": 6,
+      "body_kept": true,
+      "changed_at": 1800086403000,
+      "depth": 0,
+      "effective_wake": false,
+      "from": "fixture-head-a",
+      "from_generation": 1,
+      "id": "46ede7b6544f2440",
+      "offers": 0,
+      "recorded_at": 1800086403000,
+      "reply_to": null,
+      "reply_to_hint": null,
+      "state": "recorded",
+      "to": "fixture-head-b",
+      "to_generation": 1,
+      "wake": false
+    }
+  ],
+  "notice_last": {
+    "fixture-head-a|record-ttl": 1800086402000
+  },
+  "notices": [
+    {
+      "about": "82e8321a0fb18857",
+      "about_to": "fixture-head-b",
+      "created_at": 1800086402000,
+      "id": "78bb5cf010463d39",
+      "reason": "record-ttl",
+      "state": "recorded",
+      "to": "fixture-head-a",
+      "to_generation": 1
+    }
+  ],
+  "schema_version": 1,
+  "wake_lifetime": {
+    "fixture-head-a@1|fixture-head-b": 1
+  }
+}

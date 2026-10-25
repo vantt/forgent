@@ -1,0 +1,19 @@
+{
+  "artifactDirectoryPath": "/home/user/.agy-homes/account/.gemini/antigravity-cli/brain/00000000-0000-4000-8000-000000000001",
+  "conversationId": "00000000-0000-4000-8000-000000000001",
+  "error": "",
+  "modelName": "<redacted>",
+  "stepIdx": 2,
+  "toolCall": {
+    "args": {
+      "CommandLine": "env | grep -E '^(CODEX_THREAD_ID|CLAUDE_CODE_SESSION_ID|FGOS_SESSION_ID)=' > tool-env.txt; echo mailbox-fixture",
+      "WaitMsBeforeAsync": 5000,
+      "toolSummary": "<redacted>"
+    },
+    "name": "run_command"
+  },
+  "transcriptPath": "/home/user/.agy-homes/account/.gemini/antigravity-cli/brain/00000000-0000-4000-8000-000000000001/.system_generated/logs/transcript_full.jsonl",
+  "workspacePaths": [
+    "/run-dir/agy/dump/ws"
+  ]
+}

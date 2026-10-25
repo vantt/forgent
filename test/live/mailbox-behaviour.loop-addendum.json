@@ -1,0 +1,128 @@
+{
+  "addendumTo": {
+    "file": "test/live/mailbox-behaviour/preregistration.json",
+    "sha256": "484eb1c0a5a8781cc637380f6b0b84010c1676d33a5314419b8c8a19313cfb16"
+  },
+  "trust": "one-way: the head started second is told the first head's name and trusts it; the first trusts nobody; the direction alternates over each pair's configurations",
+  "why": "a head's mailbox name is drawn at registration: Claude Code 2.1.309 derives its session name's suffix from random bytes while its stable-address flag (tengu_session_stable_address) is off, and a Codex head gets a drawn suffix, so neither name is known at launch",
+  "limit": "each configuration measures trust in one direction only; a runaway that needs both heads to trust each other is not exercised",
+  "configs": [
+    {
+      "id": "CC-S1",
+      "pair": "CC",
+      "scenario": "S1",
+      "limits": null,
+      "trust": "aa-trusts-bb"
+    },
+    {
+      "id": "CC-S2",
+      "pair": "CC",
+      "scenario": "S2",
+      "limits": null,
+      "trust": "bb-trusts-aa"
+    },
+    {
+      "id": "CC-S3",
+      "pair": "CC",
+      "scenario": "S3",
+      "limits": null,
+      "trust": "aa-trusts-bb"
+    },
+    {
+      "id": "CC-S4",
+      "pair": "CC",
+      "scenario": "S4",
+      "limits": null,
+      "trust": "bb-trusts-aa"
+    },
+    {
+      "id": "CC-F-wake",
+      "pair": "CC",
+      "scenario": "S2",
+      "limits": {
+        "mailbox": {
+          "wake": {
+            "maxPerExchange": 1
+          }
+        }
+      },
+      "trust": "aa-trusts-bb"
+    },
+    {
+      "id": "CC-F-depth",
+      "pair": "CC",
+      "scenario": "S2",
+      "limits": {
+        "mailbox": {
+          "chain": {
+            "maxDepth": 0
+          }
+        }
+      },
+      "trust": "bb-trusts-aa"
+    },
+    {
+      "id": "CX-S1",
+      "pair": "CX",
+      "scenario": "S1",
+      "limits": null,
+      "trust": "aa-trusts-bb"
+    },
+    {
+      "id": "CX-S2",
+      "pair": "CX",
+      "scenario": "S2",
+      "limits": null,
+      "trust": "bb-trusts-aa"
+    },
+    {
+      "id": "CX-S3",
+      "pair": "CX",
+      "scenario": "S3",
+      "limits": null,
+      "trust": "aa-trusts-bb"
+    },
+    {
+      "id": "CX-S4",
+      "pair": "CX",
+      "scenario": "S4",
+      "limits": null,
+      "trust": "bb-trusts-aa"
+    },
+    {
+      "id": "CX-F-wake",
+      "pair": "CX",
+      "scenario": "S2",
+      "limits": {
+        "mailbox": {
+          "wake": {
+            "maxPerExchange": 1
+          }
+        }
+      },
+      "trust": "aa-trusts-bb"
+    },
+    {
+      "id": "CX-F-depth",
+      "pair": "CX",
+      "scenario": "S2",
+      "limits": {
+        "mailbox": {
+          "chain": {
+            "maxDepth": 0
+          }
+        }
+      },
+      "trust": "bb-trusts-aa"
+    }
+  ],
+  "harnessWords": {
+    "registerFirst": "Before anything else, run: ls",
+    "peerByFile": "the agent named in the file peer.txt (wait for that file with: until [ -f peer.txt ]; do sleep 2; done)"
+  },
+  "runsPerConfig": 5,
+  "hardStop": {
+    "ms": 900000,
+    "messages": 40
+  }
+}

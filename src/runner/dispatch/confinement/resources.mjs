@@ -17,21 +17,56 @@ import { resolveConfinementTempRoot } from './cleanup.mjs';
 import { userRuntimeDir } from '../../../run-supervisor/runtime-dir.mjs';
 
 /**
- * `hostRead: blind` leaves the host readable except what other dispatches keep: the run state of
- * the project the dispatch runs in and the confinement temp root (sibling private homes). Tokens,
- * resolved per dispatch below; the driver never names a path of its own. Only the three run-state
- * directories are listed, never all of `.fgos`: tracked files live there and would appear deleted
- * in the checkout status under a mask. The herdr sockets are machine-private (MACHINE_PRIVATE_ROOTS).
+ * `hostRead: blind` leaves the host readable except what other dispatches and live agent
+ * sessions keep: the run state of the project the dispatch runs in, the mailbox record of the
+ * project's live agent sessions, and the confinement temp root (sibling private homes). Tokens,
+ * resolved per dispatch below; the driver never names a path of its own. Only peer run state and
+ * the mailbox record are listed, never all of `.fgos`: tracked files live there and would appear
+ * deleted in the checkout status under a mask. The herdr sockets are machine-private (MACHINE_PRIVATE_ROOTS).
  */
 export const BLIND_HIDDEN_ROOTS = Object.freeze([
   '{fgosDir}/assignments',
   '{fgosDir}/workflow-runs',
   '{fgosDir}/dispatch-runs',
+  // The mailbox record; its path is owned by packages/mailbox/rust/store/src/record/paths.rs.
+  '{fgosDir}/runtime/mailbox',
   '{confinementTempRoot}',
 ]);
 
 /** The directory Claude Code keeps one control socket per open session in (`<pid>.sock`). */
 export const SESSION_SOCKET_DIR = 'cc-socks';
+
+/**
+ * Hidden roots a blind launch creates (mode 0700) when missing instead of skipping them: an
+ * independent session creates the mailbox record at any time, and the mask is fixed when the
+ * worker starts, so a worker started before the first message must not see the ones written
+ * later. Created only by `createBlindRootsWhenMissing`, never by a lookup.
+ */
+const BLIND_ROOTS_CREATED_WHEN_MISSING = Object.freeze(['{fgosDir}/runtime/mailbox']);
+
+/** Why a directory cannot be created under a `.fgos` this process may not change. */
+const UNCREATABLE = new Set(['EACCES', 'EPERM', 'EROFS', 'ENOTDIR']);
+
+/**
+ * The blind launch's one write before its hidden roots are resolved: each root of
+ * BLIND_ROOTS_CREATED_WHEN_MISSING is created (mode 0700) when missing. A no-op when the `.fgos`
+ * directory does not exist, as the mailbox record requires it, and when it cannot take the
+ * directory (read-only, foreign-owned, `runtime` a plain file): the root then stays missing and
+ * the resolver skips it, as it skips every root with nothing to hide.
+ */
+export function createBlindRootsWhenMissing(fgosDir) {
+  if (typeof fgosDir !== 'string' || !fgosDir.trim()) return;
+  const base = path.resolve(fgosDir);
+  if (!fs.existsSync(base)) return;
+  for (const template of BLIND_ROOTS_CREATED_WHEN_MISSING) {
+    const root = template.replace('{fgosDir}', base);
+    try {
+      fs.mkdirSync(root, { recursive: true, mode: 0o700 });
+    } catch (error) {
+      if (!UNCREATABLE.has(error.code)) throw error;
+    }
+  }
+}
 
 /**
  * Host directories that hold per-machine private files and are hidden from EVERY confined
@@ -268,7 +303,9 @@ function realPathOrNull(p) {
 
 /**
  * The absolute paths `hostRead: blind` hides for a dispatch (BLIND_HIDDEN_ROOTS with its tokens
- * filled in). A root that does not exist on this machine is skipped: there is nothing to hide.
+ * filled in). A pure lookup: a root that does not exist on this machine is skipped, as there is
+ * nothing to hide, and nothing is created (a blind launch calls `createBlindRootsWhenMissing`
+ * first).
  */
 export function resolveBlindHiddenRoots({ fgosDir, backendConfig = {} } = {}) {
   if (typeof fgosDir !== 'string' || !fgosDir.trim()) {
@@ -568,6 +605,7 @@ export function resolveConfinementResources({
     if (!context.runDir) {
       throw new ConfinementResourceError('confinement-grant-invalid', 'hostRead: blind requires context.runDir.');
     }
+    createBlindRootsWhenMissing(context.fgosDir);
     const hiddenRoots = resolveBlindHiddenRoots({ fgosDir: context.fgosDir, backendConfig });
     const { hostTarget: ownDir } = canonicalizeAndVerifySubpath(ownDispatchDir(context.runDir), context.fgosDir, 'own-assignment');
     if (!fs.existsSync(ownDir)) {

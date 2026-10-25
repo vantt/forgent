@@ -1769,9 +1769,18 @@ function rustTestRanges(code) {
   return ranges;
 }
 
-function rustModel(name, source) {
+// A Rust file that is test code by where it sits: anything under a `tests/` directory, and the
+// `benches/` and `examples/` targets of a crate, a directory beside the crate's Cargo.toml. A product
+// directory that happens to be called `examples` (under `src/`, say) stays product.
+function rustTestFile(name, root) {
+  if (/(^|\/)tests\//.test(name)) return true;
+  const target = /^(.*?\/)?(?:benches|examples)\//.exec(name);
+  return Boolean(target) && fs.existsSync(path.join(root, target[1] ?? '', 'Cargo.toml'));
+}
+
+function rustModel(name, source, root) {
   const code = lexRust(source);
-  const testFile = /(^|\/)tests\//.test(name) || /(^|\/)benches\//.test(name);
+  const testFile = rustTestFile(name, root);
   const tests = rustTestRanges(code);
   const block = (open) => { let depth = 0; let end = open; for (; end < code.length; end++) { if (code[end] === '{') depth++; else if (code[end] === '}' && --depth === 0) break; } return end; };
   // Generic parameters may nest one level (`fn run<S: AsRef<OsStr>>(..)`).
@@ -2444,7 +2453,7 @@ export function scan({ root = REPO, files, openInspect } = {}) {
   for (const full of list) {
     const name = rel(root, full);
     if (path.extname(name) !== '.rs') continue;
-    try { const m = rustModel(name, fs.readFileSync(full, 'utf8')); m.ctx = ctx; ctx.rust.set(name, m); } catch { /* unreadable: skipped below too */ }
+    try { const m = rustModel(name, fs.readFileSync(full, 'utf8'), root); m.ctx = ctx; ctx.rust.set(name, m); } catch { /* unreadable: skipped below too */ }
   }
   for (const full of list) {
     const name = rel(root, full);
@@ -2455,7 +2464,7 @@ export function scan({ root = REPO, files, openInspect } = {}) {
     if (!kind) continue;
     digests[name] = sha256(source);
     if (kind === 'js') scanJs(name, source, ctx);
-    else if (kind === 'rust') scanRust(ctx.rust.get(name) ?? rustModel(name, source), ctx);
+    else if (kind === 'rust') scanRust(ctx.rust.get(name) ?? rustModel(name, source, root), ctx);
     else if (kind === 'shell') scanShell(name, source, ctx);
     else if (kind === 'skill') scanSkill(name, source, ctx);
   }

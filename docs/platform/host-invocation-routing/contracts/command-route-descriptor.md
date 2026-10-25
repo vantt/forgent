@@ -29,6 +29,7 @@ Minimum fields:
 | `legacy_payload` | Required only for `legacy-cli`; names `legacy-node`. |
 | `owner_path` | Canonical implementation boundary to edit. |
 | `compatibility_tests` | Named parity/vector suites required for repair. |
+| `native_kinds` | Optional, and only on a `legacy-cli` selector: an array of kinds (the selector's first positional) the host serves natively before the composition root; every other kind reaches the legacy payload. Today only `hook` carries it, with `["mailbox"]`; `scripts/export-command-selectors.mjs` refuses it on a selector that is not `legacy-cli`, and `test/rust-host/command-routes.test.mjs` holds it to `hook` alone. |
 
 ## 2. Rules
 
@@ -41,7 +42,7 @@ Minimum fields:
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Descriptor exists for every selector. | `current partial` | [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json), [../../../../test/rust-host/command-routes.test.mjs](../../../../test/rust-host/command-routes.test.mjs) | Current snapshot has 73 selectors: 71 `legacy-cli`, two native. Keep drift tests current as selectors move. |
+| Descriptor exists for every selector. | `current partial` | [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json), [../../../../test/rust-host/command-routes.test.mjs](../../../../test/rust-host/command-routes.test.mjs) | Snapshot on branch `mailbox/v1-v3`: 80 selectors, 73 `legacy-cli`, seven native. Keep drift tests current as selectors move. |
 | `legacy-cli` preserves provider-owned argv. | `implemented preview` | [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Full compatibility-vector cleanup remains future, but manifest-owned legacy CLI lane is proven for preview. |
 
 ## 4. Related Files

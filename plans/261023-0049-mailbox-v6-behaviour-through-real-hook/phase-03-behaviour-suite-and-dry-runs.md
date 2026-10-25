@@ -50,3 +50,8 @@ Run: `free -g | awk '/Mem:/{print $7}'`, then `timeout 1800 node test/live/mailb
 
 - ST timing is a race against the model's final answer: measured as `not-reached` and `channel-mismatch`, bounded by the cell cap and the exclusion-bias rule.
 - Rollback: the suite and both modules are new files; the pinned worktree is removed with `git worktree remove`.
+
+## Plan-owner decisions after the suite (2026-10-23)
+
+- Accepted touch outside the V6 files, listed in the closing report under "touches outside mailbox": one-line config-helper writes in the V5 setup tests and `test/live/mailbox-claude.live.mjs` (main's single test door for config).
+- Pinned at `7dd06c7dc`; stage A is approved from the pinned worktree.

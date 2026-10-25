@@ -217,6 +217,16 @@ export function assertAllSelectorsListed(routes, registry = COMMAND_REGISTRY, he
 // The help door (`fgos --help|-h [<verb>] [--json]`) is answered by the
 // legacy-node payload, which owns the manifest. Only these exact tokens are
 // routed; any other leading option still has no route (R3 fails closed).
+function nativeKinds(selector, routeKind, kinds) {
+  if (routeKind !== 'legacy-cli') {
+    throw new Error(`native_kinds on selector "${selector}" needs route_kind legacy-cli, not ${routeKind}`);
+  }
+  if (!Array.isArray(kinds) || kinds.length === 0 || !kinds.every((k) => typeof k === 'string' && k)) {
+    throw new Error(`native_kinds on selector "${selector}" must be a non-empty array of kind names`);
+  }
+  return [...kinds].sort();
+}
+
 function helpRoute(selector) {
   return {
     selector,
@@ -314,6 +324,10 @@ export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations
       owner_path,
       compatibility_tests,
       ...(ann?.subcommands !== undefined ? { subcommands: Boolean(ann.subcommands) } : {}),
+      // A legacy-cli selector may name kinds (its first positional) the host
+      // serves natively before the composition root; every other kind still
+      // reaches the legacy payload.
+      ...(ann?.native_kinds !== undefined ? { native_kinds: nativeKinds(selector, route_kind, ann.native_kinds) } : {}),
       // The Rust host validates a native verb's flags itself (the legacy-node
       // payload does it for every other verb), from this projection of the
       // registry: one list of valid flags, two enforcement points.

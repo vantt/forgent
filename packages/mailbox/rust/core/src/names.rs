@@ -1,0 +1,195 @@
+//! Short names and name resolution (spec §5.1.1).
+use crate::ids::{drawn_hex, Cli, IdSource, ShortName, WriterKey};
+use crate::limits::Limits;
+use crate::registry::Binding;
+use crate::state::MailboxState;
+use std::collections::BTreeSet;
+use std::fmt;
+
+/// The length of a short name's suffix before any collision (spec §5.1.1).
+const SUFFIX_LEN: usize = 2;
+
+/// Why a typed name did not resolve to exactly one head.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ResolveRefusal {
+    /// The query names several heads at once; agents may not address a group.
+    Group,
+    /// Several heads match at the first step that matched more than one.
+    Ambiguous { candidates: Vec<ShortName> },
+    /// Nothing matches; every current name, sorted.
+    Unknown { candidates: Vec<ShortName> },
+}
+
+impl ResolveRefusal {
+    pub const fn code(&self) -> &'static str {
+        match self {
+            Self::Group => "group",
+            Self::Ambiguous { .. } => "ambiguous-name",
+            Self::Unknown { .. } => "unknown-name",
+        }
+    }
+}
+
+impl fmt::Display for ResolveRefusal {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.code())
+    }
+}
+
+impl std::error::Error for ResolveRefusal {}
+
+/// Whether a typed name addresses several heads at once (check 1). A
+/// caller that resolves aliases itself leaves such text to the core, so a
+/// group is refused as a group whatever else it looks like.
+pub fn is_group(query: &str) -> bool {
+    query
+        .chars()
+        .any(|c| c == ',' || c == '*' || c.is_whitespace())
+}
+
+pub(crate) fn in_name_alphabet(c: char) -> bool {
+    c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-')
+}
+
+fn is_own_suffix(text: &str) -> bool {
+    text.len() == SUFFIX_LEN
+        && text
+            .chars()
+            .all(|c| c.is_ascii_digit() || c.is_ascii_lowercase())
+}
+
+/// Builds `<project>-<cli>-<suffix>`, cutting the project part so the whole
+/// name fits the header bound. `None` when no project character fits.
+fn compose(project: &str, cli: &Cli, suffix: &str, limits: &Limits) -> Option<String> {
+    let tail = format!("-{}-{}", cli.as_str(), suffix);
+    let room = (limits.frame.max_header_chars as usize).checked_sub(tail.len())?;
+    let part: String = project
+        .chars()
+        .map(|c| if in_name_alphabet(c) { c } else { '-' })
+        .take(room)
+        .collect();
+    (!part.is_empty()).then(|| part + &tail)
+}
+
+/// Allocates a free short name. The head's own two characters are kept when
+/// valid and free; otherwise drawn hex, one character longer per collision.
+pub(crate) fn allocate(
+    state: &MailboxState,
+    project: &str,
+    cli: &Cli,
+    own_suffix: Option<&str>,
+    limits: &Limits,
+    ids: &mut dyn IdSource,
+) -> Option<ShortName> {
+    let taken = |name: &str| state.bindings().any(|b| b.name.as_str() == name);
+    let mut len = SUFFIX_LEN;
+    if let Some(own) = own_suffix.filter(|s| is_own_suffix(s)) {
+        let name = compose(project, cli, own, limits)?;
+        if !taken(&name) {
+            return Some(ShortName::new(name));
+        }
+        len += 1;
+    }
+    loop {
+        let name = compose(project, cli, &drawn_hex(ids, len), limits)?;
+        if !taken(&name) {
+            return Some(ShortName::new(name));
+        }
+        len += 1;
+    }
+}
+
+fn names_of<'a>(bindings: impl Iterator<Item = &'a Binding>) -> Vec<ShortName> {
+    let mut names: Vec<ShortName> = bindings.map(|b| b.name.clone()).collect();
+    names.sort();
+    names
+}
+
+impl MailboxState {
+    /// Resolves a typed name to exactly one head: exact short name, then a
+    /// unique short-name prefix, then the exact key, then a unique key
+    /// prefix. A name is never
+    /// taken from message text.
+    pub fn resolve(&self, query: &str) -> Result<&Binding, ResolveRefusal> {
+        self.resolve_skipping(query, &BTreeSet::new())
+    }
+
+    /// The binding of exactly `key` (a head the caller resolved itself),
+    /// unless the store judged it dead: then unknown, as for a name.
+    pub(crate) fn resolve_key(
+        &self,
+        key: &WriterKey,
+        skipped: &BTreeSet<WriterKey>,
+    ) -> Result<&Binding, ResolveRefusal> {
+        match self.bindings.get(key) {
+            Some(binding) if !skipped.contains(key) => Ok(binding),
+            _ => Err(ResolveRefusal::Unknown {
+                candidates: names_of(self.bindings().filter(|b| !skipped.contains(&b.key))),
+            }),
+        }
+    }
+
+    /// [`MailboxState::resolve`] with the bindings of `skipped` (heads the
+    /// store judged dead) taken out of the prefix steps and the candidates.
+    /// An exact match still names its own head: an exact short name or key
+    /// of a skipped head is refused as unknown and never passed on to a
+    /// live head it happens to prefix.
+    pub(crate) fn resolve_skipping(
+        &self,
+        query: &str,
+        skipped: &BTreeSet<WriterKey>,
+    ) -> Result<&Binding, ResolveRefusal> {
+        let live = || self.bindings().filter(|b| !skipped.contains(&b.key));
+        let unknown = || ResolveRefusal::Unknown {
+            candidates: names_of(live()),
+        };
+        if is_group(query) {
+            return Err(ResolveRefusal::Group);
+        }
+        if query.is_empty() {
+            return Err(unknown());
+        }
+        let steps: [Step<'_>; 4] = [
+            (Match::Exact, &|b| b.name.as_str() == query),
+            (Match::Prefix, &|b| b.name.as_str().starts_with(query)),
+            (Match::Exact, &|b| b.key.as_str() == query),
+            (Match::Prefix, &|b| b.key.as_str().starts_with(query)),
+        ];
+        for (kind, matches) in steps {
+            match kind {
+                Match::Exact => {
+                    if let Some(exact) = self.bindings().find(|b| matches(b)) {
+                        if skipped.contains(&exact.key) {
+                            return Err(unknown());
+                        }
+                        return Ok(exact);
+                    }
+                }
+                Match::Prefix => {
+                    let found: Vec<&Binding> = live().filter(|b| matches(b)).collect();
+                    match found.as_slice() {
+                        [] => {}
+                        [one] => return Ok(one),
+                        many => {
+                            return Err(ResolveRefusal::Ambiguous {
+                                candidates: names_of(many.iter().copied()),
+                            })
+                        }
+                    }
+                }
+            }
+        }
+        Err(unknown())
+    }
+}
+
+/// One resolution step: how it matches, and what it matches.
+type Step<'a> = (Match, &'a dyn Fn(&Binding) -> bool);
+
+/// How a resolution step matches: an exact name or key names one head
+/// whatever its judgement; a prefix matches only heads not skipped.
+#[derive(Clone, Copy)]
+enum Match {
+    Exact,
+    Prefix,
+}

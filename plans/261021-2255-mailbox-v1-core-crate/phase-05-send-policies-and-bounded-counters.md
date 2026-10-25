@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Send policies and bounded refusal counters"
-status: pending
+status: done
 priority: P2
 effort: "5h"
 dependencies: [4]
@@ -95,3 +95,17 @@ node scripts/git-one-door-scan.mjs --write-census
 - **The check order decides which reason a sender sees.** The order is fixed here and recorded in the spec in phase 8 so the verb text at V5 matches.
 - **Senders with no head share one budget.** The runner and the CLI can therefore crowd each other out. This is accepted for the first slice, because no consumer uses them yet (spec §16 Q3). It is revisited with owner question Q3.
 - **Test 10 runs about 600 sends.** It must finish in under a second, with no sleeps.
+
+## Implementation notes (2026-10-21)
+
+- Deviations (smallest correct fix):
+  - The accounting identity is a `String` newtype `Account` (it keys the `budget` map); `LifetimeKey` is the `<key>@<generation>` newtype.
+  - A refusal at checks 1-2 is counted under the recipient label `unresolved`, never the typed text, which has no length bound and would let a flood of long names grow the counters.
+  - When two candidate parents were offered at the same instant, the later one in recording order is the parent (`(offered at, position)` maximum).
+  - Phase 4's notices-overflow test sent eleven pending messages from one sender to one recipient, which the queue share (check 10) now refuses at the eleventh. Its fixture now spreads the messages over two recipients; what it asserts is unchanged.
+  - The flood test's margin is 128 bytes: only decimal digits may grow (the per-reason totals and the times held in the budget window and the counters).
+- Refusal codes and the check order match the table above and plan decision 4; `Refusal::reason()` maps each to its `CounterReason`.
+
+## Review fixes (2026-10-21, code review of phases 1-4)
+
+- **L4**: a new check 0 runs before the group check: a `from` longer than `frame.maxHeaderChars` is refused `sender-key-too-long` (`Refusal::SenderKeyTooLong`, counter `SenderKeyTooLong`), so no unbounded text reaches a header or the snapshot. This prepends one check to plan decision 4's order; the rest of the order is unchanged. Owning test in `tests/policies.rs`.
