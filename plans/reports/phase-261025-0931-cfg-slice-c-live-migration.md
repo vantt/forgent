@@ -34,6 +34,12 @@ The door cannot write that file. It refuses a JSON global with `config-format-le
 
 So the effective value of this repository on fg-server is the same before and after.
 
+**The edit was undone once (12:50 finding).** At 10:15:57 the release upgrade on fg-server (`fgctl upgrade` to `8e69abc2…`, then `fgos setup --json`, run by IDENT) put back the same 21 catalog keys and `terminal.layout.policy`. Setup's report listed them in `globalConfigAddedKeys`. A release before Slice C merges the registered defaults into the global file on every `fgos setup`. The key paths were compared with the backup, and the 13 test files run at that time were re-run twice while the file was watched; neither run wrote it. The keys were removed again at 12:57 with the same script; backup `~/.fgos/private/config.json.bak-261025-before-leak-repro`. After C, setup only calls `init`, which leaves an existing file alone (`golden_init` `an_existing_file_is_kept_whether_yaml_or_legacy_json`). So on each machine, the global file stays clean only once C is active there; until then, a `fgos setup` restores the keys.
+
+## Re-migration after merging SEAT's standard pools
+
+`origin/main` `de80877d2` brought SEAT's standard pools, which end with `openai` (`9d5fb95a4`, `bd5a8ad2b`). Nine of this repository's pools no longer equal the standard. Read through the door with no global file, the YAML committed in `6c041c302` would have changed them; for example, `advise` would go from `[claude]` to `[claude, openai]` and the `code:*` red-team pool from `[xai]` to `[xai, claude, openai]`. The pre-migration `config.json` is byte-identical on `6c041c302^` and on `origin/main`, so it was migrated again with the merged code: kept 36, droppedRedundant 240, machineOverrides 0. The new YAML is the old one plus exactly those nine `prefer` lists; no other path changed (leaf-path comparison), and the door reads all four checked pools back from the project layer with the old file's values (`be321d6d3`). The pinned-copy golden test now counts 37 kept and 235 dropped, and its size bound is relative to the source file (`da25c9521`).
+
 ## Step 4 evidence
 
 - **Tests on the migrated file.** The 12 files that held earlier failures were re-run: 319 passed, 20 failed. The six failures caused by reading the unmigrated config are now green: `capability-plan-lint`, `dispatch-i08b-remediation`, `dispatch-operability` (2), `dispatch-governance-operability`, `test-select-mutate`. What remains:
@@ -69,10 +75,26 @@ The 20 that remain are known:
 - 2 inline-lead cases in `run.test.mjs`, waiting on SEAT.
 - `node-version-and-git`, which reads the main checkout's unmigrated file from a linked worktree.
 
+## Gates after merging `de80877d2` (head `be321d6d3`)
+
+Run sequentially, 13:06 to 13:32.
+
+| Gate | Result |
+|---|---|
+| `cargo test --workspace --no-fail-fast -j 4` | 1635 passed, 0 failed |
+| `npm test` | 8487 passed, 18 failed: 17 `fgctl-upgrade`/`fgctl-init-download-sources` (red on main too) and `checks-doctor-config` `node-version-and-git` (reads the main checkout's unmigrated file) |
+| gateway `cargo test` | 88 passed, 0 failed |
+| dashboard `cargo test` | exit 0 |
+| `cargo clippy --locked --workspace --all-targets -- -D warnings` | exit 0 |
+
+SEAT retired the two inline-lead cases, so they no longer fail.
+
 ## Still to do
 
 - Budget counts in the phase 23 closeout.
-- The landing waits on SEAT's two items.
+- `DEFAULT_RUNNER_CONFIG` (`src/runner/dispatch/config.mjs`) has no caller in src or bin. The write path that used it is gone. Three test files still use it as a fixture base. Follow-up: move them onto the standard and delete it (one door).
+- Rollback for phase 22: the active release is now `sha256:8e69abc2…` (activated 10:11:41), with `4ea7812b…` as previous. The rollback target is `8e69abc2`, no longer `4ea7812b`.
+- Do not run `fgos setup` on any machine with a release before C on it after cleaning its global file.
 
 ## Unresolved
 
