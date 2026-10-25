@@ -1,0 +1,1344 @@
+{
+  "contract": "phase9-dependency-decisions.v1",
+  "sourcePin": "c94545de5b45873cb2eb419f10124283fd730a2e",
+  "status": "authored-local-decisions-not-cutover-approval",
+  "recordHashEncoding": "SHA-256 of the physical JSONL line excluding line endings",
+  "scope": "33 Phase 9 dependencies in seven exact physical records; no pair accounting or changes to original parked/carriedBlocker fields.",
+  "counts": {
+    "moved": 3,
+    "retained-in-place": 26,
+    "retired": 4
+  },
+  "untouchedDependenciesInSelectedRecords": 75,
+  "contextSources": [
+    {
+      "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+      "sha256": "35d0d046d54204f739e79218dcae95451f380df8b0427964b3ea456b57f20792",
+      "quote": "8. regenerate projections and indexes;"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md",
+      "sha256": "54872054c6b16f096caecccdef9f9792237033bb300b477fa12a7e7238711365",
+      "quote": "No product module or test is retired."
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/partition.json.gz",
+      "sha256": "be5a3174270e303e52dc5f226abc263e05c86f599c0c3982431194e23ddfbafe",
+      "pointer": "/counts"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/gate-retention.json.gz",
+      "sha256": "a5e3f46641efb2219c695f770b68e4e97ec3f210facf4fb1e1c1568d23a4317d",
+      "pointer": "/schedule"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-cutover-move-set.json",
+      "sha256": "3b8f1999d1e2b4b32e5219185ab61493569b8ade135ebebd784ceef5ab2cf5db",
+      "pointer": "/sourceNotes"
+    }
+  ],
+  "proposalPolicy": "leadDecisionProposed=true is required for an unsettled design choice. None is needed here: L12-96 and the later conserved/superseded clauses already decide all 33. This packet does not invent a new physical move for clause carriage.",
+  "finalPinDuties": [
+    "Lead integrates the five referenced gateway body patches with the full shared-file chain at F, whole-file digest guarded, preserving CTR010 and gateway-yaml claim carries; rerun owning HTTP/MCP fixture and actual-read proofs after the move.",
+    "Lead integrates the existing carries bin pointer delta with the other prepared bin bodies at F; final-pin drift reopens source bindings, not already settled path policy.",
+    "Retain the three manifest paths, regenerate contents through owning generators and verify against the authorized bounded exports. WORK/registry export dependencies remain external and unchanged.",
+    "Archive refs/partition are a plan-evidence custody design at their own historical pin. Rebuild at F; do not interpret archive records as permission to remove product inputs.",
+    "The superseded js-yaml backlog binding has no live patch to apply. Preserve the separate backlog-owner replacement question; do not replay stale whole-file patches."
+  ],
+  "entries": [
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:2",
+      "pointer": "/parked/0",
+      "id": "dynamic-016778",
+      "recordSha256": "38a6ed6e451d84886add22b0f578bef9e5e438e7b439fc72879451eeb3b206ed",
+      "consumerFile": "test/architecture.test.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/architecture-manifest.json",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "test/architecture.test.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/architecture-manifest.json",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Retain `docs/enduser-docs-index.json` (family 7); its content regeneration remains family 2's separate obligation. Retain `docs/architecture-manifest.json` (family 22) and drop its differing candidate copy from the move set at Step 7."
+        }
+      ],
+      "reason": "L12-96 explicitly retains this product manifest at its existing path; no consumer retarget or new default is needed. Drop the differing candidate manifest move, not the live architecture input. Keep the architecture reader and its owning assertions on the retained source."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:1",
+      "pointer": "/parked/0",
+      "id": "dynamic-017973",
+      "recordSha256": "bbc5f737c4a5e7809266b510c6cd90f7b04576e0ceb927ea11d747d27a8f62e0",
+      "consumerFile": "test/cli/helpers/fgos-cli-harness.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/enduser-docs-index.json",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "test/cli/helpers/fgos-cli-harness.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/enduser-docs-index.json",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Retain `docs/enduser-docs-index.json` (family 7); its content regeneration remains family 2's separate obligation. Retain `docs/architecture-manifest.json` (family 22) and drop its differing candidate copy from the move set at Step 7."
+        }
+      ],
+      "reason": "L12-96 explicitly retains this product manifest at its existing path; no consumer retarget or new default is needed. End-user index contents still regenerate through the existing generator with the authorized registry export and post-move scan set; path retention proves no serialized-content parity."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl:3",
+      "pointer": "/parked/2",
+      "id": "reference-003646",
+      "recordSha256": "3b24d57c63dff3dc1a76f2be57f7f9886988f1e75005bb777dbfcf249d6e286f",
+      "consumerFile": "src/cli/command-registry.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/cli/command-registry.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl:3",
+      "pointer": "/parked/3",
+      "id": "reference-003651",
+      "recordSha256": "3b24d57c63dff3dc1a76f2be57f7f9886988f1e75005bb777dbfcf249d6e286f",
+      "consumerFile": "src/cli/command-registry.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/cli/command-registry.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl:3",
+      "pointer": "/parked/8",
+      "id": "author-s4-fix2-284fae1afd0a9579",
+      "recordSha256": "3b24d57c63dff3dc1a76f2be57f7f9886988f1e75005bb777dbfcf249d6e286f",
+      "consumerFile": "src/cli/command-registry.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/enduser-docs-index.json",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/cli/command-registry.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/enduser-docs-index.json",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Retain `docs/enduser-docs-index.json` (family 7); its content regeneration remains family 2's separate obligation. Retain `docs/architecture-manifest.json` (family 22) and drop its differing candidate copy from the move set at Step 7."
+        }
+      ],
+      "reason": "L12-96 explicitly retains this product manifest at its existing path; no consumer retarget or new default is needed. End-user index contents still regenerate through the existing generator with the authorized registry export and post-move scan set; path retention proves no serialized-content parity."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl:3",
+      "pointer": "/parked/11",
+      "id": "author-s67-command-registry-manifest-861",
+      "recordSha256": "3b24d57c63dff3dc1a76f2be57f7f9886988f1e75005bb777dbfcf249d6e286f",
+      "consumerFile": "src/cli/command-registry.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/enduser-docs-index.json",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/cli/command-registry.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/enduser-docs-index.json",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Retain `docs/enduser-docs-index.json` (family 7); its content regeneration remains family 2's separate obligation. Retain `docs/architecture-manifest.json` (family 22) and drop its differing candidate copy from the move set at Step 7."
+        }
+      ],
+      "reason": "L12-96 explicitly retains this product manifest at its existing path; no consumer retarget or new default is needed. End-user index contents still regenerate through the existing generator with the authorized registry export and post-move scan set; path retention proves no serialized-content parity."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
+      "pointer": "/parked/0",
+      "id": "reference-000200",
+      "recordSha256": "90d60ef44a4b735890fbbbcdc6b8edc65180ba6f4639e4b6fc55f70e81547fe2",
+      "consumerFile": "apps/fgos-gateway/src/mcp.rs",
+      "dependency": "Phase 9 retention-or-move decision for docs/contracts/fgos-gateway-api-v1.yaml",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "apps/fgos-gateway/Cargo.toml",
+          "role": "maintained contract citation co-cut; not a runtime file reader",
+          "operationIds": [
+            "reference-000154"
+          ],
+          "proofs": []
+        },
+        {
+          "path": "apps/fgos-gateway/src/gateway.rs",
+          "role": "runtime contract read and in-file test fixture co-cut",
+          "operationIds": [
+            "dynamic-000664",
+            "dynamic-000665",
+            "dynamic-000693",
+            "dynamic-000694",
+            "reference-000162",
+            "reference-000163",
+            "reference-000164",
+            "reference-000172",
+            "reference-000173",
+            "reference-000177",
+            "reference-000178",
+            "reference-000181",
+            "reference-000183",
+            "reference-000187"
+          ],
+          "proofs": [
+            "apps/fgos-gateway/src/gateway.rs"
+          ]
+        },
+        {
+          "path": "apps/fgos-gateway/src/mcp.rs",
+          "role": "runtime contract read and in-file test fixture co-cut",
+          "operationIds": [
+            "dynamic-000767",
+            "dynamic-000768",
+            "dynamic-000777",
+            "dynamic-000778",
+            "dynamic-000782",
+            "dynamic-000783",
+            "dynamic-000787",
+            "dynamic-000788",
+            "reference-000190",
+            "reference-000191",
+            "reference-000192",
+            "reference-000193",
+            "reference-000194",
+            "reference-000195",
+            "reference-000196",
+            "reference-000200"
+          ],
+          "proofs": [
+            "apps/fgos-gateway/src/mcp.rs"
+          ]
+        },
+        {
+          "path": "apps/fgos-gateway/web/src/api/client.ts",
+          "role": "maintained contract citation co-cut; not a runtime file reader",
+          "operationIds": [
+            "reference-000203"
+          ],
+          "proofs": []
+        },
+        {
+          "path": "apps/fgos-gateway/web/src/api/types.ts",
+          "role": "maintained contract citation co-cut; not a runtime file reader",
+          "operationIds": [
+            "reference-000206"
+          ],
+          "proofs": []
+        }
+      ],
+      "patchRefs": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/54"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/55"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/56"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/59"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/61"
+        }
+      ],
+      "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "decision": "moved",
+      "destination": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Move `docs/contracts/fgos-gateway-api-v1.yaml` to the herdr-web-dashboard contract; repoint `gateway.rs`, `mcp.rs` and tests and delete the duplicate at cutover (families 12 and 21), preserving CTR010 identity and the `gateway-yaml-*` carry obligations."
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-cutover-move-set.json",
+          "sha256": "3b8f1999d1e2b4b32e5219185ab61493569b8ade135ebebd784ceef5ab2cf5db",
+          "pointer": "/paths/993"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-read-units.json",
+          "sha256": "6b481f93c6e74f209bd3ea779c55dd77ed7c93a78183e1666a476a05af075157",
+          "pointer": "/units/4"
+        }
+      ],
+      "reason": "L12-96 explicitly chooses the sole herdr-web-dashboard CTR010 contract. Both copies are byte-identical at this pin. Co-cut both actual readers, their in-file fixtures and all three maintained code citation consumers; remove the old duplicate only at authorized cutover. Preserve gateway-yaml claim carries and CTR010 identity; final-pin full-chain recompose/review and runtime proof remain owed."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
+      "pointer": "/parked/1",
+      "id": "dynamic-000767",
+      "recordSha256": "90d60ef44a4b735890fbbbcdc6b8edc65180ba6f4639e4b6fc55f70e81547fe2",
+      "consumerFile": "apps/fgos-gateway/src/mcp.rs",
+      "dependency": "Phase 9 retention-or-move decision for docs/contracts/fgos-gateway-api-v1.yaml",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "apps/fgos-gateway/Cargo.toml",
+          "role": "maintained contract citation co-cut; not a runtime file reader",
+          "operationIds": [
+            "reference-000154"
+          ],
+          "proofs": []
+        },
+        {
+          "path": "apps/fgos-gateway/src/gateway.rs",
+          "role": "runtime contract read and in-file test fixture co-cut",
+          "operationIds": [
+            "dynamic-000664",
+            "dynamic-000665",
+            "dynamic-000693",
+            "dynamic-000694",
+            "reference-000162",
+            "reference-000163",
+            "reference-000164",
+            "reference-000172",
+            "reference-000173",
+            "reference-000177",
+            "reference-000178",
+            "reference-000181",
+            "reference-000183",
+            "reference-000187"
+          ],
+          "proofs": [
+            "apps/fgos-gateway/src/gateway.rs"
+          ]
+        },
+        {
+          "path": "apps/fgos-gateway/src/mcp.rs",
+          "role": "runtime contract read and in-file test fixture co-cut",
+          "operationIds": [
+            "dynamic-000767",
+            "dynamic-000768",
+            "dynamic-000777",
+            "dynamic-000778",
+            "dynamic-000782",
+            "dynamic-000783",
+            "dynamic-000787",
+            "dynamic-000788",
+            "reference-000190",
+            "reference-000191",
+            "reference-000192",
+            "reference-000193",
+            "reference-000194",
+            "reference-000195",
+            "reference-000196",
+            "reference-000200"
+          ],
+          "proofs": [
+            "apps/fgos-gateway/src/mcp.rs"
+          ]
+        },
+        {
+          "path": "apps/fgos-gateway/web/src/api/client.ts",
+          "role": "maintained contract citation co-cut; not a runtime file reader",
+          "operationIds": [
+            "reference-000203"
+          ],
+          "proofs": []
+        },
+        {
+          "path": "apps/fgos-gateway/web/src/api/types.ts",
+          "role": "maintained contract citation co-cut; not a runtime file reader",
+          "operationIds": [
+            "reference-000206"
+          ],
+          "proofs": []
+        }
+      ],
+      "patchRefs": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/54"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/55"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/56"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/59"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/61"
+        }
+      ],
+      "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "decision": "moved",
+      "destination": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Move `docs/contracts/fgos-gateway-api-v1.yaml` to the herdr-web-dashboard contract; repoint `gateway.rs`, `mcp.rs` and tests and delete the duplicate at cutover (families 12 and 21), preserving CTR010 identity and the `gateway-yaml-*` carry obligations."
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-cutover-move-set.json",
+          "sha256": "3b8f1999d1e2b4b32e5219185ab61493569b8ade135ebebd784ceef5ab2cf5db",
+          "pointer": "/paths/993"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-read-units.json",
+          "sha256": "6b481f93c6e74f209bd3ea779c55dd77ed7c93a78183e1666a476a05af075157",
+          "pointer": "/units/4"
+        }
+      ],
+      "reason": "L12-96 explicitly chooses the sole herdr-web-dashboard CTR010 contract. Both copies are byte-identical at this pin. Co-cut both actual readers, their in-file fixtures and all three maintained code citation consumers; remove the old duplicate only at authorized cutover. Preserve gateway-yaml claim carries and CTR010 identity; final-pin full-chain recompose/review and runtime proof remain owed."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
+      "pointer": "/parked/2",
+      "id": "dynamic-000768",
+      "recordSha256": "90d60ef44a4b735890fbbbcdc6b8edc65180ba6f4639e4b6fc55f70e81547fe2",
+      "consumerFile": "apps/fgos-gateway/src/mcp.rs",
+      "dependency": "Phase 9 retention-or-move decision for docs/contracts/fgos-gateway-api-v1.yaml",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "apps/fgos-gateway/Cargo.toml",
+          "role": "maintained contract citation co-cut; not a runtime file reader",
+          "operationIds": [
+            "reference-000154"
+          ],
+          "proofs": []
+        },
+        {
+          "path": "apps/fgos-gateway/src/gateway.rs",
+          "role": "runtime contract read and in-file test fixture co-cut",
+          "operationIds": [
+            "dynamic-000664",
+            "dynamic-000665",
+            "dynamic-000693",
+            "dynamic-000694",
+            "reference-000162",
+            "reference-000163",
+            "reference-000164",
+            "reference-000172",
+            "reference-000173",
+            "reference-000177",
+            "reference-000178",
+            "reference-000181",
+            "reference-000183",
+            "reference-000187"
+          ],
+          "proofs": [
+            "apps/fgos-gateway/src/gateway.rs"
+          ]
+        },
+        {
+          "path": "apps/fgos-gateway/src/mcp.rs",
+          "role": "runtime contract read and in-file test fixture co-cut",
+          "operationIds": [
+            "dynamic-000767",
+            "dynamic-000768",
+            "dynamic-000777",
+            "dynamic-000778",
+            "dynamic-000782",
+            "dynamic-000783",
+            "dynamic-000787",
+            "dynamic-000788",
+            "reference-000190",
+            "reference-000191",
+            "reference-000192",
+            "reference-000193",
+            "reference-000194",
+            "reference-000195",
+            "reference-000196",
+            "reference-000200"
+          ],
+          "proofs": [
+            "apps/fgos-gateway/src/mcp.rs"
+          ]
+        },
+        {
+          "path": "apps/fgos-gateway/web/src/api/client.ts",
+          "role": "maintained contract citation co-cut; not a runtime file reader",
+          "operationIds": [
+            "reference-000203"
+          ],
+          "proofs": []
+        },
+        {
+          "path": "apps/fgos-gateway/web/src/api/types.ts",
+          "role": "maintained contract citation co-cut; not a runtime file reader",
+          "operationIds": [
+            "reference-000206"
+          ],
+          "proofs": []
+        }
+      ],
+      "patchRefs": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/54"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/55"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/56"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/59"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+          "sha256": "c8813f6a7d7777354d7a1af5ec17d4eb07dc8605248ee823c2865570b056180e",
+          "pointer": "/specs/61"
+        }
+      ],
+      "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "decision": "moved",
+      "destination": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Move `docs/contracts/fgos-gateway-api-v1.yaml` to the herdr-web-dashboard contract; repoint `gateway.rs`, `mcp.rs` and tests and delete the duplicate at cutover (families 12 and 21), preserving CTR010 identity and the `gateway-yaml-*` carry obligations."
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-cutover-move-set.json",
+          "sha256": "3b8f1999d1e2b4b32e5219185ab61493569b8ade135ebebd784ceef5ab2cf5db",
+          "pointer": "/paths/993"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-read-units.json",
+          "sha256": "6b481f93c6e74f209bd3ea779c55dd77ed7c93a78183e1666a476a05af075157",
+          "pointer": "/units/4"
+        }
+      ],
+      "reason": "L12-96 explicitly chooses the sole herdr-web-dashboard CTR010 contract. Both copies are byte-identical at this pin. Co-cut both actual readers, their in-file fixtures and all three maintained code citation consumers; remove the old duplicate only at authorized cutover. Preserve gateway-yaml claim carries and CTR010 identity; final-pin full-chain recompose/review and runtime proof remain owed."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "pointer": "/parked/3",
+      "id": "reference-000232",
+      "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+      "consumerFile": "bin/fgos.mjs",
+      "dependency": "L12-63: Session-rule navigation: the complete quoted session rule is absent from docs/specs/runner.md at this pin. Phase 9 must conserve the exact session participation/branch isolation rule in a live holder before redirecting this help pointer. Own source passage: '      // registered session (docs/specs/runner.md: \"a session worktree is'",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "bin/fgos.mjs",
+          "role": "live comment retarget to conserved clause; no executable branch change"
+        }
+      ],
+      "patchRefs": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json",
+          "sha256": "190cc885a4382b1aa371280d20328e832ecc6ceb7676c24c67582939c196e605",
+          "pointer": "/patches/13"
+        }
+      ],
+      "file": "docs/specs/runner.md",
+      "decision": "retired",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Carry the **44 missing claims verbatim** into live holders at Step 7 / Phase 9: families 14 (13), 15 (12), 16 (11) and 18 (8). Bind exact passages and holders at Step 7, then apply carriage and pointer patches at cutover; rendered copies follow core sources. No locked law changes."
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "sha256": "35d0d046d54204f739e79218dcae95451f380df8b0427964b3ea456b57f20792",
+          "quote": "6. delete maintained files under `docs/specs/**` and `docs/architect/**` only"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/claim-carries.json",
+          "sha256": "fdd4d239cdadaff2e84a2104d1a233fb9465e2a102dfd86ebb22996404cbf706",
+          "pointer": "/claims/32"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+          "sha256": "69cc51e2c7ab32fece07f1aa579eaea1ca0c38e07f136f59cb98719b818b0476",
+          "pointer": "/conservedClaims/32"
+        }
+      ],
+      "retirementScope": "The cited legacy source/pointer for this clause, not the conserved behavior and not an unqualified whole-file move.",
+      "successor": {
+        "path": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+        "sha256": "5264bcccb384ecda4278d209b66a72fbcac51bd200b57df31ad45e62950d197d",
+        "quote": "## Session Participation And Merge Isolation",
+        "anchor": "session-participation-and-merge-isolation"
+      },
+      "reason": "Retire the incorrect runner-spec attribution, not session participation or merge isolation. L12-96 family 16 and the existing s11 carry conserve the exact rule in the named live candidate contract. The sentence was never found in the alleged old spec; its real origin is the return-guard research. Reuse carries/pointer-patches.json bin delta and compose it with the other bin owners at F."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "pointer": "/parked/4",
+      "id": "reference-000235",
+      "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+      "consumerFile": "bin/fgos.mjs",
+      "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias. Own source passage: '        // docs/architect/knowledge-registry-redesign.md §7.4: an'",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "bin/fgos.mjs",
+          "role": "live comment retarget to conserved clause; no executable branch change"
+        }
+      ],
+      "patchRefs": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json",
+          "sha256": "190cc885a4382b1aa371280d20328e832ecc6ceb7676c24c67582939c196e605",
+          "pointer": "/patches/13"
+        }
+      ],
+      "file": "docs/architect/knowledge-registry-redesign.md",
+      "decision": "retired",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Carry the **44 missing claims verbatim** into live holders at Step 7 / Phase 9: families 14 (13), 15 (12), 16 (11) and 18 (8). Bind exact passages and holders at Step 7, then apply carriage and pointer patches at cutover; rendered copies follow core sources. No locked law changes."
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "sha256": "35d0d046d54204f739e79218dcae95451f380df8b0427964b3ea456b57f20792",
+          "quote": "6. delete maintained files under `docs/specs/**` and `docs/architect/**` only"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/claim-carries.json",
+          "sha256": "fdd4d239cdadaff2e84a2104d1a233fb9465e2a102dfd86ebb22996404cbf706",
+          "pointer": "/claims/15"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+          "sha256": "69cc51e2c7ab32fece07f1aa579eaea1ca0c38e07f136f59cb98719b818b0476",
+          "pointer": "/conservedClaims/15"
+        }
+      ],
+      "retirementScope": "The cited legacy source/pointer for this clause, not the conserved behavior and not an unqualified whole-file move.",
+      "successor": {
+        "path": "docs/platform/work-state/contracts/knowledge-registry.md",
+        "sha256": "bd3c632640e5f26b23bdc84af29d44a6d564b6e6cbc84d4f7f140250e9379238",
+        "quote": "### 7.4 Attestation",
+        "anchor": "74-attestation"
+      },
+      "reason": "Retire the legacy redesign citation as a live rule owner, not the rule. L12-96 family 15 and the s11 carry bind §7.4 Attestation to the maintained knowledge-registry contract, not the proposal snapshot. Reuse the existing bin pointer patch; retain currentPath-only attestation, alias refusal and the HEAD gate. Registry end-user paths/exports are not changed by this decision."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "pointer": "/parked/5",
+      "id": "reference-000236",
+      "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+      "consumerFile": "bin/fgos.mjs",
+      "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias. Own source passage: '        // docs/architect/knowledge-registry-redesign.md §8: \"The new'",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "bin/fgos.mjs",
+          "role": "live comment retarget to conserved clause; no executable branch change"
+        }
+      ],
+      "patchRefs": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json",
+          "sha256": "190cc885a4382b1aa371280d20328e832ecc6ceb7676c24c67582939c196e605",
+          "pointer": "/patches/13"
+        }
+      ],
+      "file": "docs/architect/knowledge-registry-redesign.md",
+      "decision": "retired",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Carry the **44 missing claims verbatim** into live holders at Step 7 / Phase 9: families 14 (13), 15 (12), 16 (11) and 18 (8). Bind exact passages and holders at Step 7, then apply carriage and pointer patches at cutover; rendered copies follow core sources. No locked law changes."
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "sha256": "35d0d046d54204f739e79218dcae95451f380df8b0427964b3ea456b57f20792",
+          "quote": "6. delete maintained files under `docs/specs/**` and `docs/architect/**` only"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/claim-carries.json",
+          "sha256": "fdd4d239cdadaff2e84a2104d1a233fb9465e2a102dfd86ebb22996404cbf706",
+          "pointer": "/claims/16"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+          "sha256": "69cc51e2c7ab32fece07f1aa579eaea1ca0c38e07f136f59cb98719b818b0476",
+          "pointer": "/conservedClaims/16"
+        }
+      ],
+      "retirementScope": "The cited legacy source/pointer for this clause, not the conserved behavior and not an unqualified whole-file move.",
+      "successor": {
+        "path": "docs/platform/work-state/contracts/knowledge-registry.md",
+        "sha256": "bd3c632640e5f26b23bdc84af29d44a6d564b6e6cbc84d4f7f140250e9379238",
+        "quote": "## 8. Producer Enforcement",
+        "anchor": "8-producer-enforcement"
+      },
+      "reason": "Retire the legacy redesign citation as a live rule owner, not the rule. L12-96 family 15 and the s11 carry bind §8 Producer Enforcement to the maintained knowledge-registry contract, not the proposal snapshot. Reuse the existing bin pointer patch; retain currentPath-only attestation, alias refusal and the HEAD gate. Registry end-user paths/exports are not changed by this decision."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "pointer": "/parked/23",
+      "id": "dynamic-001360",
+      "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+      "consumerFile": "bin/fgos.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "bin/fgos.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "pointer": "/parked/24",
+      "id": "dynamic-001361",
+      "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+      "consumerFile": "bin/fgos.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "bin/fgos.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "pointer": "/parked/25",
+      "id": "dynamic-001363",
+      "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+      "consumerFile": "bin/fgos.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "bin/fgos.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "pointer": "/parked/33",
+      "id": "dynamic-001454",
+      "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+      "consumerFile": "bin/fgos.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/enduser-docs-index.json",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "bin/fgos.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/enduser-docs-index.json",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Retain `docs/enduser-docs-index.json` (family 7); its content regeneration remains family 2's separate obligation. Retain `docs/architecture-manifest.json` (family 22) and drop its differing candidate copy from the move set at Step 7."
+        }
+      ],
+      "reason": "L12-96 explicitly retains this product manifest at its existing path; no consumer retarget or new default is needed. End-user index contents still regenerate through the existing generator with the authorized registry export and post-move scan set; path retention proves no serialized-content parity."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "pointer": "/parked/40",
+      "id": "author-seam8-output-2071",
+      "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+      "consumerFile": "bin/fgos.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "bin/fgos.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "pointer": "/parked/41",
+      "id": "author-seam8-output-2074",
+      "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+      "consumerFile": "bin/fgos.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "bin/fgos.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "pointer": "/parked/42",
+      "id": "author-seam8-output-3029",
+      "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+      "consumerFile": "bin/fgos.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/enduser-docs-index.json",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "bin/fgos.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/enduser-docs-index.json",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Retain `docs/enduser-docs-index.json` (family 7); its content regeneration remains family 2's separate obligation. Retain `docs/architecture-manifest.json` (family 22) and drop its differing candidate copy from the move set at Step 7."
+        }
+      ],
+      "reason": "L12-96 explicitly retains this product manifest at its existing path; no consumer retarget or new default is needed. End-user index contents still regenerate through the existing generator with the authorized registry export and post-move scan set; path retention proves no serialized-content parity."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "pointer": "/parked/1",
+      "id": "reference-003816",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+      "consumerFile": "src/setup/registrations.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "pointer": "/parked/6",
+      "id": "dynamic-014318",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+      "consumerFile": "src/setup/registrations.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/enduser-docs-index.json",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/enduser-docs-index.json",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Retain `docs/enduser-docs-index.json` (family 7); its content regeneration remains family 2's separate obligation. Retain `docs/architecture-manifest.json` (family 22) and drop its differing candidate copy from the move set at Step 7."
+        }
+      ],
+      "reason": "L12-96 explicitly retains this product manifest at its existing path; no consumer retarget or new default is needed. End-user index contents still regenerate through the existing generator with the authorized registry export and post-move scan set; path retention proves no serialized-content parity."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "pointer": "/parked/7",
+      "id": "dynamic-014329",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+      "consumerFile": "src/setup/registrations.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/enduser-docs-index.json",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/enduser-docs-index.json",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Retain `docs/enduser-docs-index.json` (family 7); its content regeneration remains family 2's separate obligation. Retain `docs/architecture-manifest.json` (family 22) and drop its differing candidate copy from the move set at Step 7."
+        }
+      ],
+      "reason": "L12-96 explicitly retains this product manifest at its existing path; no consumer retarget or new default is needed. End-user index contents still regenerate through the existing generator with the authorized registry export and post-move scan set; path retention proves no serialized-content parity."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "pointer": "/parked/8",
+      "id": "dynamic-014330",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+      "consumerFile": "src/setup/registrations.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/enduser-docs-index.json",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/enduser-docs-index.json",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Retain `docs/enduser-docs-index.json` (family 7); its content regeneration remains family 2's separate obligation. Retain `docs/architecture-manifest.json` (family 22) and drop its differing candidate copy from the move set at Step 7."
+        }
+      ],
+      "reason": "L12-96 explicitly retains this product manifest at its existing path; no consumer retarget or new default is needed. End-user index contents still regenerate through the existing generator with the authorized registry export and post-move scan set; path retention proves no serialized-content parity."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "pointer": "/parked/9",
+      "id": "dynamic-014334",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+      "consumerFile": "src/setup/registrations.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "pointer": "/parked/10",
+      "id": "dynamic-014335",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+      "consumerFile": "src/setup/registrations.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "pointer": "/parked/11",
+      "id": "dynamic-014336",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+      "consumerFile": "src/setup/registrations.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "pointer": "/parked/12",
+      "id": "dynamic-014337",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+      "consumerFile": "src/setup/registrations.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "pointer": "/parked/13",
+      "id": "dynamic-014343",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+      "consumerFile": "src/setup/registrations.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "pointer": "/parked/14",
+      "id": "dynamic-014344",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+      "consumerFile": "src/setup/registrations.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "pointer": "/parked/36",
+      "id": "author-s4-fix2-2a45460821f48dec",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+      "consumerFile": "src/setup/registrations.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/enduser-docs-index.json",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/enduser-docs-index.json",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Retain `docs/enduser-docs-index.json` (family 7); its content regeneration remains family 2's separate obligation. Retain `docs/architecture-manifest.json` (family 22) and drop its differing candidate copy from the move set at Step 7."
+        }
+      ],
+      "reason": "L12-96 explicitly retains this product manifest at its existing path; no consumer retarget or new default is needed. End-user index contents still regenerate through the existing generator with the authorized registry export and post-move scan set; path retention proves no serialized-content parity."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "pointer": "/parked/37",
+      "id": "author-s4-fix2-a8e9503a9eafcad1",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+      "consumerFile": "src/setup/registrations.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/enduser-docs-index.json",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/enduser-docs-index.json",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Retain `docs/enduser-docs-index.json` (family 7); its content regeneration remains family 2's separate obligation. Retain `docs/architecture-manifest.json` (family 22) and drop its differing candidate copy from the move set at Step 7."
+        }
+      ],
+      "reason": "L12-96 explicitly retains this product manifest at its existing path; no consumer retarget or new default is needed. End-user index contents still regenerate through the existing generator with the authorized registry export and post-move scan set; path retention proves no serialized-content parity."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "pointer": "/parked/38",
+      "id": "author-s4-fix2-70cc3f725650c613",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+      "consumerFile": "src/setup/registrations.mjs",
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "role": "owning recorded operation; retained pathname needs no retarget"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/decisions/index.md",
+      "decision": "retained-in-place",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents."
+        }
+      ],
+      "reason": "L12-96 Q2 overrides the conservative move proposal: keep the generated decision projection at its existing path and drop the duplicate candidate, not the real index. The recorded reader/help/default/output retains its operand. State.decisions export and generator-content parity remain separate external obligations."
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:66",
+      "pointer": "/parked/0",
+      "id": "author-s4-08912b8301b10321",
+      "recordSha256": "31b81f4f936e836c7338101b6e6b8ea502b7fe28a39497a7bf9a3e68e00ff05b",
+      "consumerFile": "docs/backlog.md",
+      "dependency": "docs/backlog.md: Inherited Step 3 batch-126 maps-j-01280: Phase 9 carry: the complete js-yaml upgrade procedure is at packaging-distribution/spec.md line 723 inside Retained Distribution Source Detail. It is literal carriage and cannot be an executable patch destination; current candidate sections do not carry this integrity/parity/hash procedure. Promote the full upgrade/advisory decision to a live holder before redirecting this live backlog pointer.",
+      "leadDecisionProposed": false,
+      "readers": [
+        {
+          "path": "docs/backlog.md",
+          "role": "former advisory row already retired to done under RUL107/RUL108; do not replay the stale historical backlog patch"
+        }
+      ],
+      "patchRefs": [],
+      "file": "docs/specs/distribution.md",
+      "decision": "retired",
+      "source": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "sha256": "d6d0fc7e7a7cda7c2b4d2d69e76985af382fc6636a81d5e457626cecc5e2a81e",
+          "quote": "- Carry the **44 missing claims verbatim** into live holders at Step 7 / Phase 9: families 14 (13), 15 (12), 16 (11) and 18 (8). Bind exact passages and holders at Step 7, then apply carriage and pointer patches at cutover; rendered copies follow core sources. No locked law changes."
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "sha256": "35d0d046d54204f739e79218dcae95451f380df8b0427964b3ea456b57f20792",
+          "quote": "6. delete maintained files under `docs/specs/**` and `docs/architect/**` only"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/claim-carries.json",
+          "sha256": "fdd4d239cdadaff2e84a2104d1a233fb9465e2a102dfd86ebb22996404cbf706",
+          "pointer": "/claims/38"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+          "sha256": "69cc51e2c7ab32fece07f1aa579eaea1ca0c38e07f136f59cb98719b818b0476",
+          "pointer": "/conservedClaims/38"
+        },
+        {
+          "path": "docs/backlog.md",
+          "sha256": "d0fb356de66a0bdfffac2f9835678bd4001d68779003c381e34a4f2bc9e49306",
+          "quote": "- [p-8d04c7f1] Watch js-yaml security advisories (the vendored file is deleted; every YAML parse is the pinned Rust crate under RUL107 (a third-party crate under a component contract is pinned exactly with an upgrade record and acceptance tests) and RUL108 (every YAML parse goes through the native door)) — done"
+        },
+        {
+          "path": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+          "sha256": "21b8491c94440d62f00035e4f1d90fda24212676466e41300b38d0a2f8053c35",
+          "quote": "fallback, vendored js-yaml bundle or bundle-hash test to maintain."
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/judgments.json",
+          "sha256": "39d1b9de2276ab7b906a76e340be335278b4f76b85e74103235bd16dd91222b0",
+          "pointer": "/rows/46"
+        }
+      ],
+      "retirementScope": "The obsolete vendored-js-yaml advisory/upgrade obligation cited by the former backlog row; not deletion of the distribution history or the backlog.",
+      "successor": {
+        "path": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+        "sha256": "21b8491c94440d62f00035e4f1d90fda24212676466e41300b38d0a2f8053c35",
+        "quote": "## Upgrade And Advisory Procedure",
+        "anchor": "upgrade-and-advisory-procedure"
+      },
+      "reason": "The old family-18 carry has been superseded, not promoted as an executable js-yaml upgrade instruction. Current backlog marks p-8d04c7f1 done because the vendored file is deleted; the candidate decision explicitly keeps the former procedure historical and points current YAML maintenance to the native contract and upgrade record. G9 row 46 already retires this removed binding. Do not replay the old backlog pointer patch or clear the unrelated surviving STR70a/STR62 owner question."
+    }
+  ]
+}
