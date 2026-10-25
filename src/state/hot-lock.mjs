@@ -235,6 +235,11 @@ function underDir(fgosDir, target) {
   return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel);
 }
 
+/** An exact ISO time as `Date#toISOString` writes it (`YYYY-MM-DDTHH:mm:ss.sssZ`), the only form an imported event keeps. */
+export function isExactIsoTime(value) {
+  return typeof value === 'string' && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString() === value;
+}
+
 function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, extraRoots = [], readRoots = [], stageEffects = false, commitEvents = null, afterApply = null } = {}) {
   let live = true;
   const roots = [fgosDir, ...extraRoots];
@@ -380,11 +385,6 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, ext
  * under (a log directory that is not the lock's own `.fgos`).
  * `prefetched.readRoots` grants only reads, e.g. already-resolved Git refs.
  */
-/** An exact ISO time as `Date#toISOString` writes it (`YYYY-MM-DDTHH:mm:ss.sssZ`), the only form an imported event keeps. */
-export function isExactIsoTime(value) {
-  return typeof value === 'string' && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString() === value;
-}
-
 export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} } = {}) {
   assertResource(resource);
   if (hotLockDepth() > 0) {
