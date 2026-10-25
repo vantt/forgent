@@ -1,0 +1,388 @@
+{
+ "items": [
+  {
+   "id": "dynamic-016778",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/architecture-manifest.json. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "tests-judgment-batch4.jsonl:2 /parked/0 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/architecture-manifest.json (family 22); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/architecture-manifest.json)"
+   ]
+  },
+  {
+   "id": "dynamic-017973",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/enduser-docs-index.json. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "tests-judgment-batch6.jsonl:1 /parked/0 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/enduser-docs-index.json (family 7); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/enduser-docs-index.json)"
+   ]
+  },
+  {
+   "id": "reference-003646",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "cli-help-messages.jsonl:3 /parked/2 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "reference-003651",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "cli-help-messages.jsonl:3 /parked/3 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "author-s4-fix2-284fae1afd0a9579",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/enduser-docs-index.json. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "cli-help-messages.jsonl:3 /parked/8 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/enduser-docs-index.json (family 7); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/enduser-docs-index.json)"
+   ]
+  },
+  {
+   "id": "author-s67-command-registry-manifest-861",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/enduser-docs-index.json. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "cli-help-messages.jsonl:3 /parked/11 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/enduser-docs-index.json (family 7); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/enduser-docs-index.json)"
+   ]
+  },
+  {
+   "id": "reference-000200",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "The move and destination are correct, and the 5 code readers each have a patch based on the pin bytes that retargets every full-path occurrence. But the reader list stops at the code-only R26 unit. Four candidate docs still cite docs/contracts/fgos-gateway-api-v1.yaml and are neither listed nor patched. Two yaml-doc package references are called 'history' only in the md.",
+   "evidence": [
+    "gateway-contract.jsonl:2 /parked/0 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "L12-96 + step-05-cutover-move-set.json /paths/993 -> docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml; both blobs identical at pin",
+    "recomposed.json /specs/54,55,56,59,61 beforeSha256 == pin bytes; -old/+new counts 1/1, 8/9, 5/5, 1/1, 1/1, which match the full-path counts in Cargo.toml, gateway.rs, mcp.rs, client.ts and types.ts",
+    "Unlisted, unpatched full-path citations at pin: docs/platform/config/spec.md:83; docs/platform/herdr-web-dashboard/spec.md:299; docs/platform/ui-spec/architecture/screens/S03-task-detail.md:121; docs/platform/ui-spec/contracts/15-system-events.md:38",
+    "G6 preserve-premise rows f07976/f07985 are judged 'repoint' in park-judgments/shard-3.json, and f06830/f06831/f06837 cover herdr spec.md. No row was found for config/spec.md:83. No patch exists in recomposed.json or composition/patch-specs.json",
+    "packages/yaml-doc/contracts/fixtures/parse.v1.json:1979 and packages/yaml-doc/upgrade-record.md:107 hold the full old path; the JSON records no exclusion reason",
+    "Fix: add these document readers with their G6 row or a new F composition entry, and record the yaml-doc exclusions with a reason"
+   ]
+  },
+  {
+   "id": "dynamic-000767",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "The move and destination are correct, and the 5 code readers each have a patch based on the pin bytes that retargets every full-path occurrence. But the reader list stops at the code-only R26 unit. Four candidate docs still cite docs/contracts/fgos-gateway-api-v1.yaml and are neither listed nor patched. Two yaml-doc package references are called 'history' only in the md.",
+   "evidence": [
+    "gateway-contract.jsonl:2 /parked/1 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "L12-96 + step-05-cutover-move-set.json /paths/993 -> docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml; both blobs identical at pin",
+    "recomposed.json /specs/54,55,56,59,61 beforeSha256 == pin bytes; -old/+new counts 1/1, 8/9, 5/5, 1/1, 1/1, which match the full-path counts in Cargo.toml, gateway.rs, mcp.rs, client.ts and types.ts",
+    "Unlisted, unpatched full-path citations at pin: docs/platform/config/spec.md:83; docs/platform/herdr-web-dashboard/spec.md:299; docs/platform/ui-spec/architecture/screens/S03-task-detail.md:121; docs/platform/ui-spec/contracts/15-system-events.md:38",
+    "G6 preserve-premise rows f07976/f07985 are judged 'repoint' in park-judgments/shard-3.json, and f06830/f06831/f06837 cover herdr spec.md. No row was found for config/spec.md:83. No patch exists in recomposed.json or composition/patch-specs.json",
+    "packages/yaml-doc/contracts/fixtures/parse.v1.json:1979 and packages/yaml-doc/upgrade-record.md:107 hold the full old path; the JSON records no exclusion reason",
+    "Fix: add these document readers with their G6 row or a new F composition entry, and record the yaml-doc exclusions with a reason"
+   ]
+  },
+  {
+   "id": "dynamic-000768",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "The move and destination are correct, and the 5 code readers each have a patch based on the pin bytes that retargets every full-path occurrence. But the reader list stops at the code-only R26 unit. Four candidate docs still cite docs/contracts/fgos-gateway-api-v1.yaml and are neither listed nor patched. Two yaml-doc package references are called 'history' only in the md.",
+   "evidence": [
+    "gateway-contract.jsonl:2 /parked/2 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "L12-96 + step-05-cutover-move-set.json /paths/993 -> docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml; both blobs identical at pin",
+    "recomposed.json /specs/54,55,56,59,61 beforeSha256 == pin bytes; -old/+new counts 1/1, 8/9, 5/5, 1/1, 1/1, which match the full-path counts in Cargo.toml, gateway.rs, mcp.rs, client.ts and types.ts",
+    "Unlisted, unpatched full-path citations at pin: docs/platform/config/spec.md:83; docs/platform/herdr-web-dashboard/spec.md:299; docs/platform/ui-spec/architecture/screens/S03-task-detail.md:121; docs/platform/ui-spec/contracts/15-system-events.md:38",
+    "G6 preserve-premise rows f07976/f07985 are judged 'repoint' in park-judgments/shard-3.json, and f06830/f06831/f06837 cover herdr spec.md. No row was found for config/spec.md:83. No patch exists in recomposed.json or composition/patch-specs.json",
+    "packages/yaml-doc/contracts/fixtures/parse.v1.json:1979 and packages/yaml-doc/upgrade-record.md:107 hold the full old path; the JSON records no exclusion reason",
+    "Fix: add these document readers with their G6 row or a new F composition entry, and record the yaml-doc exclusions with a reason"
+   ]
+  },
+  {
+   "id": "reference-000232",
+   "verdict": "APPROVE",
+   "severity": "low",
+   "summary": "The legacy pointer is retired and the clause is conserved at docs/platform/runner/contracts/conserved-dispatch-doctrine.md#session-participation-and-merge-isolation. The source, the carry binding and the successor heading all hold. Note: patch S28 (carries/pointer-patches.json /patches/13) has beforeSha256 4ad9ed0c, but bin/fgos.mjs at the pin is 1c50f564. Its reviewStatus is 'pending', so it needs a mechanical rebase at F. The JSON calls it 'existing' without saying it is stale.",
+   "evidence": [
+    "runtime-judgment-part-22.jsonl:13 /parked/3 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "claim-carries + s11-preflip-carries bind reference-000232 to docs/platform/runner/contracts/conserved-dispatch-doctrine.md#session-participation-and-merge-isolation; heading present at pin",
+    "phase-09 design line 138 deletes docs/specs/** and docs/architect/**",
+    "bin/fgos.mjs:1756/1820/3569 still carry the old pointers at the pin, so the 3-line delta rebases cleanly",
+    "Step 7 applied overlay: still parked 'carriage not yet composed'"
+   ]
+  },
+  {
+   "id": "reference-000235",
+   "verdict": "APPROVE",
+   "severity": "low",
+   "summary": "The legacy pointer is retired and the clause is conserved at docs/platform/work-state/contracts/knowledge-registry.md#74-attestation. The source, the carry binding and the successor heading all hold. Note: patch S28 (carries/pointer-patches.json /patches/13) has beforeSha256 4ad9ed0c, but bin/fgos.mjs at the pin is 1c50f564. Its reviewStatus is 'pending', so it needs a mechanical rebase at F. The JSON calls it 'existing' without saying it is stale.",
+   "evidence": [
+    "runtime-judgment-part-22.jsonl:13 /parked/4 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "claim-carries + s11-preflip-carries bind reference-000235 to docs/platform/work-state/contracts/knowledge-registry.md#74-attestation; heading present at pin",
+    "phase-09 design line 138 deletes docs/specs/** and docs/architect/**",
+    "bin/fgos.mjs:1756/1820/3569 still carry the old pointers at the pin, so the 3-line delta rebases cleanly",
+    "Step 7 applied overlay: still parked 'carriage not yet composed'"
+   ]
+  },
+  {
+   "id": "reference-000236",
+   "verdict": "APPROVE",
+   "severity": "low",
+   "summary": "The legacy pointer is retired and the clause is conserved at docs/platform/work-state/contracts/knowledge-registry.md#8-producer-enforcement. The source, the carry binding and the successor heading all hold. Note: patch S28 (carries/pointer-patches.json /patches/13) has beforeSha256 4ad9ed0c, but bin/fgos.mjs at the pin is 1c50f564. Its reviewStatus is 'pending', so it needs a mechanical rebase at F. The JSON calls it 'existing' without saying it is stale.",
+   "evidence": [
+    "runtime-judgment-part-22.jsonl:13 /parked/5 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "claim-carries + s11-preflip-carries bind reference-000236 to docs/platform/work-state/contracts/knowledge-registry.md#8-producer-enforcement; heading present at pin",
+    "phase-09 design line 138 deletes docs/specs/** and docs/architect/**",
+    "bin/fgos.mjs:1756/1820/3569 still carry the old pointers at the pin, so the 3-line delta rebases cleanly",
+    "Step 7 applied overlay: still parked 'carriage not yet composed'"
+   ]
+  },
+  {
+   "id": "dynamic-001360",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "runtime-judgment-part-22.jsonl:13 /parked/23 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "dynamic-001361",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "runtime-judgment-part-22.jsonl:13 /parked/24 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "dynamic-001363",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "runtime-judgment-part-22.jsonl:13 /parked/25 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "dynamic-001454",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/enduser-docs-index.json. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "runtime-judgment-part-22.jsonl:13 /parked/33 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/enduser-docs-index.json (family 7); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/enduser-docs-index.json)"
+   ]
+  },
+  {
+   "id": "author-seam8-output-2071",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "runtime-judgment-part-22.jsonl:13 /parked/40 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "author-seam8-output-2074",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "runtime-judgment-part-22.jsonl:13 /parked/41 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "author-seam8-output-3029",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/enduser-docs-index.json. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "runtime-judgment-part-22.jsonl:13 /parked/42 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/enduser-docs-index.json (family 7); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/enduser-docs-index.json)"
+   ]
+  },
+  {
+   "id": "reference-003816",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "setup-doctor-roots.jsonl:21 /parked/1 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "dynamic-014318",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/enduser-docs-index.json. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "setup-doctor-roots.jsonl:21 /parked/6 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/enduser-docs-index.json (family 7); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/enduser-docs-index.json)"
+   ]
+  },
+  {
+   "id": "dynamic-014329",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/enduser-docs-index.json. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "setup-doctor-roots.jsonl:21 /parked/7 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/enduser-docs-index.json (family 7); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/enduser-docs-index.json)"
+   ]
+  },
+  {
+   "id": "dynamic-014330",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/enduser-docs-index.json. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "setup-doctor-roots.jsonl:21 /parked/8 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/enduser-docs-index.json (family 7); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/enduser-docs-index.json)"
+   ]
+  },
+  {
+   "id": "dynamic-014334",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "setup-doctor-roots.jsonl:21 /parked/9 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "dynamic-014335",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "setup-doctor-roots.jsonl:21 /parked/10 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "dynamic-014336",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "setup-doctor-roots.jsonl:21 /parked/11 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "dynamic-014337",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "setup-doctor-roots.jsonl:21 /parked/12 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "dynamic-014343",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "setup-doctor-roots.jsonl:21 /parked/13 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "dynamic-014344",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "setup-doctor-roots.jsonl:21 /parked/14 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "author-s4-fix2-2a45460821f48dec",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/enduser-docs-index.json. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "setup-doctor-roots.jsonl:21 /parked/36 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/enduser-docs-index.json (family 7); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/enduser-docs-index.json)"
+   ]
+  },
+  {
+   "id": "author-s4-fix2-a8e9503a9eafcad1",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/enduser-docs-index.json. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "setup-doctor-roots.jsonl:21 /parked/37 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/enduser-docs-index.json (family 7); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/enduser-docs-index.json)"
+   ]
+  },
+  {
+   "id": "author-s4-fix2-70cc3f725650c613",
+   "verdict": "APPROVE",
+   "summary": "Retained in place: docs/decisions/index.md. L12-96 decides it, and the Step 7 overlay already agrees.",
+   "evidence": [
+    "setup-doctor-roots.jsonl:21 /parked/38 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "phase-08 owner-answers L12-96 retains docs/decisions/index.md (family 6 (Q2)); quote present at pin",
+    "phase-08 step-07-park-resolution-applied.json already flips this member parked->preserve (family r26:docs/decisions/index.md)",
+    "phase-09-atomic-platform-authority-cutover.md:36 allows generated docs/decisions/index.md"
+   ]
+  },
+  {
+   "id": "author-s4-08912b8301b10321",
+   "verdict": "APPROVE",
+   "summary": "Retired as superseded. The backlog row p-8d04c7f1 no longer cites docs/specs/distribution.md. The successor section states the old procedure is historical. The separate STR70a owner question stays open, as it should.",
+   "evidence": [
+    "generators-skills-and-support.jsonl:66 /parked/0 dependency matches record byte-for-byte; recordSha256 matches physical line at c94545de5",
+    "claim-carries /claims/38: matchedExpression docs/specs/distribution.md; binding target vendored-yaml-parser.md#upgrade-and-advisory-procedure",
+    "docs/backlog.md:71 at pin: row now 'done', no distribution pointer",
+    "vendored-yaml-parser.md:19-28 'not current maintenance instructions'",
+    "g9 judgments /rows/46 owned-park concerns STR70a only; Step 7 applied overlay still lists the carry blocker 0, so this packet supersedes it"
+   ]
+  },
+  {
+   "id": "check_phase9_decisions.py",
+   "verdict": "APPROVE",
+   "severity": "low",
+   "summary": "Exits 0 at the pin. All 14 negative controls claimed in the md fail as expected when reproduced (exit 1 each). Gaps: the checker does not bind a retained entry's source quote to its file, does not bind the decision type for path dependencies, and does not check that retired patchRefs apply to the pin bytes. Its reader set is the code-only R26 unit, so it cannot detect missing document readers.",
+   "evidence": [
+    "python3 -B check_phase9_decisions.py exits 0 (with and without --pin c94545de5)",
+    "Reproduced the controls missing, duplicate, wrong pointer, nonexistent path, bad digest, absent quote, bad JSON pointer, destination outside move set, missing reader, missing patch, wrong retained file, wrong successor, wrong record hash and wrong pin: all exit 1",
+    "Probe: a decisions/index.md entry citing the enduser-index quote passes (exit 0)",
+    "Probe: a retained entry flipped to 'retired' with no successor passes once counts are adjusted (exit 0)",
+    "RECORDS is hardcoded to 7 records. I independently confirmed that the 15 carriedBlocker records hold exactly these 33 'Phase 9' deps (170 parked, 75 untouched in the 7 records)"
+   ]
+  }
+ ]
+}
