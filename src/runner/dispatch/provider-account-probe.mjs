@@ -231,7 +231,7 @@ export async function runAccountProbe({
 } = {}) {
   const plan = accountInvocations(cfg, { provider, accountId, executorId });
   if (!plan.account) {
-    throw new Error(`no account "${accountId}" for provider "${plan.provider}" in runner.providers (~/.fgos/config.json)`);
+    throw new Error(`no account "${accountId}" for provider "${plan.provider}" in runner.providers (~/.fgos/private/accounts.yaml)`);
   }
   const wanted = invocationIds ? plan.invocations.filter((i) => invocationIds.includes(i.invocationId)) : plan.invocations;
   const runnerConfig = configPinnedToAccount(cfg, { provider, accountId });

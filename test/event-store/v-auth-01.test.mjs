@@ -97,6 +97,6 @@ for (const layout of ['a symlinked .fgos', 'its own .fgos']) for (const mode of 
     assert.equal(Object.values(listWork(dir).work).filter(w => w.status === 'blocked').length, 1);
     if (mode === 'slot') assert.equal(fs.readdirSync(path.join(dir, 'runtime/claims')).filter(n => n.endsWith('.json')).length, 0);
     // Nothing the racers wrote may sit in a worktree's own `.fgos`: the main store is the one authority.
-    if (layout === 'its own .fgos') for (const name of ['a', 'b']) assert.deepEqual(fs.readdirSync(path.join(temp, name, '.fgos')).sort(), ['config.json']);
+    if (layout === 'its own .fgos') for (const name of ['a', 'b']) assert.deepEqual(fs.readdirSync(path.join(temp, name, '.fgos')).sort(), ['config.yaml']);
   });
 }

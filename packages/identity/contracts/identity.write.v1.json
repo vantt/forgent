@@ -93,14 +93,17 @@
         "reason": { "type": "string", "description": "The stable code." },
         "candidates": {
           "type": "array",
-          "description": "The sessions the caller may have meant (not-found), the sessions a name matches (ambiguous), the live sessions holding the role (role-not-held); empty otherwise. Consumers ignore unknown fields: a later rung adds machine and fetchedAt, and the liveness value remote.",
+          "description": "The sessions the caller may have meant (not-found), the sessions a name matches (ambiguous), the live sessions holding the role (role-not-held); empty otherwise. A candidate of another machine also carries machine, fetchedAt and pin, and the liveness value remote; consumers ignore unknown fields.",
           "items": {
             "type": "object",
             "required": ["id", "handle", "liveness"],
             "properties": {
               "id": { "type": "string", "description": "<machine-id>/<local id>." },
               "handle": { "type": "string" },
-              "liveness": { "enum": ["alive", "unknown"] }
+              "liveness": { "enum": ["alive", "unknown", "remote"] },
+              "machine": { "type": "object", "required": ["id", "handle"], "properties": { "id": { "type": "string" }, "handle": { "type": "string" } } },
+              "fetchedAt": { "type": "string" },
+              "pin": { "enum": ["seen", "confirmed"] }
             }
           }
         }
@@ -195,7 +198,10 @@
             "clone": { "type": ["string", "null"], "description": "Working directory the session registered from." },
             "registeredAt": { "type": "string" },
             "roles": { "type": "array", "items": { "type": "string", "pattern": "^lead:[A-Z][A-Z0-9-]{0,15}$" } },
-            "liveness": { "enum": ["alive", "unknown"], "description": "unknown: the session has no terminal ancestor, so nothing can prove it dead. A dead session is never returned." }
+            "liveness": { "enum": ["alive", "unknown", "remote"], "description": "unknown: the session has no terminal ancestor, so nothing can prove it dead. remote: a session of another machine, never claimed alive. A dead session is never returned." },
+            "machine": { "type": "object", "required": ["id", "handle"], "properties": { "id": { "type": "string" }, "handle": { "type": "string" } }, "description": "Only on a remote session: the machine that published it (its id when another machine shares its handle)." },
+            "fetchedAt": { "type": "string", "description": "Only on a remote session: when this clone last fetched other machines' events; absent when it never did. The entry is as fresh as that." },
+            "pin": { "enum": ["seen", "confirmed"], "description": "Only on a remote session: how far the publishing machine's signing key is trusted." }
           }
         },
         {

@@ -55,3 +55,15 @@ test('import-legacy replays an untracked shard through the Work door with its or
   assert.equal(JSON.parse(fs.readFileSync(`${shard}.imported.json`, 'utf8')).sha256, done.sha256);
   assert.throws(() => importLegacyUseCase(ctx, { file: shard }), /already imported/);
 });
+
+test('import-legacy --check refuses a line whose time is not an exact ISO time and writes nothing', t => {
+  const fgosDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-import-legacy-ts-')));
+  const repo = path.dirname(fgosDir);
+  t.after(() => fs.rmSync(repo, { recursive: true, force: true }));
+  const shard = path.join(fgosDir, 'runtime', 'tmp', 'untracked-events', 'writer-day-only.jsonl');
+  fs.mkdirSync(path.dirname(shard), { recursive: true });
+  fs.writeFileSync(shard, `${JSON.stringify(add('dated', '2026-10-21'))}\n`);
+  assert.throws(() => importLegacyUseCase({ cwd: repo, trustedMain: repo }, { file: shard, check: true }), /:1 has ts 2026-10-21, which is not an exact ISO time/);
+  assert.equal(Boolean(listWork(fgosDir).work.dated), false);
+  assert.equal(fs.existsSync(`${shard}.imported.json`), false);
+});

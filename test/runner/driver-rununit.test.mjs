@@ -17,7 +17,7 @@ import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -82,7 +82,7 @@ function setupRepo({ capabilities } = {}) {
     providerModel: 'node',
     invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [script, '{prompt}'] }],
   };
-  const pool = { prefer: [{ executor: 'fake' }], rigor: 'standard' };
+  const pool = { prefer: [{ executor: 'fake' }], rigor: 'standard', tier: 'standard' };
   const runner = {
     defaultExecutor: 'fake',
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
@@ -429,8 +429,7 @@ test('a unit-run: ref from item data never becomes a unit input through choice.c
 
 test('a declared operation refuses a non-solo pattern in object form, and no other seat carries the stamp', async () => {
   const { repo } = setupRepo();
-  const cfgPath = path.join(repo, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(repo);
   cfg.runner.executors.fake2 = { ...cfg.runner.executors.fake, providerModel: 'node2' };
   cfg.runner.modelPolicies.node2 = { ...cfg.runner.modelPolicies.node };
   for (const cap of Object.values(cfg.runner.capabilities)) cap.prefer = [{ executor: 'fake' }, { executor: 'fake2' }];

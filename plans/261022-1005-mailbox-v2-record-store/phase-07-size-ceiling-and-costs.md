@@ -1,7 +1,7 @@
 ---
 phase: 7
 title: "Size ceiling and costs against S0"
-status: pending
+status: completed
 depends_on: [6]
 ---
 
@@ -69,3 +69,79 @@ Test 1 is green on a fresh main merge and the report states every scenario with 
 
 - Numbers on a loaded machine: record the load average beside each run (S0 did).
 - This phase changes no policy, whatever the numbers.
+
+## API drift
+
+None (main `636df9d87`).
+
+## Deviations
+
+- Windows are `human.fallbackWindowSec + 1` s apart, not `human.fallbackWindowSec`. The budget and the loop guard count an attempt until more than their window has passed (`Timestamp::is_past` is strict), so at exactly 600 s the previous window's sends still count and the 13th message to one recipient would be refused. The test asserts that `loop.windowSec` equals `human.fallbackWindowSec` before relying on it.
+- The ceiling test runs in 15.3 s in debug, so the plan's fallback (a smaller population) was not needed. It asserts that the count never exceeds `H_sender` (20,180; the steady value is 20,140) and is equal in the last two windows, and that the installed snapshot reads back equal to the state built.
+- Each measured hold of the example starts from the population's snapshot, put back untimed, because the plan's populations are fixed and a send adds a header. The contended row runs against a record that the second process keeps changing.
+- The example times each `Step` through the hold's observer and reports the p50 of each step's share. The claim+finish rows are two holds and are not split.
+- The example adds one row the plan did not list: `dead-bindings send`, the cost of owner Q2 option B's judgement of every binding at `send`.
+- The example reads the limits through the tests' shared loader (`#[path]` to `core/tests/common/support.rs`), the same one door the store's tests use.
+
+## Result against the coordinator's stop rule
+
+- The one-sender steady week (record only): no-mail p95 42.5 ms, under 50 ms. With 10 registered heads at their lifetime cap: p95 49.5 ms. With 100: p95 64.2 ms, over 50 ms.
+- The host's own cost per call comes on top of these numbers.
+- Per the coordinator's instruction (a steady-state no-mail read over 50 ms is owner Q1), no lever was picked, and the lane stops after this phase and reports. Phase 8 is not run.
+
+## Proof
+
+- `cargo test -p fgos-mailbox --test record_ceiling`: 1 passed (15.3 s, debug).
+- Mutant: doubling the core's header retention fails it ("20200 headers > ceiling 20180").
+- `cargo build --release -p fgos-mailbox --example mailbox-record-cost` builds; the run exited 0.
+- Report: `plans/reports/research-261022-1145-mailbox-v2-record-costs.md`.
+
+## Plan decision 3 reversed (plan owner (agent), 2026-10-22, after this phase's first run)
+
+The first run showed the no-write byte comparison, which re-encodes the whole state, to be about half of a no-mail hold at a week of headers.
+
+- Core: `Finished` gains `changed`, set when any item carried the token. The owning proofs are the core's finish tests, extended: `claim_then_finish_…` (changed) and `a_finish_with_a_wrong_token_…` (not changed).
+- Store: the hold's closure returns a `ReportsChange`, implemented for these results:
+  - `Claim` (`changed`) and `Finished` (`changed`);
+  - `Registered` (not `Refreshed`) and `Result<Registered, RegisterRefusal>` (refusals change nothing);
+  - `Result<SendOutcome, Refusal>` (always: the attempt is counted);
+  - the drain's `Begun` (`state_changed`);
+  - `Reported<T>` (`changing`/`unchanged`), for a closure that runs several core operations.
+- An unchanged hold returns before any encode or comparison. No path without a core flag remains, so the byte comparison is gone.
+- `snapshot::read` returns the state only.
+- Tests:
+  - phase 2's test 2 is rewritten as `a_hold_writes_exactly_when_its_change_reports_one`. A reported change is written even when the bytes would be equal, which the old comparison could not do.
+  - new: `each_core_answer_writes_exactly_when_it_changed_the_state` (same head again, refused registration, unmatched finish and quiet unchanged drain write nothing; real finish and quiet changed drain write).
+- Mutants: 9 tried, 9 killed. Store, run against `record_snapshot`: always write, `Refreshed` written, refused registration written, `Finished` always / never written, `Begun` always / never written. Core: `Finished.changed` always true. Never write was killed by the whole store suite.
+- Order of work: the implementation came before the new test cases. The mutants are their proof.
+- Recorded in branch spec §17 and §6.4, and in `plan.md` decision 3.
+
+## Re-run (after the reversal)
+
+| No-mail claim hold, p50 / p95 | Before | After |
+|---|---|---|
+| week-one | 29.95 / 42.53 | 22.63 / 36.83 |
+| week-grid 10 heads | 38.28 / 49.46 | 17.18 / 36.01 |
+| week-grid 100 heads | 58.02 / 64.15 | 44.11 / 49.68 |
+| if `bodyRetentionSec` = 86400 (measurement only) | | 2.17 / 2.20 |
+
+The record's own no-mail hold is now under 50 ms p95 in every week population measured; the host's own cost per call still comes on top. The added example row, `week-one-1d`, changes no contract value. The report's re-run section has every row.
+
+## Owner decision Q1 option (b) applied (2026-10-22)
+
+- `limits.v1.json`: `mailbox.record.bodyRetentionSec` default 604800 → 86400. Its `source` and `status` name the owner decision. Recorded in branch spec §12, §5.3 and §6.4 (the values), §16 item 20 and §17, and in `plan.md` Q1.
+- No test hard-coded the seven days: every horizon is derived from the contract. The one test whose logic assumed a horizon longer than `record.ttlSec` was `record_prune.rs` :: `a_dead_binding_still_named_by_a_header_is_kept_until_the_header_retires`. It failed at the new value, and now delivers the dead head's header half a record TTL later, derived from the contract. Its mutant (the "named" rule ignored) is still killed.
+- The ceiling at the new values: `H_sender = 20 × ceil(86400 / 600) + 20 = 2,900`. The steady value is 2,880.
+- Example: the "if bodyRetentionSec = 86400" row is removed, because that is now the default. The week scenarios are renamed `steady-one` / `steady-grid`.
+
+| No-mail claim hold, p50 / p95 (ms) | 7-day horizon, after the reversal | 1-day horizon (new default) |
+|---|---|---|
+| steady-one | 22.63 / 36.83 (20,140 headers) | 2.53 / 2.64 (2,880 headers) |
+| steady-grid 10 heads | 17.18 / 36.01 | 3.67 / 3.73 |
+| steady-grid 100 heads | 44.11 / 49.68 | 29.49 / 44.28 (22,680 headers) |
+
+The third run's load average was 5 to 15 (other sessions), which made the write rows noisier; the report's third section has every row.
+
+## Later change
+
+Review fixes M2, L5 (2026-10-22): the snapshot read is capped at a size derived from the contract (`snapshot_byte_cap`), the header ceiling is exact and defined once on `Limits`, and its count proof is in the core. See phase 8, "Review fixes".

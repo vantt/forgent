@@ -39,10 +39,10 @@ test('runPanel runs the member seats in parallel and synthesizes results', async
     const expected = `member-${i + 1}`;
     assert.equal(memberCalls[i].seat.seat, expected);
     assert.equal(memberCalls[i].seat.role, 'producer');
-    // Posture, not the role, says a member never writes, never runs inline and is measured for stance.
+    // Posture, not the role, says a member never writes, runs out of process and is measured for stance.
     assert.deepEqual(
-      { readOnly: memberCalls[i].seat.posture.readOnly, forceOutOfProcess: memberCalls[i].seat.posture.forceOutOfProcess, inlineAllowed: memberCalls[i].seat.posture.inlineAllowed, stance: memberCalls[i].seat.posture.stance },
-      { readOnly: true, forceOutOfProcess: true, inlineAllowed: false, stance: true },
+      { readOnly: memberCalls[i].seat.posture.readOnly, forceOutOfProcess: memberCalls[i].seat.posture.forceOutOfProcess, stance: memberCalls[i].seat.posture.stance },
+      { readOnly: true, forceOutOfProcess: true, stance: true },
     );
     // A different family per seat is a soft preference over every other seat, never a hard rule.
     assert.deepEqual(memberCalls[i].preferIndependentOf, ['member-1', 'member-2', 'member-3'].filter((id) => id !== expected));

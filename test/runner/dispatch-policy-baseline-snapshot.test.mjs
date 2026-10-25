@@ -18,7 +18,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../../src/runner/dispatch/resolve.mjs';
 import { parseTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
@@ -1061,7 +1061,7 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   before(() => {
     tempHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-baseline-test-home-'));
     process.env.HOME = tempHomeDir;
-    cfg = loadRunnerConfigFromDir(committedConfigDir());
+    cfg = loadRunnerConfigForDir(committedConfigDir());
     throwawayDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dispatch-snapshot-test-'));
   });
 

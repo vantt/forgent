@@ -2593,3 +2593,66 @@ fn a_group_read_over_the_output_bound_falls_back_to_single_reads() {
         assert!(matches!(&answer[0].value, PathValue::Blob(b) if b.len() == 30 * 1024 * 1024 && b[0] == n as u8));
     }
 }
+
+#[test]
+fn fetch_of_more_machine_refs_than_one_wal_record_holds_installs_every_mirror() {
+    // One fetch operation records every advertised mirror; about 290 fill one
+    // 64 KiB record, so 500 must split across operations instead of refusing.
+    struct Operations(AtomicU64);
+    impl FileSystem for &Operations {
+        fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+            if step == "before-fetch" {
+                self.0.fetch_add(1, Ordering::Relaxed);
+            }
+            Ok(())
+        }
+    }
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    let remote = t.0.join("remote");
+    init(&root, "sha1", "files");
+    init(&remote, "sha1", "files");
+    let tree = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
+    git(&remote, &["hash-object", "-t", "tree", "-w", "/dev/null"]);
+    let head = Command::new("git")
+        .args(["-c", "user.name=t", "-c", "user.email=t@t", "commit-tree", "-m", "events", tree])
+        .current_dir(&remote)
+        .output()
+        .unwrap();
+    assert!(head.status.success());
+    let head = String::from_utf8(head.stdout).unwrap();
+    let names: Vec<String> = (0..500).map(|i| format!("machine-{i:04}-a1b2c3")).collect();
+    let mut stdin = Command::new("git")
+        .args(["update-ref", "--stdin"])
+        .current_dir(&remote)
+        .stdin(Stdio::piped())
+        .spawn()
+        .unwrap();
+    {
+        use std::io::Write;
+        let input = stdin.stdin.as_mut().unwrap();
+        for name in &names {
+            writeln!(input, "create refs/fgos/events/{name} {}", head.trim()).unwrap();
+        }
+    }
+    assert!(stdin.wait().unwrap().success());
+    git(&root, &["remote", "add", "origin", remote.to_str().unwrap()]);
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let operations = Operations(AtomicU64::new(0));
+    let port = PublicationPort::with_filesystem(&driver, authority(&repo, &mut h), &operations)
+        .with_remote(RemoteGrant {
+            name: "origin".into(),
+            pinned_url: remote.to_str().unwrap().into(),
+        });
+    let mapping = "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".to_owned();
+    port.fetch_refs(&repo, "origin", &[mapping]).unwrap();
+    assert!(operations.0.load(Ordering::Relaxed) > 1);
+    let mirrors = port
+        .list_refs(&repo, &[RefPrefix::parse("refs/fgos/remotes/origin/events/").unwrap()], None, 1000)
+        .unwrap();
+    assert!(mirrors.complete);
+    assert_eq!(mirrors.entries.len(), names.len());
+    assert_eq!(wal::Wal::open(&repo).unwrap().scan(100).unwrap().unresolved, 0);
+}

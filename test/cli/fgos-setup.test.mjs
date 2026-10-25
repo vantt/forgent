@@ -214,7 +214,7 @@ test('setup runs every registered fix and reports them under "fixed", never touc
   const data = envelopeData(result.stdout);
   assert.ok(Array.isArray(data.fixed), 'setup result missing a "fixed" array');
   const byId = Object.fromEntries(data.fixed.map((entry) => [entry.id, entry]));
-  assert.ok('gate-bypass-configured' in byId, 'setup did not run the gate-bypass-configured fix');
+  assert.ok('gateway-token-configured' in byId, 'setup did not run the gateway-token-configured fix');
   assert.ok('claude-plugin-marketplace' in byId, 'setup did not run the claude-plugin-marketplace fix');
   assert.equal(byId['claude-plugin-marketplace'].changed, false);
   assert.match(byId['claude-plugin-marketplace'].message, /not found on PATH/);
@@ -244,7 +244,7 @@ test('rebuild reconstructs state.json from the log alone after the view file is 
   assert.ok(rawPersistedView(cwd).cursor, 'the rebuilt view carries the cursor it was folded to');
   // The answer is a per-consumer summary, never the views themselves.
   const { rebuilt } = envelopeData(result.stdout);
-  assert.deepEqual(rebuilt.map((entry) => entry.consumer), ['work', 'porting']);
+  assert.deepEqual(rebuilt.map((entry) => entry.consumer), ['work', 'porting', 'identity']);
   assert.equal(rebuilt[0].counts.work, 2);
   assert.equal(rebuilt[0].counts.decisions, 0);
   assert.equal(rebuilt[0].revision, before.revision);

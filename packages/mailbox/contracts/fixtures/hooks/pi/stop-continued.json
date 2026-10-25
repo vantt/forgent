@@ -1,0 +1,6 @@
+{
+  "session_id": "00000000-0000-4000-8000-000000000002",
+  "hook_event_name": "Stop",
+  "cwd": "/run-dir/pi/again/ws",
+  "subagent": false
+}

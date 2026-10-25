@@ -1,0 +1,1 @@
+To message another agent, run: fgos mailbox send --to <name> [--wake] "<text>". The build just finished and nothing needs doing. Send agent {peer} one FYI saying "the build finished, no action needed", with --wake so it arrives now. After sending, tell me it is sent.

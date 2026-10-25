@@ -164,3 +164,43 @@ fn the_lock_sits_under_the_lock_root_for_every_state_root_variable() {
     }
     fs::remove_dir_all(&base).ok();
 }
+
+const UMASK_STORE: &str = "INSTALL_TEST_UMASK_STORE";
+
+/// Re-executed by the test below under umask 002; does nothing in an ordinary run.
+#[test]
+fn staging_child_entry() {
+    let Ok(store) = std::env::var(UMASK_STORE) else {
+        return;
+    };
+    let source = PathBuf::from(&store).with_extension("source");
+    fs::create_dir_all(&source).unwrap();
+    // The candidate is not a release, so staging refuses it; the root it created stays.
+    assert!(stage_release(Path::new(&store), &source).is_err());
+}
+
+#[test]
+fn a_fresh_state_root_staged_under_umask_002_is_private_and_accepted_by_the_git_door() {
+    use std::os::unix::fs::MetadataExt;
+    use std::os::unix::process::CommandExt;
+
+    let _serial = serial();
+    let base = temp_dir("umask");
+    let store = base.join("fgos");
+    let mut child = Command::new(std::env::current_exe().unwrap());
+    child
+        .args(["--exact", "staging_child_entry", "--nocapture", "--test-threads", "1"])
+        .env(UMASK_STORE, &store)
+        .stdin(Stdio::null());
+    unsafe {
+        child.pre_exec(|| {
+            libc::umask(0o002);
+            Ok(())
+        });
+    }
+    assert!(child.status().expect("run staging child").success());
+
+    assert_eq!(fs::metadata(&store).unwrap().mode() & 0o777, 0o700, "a umask must not widen the state root");
+    fgos_git::GitDriver::new(&store).expect("the Git door accepts a freshly staged state root");
+    fs::remove_dir_all(&base).ok();
+}

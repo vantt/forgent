@@ -1,7 +1,7 @@
 ---
 phase: 7
 title: "Peer frame and body escape"
-status: pending
+status: done
 priority: P2
 effort: "3h"
 dependencies: [6]
@@ -85,3 +85,12 @@ node scripts/git-one-door-scan.mjs --write-census
 
 - A model may still decode entities and read forged text: the escape lowers the risk and does not remove it (spec §8). Whether Codex still acts on variant M with this escape is measured at V6 through the real hook; V1 proves only the structural property.
 - The frame wording is not final (spec §5.5); changing it later is a one-file change.
+
+## Implementation notes (2026-10-21)
+
+- Deviations (smallest correct fix):
+  - Two placeholders added to the contract: `{{reply}}` (the `[message]` section receives the filled `[message.reply]` section, or nothing for a sender with no head, so the reply line keeps its place before the repeat line) and `{{reason}}` (the `[notice]` section receives the filled reason sentence). Each inner section is filled first and inserted as a value, so the single-pass rule still holds.
+  - The contract file starts with `#` comment lines (the authority, the format and the placeholder list); the section parser ignores lines before the first `[name]` line.
+  - A sender with no head gets `agent="unregistered"`.
+  - `frame_sections()` is public so the contract test (test 10) reads the same parse the renderer uses.
+  - The acceptance check `rg -n "From another agent, not from the user" packages/mailbox` also finds `tests/frame.rs`, which holds the exact-string golden of test 1 and two hostile bodies; no source file holds frame text.

@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Claude head finder and caller check"
-status: pending
+status: done
 depends_on: [2, 4]
 live_calls: 0
 ---
@@ -70,4 +70,14 @@ Real files in a temporary directory and real processes; no mock of process facts
 
 ## Deviations
 
-(filled by the implementation lead from phase 2's probe: which topology, whether `procStart` is compared)
+From phase 2's probe (`plans/reports/research-261022-1751-mailbox-v4-hook-process-probe.md`): Claude Code 2.1.308 under `claude -p` runs the hook through one `sh` (dash) whose parent is the `claude` head, so the live suite uses **topology B**; `procStart` equals `/proc/<pid>/stat` `starttime`, so the finder compares it and test 6 stays. Both topologies are still built and tested (the plan specifies both).
+
+## Done on the branch (implementation lead, 2026-10-22)
+
+- `cargo test --locked -p fgos-mailbox --test head_finder --test head -- --test-threads=4`: 7 + 4 passed; the whole store crate 100 passed; clippy (`-D warnings`) and fmt clean.
+- Further deviations from the design:
+  - `Ancestry` is `{ parent: Record, parent_comm, grandparent: Option<Record> }` (a record carries its pid), and it, `Topology`, `NoHead` and `caller_is_head` live in the CLI-neutral `head` module, so the shell (phase 6) names no CLI; `adapters::claude_head` holds only `find_head`.
+  - The store reads no process table: the reader of an ancestry (`tests/common/ancestry.rs`, through `fgos-identity`'s process tree and process facts) is test support that the test-only entry includes by path. Making `fgos-identity` a normal dependency of the store would pull `fgos-host-runtime` into it; V5's host entry, which already depends on both, wires its own.
+  - Topology A refuses a shell parent (`sh`, `dash`, `bash`, `zsh`), so a hook run through a shell can never be read as direct.
+  - The session file is opened through the record's own `open_regular` (made `pub(crate)`), not a second opener; the same-head comparison is one function `same_complete_head`, used by `judge_stored` and `caller_is_head`.
+  - The FIFO case uses the existing test helper `mkfifo`; temporary directories use `TempFgos`.

@@ -1,7 +1,7 @@
 ---
 title: "Mailbox V4: Claude Code live end to end through a test-only hook entry, plus a two-session feasibility demo"
 description: "Build rung V4 of the Agent Mailbox ladder on branch mailbox/v1-v3: the hook shell (write, then finish), the Claude Code head finder and caller check, the send delivery report and the inbox verb as crate functions, a never-installed cargo example `mailbox-test-hook` that `claude -p --settings` calls, the mailbox root in BLIND_HIDDEN_ROOTS, a fixed-count live suite (stop gate, mid-step, hook really ran, send, inbox, output size), and a feasibility demo in which two real CLI sessions talk on one machine (Claude to Claude, then Claude to Codex, labelled not a support claim)."
-status: pending
+status: completed
 priority: P2
 effort: ~3d (10 phases, strictly sequential)
 branch: main (plan only); all code on branch mailbox/v1-v3 in linked worktree /home/vantt/projects/forgent-mailbox, never merged to main until the owner says feasibility is proven

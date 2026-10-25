@@ -12,12 +12,7 @@
 export {
   RunnerConfigError,
   loadRunnerConfig,
-  KNOWN_ASSISTANT_CLI_NAMES,
-  detectAssistantCli,
-  DEFAULT_RUNNER_CONFIG,
-  SUPPORTED_EXECUTOR_TEMPLATES,
-  loadRunnerConfigFromDir,
-  ensureRunnerConfigForDir,
+  loadRunnerConfigForDir,
   EXECUTOR_KINDS,
   EXECUTOR_CARRIES,
   CLAUDE_CLI_COMMANDS,
@@ -33,7 +28,6 @@ export { compileDispatchPlan } from './dispatch/plan.mjs';
 
 export {
   ProviderCapacityConfigError,
-  rejectProjectProviderAccountInventory,
   validateProviderAccountInventory,
   providerAccountInventory,
   hasProviderAccounts,

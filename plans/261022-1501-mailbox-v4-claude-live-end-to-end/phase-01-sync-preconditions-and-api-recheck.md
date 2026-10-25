@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Sync, preconditions, API re-check"
-status: pending
+status: done
 depends_on: []
 live_calls: 0
 ---
@@ -40,4 +40,15 @@ Branch synced and pushed. The plan directory reaches the branch through the main
 
 ## Deviations
 
-(filled by the implementation lead)
+Done on the branch, 2026-10-22 (implementation lead).
+
+- **V4 base:** `a5853a1bd` (the V2 review fixes committed; `git status --short` printed nothing). Phase 10's review diff starts here.
+- **Merged main:** `4379dc44c` in merge `421dfc93b`. `git log a5853a1bd..origin/main` on `src/runner/dispatch/confinement`, `packages/holder-lock`, `packages/durable-file`, `packages/process`, `packages/identity`: no commit.
+- **V2 H1 gate:** the owning test is `exact_short_name_wins_over_a_longer_name_it_prefixes` (`core/tests/names.rs:36`; its doc says an exact name of a dead head is refused, never passed on), not the one near line 77. `cargo test --locked -p fgos-mailbox-core --test names exact_short_name_wins_over_a_longer_name_it_prefixes -- --exact`: exit 0, 1 passed.
+- **API checklist:** every item matches, with these changes since the plan was written:
+  - the session-identity crate is now `fgos-identity` (`fgos_identity::{resolve_current, env_identity, WriterIdentity, WriterId}`), still a dev-dependency of `fgos-mailbox` only; `resolve_current(Some(fgos_dir))` returns `WriterIdentity { id: WriterId::Session|Pid, source }`. Later phases read `fgos_session_identity` as `fgos_identity`;
+  - `RecordError` gained `SnapshotTooLarge` and `RecordFull` (code `record-full`, returned only by a send whose new snapshot passes `snapshot_write_cap`); `record::{snapshot_read_cap, snapshot_write_cap}` are exported;
+  - `Record::open` checks every directory from `.fgos` down; `runtime/mailbox` is a record-created directory (mode must carry no group or other bits), so phase 3's 0700 creation matches what the record accepts;
+  - `Refusal`'s `Display` is its `code()` only; `Kind` serializes as `message` / `notice`.
+- **Installed versions:** Claude Code 2.1.308 (listed: 2.1.307), Codex 0.161.0 (listed).
+- **Baseline:** `CARGO_BUILD_JOBS=4 cargo test --locked -p fgos-mailbox -p fgos-mailbox-core -- --test-threads=4`: exit 0; `fgos-mailbox` 92 passed, `fgos-mailbox-core` 99 passed, 0 failed.

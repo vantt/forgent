@@ -96,4 +96,9 @@ Start V5 from a branch that holds the closed V4 fixes. Fix the base commits, the
 
 ## Notes (filled during the phase)
 
-_Base commit, origin/main, V4 fix checklist, versions, shared-file table._
+- Base: merge `811e545a7` of `origin/main` `aaa0d0f39` (census conflict regenerated). Baseline `cargo test -p fgos-mailbox -p fgos-mailbox-core -p fgos`: 284 passed, `exit=0`.
+- V4 fixes present: H1 `tests/test_hook_entry.rs` `every_kind_of_hook_usage_error_exits_zero_prints_nothing_on_stdout_and_logs_its_cause`; H2 the corrected comment in `scripts/lib/mailbox-live-cli.mjs`; M1 `tests/hook_shell.rs` `the_shell_moves_the_write_gate_to_writing_before_the_first_byte_of_stdout`; M2 `scripts/lib/codex-auth-guard.mjs` with `test/scripts/codex-auth-guard.test.mjs`; M5 `abe31e389` with `test/runner/dispatch-confinement-blind.test.mjs`; M6 `Quiet::OverReadCap` with `a_payload_one_byte_over_the_read_cap_skips_the_drain_with_its_own_reason_and_leaves_the_snapshot_unwritten`.
+- Preconditions: no `is_attempt_writer_id`; `resolve_topology` is a `pub(crate)` method of `GitDriver` taking `trusted_main` (`driver.rs:417`); no Config crate on main; no `native_kinds`.
+- Versions: Claude Code 2.1.308, Codex 0.161.0, agy 1.4.4, all under `testedAgainst`.
+- Shared files since 10-21: IDENT and HARDEN T1 changed `main.rs`, `cli_projector.rs`, `cli_presenter.rs`, `command-routes.json`, `catalog.rs`, `command-registry.mjs`, `registrations.mjs`, `packages/identity`, `packages/git/rust/src/{driver,lib}.rs`; nothing touched `agent-hooks.mjs`, `claude_transcripts.rs` or `docs/routing-handoff-contract.md`.
+- Board announcement: posted by the controller in main `2594f92e6`; skipped here.

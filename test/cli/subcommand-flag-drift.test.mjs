@@ -198,7 +198,7 @@ const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nat
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
   assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'events', 'gateway', 'goal', 'lock', 'merge', 'session', 'tool', 'workflow', 'worktree']);
-  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'friction', 'identity', 'metrics']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'friction', 'identity', 'mailbox', 'metrics']);
 });
 
 for (const entry of MULTI) {
@@ -247,7 +247,7 @@ test('the scanner sees what it claims to: known reads in known regions', () => {
   const merge = subRegions('merge', verbCase('merge'), ['list', 'next']);
   const nextReads = regionReads(merge.regions.next, 'probe');
   for (const name of ['acknowledge-iron-law', 'timeout', 'no-timeout', 'wait', 'no-wait']) assert.ok(nextReads.has(name), name);
-  assert.ok(regionReads(subRegions('tool', verbCase('tool'), ['check', 'query']).shared, 'probe').has('config'));
+  assert.ok(regionReads(dispatch.shared, 'probe').has('for'));
 });
 
 // Native verbs (the Rust host runs them; `--help` is answered from this
@@ -255,7 +255,8 @@ test('the scanner sees what it claims to: known reads in known regions', () => {
 // the crate's AVAILABLE_SUBCOMMANDS, and the `"--flag"` literals in a
 // sub-verb's own Rust region equal its schema's flags. Regions: metrics -> its
 // metrics_cli/<sub>.rs file; friction -> its match arm in friction_cli.rs;
-// config, convention and identity -> one parser shared by every sub-verb (cli_projector.rs), so
+// config, convention and identity -> one parser shared by every sub-verb (cli_projector.rs),
+// mailbox -> one parser in apps/fgos/src/wiring/mailbox_verbs.rs, so
 // its flags must equal the union of the sub-verbs' schemas.
 const RUST = (rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
 const NATIVE_SOURCES = {
@@ -282,6 +283,14 @@ const NATIVE_SOURCES = {
       const src = RUST('apps/fgos/src/cli_projector.rs');
       const start = src.indexOf('fn project_identity_request');
       return src.slice(start, src.indexOf('fn project_convention_request', start));
+    },
+  },
+  mailbox: {
+    subs: RUST('apps/fgos/src/wiring/mailbox_verbs.rs'),
+    shared: () => {
+      const src = RUST('apps/fgos/src/wiring/mailbox_verbs.rs');
+      const start = src.indexOf('pub fn project_mailbox_request');
+      return src.slice(start, src.indexOf('pub struct MailboxAnswer', start));
     },
   },
   config: {

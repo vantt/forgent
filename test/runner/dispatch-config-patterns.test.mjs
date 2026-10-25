@@ -8,9 +8,14 @@ import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture
 import {
   loadRunnerConfig,
   RunnerConfigError,
-  DEFAULT_RUNNER_CONFIG,
   validateRunnerPatternsShape,
 } from '../../src/runner/dispatch/config.mjs';
+import { readStandardValue } from '../../src/config/facade.mjs';
+
+const standardRunner = (key) => JSON.parse(JSON.stringify(readStandardValue(key ? `runner.${key}` : 'runner').value));
+// A complete runner file, as `loadRunnerConfig` reads one alone: the standard's runner section plus an executor,
+// which the standard leaves to each project.
+const BASE = { ...standardRunner(), executor: { command: 'claude', args: ['-p', '{prompt}'] } };
 
 function mkTempConfig(runnerObj) {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dispatch-config-test-'));
@@ -19,21 +24,22 @@ function mkTempConfig(runnerObj) {
   return { tmpDir, configPath };
 }
 
-test('DEFAULT_RUNNER_CONFIG contains valid default patterns', () => {
-  assert.ok(DEFAULT_RUNNER_CONFIG.patterns);
-  assert.deepEqual(DEFAULT_RUNNER_CONFIG.patterns.defaultRule, { mutatingMinRigor: 'standard' });
-  assert.equal(DEFAULT_RUNNER_CONFIG.patterns.reviewed.maxRounds, 2);
-  assert.deepEqual(DEFAULT_RUNNER_CONFIG.patterns.reviewed.checkersByRigor, {
+test('the standard\'s default patterns pass the runner\'s own pattern check', () => {
+  const patterns = standardRunner('patterns');
+  assert.ok(patterns);
+  assert.deepEqual(patterns.defaultRule, { mutatingMinRigor: 'standard' });
+  assert.equal(patterns.reviewed.maxRounds, 2);
+  assert.deepEqual(patterns.reviewed.checkersByRigor, {
     standard: ['reviewer'],
     high: ['reviewer', 'red-team'],
     critical: ['reviewer', 'red-team', 'tester'],
   });
-  assert.doesNotThrow(() => validateRunnerPatternsShape(DEFAULT_RUNNER_CONFIG.patterns, 'test'));
+  assert.doesNotThrow(() => validateRunnerPatternsShape(patterns, 'test'));
 });
 
 test('validateCapabilitiesShape: allows taste fields persona, minCheckers, verify', () => {
   const validConfig = {
-    ...DEFAULT_RUNNER_CONFIG,
+    ...BASE,
     capabilities: {
       'code:implement': {
         persona: 'systems-architect',
@@ -64,7 +70,7 @@ test('validateCapabilitiesShape: rejects invalid persona, minCheckers, verify', 
   // Empty persona
   assert.throws(() => {
     const { configPath } = mkTempConfig({
-      ...DEFAULT_RUNNER_CONFIG,
+      ...BASE,
       capabilities: { 'code:implement': { persona: '   ' } },
     });
     loadRunnerConfig(configPath);
@@ -73,7 +79,7 @@ test('validateCapabilitiesShape: rejects invalid persona, minCheckers, verify', 
   // Invalid minCheckers (not array)
   assert.throws(() => {
     const { configPath } = mkTempConfig({
-      ...DEFAULT_RUNNER_CONFIG,
+      ...BASE,
       capabilities: { 'code:implement': { minCheckers: 'reviewer' } },
     });
     loadRunnerConfig(configPath);
@@ -82,7 +88,7 @@ test('validateCapabilitiesShape: rejects invalid persona, minCheckers, verify', 
   // Invalid minCheckers entry
   assert.throws(() => {
     const { configPath } = mkTempConfig({
-      ...DEFAULT_RUNNER_CONFIG,
+      ...BASE,
       capabilities: { 'code:implement': { minCheckers: ['invalid-checker'] } },
     });
     loadRunnerConfig(configPath);
@@ -91,7 +97,7 @@ test('validateCapabilitiesShape: rejects invalid persona, minCheckers, verify', 
   // Invalid verify (empty)
   assert.throws(() => {
     const { configPath } = mkTempConfig({
-      ...DEFAULT_RUNNER_CONFIG,
+      ...BASE,
       capabilities: { 'code:implement': { verify: '  ' } },
     });
     loadRunnerConfig(configPath);
@@ -189,13 +195,13 @@ test('validateRunnerPatternsShape: enforces cumulative checkers across rigors', 
   }, 'patterns'));
 });
 
-test('DEFAULT_RUNNER_CONFIG declares an empty generatedPaths list', () => {
-  assert.deepEqual(DEFAULT_RUNNER_CONFIG.generatedPaths, []);
+test('the standard declares an empty generatedPaths list', () => {
+  assert.deepEqual(standardRunner('generatedPaths'), []);
 });
 
 test('runner.generatedPaths: well-formed {from, also} entries load', () => {
   const { configPath } = mkTempConfig({
-    ...DEFAULT_RUNNER_CONFIG,
+    ...BASE,
     generatedPaths: [{ from: 'core/skills/**', also: ['.agents/skills/**', 'plugins/fgOS/skills/**'] }],
   });
   assert.deepEqual(loadRunnerConfig(configPath).generatedPaths[0].also, ['.agents/skills/**', 'plugins/fgOS/skills/**']);
@@ -214,7 +220,7 @@ test('runner.generatedPaths: malformed entries are refused at load', () => {
     [['core'], /generatedPaths\[0\] must be an object/],
   ];
   for (const [generatedPaths, pattern] of cases) {
-    const { configPath } = mkTempConfig({ ...DEFAULT_RUNNER_CONFIG, generatedPaths });
+    const { configPath } = mkTempConfig({ ...BASE, generatedPaths });
     assert.throws(() => loadRunnerConfig(configPath), (err) => err instanceof RunnerConfigError && pattern.test(err.message), JSON.stringify(generatedPaths));
   }
 });

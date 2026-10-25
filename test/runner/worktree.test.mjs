@@ -1200,6 +1200,35 @@ test('createWorktree and createVerifyCheckout provision a declared dependency, a
   assert.deepEqual(fs.readdirSync(path.dirname(verify)).filter((name) => name.includes(path.basename(verify))), []);
 });
 
+test('removing a verify checkout also removes the ignored bytes verification produced there, while a dispatch checkout with the same unknown ignored bytes is still refused', () => {
+  const repoRoot = initTempRepo();
+  fs.writeFileSync(path.join(repoRoot, '.gitignore'), 'build-output/\n');
+  execFileSync('git', ['add', '.gitignore'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'ignore build output'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
+  const leave = (checkout) => {
+    fs.mkdirSync(path.join(checkout, 'build-output', 'debug'), { recursive: true });
+    fs.writeFileSync(path.join(checkout, 'build-output', 'debug', 'artifact.bin'), 'produced by a verification run');
+  };
+
+  // A checkout a worker or person uses keeps the port's protection: bytes no record names are never deleted.
+  const dispatch = createWorktree(repoRoot, 'item-keeps-unknown-bytes', { worktreeDir: mkWorktreeDir() });
+  leave(dispatch.path);
+  assert.throws(() => removeWorktree(repoRoot, dispatch.path, { force: true }), /worktree-ignored-bytes-preserved/);
+  assert.equal(fs.existsSync(path.join(dispatch.path, 'build-output', 'debug', 'artifact.bin')), true);
+  fs.rmSync(path.join(dispatch.path, 'build-output'), { recursive: true });
+  removeWorktree(repoRoot, dispatch.path, { force: true });
+
+  // A verify checkout is disposable: what the verification run built there goes with it.
+  const verify = createVerifyCheckout(repoRoot, branchTip(repoRoot, 'HEAD'));
+  leave(verify);
+  removeWorktree(repoRoot, verify, { force: true });
+  assert.equal(fs.existsSync(verify), false, 'the checkout directory is gone');
+  const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
+  assert.doesNotMatch(listing, new RegExp(path.basename(verify)), 'the checkout is no longer registered');
+  assert.deepEqual(fs.readdirSync(path.dirname(verify)).filter((name) => name.includes(path.basename(verify))), [], 'no set-aside directory is left');
+});
+
 test('createWorktree provisions dependencies after git worktree add and leaves its lock scope empty', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();

@@ -613,14 +613,8 @@ pub(crate) fn known_receipt_tip(
     let Some(tip) = tip else { return Ok(false) };
     let mut known = false;
     let mut stops = Vec::new();
-    for entry in std::fs::read_dir(&layout.root).map_err(io)? {
-        let entry = entry.map_err(io)?;
-        let name = entry.file_name();
-        let Some(name) = name.to_str() else { continue };
-        if StreamId::parse(name).is_err() || !entry.file_type().map_err(io)?.is_dir() {
-            continue;
-        }
-        let receipt = Receipt::read(&entry.path().join("sealed.json"))?;
+    for stream in layout.streams()? {
+        let receipt = Receipt::read(&layout.stream(&stream).sealed())?;
         if receipt.reference == reference.as_str() && !receipt.commit.is_empty() {
             stops.push(
                 Oid::parse(&receipt.commit, repo.object_format())

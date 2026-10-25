@@ -1,0 +1,8 @@
+{"type": "response_item", "payload": {"type": "custom_tool_call", "call_id": "call_84c61952031b4116b80c3969558e6d9c", "input": "const r = await tools.exec_command({cmd:\"ls\",workdir:\"/run-dir/ws\"});\ntext(r.output);\n"}}
+{"type": "response_item", "payload": {"type": "custom_tool_call_output", "call_id": "call_84c61952031b4116b80c3969558e6d9c"}}
+{"type": "response_item", "payload": {"type": "custom_tool_call", "call_id": "call_6d60762bef7f48f19746488115e61237", "input": "const r = await tools.exec_command({cmd:\"until [ -f go1.txt ]; do sleep 2; done\",workdir:\"/run-dir/ws\",yield_time_ms:30000});\ntext(JSON.stringify(r));\n"}}
+{"type": "response_item", "payload": {"type": "custom_tool_call_output", "call_id": "call_6d60762bef7f48f19746488115e61237"}}
+{"type": "response_item", "payload": {"type": "custom_tool_call", "call_id": "call_9edccec6f80b4c47b1e92eebd96c0bed", "input": "const r = await tools.exec_command({cmd:\"printf '2\\\\n' > summary.txt\",workdir:\"/run-dir/ws\"});\ntext(r.output);\n"}}
+{"type": "response_item", "payload": {"type": "custom_tool_call_output", "call_id": "call_9edccec6f80b4c47b1e92eebd96c0bed"}}
+{"type": "response_item", "payload": {"type": "custom_tool_call", "call_id": "call_d659ff0d8f96470f97f16bdc8e275fe5", "input": "const r = await tools.exec_command({cmd:\"until [ -f go2.txt ]; do sleep 2; done\",workdir:\"/run-dir/ws\",yield_time_ms:30000});\ntext(JSON.stringify(r));\n"}}
+{"type": "response_item", "payload": {"type": "custom_tool_call_output", "call_id": "call_d659ff0d8f96470f97f16bdc8e275fe5"}}

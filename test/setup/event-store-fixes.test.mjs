@@ -15,10 +15,19 @@ test('all setup fixes are idempotent; mappings are fetched only through Git conf
   assert.equal(fixEventStoreRefspec(f.repo, f.ctx).changed, true);
   assert.equal(fixEventStoreRefspec(f.repo, f.ctx).changed, false);
   assert.throws(() => f.git('config', '--get-all', 'remote.origin.push'));
-  fs.chmodSync(f.locks, 0o755);
+  // The locks directory and each parent the fix owns up to the Git common dir (Git's WAL refuses a
+  // group-writable one): a wrong mode below `fgos` is fixed, and a missing tree is created private. A
+  // group-writable `fgos` itself is refused by Git before any Event Store fact can be read.
+  const owned = [f.locks, path.dirname(f.locks), path.dirname(path.dirname(f.locks))];
+  for (const dir of owned.slice(0, 2)) {
+    fs.chmodSync(dir, 0o775);
+    assert.equal(fixEventStoreLockDirs(f.repo, f.ctx).changed, true, dir);
+    for (const each of owned) assert.equal(fs.statSync(each).mode & 0o777, 0o700, each);
+    assert.equal(fixEventStoreLockDirs(f.repo, f.ctx).changed, false);
+  }
+  fs.rmSync(owned[2], { recursive: true });
   assert.equal(fixEventStoreLockDirs(f.repo, f.ctx).changed, true);
-  assert.equal(fs.statSync(f.locks).mode & 0o777, 0o700);
-  assert.equal(fixEventStoreLockDirs(f.repo, f.ctx).changed, false);
+  for (const each of owned) assert.equal(fs.statSync(each).mode & 0o777, 0o700, each);
 });
 test('setup refuses symlink identities and lock directories, preserves invalid existing identity', t => {
   const f = fixture(t);

@@ -134,6 +134,8 @@ pub enum Verb {
     Migrate {
         global: bool,
         finish: bool,
+        /// With `global`: convert the global JSON file to YAML instead of moving the keys.
+        convert: bool,
         machine_checked: bool,
         accept_machine_overrides: bool,
         dry_run: bool,
@@ -306,6 +308,16 @@ fn answer(req: &ConfigRequest) -> Result<ConfigOutcome, Refusal> {
         }
         _ => unix_verbs::run(&bundle, &roots, &req.verb),
     }
+}
+
+/// The effective value at `path` (text form, e.g. `eventStore.remote`) for the
+/// project at `root`: project over global over the standard, as `config show`
+/// prints it. `None` when no layer sets it. For host code that needs one
+/// setting in process, so none reads the config files itself.
+pub fn effective_value(root: &Path, path: &str) -> Result<Option<Value>, Refusal> {
+    let request = ConfigRequest { root: root.to_owned(), verb: Verb::Show { path: Some(path.to_owned()) } };
+    let shown = answer(&request)?.data;
+    Ok(shown["present"].as_bool().filter(|present| *present).and_then(|_| shown.get("value").cloned()).filter(|value| !value.is_null()))
 }
 
 #[derive(Debug, Clone)]

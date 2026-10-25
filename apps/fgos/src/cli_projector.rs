@@ -69,6 +69,26 @@ pub fn project_cli_invocation(
             ContractRef::from_static("identity.write.request", "1.0.0"),
             Box::new(project_identity_request(args)?),
         ),
+        crate::wiring::mailbox_verbs::SEND_OPERATION_ID => (
+            ContractRef::from_static("mailbox.send.request", "1.0.0"),
+            Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
+        ),
+        crate::wiring::mailbox_verbs::INBOX_OPERATION_ID => (
+            ContractRef::from_static("mailbox.inbox.request", "1.0.0"),
+            Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
+        ),
+        crate::wiring::mailbox_verbs::INBOX_CLAIM_OPERATION_ID => (
+            ContractRef::from_static("mailbox.inbox.claim.request", "1.0.0"),
+            Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
+        ),
+        crate::wiring::mailbox_verbs::LIST_OPERATION_ID => (
+            ContractRef::from_static("mailbox.list.request", "1.0.0"),
+            Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
+        ),
+        crate::wiring::mailbox_verbs::STATUS_OPERATION_ID => (
+            ContractRef::from_static("mailbox.status.request", "1.0.0"),
+            Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
+        ),
         "config.read" | "config.write" => (
             ContractRef::from_static(
                 if operation.as_str() == "config.read" { "config.read.request" } else { "config.write.request" },
@@ -91,10 +111,18 @@ pub fn project_cli_invocation(
 
 /// The operation a native route runs for these arguments. A route names one
 /// operation; `identity` fans out over three (`identity.writer` bare,
-/// `identity.read`, `identity.write`) and the arguments decide which.
+/// `identity.read`, `identity.write`) and `mailbox` over five
+/// (`mailbox.send`, `mailbox.inbox`, `mailbox.inbox.claim` with `--claim`,
+/// `mailbox.list`, `mailbox.status`),
+/// and the arguments decide which.
 pub fn native_operation_id(route_operation: &str, args: &[OsString]) -> Result<String, String> {
     if route_operation == fgos_identity::IDENTITY_OPERATION_ID {
         return Ok(project_identity_request(args)?.operation_id().to_string());
+    }
+    if route_operation == crate::wiring::mailbox_verbs::INBOX_OPERATION_ID {
+        return Ok(crate::wiring::mailbox_verbs::project_mailbox_request(args)
+            .operation_id()
+            .to_string());
     }
     if route_operation == fgos_config::provider::CONFIG_READ_OPERATION_ID {
         let request = project_config_request(args, std::path::PathBuf::new())?;
@@ -106,7 +134,7 @@ pub fn native_operation_id(route_operation: &str, args: &[OsString]) -> Result<S
 /// `fgos config show|standard [--path <p>]`, `explain <path>`, `check`, `set <path> <value>
 /// [--reason <text>] [--global]`, `unset <path> [--reason <text>] [--global]
 /// [--acknowledge-comment-loss]`, `patch <file> [--reason <text>] [--global]`, `migrate [--dry-run]
-/// [--accept-machine-overrides]` or `migrate --global [--finish [--machine-checked]] [--dry-run]`,
+/// [--accept-machine-overrides]` or `migrate --global [--finish [--machine-checked] | --convert [--machine-checked]] [--dry-run]`,
 /// `refresh-docs [--global]`. A path is in the text form of YAML Document. `--dir` and `--json`
 /// are accepted on every verb; the reason is optional here because a write that changes nothing
 /// needs none (the crate refuses a missing one when it is needed).
@@ -127,7 +155,7 @@ fn project_config_request(
         "unset" => (&["--reason"], &["--global", "--acknowledge-comment-loss"], 1),
         "patch" => (&["--reason"], &["--global"], 1),
         "migrate" => {
-            (&[], &["--dry-run", "--global", "--finish", "--machine-checked", "--accept-machine-overrides"], 0)
+            (&[], &["--dry-run", "--global", "--finish", "--convert", "--machine-checked", "--accept-machine-overrides"], 0)
         }
         "refresh-docs" => (&[], &["--global"], 0),
         other => {
@@ -181,8 +209,11 @@ fn project_config_request(
             if has("--finish") && !global {
                 return Err("--finish needs --global".into());
             }
-            if has("--machine-checked") && !has("--finish") {
-                return Err("--machine-checked needs --finish".into());
+            if has("--convert") && (!global || has("--finish")) {
+                return Err("--convert needs --global and goes without --finish".into());
+            }
+            if has("--machine-checked") && !has("--finish") && !has("--convert") {
+                return Err("--machine-checked needs --finish or --convert".into());
             }
             if has("--accept-machine-overrides") && global {
                 return Err("--accept-machine-overrides is for the project migration, not --global".into());
@@ -190,6 +221,7 @@ fn project_config_request(
             Verb::Migrate {
                 global,
                 finish: has("--finish"),
+                convert: has("--convert"),
                 machine_checked: has("--machine-checked"),
                 accept_machine_overrides: has("--accept-machine-overrides"),
                 dry_run: has("--dry-run"),
@@ -203,7 +235,7 @@ fn project_config_request(
 /// machine [--alias <name>] [--json]`, `fgos identity project [--init|--new]
 /// [--handle <name>] [--json]`, `fgos identity session [--register] [--role
 /// lead:<LANE>] [--take]`, `fgos identity resolve <query>`, `fgos identity list
-/// [--project] [--prune]`, `fgos identity pins [--forget <machine-id> | --confirm <machine-id> --fingerprint <fp>]`, `fgos identity mint <kind> [--release <number>]
+/// [--project] [--prune] [--machine <handle|id>]`, `fgos identity pins [--forget <machine-id> | --confirm <machine-id> --fingerprint <fp>]`, `fgos identity mint <kind> [--release <number>]
 /// [--json]`. `--dir` is accepted and ignored on
 /// every verb, because the shell integration appends it.
 fn project_identity_request(
@@ -229,8 +261,8 @@ fn project_identity_request(
             &["--dir"],
         ),
         Some("list") => (
-            fgos_identity::Verb::List { project: false, prune: false },
-            &["--project", "--prune", "--dir"],
+            fgos_identity::Verb::List { project: false, prune: false, machine: None },
+            &["--project", "--prune", "--machine", "--dir"],
         ),
         Some("project") => (
             fgos_identity::Verb::Project(fgos_identity::ProjectAction::Read),
@@ -285,6 +317,7 @@ fn project_identity_request(
     let mut drop_role: Option<String> = None;
     let mut by_project = false;
     let mut prune = false;
+    let mut machine_filter: Option<String> = None;
     // `Some(fork)` once `--init` (false) or `--new` (true) was given.
     let mut mint: Option<bool> = None;
     let mut handle: Option<String> = None;
@@ -383,6 +416,12 @@ fn project_identity_request(
                 }
                 fingerprint = Some(flag_value);
             }
+            "--machine" => {
+                if flag_value.is_empty() {
+                    return Err("--machine requires a machine handle or id".into());
+                }
+                machine_filter = Some(flag_value);
+            }
             "--handle" => {
                 if flag_value.is_empty() {
                     return Err("--handle requires a value".into());
@@ -419,9 +458,10 @@ fn project_identity_request(
                 *action = fgos_identity::SessionAction::Register { role, take };
             }
         }
-        fgos_identity::Verb::List { project, prune: pruned } => {
+        fgos_identity::Verb::List { project, prune: pruned, machine } => {
             *project = by_project;
             *pruned = prune;
+            *machine = machine_filter;
         }
         _ => {}
     }
@@ -631,7 +671,11 @@ mod tests {
         );
         assert_eq!(
             request(&["identity", "list", "--project", "--prune"]).unwrap().verb,
-            fgos_identity::Verb::List { project: true, prune: true }
+            fgos_identity::Verb::List { project: true, prune: true, machine: None }
+        );
+        assert_eq!(
+            request(&["identity", "list", "--machine", "bravo"]).unwrap().verb,
+            fgos_identity::Verb::List { project: false, prune: false, machine: Some("bravo".into()) }
         );
         assert!(request(&["identity", "session", "--take"]).is_err(), "--take needs --role");
         assert!(request(&["identity", "resolve"]).is_err());
@@ -859,7 +903,7 @@ mod tests {
         assert_eq!(config(&["config", "refresh-docs", "--global"]).unwrap().verb, Verb::RefreshDocs { global: true });
         assert_eq!(
             config(&["config", "migrate", "--global", "--finish", "--machine-checked"]).unwrap().verb,
-            Verb::Migrate { global: true, finish: true, machine_checked: true, accept_machine_overrides: false, dry_run: false }
+            Verb::Migrate { global: true, finish: true, convert: false, machine_checked: true, accept_machine_overrides: false, dry_run: false }
         );
         // A negative number is a value, not a flag.
         assert!(matches!(config(&["config", "set", "a", "-1"]).unwrap().verb, Verb::Set { value, .. } if value == "-1"));

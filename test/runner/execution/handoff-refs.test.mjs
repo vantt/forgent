@@ -60,13 +60,6 @@ test('without a settled report the claim stands in for it', () => {
   assert.equal(reportRefOf({ role: 'producer', round: 1, runResult }, { mainRoot: root }), path.join(runDir, 'claim.json'));
 });
 
-test('an inline record hands over its evidence refs, relative to the unit worktree', () => {
-  const root = makeRoot();
-  const worktree = path.join(root, 'wt');
-  const ref = reportRefOf({ role: 'producer', round: 1, runResult: { evidenceRefs: ['docs/out.md'] } }, { mainRoot: root, worktree });
-  assert.equal(ref, path.join(worktree, 'docs/out.md'));
-});
-
 test('a record that left nothing is refused rather than skipped', () => {
   const root = makeRoot();
   for (const runResult of [{}, { evidence: { artifacts: [] }, settleReports: [] }, undefined]) {

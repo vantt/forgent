@@ -130,12 +130,11 @@ impl ObservationSource for ClaudeTranscriptsSource {
     }
 
     fn observations(&self, root: &Path, w: &Window) -> Result<Vec<Observation>, SourceError> {
-        let claude_dir = match std::env::var("CLAUDE_CONFIG_DIR") {
-            Ok(dir) => PathBuf::from(dir),
-            Err(_) => match std::env::var("HOME") {
-                Ok(home) => PathBuf::from(home).join(".claude"),
-                Err(_) => return Ok(Vec::new()),
-            },
+        let Some(claude_dir) = fgos_identity::cli_dirs::claude_config_dir(
+            std::env::var_os("HOME").as_deref(),
+            std::env::var_os("CLAUDE_CONFIG_DIR").as_deref(),
+        ) else {
+            return Ok(Vec::new());
         };
 
         let projects_dir = claude_dir.join("projects");

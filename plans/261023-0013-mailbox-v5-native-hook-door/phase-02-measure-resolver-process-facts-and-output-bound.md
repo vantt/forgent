@@ -118,4 +118,9 @@ The CLI then spawns it exactly as it will spawn the real shim in phase 8, and th
 
 ## Notes
 
-_Filled during the phase._
+- Report: `plans/reports/research-261023-0148-mailbox-v5-measurements.md` (commit `1966d3574`); recorder modes in `ecdb84f3d`.
+- Live runs: P1–P5 as planned (5), plus P3b and P5b (`ladder-sum`), authorized by the plan owner (agent) after the first report: 7 in this phase.
+- Plan owner decisions (2026-10-23, also in spec §17):
+  1. The re-run showed the inline threshold applies per hook in both CLIs, so the bound is the largest inline step less one step: 8,192 bytes (4,608 under the summed-case rule before the re-run).
+  2. The Codex hook row keeps the plain `shimCommand` form: Codex runs a hook command through the user's `$SHELL -c`, and the guarded form keeps that shell (zsh here) at the head position. Consequence for owner question 2: on a release older than the native kind, an unguarded Codex row shows "Unknown hook kind" (exit 1).
+  3. The Git component's state root relative to the cwd when `HOME` and `XDG_STATE_HOME` are unset is `tsk-43x4`, for the Git lane; not fixed here.

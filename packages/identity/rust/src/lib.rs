@@ -7,6 +7,7 @@
 //! vectors: `packages/identity/contracts/`.
 
 pub mod attempt;
+pub mod cli_dirs;
 #[cfg(feature = "directory")]
 pub mod current;
 #[cfg(feature = "directory")]
@@ -27,10 +28,12 @@ pub mod refusal;
 pub mod resolve;
 pub mod session;
 #[cfg(feature = "directory")]
+pub mod shared;
+#[cfg(feature = "directory")]
 pub mod signing;
 pub mod text;
 
-pub use attempt::{mint_attempt_writer_id, InvalidAttemptId, ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH};
+pub use attempt::{is_attempt_writer_id, mint_attempt_writer_id, InvalidAttemptId, ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH};
 pub use launcher::{scrub_and_set, EmptyWriterId};
 pub use errors::Error;
 pub use mint::{random, Kind, RandomKind, SequenceKind, KIND_NAMES, RANDOM_CHARS};
@@ -45,6 +48,8 @@ pub use pins::{Pin, PinState, Recorded};
 pub use signing::{sign, verify, Signature, Verified};
 #[cfg(feature = "directory")]
 pub use project::{project_info, project_init, ProjectInfo, ProjectMinted};
+#[cfg(feature = "directory")]
+pub use shared::{EntryLog, LogDoor, MachineRef, RawEvent, SharedView};
 #[cfg(feature = "provider")]
 #[cfg(feature = "directory")]
 pub use refusal::{Candidate, Liveness, Refusal};

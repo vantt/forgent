@@ -8,6 +8,8 @@ eventStore:
   seal:
     # @fgos:doc Seconds between seals of the open event segment. Minimum: 1. Default: 300.
     intervalSec: 300
+    # @fgos:doc Seconds a lifecycle seal waits for more events of the same unit of work before it seals them as one. Minimum: 1. Default: 30.
+    coalesceSec: 30
   # @fgos:doc The sync timer of the event store.
   sync:
     # @fgos:doc Seconds between syncs with the remote; 0 turns the timer off. Minimum: 0. Default: 300.

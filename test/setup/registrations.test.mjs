@@ -4,26 +4,18 @@
 // picked up through checks.mjs's own re-exported DOCTOR_CHECKS without this
 // test (or any other new module) touching checks.mjs itself.
 import '../helpers/process-tmp-root.mjs';
-import { EVENT_STORE_DEFAULTS } from '../../src/event-store/index.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
-import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
-import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT, findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainWorkflowOperationsCoverage } from '../../src/setup/registrations.mjs';
-import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { execFileSync, spawnSync } from 'node:child_process';
+import crypto from 'node:crypto';
+import { DOCTOR_CHECKS, FIX_REGISTRATIONS, registerCheck, registerFix, runFixes } from '../../src/setup/checks.mjs';
+import { findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainWorkflowOperationsCoverage } from '../../src/setup/registrations.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
-
-const EXPECTED_RUNNER_DEFAULT = {
-  ...DEFAULT_RUNNER_CONFIG,
-  capabilities: DEFAULT_CAPABILITY_SLOTS,
-  modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, openai: { nano: 'gpt-5.5' } },
-  executors: { openai: PI_EXECUTOR_DEFAULT },
-};
 
 // tsk-4xg: runFixes() below invokes every registered fix, including the
 // real `claude-plugin-marketplace` one, which shells out to a real,
@@ -86,45 +78,8 @@ test('registering a check with a duplicate id throws rather than silently shadow
   );
 });
 
-test('a new module can register a config-default independently of any check (D2)', () => {
-  const before = CONFIG_DEFAULT_REGISTRATIONS.length;
-  registerConfigDefault({
-    id: 'registrations-test-throwaway-config',
-    key: 'throwawayModule',
-    shape: { enabled: true },
-  });
-  assert.equal(CONFIG_DEFAULT_REGISTRATIONS.length, before + 1);
-  const entry = CONFIG_DEFAULT_REGISTRATIONS.find((c) => c.id === 'registrations-test-throwaway-config');
-  assert.ok(entry, 'CONFIG_DEFAULT_REGISTRATIONS did not pick up the new registration');
-  assert.equal(entry.key, 'throwawayModule');
-  assert.deepEqual(entry.shape, { enabled: true });
-});
-
-test('registerConfigDefault rejects a non-object shape', () => {
-  assert.throws(
-    () => registerConfigDefault({ id: 'registrations-test-bad-shape', key: 'bad', shape: 'not-an-object' }),
-    /plain-object shape/,
-  );
-});
-
-test('registerConfigDefault requires a non-empty key', () => {
-  assert.throws(
-    () => registerConfigDefault({ id: 'registrations-test-no-key', key: '', shape: {} }),
-    /non-empty key/,
-  );
-});
-
-test('the runner\'s own config-default is registered under the "runner" key (built-in, proves the same mechanism a new module would use)', () => {
-  const entry = CONFIG_DEFAULT_REGISTRATIONS.find((c) => c.id === 'runner');
-  assert.ok(entry, 'the built-in runner config-default is missing from CONFIG_DEFAULT_REGISTRATIONS');
-  assert.equal(entry.key, 'runner');
-  assert.equal(typeof entry.shape, 'object');
-});
-
 // ─── fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D3, tsk-2qz-1): a
-// third registration capability, independent of check/configDefault, proven
-// here with a throwaway entry -- never the real gate-bypass entry (that's
-// tsk-2qz-2's own job, per the plan's piece boundary).
+// registration capability independent of check, proven here with a throwaway entry.
 
 test('a new module can register a fix via registrations.mjs and see it in checks.mjs\'s own FIX_REGISTRATIONS, without checks.mjs being edited', () => {
   const before = FIX_REGISTRATIONS.length;
@@ -172,106 +127,6 @@ test('runFixes invokes every registered fix against the given cwd and reports id
   assert.equal(results.length, before + 1);
   const entry = results.find((r) => r.id === 'registrations-test-runfixes-throwaway');
   assert.deepEqual(entry, { id: 'registrations-test-runfixes-throwaway', changed: true, message: 'ran against /tmp/some-cwd' });
-});
-
-// ─── ensureSharedConfigDefaults (tsk-5vf D4): the registry-driven assembler
-// `fgos setup` calls. CONFIG_DEFAULT_REGISTRATIONS is a live, shared, mutable
-// module array (see the throwaway-registration tests above) -- these
-// assertions only check for the presence/shape of entries this file itself
-// controls (the built-in `runner` entry), never a strict deepEqual of the
-// WHOLE assembled object, which would break the moment any other test in
-// the same process registers its own throwaway entry.
-
-test('ensureSharedConfigDefaults on a fresh dir writes every registered entry under its own key, including the built-in "runner" one', () => {
-  const dir = mkTempDir();
-  const { config, addedKeys } = ensureSharedConfigDefaults(dir);
-  // tsk-2uf-3: the registered "runner" config-default layers the
-  // advise/execute capability slots onto DEFAULT_RUNNER_CONFIG (that
-  // constant itself, src/runner/dispatch.mjs, stays untouched -- see
-  // registrations.mjs's own `DEFAULT_CAPABILITY_SLOTS` composition), so
-  // the assembled "runner" section is no longer byte-identical to
-  // DEFAULT_RUNNER_CONFIG alone.
-  // A project's own runner section starts in the seat-binding schema; the registered default is the rest.
-  const projectRunner = { ...EXPECTED_RUNNER_DEFAULT, patterns: { ...EXPECTED_RUNNER_DEFAULT.patterns, seatBinding: { schema: 1 } } };
-  assert.deepEqual(config.runner, projectRunner);
-  assert.ok(addedKeys.some((k) => k.startsWith('runner.')) || addedKeys.includes('runner'));
-  const written = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'config.json'), 'utf8'));
-  assert.deepEqual(written.runner, projectRunner);
-});
-
-test('ensureSharedConfigDefaults for the global layer writes the registered runner default with no seat-binding key', () => {
-  const dir = mkTempDir();
-  const { config } = ensureSharedConfigDefaults(dir, { layer: 'global' });
-  assert.deepEqual(config.runner, EXPECTED_RUNNER_DEFAULT);
-  assert.equal(config.runner.patterns.seatBinding, undefined, 'every older release on the machine reads the global file');
-  assert.equal('rigorToTier' in config.runner, false);
-});
-
-test('ensureSharedConfigDefaults leaves the marker out of a runner section that is already there: converting it is the conversion\'s job', () => {
-  const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  writeProjectConfig(dir, { runner: { timeoutMs: 1000 } });
-  const { config } = ensureSharedConfigDefaults(dir);
-  assert.equal(config.runner.patterns.seatBinding, undefined);
-  assert.equal('rigorToTier' in config.runner, false);
-});
-
-test('ensureSharedConfigDefaults on an already-complete shared file does not rewrite it', () => {
-  const dir = mkTempDir();
-  const first = ensureSharedConfigDefaults(dir);
-  const sharedPath = path.join(dir, '.fgos', 'config.json');
-  const before = fs.statSync(sharedPath).mtimeMs;
-  const second = ensureSharedConfigDefaults(dir);
-  assert.deepEqual(second.addedKeys, []);
-  assert.deepEqual(second.config, first.config);
-  assert.equal(fs.statSync(sharedPath).mtimeMs, before);
-});
-
-const WORKFLOW_CAPABILITIES = [
-  'marketing:research', 'marketing:write', 'marketing:publish',
-  'architecture:frame', 'architecture:shape', 'architecture:critique', 'architecture:synthesize', 'architecture:explain',
-  'business:frame', 'business:perspectives', 'business:critique', 'business:synthesize', 'business:plan',
-];
-
-test('ensureSharedConfigDefaults on an empty project registers the Workflow capabilities', () => {
-  const dir = mkTempDir();
-  const { config } = ensureSharedConfigDefaults(dir);
-  for (const name of WORKFLOW_CAPABILITIES) {
-    assert.equal(typeof config.runner.capabilities[name]?.description, 'string', `${name} missing`);
-  }
-});
-
-test('ensureSharedConfigDefaults adds missing Workflow capabilities without touching one the project already tuned', () => {
-  const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  const tuned = { description: 'project taste', prefer: [{ executor: 'mine' }] };
-  writeProjectConfig(dir, { runner: { capabilities: { 'marketing:write': tuned } } });
-  const { config } = ensureSharedConfigDefaults(dir);
-  assert.deepEqual(config.runner.capabilities['marketing:write'], tuned);
-  assert.ok(config.runner.capabilities['marketing:research']);
-  assert.ok(config.runner.capabilities['business:plan']);
-});
-
-seedFileLocalBwrapRegistry();
-
-test('setup adds a coding:plan slot beside a project bare-verb plan pool, and bind no longer serves it from that pool', async () => {
-  const { bind } = await import('../../src/runner/execution/bind.mjs');
-  const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  const plan = { prefer: [{ executor: 'mine' }] };
-  writeProjectConfig(dir, { runner: { capabilities: { plan } } });
-  const { config } = ensureSharedConfigDefaults(dir);
-  assert.deepEqual(config.runner.capabilities.plan, plan, 'the project entry is untouched');
-  assert.equal(typeof config.runner.capabilities['coding:plan']?.description, 'string', 'the slot is still added');
-  assert.equal(config.runner.capabilities['coding:plan'].prefer, undefined);
-  const runnerConfig = {
-    ...config.runner,
-    modelPolicies: { ...config.runner.modelPolicies, mine: { nano: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' } },
-    executors: { mine: { kind: 'agent', command: 'mine', invocations: [{ id: 'mine-cli', via: 'cli', confinement: { backend: 'bwrap' } }] } },
-  };
-  // The bare verb of a capability is not a lookup key: the slot has no pool of its own, so it is refused.
-  const bound = bind({ unit: { id: 'u', capability: 'coding:plan', writes: [] }, role: 'producer' }, { runnerConfig, session: { headless: true } });
-  assert.equal(bound.refused.reason, 'headless-no-executor');
 });
 
 // ─── spec/registry agreement. Data Dictionary #7 and #7b used to say the
@@ -436,78 +291,6 @@ test('plugin-dev-skills-packaged fails and names any .claude/skills/fgos-* dev-s
   assert.match(result.message, /Unknown skill/);
 });
 
-// ─── gateway-token-configured (tsk-4r1, found by the gateway audit,
-// Finding 9): the gateway's own token lives in ~/.fgos/config.json (home),
-// never `cwd`'s -- every test below overrides HOME so it never touches
-// this machine's real home config, mirroring plugin-skill-cli-reachable's
-// own HOME-override discipline above.
-
-function gatewayTokenConfiguredCheck() {
-  const entry = DOCTOR_CHECKS.find((c) => c.id === 'gateway-token-configured');
-  assert.ok(entry, 'gateway-token-configured must be registered');
-  return entry.check;
-}
-
-function gatewayTokenConfiguredFix() {
-  const entry = FIX_REGISTRATIONS.find((f) => f.id === 'gateway-token-configured');
-  assert.ok(entry, 'gateway-token-configured fix must be registered');
-  return entry.fix;
-}
-
-test('gateway-token-configured check fails when HOME has no gateway.token, and fix provisions a real one the check then accepts', () => {
-  const homeDir = mkTempDir();
-  const originalHome = process.env.HOME;
-  const originalUserProfile = process.env.USERPROFILE;
-  process.env.HOME = homeDir;
-  process.env.USERPROFILE = homeDir;
-  try {
-    const before = gatewayTokenConfiguredCheck()();
-    assert.equal(before.passed, false);
-    assert.match(before.message, /gateway\.token missing/);
-    assert.match(before.message, /fgos doctor --fix/);
-
-    const fixResult = gatewayTokenConfiguredFix()();
-    assert.equal(fixResult.changed, true);
-
-    const written = JSON.parse(fs.readFileSync(path.join(homeDir, '.fgos', 'config.json'), 'utf8'));
-    assert.equal(typeof written.gateway.token, 'string');
-    assert.ok(written.gateway.token.length >= 32, `expected a high-entropy token, got ${written.gateway.token.length} chars`);
-
-    const after = gatewayTokenConfiguredCheck()();
-    assert.equal(after.passed, true);
-  } finally {
-    if (originalHome === undefined) delete process.env.HOME; else process.env.HOME = originalHome;
-    if (originalUserProfile === undefined) delete process.env.USERPROFILE; else process.env.USERPROFILE = originalUserProfile;
-  }
-});
-
-test('gateway-token-configured fix is idempotent — an existing token is never rotated out from under a client that already has it', () => {
-  const homeDir = mkTempDir();
-  const originalHome = process.env.HOME;
-  const originalUserProfile = process.env.USERPROFILE;
-  process.env.HOME = homeDir;
-  process.env.USERPROFILE = homeDir;
-  try {
-    fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-    writeGlobalConfig(homeDir, { gateway: { port: 4170, token: 'already-set-token' } });
-    const fixResult = gatewayTokenConfiguredFix()();
-    assert.equal(fixResult.changed, false);
-    const written = JSON.parse(fs.readFileSync(path.join(homeDir, '.fgos', 'config.json'), 'utf8'));
-    assert.equal(written.gateway.token, 'already-set-token');
-  } finally {
-    if (originalHome === undefined) delete process.env.HOME; else process.env.HOME = originalHome;
-    if (originalUserProfile === undefined) delete process.env.USERPROFILE; else process.env.USERPROFILE = originalUserProfile;
-  }
-});
-
-test('the gateway config-default is registered under the "gateway" key with port and an unarmed null token', () => {
-  const entry = CONFIG_DEFAULT_REGISTRATIONS.find((c) => c.id === 'gateway');
-  assert.ok(entry, 'the gateway config-default is missing from CONFIG_DEFAULT_REGISTRATIONS');
-  assert.equal(entry.key, 'gateway');
-  assert.equal(entry.shape.port, 4170);
-  assert.equal(entry.shape.token, null);
-});
-
 test('task-specs-resolve doctor check passes when core/task-specs/ and domain task-specs exist', () => {
   const entry = DOCTOR_CHECKS.find((c) => c.id === 'task-specs-resolve');
   assert.ok(entry, 'task-specs-resolve check must be registered');
@@ -621,7 +404,7 @@ function asWorkflowDomains(domains) {
 
 
 test('findWorkflowStageOperationProblems passes on the live repository setup', () => {
-  const problems = findWorkflowStageOperationProblems(process.cwd());
+  const problems = findWorkflowStageOperationProblems(mkTempDir());
   assert.deepEqual(problems, []);
 });
 
@@ -639,7 +422,7 @@ test('findWorkflowStageOperationProblems fails when operation taskSpec does not 
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  const problems = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomains));
   assert.equal(problems.length > 0, true);
   assert.match(problems[0], /nonexistent-task-spec-file/);
 });
@@ -661,7 +444,7 @@ test('findWorkflowStageOperationProblems fails when operation role is not in rol
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  const problems = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomains));
   assert.equal(problems.length > 0, true);
   assert.match(problems[0], /unknown-role-xyz/);
 });
@@ -680,7 +463,7 @@ test('findWorkflowStageOperationProblems fails when operation skill is not provi
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  const problems = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomains));
   assert.equal(problems.length > 0, true);
   assert.match(problems[0], /fgos-completely-fake-skill-123/);
 });
@@ -707,7 +490,7 @@ test('findWorkflowStageOperationProblems fails when operation reason has no matc
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  const problems = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomains));
   assert.equal(problems.length > 0, true);
   assert.match(problems[0], /does not match any legal roleGraph edge/);
 });
@@ -727,7 +510,7 @@ test('findWorkflowStageOperationProblems fails when multiple operations are mark
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  const problems = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomains));
   assert.equal(problems.length > 0, true);
   assert.match(problems[0], /2 operations marked primary: true/);
 });
@@ -747,7 +530,7 @@ test('findWorkflowStageOperationProblems fails when the primary operation does n
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  const problems = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('does not include step skill')));
 });
 
@@ -771,7 +554,7 @@ test('findWorkflowStageOperationProblems fails when policy rigor or preferPerson
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  const problems = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomains));
   assert.equal(problems.length >= 2, true);
   assert.ok(problems.some((p) => p.includes('policy.rigor')));
   assert.ok(problems.some((p) => p.includes('policy.preferPersona')));
@@ -805,7 +588,7 @@ test('findWorkflowStageOperationProblems fails on invalid dispatch mode or human
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  const problems = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('invalid dispatch mode "robot-only"')));
   assert.ok(problems.some((p) => p.includes('dispatch: human-only operation must not declare executor policy')));
 });
@@ -842,7 +625,7 @@ test('findWorkflowStageOperationProblems fails on invalid preferExecutor or visi
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  const problems = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('policy.preferExecutor "does-not-exist" is not a recognized executor')));
   assert.ok(problems.some((p) => p.includes('policy.visibility "opaque" must be "headless" or "visible"')));
   assert.ok(problems.some((p) => p.includes('policy contains disallowed key(s) [fallbackExecutors]')));
@@ -864,7 +647,7 @@ test('findWorkflowStageOperationProblems fails on duplicate operation id or empt
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  const problems = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('duplicate operation id "duplicate-id"')));
   assert.ok(problems.some((p) => p.includes('operation id must be a non-empty string')));
 });
@@ -889,7 +672,7 @@ test('findWorkflowStageOperationProblems fails when required fields taskSpec, ro
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  const problems = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('missing-taskSpec') && p.includes('taskSpec must be a non-empty string')));
   assert.ok(problems.some((p) => p.includes('missing-role') && p.includes('role must be a non-empty string in roleGraph.roles')));
   assert.ok(problems.some((p) => p.includes('missing-skills') && p.includes('skills must be an array of strings')));
@@ -923,7 +706,7 @@ test('findWorkflowStageOperationProblems strictly enforces role as TARGET role (
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  const problems = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('bad-target-op') && p.includes('does not match any legal roleGraph edge')));
   assert.ok(!problems.some((p) => p.includes('good-target-op')));
 });
@@ -953,7 +736,7 @@ test('findWorkflowStageOperationProblems fails when policy contains disallowed k
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  const problems = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('policy contains disallowed key(s) [model, timeoutMs, prompt]')));
 });
 
@@ -970,7 +753,7 @@ test('findWorkflowStageOperationProblems fails when a step\'s operations is not 
       },
     },
   };
-  const problemsNonArray = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomainsNonArray));
+  const problemsNonArray = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomainsNonArray));
   assert.ok(problemsNonArray.some((p) => p.includes('coding.feature.planning.operations: must be an array of operation objects')));
   assert.ok(problemsNonArray.some((p) => p.includes('coding.feature.discovery.operations: must be an array of operation objects')));
 });
@@ -978,12 +761,12 @@ test('findWorkflowStageOperationProblems fails when a step\'s operations is not 
 test('domain-workflow-operations-coverage doctor check is registered and passes on clean repo', () => {
   const check = DOCTOR_CHECKS.find((c) => c.id === 'domain-workflow-operations-coverage');
   assert.ok(check, 'domain-workflow-operations-coverage doctor check must be registered');
-  const result = check.check(process.cwd());
+  const result = check.check(mkTempDir());
   assert.equal(result.passed, true);
   assert.match(result.message, /every step operation across domain workflows resolves/);
 });
 
-test('doctor check runner-generated-paths accepts an absent or well-formed list and flags a malformed one', () => {
+test('doctor check runner-generated-paths accepts the standard\'s empty list or a well-formed one and flags a malformed one', () => {
   const tmpDir = mkTempDir();
   const fgosDir = path.join(tmpDir, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
@@ -991,10 +774,9 @@ test('doctor check runner-generated-paths accepts an absent or well-formed list 
   const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-generated-paths');
   assert.ok(check, 'runner-generated-paths doctor check must be registered');
 
-  write({ capabilities: DEFAULT_CAPABILITY_SLOTS });
-  const missing = check.check(tmpDir);
-  assert.equal(missing.passed, true);
-  assert.match(missing.message, /warning/);
+  const standard = check.check(tmpDir);
+  assert.equal(standard.passed, true);
+  assert.match(standard.message, /valid \(0 mapping/);
 
   write({ generatedPaths: [{ from: 'core/skills/**', also: ['.agents/skills/**'] }] });
   const valid = check.check(tmpDir);
@@ -1004,28 +786,24 @@ test('doctor check runner-generated-paths accepts an absent or well-formed list 
   write({ generatedPaths: [{ from: '**', also: ['x'] }] });
   const bare = check.check(tmpDir);
   assert.equal(bare.passed, false);
-  assert.match(bare.message, /project/);
   assert.match(bare.message, /generatedPaths\[0\]\.from/);
 
   write({ generatedPaths: [{ from: 'core', also: ['x'], extra: true }] });
   const unknownKey = check.check(tmpDir);
   assert.equal(unknownKey.passed, false);
-  assert.match(unknownKey.message, /unknown key "extra"/);
+  assert.match(unknownKey.message, /unknown key "extra"|config-schema/);
 });
 
-test('doctor check runner-patterns-config passes with defaults or warns when missing', () => {
+test('doctor check runner-patterns-config passes on the standard and on a valid project override, and fails a non-cumulative one', () => {
   const tmpDir = mkTempDir();
   const fgosDir = path.join(tmpDir, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
-
-  // Missing runner.patterns entirely -> warning (passes)
-  writeProjectConfig(tmpDir, { runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } });
   const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
   assert.ok(check, 'runner-patterns-config doctor check must be registered');
-  const missingRes = check.check(tmpDir);
-  assert.equal(missingRes.passed, true);
-  assert.match(missingRes.message, /warning/);
-  assert.match(missingRes.message, /falling back to setup defaults/);
+
+  const standard = check.check(tmpDir);
+  assert.equal(standard.passed, true);
+  assert.match(standard.message, /valid/);
 
   // Present and valid
   writeProjectConfig(tmpDir, {
@@ -1064,16 +842,60 @@ test('doctor check runner-patterns-config passes with defaults or warns when mis
   assert.equal(invalidRes.passed, false);
   assert.match(invalidRes.message, /not cumulative/);
 });
-
-test('Event Store has one registered config default, remote origin, and setup preserves an explicit remote', () => {
-  const entries = CONFIG_DEFAULT_REGISTRATIONS.filter(r => r.key === 'eventStore');
-  assert.deepEqual(entries.map(r => r.shape), [EVENT_STORE_DEFAULTS]);
-  assert.equal(EVENT_STORE_DEFAULTS.remote, 'origin');
-  const temp = mkTempDir();
+test('the mailbox check passes as not enabled until the project opts in, and names the opt-in', () => {
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'mailbox-hook');
+  assert.ok(check, 'a mailbox check is registered');
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mailbox-check-'));
   try {
+    const absent = check.check(temp);
+    assert.equal(absent.passed, true);
+    assert.match(absent.message, /not enabled/);
+    assert.match(absent.message, /mailbox\.enabled/);
     fs.mkdirSync(path.join(temp, '.fgos'));
-    writeProjectConfig(temp, { eventStore: { remote: 'upstream' } });
-    ensureSharedConfigDefaults(temp);
-    assert.equal(JSON.parse(fs.readFileSync(path.join(temp, '.fgos/config.json'))).eventStore.remote, 'upstream');
+    writeProjectConfig(temp, { mailbox: { enabled: false } });
+    assert.match(check.check(temp).message, /not enabled/);
+    writeProjectConfig(temp, { mailbox: { enabled: true } });
+    const on = check.check(temp);
+    assert.equal(on.passed, true);
+    assert.match(on.message, /^enabled/);
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
+
+test('the mailbox-hook doctor row reports the record verdict from fgos mailbox status, passes with no record yet, and writes nothing', async () => {
+  const { ensureHostBin, REPO_ROOT } = await import('../../scripts/lib/git-addon-stage.mjs');
+  const host = ensureHostBin(process.env, REPO_ROOT);
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'mailbox-hook');
+  const temp = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mailbox-doctor-')));
+  const project = path.join(temp, 'project');
+  const record = path.join(project, '.fgos', 'runtime', 'mailbox', 'record');
+  const before = process.env.FGOS_HOST_BIN;
+  process.env.FGOS_HOST_BIN = host;
+  try {
+    execFileSync('git', ['init', '-q', project]);
+    fs.mkdirSync(path.join(project, '.fgos'));
+    writeProjectConfig(project, { mailbox: { enabled: true } });
+
+    const none = check.check(project);
+    assert.equal(none.passed, true, none.message);
+    assert.match(none.message, /record: none yet/);
+    assert.equal(fs.existsSync(path.join(project, '.fgos', 'runtime')), false, 'the check created nothing');
+
+    // A refused send opens the record and counts the refusal.
+    const sent = spawnSync(host, ['mailbox', 'send', '--to', 'nobody', 'hi'], { cwd: project, env: { ...process.env, FGOS_SESSION_ID: 'doctor-test' }, encoding: 'utf8' });
+    assert.equal(sent.status, 1, sent.stdout + sent.stderr);
+    const snapshot = fs.readFileSync(path.join(record, 'snapshot.json'));
+    const ok = check.check(project);
+    assert.equal(ok.passed, true, ok.message);
+    assert.match(ok.message, /record: ok \(0 head\(s\), 0 pending\)/);
+    assert.deepEqual(fs.readFileSync(path.join(record, 'snapshot.json')), snapshot, 'the check wrote nothing');
+
+    fs.chmodSync(record, 0o777);
+    const broken = check.check(project);
+    assert.equal(broken.passed, false);
+    assert.match(broken.message, /record cannot be read: record-dir-untrusted/);
+  } finally {
+    if (before === undefined) delete process.env.FGOS_HOST_BIN;
+    else process.env.FGOS_HOST_BIN = before;
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
 });

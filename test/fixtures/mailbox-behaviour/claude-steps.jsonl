@@ -1,0 +1,40 @@
+{"type": "attachment", "attachment": {"type": "environment", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "model", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "deferred_tools_delta", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "agent_listing_delta", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "skill_listing", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "total_tokens_reminder", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "session_context", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "date", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "credential_org", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "remote_session_change", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "prompt_snapshot", "hookEvent": null}}
+{"type": "api-request-blob"}
+{"type": "api-request-blob"}
+{"type": "api-request"}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_011ArTbYJW75nbnAFLJDAZh6", "name": "Bash", "input": {"command": "ls"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_011ArTbYJW75nbnAFLJDAZh6"}]}}
+{"type": "attachment", "attachment": {"type": "prompt_snapshot", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "deferred_tools_delta", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "mcp_instructions_delta", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "skill_listing", "hookEvent": null}}
+{"type": "attachment", "attachment": {"type": "total_tokens_reminder", "hookEvent": null}}
+{"type": "api-request-blob"}
+{"type": "api-request"}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_01Rd6CBQ9Bfx9Hv3o1khENxp", "name": "Bash", "input": {"command": "until [ -f go1.txt ]; do sleep 2; done"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_01Rd6CBQ9Bfx9Hv3o1khENxp"}]}}
+{"type": "attachment", "attachment": {"type": "hook_success", "hookEvent": "PostToolUse"}}
+{"type": "attachment", "attachment": {"type": "hook_additional_context", "hookEvent": "PostToolUse"}}
+{"type": "attachment", "attachment": {"type": "total_tokens_reminder", "hookEvent": null}}
+{"type": "api-request-blob"}
+{"type": "api-request"}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_01MkBfUfsq7a6Mg38tewFcYX", "name": "Bash", "input": {"command": "echo 2 > summary.txt"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_01MkBfUfsq7a6Mg38tewFcYX"}]}}
+{"type": "attachment", "attachment": {"type": "total_tokens_reminder", "hookEvent": null}}
+{"type": "api-request-blob"}
+{"type": "api-request"}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_01RTmeR8jCHqbpLjJhxFfykU", "name": "Bash", "input": {"command": "until [ -f go2.txt ]; do sleep 2; done"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_01RTmeR8jCHqbpLjJhxFfykU"}]}}
+{"type": "attachment", "attachment": {"type": "total_tokens_reminder", "hookEvent": null}}
+{"type": "api-request-blob"}
+{"type": "api-request"}

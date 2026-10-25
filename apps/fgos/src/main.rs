@@ -57,6 +57,26 @@ pub struct CommandRouteDescriptor {
     /// Flags a native verb accepts, per sub-command.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subcommand_flags: Option<HashMap<String, Vec<String>>>,
+    /// On a legacy-cli selector: the kinds (its first positional) the host
+    /// serves natively before the composition root; every other kind
+    /// reaches the legacy payload.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_kinds: Option<Vec<String>>,
+}
+
+/// Whether an exact `--help` or `-h` token follows the selector: a help
+/// request, which the legacy-node payload answers from the verb manifest.
+fn wants_help_token(cli_args: &[std::ffi::OsString]) -> bool {
+    cli_args.iter().skip(1).any(|a| a == "--help" || a == "-h")
+}
+
+/// Whether `cli_args` names a kind the route serves natively.
+fn native_kind(route: &CommandRouteDescriptor, cli_args: &[std::ffi::OsString]) -> bool {
+    let kind = cli_args.get(1).and_then(|a| a.to_str());
+    route
+        .native_kinds
+        .as_ref()
+        .is_some_and(|kinds| kind.is_some_and(|kind| kinds.iter().any(|k| k == kind)))
 }
 
 /// First `--flag` token after the selector (and sub-command) that the route's
@@ -111,6 +131,11 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     fgos_identity::IDENTITY_DESCRIPTOR,
     fgos_identity::IDENTITY_READ_DESCRIPTOR,
     fgos_identity::IDENTITY_WRITE_DESCRIPTOR,
+    wiring::mailbox_verbs::SEND_DESCRIPTOR,
+    wiring::mailbox_verbs::INBOX_DESCRIPTOR,
+    wiring::mailbox_verbs::INBOX_CLAIM_DESCRIPTOR,
+    wiring::mailbox_verbs::LIST_DESCRIPTOR,
+    wiring::mailbox_verbs::STATUS_DESCRIPTOR,
     fgos_config::provider::CONFIG_READ_DESCRIPTOR,
     fgos_config::provider::CONFIG_WRITE_DESCRIPTOR,
 ];
@@ -122,6 +147,7 @@ static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
         fgos_observe::friction_cli::AVAILABLE_SUBCOMMANDS,
     ),
     ("convention", fgos_convention::AVAILABLE_SUBCOMMANDS),
+    ("mailbox", wiring::mailbox_verbs::AVAILABLE_SUBCOMMANDS),
     ("config", fgos_config::provider::AVAILABLE_SUBCOMMANDS),
 ];
 
@@ -224,6 +250,14 @@ fn main() {
         }
     };
 
+    // A kind the route table declares native (`hook mailbox`) runs here,
+    // before the composition root: the hook protocol needs exact stdout
+    // bytes, exit 0 on every path, and no snapshot or async runtime on its
+    // hot path. A help request falls through to legacy, which owns help.
+    if native_kind(route, cli_args) && !wants_help_token(cli_args) {
+        wiring::mailbox_hook::main(&cli_args[2..]);
+    }
+
     // Composition root: build snapshot and InvocationService.
     let snapshot = build_snapshot(CATALOG, COMPOSITION_PROVIDERS, "fgos-composition-root-v1");
     let service = InvocationService::new(snapshot);
@@ -252,9 +286,21 @@ fn main() {
         fgos_identity::IDENTITY_READ_DESCRIPTOR,
         fgos_identity::IDENTITY_WRITE_DESCRIPTOR,
     ] {
-        service.register_provider(Arc::new(fgos_identity::IdentityProvider::for_descriptor(
-            descriptor,
-        )));
+        service.register_provider(Arc::new(
+            fgos_identity::IdentityProvider::for_descriptor(descriptor)
+                .with_log_door(Arc::new(wiring::identity_log::StoreLogDoor)),
+        ));
+    }
+    for descriptor in [
+        wiring::mailbox_verbs::SEND_DESCRIPTOR,
+        wiring::mailbox_verbs::INBOX_DESCRIPTOR,
+        wiring::mailbox_verbs::INBOX_CLAIM_DESCRIPTOR,
+        wiring::mailbox_verbs::LIST_DESCRIPTOR,
+        wiring::mailbox_verbs::STATUS_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(
+            wiring::mailbox_verbs::MailboxProvider::for_descriptor(descriptor),
+        ));
     }
     for descriptor in [
         fgos_config::provider::CONFIG_READ_DESCRIPTOR,
@@ -270,7 +316,7 @@ fn main() {
     // manifest (src/cli/command-registry.mjs): `fgos <native-verb> ... --help`
     // returns that verb's manifest entry instead of running the operation.
     // Only an exact `--help`/`-h` token after the selector counts.
-    let wants_help = cli_args.iter().skip(1).any(|a| a == "--help" || a == "-h");
+    let wants_help = wants_help_token(cli_args);
     let route_kind = if wants_help {
         "legacy-cli"
     } else {

@@ -6,7 +6,12 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { BLIND_PROVEN_PAIRS, checkBlindStepsUseProvenPools } from '../../src/setup/blind-steps-proven-pools.mjs';
+
+// The bwrap-confined invocations below only bind when the machine registry names bwrap; a machine that never ran
+// setup must behave like one that did.
+seedFileLocalBwrapRegistry();
 
 const cliBwrap = (id, command) => ({ id, via: 'cli', adapter: 'cli-spawn', command, args: ['-p', '{prompt}'], confinement: { backend: 'bwrap' } });
 const herdrBwrap = (id, command) => ({ id, via: 'cli', adapter: 'herdr-spawn', command, args: ['{prompt}'], confinement: { backend: 'bwrap' } });

@@ -21,12 +21,14 @@ import {
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { deriveLegacyInventory, legacyStateKey, readLlmAccounts } from '../../src/runner/dispatch/llm-accounts.mjs';
 import { configPinnedToAccount } from '../../src/runner/dispatch/provider-account-probe.mjs';
-import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { checkById } from '../setup/helpers/setup-checks-harness.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
-import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeAccountsFile as writeAccountsFileIn, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
+
+const writeAccountsFile = (home, runner) => writeAccountsFileIn(path.join(home, '.fgos'), runner);
 
 process.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-pool-state-root-'));
 
@@ -226,7 +228,8 @@ test('the declared account order survives the merge of the global config into a 
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pool-order-home-'));
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-  const { llmAccounts, ...projectRunner } = config({
+  // The executor catalog and the model policies come from the standard here.
+  const { llmAccounts, executors: _executors, modelPolicies: _policies, ...projectRunner } = config({
     openrouter: {
       zulu: { credentialStore: { pi: '/srv/pi/zulu' } },
       alpha: { credentialStore: { pi: '/srv/pi/alpha' } },
@@ -234,11 +237,11 @@ test('the declared account order survives the merge of the global config into a 
     },
   });
   writeProjectConfig(dir, { runner: { ...projectRunner, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } });
-  writeGlobalConfig(home, { runner: { llmAccounts } });
+  writeAccountsFile(home, { llmAccounts });
   const prev = process.env.HOME;
   process.env.HOME = home;
   try {
-    const loaded = loadRunnerConfigFromDir(dir);
+    const loaded = loadRunnerConfigForDir(dir);
     assert.deepEqual(Object.keys(providerAccountInventory(loaded).openrouter.accounts), ['zulu', 'alpha', 'mike']);
   } finally {
     process.env.HOME = prev;
@@ -251,9 +254,9 @@ test('doctor warns about a store no invocation declares files for, and stays qui
     const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pool-doctor-home-'));
     fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
     fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-    const { llmAccounts, ...projectRunner } = runner;
+    const { llmAccounts, executors: _executors, modelPolicies: _policies, ...projectRunner } = runner;
     writeProjectConfig(dir, { runner: { ...projectRunner, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } });
-    writeGlobalConfig(home, { runner: { llmAccounts } });
+    writeAccountsFile(home, { llmAccounts });
     const prev = process.env.HOME;
     process.env.HOME = home;
     try {

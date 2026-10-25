@@ -59,6 +59,9 @@ export const readMachineConfig = (options = {}) => call('snapshot', options);
 /** Whether `projectRoot` has a project config file: a YAML file or a legacy JSON one. A migration tombstone is no source. */
 export const projectConfigPresent = (projectRoot, options = {}) => readConfig({ ...options, projectRoot, sections: [] }).revisions.project !== 'absent';
 
+/** The bundled standard's value at a dotted path (`runner.modelPolicies.claude.advanced`), reading no file: `{ present, value }`. */
+export const readStandardValue = (path) => call('standardValue', { path });
+
 /** The account pools alone, valid with no usable project or global file: `{ present, state, revision, runner }`. */
 export const readMachineAccounts = (options = {}) => call('accounts', options);
 
@@ -68,5 +71,5 @@ export const checkConfig = (options) => call('check', options);
 /** Applies the named repairs (`ids`) a check offered: `{ changed: [{ fix, path }], skipped }`. A confined session is refused. */
 export const fixConfig = (options) => call('fix', options);
 
-/** Creates the header-only config file of `target` (`'project'` or `'global'`) when that scope has none: `{ created, revision }`. */
+/** Creates the header-only config file of `target` (`'project'` or `'global'`) when that scope has none: `{ created, file, revision }`, `file` being the name the scope holds now (`config.yaml`, or a legacy `config.json` left alone). */
 export const initConfigFile = (options) => call('init', options);

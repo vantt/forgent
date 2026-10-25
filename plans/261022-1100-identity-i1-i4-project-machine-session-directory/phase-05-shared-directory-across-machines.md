@@ -49,6 +49,13 @@ A session on one machine resolves a session on another machine after one `fgos e
 8. **Gates:** `cargo test -p fgos-identity`, `cargo test --workspace` and `npm test` sequentially with the RAM cap; regenerate the census (`node scripts/git-one-door-scan.mjs --write-census`) as the last commit.
 9. **Land on all three machines** (landing procedure of the I5 landing report), then the two-machine proof below, then a board line to MAIL (the remote candidates and `pin` field it can read), WORK (the new consumer in the manifest) and every lane (`resolve lead:<LANE>` now works across machines).
 
+## Step 1 facts (read from code 2026-10-24 23:40)
+
+- (a) Old releases are safe: only `append` and `promote` consult the type registry (`packages/event-store/rust/src`); `read`, `seal`, `sync` carry any type. Node readers filter by stream (`work-event-store.mjs:54` reads `project`, `porting-store.mjs:67` reads `project:porting`, `migrate.mjs:206` both). Events in `project:identity` are never folded by an older release, so the publisher needs no landing order and the rollback leaves inert data.
+- (c) `fetchedAt` = `SyncStatus.last_fetch` (`sync.rs:39`, `TransferRecord`), store-wide, not per mirror ref; the answer names it as the clone's last fetch.
+- (d) `append` takes the store's own `event-append` lock (`append.rs` `acquire_append`); `withConsumerState` is Work's gate, not the store's. The host appends directly with `held_ranks: &[]`, opening the layout as `Layout::from_common_dir` (as `packages/work-state/rust/src/event_reader.rs` tests do) and loading only `identity-event-streams.v1.json` into its `Registry`.
+- (b) resolve cost is measured after step 4 (budget 50 ms).
+
 ## Files
 
 - Create: `packages/identity/rust/src/shared.rs`, `packages/identity/rust/tests/shared.rs`, `packages/identity/contracts/identity-event-streams.v1.json`, `src/identity/directory-store.mjs`, `apps/fgos/src/identity_shared.rs` (adapter; name follows the host's module naming at the time).

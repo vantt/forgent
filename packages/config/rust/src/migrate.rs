@@ -4,9 +4,13 @@
 //! file must equal the one read through the old, except where a machine's global file makes a dropped
 //! value matter, which is listed and needs `accept_machine_overrides`. A mismatch aborts; nothing is
 //! repaired. The YAML text is the write transaction's own `produce`; every report holds paths only.
+//!
+//! The global file migrates the same way (`global`), once the machine check says no release on the
+//! machine reads `~/.fgos/config.json` and the account and token keys have moved out of it: there
+//! is no lower machine layer under it, so its effective value must stay exactly the same.
 use std::collections::BTreeSet;
 use std::io;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use fgos_durable_file::Installed;
 use fgos_durable_file::{install_once_with_mode, replace_durably_with_mode};
@@ -15,18 +19,60 @@ use fgos_yaml_doc::path::{format_path, parse_path};
 use fgos_yaml_doc::{parse, Profile, Segment, Value as Doc};
 use serde_json::Value;
 
-use crate::files::{is_tombstone, read_beneath, LoadedFile};
+use crate::files::{is_tombstone, read_beneath, LoadedFile, PRIVATE_DIR_MODE, PRIVATE_FILE_MODE};
 use crate::files::{JSON_NAME, TOMBSTONE, YAML_NAME};
 use crate::grammar::{doc_lines, is_grammar_line, Actor, Reason};
-use crate::locks::{hold, PROJECT_CONFIG};
-use crate::schema::{json_at, json_put};
+use crate::locks::{hold, GLOBAL_CONFIG, PROJECT_CONFIG};
+use crate::schema::{json_at, json_put, Schemas};
 use crate::scope::{judge, SourceKind};
-use crate::snapshot::{Context, SessionClass, SnapshotError, SnapshotRequest};
+use crate::snapshot::{split_global, Context, SessionClass, SnapshotError, SnapshotRequest};
 use crate::write::{conflict, dir_identity, io_error, produce};
 use crate::write::{snapshot_with, without_project, Edit};
 use crate::ConfigRefusal;
 
 const BACKUPS: &str = ".fgos/runtime/config-migrate";
+
+/// Where a scope's file lives and how it is written: everything else of a migration is the same.
+struct Place {
+    /// The directory every read and write stays beneath.
+    base: PathBuf,
+    /// The scope's directory under `base` (`.fgos`).
+    dir: PathBuf,
+    kind: SourceKind,
+    /// The backup directory under `base`.
+    backups: PathBuf,
+    lock: &'static str,
+    lock_dir: PathBuf,
+    yaml_mode: u32,
+}
+
+impl Place {
+    fn project(roots: &SnapshotRequest) -> Place {
+        let base = roots.project_root.clone();
+        Place {
+            lock_dir: base.join(".fgos"),
+            base,
+            dir: PathBuf::from(".fgos"),
+            kind: SourceKind::Project,
+            backups: PathBuf::from(BACKUPS),
+            lock: PROJECT_CONFIG,
+            yaml_mode: 0o644,
+        }
+    }
+
+    fn global(roots: &SnapshotRequest) -> Result<Place, SnapshotError> {
+        let (parent, dir) = split_global(&roots.global_dir)?;
+        Ok(Place {
+            base: parent.to_path_buf(),
+            backups: dir.join("private/config-migrate"),
+            dir: dir.to_path_buf(),
+            kind: SourceKind::Global,
+            lock: GLOBAL_CONFIG,
+            lock_dir: PathBuf::new(),
+            yaml_mode: PRIVATE_FILE_MODE,
+        })
+    }
+}
 
 fn contract() -> &'static Value {
     contract!("migration.v1.json")
@@ -137,7 +183,12 @@ struct Plan {
     notes: Vec<(Vec<Segment>, Vec<String>)>,
 }
 
-fn classify(ctx: &Context, doc: &Doc, report: &mut MigrationReport) -> Result<Plan, SnapshotError> {
+fn classify(
+    ctx: &Context,
+    doc: &Doc,
+    kind: SourceKind,
+    report: &mut MigrationReport,
+) -> Result<Plan, SnapshotError> {
     let retired: Vec<Vec<Segment>> = contract()["retired"]
         .as_array()
         .into_iter()
@@ -180,11 +231,9 @@ fn classify(ctx: &Context, doc: &Doc, report: &mut MigrationReport) -> Result<Pl
         let mut alone = Value::Null;
         json_put(&mut alone, &path, Some(value.clone()));
         let standard = ctx.standard.value_at(&path);
-        // A key outside the project file's scope is dropped when it holds nothing the standard
-        // does not (a null, or the standard's own value); anything else is the owner's to move.
-        let refusal = judge(ctx.schemas, SourceKind::Project, &alone, None)
-            .into_iter()
-            .next();
+        // A key outside the file's scope is dropped when it holds nothing the standard does not
+        // (a null, or the standard's own value); anything else is the owner's to move.
+        let refusal = judge(ctx.schemas, kind, &alone, None).into_iter().next();
         match refusal {
             Some(r)
                 if value.is_null()
@@ -229,12 +278,24 @@ fn attach_notes(
     Ok(doc.to_bytes())
 }
 
-fn differing(a: &Value, b: &Value, path: &mut Vec<Segment>, out: &mut BTreeSet<String>) {
-    if let (Value::Object(x), Value::Object(y)) = (a, b) {
+fn differing(
+    schemas: &Schemas,
+    a: &Value,
+    b: &Value,
+    path: &mut Vec<Segment>,
+    out: &mut BTreeSet<String>,
+) {
+    // A value a higher layer replaces whole is one decision: it is listed at its own path, the
+    // path a machine file holds it under, never at the keys it carries or drops.
+    let whole = matches!(
+        schemas.resolve(path).and_then(|r| r.merge),
+        Some("replace" | "leaf")
+    );
+    if let (Value::Object(x), Value::Object(y), false) = (a, b, whole) {
         for key in x.keys().chain(y.keys()).collect::<BTreeSet<_>>() {
             path.push(Segment::Key(key.clone()));
             match (x.get(key), y.get(key)) {
-                (Some(p), Some(q)) => differing(p, q, path, out),
+                (Some(p), Some(q)) => differing(schemas, p, q, path, out),
                 _ => drop(out.insert(format_path(path))),
             }
             path.pop();
@@ -255,12 +316,24 @@ fn differences(
     old: &[u8],
     new: &[u8],
 ) -> Result<Vec<String>, SnapshotError> {
-    // The project layer is exactly the bytes, even while both files of the project exist.
-    let isolated = without_project(roots);
+    // The project layer is exactly the bytes, even while both files of the project exist, and its
+    // command values too: in a linked worktree the snapshot would take them from the main checkout,
+    // so both sides would read the same command values and hide every machine override among them.
+    let absent = without_project(roots);
+    let isolated = SnapshotRequest {
+        trusted_root: absent.project_root.clone(),
+        ..absent
+    };
     let read =
         |bytes| snapshot_with(ctx, &isolated, "project", bytes).map(|snapshot| snapshot.value);
     let mut found = BTreeSet::new();
-    differing(&read(old)?, &read(new)?, &mut Vec::new(), &mut found);
+    differing(
+        ctx.schemas,
+        &read(old)?,
+        &read(new)?,
+        &mut Vec::new(),
+        &mut found,
+    );
     Ok(found.into_iter().collect())
 }
 
@@ -283,37 +356,67 @@ fn compare(
     }
 }
 
-/// Backup, YAML, second check, tombstone, under the project lock; each stage is observed.
-fn install(
+/// The global file's equivalence: read over no project file, the two must give the same value
+/// everywhere, since no machine layer lies under the global file to explain a difference.
+fn same_global(
+    ctx: &Context,
     roots: &SnapshotRequest,
+    old: &[u8],
+    new: &[u8],
+) -> Result<(), SnapshotError> {
+    let absent = without_project(roots);
+    let bare = SnapshotRequest {
+        trusted_root: absent.project_root.clone(),
+        ..absent
+    };
+    let read = |bytes| snapshot_with(ctx, &bare, "global", bytes).map(|snapshot| snapshot.value);
+    let mut found = BTreeSet::new();
+    differing(
+        ctx.schemas,
+        &read(old)?,
+        &read(new)?,
+        &mut Vec::new(),
+        &mut found,
+    );
+    match found.is_empty() {
+        true => Ok(()),
+        false => Err(listing("config-migrate-equivalence-failed", found)),
+    }
+}
+
+/// Backup, YAML, second check, tombstone, under the scope's lock; each stage is observed.
+fn install(
+    place: &Place,
     opts: &MigrateOptions,
     old: &LoadedFile,
     yaml: Option<&[u8]>,
     observe: &mut dyn FnMut(MigrateStep) -> io::Result<()>,
 ) -> Result<String, SnapshotError> {
-    let (root, max) = (
-        &roots.project_root,
-        Profile::StrictConfig.limits().input_bytes,
-    );
-    let fgos = root.join(".fgos");
-    let _lock = hold(PROJECT_CONFIG, &fgos, &opts.lock_root, opts.lock_wait_ms)?;
-    dir_identity(root, Path::new(BACKUPS), 0o700)?;
+    let (root, max) = (&place.base, Profile::StrictConfig.limits().input_bytes);
+    let fgos = root.join(&place.dir);
+    let _lock = hold(
+        place.lock,
+        &place.lock_dir,
+        &opts.lock_root,
+        opts.lock_wait_ms,
+    )?;
+    dir_identity(root, &place.backups, PRIVATE_DIR_MODE)?;
     let (backups, name) = (
-        root.join(BACKUPS),
+        root.join(&place.backups),
         format!("{}-{JSON_NAME}", &old.revision[..16]),
     );
-    if install_once_with_mode(&backups, &name, &old.bytes, 0o600).map_err(io_error)?
+    if install_once_with_mode(&backups, &name, &old.bytes, PRIVATE_FILE_MODE).map_err(io_error)?
         == Installed::AlreadyExists
     {
         // The name carries the content revision; a different content under it is not ours to trust.
-        let held = read_beneath(root, &Path::new(BACKUPS).join(&name), max)?;
+        let held = read_beneath(root, &place.backups.join(&name), max)?;
         if held.is_none_or(|file| file.bytes != old.bytes) {
             return Err(conflict("backup-differs"));
         }
     }
     observe(MigrateStep::BackupWritten)?;
     if let Some(bytes) = yaml {
-        if install_once_with_mode(&fgos, YAML_NAME, bytes, 0o644).map_err(io_error)?
+        if install_once_with_mode(&fgos, YAML_NAME, bytes, place.yaml_mode).map_err(io_error)?
             == Installed::AlreadyExists
         {
             return Err(conflict("revision-changed"));
@@ -321,14 +424,14 @@ fn install(
     }
     observe(MigrateStep::YamlCreated)?;
     observe(MigrateStep::SecondCheck)?;
-    let now = read_beneath(root, &Path::new(".fgos").join(JSON_NAME), max)?;
+    let now = read_beneath(root, &place.dir.join(JSON_NAME), max)?;
     if now.is_none_or(|file| file.revision != old.revision) {
         return Err(conflict("revision-changed"));
     }
     let tombstone = [TOMBSTONE.as_bytes(), b"\n"].concat();
     replace_durably_with_mode(&fgos, JSON_NAME, &tombstone, old.mode).map_err(io_error)?;
     observe(MigrateStep::TombstoneWritten)?;
-    Ok(format!("{BACKUPS}/{name}"))
+    Ok(place.backups.join(name).to_string_lossy().into_owned())
 }
 
 /// Migrates `.fgos/config.json` of the project at `roots.project_root`. Run again after an
@@ -338,13 +441,48 @@ pub fn project(
     roots: &SnapshotRequest,
     writer: &WriterIdentity,
     opts: &MigrateOptions,
+    observe: impl FnMut(MigrateStep) -> io::Result<()>,
+) -> Result<MigrationReport, SnapshotError> {
+    run(ctx, roots, &Place::project(roots), writer, opts, observe)
+}
+
+/// Migrates `~/.fgos/config.json` the same way. Refused unless `machine_checked` (no release on
+/// this machine reads or writes the JSON file) and the account and token keys have left it; a dry
+/// run needs neither and writes nothing.
+pub fn global(
+    ctx: &Context,
+    roots: &SnapshotRequest,
+    writer: &WriterIdentity,
+    opts: &MigrateOptions,
+    machine_checked: bool,
+    observe: impl FnMut(MigrateStep) -> io::Result<()>,
+) -> Result<MigrationReport, SnapshotError> {
+    if !machine_checked && !opts.dry_run {
+        return Err(ConfigRefusal::new("config-machine-check-required").into());
+    }
+    let pending = crate::relocate::plan(ctx, &roots.global_dir)?;
+    if !pending.is_empty() {
+        return Err(listing(
+            "config-migrate-moves-pending",
+            pending.into_iter().map(|p| p.path),
+        ));
+    }
+    run(ctx, roots, &Place::global(roots)?, writer, opts, observe)
+}
+
+fn run(
+    ctx: &Context,
+    roots: &SnapshotRequest,
+    place: &Place,
+    writer: &WriterIdentity,
+    opts: &MigrateOptions,
     mut observe: impl FnMut(MigrateStep) -> io::Result<()>,
 ) -> Result<MigrationReport, SnapshotError> {
     if roots.class == SessionClass::Confined && !opts.dry_run {
         return Err(ConfigRefusal::new("config-write-confined").into());
     }
     let max = Profile::StrictConfig.limits().input_bytes;
-    let (root, fgos) = (&roots.project_root, Path::new(".fgos"));
+    let (root, fgos) = (&place.base, place.dir.as_path());
     let json = read_beneath(root, &fgos.join(JSON_NAME), max)?;
     let yaml = read_beneath(root, &fgos.join(YAML_NAME), max)?;
     let mut report = MigrationReport {
@@ -368,7 +506,7 @@ pub fn project(
         return Err(invalid("not-a-mapping"));
     }
     report.resumed = yaml.is_some();
-    let plan = classify(ctx, doc.value(), &mut report)?;
+    let plan = classify(ctx, doc.value(), place.kind, &mut report)?;
     let actor = Actor::from_writer(writer);
     let reason = Reason::migrated(contract()["reason"].as_str().unwrap_or_default())?;
     let set = |(path, value): &(Vec<Segment>, Value)| Edit::Set {
@@ -388,12 +526,17 @@ pub fn project(
         .or(yaml.as_ref().map(|f| f.bytes.as_slice()))
         .unwrap_or_default();
     let old_bytes = serde_json::to_vec(&plan.old_side).map_err(io::Error::other)?;
+    let checked = match place.kind {
+        SourceKind::Global => same_global(ctx, roots, &old_bytes, new_bytes).map(|()| Vec::new()),
+        _ => compare(ctx, roots, &old_bytes, new_bytes),
+    };
     // An existing YAML file that is not the migration of this JSON file is a shadow, not a resume.
-    report.machine_overrides = match (compare(ctx, roots, &old_bytes, new_bytes), report.resumed) {
+    report.machine_overrides = match (checked, report.resumed) {
         (Err(_), true) => {
+            let file = place.dir.join(JSON_NAME);
             return Err(ConfigRefusal::new("config-legacy-shadowed")
-                .in_file(".fgos/config.json")
-                .into())
+                .in_file(&file.to_string_lossy())
+                .into());
         }
         (checked, _) => checked?,
     };
@@ -409,7 +552,7 @@ pub fn project(
     report.unknown_kept = unknown.map(|p| format_path(p)).collect();
     report.dropped_redundant = plan.redundant.iter().map(|p| format_path(p)).collect();
     if !opts.dry_run {
-        report.backup = Some(install(roots, opts, &old, fresh.as_deref(), &mut observe)?);
+        report.backup = Some(install(place, opts, &old, fresh.as_deref(), &mut observe)?);
     }
     Ok(report)
 }

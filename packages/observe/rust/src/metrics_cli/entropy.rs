@@ -36,7 +36,6 @@ pub struct EntropyCalculation {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EntropyCounts {
     pub outcomes: u64,
-    pub frictions: u64,
     pub settlements: u64,
 }
 
@@ -44,13 +43,6 @@ pub struct EntropyCounts {
 pub struct EntropyTrend {
     pub baseline: bool,
     pub delta: Option<i64>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct EntropyCompounded {
-    pub outcomes: i64,
-    pub frictions: i64,
-    pub settlements: i64,
 }
 
 pub fn calculate_entropy_score_and_parts(
@@ -95,7 +87,6 @@ pub fn calculate_entropy_score_and_parts(
         parts,
         counts: EntropyCounts {
             outcomes: signals.total_outcomes_with_actual,
-            frictions: 0,
             settlements: signals.total_settlements,
         },
     })

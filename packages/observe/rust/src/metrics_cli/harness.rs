@@ -6,13 +6,12 @@ use crate::case_journal;
 use crate::contract::{Observation, ObservationSource, ObserveRequest, Window};
 use crate::metrics_cli::parse_flags;
 use crate::scorecard::{
-    compute_case, compute_faults, compute_runs, compute_sessions, compute_tokens, compute_work,
-    CommitsSection, ComplexitySection, LocBreakdown, Scorecard,
+    compute_case, compute_faults, compute_runs, compute_tokens, compute_work, CommitsSection,
+    Scorecard,
 };
 use crate::sources::invocation_faults::InvocationFaultsSource;
-use crate::sources::repo::{count_commits_in_range, count_lines_of_code, tracked_files};
+use crate::sources::repo::count_commits_in_range;
 use serde_json::json;
-use std::path::Path;
 
 pub fn dispatch_harness(
     req: &ObserveRequest,
@@ -75,12 +74,6 @@ pub fn dispatch_harness(
         Some(serde_json::to_value(compute_runs(&observations)).map_err(|e| e.to_string())?)
     };
 
-    let sessions_sec = if is_plain_or_cook {
-        Some(json!("n/a (harness plain/cook-plan)"))
-    } else {
-        Some(serde_json::to_value(compute_sessions(&observations)).map_err(|e| e.to_string())?)
-    };
-
     let tokens_sec = compute_tokens(&observations);
 
     // Commits section
@@ -103,8 +96,6 @@ pub fn dispatch_harness(
     // Faults section
     let faults_sec = compute_faults(&observations);
 
-    // Complexity section (#5)
-    let complexity_sec = compute_complexity(&req.root);
     // Work section (#1, #2)
     let case_items = case_window.as_ref().map(|cw| cw.items.as_slice());
     let work_sec = Some(
@@ -115,211 +106,11 @@ pub fn dispatch_harness(
     let scorecard = Scorecard {
         case: case_sec,
         runs: runs_sec,
-        sessions: sessions_sec,
         tokens: tokens_sec,
         commits: commits_sec,
-        friction: json!("n/a (pre-F5)"),
-        complexity: complexity_sec,
         work: work_sec,
         faults: faults_sec,
         warnings,
     };
     serde_json::to_value(scorecard).map_err(|e| e.to_string())
-}
-
-/// Compute complexity metrics (#5): LOC by fixed glob groups, protocols used/defined, native routes / total routes.
-fn compute_complexity(root: &Path) -> ComplexitySection {
-    let loc = compute_loc_breakdown(root);
-
-    // protocols used vs defined
-    let protocols_defined = count_protocols_defined(root);
-    let protocols_used = count_protocols_used(root);
-
-    // Embedded routes
-    let total_routes = 50; // or routes count
-    let native_routes = 2; // metrics and friction
-
-    ComplexitySection {
-        lines_of_code: loc,
-        protocols_used,
-        protocols_defined,
-        native_routes,
-        total_routes,
-    }
-}
-
-fn compute_loc_breakdown(root: &Path) -> LocBreakdown {
-    let mut loc = LocBreakdown::default();
-
-    if let Ok((top, files)) = tracked_files(root) {
-        for rel_path in files.iter().map(String::as_str) {
-            let full_path = top.join(rel_path);
-            if !full_path.is_file() {
-                continue;
-            }
-            // Only count code files (js, mjs, ts, rs)
-            let ext = full_path.extension().and_then(|s| s.to_str()).unwrap_or("");
-            if !matches!(ext, "js" | "mjs" | "ts" | "rs") {
-                continue;
-            }
-
-            let line_count = std::fs::read_to_string(&full_path)
-                .map(|content| content.lines().count() as u64)
-                .unwrap_or(0);
-
-            loc.total += line_count;
-
-            if rel_path.starts_with("test/")
-                || rel_path.contains("/test")
-                || rel_path.ends_with(".test.mjs")
-                || rel_path.ends_with(".test.js")
-            {
-                loc.tests += line_count;
-            } else if rel_path.starts_with("src/runner/") {
-                loc.runner += line_count;
-            } else if rel_path.starts_with("packages/") {
-                loc.packages += line_count;
-            } else if rel_path.starts_with("apps/") {
-                loc.apps += line_count;
-            } else if rel_path.starts_with("herdr-dashboard/") {
-                loc.herdr_plugin += line_count;
-            } else {
-                loc.other += line_count;
-            }
-        }
-    }
-
-    if loc.total == 0 {
-        loc.total = count_lines_of_code(root).unwrap_or(0);
-    }
-
-    loc
-}
-
-const MAX_READ_BYTES: u64 = 1024 * 1024; // 1 MiB cap prevents unbounded memory / DoS
-
-fn extract_protocol_id_from_file(path: &Path) -> Option<String> {
-    let meta = path.metadata().ok()?;
-    if !meta.is_file() || meta.len() > MAX_READ_BYTES {
-        return None;
-    }
-    let f = std::fs::File::open(path).ok()?;
-    let mut limited = std::io::Read::take(f, MAX_READ_BYTES);
-    let mut content = String::new();
-    std::io::Read::read_to_string(&mut limited, &mut content).ok()?;
-
-    let val = fgos_yaml_doc::parse(content.as_bytes(), fgos_yaml_doc::Profile::Tool, "<flow>")
-        .and_then(|doc| doc.to_json())
-        .ok()?;
-    let id = val.get("metadata")?.get("id")?.as_str()?;
-    let id = id.trim();
-    if id.is_empty() {
-        return None;
-    }
-    // If kind is declared, it should be FlowDefinition
-    if let Some(kind) = val.get("kind").and_then(|k| k.as_str()) {
-        if kind != "FlowDefinition" {
-            return None;
-        }
-    }
-    // If spec.profile.kind is declared, it must be CoordinationProtocol
-    if let Some(spec) = val.get("spec") {
-        if let Some(profile) = spec.get("profile") {
-            if let Some(kind) = profile.get("kind").and_then(|k| k.as_str()) {
-                if kind != "CoordinationProtocol" {
-                    return None;
-                }
-            }
-        }
-    }
-    Some(id.to_string())
-}
-
-fn scan_tier_directory(dir: &Path, seen_protocols: &mut std::collections::HashSet<String>) {
-    let Ok(entries) = std::fs::read_dir(dir) else {
-        return;
-    };
-    let mut files: Vec<std::path::PathBuf> = Vec::new();
-    for entry in entries.flatten() {
-        let path = entry.path();
-        if let Ok(meta) = path.metadata() {
-            if meta.is_file() && meta.len() <= MAX_READ_BYTES {
-                if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
-                    let ext_lower = ext.to_lowercase();
-                    if ext_lower == "yaml" || ext_lower == "yml" || ext_lower == "json" {
-                        files.push(path);
-                    }
-                }
-            }
-        }
-    }
-    files.sort();
-    for file in files {
-        if let Some(id) = extract_protocol_id_from_file(&file) {
-            seen_protocols.insert(id);
-        }
-    }
-}
-
-pub fn count_protocols_defined(root: &Path) -> u64 {
-    let mut protocols = std::collections::HashSet::new();
-
-    // Tier 1: project (<root>/.fgos/coordination-protocols)
-    let project_dir = root.join(".fgos").join("coordination-protocols");
-    scan_tier_directory(&project_dir, &mut protocols);
-
-    // Tier 2: domain (<root>/domains/<domain>/coordination-protocols)
-    let domains_dir = root.join("domains");
-    if let Ok(entries) = std::fs::read_dir(&domains_dir) {
-        let mut domain_dirs: Vec<std::path::PathBuf> = Vec::new();
-        for entry in entries.flatten() {
-            let path = entry.path();
-            if path.is_dir() {
-                domain_dirs.push(path);
-            }
-        }
-        domain_dirs.sort();
-        for domain_dir in domain_dirs {
-            let tier_dir = domain_dir.join("coordination-protocols");
-            scan_tier_directory(&tier_dir, &mut protocols);
-        }
-    }
-
-    // Tier 3: core (<root>/core/coordination-protocols)
-    let core_dir = root.join("core").join("coordination-protocols");
-    scan_tier_directory(&core_dir, &mut protocols);
-
-    protocols.len() as u64
-}
-
-pub fn count_protocols_used(root: &Path) -> u64 {
-    let sessions_dir = root.join(".fgos").join("coordination").join("sessions");
-    let mut protocols = std::collections::HashSet::new();
-    if let Ok(entries) = std::fs::read_dir(sessions_dir) {
-        for e in entries.flatten() {
-            let session_json = e.path().join("session.json");
-            let Ok(meta) = session_json.metadata() else {
-                continue;
-            };
-            if !meta.is_file() || meta.len() > MAX_READ_BYTES {
-                continue;
-            }
-            if let Ok(f) = std::fs::File::open(&session_json) {
-                let limited = std::io::Read::take(f, MAX_READ_BYTES);
-                if let Ok(v) = serde_json::from_reader::<_, serde_json::Value>(
-                    std::io::BufReader::new(limited),
-                ) {
-                    if let Some(dref) = v.get("definitionRef") {
-                        if let Some(id) = dref.get("id").and_then(|id| id.as_str()) {
-                            let trimmed = id.trim();
-                            if !trimmed.is_empty() {
-                                protocols.insert(trimmed.to_string());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    protocols.len() as u64
 }

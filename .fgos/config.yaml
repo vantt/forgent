@@ -1,0 +1,251 @@
+# @fgos:v1
+# see: fgos config standard
+
+# @fgos:doc Which orchestration steps the herdr launcher starts by itself.
+herdrOrchestrator:
+  # @fgos:doc When true the launcher starts the discover step on its own. Default: false.
+  # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+  autoDiscover: true
+# @fgos:doc The runner: executors, capabilities, model policies, tier fallback, patterns and run limits.
+# nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote
+# mini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ
+# standard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả
+# advanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan
+# flagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel
+# frontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng
+runner:
+  # @fgos:doc The default executor a run spawns when no capability names one; detected from PATH when the project names none.
+  executor:
+    # @fgos:doc The program to spawn.
+    # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+    command: claude
+    # @fgos:doc Arguments of the program; {prompt} and {model} are replaced at launch.
+    # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+    args:
+      - -p
+      - "{prompt}"
+      - --model
+      - "{model}"
+      - --permission-mode
+      - acceptEdits
+      - --allowedTools
+      - Bash(cargo build:*),Bash(cargo check:*),Bash(cargo test:*),Bash(cargo clippy:*),Bash(cargo fmt:*),Bash(node --test:*),Bash(rtk cargo:*),Bash(rtk node:*),Bash(rtk proxy cargo:*),Bash(rtk proxy node:*),Skill
+  # @fgos:doc The capability catalog: what each capability is called, which executors serve it and how it is held.
+  capabilities:
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    impact-analysis:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer: gitnexus
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    advise:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"claude","invocation":"claude-cli-bwrap"},{"executor":"openai","invocation":"codex-cli-bwrap"}].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: claude
+          invocation: claude-cli-bwrap
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    execute:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"gemini"},{"executor":"deepseek"},{"executor":"glm"},"claude","openai"].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: gemini
+        - executor: deepseek
+        - executor: glm
+        - claude
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    fgos-coding-implement:
+      # @fgos:doc What the capability is for.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      description: code-implement work for the coding domain executing stage -- preferred executor gemini through omp (omp-gemini-tetcu72), claude as fallback.
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"gemini","invocation":"omp-herdr"},{"executor":"deepseek"},{"executor":"glm"},"claude","openai"].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: gemini
+          invocation: omp-herdr
+        - executor: deepseek
+        - executor: glm
+        - claude
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    code:implement:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"gemini","invocation":"omp-herdr"},{"executor":"deepseek"},{"executor":"glm"},"claude","openai"].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: gemini
+          invocation: omp-herdr
+        - executor: deepseek
+        - executor: glm
+        - claude
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    code:test:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"gemini"},{"executor":"deepseek"},{"executor":"glm"},"claude","openai"].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: gemini
+        - executor: deepseek
+        - executor: glm
+        - claude
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    code:refactor:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"gemini"},{"executor":"deepseek"},{"executor":"glm"},"claude","openai"].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: gemini
+        - executor: deepseek
+        - executor: glm
+        - claude
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    coding:implement:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: [{"executor":"gemini","invocation":"omp-herdr"},{"executor":"deepseek"},{"executor":"glm"},"claude","openai"].
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      prefer:
+        - executor: gemini
+          invocation: omp-herdr
+        - executor: deepseek
+        - executor: glm
+        - claude
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    code:*:
+      # @fgos:doc Per-role tier and executor taste; a role is producer, synthesizer, reviewer, red-team or judge.
+      roles:
+        # @fgos:doc The tier and executors one role, persona or seat prefers.
+        red-team:
+          # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: ["xai","claude","openai"].
+          # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+          prefer:
+            - xai
+    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
+    marketing:*:
+      # @fgos:doc Per-role tier and executor taste; a role is producer, synthesizer, reviewer, red-team or judge.
+      roles:
+        # @fgos:doc The tier and executors one role, persona or seat prefers.
+        red-team:
+          # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: ["claude","openai"].
+          # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+          prefer:
+            - claude
+  # @fgos:doc The executor registry: every executor a seat can be bound to, by id.
+  executors:
+    # @fgos:doc One executor: an agent that runs work or a tool that is only present, with the invocations that start it.
+    gitnexus:
+      # @fgos:doc agent runs work for a seat, tool is only called. Values: agent | tool.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      kind: tool
+      # @fgos:doc What the executor is and how its invocations differ.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      description: Code-graph blast radius
+      # @fgos:doc Capabilities a tool serves.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      for:
+        - impact-analysis
+      # @fgos:doc Directory a tool scans.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      scanTarget: .gitnexus
+      # @fgos:doc The responsibility a tool fills.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      responsibility: Verification
+      # @fgos:doc The ways to start the executor.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      invocations:
+        - via: mcp
+          command: mcp:gitnexus
+          tools:
+            impact-analysis: mcp__gitnexus__impact
+    # @fgos:doc One executor: an agent that runs work or a tool that is only present, with the invocations that start it.
+    herdr:
+      # @fgos:doc agent runs work for a seat, tool is only called. Values: agent | tool.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      kind: tool
+      # @fgos:doc Capabilities a tool serves.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      for:
+        - pane-labeling
+      # @fgos:doc The responsibility a tool fills.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      responsibility: Chrome
+      # @fgos:doc What the executor is and how its invocations differ.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      description: herdr pane label writer (herdr pane rename) for /fgOS:terminal
+      # @fgos:doc The ways to start the executor.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      invocations:
+        - via: cli
+          command: herdr
+          args: []
+    # @fgos:doc One executor: an agent that runs work or a tool that is only present, with the invocations that start it.
+    gemini:
+      # @fgos:doc What the executor is and how its invocations differ.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      description: "Gemini provider via omp (oh-my-pi) on the gemini-tetcu72 profile; Antigravity CLI (agy) invocations removed 2026-10-16 (agy not installed, owner chose omp). Invocations: omp-gemini-tetcu72 (herdr pane), omp-cli-bwrap-gemini-tetcu72 (headless). The confined account comes from runner.providers.gemini.accounts in the global config."
+    # @fgos:doc One executor: an agent that runs work or a tool that is only present, with the invocations that start it.
+    xai:
+      # @fgos:doc What the executor is and how its invocations differ.
+      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+      description: xai (Grok) provider via omp CLI (oh-my-pi, a pi fork) with the xai-vantt profile; replaces the pi grok-vantt login that kept needing re-OAuth. omp reads the profile through PI_CODING_AGENT_DIR like pi does. PI_CONFIG_DIR is a path relative to HOME that lands in /tmp, because omp writes a runtime directory under its config root and the confined home is read-only. omp uses glob instead of ls/find. The account files are declared in the user-level ~/.fgos/config.json (providers.xai).
+  # @fgos:doc Milliseconds one run may take before it is stopped. Maximum: 14400000. Default: 900000.
+  # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+  timeoutMs: 2100000
+  # @fgos:doc The highest tier any seat may run at; absent means no ceiling. Values: nano | mini | standard | advanced | flagship | frontier.
+  # @fgos:doc Tier ladder, weakest first:
+  # @fgos:doc nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote
+  # @fgos:doc mini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ
+  # @fgos:doc standard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả
+  # @fgos:doc advanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan
+  # @fgos:doc flagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel
+  # @fgos:doc frontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng
+  # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+  maxTier: flagship
+  # @fgos:doc Generated trees a unit write scope widens to when it touches their source. Default: [].
+  # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+  generatedPaths:
+    - from: core/skills/**
+      also:
+        - .agents/skills/**
+        - plugins/fgOS/skills/**
+        - .claude/skills/**
+  # @fgos:doc Milliseconds of silence after which a worker is stopped; absent leaves idle stopping off.
+  # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+  idleTimeoutMs: 5400000
+  # @fgos:doc The model each family uses at each tier, by family then tier.
+  # @fgos:doc Tier ladder, weakest first:
+  # @fgos:doc nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote
+  # @fgos:doc mini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ
+  # @fgos:doc standard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả
+  # @fgos:doc advanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan
+  # @fgos:doc flagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel
+  # @fgos:doc frontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng
+  modelPolicies:
+    # @fgos:doc The tiers of one family; a tier it omits has no model.
+    deepseek:
+      # @fgos:doc The model a family uses at one tier: a model id, model@pool, an object with model, pool and effort, or a non-empty list of those in the order they are tried. A cell is replaced whole by a higher layer, never merged. Default: deepseek/deepseek-v4-pro@openrouter.
+      # @fgos:why [e0397c00-5319-463e-8e23-86031fbc824b] Owner 2026-10-25: run deepseek's advanced seat on v4.1-flash through thehive first, OpenRouter as fallback; v4-pro on OpenRouter ran out of credit (402) on a plan-driven review
+      advanced:
+        - thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive
+        - deepseek/deepseek-v4.1-flash@openrouter
+# @fgos:doc How far agent work may skip human approval gates.
+gateBypass:
+  # @fgos:doc Gate bypass level for agent work; off approves nothing automatically and each higher level approves work up to that size. Values: off | light | standard | heavy. Default: off.
+  # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+  level: standard
+# @fgos:doc When delivered work items have their worktree and branch reclaimed.
+cleanup:
+  # @fgos:doc Days a delivered root work item waits before the cleanup stage reclaims its worktree and branch. Default: 7.
+  # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+  ttlDays: 5
+# @fgos:doc Shell commands that must pass before work returns or merges.
+invariantChecks:
+  # @fgos:doc Shell commands run at return and merge; each must exit 0, and an empty list runs no check. Default: [].
+  # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+  commands:
+    - node scripts/run-tests.mjs test/architecture.test.mjs
+# @fgos:doc Whether the end-user docs index is enforced.
+docRegistry:
+  # @fgos:doc When true a stale end-user docs index fails the gate; when false it is only reported. Default: false.
+  # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+  enforce: true
+# @fgos:doc Commands every runner-created worktree runs after its dependency install.
+worktreeSetup:
+  # @fgos:doc Shell commands run in a new worktree after its dependency install; an empty list runs nothing beyond the install. Default: [].
+  # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+  commands:
+    - for d in .claude/skills .agents/skills .omp/skills .pi/skills .grok/skills; do [ -d "$FGOS_REPO_ROOT/$d" ] || continue; mkdir -p "$d"; for s in "$FGOS_REPO_ROOT/$d"/ak-*; do [ -d "$s" ] && cp -R "$s" "$d/"; done; done; true

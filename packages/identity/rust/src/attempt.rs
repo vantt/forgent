@@ -41,3 +41,10 @@ pub fn mint_attempt_writer_id(attempt_id: &str) -> Result<String, InvalidAttempt
         Err(InvalidAttemptId)
     }
 }
+
+/// Whether `id` is a runner attempt's writer id: it carries
+/// [`ATTEMPT_PREFIX`]. The one test of that prefix, so no caller compares
+/// the string itself.
+pub fn is_attempt_writer_id(id: &str) -> bool {
+    id.starts_with(ATTEMPT_PREFIX)
+}

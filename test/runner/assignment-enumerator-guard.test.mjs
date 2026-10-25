@@ -121,6 +121,9 @@ const ALLOWED = new Map([
   // The test runner snapshots every file of the repository's `.fgos` store
   // before and after a suite to report leaked writes. It compares file
   // contents and never interprets assignments or runs.
+  ['scripts/record-mailbox-hook-fixtures.mjs: cmdProbe: readdirSync(path.join(runDir, \'calls\'))', { count: 1, reason: "the mailbox fixture recorder's own run directory under the scratch work root, not .fgos/assignments" }],
+  ['scripts/record-mailbox-hook-fixtures.mjs: cmdSummarize: readdirSync(calls)', { count: 1, reason: "the mailbox fixture recorder's own run directory under the scratch work root, not .fgos/assignments" }],
+  ['scripts/record-mailbox-hook-fixtures.mjs: cmdSummarize: readdirSync(toolDir)', { count: 1, reason: "the mailbox fixture recorder's own run directory under the scratch work root, not .fgos/assignments" }],
   ['scripts/run-tests.mjs: walk: readdirSync(currentDir)', { count: 1, reason: 'whole-store file snapshot for leak detection, not a run reader' }],
 ]);
 

@@ -4,14 +4,8 @@
 // trong 120s của file gốc, nên gom theo chủ đề sẽ đẻ ra nhóm vượt ngưỡng 30s.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
-import { writeGlobalConfig } from '../helpers/config-fixture.mjs';
 import {
-  DEFAULT_CLEANUP_LEAF_TTL_DAYS,
-  DEFAULT_CLEANUP_TTL_DAYS,
-  DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
-  DEFAULT_INVARIANT_CHECK_COMMANDS,
   DEFAULT_LEVEL,
-  DEFAULT_RUNNER_CONFIG,
   DOCTOR_CHECKS,
   FGOS,
   FIX_REGISTRATIONS,
@@ -50,23 +44,6 @@ test('fgos setup (no flags) produces valid wrapEnvelope-shaped JSON on stdout', 
   const envelope = JSON.parse(result.stdout);
   assert.equal(typeof envelope.contract, 'string');
   assert.ok('data' in envelope);
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup fills a missing default key into an existing ~/.fgos/config.json without touching a key the user already customized (tsk-1ri D1)', () => {
-  const cwd = mkTemp('setup-cli-global-config-fill-');
-  const homeDir = mkTemp('setup-cli-global-config-fill-home-');
-  const globalDir = path.join(homeDir, '.fgos');
-  fs.mkdirSync(globalDir, { recursive: true });
-  const globalPath = path.join(globalDir, 'config.json');
-  const customized = { runner: { ...DEFAULT_RUNNER_CONFIG, executor: { command: 'my-custom-cli', args: ['{prompt}'] } } };
-  writeGlobalConfig(homeDir, customized);
-
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const written = JSON.parse(fs.readFileSync(globalPath, 'utf8'));
-  assert.equal(written.runner.executor.command, 'my-custom-cli', 'a value the user already customized must never be overwritten');
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });

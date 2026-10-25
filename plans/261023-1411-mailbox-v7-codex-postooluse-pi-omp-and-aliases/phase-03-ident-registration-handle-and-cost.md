@@ -48,3 +48,12 @@ live_budget: "2 benign alias cases (Claude Code, Codex) + 2 cost runs (T1, T2) o
 
 - The frame text changes (the `handle` attribute), so V6's numbers were measured on the previous frame bytes; V7c and V7e freeze the new frame in their addenda, and spec §5.5 names which frame each number used.
 - IDENT's `head_liveness` is unknown under bwrap print mode for IDENT's own registrations; the mailbox passes its verified head record through C1 so its entries can be judged.
+
+## Plan-owner decisions after the V7 review (agent, 2026-10-23; `reports/code-review-v7abd.md`)
+
+- H2: `status` lists `handleConflicts`: each head whose handle Identity holds for another session, or another head of this record derives too, with its own full id, by which it is still reached.
+- M3: Identity's `register_writer` takes the head's pid and reads its process facts again, so a pid reused in the milliseconds between the hook's caller check and that read would record another process's liveness. Known limit until Identity takes `HeadRef { pid, start_time }`; adapted at the first sync after it lands.
+- L1: the "already registered under its own id" branch has its own proof.
+- L5: a watchdog exit inside Identity's durable write may leave a temp file in Identity's directory. It is never counted (the scan reads `*.json` only); documented on `ensure_registered`.
+- L7: a head whose registering call met no machine id is registered at its next quiet call, while the latest hook outcome is `ident:machine-id-missing`; the outcome file is cleared once it succeeds. The step runs only with the write gate idle, so the watchdog still covers it.
+- The shell now reports every bound head (`ShellOutcome.bound`, with `registered` set only for a new generation), so the retry has the head.

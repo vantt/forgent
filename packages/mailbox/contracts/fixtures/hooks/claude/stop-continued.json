@@ -1,0 +1,15 @@
+{
+  "session_id": "00000000-0000-4000-8000-000000000003",
+  "transcript_path": "/home/user/.claude/projects/-run-dir-claude-accept-ws/00000000-0000-4000-8000-000000000003.jsonl",
+  "cwd": "/run-dir/claude/accept/ws",
+  "prompt_id": "00000000-0000-4000-8000-000000000004",
+  "permission_mode": "bypassPermissions",
+  "effort": {
+    "level": "medium"
+  },
+  "hook_event_name": "Stop",
+  "stop_hook_active": true,
+  "last_assistant_message": "<redacted>",
+  "background_tasks": [],
+  "session_crons": []
+}

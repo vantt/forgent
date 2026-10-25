@@ -226,7 +226,12 @@ test('a cached view is reused after an append and after a seal, and refolded whe
   const f = workFixture(t);
   f.run(tx => tx.append({ type: 'work.add', payload: { id: 'one', title: 'source' } }));
   const requests = [];
-  const spy = { ownOrigin: f.store.ownOrigin, read: (request, held) => { requests.push(request); return f.store.read(request, held); } };
+  let refusal;
+  const spy = { ownOrigin: f.store.ownOrigin, read: (request, held) => {
+    requests.push(request);
+    if (refusal) throw refusal;
+    return f.store.read(request, held);
+  } };
   // A cache that differs from the fold can only be returned if it was reused.
   const marked = title => {
     const { revision, viewSchemaVersion, cursor, ...view } = cache(f);
@@ -245,9 +250,17 @@ test('a cached view is reused after an append and after a seal, and refolded whe
   assert.equal(requests[2].folded.length, 1, 'the walk still continues from the retained events');
   assert.equal(readWorkState(spy, {}).view.work.one.title, 'foreign');
   assert.equal(requests[3].cursor, undefined, 'a rebuild read never continues from a retained catch-up');
+  // A long-lived process whose catch-up the store refuses does not keep retrying from it.
+  assert.ok(title() && requests[4].cursor, 'the catch-up continues again');
+  refusal = Object.assign(new Error('event-store-mirror-rewound'), { code: 'event-store-mirror-rewound' });
+  assert.throws(() => title(), { code: 'event-store-mirror-rewound' });
+  assert.ok(requests[5].cursor, 'the refused read continued from the retained catch-up');
+  refusal = undefined;
+  assert.equal(title(), 'foreign');
+  assert.equal(requests[6].cursor, undefined, 'after a refused read the next one starts from zero');
 });
 
-test('a process with no catch-up of its own continues from the history checkpoint, and a rebuild verifies from zero', t => {
+test('a process with no catch-up of its own continues from the history checkpoint, a rebuild verifies from zero, and what a read did without is named', t => {
   const f = workFixture(t);
   const history = path.join(f.hot, 'cache/event-history.json');
   f.run(tx => tx.append({ type: 'work.add', payload: { id: 'one', title: 'one' } }));
@@ -280,11 +293,24 @@ test('a process with no catch-up of its own continues from the history checkpoin
   assert.equal(rebuilt.reports[0].report.continued, false);
   assert.equal(rebuilt.reports[0].report.written, true, 'a rebuild replaces the file');
 
-  fs.writeFileSync(history, '{"v":1,');
-  const damaged = session();
-  assert.equal(readWorkState(damaged.wrapper, { cachePath: f.cache, historyPath: history }).events.length, 1);
-  assert.match(damaged.reports[0].report.ignored, /checkpoint/);
-  assert.equal(damaged.reports[0].report.written, true, 'a damaged file is replaced');
+  // A damaged checkpoint and a peer mirror the reader skipped are named on stderr, each once per process.
+  const stderr = [];
+  const write = process.stderr.write;
+  process.stderr.write = chunk => { stderr.push(String(chunk)); return true; };
+  try {
+    fs.writeFileSync(history, '{"v":1,');
+    const damaged = session();
+    assert.equal(readWorkState(damaged.wrapper, { cachePath: f.cache, historyPath: history }).events.length, 1);
+    assert.match(damaged.reports[0].report.ignored, /checkpoint/);
+    assert.equal(damaged.reports[0].report.written, true, 'a damaged file is replaced');
+    const peer = path.join(f.repo, '.git/refs/fgos/remotes/origin/events/EVIL');
+    fs.mkdirSync(path.dirname(peer), { recursive: true });
+    fs.writeFileSync(peer, `${f.git('rev-parse', 'refs/fgos/events/phase-seven')}\n`);
+    for (let i = 0; i < 2; i++) assert.equal(readWorkState(session().wrapper, { historyPath: history }).events.length, 1, 'the bad mirror is skipped');
+  } finally { process.stderr.write = write; }
+  assert.equal(stderr.filter(line => /^fgos: warning: event-store-checkpoint-ignored: /.test(line)).length, 1, stderr.join(''));
+  assert.deepEqual(stderr.filter(line => line.includes('refs/fgos/remotes/origin/events/EVIL')),
+    ['fgos: warning: event-store-integrity refs/fgos/remotes/origin/events/EVIL: invalid machine in ref\n']);
 });
 
 test('lifecycle events seal after release with the native opportunistic route', t => {

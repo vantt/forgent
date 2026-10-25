@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fixture, append } from '../event-store/phase07-fixture.mjs';
 import { checkEventStore, eventStoreSetupContext, eventStoreDoctor } from '../../src/setup/event-store-checks.mjs';
 import { fixEventStoreRefspec } from '../../src/setup/event-store-fixes.mjs';
@@ -52,6 +53,21 @@ test('orphan branches warn, persisted integrity fails, and nonrepositories fail 
   fs.writeFileSync(path.join(f.repo, '.git/fgos/events/project/integrity.json'), JSON.stringify({ code: 'event-store-ref-moved', ranges: [] }));
   assert.equal(checkEventStore(f.repo, 'event-store-integrity', f.ctx).passed, false);
   assert.equal(checkEventStore(f.temp, 'event-store-open-root', { ...f.ctx, trustedMain: f.temp }).passed, false);
+});
+test('integrity fails and names a peer mirror the reader skipped and the warning the last sync kept for it', async t => {
+  const { syncUseCase } = await import('../../src/verbs/events/sync.mjs');
+  const f = fixture(t, { remote: true });
+  fixEventStoreRefspec(f.repo, f.ctx); append(f.store, [{}]);
+  assert.equal(checkEventStore(f.repo, 'event-store-integrity', f.ctx).passed, true);
+  // A peer pushed a ref whose commit is no sealed history (no seal.json).
+  const remote = (...args) => execFileSync('git', ['-C', path.join(f.temp, 'remote'), ...args], { encoding: 'utf8', input: '',
+    env: { ...process.env, GIT_AUTHOR_NAME: 'Peer', GIT_AUTHOR_EMAIL: 'peer@example.test', GIT_COMMITTER_NAME: 'Peer', GIT_COMMITTER_EMAIL: 'peer@example.test' } }).trim();
+  remote('update-ref', 'refs/fgos/events/peer-bb', remote('commit-tree', '-m', 'not a seal', remote('mktree')));
+  syncUseCase(f.ctx);
+  const row = checkEventStore(f.repo, 'event-store-integrity', f.ctx);
+  assert.equal(row.passed, false);
+  assert.match(row.message, /event-store-gap refs\/fgos\/remotes\/origin\/events\/peer-bb: /, 'the read skipped the mirror by name');
+  assert.match(row.message, /sync: event-store-gap: /, 'the warning the sync kept fails the row too');
 });
 test('refspec check rejects broad namespace wildcards and agrees with Git on missing/installed mappings', async t => {
   const { checkGit } = await import('../../src/setup/git-checks.mjs');
@@ -116,7 +132,7 @@ test('a doctor run remembers a failed setup context instead of retrying it per r
   const check = eventStoreDoctor(f.repo, f.ctx);
   const first = check('event-store-git-version');
   assert.equal(first.passed, false);
-  assert.match(first.message, /event-store-config: cannot parse shared config/, 'doctor sees the parse failure, never the defaults');
+  assert.match(first.message, /event-store-config: config-parse/, 'doctor sees the parse failure, never the defaults');
   writeProjectConfig(f.repo, {});
   assert.deepEqual(check('event-store-open-root'), { passed: false, message: first.message }, 'every row of the run reports the one remembered failure');
   assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-open-root').passed, true, 'a new run observes the repaired file');
@@ -128,7 +144,7 @@ test('doctor reports a malformed seal coalescing window on every row, and a repa
     writeProjectConfig(f.repo, { eventStore: { seal: { coalesceSec: bad } } });
     const row = eventStoreDoctor(f.repo, f.ctx)('event-store-unsealed');
     assert.equal(row.passed, false, `coalesceSec ${JSON.stringify(bad)}`);
-    assert.match(row.message, /event-store-config: invalid seal\.coalesceSec/);
+    assert.match(row.message, /event-store-config: config-schema .*eventStore\.seal\.coalesceSec/);
   }
   writeProjectConfig(f.repo, { eventStore: { seal: { coalesceSec: 5 } } });
   assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-unsealed').passed, true);

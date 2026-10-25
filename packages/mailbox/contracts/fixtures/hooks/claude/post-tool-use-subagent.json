@@ -1,0 +1,27 @@
+{
+  "session_id": "00000000-0000-4000-8000-000000000006",
+  "transcript_path": "/home/user/.claude/projects/-run-dir-claude-subagent-ws/00000000-0000-4000-8000-000000000006.jsonl",
+  "cwd": "/run-dir/claude/subagent/ws",
+  "prompt_id": "00000000-0000-4000-8000-000000000007",
+  "permission_mode": "bypassPermissions",
+  "agent_id": "00000000-0000-4000-8000-000000000008",
+  "agent_type": "<redacted>",
+  "effort": {
+    "level": "medium"
+  },
+  "hook_event_name": "PostToolUse",
+  "tool_name": "Bash",
+  "tool_input": {
+    "command": "env | grep -E '^(CODEX_THREAD_ID|CLAUDE_CODE_SESSION_ID|FGOS_SESSION_ID)=' > sub-env.txt; echo mailbox-subagent",
+    "description": "<redacted>"
+  },
+  "tool_response": {
+    "stdout": "mailbox-subagent",
+    "stderr": "",
+    "interrupted": false,
+    "isImage": false,
+    "noOutputExpected": false
+  },
+  "tool_use_id": "00000000-0000-4000-8000-000000000009",
+  "duration_ms": 894
+}

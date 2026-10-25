@@ -115,3 +115,8 @@ cargo clippy --locked -p fgos-mailbox -p fgos-identity -p fgos-observe --all-tar
 - [ ] Shared Claude config-dir resolver; move Observe onto it
 - [ ] One resolver function for the entry
 - [ ] Run the gate; regenerate the census; sync and push
+
+## Notes
+
+- Commits `58aaaafa2` (shared `claude_config_dir`; Observe's copy deleted), `5ed25bf20` (ancestry reader, caller check from the contract, Codex head finder and writer key, `resolver_for`), `c91d29ede` (harness stubs: `/bin/sh` hop, Codex stub as a hard link of Node named `codex`). Gate: 413 passed; `cargo test -p fgos` 57 passed; 11 hand mutants killed.
+- The caller check is the free function `head_position(ancestry, facts)`; `ShellInput.topology` is gone. The test entry keeps `--topology` only as an assertion against the contract until it is retired in phase 6.

@@ -395,3 +395,5 @@ Frame approval (with this plan): the scope, the three landings, the budget (Rust
 2. `dispatch-decide` refuses on `config-*` refusals (spec section 11: enforcement hooks fail closed on a config that does not parse or breaks the profile) and keeps today's behaviour on infrastructure failures; changing the infrastructure case is out of this slice.
 3. Retire the `config-awareness` doctor row (the snapshot's provenance answers it) and move `bin.globalFgosPath` to `~/.fgos/runtime/bin-cache.json` (spec section 8: a cache, not config).
 4. `--config <path>`: keep it only if a caller outside the test suite uses it (phase 00 checks with rg); otherwise remove the flag and its tests in the same change (L10).
+
+- **G-C3 answered by the owner 2026-10-24 (option A):** accept the cold release build growth from the validator chain in the gateway (215 s → 376 s CPU) and herdr-dashboard (80 s → 187 s CPU); no reader without validation, no CLI spawn. Paid only by source builds; released binaries and run time are unchanged.

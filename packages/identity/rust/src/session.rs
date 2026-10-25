@@ -51,7 +51,7 @@ pub fn cli_of(env_var: &str, local_id: &str) -> &'static str {
         "CODEX_THREAD_ID" => "codex",
         // The neutral label; the process ancestry may say `omp` instead.
         crate::resolve::PI_SESSION_VAR => "pi",
-        _ if local_id.starts_with(crate::attempt::ATTEMPT_PREFIX) => "worker",
+        _ if crate::attempt::is_attempt_writer_id(local_id) => "worker",
         _ => "fgos",
     }
 }

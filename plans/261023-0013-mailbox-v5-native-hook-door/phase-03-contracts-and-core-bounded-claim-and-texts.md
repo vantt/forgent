@@ -108,3 +108,9 @@ None. The changes stay inside `packages/mailbox`. The census is regenerated for 
 - [ ] Add the texts
 - [ ] Pass the bound in `begin` and add the pointer reply
 - [ ] Run the gate; regenerate the census; sync and push
+
+## Notes
+
+- Commits `e7cdb847b` (core: bounded step claim, pointer line, version clauses) and `eedbb3935` (store: `hookFacts`, breaker and p95 keys, the bound in the drain, pointer-only reply, `NoStepBound`). Gate: 248 passed; 26 hand mutants killed.
+- The bound was written as 4,608 and raised to 8,192 after the phase 2 re-run (plan owner decision 1).
+- The two too-large tests of the table are one test; the `[record.error]` "do not loop" text already had its owning test.

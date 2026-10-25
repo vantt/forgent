@@ -1,0 +1,148 @@
+{
+  "contract": {
+    "id": "mailbox-adapters",
+    "version": 1
+  },
+  "description": "The CLI versions each mailbox hook adapter is proven against (docs/platform/agent-mailbox/spec.md §4.1, spelled testedAgainst here), and the measured hook facts of each drained CLI (hookFacts). A version is listed only when its Stop and PostToolUse payloads and the output shapes the CLI injected were recorded on it; the fixtures live under fixtures/hooks/<cli>/. hookFacts are per CLI, not per version: hookTopology (direct: the CLI starts the hook itself, or its in-process extension does (pi, omp); one-shell-hop: through one shell that does not exec it), hookShell (the path the CLI invokes for the hook command, checked against the hop parent's executable and argv[0]; null for direct), headExecutables (exe basenames accepted at the direct head position), headComm (optional: the command name a direct head must also carry where its executable is not specific to the CLI, pi on node), postToolUseContextMaxBytes (the bound of a PostToolUse drain's output; null means no PostToolUse drain) and channels: for stop and postToolUse, whether that hook delivers mail (deliver), the role its injected text reaches the model under (role) and where that role was recorded (source). A provider-level message role is written as it is (user, developer); a role prefixed transcript: is the CLI's transcript record type, recorded where the provider-level role was not. No delivering channel may have role user: a user-role channel turns a peer's mail into the user's own request. A postToolUse channel delivers exactly when postToolUseContextMaxBytes is set. measuredOn names the versions the facts were measured on, and for a CLI that routes to several providers the provider converter the channel roles were recorded through (provider); re-recording a new version re-measures them. A CLI of the first slice that could not be proven is listed under deferred with its reason, never left out silently.",
+  "source": "hookFacts: plans/reports/research-261023-0148-mailbox-v5-measurements.md tables (b), (c), (d), (e), (f) and (g); the bound applies plan decision 6's margin rule for a threshold shown to apply per hook (the largest inline ladder step, 9,216 bytes, less one ladder step of 1,024 bytes), in both CLIs",
+  "testedAgainst": [
+    {
+      "cli": "claude",
+      "version": "2.1.307"
+    },
+    {
+      "cli": "claude",
+      "version": "2.1.308"
+    },
+    {
+      "cli": "claude",
+      "version": "2.1.309"
+    },
+    {
+      "cli": "codex",
+      "version": "0.161.0"
+    },
+    {
+      "cli": "pi",
+      "version": "1.4.0"
+    },
+    {
+      "cli": "omp",
+      "version": "18.12.6"
+    }
+  ],
+  "hookFacts": {
+    "claude": {
+      "measuredOn": {
+        "versions": [
+          "2.1.308"
+        ],
+        "platform": "linux"
+      },
+      "hookTopology": "one-shell-hop",
+      "hookShell": "/bin/sh",
+      "headExecutables": [],
+      "postToolUseContextMaxBytes": 8192,
+      "channels": {
+        "stop": {
+          "deliver": true,
+          "role": "transcript:attachment:hook_blocking_error",
+          "source": "plans/reports/research-261023-1135-mailbox-v6-preparation.md (injection record types on Claude Code 2.1.309) and plans/reports/research-261022-1825-mailbox-v4-live-suite.md; the provider-level role is not recorded"
+        },
+        "postToolUse": {
+          "deliver": true,
+          "role": "transcript:attachment:hook_additional_context",
+          "source": "plans/reports/research-261023-1135-mailbox-v6-preparation.md (injection record types on Claude Code 2.1.309) and plans/reports/research-261022-1825-mailbox-v4-live-suite.md; the provider-level role is not recorded"
+        }
+      }
+    },
+    "codex": {
+      "measuredOn": {
+        "versions": [
+          "0.161.0"
+        ],
+        "platform": "linux"
+      },
+      "hookTopology": "direct",
+      "hookShell": null,
+      "headExecutables": [
+        "codex"
+      ],
+      "postToolUseContextMaxBytes": 8192,
+      "channels": {
+        "stop": {
+          "deliver": false,
+          "role": "user",
+          "source": "plans/reports/research-261023-1135-mailbox-v6-preparation.md, \"Codex channel roles\" (stage A rollouts codex.MX.ST.002 and codex.MX.PT.002, Codex 0.161.0); Stop turned off after V6 stage A acted on 10 of 35 harmful requests through it and 0 of 35 through PostToolUse"
+        },
+        "postToolUse": {
+          "deliver": true,
+          "role": "developer",
+          "source": "plans/reports/research-261023-1135-mailbox-v6-preparation.md, \"Codex channel roles\" (stage A rollouts codex.MX.ST.002 and codex.MX.PT.002, Codex 0.161.0); Stop turned off after V6 stage A acted on 10 of 35 harmful requests through it and 0 of 35 through PostToolUse"
+        }
+      }
+    },
+    "pi": {
+      "measuredOn": {
+        "versions": [
+          "1.4.0"
+        ],
+        "platform": "linux",
+        "provider": "openai-codex-responses"
+      },
+      "hookTopology": "direct",
+      "hookShell": null,
+      "headExecutables": [
+        "node"
+      ],
+      "headComm": "pi",
+      "postToolUseContextMaxBytes": 8192,
+      "channels": {
+        "stop": {
+          "deliver": false,
+          "role": "user",
+          "source": "plans/reports/research-261024-0024-mailbox-pi-omp-recordings-and-roles.md: every pi 1.4.0 method that starts a turn (sendMessage with any deliverAs, sendUserMessage) reached the provider as user, so a pi Stop takes no mail; the extension's agent_end call only registers the head"
+        },
+        "postToolUse": {
+          "deliver": true,
+          "role": "tool",
+          "source": "plans/reports/research-261024-0024-mailbox-pi-omp-recordings-and-roles.md (role table: the extension's tool_result append reached the provider as function_call_output on pi 1.4.0 and omp 18.12.6, recorded against the local endpoint with no model) and the record-fixtures run that wrote fixtures/hooks/pi/; a 65,536-byte block arrived whole, so the bound shared by every CLI, 8,192 bytes, applies; the role was recorded through the openai-codex Responses converter only (measuredOn.provider): on another provider a tool result may ride inside a user-role message, unmeasured"
+        }
+      }
+    },
+    "omp": {
+      "measuredOn": {
+        "versions": [
+          "18.12.6"
+        ],
+        "platform": "linux",
+        "provider": "openai-codex-responses"
+      },
+      "hookTopology": "direct",
+      "hookShell": null,
+      "headExecutables": [
+        "omp"
+      ],
+      "postToolUseContextMaxBytes": 8192,
+      "channels": {
+        "stop": {
+          "deliver": false,
+          "role": "developer",
+          "source": "plans/reports/research-261024-0024-mailbox-pi-omp-recordings-and-roles.md: omp 18.12.6's sendMessage reached the provider as developer through the Codex converter only (the Gemini converter is unrecorded) and sendUserMessage as user, so an omp Stop takes no mail; the extension's agent_end call only registers the head"
+        },
+        "postToolUse": {
+          "deliver": true,
+          "role": "tool",
+          "source": "plans/reports/research-261024-0024-mailbox-pi-omp-recordings-and-roles.md (role table: the extension's tool_result append reached the provider as function_call_output on pi 1.4.0 and omp 18.12.6, recorded against the local endpoint with no model) and the record-fixtures run that wrote fixtures/hooks/omp/; a 65,536-byte block arrived whole, so the bound shared by every CLI, 8,192 bytes, applies; the role was recorded through the openai-codex Responses converter only (measuredOn.provider): on another provider a tool result may ride inside a user-role message, unmeasured"
+        }
+      }
+    }
+  },
+  "deferred": [
+    {
+      "cli": "agy",
+      "version": "1.4.4",
+      "reason": "not drained: an agy subagent runs as its own conversation whose events carry no marker and which fires its own Stop, so no agy event can be told to be the head's; and agy 1.4.4 refused both PostToolUse context shapes (protojson: unknown field additionalContext, unknown field hookSpecificOutput; its post-tool hook result has only overwriteResult, rejected as a channel). The Stop block and the payloads are recorded under fixtures/hooks/agy/. Unblocked by a payload field naming the parent conversation or a hook scope for the head conversation only"
+    }
+  ]
+}

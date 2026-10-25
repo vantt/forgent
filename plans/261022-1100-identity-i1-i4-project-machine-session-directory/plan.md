@@ -1,6 +1,6 @@
 ---
 title: "Identity: one door for every id (machine, project, session, and every owner's records)"
-status: planning
+status: completed
 lane: IDENT
 spec: docs/platform/identity/spec.md
 created: 2026-10-22
@@ -26,7 +26,7 @@ The ladder of spec section 7 is reordered so the first landing removes the mess 
 | [03](phase-03-project-id.md) | I1 | Project id in tracked `.fgos/project.json`, minted only by explicit `fgos identity project --init`, fork keeps it, `--new` splits; doctor warns when absent | crate tests; two clones of one repo print the same id | 00, 01 |
 | [07](phase-07-mint-door-for-every-owner.md) | — | Mint door for every owner (spec section 4a): random 50-bit ids, counter refs for sequences; move `tsk-`, decision numbers, `D-ADR` and `p-` onto it | crate tests; a two-clone race on a real remote claims distinct numbers; doctor finds no duplicate id | 01 |
 | [04](phase-04-local-directory-resolve-list.md) | I3b | Local directory of live sessions, role aliases `lead:<LANE>`, `resolve` and `list` on one machine | two live sessions resolve each other by handle and by role | 02, 03 |
-| [05](phase-05-shared-directory-across-machines.md) | I4 | Directory entries through Event Store refs; `resolve` across machines after one fetch | a session on one machine resolves one on another after `fgos events sync` | 04, Event Store publication live (cutover landed on three machines 2026-10-24; planned in detail) |
+| [05](phase-05-shared-directory-across-machines.md) | I4 | Directory entries through Event Store refs; `resolve` across machines after one fetch | a session on one machine resolves one on another after `fgos events sync` | 04, Event Store publication live — **done 2026-10-25**: main `6ef50e4c7`, on all three machines; live two-machine proof handed to CFG/OPC until Slice C is active ([report](../reports/phase-261025-1315-ident-i4-shared-directory-across-machines.md)) |
 | [06](phase-06-board-and-consumers.md) | — | Board and reports name agents by handle; Mailbox address takes the session handle | board rows rewritten once; mailbox spec points here | 02 (board), 04 (mailbox) |
 
 ## Landing on every machine and notes to consumers (owner 2026-10-22 11:25)

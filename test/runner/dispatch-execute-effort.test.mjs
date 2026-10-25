@@ -16,7 +16,7 @@ import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { renderReasoningEffortArgs, checkLaunchedModel, collectModelWarnings } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { bindableExecute } from '../helpers/work-seat-config.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { bind } from '../../src/runner/execution/bind.mjs';
@@ -213,7 +213,7 @@ if (match) {
 process.stderr.write('model: some-other-model\\n');
 console.log('All good');
 `);
-  const runnerConfig = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'config.json'), 'utf8')).runner;
+  const runnerConfig = readProjectConfig(root).runner;
   runnerConfig.executor = { allowCrossProvider: true, command: cli, args: ['exec', '--model', '{model}', '{prompt}'] };
   runnerConfig.modelPolicies.claude = { standard: 'fake-standard', flagship: 'fake-flagship' };
   const assignment = buildAssignment({ workId: 'tsk-effort-asgn', stage: 'planning', operation: 'validate-plan' });
@@ -237,7 +237,7 @@ console.log('All good');
 const bindConfig = () => ({
   modelPolicies: { openai: { standard: 'gpt-std' }, claude: { standard: 'sonnet' } },
   defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-  capabilities: { 'docs:write': { prefer: [{ executor: 'codex' }], rigor: 'standard' } },
+  capabilities: { 'docs:write': { prefer: [{ executor: 'codex' }], rigor: 'standard', tier: 'standard' } },
   executors: {
     codex: { kind: 'agent', providerModel: 'openai', allowCrossProvider: true, invocations: [{ id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'codex', args: ['exec', '{prompt}'] }] },
     claude: { kind: 'agent', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'claude-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'claude', args: ['-p', '{prompt}'] }] },
@@ -287,7 +287,7 @@ test('fgos run with an effort override renders it into the CLI the bound executo
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { openai: { standard: 'gpt-std' } },
     executors: { codex: { kind: 'agent', providerModel: 'openai', allowCrossProvider: true, invocations: [{ id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: cli, args: ['exec', '--model', '{model}', '{prompt}'] }] } },
-    capabilities: { 'docs:write': { prefer: [{ executor: 'codex' }], rigor: 'standard' } },
+    capabilities: { 'docs:write': { prefer: [{ executor: 'codex' }], rigor: 'standard', tier: 'standard' } },
   };
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   writeProjectConfig(repoRoot, { runner });
@@ -318,8 +318,9 @@ test('fgos run --effort reaches bind() as an override, and a level the executor 
   const runner = {
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    executors: { claude: { kind: 'agent', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'claude', args: ['-p', '{prompt}'] }] } },
-    capabilities: { 'docs:write': { prefer: [{ executor: 'claude' }], rigor: 'standard' } },
+    // An executor of its own: one named after a standard executor would replace that one's invocations, which the standard's capabilities name.
+    executors: { 'effort-agent': { kind: 'agent', providerModel: 'claude', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'claude', args: ['-p', '{prompt}'] }] } },
+    capabilities: { 'docs:write': { prefer: [{ executor: 'effort-agent' }], rigor: 'standard', tier: 'standard' } },
   };
   fs.mkdirSync(path.join(repo, '.fgos'));
   writeProjectConfig(repo, { runner });
@@ -347,8 +348,8 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
   const runner = {
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    executors: { claude: { kind: 'agent', providerModel: 'claude', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: '/nonexistent/claude', args: ['-p', '{prompt}'] }] } },
-    capabilities: { 'docs:write': { prefer: [{ executor: 'claude' }], rigor: 'standard' } },
+    executors: { 'effort-agent': { kind: 'agent', providerModel: 'claude', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: '/nonexistent/claude', args: ['-p', '{prompt}'] }] } },
+    capabilities: { 'docs:write': { prefer: [{ executor: 'effort-agent' }], rigor: 'standard', tier: 'standard' } },
   };
   fs.mkdirSync(path.join(repo, '.fgos'));
   writeProjectConfig(repo, { runner });
@@ -357,7 +358,7 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
   execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', wt], { cwd: repo });
   const unitFile = path.join(wt, 'unit.json');
   fs.writeFileSync(unitFile, JSON.stringify({ id: 'u', objective: 'x', capability: 'docs:write', writes: ['README.md'] }));
-  const override = JSON.stringify({ scope: { role: 'reviewer' }, executor: 'claude' });
+  const override = JSON.stringify({ scope: { role: 'reviewer' }, executor: 'effort-agent' });
   let out;
   try {
     out = execFileSync(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repo, '--override', override, '--effort', 'max', '--json'], { cwd: wt, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });

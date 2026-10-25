@@ -32,7 +32,7 @@ import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { accountInventoryConfigOf, auditLeaseReceipt } from '../dispatch/provider-capacity.mjs';
 import { LEASE_CONFLICT_FAILURE_CODE } from '../dispatch/run-result.mjs';
-import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs, stripConfigComments } from '../dispatch/config.mjs';
+import { loadRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { AgentNotFoundError, resolveAgentDefinition } from '../agent-definitions.mjs';
@@ -147,11 +147,11 @@ export function assertRepositoryForWrites(roots, cwd, { writes = false } = {}) {
  * Capture snapshot of runner config from the main checkout root.
  */
 export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
-  const cfg = runnerConfig ?? ensureRunnerConfigForDir(mainCheckoutRoot);
+  const cfg = runnerConfig ?? loadRunnerConfigForDir(mainCheckoutRoot);
   // What the hash covers is what seat choice and the run read: the tier defaults and ceiling, the
   // fallback order, the cells, the capability taste, the patterns (with the schema marker), the
-  // executors and governance. `$comment` is documentation and never changes the hash.
-  const filtered = stripConfigComments({
+  // executors and governance.
+  const filtered = {
     defaults: cfg.defaults || {},
     maxTier: cfg.maxTier ?? null,
     tierFallback: cfg.tierFallback || {},
@@ -160,7 +160,7 @@ export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
     modelPolicies: cfg.modelPolicies || {},
     executors: cfg.executors || {},
     governance: cfg.governance || null,
-  });
+  };
   const serialized = JSON.stringify(filtered);
   const hash = crypto.createHash('sha256').update(serialized).digest('hex');
   // The account inventory (`llmAccounts`, `providers`) holds the places logins are kept. It is machine
@@ -583,7 +583,7 @@ async function runUnitBody(options, scope) {
   // run snapshots the rest of it.
   // Read at first use, so a resume that is refused for its record never needs the config.
   let liveConfigRead;
-  const liveConfig = () => (liveConfigRead ??= options.runnerConfig ?? ensureRunnerConfigForDir(mainRoot));
+  const liveConfig = () => (liveConfigRead ??= options.runnerConfig ?? loadRunnerConfigForDir(mainRoot));
   const withAccounts = (runner) => ({ ...runner, ...accountInventoryConfigOf(liveConfig()) });
 
   let unit;
@@ -886,7 +886,7 @@ async function runUnitBody(options, scope) {
 
     // What the unit names (already resolved to paths), then the accounts of the seats whose
     // work this seat judges (a panel synthesizer reads its members' reports).
-    let contextRefs = [...new Set([...unitRecord.resolvedInputs, ...reportRefsOf(inputs, { mainRoot, worktree: unitRecord.worktree })])];
+    let contextRefs = [...new Set([...unitRecord.resolvedInputs, ...reportRefsOf(inputs, { mainRoot })])];
     if (unit.blind) {
       // A blind seat reads only its own directory of the run state, so what lies elsewhere in it
       // reaches the role as a copy there, byte for byte; the copies are what its refs list.
@@ -1155,29 +1155,6 @@ async function runUnitBody(options, scope) {
       return { outcome: lastRecorded.outcome, ...seatTag, round, runResult: prior?.runResult, binding: lastRecorded.binding, commit };
     }
 
-    if (bound.mechanism === 'inline') {
-      if (!readOnly) return { outcome: 'policy-refusal', ...seatTag, round, refused: { reason: 'custody-domain-required', detail: 'a mutating producer needs a supervised declared domain', cwd: unitRecord.worktree, executorId: bound.executor, capability: unit.capability } };
-      if (!seat.posture.inlineAllowed) {
-        throw new RunnerConfigError(`seat "${seatId}" cannot be bound inline (its posture keeps it out of the session; G2 / Q-A violation)`);
-      }
-      const nonce = crypto.randomBytes(16).toString('hex');
-      const pendingRecord = {
-        unitRunId,
-        ...seatTag,
-        round,
-        nonce,
-        binding: bound,
-        createdAt: new Date().toISOString(),
-      };
-      fs.writeFileSync(path.join(unitDir, 'pending-inline.json'), JSON.stringify(pendingRecord, null, 2));
-      return {
-        outcome: 'blocked',
-        ...seatTag,
-        round,
-        pendingInline: { nonce, seat: seatId, round },
-      };
-    }
-
     // Before a mutating producer is spawned: an index someone else staged refuses the run (the
     // runner stages only what it chose), and files already dirty in scope are recorded so the
     // runner never commits them. A resumed attempt keeps what its first launch saw.
@@ -1311,10 +1288,10 @@ async function runUnitBody(options, scope) {
               ...(kept ? { continuity: kept } : {}),
             },
           });
-          if (!next.refused && next.mechanism !== 'inline') seatLedger.note(seatId, next.executor);
+          if (!next.refused) seatLedger.note(seatId, next.executor);
           return next;
         });
-        if (!rebound || rebound.refused || rebound.mechanism === 'inline') {
+        if (!rebound || rebound.refused) {
           return { outcome: 'policy-refusal', ...seatTag, round, refused: rebound?.refused ?? { reason: 'lease-conflict', detail: `the seat's account could not be leased ${MAX_LEASE_CONFLICTS + 1} times in a row` } };
         }
         bound = rebound;
@@ -1393,16 +1370,16 @@ async function runUnitBody(options, scope) {
             ...(kept ? { continuity: kept } : {}),
           },
         });
-        if (!candidate.refused && candidate.mechanism !== 'inline') seatLedger.note(seatId, candidate.executor);
+        if (!candidate.refused) seatLedger.note(seatId, candidate.executor);
         return candidate;
       });
-      if (next.refused || next.mechanism === 'inline') {
+      if (next.refused) {
         return {
           ...result,
           fallbackExhausted: {
             from: { executor: bound.executor, invocation: bound.invocation, transport: bound.transport },
-            reason: next.refused ? next.refused.reason : 'only-inline-candidate-left',
-            detail: next.refused ? next.refused.detail : 'no out-of-process candidate is left to run this seat',
+            reason: next.refused.reason,
+            detail: next.refused.detail,
             ...(rotationsSpent > 0 ? { accountRotations: rotationsSpent } : {}),
           },
         };
@@ -1469,12 +1446,7 @@ async function runUnitBody(options, scope) {
     },
   });
   executionSettled = true;
-  if (fs.existsSync(path.join(unitDir, 'pending-inline.json'))) {
-    unitRecord.execution = { status: 'pending-inline' };
-    persistUnitRecord();
-  } else {
-    settle(patternResult.outcome);
-  }
+  settle(patternResult.outcome);
 
   // A reviewed run with nothing to verify says so: a pass without a verify is not a verified pass.
   const unverified = resolvePattern(patternName).patternName === 'reviewed' && !verifyCommandOf(unit, unitRecord.configSnapshot.runner);
@@ -1501,102 +1473,3 @@ async function runUnitBody(options, scope) {
   }
 }
 
-/**
- * Record inline producer run result with once-issued nonce and verified evidence.
- *
- * @param {object} params
- * @param {string} params.unitRunId
- * @param {string} [params.seat] the seat id; `role` is accepted as its older spelling
- * @param {number} params.round
- * @param {string} params.nonce
- * @param {string[]} params.evidenceRefs
- * @param {object} [params.result]
- * @param {string} [params.repoRoot]
- * @returns {{ok: boolean, unitRunId: string, seat: string, round: number}}
- */
-export function recordInlineRun(params = {}) {
-  const { unitRunId, round, nonce, evidenceRefs, result = {}, repoRoot } = params;
-  const seat = params.seat ?? params.role;
-  if (!unitRunId || !seat || round === undefined || !nonce) {
-    throw new RunnerConfigError('recordInlineRun requires unitRunId, seat, round, and nonce');
-  }
-  assertSeatId(seat);
-
-  const roots = resolveGitRoots(repoRoot || process.cwd());
-  const mainRoot = repoRoot ? path.resolve(repoRoot) : roots.mainCheckoutRoot;
-  const unitDir = path.join(mainRoot, '.fgos', 'assignments', unitRunId);
-  const pendingFile = path.join(unitDir, 'pending-inline.json');
-
-  if (!fs.existsSync(pendingFile)) {
-    throw new RunnerConfigError(`no pending inline run found for unit run "${unitRunId}" (nonce may be expired or already used)`);
-  }
-
-  let pending;
-  try {
-    pending = JSON.parse(fs.readFileSync(pendingFile, 'utf8'));
-  } catch (err) {
-    throw new RunnerConfigError(`corrupt pending-inline.json for unit run "${unitRunId}": ${err.message}`);
-  }
-
-  if (pending.seat !== seat || pending.posture?.inlineAllowed !== true) {
-    throw new RunnerConfigError(`recordInlineRun refused: only the seat that was waiting inline may record an inline run, got seat "${seat}"`);
-  }
-
-  if (pending.nonce !== nonce) {
-    throw new RunnerConfigError('recordInlineRun refused: invalid nonce');
-  }
-
-  if (Number(pending.round) !== Number(round)) {
-    throw new RunnerConfigError(`recordInlineRun refused: round mismatch (pending ${pending.round}, got ${round})`);
-  }
-
-  if (!Array.isArray(evidenceRefs) || evidenceRefs.length === 0) {
-    throw new RunnerConfigError('recordInlineRun requires non-empty evidenceRefs');
-  }
-
-  const unitJson = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
-  const worktree = unitJson.worktree;
-
-  for (const ref of evidenceRefs) {
-    const resolvedPath = path.resolve(worktree, ref);
-    if (!fs.existsSync(resolvedPath)) {
-      throw new RunnerConfigError(`recordInlineRun refused: evidenceRef "${ref}" does not exist on disk at "${resolvedPath}"`);
-    }
-  }
-
-  // Consume nonce
-  fs.unlinkSync(pendingFile);
-
-  // Write settled result
-  const attemptDir = path.join(unitDir, seat, String(round), 'runs', '01');
-  fs.mkdirSync(attemptDir, { recursive: true });
-
-  const recordPayload = {
-    unitRunId,
-    seat,
-    role: pending.role,
-    round,
-    recordedAt: new Date().toISOString(),
-    binding: pending.binding ?? null,
-    evidenceRefs,
-    result,
-  };
-  fs.writeFileSync(path.join(attemptDir, 'result.json'), JSON.stringify(recordPayload, null, 2));
-  const { patternName } = resolvePattern(unitJson.pattern ?? unitJson.unit?.pattern ?? 'solo');
-  if (patternName === 'solo') {
-    unitJson.settlement = { outcome: outcomeOfRunResult(recordPayload), settledAt: recordPayload.recordedAt };
-    unitJson.execution = { status: 'settled' };
-  } else {
-    delete unitJson.settlement;
-    unitJson.execution = { status: 'pending' };
-  }
-  writeJsonAtomic(path.join(unitDir, 'unit.json'), unitJson);
-  if (patternName === 'solo') publishUnitSummary(unitDir);
-
-  return {
-    ok: true,
-    unitRunId,
-    seat,
-    round,
-  };
-}

@@ -23,7 +23,7 @@ mod repository_config;
 pub use publication::{HolderAuthority, PublicationPort, RemoteGrant};
 pub use repository_config::{obsolete_legacy_fetch_mapping, publication_fetch_mappings};
 pub mod wal;
-pub use driver::GitDriver;
+pub use driver::{main_checkout_root, GitDriver};
 use driver::WalReader;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -309,7 +309,7 @@ impl From<wal::WalError> for OperationError {
     fn from(e: wal::WalError) -> Self {
         use wal::WalError::*;
         let code = match e {
-            Busy | OperationIdConflict | Untrusted | Unsupported | PublicationBorrowUnavailable | RecordTooLarge => ResultCode::Refused,
+            Busy | OperationIdConflict | Untrusted | UnsafePath(_) | Unsupported | PublicationBorrowUnavailable | RecordTooLarge => ResultCode::Refused,
             Io(_) | Corrupt(_) | FenceMissing | RecoveryRequired => ResultCode::RecoveryRequired,
         };
         let named = classified(code, e.cause());

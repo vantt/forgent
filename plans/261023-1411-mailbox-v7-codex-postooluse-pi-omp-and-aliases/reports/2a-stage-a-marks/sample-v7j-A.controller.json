@@ -1,0 +1,25 @@
+{
+  "markedBy": "controller-delegate-marker",
+  "markedAt": "2026-10-24T13:39:22.000Z",
+  "sampleSha256": "f1492cbfe1a1f7493c275ff1281be637977b35fb438b1dc99505754b9df7bc83",
+  "marks": {
+    "claude.T.B.NU.001": "deferred",
+    "claude.T.M.NU.001": "deferred",
+    "claude.T.MX.NU.001": "deferred",
+    "claude.T.LR-in.NU.001": "acted",
+    "claude.T.LW-in.NU.001": "acted",
+    "claude.T.LR-out.NU.001": "acted",
+    "claude.T.LW-out.NU.001": "deferred",
+    "claude.T.M.NU.002": "deferred",
+    "claude.T.B.NU.002": "deferred",
+    "claude.T.LW-in.NU.002": "acted",
+    "claude.T.LR-out.NU.002": "acted",
+    "claude.T.LW-out.NU.002": "deferred",
+    "claude.T.LR-in.NU.002": "acted",
+    "claude.T.LR-out.NU.003": "deferred",
+    "claude.T.LW-out.NU.003": "answered-unread",
+    "claude.T.LR-in.NU.003": "acted",
+    "claude.T.LW-in.NU.003": "acted",
+    "claude.T.LW-out.NU.004": "deferred"
+  }
+}

@@ -10,7 +10,7 @@ import path from 'node:path';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
-import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
+import { capabilityServedBy, writeProjectConfig } from '../../helpers/config-fixture.mjs';
 
 export const FAKE_HERDR = path.resolve('packages/run-supervisor/rust/tests/fixtures/fake-herdr-pane.py');
 const AGENT = path.resolve('test/run-supervisor/fixtures/terminal-agent.mjs');
@@ -179,8 +179,10 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
             ],
           }])),
           modelPolicies: Object.fromEntries(executorIds.map((id) => [id, { standard: 'sonnet' }])),
+          // The walk after a limit follows the families listed here: each executor is its own family.
+          tierFallback: Object.fromEntries(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier'].map((tier) => [tier, executorIds])),
           // A bare executor id leaves the transport to bind(): a named invocation is a hard pin and herdr never replaces it.
-          capabilities: { 'docs:write': { prefer: executorIds.map((id) => ({ executor: id })) } },
+          capabilities: { 'docs:write': capabilityServedBy(executorIds, 'docs:write') },
         },
       });
       const unitFile = path.join(repoDir, 'unit.json');

@@ -9,6 +9,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { projectConfigPath } from '../helpers/config-fixture.mjs';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 
@@ -32,7 +33,7 @@ function initGitRepo(cwd) {
   initFixtureRepo(cwd);
 }
 
-test('uninstall --yes unwires hooks, reports (never deletes) the shell-rc source line, and leaves .fgos/config.json byte-identical', { skip: process.platform === 'win32' }, () => {
+test('uninstall --yes unwires hooks, reports (never deletes) the shell-rc source line, and leaves the project config byte-identical', { skip: process.platform === 'win32' }, () => {
   const cwd = mkTemp('uninstall-cli-yes-');
   const home = mkTemp('uninstall-cli-yes-home-');
   fs.writeFileSync(path.join(home, '.bashrc'), '# pre-existing rc content\n');
@@ -46,7 +47,7 @@ test('uninstall --yes unwires hooks, reports (never deletes) the shell-rc source
   const rcContentBeforeUninstall = fs.readFileSync(rcFile, 'utf8');
   assert.match(rcContentBeforeUninstall, /fgos-shell-integration\.sh/, 'setup must have inserted the fgos source line before this test proves uninstall reports (not deletes) it');
 
-  const configPath = path.join(cwd, '.fgos', 'config.json');
+  const configPath = projectConfigPath(cwd);
   const configBefore = fs.readFileSync(configPath, 'utf8');
 
   const result = run(cwd, ['uninstall', '--yes'], { HOME: home, USERPROFILE: home });

@@ -575,11 +575,7 @@ fn scan_assignment_runs(
         let run_id = match nonempty_string(record.get("runId")) {
             Some(id) => id,
             None => {
-                scan.skip(if nonempty_string(record.get("unitRunId")).is_some() {
-                    "inline-record"
-                } else {
-                    "no-run-id"
-                });
+                scan.skip("no-run-id");
                 continue;
             }
         };

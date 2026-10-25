@@ -110,7 +110,7 @@ fn pages(
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, target_os = "linux"))]
 mod tests {
     use fgos_git::{GitDriver, HeadFact, RefPrefix, RepoHandle, ResolveRepo};
     use std::{fs, os::unix::fs::PermissionsExt, path::Path, process::Command};

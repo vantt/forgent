@@ -43,7 +43,6 @@ function workflowLink(value) {
 
 /** A published attempt without its terminal result remains unsettled, even after a crash. */
 function unitHasActiveRun(unitDir, record) {
-  if (fs.existsSync(path.join(unitDir, 'pending-inline.json'))) return true;
   if (record.execution?.status) return record.execution.status !== 'settled';
   for (const seatEntry of fs.readdirSync(unitDir, { withFileTypes: true })) {
     if (!seatEntry.isDirectory()) continue;
@@ -84,21 +83,18 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   const options = record.unit?.stanceOptions ?? [];
   const rawSeats = readUnitRunSeats(unitDir);
   const settlementTimes = [];
-  let inline = false;
   // Provider family each final seat was bound to, when its binding asked for a soft spread.
   const familyBySeat = new Map();
   const seats = rawSeats.filter((seat) => seat.final).map((seat) => {
     const project = (attempt) => {
       const result = attempt.runResult ?? {};
       const recordedBinding = record.bindings?.[`${seat.seat}/${seat.round}`]?.find((entry) => entry.assignmentId === attempt.assignmentId);
-      const binding = recordedBinding?.binding ?? attempt.assignment?.binding ?? result.binding ?? {};
+      const binding = recordedBinding?.binding ?? attempt.assignment?.binding ?? {};
       if (attempt === seat.final && binding.provenance?.familySpread?.value?.family) {
         familyBySeat.set(`${seat.seat}/${seat.round}`, binding.provenance.familySpread.value.family);
       }
       const executor = result.executorId ?? binding.executor ?? null;
-      const isInline = !result.runId && result.unitRunId === unitRunId;
-      inline ||= isInline;
-      const settledAt = timestamp(result.settledAt) ?? timestamp(result.timestamp) ?? (isInline ? timestamp(result.recordedAt) : null);
+      const settledAt = timestamp(result.settledAt) ?? timestamp(result.timestamp);
       if (settledAt) settlementTimes.push(settledAt);
       return {
         assignmentId: result.assignmentId ?? attempt.assignmentId,
@@ -116,7 +112,7 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
       role: seatInfo.get(seat.seat)?.role ?? seat.seat,
       kind: kindOf(seat.seat),
       round: seat.round,
-      final: { ...project(seat.final), stance: extractStance(seat.final.runResult?.agentClaim ?? seat.final.runResult?.result, options) },
+      final: { ...project(seat.final), stance: extractStance(seat.final.runResult?.agentClaim, options) },
       attempts: seat.attempts.map(project),
     };
   }).sort((a, b) => a.seat.localeCompare(b.seat) || a.round - b.round);
@@ -151,7 +147,6 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
       : timestamp(settlement?.settledAt) ?? timestamp(legacy?.settledAt) ?? settlementTimes.at(-1) ?? null,
     stanceOptions: [...options],
     seats,
-    inline,
     ...(sharedFamilies.length > 0 ? { sharedFamilies } : {}),
     ...(legacy?.evidence && !settlement ? { derivation: legacy.evidence } : {}),
   };
@@ -168,7 +163,7 @@ export function readStoredUnitSummary(unitDir) {
 }
 
 /**
- * Why no summary can be published now: 'active' while any attempt or inline step is still open,
+ * Why no summary can be published now: 'active' while any attempt is still open,
  * 'unsettled' when the unit is finished but has no establishable outcome or settlement time.
  */
 export function unitSummarySkipReason(unitDir, summary) {

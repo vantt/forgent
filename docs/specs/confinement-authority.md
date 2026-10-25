@@ -1200,13 +1200,18 @@ Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ t
 hoặc run dir nếu không có assignment) chỉ-đọc; các mount nằm dưới mask (outbox ghi được, private
 home); cuối cùng `--remount-ro` trên các mask. Hidden root là dữ liệu của contract
 (`BLIND_HIDDEN_ROOTS`), không phải code của driver: `{fgosDir}/assignments`,
-`{fgosDir}/workflow-runs`, `{fgosDir}/dispatch-runs` của project dispatch đang chạy, và
-confinement temp root (private home của dispatch khác, chứa transcript agent). Socket của herdr
+`{fgosDir}/workflow-runs`, `{fgosDir}/dispatch-runs` của project dispatch đang chạy,
+`{fgosDir}/runtime/mailbox` (record thư của các phiên agent đang sống; chỉ bước launch blind tạo
+nó, mode 0700, khi chưa có và `.fgos` đã tồn tại, để mask không phụ thuộc bên nào khởi động
+trước; phép tra hidden root và phép kiểm tra handoff ref không tạo gì; `.fgos` không nhận được
+thư mục (chỉ-đọc, của người khác, `runtime` là file) thì bỏ qua, root vắng mặt thì không có gì để
+che; xem `docs/platform/agent-mailbox/spec.md` §8 mục 6), và confinement temp
+root (private home của dispatch khác, chứa transcript agent). Socket của herdr
 từng nằm trong danh sách này; từ 2026-10-24 nó là machine-private (§9.3), che với mọi dispatch.
 Resource `hidden-root` và `own-assignment` đi vào plan/attestation; attestation ghi thêm
 `requested.override`, `effectiveControls.hostRead: blind` và `hiddenRoots`.
 
-Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file
+Vì sao như vậy: (1) chỉ che run state của peer và record mailbox chứ không che cả `.fgos`, vì `.fgos` có file
 tracked (config, events) — che cả thư mục làm chúng hiện thành "đã xoá" trong trạng thái checkout,
 và worker ghi được workspace có thể commit việc xoá đó; (2) `--unshare-pid` vì không có nó worker
 đọc được cmdline của tiến trình anh em; (3) socket herdr bị che vì `--ro-bind / /` vẫn cho

@@ -1,41 +1,10 @@
-// Doctor rows for Seat Binding: `seat-binding-config` (the project config's tier ladder `$comment` is current)
-// and `seat-binding-dry-bind` (every seat of every Workflow unit binds under the committed config).
+// Doctor row for Seat Binding: `seat-binding-dry-bind` (every seat of every Workflow unit binds under the committed config).
 
-import path from 'node:path';
-import { sharedConfigFilePath, readSharedConfig } from '../config/shared-config-file.mjs';
-import { createSeatBindingClient } from '../seat-binding/client.mjs';
-import { ladderCommentLines } from './tier-ladder-comment.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots, workflowUnitContract } from './workflow-definition-files.mjs';
 
 const MAX_LISTED = 8;
-const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const listed = (items) => (items.length > MAX_LISTED ? `${items.slice(0, MAX_LISTED).join('; ')}; and ${items.length - MAX_LISTED} more` : items.join('; '));
-
-/**
- * The project's runner `$comment`, when it has one, matches the crate's tier ladder. A difference is
- * reported, not failed: `fgos setup` refreshes it. An unreadable config fails the row.
- */
-export function checkSeatBindingConfig(cwd) {
-  const file = sharedConfigFilePath(cwd);
-  let runner;
-  try {
-    runner = readSharedConfig(cwd).runner;
-  } catch (err) {
-    return { passed: false, message: err.message };
-  }
-  if (!isPlainObject(runner) || runner.$comment === undefined) return { passed: true, message: `${file}#runner carries no tier ladder $comment` };
-  let ladder;
-  try {
-    ladder = ladderCommentLines(createSeatBindingClient({ cwd, fgosDir: path.join(cwd, '.fgos') }).tierLadder().definitions);
-  } catch (err) {
-    return { passed: true, message: `${file}#runner $comment was not compared with the tier ladder (${err.code ?? 'error'}: ${err.message})` };
-  }
-  if (JSON.stringify(runner.$comment) !== JSON.stringify(ladder)) {
-    return { passed: true, message: `${file}#runner $comment differs from the tier ladder: run \`fgos setup\` to refresh it` };
-  }
-  return { passed: true, message: `${file}#runner $comment matches the tier ladder` };
-}
 
 // The session every seat is bound against: headless, no lead, no herdr session. What a person's own session
 // would add is not the config's business, and a doctor row must give the same answer wherever it runs.

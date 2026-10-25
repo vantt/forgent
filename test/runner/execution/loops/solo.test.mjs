@@ -30,7 +30,6 @@ test('runSolo dispatches the producer seat and returns outcome', async () => {
   assert.equal(calls[0].unit, unit);
   assert.equal(calls[0].seat.posture.readOnly, false); // writes has paths
   assert.equal(calls[0].seat.posture.writer, true);
-  assert.equal(calls[0].seat.posture.inlineAllowed, true);
 
   assert.equal(result.outcome, 'pass');
   assert.equal(result.rounds, 1);
@@ -85,7 +84,7 @@ test('runSolo preserves non-pass outcomes strictly from valid set', async () => 
   }
 });
 
-test('a solo unit may declare its one seat, which never runs inline', async () => {
+test('a solo unit may declare its one seat', async () => {
   const calls = [];
   const unit = { id: 'u-consult', objective: 'Consult advisor', seats: [{ seat: 'advisor', role: 'producer' }] };
   const runRole = async (opts) => {
@@ -96,7 +95,6 @@ test('a solo unit may declare its one seat, which never runs inline', async () =
   const result = await runSolo(unit, {}, { runRole });
   assert.equal(calls.length, 1);
   assert.equal(calls[0].seat.seat, 'advisor');
-  assert.equal(calls[0].seat.posture.inlineAllowed, false);
   assert.equal(result.results[0].seat, 'advisor');
 
   await assert.rejects(runSolo({ ...unit, seats: [{ seat: 'a', role: 'producer' }, { seat: 'b', role: 'producer' }] }, {}, { runRole }), /exactly one seat/);

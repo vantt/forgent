@@ -103,6 +103,7 @@ fn legacy_import_real_publication_reuses_exact_commit_and_reads_nested_porting()
         ReadRequest {
             layout: &f.layout,
             origin: "",
+            machine: "test-aa",
             streams: &streams,
             cursor: &Cursor::default(),
             folded: &[],
@@ -207,6 +208,65 @@ fn legacy_import_dirty_multiple_porting_and_moved_head_refuse() {
         .contains("multiple porting"));
 }
 
+// A project that ignores `.fgos/*` and re-includes only the old event log
+// would let the import publish `refs/fgos/legacy` and then fail to stage the
+// fence; the dry run must refuse it by name instead.
+#[test]
+fn an_ignored_fence_path_refuses_migration_before_the_legacy_ref_is_written() {
+    let f = Fixture::new();
+    legacy(&f, false);
+    let root = f.repo.trusted_main_root();
+    fs::write(root.join(".gitignore"), "/.fgos/*\n!/.fgos/events.jsonl\n").unwrap();
+    git(&f, &["add", ".gitignore"]);
+    git(&f, &["commit", "-qm", "ignore store"]);
+    let before = inventory(&f.driver, &f.repo).unwrap();
+    assert_eq!(
+        ensure_clean(&f.driver, &f.repo, &before).unwrap_err().code.to_string(),
+        "event-store-migration-fence-ignored"
+    );
+    assert_eq!(
+        import_legacy(&f.driver, &f.repo, &f.layout, before.from_commit.as_str(), &[], 0)
+            .unwrap_err()
+            .code
+            .to_string(),
+        "event-store-migration-fence-ignored"
+    );
+    assert!(matches!(
+        f.driver
+            .resolve_ref(&f.repo, &RefName::parse("refs/fgos/legacy").unwrap())
+            .unwrap(),
+        RefValue::Absent
+    ));
+    fs::write(root.join(".gitignore"), "/.fgos/*\n!/.fgos/events.jsonl\n!/.fgos/events\n").unwrap();
+    git(&f, &["commit", "-qam", "re-include fence"]);
+    let after = inventory(&f.driver, &f.repo).unwrap();
+    assert!(ensure_clean(&f.driver, &f.repo, &after).unwrap().is_empty());
+}
+
+// An empty untracked legacy file holds no history: it counts as absent and is
+// named for removal, while one with content still refuses.
+#[test]
+fn an_empty_untracked_legacy_file_counts_as_absent() {
+    let f = Fixture::new();
+    git(&f, &["config", "user.name", "Fixture"]);
+    git(&f, &["config", "user.email", "fixture@example.test"]);
+    let root = f.repo.trusted_main_root();
+    fs::write(root.join("README"), "project\n").unwrap();
+    git(&f, &["add", "README"]);
+    git(&f, &["commit", "-qm", "base"]);
+    fs::write(root.join(".fgos/events.jsonl"), "").unwrap();
+    let inv = inventory(&f.driver, &f.repo).unwrap();
+    assert_eq!(
+        ensure_clean(&f.driver, &f.repo, &inv).unwrap(),
+        vec![".fgos/events.jsonl".to_string()]
+    );
+    fs::write(root.join(".fgos/events.jsonl"), "{}\n").unwrap();
+    assert!(ensure_clean(&f.driver, &f.repo, &inv)
+        .unwrap_err()
+        .detail
+        .contains("dirty or untracked migration path: .fgos/events.jsonl"));
+}
+
 #[test]
 fn legacy_import_sealed_tree_refuses_missing_data_and_invalid_events_before_publication() {
     let f = Fixture::new();
@@ -292,4 +352,49 @@ fn a_cutover_operation_directory_without_an_intent_does_not_block_the_next_attem
             .unwrap();
     }
     assert_eq!(import().unwrap()["operationId"], id);
+}
+
+/// After the cutover a write is admitted only while every legacy mirror still
+/// names the pinned import: a mirror that moved away from the pin refuses with
+/// refspec-missing, the same answer as a pin that was never fetched.
+#[test]
+fn a_migrated_write_is_refused_when_a_legacy_mirror_differs_from_the_pin() {
+    let f = Fixture::new();
+    legacy(&f, false);
+    let head = inventory(&f.driver, &f.repo).unwrap().from_commit;
+    let pin = import_legacy(&f.driver, &f.repo, &f.layout, head.as_str(), &[], 0).unwrap();
+    let root = f.repo.trusted_main_root();
+    git(&f, &["rm", "-q", ".fgos/events.jsonl"]);
+    fs::create_dir_all(root.join(".fgos")).unwrap();
+    let fence = serde_json::json!({"legacyRefOid": pin["legacyRefOid"], "sealDigest": pin["sealDigest"], "fromCommit": pin["fromCommit"]});
+    fs::write(
+        root.join(".fgos/events"),
+        serde_json::to_vec(&fence).unwrap(),
+    )
+    .unwrap();
+    git(&f, &["add", ".fgos/events"]);
+    git(&f, &["commit", "-qm", "cutover fence"]);
+    fgos_event_store::refspec::ensure_refspecs(&f.driver, &f.repo, "origin").unwrap();
+    write_readiness(&f.driver, &f.repo, "origin").unwrap();
+    let legacy_ref = pin["legacyRefOid"].as_str().unwrap();
+    git(
+        &f,
+        &["update-ref", "refs/fgos/remotes/origin/legacy", legacy_ref],
+    );
+    write_readiness(&f.driver, &f.repo, "origin").unwrap();
+    git(
+        &f,
+        &[
+            "update-ref",
+            "refs/fgos/remotes/origin/legacy",
+            head.as_str(),
+        ],
+    );
+    assert_eq!(
+        write_readiness(&f.driver, &f.repo, "origin")
+            .unwrap_err()
+            .code
+            .to_string(),
+        "event-store-refspec-missing"
+    );
 }

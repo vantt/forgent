@@ -112,3 +112,8 @@ echo "exit=$?"
 ## Risks
 
 - **Main moves during the gates.** Merge once at the start of this phase. If the final push finds main moved, merge again and rerun the narrow gate (the first `cargo test` line plus `node --test test/rust-host/command-routes.test.mjs test/setup/agent-hooks.test.mjs`), not the whole set, unless the merge touched a shared file of this rung. In that case rerun the full set.
+
+## Notes
+
+- Docs `30c247443`; gate fixes `4d01de59d`, `17359341b`, `ced3cf78e`; closing report `plans/reports/closing-261023-0353-mailbox-v5-native-hook-door.md` holds the gate table, the branch-only failures and their fixes, and the failures shared with clean main `a7d508e8a`.
+- Review step skipped, as the controller ruled; the controller runs the independent review.

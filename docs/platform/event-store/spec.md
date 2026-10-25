@@ -39,7 +39,7 @@ Run `wf-run-1792220971594-ec5449e2` wrote version 2 from the draft that council 
 
 ## 1. Purpose
 
-Event Store owns one decision: how an event of any fgOS domain becomes durable on the machine that wrote it, how it is sealed into immutable git objects on that machine's own ref, how those refs are shared between machines, and how the union of all of it is read back in one deterministic order. Work is the first consumer; porting, observe and decisions follow.
+Event Store owns one decision: how an event of any fgOS domain becomes durable on the machine that wrote it, how it is sealed into immutable git objects on that machine's own ref, how those refs are shared between machines, and how the union of all of it is read back in one deterministic order. Work is the first consumer; porting, observe and decisions follow, and identity (the shared directory of agent sessions across machines, stream `project:identity`, docs/platform/identity/spec.md section 5) is a registered consumer in `packages/event-store/contracts/consumers.v1.json`, whose rebuild only drops its cache because its fold lives in the Rust identity crate.
 
 Event truth stops being files in the git work tree. An event is appended to an open log outside the work tree and acknowledged after `fsync`; it is then sealed, on a cadence, into a commit on `refs/fgos/events/<machine-id>` through git plumbing that touches no index, no work tree, no HEAD and no hook-running porcelain. Machines exchange events by pushing their own ref and fetching the others; the read side is the union by event hash. Views are caches owned by consumers and are rebuildable.
 
@@ -440,6 +440,7 @@ Settled with the phase 05 review (2026-10-18):
 
 - **Reconciliation is authenticated, never inferred from the graph.** Before the compare-and-swap of step 3, sync durably records the exact verified prior own tip and the computed candidate (merge or fast-forward target) as authorized; only that pair is accepted as the store's own later. A merge commit on the own ref that no such authorization names is refused (`event-store-ref-tampered`), even when its shape is valid. The authorization survives failures before and after the CAS, so a crash after the CAS recovers and publishes.
 - **Each mirror is verified on its own.** A foreign mirror that is rewound, forged or otherwise fails verification keeps its last authenticated tip and position and is recorded as a typed warning in the sync status; own publication continues. A failure of the mirror of the own machine id refuses the sync.
+- **The reader verifies each mirror on its own too (2026-10-25, owner-approved edge rule).** A peer's mirror that the read cannot use (an invalid machine name, a symbolic ref, a header that names another machine or scope, a blob over the reader's cap, a forged own-origin claim, any other verification failure) is left out of the answer and named in the read result's `skippedMirrors` (`refName`, `machine`, `code`, `detail`); it is never dropped silently. A peer's mirror that rewound or vanished keeps the tip the caller's cursor or the checkpoint already authenticated, so the events it vouched for stay in the answer, the cursor keeps that baseline for the next read, and the mirror is named with `event-store-mirror-rewound`. When the reader must walk that baseline (no certified checkpoint covers it) and its objects are gone from the clone (for example after `git gc`), the walk fails: the mirror is named a second time with that error and its events leave the answer. The machine's own history stays fail-closed: a failure on any event ref outside `refs/fgos/remotes/`, or on the mirror of the reading machine's id (named in the read request), refuses the read, even in a fresh clone with no own ref yet, because its first sync seals onto that history. `fgos events status` carries the same `skippedMirrors`, and the `event-store-integrity` doctor row fails naming each one and each mirror warning the last sync kept. A clone with no open root yet (`fgos/events` in the Git common directory, made by the first write or `fgos setup`) reads as empty history; a write there refuses with `event-store-lock-dir-invalid`, naming the directory and `fgos setup`.
 - **Certified sync positions.** Sync persists each mirror's authenticated position next to its tip and uses it as a certified stop, so a steady sync walks only new commits; a status file written before positions existed is verified in full once.
 - **One tracked-fence authority per clone.** The tracked legacy fence is read at the HEAD of the trusted main checkout of the clone, so every linked worktree of one clone shares it, whatever commit the worktree is on. Every fence mismatch, in read and in sync, reports `event-store-legacy-mismatch`.
 
@@ -558,7 +559,7 @@ Today's tracked truth: `.fgos/events.jsonl` (frozen baseline) and 90 shards `.fg
 
 Stop-everything cutover, one change, on all three machines and every workspace (holder-lock section 12 pattern):
 
-1. Stop every fgOS writer (quiesce scan) on every machine. Each machine commits and pushes its tracked event changes to main (they still merge by `merge=union`).
+1. Stop every fgOS writer on every machine: a procedure the operator carries out on all three machines, not something one scan can see. `fgos events migrate` runs the quiesce scan only for the workspace it migrates; it finds that workspace's writers (cwd in its root or a listed worktree, or a typed `--dir`/`--worktree`/`--cwd`/`-C` root) and is blind to every other machine and to processes of other workspaces on this one, which do not block it. A launcher that serves the workspace from another directory (`fgos-gateway`, a run supervisor) is not found either: its children run inside the workspace and are found while they run, and one started after the scan meets write admission and the fence, but the operator stops such launchers as part of this step. Each machine commits and pushes its tracked event changes to main (they still merge by `merge=union`).
 2. On one machine, pull main. Record the pre-cutover Work view (view and `revision`; the `snapshot` anchor is excluded because the cursor replaces it).
 3. Import once: one commit on `refs/fgos/legacy` whose tree holds the tracked files byte for byte under their current names (`events.jsonl`, `events/<name>.jsonl`), plus `porting/events.jsonl` of any workspace that has one, and `seal.json {kind: "legacy", fromCommit, treeOfFgosEvents}`. Keeping names keeps the legacy order `(ts, file, seq)` of `src/state/replay.mjs:876-880` identical.
 4. Rebuild the Work view through the new reader and compare with step 2 byte for byte. Any difference stops the cutover.
@@ -642,7 +643,7 @@ Clarification, 2026-10-22: only the automatic triggers are gated by the dispatch
 
 ## 22. Support matrix and known limits
 
-- Linux first. macOS follows holder-lock's `flock` driver once the seal crash matrix runs there. Windows has a holder-lock driver now, but the seal crash matrix has not run there, so Windows stays out of this store. Network filesystems are refused.
+- Linux only. Every other platform, macOS and Windows included, is refused with `event-store-unsupported-platform`: holder-lock has drivers there, but the seal crash matrix has not run there and macOS needs its own fsync and lock semantics (backlog `p-zsy3fmbcpd`). Network filesystems are refused.
 - One user; lock directories are mode 0700; multi-user permissions are out of scope.
 - Unsealed events are lost with the disk or the clone; the window is the seal cadence while fgOS runs, unbounded while nothing runs.
 - Cross-machine success is provisional against concurrent events of other stores (section 12); the owner accepted this, and there is no online coordinator.
@@ -652,7 +653,7 @@ Clarification, 2026-10-22: only the automatic triggers are gated by the dispatch
 - SIGKILL tests do not prove power-loss safety; the guarantee rests on `fsync` semantics of the filesystem, reported by doctor.
 - A branch rename is not followed by the branch stream key.
 - Deleting a machine ref on the remote removes it from other clones at their next pruning fetch; the history then lives only on that machine.
-- Erasing a secret that reached a pushed ref needs a history rewrite on every clone; there is no tombstone protocol.
+- A secret that reached a pushed event cannot be erased. There is no tombstone protocol, and the store refuses a rewritten history: a rewound peer mirror keeps its earlier tip and is named `event-store-mirror-rewound` (section 14), and a rewound own ref refuses. The remedy is to treat the secret as leaked: revoke or rotate it at its issuer, and stop writing it into Work text. Events are not masked at append today (decision of 2026-10-25; backlog `p-nykfevjxqf`): worker secrets reach workers only through the environment, and `executor.dispatch` records the configured command unexpanded, so the exposure is text a person types into an item, note or reason.
 - The chain grows with history, and a range walk does not make that free. In V-REF-01, on a DAG of 100,011 commits, a full `rev-list` took 224 ms and a range `A..B` took 190 ms for 90,011 commits (section 15). Ref-chain snapshot and compaction are a later item, opened when a full rebuild exceeds the budget V-SPAWN-01 fixes for reads. Owner threshold (2026-10-17): open that item when a full rebuild exceeds 2 s on the slowest of the owner's machines.
 
 ## 23. Proof gates
@@ -746,7 +747,7 @@ The two pre-signature proofs (section 23.1) are evidence about a finite Python m
 
 ## 25. Out of scope
 
-SQLite WAL and multi-process SQLite semantics: the view is a consumer cache, so whichever engine a consumer picks is that consumer's concern. Red-team round 2 proposed adding this expertise, and it does not apply to the store. This stays a dissent (see "Unresolved dissent"). It becomes required when a consumer folds into SQLite inside the Work gate. Also out: a dedicated scheduler or daemon, Windows, network filesystems, multi-user permissions, hard deletion, ref-chain compaction, removing the `.fgos` strip, and an online cross-machine coordinator.
+SQLite WAL and multi-process SQLite semantics: the view is a consumer cache, so whichever engine a consumer picks is that consumer's concern. Red-team round 2 proposed adding this expertise, and it does not apply to the store. This stays a dissent (see "Unresolved dissent"). It becomes required when a consumer folds into SQLite inside the Work gate. Also out: a dedicated scheduler or daemon, platforms other than Linux, network filesystems, multi-user permissions, hard deletion, ref-chain compaction, removing the `.fgos` strip, and an online cross-machine coordinator.
 
 Outside expertise: the owner engages none (decision of 2026-10-17 15:13). The six gaps the councils named are covered as follows:
 
@@ -998,7 +999,12 @@ historical log, and measures parity from the exported restorable bytes.
 writing objects or refs. It reports the computed legacy commit OID and whether
 the observed ref will be created, reused or replaced as an unfenced stale import;
 its three setup repairs can create local identity/lock
-state and Git mapping provenance. Publication validates the expected HEAD,
+state and Git mapping provenance. It refuses `event-store-migration-fence-ignored`
+when the checkout's ignore rules exclude `.fgos/events`, since the cutover commit
+could not track the fence. An untracked legacy file that is empty holds no history:
+it counts as absent, the plan names it under `emptyLegacy`, and the real run
+removes it before the commit. When the cutover commit fails, the error carries
+Git's stderr as text. Publication validates the expected HEAD,
 regular-file paths, event records and clean inputs again under `event-seal`.
 It writes a deterministic parentless legacy commit and CASes an absent ref;
 an identical existing commit is reused. Without a tracked fence, a stale direct
@@ -1028,7 +1034,7 @@ Preparation records write admission before any hot gate: tracked legacy data
 without a fence refuses `event-store-migration-required`; a pinned clone without
 the matching legacy ref or configured publication-remote mapping refuses
 `event-store-refspec-missing`. Prepared admission is valid for that process
-lifetime: stop-everything migration requires ending old writer processes.
+lifetime: stop-everything migration requires ending old writer processes of the workspace, on every machine; the scan proves only this workspace on this machine.
 
 A normal cutover failure restores tracked input bytes only for explicit Git
 pre-attempt refusal codes or `commit-rejected` after Git's snapshot restoration,
@@ -1208,5 +1214,5 @@ Dated clarification with no protocol change: a process that reads the same store
 
 Dated clarification with no protocol change, made with the Work part of the section 23.2 gate ([report](../../../plans/reports/verification-261023-1630-work-cutover-parity-and-docs.md)):
 
-- Section 23.2 item 9 asks for the addon "in both the npm package and the legacy-node payload". The npm install channel is retired (owner decision, plan refresh Q-W1 superseded 2026-10-22) and ships no addon: on it Work verbs and `fgos events` refuse with `git-addon-unavailable`, naming the missing addon. Item 9 is therefore met by the legacy-node payload alone: the addon loads from the staged release, activation refuses a linux-x64 payload without `components.nativeAddon`, and `event-store-native-addon` has setup and doctor vectors. Work verbs also refuse on Windows (`event-store-unsupported-platform`).
+- Section 23.2 item 9 asks for the addon "in both the npm package and the legacy-node payload". The npm install channel is retired (owner decision, plan refresh Q-W1 superseded 2026-10-22) and ships no addon: on it Work verbs and `fgos events` refuse with `git-addon-unavailable`, naming the missing addon. Item 9 is therefore met by the legacy-node payload alone: the addon loads from the staged release, activation refuses a linux-x64 payload without `components.nativeAddon`, and `event-store-native-addon` has setup and doctor vectors. Work verbs also refuse on every platform other than Linux, macOS included (`event-store-unsupported-platform`).
 - Section 19 describes the code the cutover deletes. On the Work cutover branch every row is gone from the tree; the cited lines belong to the pre-cutover tree. The standing proof is the reader census in `test/event-store/door.test.mjs`: no product file reads the retired event files or imports a reader of them. The tracked event files and the `.gitattributes` `merge=union` line of a repository leave in that repository's own `fgos events migrate` commit.

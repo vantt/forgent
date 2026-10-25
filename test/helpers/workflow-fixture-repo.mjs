@@ -11,7 +11,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { withProviderFamilies } from './provider-families.mjs';
 import { makeFixtureDir } from './fixture-dir.mjs';
-import { writeProjectConfig } from './config-fixture.mjs';
+import { capabilityServedBy, writeProjectConfig } from './config-fixture.mjs';
 import { activateGitFixture } from './git-fixture.mjs';
 
 /**
@@ -80,7 +80,7 @@ export function setupWorkflowFixtureRepo({
           invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [echoScript, '{prompt}'] }],
         },
       },
-      capabilities: Object.fromEntries(capabilities.map((name) => [name, { prefer: [{ executor: 'test-node' }], rigor: 'standard' }])),
+      capabilities: Object.fromEntries(capabilities.map((name) => [name, capabilityServedBy('test-node', name)])),
       patterns: { seatBinding: { schema: 1 },
         defaultRule: { mutatingMinRigor: 'standard' },
         reviewed,

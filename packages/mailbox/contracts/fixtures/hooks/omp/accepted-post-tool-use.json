@@ -1,0 +1,4 @@
+{
+  "inject": "{{TEXT}}",
+  "method": "tool-result"
+}

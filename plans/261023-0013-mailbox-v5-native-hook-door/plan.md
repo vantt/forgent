@@ -149,6 +149,7 @@ There is a fixed count and no retry loop anywhere. A failed case is reported wit
 | 7 | [Hook install table, config registration, doctor probe](phase-07-hook-install-table-config-and-doctor-probe.md) | `node --test test/setup/agent-hooks.test.mjs test/setup/claude-code-hooks.test.mjs test/setup/registrations.test.mjs` | 0 |
 | 8 | [Live through the real entry, and the hook cost in each CLI](phase-08-live-through-the-real-entry-and-hook-cost.md) | `node test/live/mailbox-claude.live.mjs run L1|L2|C1|T1|T2`; research report | 5 |
 | 9 | [Branch docs, full gates, closing](phase-09-branch-docs-gates-and-closing.md) | workspace gates, run one at a time; `fgos convention check`; closing report | 0 |
+| 10 | [V5 review fixes](phase-10-review-fixes.md) | `cargo test -p fgos-mailbox -p fgos-mailbox-core -p fgos -p fgos-git -p fgos-distribution`; `node --test test/setup/agent-hooks.test.mjs test/setup/registrations.test.mjs test/rust-host/command-routes.test.mjs`; workspace gates | 0 |
 
 **Dependencies:** strictly sequential, and no phase runs in parallel with another (memory rule; the same shared files throughout).
 

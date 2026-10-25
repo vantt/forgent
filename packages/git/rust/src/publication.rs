@@ -1271,6 +1271,19 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
 }
 
 static TRANSFER_ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+fn transfer_id() -> Result<String> {
+    Ok(format!(
+        "remote-{}-{}-{}",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_err(|_| failure("clock-before-epoch"))?
+            .as_nanos(),
+        TRANSFER_ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+    ))
+}
+/// One advertised mirror to install: target ref, advertised object, current tip.
+type Mapping = (String, Oid, ExpectedTip);
 impl<F: FileSystem> PublicationPort<'_, F> {
     fn remote_url(&self, repo: &RepoHandle, remote: &str) -> Result<(String, &'static str)> {
         let grant = self
@@ -1298,33 +1311,30 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         kind: wal::OperationKind,
         resources: Vec<String>,
     ) -> Result<(String, Intent)> {
-        let id = format!(
-            "remote-{}-{}-{}",
-            std::process::id(),
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .map_err(|_| failure("clock-before-epoch"))?
-                .as_nanos(),
-            TRANSFER_ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
-        );
-        let request_digest =
-            wal::canonical_digest(&(&kind, &resources, &self.authority.binding))?;
         // One read: a transfer records the bound ref's tip as both values.
         let current = tip(&self.ref_tip(repo, &resources[0])?);
-        Ok((
-            id,
-            Intent {
-                kind,
-                request_digest,
-                repo_identity: self.authority.repo_identity.clone(),
-                resource_set: resources.clone(),
-                authority_binding: self.authority.binding.clone(),
-                writer_identity: self.authority.writer.clone(),
-                object_format: repo.object_format(),
-                expected: current.clone(),
-                next: current,
-            },
-        ))
+        Ok((transfer_id()?, self.intent_at(repo, kind, resources, current)?))
+    }
+    fn intent_at(
+        &self,
+        repo: &RepoHandle,
+        kind: wal::OperationKind,
+        resources: Vec<String>,
+        current: wal::Tip,
+    ) -> Result<Intent> {
+        let request_digest =
+            wal::canonical_digest(&(&kind, &resources, &self.authority.binding))?;
+        Ok(Intent {
+            kind,
+            request_digest,
+            repo_identity: self.authority.repo_identity.clone(),
+            resource_set: resources,
+            authority_binding: self.authority.binding.clone(),
+            writer_identity: self.authority.writer.clone(),
+            object_format: repo.object_format(),
+            expected: current.clone(),
+            next: current,
+        })
     }
     fn transfer_start(
         &self,
@@ -1431,24 +1441,73 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             mappings.push((target, oid, old));
         }
         mappings.sort_by(|a, b| a.0.cmp(&b.0));
-        let mut resources = vec![self.authority.reference.as_str().into()];
-        resources.extend(mappings.iter().map(|m| m.0.clone()));
-        let (id, intent) = self.transfer_intent(
-            repo,
-            wal::OperationKind::RemoteFetch {
-                url: url.clone(),
-                refspecs: refspecs.to_vec(),
-                targets: mappings
-                    .iter()
-                    .map(|(name, next, old)| {
-                        (name.clone(), tip(old), wal::Tip::Oid(next.as_str().into()))
-                    })
-                    .collect(),
-            },
-            resources,
-        )?;
+        // Every mapping is its own exact-old CAS, so splitting the advertisement
+        // changes no guarantee: each operation records as many mappings as fit
+        // one WAL record and settles before the next begins.
+        let mut rest = &mappings[..];
+        loop {
+            let id = transfer_id()?;
+            let current = tip(&self.ref_tip(repo, self.authority.reference.as_str())?);
+            let intent = |n: usize| {
+                let chunk = &rest[..n];
+                let mut resources = vec![self.authority.reference.as_str().into()];
+                resources.extend(chunk.iter().map(|m| m.0.clone()));
+                self.intent_at(
+                    repo,
+                    wal::OperationKind::RemoteFetch {
+                        url: url.clone(),
+                        refspecs: refspecs.to_vec(),
+                        targets: chunk
+                            .iter()
+                            .map(|(name, next, old)| {
+                                (name.clone(), tip(old), wal::Tip::Oid(next.as_str().into()))
+                            })
+                            .collect(),
+                    },
+                    resources,
+                    current.clone(),
+                )
+            };
+            let fits = |n: usize| -> Result<bool> { Ok(wal::intent_fits(&id, &intent(n)?)?) };
+            let mut n = rest.len();
+            if !fits(n)? {
+                if n == 0 {
+                    return Err(wal::WalError::RecordTooLarge.into());
+                }
+                // The largest prefix that fits; record size grows with every mapping.
+                let (mut lo, mut hi) = (0, n - 1);
+                while lo < hi {
+                    let mid = (lo + hi).div_ceil(2);
+                    if fits(mid)? {
+                        lo = mid;
+                    } else {
+                        hi = mid - 1;
+                    }
+                }
+                if lo == 0 {
+                    return Err(wal::WalError::RecordTooLarge.into());
+                }
+                n = lo;
+            }
+            let receipt = self.fetch_operation(repo, scheme, &url, &id, intent(n)?, &rest[..n])?;
+            rest = &rest[n..];
+            if rest.is_empty() {
+                return Ok(receipt);
+            }
+        }
+    }
+    /// Downloads and installs one recorded chunk of mirrors under operation `id`.
+    fn fetch_operation(
+        &self,
+        repo: &RepoHandle,
+        scheme: &'static str,
+        url: &str,
+        id: &str,
+        intent: Intent,
+        mappings: &[Mapping],
+    ) -> Result<Receipt> {
         let wal = self.wal(repo)?;
-        let chain = self.transfer_start(repo, &wal, &id, intent)?;
+        let chain = self.transfer_start(repo, &wal, id, intent)?;
         let result = (|| {
             self.point("before-fetch")?;
             // Download exact advertised objects without a ref destination. Mirror
@@ -1464,7 +1523,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             .into_iter()
             .map(str::to_owned)
             .collect();
-            args.push(url);
+            args.push(url.into());
             args.extend(mappings.iter().map(|m| m.1.as_str().into()));
             if !mappings.is_empty() {
                 let out = self.remote_call(repo, scheme, &args)?;
@@ -1476,17 +1535,17 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             self.sync_all_objects(repo)?;
             let mut observations = vec![];
             for (target, oid, old) in mappings {
-                let next = ExpectedTip::Oid(oid);
-                let out = self.cas_raw(repo, &target, &old, &next)?;
+                let next = ExpectedTip::Oid(oid.clone());
+                let out = self.cas_raw(repo, target, old, &next)?;
                 if !out.success {
                     return Err(out.error("mirror-cas-failed-recovery-required"));
                 }
-                let observed = self.ref_tip(repo, &target)?;
+                let observed = self.ref_tip(repo, target)?;
                 if observed != next {
                     return Err(failure("mirror-read-back-mismatch"));
                 }
-                self.sync_refs(repo, &target)?;
-                observations.push((target, tip(&observed)));
+                self.sync_refs(repo, target)?;
+                observations.push((target.clone(), tip(&observed)));
             }
             self.transfer_finish(
                 repo,
@@ -1500,7 +1559,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
                 },
             )
         })();
-        result.map_err(|e| self.pending_error(repo, &id, chain.intent(), e))
+        result.map_err(|e| self.pending_error(repo, id, chain.intent(), e))
     }
     fn push(
         &self,

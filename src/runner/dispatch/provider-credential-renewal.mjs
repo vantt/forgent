@@ -482,6 +482,22 @@ const ompLayout = {
 
 const LAYOUTS = Object.freeze({ [piLayout.name]: piLayout, [codexLayout.name]: codexLayout, [ompLayout.name]: ompLayout });
 
+// Claude Code: `.claude/.credentials.json`, whose `claudeAiOauth.expiresAt` is in ms. Read only: no fgOS
+// dispatch renews a Claude login, so this layout answers only how long a login stays valid, and is not one
+// of the renewable LAYOUTS above.
+const claudeLayout = {
+  name: 'claude-credentials-json',
+  read(home) {
+    const parsed = readJsonFile(path.join(home, '.claude', '.credentials.json'));
+    if (!parsed.ok) return parsed;
+    const oauth = parsed.doc?.claudeAiOauth;
+    if (!isObject(oauth) || !Number.isFinite(oauth.expiresAt)) return fail('unexpected-shape');
+    const expiresMs = toMs(oauth.expiresAt);
+    return { ok: true, entries: [{ key: 'claudeAiOauth', owner: null, expiresMs, dueMs: expiresMs }] };
+  },
+};
+const EXPIRY_LAYOUTS = Object.freeze({ ...LAYOUTS, [claudeLayout.name]: claudeLayout });
+
 /** The layout name of a credential source (the same order the probe command uses), or null. */
 export function credentialLayout(source) {
   if (source?.kind === 'codex-home') return codexLayout.name;
@@ -498,7 +514,7 @@ export function credentialLayout(source) {
  * `unexpected-shape`, `sqlite-unavailable`, `unknown-layout`); values are never part of the result.
  */
 export function readCredentialExpiry(layoutName, home, { loadSqlite = defaultLoadSqlite } = {}) {
-  const layout = LAYOUTS[layoutName];
+  const layout = EXPIRY_LAYOUTS[layoutName];
   if (!layout) return fail('unknown-layout');
   const read = layout.read(home, { loadSqlite });
   if (!read.ok) return read;

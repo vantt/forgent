@@ -6,5 +6,5 @@ type: object
 properties:
   fallbackIntervalSec:
     description: Seconds between checkpoints of the event log when no other trigger fired.
-    type: integer
-    minimum: 1
+    type: number
+    minimum: 0

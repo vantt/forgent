@@ -103,10 +103,27 @@ The same shim and host, the recorded `post-tool-use.json` fixture as stdin, and 
 
 ## Todo
 
-- [ ] `product` mode, binary fingerprint, private shim and activation, installer-written rows
-- [ ] Trace parser with a dry proof
-- [ ] Clean-up and the auth set-aside per case
-- [ ] Dry-run every case
-- [ ] L1, L2, C1, T1, T2 (5 real invocations), redirected, with the exit read right after
-- [ ] Out-of-CLI split
-- [ ] Report with the V6 precondition; convention check; commit; sync; push
+- [x] `product` mode, binary fingerprint, private shim and activation, installer-written rows
+- [x] Trace parser with a dry proof
+- [x] Clean-up and the auth set-aside per case
+- [x] Dry-run every case
+- [x] L1, L2, C1, T1, T2 (5 real invocations), redirected, with the exit read right after
+- [x] Out-of-CLI split
+- [x] Report with the V6 precondition; convention check; commit; sync; push
+
+## Notes
+
+- Commits:
+  - `83e9f04c1` the live suite through the product door (private shim, release and activation; installer-written rows; strace trace parser; `cost` and `stub` subcommands; V4 cases and demos retired);
+  - `20f2c93aa` the version envelope vector lists `mailbox` (missed in phase 6);
+  - `dc8e92240` and `72042d720` the workspace shim reads its activation with shell builtins only (owner question 3 default (a)), for DIST review;
+  - `ed6fa1cb9` C1's long final answer, after the run;
+  - the report commit below.
+- Live runs: L1, L2, C1, T1, T2, once each, after their dry runs; 12 in total with phase 2's 7, the plan's ceiling. Spawn markers and evidence: the report.
+- Results: L1 and L2 passed every check. C1 passed registration, the inline mid-step frame and the model's own send; its Stop check was not observed (the wake message arrived after Codex's Stop). Steady no-mail PostToolUse p95 under strace: Claude Code 68.4 ms (N = 99), Codex 78.1 ms (N = 99), both over 50 ms.
+- Deviation from step 6 ("Do not tune anything inside this phase"): the controller ruled that owner question 3's default (a) applies when one cost clearly dominates. The shim did (p50 31–34 ms of 52–63 ms per call), so the shim was rewritten through its owner. Outside the CLI its p95 fell from 51.4 ms to 3.4 ms. The in-CLI re-measure needs two more live runs beyond the ceiling and waits for the controller.
+- Deviation: the five runs used a byte copy of the main checkout's shim; since `dc8e92240` the suite lays out this branch's generated shim.
+- Deviation: the installer's `PreToolUse` rows were removed in each case (they need the legacy-node payload, which the private release does not stage).
+- Report: `plans/reports/research-261023-0345-mailbox-v5-live-suite-and-hook-cost.md`.
+- Authorization (plan owner (agent), 2026-10-23, after the report): three more live runs, T1 and T2 with the builtins-only shim and C1 with the fixed harness. The V5 ceiling is now 15 (12 + 3). Same rules: dry run first, benign content only, every guard on, no retries, memory and quiet-window check before each. If a CLI's p95 stays above 50 ms, the remaining dominant cost is named and that CLI closes DONE_WITH_CONCERNS; no further optimisation without asking.
+- Re-runs (2026-10-23, host `5d664f0ff`, after `check C1 T1 T2` passed): C1 21:00:10Z every check passed, the Stop gate included; T1 21:00:46Z steady p95 26.5 ms (N = 99); T2 21:03:10Z steady p95 38.1 ms (N = 99), its "held back" check reads failed because the model claimed the message through `inbox --claim`, as in the first T2. Both CLIs now meet the 50 ms target under strace. V5 live total: 15.

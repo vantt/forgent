@@ -224,6 +224,23 @@ test('codex expiry is due at the earlier of the token expiry and the refresh int
   } finally { w.cleanup(); }
 });
 
+test('claude expiry is read from the login file, never quoted, and is not a renewable layout', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    const file = path.join(w.home, '.claude', '.credentials.json');
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, JSON.stringify({ claudeAiOauth: { accessToken: FAKE.oldAccess, refreshToken: FAKE.other, expiresAt: now + HOUR } }));
+    const read = readCredentialExpiry('claude-credentials-json', w.home);
+    assert.deepEqual(read, { ok: true, entries: [{ key: 'claudeAiOauth', expiresMs: now + HOUR, dueMs: now + HOUR }] });
+    assert.equal(JSON.stringify(read).includes('FAKE'), false);
+
+    fs.writeFileSync(file, JSON.stringify({ claudeAiOauth: { accessToken: FAKE.oldAccess } }));
+    assert.deepEqual(readCredentialExpiry('claude-credentials-json', w.home), { ok: false, code: 'unexpected-shape' });
+    assert.equal(credentialLayout({ kind: 'home-files', home: w.home, files: ['.claude/.credentials.json'] }), null);
+  } finally { w.cleanup(); }
+});
+
 test('an unknown layout, a missing store and malformed JSON give fixed codes that never quote the input', () => {
   const w = workspace();
   try {

@@ -13,7 +13,7 @@ import { acquireSync, createLockScope, spawnWithLocks } from '../../src/holder-l
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
 import { attemptGateCommand, attemptPaths, attemptStepEnv, awaitSettledResult, buildEnvelope, captureTail, prepareAttemptFiles, waitForBinding, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
 import { BIN_FGOS, bwrapUsable, createProject, killToken, readJson, startRun, waitUntil } from './support/direct-harness.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -160,7 +160,7 @@ test('awaitSettledResult returns null for a supervisor that is gone and an attem
 
 test('a real run carries the configured kill grace and the lock kill wait in its envelope and keeps the secrets in the side file only', { skip, timeout: 60_000 }, async () => {
   const project = createProject({ agent: { runMs: 300 }, dispatch: { gateKillGraceMs: 2345 } });
-  const config = JSON.parse(fs.readFileSync(path.join(project.repoDir, '.fgos', 'config.json'), 'utf8'));
+  const config = readProjectConfig(project.repoDir);
   config.runner.executors.noisy.invocations[0].env.API_KEY = 'sk-live-secret-9';
   writeProjectConfig(project.repoDir, config);
   const run = startRun(project, project.unitFile('envelope-real'));

@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Worktree, crate skeleton, limits contract, purity lint"
-status: pending
+status: done
 priority: P2
 effort: "3h"
 dependencies: []
@@ -100,3 +100,10 @@ cargo tree -p fgos-mailbox-core -e normal --depth 1   # shows serde only
 ## Security
 
 No secrets; the contract holds numbers and prose only.
+
+## Implementation notes (2026-10-21)
+
+- Branch `mailbox/v1-v3` and worktree `/home/vantt/projects/forgent-mailbox` created from `origin/main` `27e5412bc` (no branch existed locally or on origin).
+- Baseline before any change: `cargo fmt --all -- --check` exit 1 (175 files outside `packages/mailbox` need formatting: `packages/run-supervisor/rust` 42, `packages/process/rust` 28, `packages/git/rust` 27, `packages/holder-lock/rust` 22, and others under `apps/` and `packages/`); `cargo clippy --locked --workspace --all-targets -- -D warnings` exit 0. Left alone; phase 8 compares against it.
+- Deviation (stronger proof, same behaviour): the contract test drops every key in turn, not one, so no `Limits` field can fall back to a code default unnoticed.
+- Purity probe (removed after the run), `cargo clippy -p fgos-mailbox-core --all-targets -- -D warnings`: one error per family — `disallowed method std::fs::read`, `std::path::Path::exists`, `std::env::var`, `std::io::stdout`, `std::time::SystemTime::now` (plus `disallowed type std::time::SystemTime`), `disallowed type std::process::Command`, `disallowed macro std::println` (plus `print_stdout`). The crate-local `clippy.toml` is picked up without any environment setting.

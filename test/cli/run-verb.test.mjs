@@ -13,7 +13,7 @@ seedFileLocalBwrapRegistry();
 // bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
-import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { capabilityServedBy, writeGlobalConfig, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
@@ -72,7 +72,7 @@ function setupTestRepo() {
         },
       },
       capabilities: {
-        'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
+        'docs:write': capabilityServedBy('test-node', 'docs:write'),
       },
       patterns: { seatBinding: { schema: 1 },
         defaultRule: { mutatingMinRigor: 'standard' },
@@ -112,57 +112,6 @@ test('fgos run executes read-only unit from file', () => {
 
   assert.ok(stdout.includes('unit-run-'));
   assert.ok(stdout.includes('"outcome": "pass"'));
-});
-
-test('fgos run record completes pending inline turn with verified evidence', () => {
-  const tmp = setupTestRepo();
-  const unitRunId = 'unit-run-cli-record-1';
-  const unitDir = path.join(tmp, '.fgos', 'assignments', unitRunId);
-  fs.mkdirSync(unitDir, { recursive: true });
-
-  const unitRecord = {
-    unit: { id: 'u-inline-cli', objective: 'Test inline CLI', capability: 'docs:write', writes: ['evidence.md'] },
-    overrides: [],
-    worktree: fs.realpathSync(tmp),
-  };
-  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(unitRecord, null, 2));
-
-  const pending = {
-    unitRunId,
-    seat: 'producer',
-    role: 'producer',
-    posture: { inlineAllowed: true },
-    round: 1,
-    nonce: 'cli-nonce-abc',
-  };
-  fs.writeFileSync(path.join(unitDir, 'pending-inline.json'), JSON.stringify(pending, null, 2));
-
-  fs.writeFileSync(path.join(tmp, 'evidence.md'), '# Evidence\n');
-
-  const stdout = execFileSync(
-    process.execPath,
-    [
-      BIN_FGOS,
-      'run',
-      'record',
-      '--unit-run',
-      unitRunId,
-      '--role',
-      'producer',
-      '--round',
-      '1',
-      '--nonce',
-      'cli-nonce-abc',
-      '--evidence',
-      'evidence.md',
-      '--dir',
-      tmp,
-    ],
-    { cwd: tmp, encoding: 'utf8' },
-  );
-
-  assert.ok(stdout.includes('"ok": true'));
-  assert.ok(stdout.includes(unitRunId));
 });
 
 // `fgos run "<prompt>"`: the CLI builds the unit itself and runs it through the same door.
@@ -426,7 +375,7 @@ test('fgos run help names --input and --verify', () => {
 // one a seat resolves to, and an accepted dependence, are refused by name before any unit run exists; at or below the resolved tier everything works.
 const setRunnerConfig = (tmp, patch) => {
   const file = path.join(tmp, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const cfg = readProjectConfig(tmp);
   writeProjectConfig(tmp, { ...cfg, runner: patch(cfg.runner) });
 };
 

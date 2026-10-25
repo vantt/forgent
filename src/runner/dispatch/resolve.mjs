@@ -9,7 +9,7 @@
 // barrel. See `docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md` D7 for the split rationale.
 
-import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, normalizePreferCandidates } from './config.mjs';
+import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, EXECUTOR_MISSING_MESSAGE, normalizePreferCandidates } from './config.mjs';
 import { credentialStoreOf } from './provider-capacity.mjs';
 
 /**
@@ -200,8 +200,8 @@ export function deriveProviderFamily(executorEntry, resolvedCommand = 'claude') 
  * `agentType` support is `tsk-53h`'s separate follow-on, not built here).
  * Reuses `baseExecutor`'s (the already-resolved `cfg.executor`, guaranteed
  * `{command,args}`-shaped by `validateExecutorShape` at config-load time)
- * own args template verbatim — never a hardcoded literal copy of
- * `DEFAULT_RUNNER_CONFIG` — so a project's own `--allowedTools`/
+ * own args template verbatim — never a hardcoded literal copy of the
+ * default executor — so a project's own `--allowedTools`/
  * `--permission-mode` customization carries through to its agentType
  * executors too. Strips the `'--model','{model}'` pair (D2: the named
  * agent definition's own pinned `model:` frontmatter wins, never overridden
@@ -411,8 +411,9 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
         : resolvedViaAgentType
           ? buildAgentTypeExecutor(cfg.executor, effectiveAgentType)
           : undefined;
-  const executor = byExecutor ?? (cfg && cfg.executor);
-  if (!executor || typeof executor.command !== 'string' || !Array.isArray(executor.args)) {
+  if (!byExecutor && !cfg?.executor) throw new RunnerConfigError(EXECUTOR_MISSING_MESSAGE, { code: 'runner-executor-missing' });
+  const executor = byExecutor ?? cfg.executor;
+  if (typeof executor.command !== 'string' || !Array.isArray(executor.args)) {
     throw new RunnerConfigError('runner config "executor" must have a string "command" and an "args" array.');
   }
 

@@ -1,7 +1,6 @@
 // Thin doctor/setup adapter: repository trust, configuration and WAL parsing stay in Rust.
 import path from 'node:path';
-import { readSharedConfig } from '../config/shared-config-file.mjs';
-import { mergeWithGlobalConfig } from '../config/global-config.mjs';
+import { readConfig } from '../config/facade.mjs';
 import { randomUUID } from 'node:crypto';
 import { loadNativeAddon, nativeError } from '../git/native.mjs';
 import { createGitRecovery } from '../git/recovery.mjs';
@@ -21,7 +20,7 @@ function context(cwd, loaderOptions) {
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
   // The addon first: a channel without one reports `addon not shipped` before the door-backed state root is asked.
   const native = loadNativeAddon(loaderOptions);
-  return { root, remote: mergeWithGlobalConfig(readSharedConfig(root)).eventStore?.remote ?? 'origin', stateRoot: resolveStateRoot().stateRoot, native };
+  return { root, remote: readConfig({ projectRoot: root, sections: ['eventStore'] }).value.eventStore?.remote ?? 'origin', stateRoot: resolveStateRoot().stateRoot, native };
 }
 // A row is its problems joined into one sentence, or its passing text; the facts it judged go under detail.
 const row = (problems, ok, detail, found = problems.filter(Boolean)) => found.length ? { passed: false, message: found.join('; '), detail } : { passed: true, message: ok, detail };
@@ -116,8 +115,9 @@ const attemptFix = (cwd, fix) => {
   try { return fix(cwd); } catch (err) { return { changed: false, message: `warning: Git setup refused: ${err.message}` }; }
 };
 export const fixGitDriverDirectories = (cwd, loaderOptions) => attemptFix(cwd, () => {
-  const { stateRoot, native } = context(cwd, loaderOptions);
-  return { changed: native.prepareGitDriverDirectories(stateRoot), message: 'fgOS Git driver directories are current-user-owned and safely permissioned' };
+  // No config read here: the door refuses while these directories are unsafe, and this is what makes them safe.
+  const native = loadNativeAddon(loaderOptions);
+  return { changed: native.prepareGitDriverDirectories(resolveStateRoot().stateRoot), message: 'fgOS Git driver directories are current-user-owned and safely permissioned' };
 });
 /** A fix that first makes the driver directories safe, then runs its own repair. */
 const afterDriverDirectories = (cwd, loaderOptions, fix) => {
