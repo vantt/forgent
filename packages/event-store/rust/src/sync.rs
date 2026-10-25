@@ -276,6 +276,14 @@ pub fn sync_with_fs(
         state.tips.clear();
         state.positions.clear();
     }
+    if req.opportunistic {
+        // Claim the due window before any network work: a command that ends while this publish runs
+        // reads this attempt time and starts no second publisher.
+        state.time = now()?;
+        state.remote = req.remote.into();
+        fgos_durable_file::replace_durably(&req.layout.root, "sync.json", &line(&state)?)
+            .map_err(Error::from_install_error)?;
+    }
     state
         .warnings
         .retain(|w| w.starts_with("event-store-machine-ref-shared:"));
