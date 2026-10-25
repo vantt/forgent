@@ -14,7 +14,8 @@ import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
 import { fixGitFetchMapping } from '../../src/setup/git-checks.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
-import { scan } from '../../src/runner/dispatch/process-identity.mjs';
+import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
+import { scan, signalByIdentity } from '../../src/runner/dispatch/process-identity.mjs';
 import { resolveFaultLogPath } from '../../src/cli/invocation-fault-log.mjs';
 
 function workRepo(t, { remote = false } = {}) {
@@ -100,6 +101,33 @@ test('the end trigger hands a due publish to a detached child, does not wait for
   maintainEventStore(repo, { trustedMain: repo, end: true });
   assert.deepEqual(syncChildren(repo), [], 'a push inside the interval starts no child');
   assert.deepEqual(store.maintenance([]).lastPush, first, 'a push inside the interval is not repeated');
+});
+
+test('end triggers that run while a publish child is in flight start no second child', async (t) => {
+  const { temp, repo, store } = workRepo(t, { remote: true });
+  // A git that stalls on network verbs keeps the first child inside its sync, holding the seal lock.
+  const real = execFileSync('sh', ['-c', 'command -v git'], { encoding: 'utf8' }).trim();
+  const bin = path.join(temp, 'slow-git'); fs.mkdirSync(bin);
+  fs.writeFileSync(path.join(bin, 'git'), `#!/bin/sh\nfor a in "$@"; do case "$a" in fetch|push|ls-remote) exec sleep 8;; esac; done\nexec ${JSON.stringify(real)} "$@"\n`, { mode: 0o755 });
+  addAt(store, 3600);
+  const priorPath = process.env.PATH;
+  process.env.PATH = `${bin}${path.delimiter}${priorPath}`;
+  let child;
+  try {
+    assert.equal(maintainEventStore(repo, { trustedMain: repo, end: true }).error, null);
+    // The first child is inside its sync once it holds the seal lock.
+    const sealHeld = () => {
+      const taken = acquireSync(createLockScope('triggers-test'), 'event-seal', { eventOpenRoot: path.join(repo, '.git/fgos/events') });
+      if (taken.result === 'acquired') { taken.handle.release(); return false; }
+      return true;
+    };
+    [child] = await waitFor('the first child to hold the seal lock', () => (sealHeld() && syncChildren(repo).length ? syncChildren(repo) : null));
+    for (let burst = 0; burst < 5; burst += 1) assert.equal(maintainEventStore(repo, { trustedMain: repo, end: true }).error, null);
+    assert.equal(syncChildren(repo).length, 1, 'five more end triggers started no second publisher');
+  } finally {
+    process.env.PATH = priorPath;
+    if (child) signalByIdentity(child.tuple, 'kill');
+  }
 });
 
 test('a store that cannot be opened is reported as a code, never thrown at the command that triggered it', (t) => {
