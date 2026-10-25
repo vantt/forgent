@@ -1,71 +1,1680 @@
 {
-  "sourceHead": "ee2ce49c4b610daccb656f79fdb29531bb41d06b",
+  "sourceHead": "0d200a3cd799c21688b8574646a6baae71300d27",
   "tokenizer": {
     "name": "marked",
     "version": "18.0.11",
     "module": "/home/vantt/.nvm/versions/node/v24.18.0/lib/node_modules/@earendil-works/pi-coding-agent/node_modules/marked/lib/marked.esm.js",
     "moduleSha256": "05e41134d075ad3a009a748d6c779c3d83cea9b942be911c2d9abade36d1dd31",
-    "method": "Lexer plus recursive walkTokens codespan tokens; examine EVERY span containing ](, with no path-prefix filter. Neither regex code-span matching nor a path allowlist."
+    "method": "Lexer + recursive walkTokens; every codespan AND code token in every platform file; all ]( hits, no path-prefix filter."
   },
   "fileCount": 1198,
   "markdownFiles": 627,
-  "beforeCodeSpans": 83102,
-  "afterCodeSpans": 83104,
+  "sourceFileCount": 3308,
+  "additionalSources": [
+    "docs/platform/git/spec.md@d4839a339"
+  ],
+  "literalCounts": {
+    "codespan": 83104,
+    "code": 2346
+  },
   "candidates": [
     {
-      "file": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
+      "file": "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+      "type": "code",
+      "literalSha256": "0f7968eb60080189372d09cd52388a6ce4f7045036a23f0392bfaede7026bedf",
+      "literalBytes": 18591,
+      "raw": "```text\n\nAgent Coordination is a critical foundation component. It is not a small docs\ncleanup target. It covers multiple important subcomponents: coordination\nsession identity, flow definition, workflow/stage operation compatibility,\nassig… [full literal authenticated by digest; replay scanner]",
+      "line": 48,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+        "commit": "HEAD",
+        "fileSha256": "c52b6416538d94c5b6cc11ea4f75c8061ddd3392c7e00b59b17a3e42ad67d14c",
+        "literalSha256": "0f7968eb60080189372d09cd52388a6ce4f7045036a23f0392bfaede7026bedf",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+      "type": "code",
+      "literalSha256": "4cc0ba69aaa930c1f9ebf52433a55ea62062b3b333a6b366582e53881caaab61",
+      "literalBytes": 12030,
+      "raw": "```text\n\nThis area should not be compressed into fewer buckets just to look simpler.\nIts current separation is meaningful and should mostly survive the move.\n\nBecause agent-coordination covers many child components, the target portal must\ni… [full literal authenticated by digest; replay scanner]",
+      "line": 257,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+        "commit": "HEAD",
+        "fileSha256": "c52b6416538d94c5b6cc11ea4f75c8061ddd3392c7e00b59b17a3e42ad67d14c",
+        "literalSha256": "4cc0ba69aaa930c1f9ebf52433a55ea62062b3b333a6b366582e53881caaab61",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+      "type": "code",
+      "literalSha256": "40ec0a79879f3045a44d04526a1061281651db95b91871fb7c3924163a57e2b6",
+      "literalBytes": 1250,
+      "raw": "```text\n\nThen read, in this order:\n\n1. [../../doc-governance.md](../../doc-governance.md)\n2. [../../platform/README.md](../../platform/README.md)\n3. [../../platform/component-boundary.md](../../platform/component-boundary.md)\n4. This plan.\n… [full literal authenticated by digest; replay scanner]",
+      "line": 479,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+        "commit": "HEAD",
+        "fileSha256": "c52b6416538d94c5b6cc11ea4f75c8061ddd3392c7e00b59b17a3e42ad67d14c",
+        "literalSha256": "40ec0a79879f3045a44d04526a1061281651db95b91871fb7c3924163a57e2b6",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+      "type": "code",
+      "literalSha256": "64ab9b0e206fec07d0f2872b4a6942c0f430826c4e6489c187cdb0e21af4efcf",
+      "literalBytes": 2264,
+      "raw": "```text\n\nRuntime recovery and group-thinking docs may be promoted in this phase only if\ntheir status is clear. Otherwise create index rows pointing back to legacy\nsources and mark them `proposed`, `partial`, or `unknown`.\n\nFor runtime recov… [full literal authenticated by digest; replay scanner]",
+      "line": 810,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+        "commit": "HEAD",
+        "fileSha256": "c52b6416538d94c5b6cc11ea4f75c8061ddd3392c7e00b59b17a3e42ad67d14c",
+        "literalSha256": "64ab9b0e206fec07d0f2872b4a6942c0f430826c4e6489c187cdb0e21af4efcf",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+      "type": "code",
+      "literalSha256": "747cf30f926d12c433402f772431343ab7b003aa375814b909cb8f7cfff0f6f0",
+      "literalBytes": 862,
+      "raw": "```text\n\nThen decide per proof root:\n\n- `link-only` for large proof artifact directories during first migration;\n- `move` only for compact proof docs that do not risk breaking historical\n  evidence paths;\n- `keep-legacy-current` for active verification tracks that are still being\n  appended to.\n\nThe default for large proof trees is `link-only`.\n\n### 9.10. Platform Portal Update Gate\n\nUpdate [../../platform/README.md](../../platform/README.md) only after Phase 1\nfiles exist and links resolve.\n\nThe platform portal row should point to\n`docs/platform/agent-coordination/README.md` as the target area portal and list\n`docs/architect/agent-coordination/` as legacy/current source during migration.\n\n### 9.11. Legacy Status Notes\n\nDo not add status notes to old docs until the target doc exists.\n\nUse this exact status-note shape at the top of old docs when redirecting:\n\n```\n",
+      "line": 871,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+        "commit": "HEAD",
+        "fileSha256": "c52b6416538d94c5b6cc11ea4f75c8061ddd3392c7e00b59b17a3e42ad67d14c",
+        "literalSha256": "747cf30f926d12c433402f772431343ab7b003aa375814b909cb8f7cfff0f6f0",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+      "type": "code",
+      "literalSha256": "29022715665cb5be40fdd391ddb525aa2db582e9b0c09648eda2ff9e50d38999",
+      "literalBytes": 6242,
+      "raw": "```text\n\nRun a local link check for production docs touched in that phase. Templates may\ncontain future relative links and should be checked separately.\n\nRender long Markdown files with `mdview open <absolute-path>`.\n\n### 9.14. Phase Comple… [full literal authenticated by digest; replay scanner]",
+      "line": 936,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+        "commit": "HEAD",
+        "fileSha256": "c52b6416538d94c5b6cc11ea4f75c8061ddd3392c7e00b59b17a3e42ad67d14c",
+        "literalSha256": "29022715665cb5be40fdd391ddb525aa2db582e9b0c09648eda2ff9e50d38999",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
+      "type": "code",
+      "literalSha256": "244da86a73ae2c24e86bde81d9bfbe41f62456063fee866af2b123c5c5dc9ffb",
+      "literalBytes": 6827,
+      "raw": "~~~~text\n# Agent Coordination System Context\n\n```txt\nDocument type: Architecture\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Agent Coordination System Context\nDesign status: Candidate\nI… [full literal authenticated by digest; replay scanner]",
+      "line": 26,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/system-context.md",
+        "commit": "54c2698ee8c5b8f1baeac7244e946c793a637d29",
+        "fileSha256": "bb94d3bfb023d6184dcd90ed110eb65b7906fc997c1bde839e1d7ee34f5178e4",
+        "literalSha256": "244da86a73ae2c24e86bde81d9bfbe41f62456063fee866af2b123c5c5dc9ffb",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+      "type": "code",
+      "literalSha256": "793e2a61d97614a92fb14c28ddf55877ab8c5f8d9bf65a161b960ce05fa2ff3d",
+      "literalBytes": 20432,
+      "raw": "~~~~text\n---\narea: agent-coordination-runtime\nupdated: 2026-09-11\ncoverage: proposed\n---\n\n# Coordination Recovery Planning And Session Continuation\n\n```txt\nDocument type: Architecture\nAudience: Human reviewers, maintainers, documentation ag… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/coordination-continuation-recovery.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "3c116095c0f9fd25085add37f282ffd97063978d40db61bf46725e5885a5e24e",
+        "literalSha256": "793e2a61d97614a92fb14c28ddf55877ab8c5f8d9bf65a161b960ce05fa2ff3d",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+      "type": "code",
+      "literalSha256": "8fad939b85d6f909db6732b8e54d4bd0bd7923f9174aeca0cf89f1c7d966323a",
+      "literalBytes": 7894,
+      "raw": "~~~~text\n# Coordination Foundation Baseline\n\n```txt\nDocument type: Architecture\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Coordination Foundation Baseline\nDesign status: Candidate\nImp… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "2a7c083b0635c1a7679b9a5c3a3337e9c4b44cc3e3ae6ce5e5987ae9ca640b24",
+        "literalSha256": "8fad939b85d6f909db6732b8e54d4bd0bd7923f9174aeca0cf89f1c7d966323a",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+      "type": "code",
+      "literalSha256": "73f78724a44cc6d2631f1b67bd0c69e3156414667265d0cd9549f1e99d37849c",
+      "literalBytes": 19826,
+      "raw": "~~~~text\n# Dispatch Control Plane\n\n```txt\nDocument type: Architecture\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Dispatch Control Plane\nDesign status: Candidate\nImplementation: Not re-… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "2f963016f1573db89f8b19cdea4c767a59238a12dc1a4b4bc620d8bd0089cd6f",
+        "literalSha256": "73f78724a44cc6d2631f1b67bd0c69e3156414667265d0cd9549f1e99d37849c",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md",
+      "type": "code",
+      "literalSha256": "8fde43725e1049c57359b933fbb2ea20f89b3f4e5ba701d70a10d9281e837225",
+      "literalBytes": 14287,
+      "raw": "~~~~text\n---\narea: dispatch-control-plane\nupdated: 2026-09-11\ncoverage: proposed\n---\n\n# Executor Fallback And Effect Eligibility\n\n```txt\nDocument type: Architecture\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Prese… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "969ba5f64da76515a222214955eaac68d6fb40bd1e73ddd904be4815f43410fa",
+        "literalSha256": "8fde43725e1049c57359b933fbb2ea20f89b3f4e5ba701d70a10d9281e837225",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+      "type": "code",
+      "literalSha256": "434d3711372de38922e720a1651e78dfdd780605c80f777b04e31d81a923cb9a",
+      "literalBytes": 16332,
+      "raw": "~~~~text\n# Group Thinking Trigger Surface\n\n```txt\nDocument type: Architecture\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Group Thinking Trigger Surface\nDesign status: Candidate\nImpleme… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "d869ea5af7be444e8a18d79f1836fb947426d38b75c86383c5c8e34dad13a5f8",
+        "literalSha256": "434d3711372de38922e720a1651e78dfdd780605c80f777b04e31d81a923cb9a",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
+      "type": "code",
+      "literalSha256": "6e3e9feb16a702ae42ebb6a5c638035bd47fa246f1e31815a20e384bf3542f2b",
+      "literalBytes": 7090,
+      "raw": "~~~~text\n# Coordination Protocol Model\n\n```txt\nDocument type: Architecture\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Coordination Protocol Model\nDesign status: Candidate\nImplementatio… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "412c6549eef2c2a3e2e8e3c86201cd814831e664fe01fe7254f416cf43bb1eae",
+        "literalSha256": "6e3e9feb16a702ae42ebb6a5c638035bd47fa246f1e31815a20e384bf3542f2b",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+      "type": "code",
+      "literalSha256": "7980593995512a89728f11b5d9667f10a17a6496d2d5ca485b575e2441e90e86",
+      "literalBytes": 6957,
+      "raw": "~~~~text\n# Agent Coordination Architecture\n\n```txt\nDocument type: Collection index\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Agent Coordination Architecture\nDesign status: Candidate\nI… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/README.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "6ac092c31c002281cde491c707e20d29e722e3797c7aafbacd99d840308e961b",
+        "literalSha256": "7980593995512a89728f11b5d9667f10a17a6496d2d5ca485b575e2441e90e86",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+      "type": "code",
+      "literalSha256": "f3b5d17c9bdaaa81c09d4235f6412cab9be0251a0ce0c593ce6fe2859f2e5fef",
+      "literalBytes": 17904,
+      "raw": "~~~~text\n---\narea: agent-coordination-runtime\nupdated: 2026-09-14\ncoverage: substantially-implemented\n---\n\n# RunHandle And Recovery Material\n\n```txt\nDocument type: Architecture\nAudience: Human reviewers, maintainers, documentation agents\nPu… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "d6715088af75b954a9642034e607f04a9a0c4432723830fb50b2963d6e7f9a23",
+        "literalSha256": "f3b5d17c9bdaaa81c09d4235f6412cab9be0251a0ce0c593ce6fe2859f2e5fef",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+      "type": "code",
+      "literalSha256": "bc6857745512c59967aa15569407f114922e70d19b09d21b1df888162cb8b333",
+      "literalBytes": 3942,
+      "raw": "~~~~text\n# Assignment Execution Runtime Model\n\n```txt\nDocument type: Architecture\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Assignment Execution Runtime Model\nDesign status: Candidate… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "fd162fbe58d911dff7c0a821bea4cfbee4e531f312d580e93db1119fee81ddc9",
+        "literalSha256": "bc6857745512c59967aa15569407f114922e70d19b09d21b1df888162cb8b333",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+      "type": "code",
+      "literalSha256": "38d0512c336fb764e85e6409fbef7f52790287bddc48064477af07eb07b34edc",
+      "literalBytes": 25901,
+      "raw": "~~~~text\n---\narea: agent-coordination-runtime\nupdated: 2026-09-14\ncoverage: substantially-implemented\n---\n\n# Runtime Recovery And Work Continuity\n\n```txt\nDocument type: Architecture\nAudience: Human reviewers, maintainers, documentation agen… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "b564291e08611ef3b017f03788f78ea05211ca619a524783a7a757c9e8595d6d",
+        "literalSha256": "38d0512c336fb764e85e6409fbef7f52790287bddc48064477af07eb07b34edc",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+      "type": "code",
+      "literalSha256": "a84e184390b553097955b4367c13cc11707738daabefbde17859b806e187496c",
+      "literalBytes": 5941,
+      "raw": "~~~~text\n# Agent Coordination System Context\n\n```txt\nDocument type: Architecture\nAudience: Human reviewer, maintainer and implementation agent\nPurpose: Navigate preserved design and historical material without asserting a retired runtime\nDe… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/system-context.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "3328892b0f4f35ab5ac2ccf184290693c6531ce25ab964a2f81a26388060e90a",
+        "literalSha256": "a84e184390b553097955b4367c13cc11707738daabefbde17859b806e187496c",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md",
+      "type": "code",
+      "literalSha256": "a29e55a67815a68bce1ea31c11c7257ca73e2a99cbbc353be15bc03448e57d3d",
+      "literalBytes": 6432,
+      "raw": "~~~~text\n# Visibility And Herdr\n\n```txt\nDocument type: Architecture\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Visibility And Herdr\nDesign status: Candidate\nImplementation: Not re-veri… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "cb491b29d61eb39a5a3e32d00078d2b5f0140717a7743f6dc1f62466f7d32f61",
+        "literalSha256": "a29e55a67815a68bce1ea31c11c7257ca73e2a99cbbc353be15bc03448e57d3d",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md",
+      "type": "code",
+      "literalSha256": "7df313d40b65a8f816c01d0142feef495c11d68a6001e2893ade55f448cec8e8",
+      "literalBytes": 4706,
+      "raw": "~~~~text\n# Work Integration Boundaries\n\n```txt\nDocument type: Architecture\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Work Integration Boundaries\nDesign status: Candidate\nImplementatio… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/architecture/work-integration.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "70378870d687f1b8e575f520deeb133d1eb81c867c7963d3ebed0eb691af515a",
+        "literalSha256": "7df313d40b65a8f816c01d0142feef495c11d68a6001e2893ade55f448cec8e8",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
+      "type": "code",
+      "literalSha256": "be974c3d3ff1459f062c0c90991991b165d2902e786e9f14d07d57d9bb40bd96",
+      "literalBytes": 20195,
+      "raw": "~~~~text\n# Assignment, Run, And RunResult Contract\n\n```txt\nDocument type: Contract\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Assignment, Run, And RunResult Contract\nDesign status: Can… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "e25c355b00520577a9fb2262ecefdee906703024ec9d9af1eef184677d2c5c44",
+        "literalSha256": "be974c3d3ff1459f062c0c90991991b165d2902e786e9f14d07d57d9bb40bd96",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+      "type": "code",
+      "literalSha256": "9b935b4ba713a49749b1f0e1bb1beb4bc18642abed13ae51ab6d3544d3136ef5",
+      "literalBytes": 84622,
+      "raw": "~~~~text\n# CoordinationSession Persistence And Recovery Contract\n\n```txt\nDocument type: Contract\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for CoordinationSession Persistence And Recovery… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/contracts/coordination-session.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "38bfc02b54d412ba0a412f778c147915fac6305dbfaac1e05ff8f363eff20601",
+        "literalSha256": "9b935b4ba713a49749b1f0e1bb1beb4bc18642abed13ae51ab6d3544d3136ef5",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+      "type": "code",
+      "literalSha256": "1e04eb0ec153081c6a9f58aaefc5553d4e7c3e3ab106ff0daf623e4080b5df74",
+      "literalBytes": 45031,
+      "raw": "~~~~text\n# FlowDefinition And Profile Schema Contract\n\n```txt\nDocument type: Contract\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for FlowDefinition And Profile Schema Contract\nDesign statu… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/contracts/flow-definition.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "54d5c541879c9c2d48b2125cd702f12d9831389f84009d332190bc86ef7e18c8",
+        "literalSha256": "1e04eb0ec153081c6a9f58aaefc5553d4e7c3e3ab106ff0daf623e4080b5df74",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+      "type": "code",
+      "literalSha256": "a3d3b197e0ccb5411290a1e12da8f2bb25087c4e76206b72021860fddd543f69",
+      "literalBytes": 3028,
+      "raw": "~~~~text\n# Agent Coordination Contracts\n\n```txt\nDocument type: Collection index\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Agent Coordination Contracts\nDesign status: Candidate\nImpleme… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/contracts/README.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "5fbb019e87a413ea2a85b1f07b9eaf297f723d71b5f6f2893b4e6f80d7ec09d6",
+        "literalSha256": "a3d3b197e0ccb5411290a1e12da8f2bb25087c4e76206b72021860fddd543f69",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+      "type": "code",
+      "literalSha256": "348bf47065763e5f544600f387b4d2789e31cdf842241b8d639143ac4f5cf86a",
+      "literalBytes": 3933,
+      "raw": "~~~~text\n# Workflow Stage Operation Contract\n\n```txt\nDocument type: Contract\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Workflow Stage Operation Contract\nDesign status: Candidate\nImple… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "980c6dce1a43aae09769995508966b8652079a97ed608fc519cade334b4de24d",
+        "literalSha256": "348bf47065763e5f544600f387b4d2789e31cdf842241b8d639143ac4f5cf86a",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "type": "code",
+      "literalSha256": "c67626955568473d58d472d4125f18e1f7a327b46f6fc4f3cb1c47412e8c2ade",
+      "literalBytes": 5855,
+      "raw": "~~~~text\n# ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot\n\n```txt\nDocument type: Decision\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for ADR-006: Assignment Prov… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "685c84e23f4b080f880c0e53d08f11d7fdf3c40da0c97af3e433a0aa60868881",
+        "literalSha256": "c67626955568473d58d472d4125f18e1f7a327b46f6fc4f3cb1c47412e8c2ade",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "type": "code",
+      "literalSha256": "3971f49cd304c5fff31ac67ac91f3e46215683c28986b046308bed0cf8894516",
+      "literalBytes": 4768,
+      "raw": "~~~~text\n# ADR-007: Domain Harness Seam And Non-Driving Inline Evidence\n\n```txt\nDocument type: Decision\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for ADR-007: Domain Harness Seam And Non-… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "f0a2a38c872c18d9f1e86f11a0b0a0788b7108ef8a49e5a17e9b3e5076bcabe9",
+        "literalSha256": "3971f49cd304c5fff31ac67ac91f3e46215683c28986b046308bed0cf8894516",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+      "type": "code",
+      "literalSha256": "62a6fb1ca4423381c9e8d6ce57f77992e96dc0547d96ccf3c21791cdc8dddcbe",
+      "literalBytes": 10837,
+      "raw": "~~~~text\n# ADR-008: CoordinationSession As V1 Recovery Root, One-Way Assignment Membership, And Mission Deferral\n\n```txt\nDocument type: Decision\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material … [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "ec77c692f0fe9e73c4fb86d35de3f7567fdd5b0c7cdd20bf4ade373feb9621bf",
+        "literalSha256": "62a6fb1ca4423381c9e8d6ce57f77992e96dc0547d96ccf3c21791cdc8dddcbe",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+      "type": "code",
+      "literalSha256": "ee6014a0efc432e6aa6dfc67bbc6a7a132f3d918a6fe5cf08c395f2cc5c14f8e",
+      "literalBytes": 9991,
+      "raw": "~~~~text\n# ADR-009: Versioned FlowDefinition As Shared Graph/Operation/Policy IR With Typed Profiles\n\n```txt\nDocument type: Decision\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for ADR-009:… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "f17cb3fdcefa9b44dd3bd63fcf7dc7077cc74f42952fb12e49fff3101b964307",
+        "literalSha256": "ee6014a0efc432e6aa6dfc67bbc6a7a132f3d918a6fe5cf08c395f2cc5c14f8e",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+      "type": "code",
+      "literalSha256": "ff96f6cb79fe0cef8ba542b0fc368c6c08164056168f885c32b0ab609204be99",
+      "literalBytes": 8007,
+      "raw": "~~~~text\n# ADR-010: Interactive/Headless Capability Parity As An Intended Future Property, And Domain-Owned Work Isolation\n\n```txt\nDocument type: Decision\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "362e65352d18c3f0e0d0eeeefc6051bd983b4e03c9985eefb2d5aa1d5c152f54",
+        "literalSha256": "ff96f6cb79fe0cef8ba542b0fc368c6c08164056168f885c32b0ab609204be99",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+      "type": "code",
+      "literalSha256": "91fa30170d48b59bd588f8589592fe4b1387906ec35ab1861a25e519597a6fbc",
+      "literalBytes": 4275,
+      "raw": "~~~~text\n# Agent Coordination Architecture Decisions\n\n```txt\nDocument type: Collection index\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Agent Coordination Architecture Decisions\nDesign… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/decisions/README.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "56b43bba7aeeb2cf49bed25052064808b6f654ef521614446e630d2026eb9854",
+        "literalSha256": "91fa30170d48b59bd588f8589592fe4b1387906ec35ab1861a25e519597a6fbc",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+      "type": "code",
+      "literalSha256": "9f9f703c2de3ff52458407789cf33b96ac5844b2f75077420d01e5dd355ae08e",
+      "literalBytes": 32216,
+      "raw": "~~~~text\n# Agent Coordination Intent Preservation Ledger\n\n```txt\nDocument type: Intent preservation ledger\nAudience: Human reviewer, maintainer and implementation agent\nPurpose: Navigate preserved design and historical material without asse… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/intent-preservation-ledger.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "29ed3888ab8539f922a352d63bc4cbaf4050210455e1abb1d0dedc159a7fd681",
+        "literalSha256": "9f9f703c2de3ff52458407789cf33b96ac5844b2f75077420d01e5dd355ae08e",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+      "type": "code",
+      "literalSha256": "64b4fa9a70f5d98f7f4c52ae8dcef34ce5cf938327f5b9a1f0958e25415c193f",
+      "literalBytes": 40397,
+      "raw": "~~~~text\n# Architecture Advisory Artifact Templates\n\n```txt\nDocument type: Guide / runbook\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Architecture Advisory Artifact Templates\nDesign st… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "0e959640b0f2ca28b7bf90d533567b2d6b09a9e557d25b4e50f726893fa22050",
+        "literalSha256": "64b4fa9a70f5d98f7f4c52ae8dcef34ce5cf938327f5b9a1f0958e25415c193f",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+      "type": "code",
+      "literalSha256": "d4807289860154ef8654c2d1754deb8ca4d0928fbc53133c46be5809a3007cb2",
+      "literalBytes": 20865,
+      "raw": "~~~~text\n# Architecture Advisory Evaluation Rubric\n\n```txt\nDocument type: Guide / runbook\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Architecture Advisory Evaluation Rubric\nDesign stat… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "f8608622222cf2444210aa51f6ca478d11a3e8b95f08ad185c16a45aa57ed264",
+        "literalSha256": "d4807289860154ef8654c2d1754deb8ca4d0928fbc53133c46be5809a3007cb2",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "type": "code",
+      "literalSha256": "d27f0dce0137b823887f4da9a44c2948432678f22f01c31f7b4711286a1b3f49",
+      "literalBytes": 85766,
+      "raw": "~~~~text\n# Architecture Advisory Role Doctrine\n\n```txt\nDocument type: Guide / runbook\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Architecture Advisory Role Doctrine\nDesign status: Cand… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "610ffe2502a39b0f5aa3654239bb91f955b4e872daa58e54471b9cd97b682cf9",
+        "literalSha256": "d27f0dce0137b823887f4da9a44c2948432678f22f01c31f7b4711286a1b3f49",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+      "type": "code",
+      "literalSha256": "30c1c068f10e4d58e56e68c82778cbd9efa7c1908878c4694d9ee407a5c04a61",
+      "literalBytes": 16286,
+      "raw": "~~~~text\n# Coordination Operating Harness\n\n```txt\nDocument type: Guide / runbook\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Coordination Operating Harness\nDesign status: Candidate\nImpl… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "dff5fbaeb0361da18dfa4485cb2721d4ecf6fb9090b5c71c4dca6cf198b90178",
+        "literalSha256": "30c1c068f10e4d58e56e68c82778cbd9efa7c1908878c4694d9ee407a5c04a61",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+      "type": "code",
+      "literalSha256": "b869a9ef6c9ae293463aa27a6b8d0eb0228aaa7f514001e54ae1722aa85aa73e",
+      "literalBytes": 20894,
+      "raw": "~~~~text\n# MVP6+ Dogfood Handoff\n\n```txt\nDocument type: Guide / runbook\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for MVP6+ Dogfood Handoff\nDesign status: Candidate\nImplementation: Not re… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "ce9a316aed566a1402b920541fedb34c06a382aa67681f4a5a3ac6f71d54c1ec",
+        "literalSha256": "b869a9ef6c9ae293463aa27a6b8d0eb0228aaa7f514001e54ae1722aa85aa73e",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "type": "code",
+      "literalSha256": "b0e8b3f9fa8a332beec7038738944b5d77bab71c69530d9c3d99e860f5a96835",
+      "literalBytes": 47566,
+      "raw": "~~~~text\n# Architecture Advisory Coordinator Prompt\n\n```txt\nDocument type: Guide / runbook\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Architecture Advisory Coordinator Prompt\nDesign st… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "f9337117388f9a064b22ad405c1b3133331366c72165643624a88cc186a15d76",
+        "literalSha256": "b0e8b3f9fa8a332beec7038738944b5d77bab71c69530d9c3d99e860f5a96835",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+      "type": "code",
+      "literalSha256": "3883c92d009517415311b060f6d360537582f8e61a69e5729b14aec29a5deaa8",
+      "literalBytes": 5091,
+      "raw": "~~~~text\n# Agent Coordination Playbooks\n\n```txt\nDocument type: Collection index\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Agent Coordination Playbooks\nDesign status: Candidate\nImpleme… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/playbooks/README.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "895690fa0cc87de7e14becadf95b274d57f89186c116d6315e0964beb5caa337",
+        "literalSha256": "3883c92d009517415311b060f6d360537582f8e61a69e5729b14aec29a5deaa8",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+      "type": "code",
+      "literalSha256": "a7eb9f25c79b3c52b22e7dac6caf501d1f1621cbbf2de24f42e65b499f4c1ebd",
+      "literalBytes": 39613,
+      "raw": "~~~~text\n# DAG Request Scheduler For Coordination Runs\n\n```txt\nDocument type: Proposal\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for DAG Request Scheduler For Coordination Runs\nDesign sta… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/proposals/dag-request-scheduler.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "49a95abb6178800148fe6a465c1e642bfd105a6b5c03ae6283052b037319b99e",
+        "literalSha256": "a7eb9f25c79b3c52b22e7dac6caf501d1f1621cbbf2de24f42e65b499f4c1ebd",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+      "type": "code",
+      "literalSha256": "cd6cff8583332d30551ae2a44f7342dbb7527746a0c246969cced4e80feed708",
+      "literalBytes": 40791,
+      "raw": "~~~~text\n# Dispatch Control Plane Redesign\n\n```txt\nDocument type: Proposal\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Dispatch Control Plane Redesign\nDesign status: Candidate\nImplement… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "3ac2655fe07216ab4087fd1e80b7f7adafbb1cd1d929fbd0c6b0f2508dc9793c",
+        "literalSha256": "cd6cff8583332d30551ae2a44f7342dbb7527746a0c246969cced4e80feed708",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+      "type": "code",
+      "literalSha256": "a48926e2053e2d24b3b5522b88fd0737d5c6b5005355d95198990c9689ba64ee",
+      "literalBytes": 4944,
+      "raw": "~~~~text\n# Agent Coordination Proposals\n\n```txt\nDocument type: Collection index\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Agent Coordination Proposals\nDesign status: Candidate\nImpleme… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/proposals/README.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "6aa7be3a449e9fc2812793629c0687960e569954317408f881e0d024289368ce",
+        "literalSha256": "a48926e2053e2d24b3b5522b88fd0737d5c6b5005355d95198990c9689ba64ee",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+      "type": "code",
+      "literalSha256": "22d981a7b81caa776fa7d5f1df4716ffbf84a955fcefeaa83d9d9a03f78054c3",
+      "literalBytes": 4382,
+      "raw": "~~~~text\n# Semantic CLI Surface for Agent Coordination\n\n```txt\nDocument type: Architecture Proposal\nAudience: Human reviewer, maintainer and implementation agent\nPurpose: Navigate preserved design and historical material without asserting a… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "3c29467db4973eb357442225fbcfc14a4aacd60660eeebfcd4041c64162e8bc9",
+        "literalSha256": "22d981a7b81caa776fa7d5f1df4716ffbf84a955fcefeaa83d9d9a03f78054c3",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+      "type": "code",
+      "literalSha256": "fd64740350fdd72e3cfc9f77cf1b65cd5a1e8879052b6f791b8cbb6615f8a4b8",
+      "literalBytes": 43025,
+      "raw": "~~~~text\n# Step 07 - CoordinationSession, AdhocTask, And Planning Boundary\n\n```txt\nDocument type: Proposal\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Step 07 - CoordinationSession, Adh… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "dceae9599d635680848956835527382b82bd39ffba2fccf4369f0a016194acee",
+        "literalSha256": "fd64740350fdd72e3cfc9f77cf1b65cd5a1e8879052b6f791b8cbb6615f8a4b8",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+      "type": "code",
+      "literalSha256": "a93bb0c7ab690d138da531333f8423f820b46674768a029fc6c9ab9ecb1cf5b9",
+      "literalBytes": 76053,
+      "raw": "~~~~text\n# Step 08 - Standalone Coordination And Optional Protocols\n\n```txt\nDocument type: Proposal\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Step 08 - Standalone Coordination And Opt… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "ad00271c276f81ce73a51c9229597cf4ef50962562231560506f296ee3fea2b5",
+        "literalSha256": "a93bb0c7ab690d138da531333f8423f820b46674768a029fc6c9ab9ecb1cf5b9",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
+      "type": "code",
+      "literalSha256": "6407dcf76848d8652d79ea30f4c767e0cf0aa29f1982002cdea6a167dbc183eb",
+      "literalBytes": 15273,
+      "raw": "~~~~text\n# Team Communication Protocol V1\n\n```txt\nDocument type: Proposal\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Team Communication Protocol V1\nDesign status: Candidate\nImplementat… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "6f9d87a2f4189617629be45686edcbbb794e74bf823d9a319645576c9b5cb357",
+        "literalSha256": "6407dcf76848d8652d79ea30f4c767e0cf0aa29f1982002cdea6a167dbc183eb",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+      "type": "code",
+      "literalSha256": "aa61581431dbbb017171727ed37dba8ac7b63599a8a986e54b27f7ffff10054c",
+      "literalBytes": 2652,
+      "raw": "~~~~text\n# Agent Coordination\n\n```txt\nDocument type: Area Portal\nAudience: Human reviewer, maintainer and implementation agent\nPurpose: Route current execution to its owners and retain historical evidence\nDesign status: Accepted\nImplementat… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/README.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "fc8c55194c9512f9a46728d9dfb0b1079529eb2adccb5b2af142b004d50eeff4",
+        "literalSha256": "aa61581431dbbb017171727ed37dba8ac7b63599a8a986e54b27f7ffff10054c",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+      "type": "code",
+      "literalSha256": "2df1197485778b05a7b5f54f592cf0c150bf746249d04f774797a03fc5acb74c",
+      "literalBytes": 3150,
+      "raw": "~~~~text\n# Agent Coordination Roadmap\n\n```txt\nDocument type: Collection index\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Agent Coordination Roadmap\nDesign status: Candidate\nImplementat… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/roadmap/README.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "e23effba87631a93ae85d7861bfea634e1f036472cff3a6dad385920a36b9e2d",
+        "literalSha256": "2df1197485778b05a7b5f54f592cf0c150bf746249d04f774797a03fc5acb74c",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+      "type": "code",
+      "literalSha256": "f5a2a8e5a26681d930862ab332e1bfdd458ab23b0bfceb53b4bc37ddd96a1b8a",
+      "literalBytes": 2555,
+      "raw": "~~~~text\n# Team Dispatch V1 Roadmap\n\n```txt\nDocument type: Roadmap\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Team Dispatch V1 Roadmap\nDesign status: Candidate\nImplementation: Not re-v… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/README.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "2e37db98aa30162e507166469a01780d7e4c58236de18f9654b5b11a97339518",
+        "literalSha256": "f5a2a8e5a26681d930862ab332e1bfdd458ab23b0bfceb53b4bc37ddd96a1b8a",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+      "type": "code",
+      "literalSha256": "5c40ce40d3b16933191f7f69f32a4ad820acaf3e6ea8ecb817044e637606375d",
+      "literalBytes": 55149,
+      "raw": "~~~~text\n# Step 00 - Team Dispatch V1 Overview\n\n```txt\nDocument type: Roadmap\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Step 00 - Team Dispatch V1 Overview\nDesign status: Candidate\nIm… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "fd4e0935684a5c4215574f6b8908cc8eb72b140777a41f40a7b3b20ab2ae14f3",
+        "literalSha256": "5c40ce40d3b16933191f7f69f32a4ad820acaf3e6ea8ecb817044e637606375d",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/spec.md",
+      "type": "code",
+      "literalSha256": "ac36a333d0b9c02c9395cc0378ead8e8f439374619ea3f9ec354f138fe4bdf05",
+      "literalBytes": 6165,
+      "raw": "~~~~text\n# Agent Coordination Spec\n\n```txt\nDocument type: Spec\nAudience: Human reviewer, maintainer and implementation agent\nPurpose: Route current execution to its code and runner-spec owners, retaining verified boundaries\nDesign status: C… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/spec.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "9d7faa4227e606991b16f9a7cd1fdf094d06c2e7daf0c6969153ab823f28d177",
+        "literalSha256": "ac36a333d0b9c02c9395cc0378ead8e8f439374619ea3f9ec354f138fe4bdf05",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+      "type": "code",
+      "literalSha256": "670428dd503794619ad42b730f59f53aab5bddc2442c68ef6b72b9f216103a13",
+      "literalBytes": 2096,
+      "raw": "~~~~text\n# Agent Coordination Subcomponents\n\n```txt\nDocument type: Subcomponent portal\nAudience: Human reviewer, maintainer and implementation agent\nPurpose: Navigate preserved design and historical material without asserting a retired runt… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/subcomponents/README.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "51ef47d23b93a5086e7166d0f9cb1aa9890f328c72da686841beb1b77c2c6368",
+        "literalSha256": "670428dd503794619ad42b730f59f53aab5bddc2442c68ef6b72b9f216103a13",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+      "type": "code",
+      "literalSha256": "fffb23870e008de6dae4a00125bc10c4c4922125d1ac62b051170d822bda7331",
+      "literalBytes": 1914,
+      "raw": "~~~~text\n# Agent Coordination Implementation Alignment\n\n```txt\nDocument type: Verification\nAudience: Human reviewer, maintainer and implementation agent\nPurpose: Navigate preserved design and historical material without asserting a retired … [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/verification/implementation-alignment.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "8d3358888aadd05dc759f677f0d5051f9698faeeca3ea85081785e65e59eade1",
+        "literalSha256": "fffb23870e008de6dae4a00125bc10c4c4922125d1ac62b051170d822bda7331",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+      "type": "code",
+      "literalSha256": "9093bc62d755242f19e3a4f49b9dcd3fbc8a643802ac42676781c44aa84f4449",
+      "literalBytes": 4170,
+      "raw": "~~~~text\n# Agent Coordination Verification\n\n```txt\nDocument type: Collection index\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Agent Coordination Verification\nDesign status: Candidate\nI… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/verification/README.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "e78bac480615f20e753369e8b8d624ff3a67a123d17e8a6c8c396a6fed201f40",
+        "literalSha256": "9093bc62d755242f19e3a4f49b9dcd3fbc8a643802ac42676781c44aa84f4449",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
+      "type": "code",
+      "literalSha256": "e3e887d6f0917eedb279f1c0df76901317885bef2730e93b9c14ec2ab0ef33e5",
+      "literalBytes": 18215,
+      "raw": "~~~~text\n# Agent Coordination Foundation Vision\n\n```txt\nDocument type: Vision\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Agent Coordination Foundation Vision\nDesign status: Candidate\nI… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/vision.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "88eb066b1cc3f59286bd62a9ba4cfea02536bef3fe4ddd9ddfe1ea6bafa1022a",
+        "literalSha256": "e3e887d6f0917eedb279f1c0df76901317885bef2730e93b9c14ec2ab0ef33e5",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
+      "type": "code",
+      "literalSha256": "1d0b73a5ce8aeb5681ff96d105c199fd78553324731dd9dda5ba770cb2864026",
+      "literalBytes": 13483,
+      "raw": "~~~~text\n# Canonical Agent Coordination Concepts\n\n```txt\nDocument type: Vocabulary\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Canonical Agent Coordination Concepts\nDesign status: Candi… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "fafc46fdb1d07dd3432fff2cab80ab916f0bd69cec2302c8710e17d7a1550e7c",
+        "literalSha256": "1d0b73a5ce8aeb5681ff96d105c199fd78553324731dd9dda5ba770cb2864026",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
+      "type": "code",
+      "literalSha256": "0b7c50a3e9399c4d4d7b3c1407b31c219e316f743067726e85da50e9ad11e2a1",
+      "literalBytes": 5642,
+      "raw": "~~~~text\n# Agent Coordination Concept Relationships\n\n```txt\nDocument type: Vocabulary\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Agent Coordination Concept Relationships\nDesign status:… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "43dcd3a7cdda7e5713dc2d56765a3fb0ddb9effde8cba820a919a1c07acb8cf5",
+        "literalSha256": "0b7c50a3e9399c4d4d7b3c1407b31c219e316f743067726e85da50e9ad11e2a1",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+      "type": "code",
+      "literalSha256": "d1a32f205ece457a7916e1dec95748a9047e29340e2a097719cdb782b6638b6a",
+      "literalBytes": 4227,
+      "raw": "~~~~text\n# Deprecated And Reserved Coordination Terms\n\n```txt\nDocument type: Vocabulary\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Deprecated And Reserved Coordination Terms\nDesign sta… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "64772305e549d11f0a822655718281dd4b6f7c37abb6a549666a3a991c3a1d35",
+        "literalSha256": "d1a32f205ece457a7916e1dec95748a9047e29340e2a097719cdb782b6638b6a",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+      "type": "code",
+      "literalSha256": "e3e2484905f814aeeb592f82cfda6988fe2e1c5134a98b0afb9842329e6b483f",
+      "literalBytes": 3088,
+      "raw": "~~~~text\n# Agent Coordination Vocabulary\n\n```txt\nDocument type: Collection index\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Agent Coordination Vocabulary\nDesign status: Candidate\nImple… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/vocabulary/README.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "595ef132a7c493d37af7a5bf1d6a63beb80cb336eb513b177c37a5db0c02cbb2",
+        "literalSha256": "e3e2484905f814aeeb592f82cfda6988fe2e1c5134a98b0afb9842329e6b483f",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
+      "type": "code",
+      "literalSha256": "9934e18fe39ca30dc98db2560e8091110b490c1e112aa21d34dbd719e5478ccc",
+      "literalBytes": 14669,
+      "raw": "~~~~text\n# Agent Coordination Claim Preservation\n\n```txt\nDocument type: Claim preservation table\nAudience: Human reviewer, architect, maintainer, documentation agent\nPurpose: Preserve accepted, deferred, proposed, and current Agent Coordina… [full literal authenticated by digest; replay scanner]",
+      "line": 26,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+        "commit": "54c2698ee8c5b8f1baeac7244e946c793a637d29",
+        "fileSha256": "233d2606af01d75300ade167e27c1532469f27f3687d8bef4fe50ff383694eb8",
+        "literalSha256": "9934e18fe39ca30dc98db2560e8091110b490c1e112aa21d34dbd719e5478ccc",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
+      "type": "code",
+      "literalSha256": "b6e81bf05783d1ac78352a742e89e12fb55bc457c89139d7c7f28bc979436768",
+      "literalBytes": 4031,
+      "raw": "~~~~text\n# Agent Coordination Migration Status\n\n```txt\nDocument type: Migration status\nAudience: Human reviewer, architect, maintainer, documentation agent\nPurpose: Track phase-by-phase progress for the Agent Coordination documentation migr… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/history/documentation-migration/migration-status.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "893c98bcaa6b315f9d25f4fba48779891c4f06ba3e43ca8e867c8ebad8537d4c",
+        "literalSha256": "b6e81bf05783d1ac78352a742e89e12fb55bc457c89139d7c7f28bc979436768",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "type": "code",
+      "literalSha256": "cf18def0b709923a463096b44ce2c6cc6114172afc7cd1d027d8fd82e8e84577",
+      "literalBytes": 35879,
+      "raw": "~~~~text\n# Orchestration Vocabulary Map\n\n```txt\nDocument type: History\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Orchestration Vocabulary Map\nDesign status: Candidate\nImplementation: … [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "a5ae48dac78e2adb367559783ecdfb833189941a2876fa0394e8a6872194afbc",
+        "literalSha256": "cf18def0b709923a463096b44ce2c6cc6114172afc7cd1d027d8fd82e8e84577",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md",
+      "type": "code",
+      "literalSha256": "8507c7783640d969c2b3e8c09ff8b896b0ef16919502dc807adbe69021850944",
+      "literalBytes": 14756,
+      "raw": "~~~~text\n# Platform Intent Preservation Ledger\n\n```txt\nDocument type: Intent preservation ledger\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve full platform intent across simplified implementation slices\nDesign st… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/intent-preservation-ledger.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "31d64f0edb1876838f4cbe0050611967e4d854bc5b0904b21c3183ba5db79fba",
+        "literalSha256": "8507c7783640d969c2b3e8c09ff8b896b0ef16919502dc807adbe69021850944",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
+      "type": "code",
+      "literalSha256": "52cf3dc73eb299b82d8b86494fbba77ae3ba0ce7b3e3b70cae3ef5ba1e1441b0",
+      "literalBytes": 34569,
+      "raw": "~~~~text\n# Agent Coordination Intent Preservation Ledger\n\n```txt\nDocument type: Intent preservation ledger\nAudience: Human reviewers, maintainers, documentation agents\nPurpose: Preserve source material for Agent Coordination Intent Preserva… [full literal authenticated by digest; replay scanner]",
+      "line": 26,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/intent-preservation-ledger.md",
+        "commit": "54c2698ee8c5b8f1baeac7244e946c793a637d29",
+        "fileSha256": "b9e37bbf8a88c3a13a5331dff8e089f5747d6cb0260a8234a730bbb22672333c",
+        "literalSha256": "52cf3dc73eb299b82d8b86494fbba77ae3ba0ce7b3e3b70cae3ef5ba1e1441b0",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md",
+      "type": "code",
+      "literalSha256": "ebd4be48b59fda2f8e8b45fc211f86fffc470685acfc4d0fd19ee6599d7c62d8",
+      "literalBytes": 4597,
+      "raw": "~~~~text\n# Agent Coordination System Context\n\n> Migration status: This document is a legacy/current source for\n> `docs/platform/agent-coordination/architecture/system-context.md`. Do not edit divergent design\n> claims here without also upda… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/architecture/system-context.md",
+        "commit": "HEAD",
+        "fileSha256": "db2d23502ec7ed084a106fa1e4cd4286cc5e3dce7aa51ee0afb330c66fe3e4dd",
+        "literalSha256": "ebd4be48b59fda2f8e8b45fc211f86fffc470685acfc4d0fd19ee6599d7c62d8",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+      "type": "code",
+      "literalSha256": "a9b59c87e69970c554fdfc44d9890b5e21e4f8e4fa9006ec8bc85fdb33299925",
+      "literalBytes": 30393,
+      "raw": "~~~~text\n# Agent Coordination Intent Preservation Ledger\n\nDocument type: Index\nDesign status: N/A\nImplementation: Active\nLast reviewed: 2026-09-04\nCanonical for: traceability of explicitly preserved intent, not architecture or runtime contr… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/intent-preservation-ledger.md",
+        "commit": "HEAD",
+        "fileSha256": "1a0a6e7df11d09006c8679a467a85f0f8c0d8f0ad08bb11b3fbea6080b312db0",
+        "literalSha256": "a9b59c87e69970c554fdfc44d9890b5e21e4f8e4fa9006ec8bc85fdb33299925",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "type": "code",
+      "literalSha256": "af327ca3a136b56a4d085362944ac961b79c4fcf031b28505a8a56eb70fff916",
+      "literalBytes": 10044,
+      "raw": "~~~~text\n# Agent Coordination Documentation\n\n> Migration status: This document is a legacy/current source for\n> `docs/platform/agent-coordination/README.md`. Do not edit divergent design\n> claims here without also updating the target doc or… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/README.md",
+        "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "fileSha256": "75303f27d6e8dfe8162e9ad37d331218a1c74438a400b4d93ddb03e5bb699c3c",
+        "literalSha256": "af327ca3a136b56a4d085362944ac961b79c4fcf031b28505a8a56eb70fff916",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "type": "code",
+      "literalSha256": "2cedf8fdcbe6ccbcfbcc0e268730f625e568c7b1bcd8b249b5524ae5fc2e8bd3",
+      "literalBytes": 2208,
+      "raw": "````text\n# Agent Coordination Documentation\n\n> Migration status: This document is a legacy/current source for\n> `docs/platform/agent-coordination/README.md`. Do not edit divergent design\n> claims here without also updating the target doc or… [full literal authenticated by digest; replay scanner]",
       "line": 225,
-      "classification": "pre-existing source bytes, not rewriter corruption",
-      "source": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
-      "sourceSha256": "142c1051f595bb6eddacfd99222b5877ec55dd3b47f2c8410efd4f5ca9d180ce",
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/README.md",
+        "commit": "HEAD",
+        "fileSha256": "25468d205a0c4ba82dcd1e471d287ae70aa65d1370f9a239f1a0dcebe3e94dd1",
+        "literalSha256": "2cedf8fdcbe6ccbcfbcc0e268730f625e568c7b1bcd8b249b5524ae5fc2e8bd3",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/README.md",
+      "type": "code",
+      "literalSha256": "a4b59eec982b34819a146ef7a8f69caff0170067a152460ce42fbd421aafda6f",
+      "literalBytes": 18998,
+      "raw": "~~~~text\n# Agent Coordination\n\n```txt\nDocument type: Area portal\nAudience: Human reviewer, architect, maintainer, documentation agent\nPurpose: Route readers through the Agent Coordination platform area during migration\nDesign status: Accept… [full literal authenticated by digest; replay scanner]",
+      "line": 26,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/README.md",
+        "commit": "54c2698ee8c5b8f1baeac7244e946c793a637d29",
+        "fileSha256": "82fc75648e7cf6613130e4c1b02b3db30fd6c5cf74a8e7bd0a0bd7e4331d45d4",
+        "literalSha256": "a4b59eec982b34819a146ef7a8f69caff0170067a152460ce42fbd421aafda6f",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "type": "code",
+      "literalSha256": "e46ae13850b71a5dbcb873004d9e5d306b93f5068daf7f3f4289b24dd46e4e31",
+      "literalBytes": 12368,
+      "raw": "~~~~text\n# Agent Coordination Spec\n\n```txt\nDocument type: Spec\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: State current Agent Coordination behavior, owned contracts, consumed contracts, and known gaps dur… [full literal authenticated by digest; replay scanner]",
+      "line": 26,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/spec.md",
+        "commit": "54c2698ee8c5b8f1baeac7244e946c793a637d29",
+        "fileSha256": "5a016bb65b7c8ebab5b20c338062836f45413bdb0141111f0729fddf9feae7af",
+        "literalSha256": "e46ae13850b71a5dbcb873004d9e5d306b93f5068daf7f3f4289b24dd46e4e31",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+      "type": "code",
+      "literalSha256": "ff5514b327b80c238217b37f7d46135eeba246e31ff5d0af304993a19db846cf",
+      "literalBytes": 7701,
+      "raw": "~~~~text\n# Agent Coordination Subcomponents\n\n```txt\nDocument type: Subcomponent portal\nAudience: Human reviewer, architect, maintainer, documentation agent\nPurpose: Preserve the Agent Coordination child-component map during documentation mi… [full literal authenticated by digest; replay scanner]",
+      "line": 26,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/subcomponents/README.md",
+        "commit": "54c2698ee8c5b8f1baeac7244e946c793a637d29",
+        "fileSha256": "6c3a06c5d863fea84ce59c3ddcc6dd53cc8b195b1ce0bac29fd55062364483b7",
+        "literalSha256": "ff5514b327b80c238217b37f7d46135eeba246e31ff5d0af304993a19db846cf",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
+      "type": "code",
+      "literalSha256": "9c2b83567802fc9f2693595b305f2db5dbbbfa3eac2f9223f3610602b39606c1",
+      "literalBytes": 8469,
+      "raw": "~~~~text\n# Agent Coordination Implementation Alignment\n\n```txt\nDocument type: Verification\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Map Agent Coordination design claims to implementation status, evidenc… [full literal authenticated by digest; replay scanner]",
+      "line": 26,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/agent-coordination/verification/implementation-alignment.md",
+        "commit": "54c2698ee8c5b8f1baeac7244e946c793a637d29",
+        "fileSha256": "d35fd9a2357a9df55942661b6d8919320205486aefc763bca92bd47199517776",
+        "literalSha256": "9c2b83567802fc9f2693595b305f2db5dbbbfa3eac2f9223f3610602b39606c1",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
+      "type": "codespan",
+      "literalSha256": "358d713c9b31b5d36d1007b787a443040e721e55ab49b3f38f4270031d1f6308",
+      "literalBytes": 49,
       "raw": "`/import\\s*\\{([^}]*)\\}\\s*from\\s*['\"]([^'\"]+)['\"]/g`",
-      "sourceKind": "legacy source"
+      "line": 225,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
+        "commit": "HEAD",
+        "fileSha256": "142c1051f595bb6eddacfd99222b5877ec55dd3b47f2c8410efd4f5ca9d180ce",
+        "literalSha256": "358d713c9b31b5d36d1007b787a443040e721e55ab49b3f38f4270031d1f6308",
+        "byteExact": true
+      }
     },
     {
       "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
-      "line": 37,
-      "classification": "pre-existing source bytes, not rewriter corruption",
-      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
-      "sourceSha256": "55dc113e5e3f0d8d9abccc4d1a6d9e3cc74e6af5c0e979e53fad6517c0d18639",
+      "type": "codespan",
+      "literalSha256": "4b93c0a262d21cf505e8d15f10db6925daa0d1881daa8abe30e69940aca43406",
+      "literalBytes": 14,
       "raw": "`](*.md#anchor)`",
-      "sourceKind": "legacy source"
+      "line": 37,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
+        "commit": "HEAD",
+        "fileSha256": "55dc113e5e3f0d8d9abccc4d1a6d9e3cc74e6af5c0e979e53fad6517c0d18639",
+        "literalSha256": "4b93c0a262d21cf505e8d15f10db6925daa0d1881daa8abe30e69940aca43406",
+        "byteExact": true
+      }
     },
     {
       "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
-      "line": 80,
-      "classification": "pre-existing source bytes, not rewriter corruption",
-      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
-      "sourceSha256": "55dc113e5e3f0d8d9abccc4d1a6d9e3cc74e6af5c0e979e53fad6517c0d18639",
+      "type": "codespan",
+      "literalSha256": "4172b81fc619caba2a5b22077804da1fa32e40ef10748a9ac03fbfa232245f4e",
+      "literalBytes": 116,
       "raw": "`> Extracted into [ADR-010](...) and the\n[CoordinationSession Contract](...) storage layout / Work Boundary sections.`",
-      "sourceKind": "legacy source"
+      "line": 80,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
+        "commit": "HEAD",
+        "fileSha256": "55dc113e5e3f0d8d9abccc4d1a6d9e3cc74e6af5c0e979e53fad6517c0d18639",
+        "literalSha256": "4172b81fc619caba2a5b22077804da1fa32e40ef10748a9ac03fbfa232245f4e",
+        "byteExact": true
+      }
     },
     {
       "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
-      "line": 337,
-      "classification": "pre-existing source bytes, not rewriter corruption",
-      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
-      "sourceSha256": "55dc113e5e3f0d8d9abccc4d1a6d9e3cc74e6af5c0e979e53fad6517c0d18639",
+      "type": "codespan",
+      "literalSha256": "4172b81fc619caba2a5b22077804da1fa32e40ef10748a9ac03fbfa232245f4e",
+      "literalBytes": 116,
       "raw": "`> Extracted into [ADR-010](...) and the\n[CoordinationSession Contract](...) storage layout / Work Boundary\nsections.`",
-      "sourceKind": "legacy source"
+      "line": 337,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
+        "commit": "HEAD",
+        "fileSha256": "55dc113e5e3f0d8d9abccc4d1a6d9e3cc74e6af5c0e979e53fad6517c0d18639",
+        "literalSha256": "4172b81fc619caba2a5b22077804da1fa32e40ef10748a9ac03fbfa232245f4e",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
+      "type": "code",
+      "literalSha256": "a1b9ed0db86ee6f47bcd0b03a90b4f19ec34950b9d1f911443196a3ccb46fdd1",
+      "literalBytes": 1006,
+      "raw": "```diff\n - mutating activity is either serialized in one authorized workspace or placed\n   in distinct domain-provisioned worktrees/branches with resource claims;\n-\n-> Extracted into [ADR-010](../decisions/ADR-010-interactive-headless-parity-and-work-isolation.md)\n-> and the [CoordinationSession Contract](../contracts/coordination-session.md)\n-> storage layout / Work Boundary sections.\n - the coordination ledger records workspace/isolation references but cannot\n   merge branches, advance Work, or invent a coding isolation policy;\n - the first standalone proofs stay read-only; Work-attached mutation remains a\n   stop gate until a coding-domain live proof demonstrates conflict detection,\n   isolation, merge ownership, and recovery.\n+\n+> Extracted into [ADR-010](../decisions/ADR-010-interactive-headless-parity-and-work-isolation.md)\n+> and the [CoordinationSession Contract](../contracts/coordination-session.md)\n+> storage layout / Work Boundary sections.\n\n ##### Interactive and headless operating modes\n```",
+      "line": 344,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
+        "commit": "HEAD",
+        "fileSha256": "55dc113e5e3f0d8d9abccc4d1a6d9e3cc74e6af5c0e979e53fad6517c0d18639",
+        "literalSha256": "a1b9ed0db86ee6f47bcd0b03a90b4f19ec34950b9d1f911443196a3ccb46fdd1",
+        "byteExact": true
+      }
     },
     {
       "file": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-failure-probe.mjs",
-      "line": 71,
-      "classification": "pre-existing source bytes, not rewriter corruption",
-      "source": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-failure-probe.mjs",
-      "sourceSha256": "15ed286bfe6c39664487ffa8e4cbe6f607342487ff8099a4cc4f43e727b6280c",
+      "type": "codespan",
+      "literalSha256": "d112781c373317cbda3ff97c4376df63dbd3fef1532030d3b85f158e3de5f2d4",
+      "literalBytes": 988,
       "raw": "`)};\nprocess.env.HERDR_SOCKET_PATH = ${JSON.stringify(SOCK)};\nconst prompt = ['# Long task', '', 'Count slowly from 1 to 40, one number per line.', 'Then create COUNTED.txt containing the word done.', '', 'Do not ask questions.'].join('\\\\n');\ntry {\n  const res = await EXECUTOR_ADAPTERS['herdr-spawn']({\n    command: 'claude', args: [], argsTemplate: [], prompt, env: {},\n    interactiveMode: { exitCommand: '/exit', kind: 'claude', readyTimeoutMs: 90000, promptTimeoutMs: 20000, resendAfterMs: 60000, maxResends: 0 },\n  }, {\n    cwd: ${JSON.stringify(WORK)}, runDir: ${JSON.stringify(RUN_DIR)},\n    timeoutMs: 180000, idleTimeoutMs: 150000,\n    workId: 'v0-proof-b', tier: 'standard', model: 'sonnet',\n  });\n  console.log(JSON.stringify({ outcome: res.outcome, paneId: res.paneId }));\n} catch (err) {\n  console.log(JSON.stringify({ outcome: err.outcome ?? null, reason: err.reason ?? null, errorClass: err.errorClass, paneId: err.paneId, message: String(err.message).slice(0, 300) }));\n}\n`",
-      "sourceKind": "legacy source"
+      "line": 71,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-failure-probe.mjs",
+        "commit": "HEAD",
+        "fileSha256": "15ed286bfe6c39664487ffa8e4cbe6f607342487ff8099a4cc4f43e727b6280c",
+        "literalSha256": "d112781c373317cbda3ff97c4376df63dbd3fef1532030d3b85f158e3de5f2d4",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/component-boundary.md",
+      "type": "code",
+      "literalSha256": "b733a82e1ffbcceeeebd63b6e9fd7ac8c95feb3e9aeda550a833f4218e2daab6",
+      "literalBytes": 894,
+      "raw": "```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispatch And Execution Engine:\n  DispatchResolverPort   (superseded in naming by DispatchRuntimePort,\n                          [Component Authority Boundary Map §13](../proposals/component-authority-boundary-map.md#13-draft-ports);\n                          same candidate facade, not two live ports)\n  RunStorePort\n  ExecutorAdapterPort\n\nRun Result Evaluator:\n  EvidenceCollectorPort\n  ResultNormalizerPort\n  ArtifactStorePort\n\nDomain Components And Extension Layer:\n  DefinitionLoaderPort\n  DomainHarnessPort\n  ProtocolPackagePort\n  PolicyProviderPort\n  EvidencePolicyPort\n\nHost And Surface Layer:\n  VisibilityPort\n  CommandSurfacePort\n  ApiSurfacePort\n\nShared infrastructure:\n  ClockPort\n  IdGeneratorPort\n  FilesystemPort\n```",
+      "line": 536,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "commit": "HEAD",
+        "fileSha256": "913cbbc9419fc059e5ce1dcaeb7d06d6d90d6e9d3ef45195c15cd59ff0359bf3",
+        "literalSha256": "b733a82e1ffbcceeeebd63b6e9fd7ac8c95feb3e9aeda550a833f4218e2daab6",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/architecture.md",
+      "type": "code",
+      "literalSha256": "5b4fa4bbeb2619d28842d732cc1cd4e1fb1bb476ad9243b21485b3d42e118315",
+      "literalBytes": 249,
+      "raw": "```markdown\n| Relationship | File |\n|---|---|\n| current behavior | [../spec.md](../spec.md) |\n| area portal | [../README.md](../README.md) |\n| contracts affected | [../contracts/](../contracts/) |\n| verification evidence | [../verification/](../verification/) |\n```",
+      "line": 59,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/templates/architecture.md",
+        "commit": "HEAD",
+        "fileSha256": "4dbe00e3ac6e365af738e61bf930780958e82b59f29d947d94859d037dbe9d0d",
+        "literalSha256": "5b4fa4bbeb2619d28842d732cc1cd4e1fb1bb476ad9243b21485b3d42e118315",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/area-readme.md",
+      "type": "code",
+      "literalSha256": "f2fdffeeee9470375dd9d514159639e3b30b67e8fef299e62504e7b02596b3f0",
+      "literalBytes": 576,
+      "raw": "```markdown\n| Need | Read |\n|---|---|\n| Full direction / north star | [vision.md](vision.md) |\n| Preserved intent across simplified slices | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| Current behavior/state | [spec.md](spec.md) |\n| Child component map | [subcomponents/](subcomponents/) or §6 below |\n| Design rationale/boundaries | [architecture/](architecture/) |\n| Exact interfaces/rules | [contracts/](contracts/) |\n| Proof/evidence | [verification/](verification/) |\n| Open proposals | [proposals/](proposals/) |\n| Historical context | [history/](history/) |\n```",
+      "line": 30,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/templates/area-readme.md",
+        "commit": "HEAD",
+        "fileSha256": "ff2741785d000ae3e61eeeaf09e1a1318ded5080fb5cfbcc2ad01c2f35461ea8",
+        "literalSha256": "f2fdffeeee9470375dd9d514159639e3b30b67e8fef299e62504e7b02596b3f0",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/area-readme.md",
+      "type": "code",
+      "literalSha256": "53a193af9746b5861d80117df6234778c03729ec788caf49345211f12c6ecffc",
+      "literalBytes": 584,
+      "raw": "```markdown\n| Purpose | Path | Authority |\n|---|---|---|\n| Full direction | [vision.md](vision.md) | Canonical for intended direction |\n| Preserved intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) | Canonical for deferred-preserved intent |\n| Current behavior | [spec.md](spec.md) | Canonical for current state |\n| Subcomponents | [subcomponents/](subcomponents/) or §6 below | Canonical for child component navigation |\n| Architecture | [architecture/](architecture/) | Canonical for rationale/boundary |\n| Contract | [contracts/](contracts/) | Normative interface/rule |\n```",
+      "line": 54,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/templates/area-readme.md",
+        "commit": "HEAD",
+        "fileSha256": "ff2741785d000ae3e61eeeaf09e1a1318ded5080fb5cfbcc2ad01c2f35461ea8",
+        "literalSha256": "53a193af9746b5861d80117df6234778c03729ec788caf49345211f12c6ecffc",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/area-readme.md",
+      "type": "code",
+      "literalSha256": "4bd5313e8e0b19bc7a2f4981ad2b1399a27a9a7cbad268828adce8b7f45c49d5",
+      "literalBytes": 455,
+      "raw": "```markdown\n| Relationship | File |\n|---|---|\n| states full direction | [vision.md](vision.md) |\n| preserves deferred intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| defines current behavior | [spec.md](spec.md) |\n| maps child components | [subcomponents/](subcomponents/) |\n| explains design shape | [architecture/](architecture/) |\n| defines normative rules | [contracts/](contracts/) |\n| proves claims | [verification/](verification/) |\n```",
+      "line": 110,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/templates/area-readme.md",
+        "commit": "HEAD",
+        "fileSha256": "ff2741785d000ae3e61eeeaf09e1a1318ded5080fb5cfbcc2ad01c2f35461ea8",
+        "literalSha256": "4bd5313e8e0b19bc7a2f4981ad2b1399a27a9a7cbad268828adce8b7f45c49d5",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/contract.md",
+      "type": "code",
+      "literalSha256": "fb0843352ea12829e155cd45dd6156834ea4123d18e6a859329393ff07a8ee2c",
+      "literalBytes": 193,
+      "raw": "```markdown\n| Relationship | File |\n|---|---|\n| owning area | [../README.md](../README.md) |\n| current behavior | [../spec.md](../spec.md) |\n| verification evidence | [../verification/](../verification/) |\n```",
+      "line": 54,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/templates/contract.md",
+        "commit": "HEAD",
+        "fileSha256": "5e894fbda25b858b80740a1676032dac9e2ede0aa5cd12b566506e7123d69a4d",
+        "literalSha256": "fb0843352ea12829e155cd45dd6156834ea4123d18e6a859329393ff07a8ee2c",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/decision.md",
+      "type": "code",
+      "literalSha256": "761063de33d3f2bd45daba62389b4775f542d1ab20470952661ff3eb601a7508",
+      "literalBytes": 150,
+      "raw": "```markdown\n| Relationship | File |\n|---|---|\n| owning area | [../README.md](../README.md) |\n| current behavior | [../spec.md](../spec.md) |\n| evidence | <link> |\n```",
+      "line": 42,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/templates/decision.md",
+        "commit": "HEAD",
+        "fileSha256": "c0f1d59f2917dfc70841f52ea1dc8232cb5e5f8ff88c950d4a498fc9a6a17802",
+        "literalSha256": "761063de33d3f2bd45daba62389b4775f542d1ab20470952661ff3eb601a7508",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/intent-preservation-ledger.md",
+      "type": "code",
+      "literalSha256": "c76ccfd8fd32f42418fc5b9e9f7f69333c4d3c2af3023da9e3624abd6de61e9d",
+      "literalBytes": 116,
+      "raw": "```markdown\n| Relationship | File |\n|---|---|\n| area vision | [vision.md](vision.md) |\n| current behavior | [spec.md](spec.md) |\n```",
+      "line": 53,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/templates/intent-preservation-ledger.md",
+        "commit": "HEAD",
+        "fileSha256": "4b2c2916f67d00b5158ce9d82c93bb21dfad41f6c5cc3ffdbf01d29a51fe9c50",
+        "literalSha256": "c76ccfd8fd32f42418fc5b9e9f7f69333c4d3c2af3023da9e3624abd6de61e9d",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/spec.md",
+      "type": "code",
+      "literalSha256": "c51828ec79bcb07e97fa714d944361dd73f6d28b1832d6b748cb4ecda1adbc40",
+      "literalBytes": 234,
+      "raw": "```markdown\n| Relationship | File |\n|---|---|\n| area portal | [README.md](README.md) |\n| design rationale | [architecture/](architecture/) |\n| owned contracts | [contracts/](contracts/) |\n| verification evidence | [verification/](verification/) |\n```",
+      "line": 63,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/templates/spec.md",
+        "commit": "HEAD",
+        "fileSha256": "980f368c517dad90aa9a1426285d6d200633e4ef6f0c4625e40d1ee9923a0b0e",
+        "literalSha256": "c51828ec79bcb07e97fa714d944361dd73f6d28b1832d6b748cb4ecda1adbc40",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/subcomponent-readme.md",
+      "type": "code",
+      "literalSha256": "52afa7d87c50531f57c4b99d57eaca863eba028340d1fa3b65792cc514b65863",
+      "literalBytes": 231,
+      "raw": "```markdown\n| Field | Value |\n|---|---|\n| Parent area | [../../README.md](../../README.md) |\n| Parent spec | [../../spec.md](../../spec.md) |\n| Parent intent ledger | [../../intent-preservation-ledger.md](../../intent-preservation-ledger.md) |\n```",
+      "line": 24,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/templates/subcomponent-readme.md",
+        "commit": "HEAD",
+        "fileSha256": "c87c476534b677740bb610aee582b1a4cb095ca3c4e2de6ea47f1ddc6c3a891b",
+        "literalSha256": "52afa7d87c50531f57c4b99d57eaca863eba028340d1fa3b65792cc514b65863",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/subcomponent-readme.md",
+      "type": "code",
+      "literalSha256": "5e6f431308636052ea3e0656a2f6523510c766773e1baff8b3226d998f57edba",
+      "literalBytes": 296,
+      "raw": "```markdown\n| Need | Read |\n|---|---|\n| Current behavior/state | [spec.md](spec.md) |\n| Design rationale/boundaries | [architecture/](architecture/) |\n| Exact local interfaces/rules | [contracts/](contracts/) |\n| Proof/evidence | [verification/](verification/) |\n| Historical context | [history/](history/) |\n```",
+      "line": 40,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/templates/subcomponent-readme.md",
+        "commit": "HEAD",
+        "fileSha256": "c87c476534b677740bb610aee582b1a4cb095ca3c4e2de6ea47f1ddc6c3a891b",
+        "literalSha256": "5e6f431308636052ea3e0656a2f6523510c766773e1baff8b3226d998f57edba",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/subcomponent-readme.md",
+      "type": "code",
+      "literalSha256": "c2156d0d8e5129281c6fab03e4d1d3719c6dc3e681b8b32c1088c6f6702bba8e",
+      "literalBytes": 347,
+      "raw": "```markdown\n| Relationship | File |\n|---|---|\n| parent area | [../../README.md](../../README.md) |\n| parent current behavior | [../../spec.md](../../spec.md) |\n| local current behavior | [spec.md](spec.md) |\n| local design shape | [architecture/](architecture/) |\n| local contracts | [contracts/](contracts/) |\n| local proof | [verification/](verification/) |\n```",
+      "line": 79,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/templates/subcomponent-readme.md",
+        "commit": "HEAD",
+        "fileSha256": "c87c476534b677740bb610aee582b1a4cb095ca3c4e2de6ea47f1ddc6c3a891b",
+        "literalSha256": "c2156d0d8e5129281c6fab03e4d1d3719c6dc3e681b8b32c1088c6f6702bba8e",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/verification.md",
+      "type": "code",
+      "literalSha256": "5d8f7cd0fabc70ce7e9ab5be6bef99966fbcf74c227d6719c84628d6649b72fc",
+      "literalBytes": 173,
+      "raw": "```markdown\n| Relationship | File |\n|---|---|\n| claim owner | [../README.md](../README.md) |\n| current behavior | [../spec.md](../spec.md) |\n| contract or architecture proved | <link> |\n```",
+      "line": 36,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/templates/verification.md",
+        "commit": "HEAD",
+        "fileSha256": "3ae81f2d4d4724e6e4da585ac073ae5ce78b5f7ace0fba37f504bf9579c722f4",
+        "literalSha256": "5d8f7cd0fabc70ce7e9ab5be6bef99966fbcf74c227d6719c84628d6649b72fc",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/vision.md",
+      "type": "code",
+      "literalSha256": "23734513736d05daa91e5540d7e80790c2b17e6a54d7b8015045440fcc984f79",
+      "literalBytes": 170,
+      "raw": "```markdown\n| Relationship | File |\n|---|---|\n| preserves deferred intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| current behavior | [spec.md](spec.md) |\n```",
+      "line": 44,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/templates/vision.md",
+        "commit": "HEAD",
+        "fileSha256": "61d867cd5921cb157c8cfbaa874f733fa94b4478c4d1710a59d6804dae57f622",
+        "literalSha256": "23734513736d05daa91e5540d7e80790c2b17e6a54d7b8015045440fcc984f79",
+        "byteExact": true
+      }
     },
     {
       "file": "docs/platform/git/spec.md",
-      "line": 644,
-      "classification": "pre-existing source bytes, not rewriter corruption",
-      "source": "docs/platform/git/spec.md",
-      "sourceSha256": "63856aff2b0d80be616388cd3059ccfbebcd096d9e55ec83b19cd3ec4a748d9e",
+      "type": "codespan",
+      "literalSha256": "0dd4a9b8dd39b5610d6602c95873f7483d9aa5443505a93174188c148755754b",
+      "literalBytes": 15,
       "raw": "`table[key](…)`",
-      "sourceKind": "canonical same-file original, no legacy carry"
+      "line": 644,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/platform/git/spec.md",
+        "commit": "d4839a339",
+        "fileSha256": "6455fc7cc9ed63021a9cdd3f5d73c5e31c77aa19a673b9f519217c67df7f5c92",
+        "literalSha256": "0dd4a9b8dd39b5610d6602c95873f7483d9aa5443505a93174188c148755754b",
+        "byteExact": true
+      }
     },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "type": "code",
+      "literalSha256": "3eb6efe648980740c062eb5f792200bc14dd24c64c620f7c677ab1657bdf87bd",
+      "literalBytes": 803,
+      "raw": "````md\nThis document discusses only migration options, ordering, transition stages,\ncutover, and rollback. The stable host model, peer CLI/remote host use cases,\nOperation Provider Router, provider mechanics, protocols, plugin registry,\nauthority, and technical tradeoffs live in\n[Host Invocation And Provider Routing Architecture](./host-invocation-provider-routing.md).\nComponent ownership, authority boundaries, and the physical placement compass\nfor files/crates/components live in\n[fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md);\nevery native migration slice must read it before choosing where a provider or\ncomponent module lives.\nThe executable work breakdown lives in\n[Rust Host And Proof Providers Implementation Plan](./rust-cli-and-proof-components-plan.md).\n````",
+      "line": 172,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "commit": "HEAD",
+        "fileSha256": "17103ea9eeaf6ca68869a37e44dca6cb8cc128ae315ef914bde71950f05d20b7",
+        "literalSha256": "3eb6efe648980740c062eb5f792200bc14dd24c64c620f7c677ab1657bdf87bd",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "type": "code",
+      "literalSha256": "da634aada4e735156922478dd7d6269afa712adda1f8ce1a36e87a02bb483496",
+      "literalBytes": 732,
+      "raw": "````md\n1. Read\n   [fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md)\n   and name responsibility, semantic operations, authority, state, side\n   effects, component class, and physical placement.\n2. Select a complete operation/use-case boundary rather than private helpers.\n3. Capture current Node behavior as shared fixtures.\n4. Extract only the Node boundary needed for this migration slice.\n5. Implement the corresponding native Rust provider.\n6. Run both providers against the same semantic fixtures.\n7. Shadow only side-effect-free reads.\n8. Switch the operation from legacy to native after parity proof.\n9. Observe the rollback window.\n10. Remove the Node implementation in a later cleanup change.\n````",
+      "line": 227,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "commit": "HEAD",
+        "fileSha256": "17103ea9eeaf6ca68869a37e44dca6cb8cc128ae315ef914bde71950f05d20b7",
+        "literalSha256": "da634aada4e735156922478dd7d6269afa712adda1f8ce1a36e87a02bb483496",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "type": "code",
+      "literalSha256": "d6845ac9e1b96141e430ec0d44a6fa5c23460ca51b3426da86f52e8723bcd66d",
+      "literalBytes": 21739,
+      "raw": "````md\n# Host Invocation Documentation Standardization Plan\n\n```txt\nDocument type: Migration plan\nAudience: Human reviewer, architect, documentation agent, implementation agent\nPurpose: Plan the rewrite of host-invocation docs into the new … [full literal authenticated by digest; replay scanner]",
+      "line": 17,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+        "commit": "HEAD",
+        "fileSha256": "06e5994c1f64d470f78627a3748b4daba5d123b3868f1eb28fd42a6ebc264f3a",
+        "literalSha256": "d6845ac9e1b96141e430ec0d44a6fa5c23460ca51b3426da86f52e8723bcd66d",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/proposals/architecture-advisory-panel.md",
+      "type": "code",
+      "literalSha256": "6703b82f815751a15c7bd3c8e4f6bb8bd1d6ee3147856f9898461c08ed951229",
+      "literalBytes": 456,
+      "raw": "````markdown\nRelated:\n[Step 09 Group Thinking Substrate](step-09-group-thinking-substrate.md),\n[Agent Coordination Vision](../agent-coordination/vision.md),\n[CoordinationSession Contract](../agent-coordination/contracts/coordination-session.md),\n[FlowDefinition Contract](../agent-coordination/contracts/flow-definition.md),\n[Group Thinking user guide](../../how-to/use-fgos-group-thinking.md), and\n[`fgos-code-panel`](../../../.agents/skills/fgos-code-panel/SKILL.md).\n````",
+      "line": 40,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/proposals/architecture-advisory-panel.md",
+        "commit": "HEAD",
+        "fileSha256": "89184422386302e25b111cf6fb84317dc5a7802102654b3f57c0f0db960f4766",
+        "literalSha256": "6703b82f815751a15c7bd3c8e4f6bb8bd1d6ee3147856f9898461c08ed951229",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/proposals/architecture-advisory-panel.md",
+      "type": "code",
+      "literalSha256": "e62001e4512f962fc42d43b3e399bb9a7e773f1881e60f08610d4b584e21022e",
+      "literalBytes": 126,
+      "raw": "````markdown\nImplementation plan:\n[Architecture Advisory Panel execution track](../../../plans/260905-architecture-advisory-panel/plan.md).\n````",
+      "line": 51,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/proposals/architecture-advisory-panel.md",
+        "commit": "HEAD",
+        "fileSha256": "89184422386302e25b111cf6fb84317dc5a7802102654b3f57c0f0db960f4766",
+        "literalSha256": "e62001e4512f962fc42d43b3e399bb9a7e773f1881e60f08610d4b584e21022e",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/proposals/coordination-capability-envelope.md",
+      "type": "code",
+      "literalSha256": "4fdbbbea7ccf63f601901370e1f5b3bcfa62f40708385d99835bcd621f375252",
+      "literalBytes": 910,
+      "raw": "````markdown\n- [Assignment runner](../../../src/runner/dispatch/assignment-runner.mjs) explicitly\n  documents same-user trust and post-execution read-only grading/rollback.\n- [Prompt renderer](../../../src/runner/dispatch/assignment.mjs) renders the basic\n  objective/context/output packet; this is not a complete soul delivery contract.\n- [Session engine](../../../src/runner/coordination/session-engine.mjs),\n  `classifySessionQuorum`, takes the manifest actor roster as required;\n  aggregation-based close requires `consensus`.\n- [Public run](../../../src/verbs/coordination/run.mjs) automatically attempts close.\n- [Store](../../../src/runner/coordination/store.mjs), `assertDriverIdentity`, compares\n  writer identity strings; session `maxRounds` uses Assignment count.\n- [Chain](../../../src/verbs/coordination/chain.mjs) selects the latest active session\n  and derives a hint; it does not reconstruct plan rationale.\n````",
+      "line": 103,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/proposals/coordination-capability-envelope.md",
+        "commit": "HEAD",
+        "fileSha256": "98788f9d29c5cc9215a492a95513abfee6f22c5a95fda0c3c9136f9750676492",
+        "literalSha256": "4fdbbbea7ccf63f601901370e1f5b3bcfa62f40708385d99835bcd621f375252",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/proposals/coordination-envelope-probe-contract.md",
+      "type": "code",
+      "literalSha256": "bcb558893c21d16ea7ee2e4d7276353ce8dfaf0018223eb725539bcdb5c7eedb",
+      "literalBytes": 363,
+      "raw": "````markdown\nRelated: [Conceptual architecture](coordination-capability-envelope.md),\n[Advisory execution plan](../../../plans/260905-architecture-advisory-panel/plan.md),\n[Advisory current cell](../agent-coordination/verification/architecture-advisory-panel/current-cell.md),\n[Advisory evidence index](../agent-coordination/verification/architecture-advisory-panel/index.md).\n````",
+      "line": 34,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-probe-contract.md",
+        "commit": "HEAD",
+        "fileSha256": "676bc6b9b123411fd38aa75f022213035332048547ebca3bd805a82f3b8b5336",
+        "literalSha256": "bcb558893c21d16ea7ee2e4d7276353ce8dfaf0018223eb725539bcdb5c7eedb",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "type": "code",
+      "literalSha256": "dd7759c61f9fda0ed9be4e4fab7eed143c6a6967c591f523b48a584800d9f5b7",
+      "literalBytes": 1647,
+      "raw": "````markdown\nDocument type: Proposal\nDesign status: Discussion\nImplementation: Not started\nLast reviewed: 2026-09-04\nCanonical for: nothing until explicitly accepted\nOriginal date: 2026-09-02\nScope: capture the discussion about bringing the… [full literal authenticated by digest; replay scanner]",
+      "line": 27,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "commit": "HEAD",
+        "fileSha256": "cca8c3ce96f36e9485078ed21d67999904b333774e9093ab2e403d15ab9c51d3",
+        "literalSha256": "dd7759c61f9fda0ed9be4e4fab7eed143c6a6967c591f523b48a584800d9f5b7",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "type": "codespan",
+      "literalSha256": "1e6a9264922735c4623ac7b7436ed443a5c7c95b6fc871f2a302015f4c3c65b4",
+      "literalBytes": 25,
+      "raw": "`d['executeAssignment'](a)`",
+      "line": 191,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/specs/runner.md",
+        "commit": "HEAD",
+        "fileSha256": "88d0e89522a29eed0d222da57c26c1dfd3912cd3e463e36887e211bbf74e5279",
+        "literalSha256": "1e6a9264922735c4623ac7b7436ed443a5c7c95b6fc871f2a302015f4c3c65b4",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/workflow/spec.md",
+      "type": "code",
+      "literalSha256": "34973c23fa3d17374ced7571d51bb5d19cf37a2dd9a246168cbda9b82232f10a",
+      "literalBytes": 1377,
+      "raw": "```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # subject: văn bản yêu cầu\n  - id: positions-settled  # subject: ba report panelist\n  -… [full literal authenticated by digest; replay scanner]",
+      "line": 404,
+      "classification": "exact legacy source literal",
+      "source": {
+        "path": "docs/specs/workflow.md",
+        "commit": "HEAD",
+        "fileSha256": "df63011fa93f440316bf2e0367b1757568c5323d2c45c7815894a69ef63c2e34",
+        "literalSha256": "34973c23fa3d17374ced7571d51bb5d19cf37a2dd9a246168cbda9b82232f10a",
+        "byteExact": true
+      }
+    }
+  ],
+  "priorInlineScan": {
+    "sourceHead": "ee2ce49c4b610daccb656f79fdb29531bb41d06b",
+    "beforeCodeSpans": 83102,
+    "afterCodeSpans": 83104,
+    "corruptSpansRestored": 1,
+    "unresolved": 0
+  },
+  "priorInlineRepairs": [
     {
       "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
       "line": 191,
@@ -82,17 +1691,39 @@
       }
     }
   ],
+  "restores": [
+    {
+      "file": "docs/platform/component-boundary.md",
+      "type": "code",
+      "before": "```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispatch And Execution Engine:\n  DispatchResolverPort   (superseded in naming by DispatchRuntimePort,\n                          [Component Authority Boundary Map §13](../architect/proposals/component-authority-boundary-map.md#13-draft-ports);\n                          same candidate facade, not two live ports)\n  RunStorePort\n  ExecutorAdapterPort\n\nRun Result Evaluator:\n  EvidenceCollectorPort\n  ResultNormalizerPort\n  ArtifactStorePort\n\nDomain Components And Extension Layer:\n  DefinitionLoaderPort\n  DomainHarnessPort\n  ProtocolPackagePort\n  PolicyProviderPort\n  EvidencePolicyPort\n\nHost And Surface Layer:\n  VisibilityPort\n  CommandSurfacePort\n  ApiSurfacePort\n\nShared infrastructure:\n  ClockPort\n  IdGeneratorPort\n  FilesystemPort\n```",
+      "after": "```txt\nWork Lifecycle Engine:\n  WorkLifecyclePort\n  OccupancyPort\n\nAgent Coordination Engine:\n  SessionStorePort\n  AssignmentStorePort\n  TeamCognitionPort\n  WorkContextPort\n\nDispatch And Execution Engine:\n  DispatchResolverPort   (superseded in naming by DispatchRuntimePort,\n                          [Component Authority Boundary Map §13](../proposals/component-authority-boundary-map.md#13-draft-ports);\n                          same candidate facade, not two live ports)\n  RunStorePort\n  ExecutorAdapterPort\n\nRun Result Evaluator:\n  EvidenceCollectorPort\n  ResultNormalizerPort\n  ArtifactStorePort\n\nDomain Components And Extension Layer:\n  DefinitionLoaderPort\n  DomainHarnessPort\n  ProtocolPackagePort\n  PolicyProviderPort\n  EvidencePolicyPort\n\nHost And Surface Layer:\n  VisibilityPort\n  CommandSurfacePort\n  ApiSurfacePort\n\nShared infrastructure:\n  ClockPort\n  IdGeneratorPort\n  FilesystemPort\n```",
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "commit": "HEAD",
+        "fileSha256": "913cbbc9419fc059e5ce1dcaeb7d06d6d90d6e9d3ef45195c15cd59ff0359bf3",
+        "literalSha256": "b733a82e1ffbcceeeebd63b6e9fd7ac8c95feb3e9aeda550a833f4218e2daab6",
+        "byteExact": true
+      }
+    },
+    {
+      "file": "docs/platform/workflow/spec.md",
+      "type": "code",
+      "before": "```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # subject: văn bản yêu cầu\n  - id: positions-settled  # subject: ba report panelist\n  - id: verdict-settled    # subject: report synthesizer\nactivities:\n  - id: deliberate\n    entry: [request-received]\n    produces: [positions-settled, verdict-settled]\n    unit:                  # giữ nguyên template hôm nay\n      capability: delphi:propose\n      pattern: panel\n      blind: true\n      contextRefs: [core/agents/council-assumptions.yaml, core/agents/council-ship-maintain.yaml, core/agents/council-feedback-loops.yaml]\n      seats: [member-1, member-2, member-3, synthesizer]   # ghế khai tường minh, role producer ×3 + synthesizer ([seat-binding.md](../seat-binding/spec.md) mục 7.1)\n      params: { roleTasks: { member-1: ..., member-2: ..., member-3: ..., synthesizer: ... } }   # khoá theo ghế\nmust:\n  - id: independent-positions\n    guard: independence-blind      # đóng gói một Unit panel với ghế blind là bắt buộc\n    subject: positions-settled\n    reason: một ghế đã đọc ý kiến ghế khác thì không còn là một lăng kính độc lập\nclosure: [verdict-settled]\nframeDefaults: { dispatches: 1, mutatingDispatches: 0, seatLaunchesPerDispatch: 4, fallbackPerSeat: 2 }\n```",
+      "after": "```yaml\nid: council-lite\nkind: playbook            # mọi decision point listedRoutesOnly trừ khi điểm đó nói khác\nmilestones:\n  - id: request-received   # subject: văn bản yêu cầu\n  - id: positions-settled  # subject: ba report panelist\n  - id: verdict-settled    # subject: report synthesizer\nactivities:\n  - id: deliberate\n    entry: [request-received]\n    produces: [positions-settled, verdict-settled]\n    unit:                  # giữ nguyên template hôm nay\n      capability: delphi:propose\n      pattern: panel\n      blind: true\n      contextRefs: [core/agents/council-assumptions.yaml, core/agents/council-ship-maintain.yaml, core/agents/council-feedback-loops.yaml]\n      seats: [member-1, member-2, member-3, synthesizer]   # ghế khai tường minh, role producer ×3 + synthesizer ([seat-binding.md](seat-binding.md) mục 7.1)\n      params: { roleTasks: { member-1: ..., member-2: ..., member-3: ..., synthesizer: ... } }   # khoá theo ghế\nmust:\n  - id: independent-positions\n    guard: independence-blind      # đóng gói một Unit panel với ghế blind là bắt buộc\n    subject: positions-settled\n    reason: một ghế đã đọc ý kiến ghế khác thì không còn là một lăng kính độc lập\nclosure: [verdict-settled]\nframeDefaults: { dispatches: 1, mutatingDispatches: 0, seatLaunchesPerDispatch: 4, fallbackPerSeat: 2 }\n```",
+      "source": {
+        "path": "docs/specs/workflow.md",
+        "commit": "HEAD",
+        "fileSha256": "df63011fa93f440316bf2e0367b1757568c5323d2c45c7815894a69ef63c2e34",
+        "literalSha256": "34973c23fa3d17374ced7571d51bb5d19cf37a2dd9a246168cbda9b82232f10a",
+        "byteExact": true
+      }
+    }
+  ],
   "corruptSpansRestored": 1,
+  "corruptFencesRestored": 2,
+  "replayRecipe": "node --no-addons rebind/scan-code-literals.mjs <recorded tokenizer module> <additionalSources...>; stdout is this report. Run from repository root. No native addon or package installation.",
   "unresolved": 0,
   "scanFiles": [
-    {
-      "path": "docs/platform/README.md",
-      "sha256": "1ced7aa146e2669d4ac346edba862422b5b4ee0af3fb86bbe4fea9b636d60ac0"
-    },
-    {
-      "path": "docs/platform/agent-confinement/README.md",
-      "sha256": "2ee76f9364637f691e28941d445100fdda7dd8a7df8ba827c2dc51db90a2967d"
-    },
     {
       "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
       "sha256": "691e69db53290609dc673c1aebe15ad1c165f9d86541dbabdb6fbcd9d1d1a7ae"
@@ -106,16 +1737,12 @@
       "sha256": "07c52fe3fa4533cb6c07414b639cf8e7eb4ea8d888c912d2e557cc6231a6279f"
     },
     {
+      "path": "docs/platform/agent-confinement/README.md",
+      "sha256": "2ee76f9364637f691e28941d445100fdda7dd8a7df8ba827c2dc51db90a2967d"
+    },
+    {
       "path": "docs/platform/agent-confinement/spec.md",
       "sha256": "20a3161a93d9c99555b852058e0c139d27f58b9aa4d8b22f22513e8c32272f10"
-    },
-    {
-      "path": "docs/platform/agent-coordination/README.md",
-      "sha256": "a0a5aa8e1899e97ef1f250c1c4365f9735709dd2e1f17a80a684f9acaf7c99f0"
-    },
-    {
-      "path": "docs/platform/agent-coordination/architecture/README.md",
-      "sha256": "164d48cf0386988457af6447eb9a6cd5600765610f649b3ec179628ed8df98df"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
@@ -136,6 +1763,10 @@
     {
       "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
       "sha256": "726b5d36a7a0ee13be3b795cacf856be63394b0e4d42481ef1f1641a6d840967"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/README.md",
+      "sha256": "164d48cf0386988457af6447eb9a6cd5600765610f649b3ec179628ed8df98df"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/run-handle.md",
@@ -202,10 +1833,6 @@
       "sha256": "7de6f1e0a46de1715ad8d38b882ca52e82ab32485e9f5e7e5ae8dfe5f7c10977"
     },
     {
-      "path": "docs/platform/agent-coordination/history/README.md",
-      "sha256": "25464848cd84aa481c07ce54b8de52e1669a13e7a77e61d4e9ad2c84612f17b1"
-    },
-    {
       "path": "docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
       "sha256": "4564427d37a3233680d8407090063b3f3d13552612fed95bd5bbf473be8a535c"
     },
@@ -262,20 +1889,12 @@
       "sha256": "90f07b2fe30267ed4b0d86dfa7d1d38e69b62dcfe81195f05dcf4e1c17e66279"
     },
     {
-      "path": "docs/platform/agent-coordination/history/retired-engine/README.md",
-      "sha256": "f6d58bc25861604c541e6c75ec8dcc7dd446a693d5a8e0e88c8ca18956884929"
+      "path": "docs/platform/agent-coordination/history/README.md",
+      "sha256": "25464848cd84aa481c07ce54b8de52e1669a13e7a77e61d4e9ad2c84612f17b1"
     },
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
       "sha256": "5e9fa05c1f8d9b689985685240a6c17375fd575b9978fb29b9391460fdfd2b99"
-    },
-    {
-      "path": "docs/platform/agent-coordination/history/retired-engine/files/README.md",
-      "sha256": "fcb4e76bb918cec17c8d833abf8104957909794f9475fc805e0b46eef92a35ee"
-    },
-    {
-      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
-      "sha256": "7322f48aae09a8f0474dff36976bf89d4e90c1a7cd0c27ac718311c68fb51476"
     },
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
@@ -306,6 +1925,10 @@
       "sha256": "138c4eefc7fdb7d702586d2951f11aeed7ae4ba1c0955bfd895922185c3e2d92"
     },
     {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+      "sha256": "7322f48aae09a8f0474dff36976bf89d4e90c1a7cd0c27ac718311c68fb51476"
+    },
+    {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
       "sha256": "b18256aa248efdcb884ca4df66b25da2abc63b9d1c93a2e06a6d7dccfd52fc59"
     },
@@ -330,10 +1953,6 @@
       "sha256": "3a9a96dc3be9ea7d8818ced5870d9289ffa28299be93e5d19855a6ae3030111a"
     },
     {
-      "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
-      "sha256": "7b10274c9528f2ac3e304f3edb11c09ce9083979917e384a65a8a54156b04809"
-    },
-    {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
       "sha256": "8693fefc4020ecee41bd8e37384f37049cbc33e555952ae9a97090b4535b502b"
     },
@@ -344,6 +1963,10 @@
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
       "sha256": "e005edcfa74d8745286a261247ee5ab09193e34c90a3ef3cc3cd51a27e94378a"
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+      "sha256": "7b10274c9528f2ac3e304f3edb11c09ce9083979917e384a65a8a54156b04809"
     },
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
@@ -402,10 +2025,6 @@
       "sha256": "68caae1d33be3dc6f94375bdf3aa25e8aee90ce46b00975e3559f44224faa082"
     },
     {
-      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
-      "sha256": "5a4f9f9209d843b392693f6613243d8172cef807a8c86b719a8dbf9e4eaa4075"
-    },
-    {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
       "sha256": "2e4cfa172517ff749aa840bce13f2a687909242e409b6175c3c9d28285600c6b"
     },
@@ -438,8 +2057,8 @@
       "sha256": "de04beab895a45657097eae7dd8d2bcc8dd8ad888f5f661a44cf63a56ba97446"
     },
     {
-      "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
-      "sha256": "641542f2f68685579c498d1b2ec067dc056e46ea0b44782fc019ec212f3d1873"
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+      "sha256": "5a4f9f9209d843b392693f6613243d8172cef807a8c86b719a8dbf9e4eaa4075"
     },
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
@@ -448,6 +2067,10 @@
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
       "sha256": "d272fe276db3a6b29828803f5b59caa32bc0ea4ba8039bfbce18edfcb66fdf31"
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+      "sha256": "641542f2f68685579c498d1b2ec067dc056e46ea0b44782fc019ec212f3d1873"
     },
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
@@ -464,6 +2087,10 @@
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
       "sha256": "7541a5f027caf273459b72b36fe635ebd7262db1a28a5dee4bf8fb8ac9b4df41"
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+      "sha256": "fcb4e76bb918cec17c8d833abf8104957909794f9475fc805e0b46eef92a35ee"
     },
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
@@ -510,20 +2137,16 @@
       "sha256": "ae2eaf9f4e9dc5378b3666da02f0d400029f102ce0ed2d01a36907ceb967942f"
     },
     {
-      "path": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
-      "sha256": "79c603b606b3dc27b6bbd8637ebf8686e9fda2b884d036f9dec12df36aea8103"
-    },
-    {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
       "sha256": "5a27d9dab4ffd936948174f231ebeac8b95a55e03149189501cd1fcf127fe021"
     },
     {
-      "path": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
-      "sha256": "0bc5655a72cb5fb06754a2448a48cf57bcb66ed9a4d154ea8bb36fdbd1af9657"
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+      "sha256": "79c603b606b3dc27b6bbd8637ebf8686e9fda2b884d036f9dec12df36aea8103"
     },
     {
-      "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
-      "sha256": "a63d2d508214c7d414bcac819a7ec415f6e1169291b28bf7a5520201ea937900"
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
+      "sha256": "0bc5655a72cb5fb06754a2448a48cf57bcb66ed9a4d154ea8bb36fdbd1af9657"
     },
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
@@ -536,6 +2159,10 @@
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
       "sha256": "282210b38026e6b7b1349865798b5073558791ba9a918a51322057890e94d77e"
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+      "sha256": "a63d2d508214c7d414bcac819a7ec415f6e1169291b28bf7a5520201ea937900"
     },
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/stage-operation-taskspec-skill-relationship.svg",
@@ -570,10 +2197,6 @@
       "sha256": "e7ffb99241761e46ec108f2e9d4e47a6fa67be124594b75661b8aaebf16d1210"
     },
     {
-      "path": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
-      "sha256": "9c8f5d8e2a55ddf88950fe4ca069cf8cdd46ef9213d77b9d8666ebbc813800f5"
-    },
-    {
       "path": "docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md",
       "sha256": "faa90b316286f190e01a800ad9a2c27cd5d9e1aeb8d22adaebaaf727f62a09ea"
     },
@@ -582,8 +2205,16 @@
       "sha256": "60a61d421faa9cd83d7625c3068aedb604a5edd02f78840c82cd445ba64e919e"
     },
     {
+      "path": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "sha256": "9c8f5d8e2a55ddf88950fe4ca069cf8cdd46ef9213d77b9d8666ebbc813800f5"
+    },
+    {
       "path": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
       "sha256": "8a4d1ebaf6562f253c3ccd0a4410658d7144e084e3834c08a88eb9288a7915b6"
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/README.md",
+      "sha256": "f6d58bc25861604c541e6c75ec8dcc7dd446a693d5a8e0e88c8ca18956884929"
     },
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/spec.md",
@@ -596,10 +2227,6 @@
     {
       "path": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
       "sha256": "526d0b22dc43ed34423acfd18d97458ce411819271eb1c3a22bf9639c59cf85e"
-    },
-    {
-      "path": "docs/platform/agent-coordination/playbooks/README.md",
-      "sha256": "bb30bd431390f4791b4f722434adecccb85b302f964f7b3c0e54fc8feb9cd953"
     },
     {
       "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
@@ -626,24 +2253,36 @@
       "sha256": "3cccc8cff795fe5b589c19f8aed2e9bc23594ead0aa39009dba1be0eb52b37e6"
     },
     {
-      "path": "docs/platform/agent-coordination/proposals/README.md",
-      "sha256": "591ae7799242fc7c5c4f89383565f1c7eb1b37128c5f9e0f519263e08387f535"
+      "path": "docs/platform/agent-coordination/playbooks/README.md",
+      "sha256": "bb30bd431390f4791b4f722434adecccb85b302f964f7b3c0e54fc8feb9cd953"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "sha256": "4b5425c7104d77f69f4beaf6f00e96950042ce8a81efbedf148cd42c117d13fb"
     },
     {
+      "path": "docs/platform/agent-coordination/proposals/README.md",
+      "sha256": "591ae7799242fc7c5c4f89383565f1c7eb1b37128c5f9e0f519263e08387f535"
+    },
+    {
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "sha256": "6283f064d761fc87f746031a2d12da027c06bbea5be85e5a45365ed8d2df4088"
+    },
+    {
+      "path": "docs/platform/agent-coordination/README.md",
+      "sha256": "a0a5aa8e1899e97ef1f250c1c4365f9735709dd2e1f17a80a684f9acaf7c99f0"
     },
     {
       "path": "docs/platform/agent-coordination/spec.md",
       "sha256": "1306d4f34b42fb2f6eaf9aff1dfb894e300e989975ab0ba9a0842847f24d22c9"
     },
     {
-      "path": "docs/platform/agent-coordination/verification/README.md",
-      "sha256": "da761fbeb9673b7c71caae2d0b3ef9cad64bceebb50ff38581e34e7e7799c6f5"
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/current-cell.md",
+      "sha256": "26412dd84e3ae4fccf8587ed7cf20404963e8b93d31674b8c34a71032f7090a8"
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/index.md",
+      "sha256": "2becc5d17a36e793e00bbfde6385f95db525437640a2acb86e270bca79aebba1"
     },
     {
       "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P00.1.md",
@@ -688,14 +2327,6 @@
     {
       "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md",
       "sha256": "d9c6de60b293a2cd1f9e1349ae6642057205edb79d149651c0a930412b74ea8a"
-    },
-    {
-      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/current-cell.md",
-      "sha256": "26412dd84e3ae4fccf8587ed7cf20404963e8b93d31674b8c34a71032f7090a8"
-    },
-    {
-      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/index.md",
-      "sha256": "2becc5d17a36e793e00bbfde6385f95db525437640a2acb86e270bca79aebba1"
     },
     {
       "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/agy-bwrap.log",
@@ -2198,6 +3829,10 @@
       "sha256": "4b59a8a4020896f8a02d6c70e5ef525328930546bf22dd6486bcdac7555aa685"
     },
     {
+      "path": "docs/platform/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md",
+      "sha256": "35a09e646eae5bcc368bf961f818582aaf35f7ada65554df83120c1940e377e9"
+    },
+    {
       "path": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P00.md",
       "sha256": "c3d5f819bbaf4a0de177b3b3c3eae13e9eec0fdf4646e87f5ba4f670d593f413"
     },
@@ -2232,10 +3867,6 @@
     {
       "path": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P08.md",
       "sha256": "99eb8d1df43f621b6bd6888496cf7189ded51a6ce9b94bb022241509ce676c86"
-    },
-    {
-      "path": "docs/platform/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md",
-      "sha256": "35a09e646eae5bcc368bf961f818582aaf35f7ada65554df83120c1940e377e9"
     },
     {
       "path": "docs/platform/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md",
@@ -2290,18 +3921,6 @@
       "sha256": "f38b778a76b664d8ed70f947636d8536f6ef2017eff15d3226ed4ef9a6ae440f"
     },
     {
-      "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
-      "sha256": "1ec797b388254eaee043cc4ff6d403bda0cc0703d7e6437789bd6fb4f2955beb"
-    },
-    {
-      "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
-      "sha256": "142c1051f595bb6eddacfd99222b5877ec55dd3b47f2c8410efd4f5ca9d180ce"
-    },
-    {
-      "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P03.1.md",
-      "sha256": "d1bae74693a7c38eb902dd69facb8d4f87041f586f109da751ed723ee66d4482"
-    },
-    {
       "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P01.1.md",
       "sha256": "1e2c0a0cb8fe41676031a40679a61a3935f713a0f6c1850ae528f52d5a26d397"
     },
@@ -2316,6 +3935,22 @@
     {
       "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/index.md",
       "sha256": "380b2214205baa0d76f61efc36929671470730e4ba1bdd1f0e2a262df1a50e38"
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sha256": "1ec797b388254eaee043cc4ff6d403bda0cc0703d7e6437789bd6fb4f2955beb"
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
+      "sha256": "142c1051f595bb6eddacfd99222b5877ec55dd3b47f2c8410efd4f5ca9d180ce"
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P03.1.md",
+      "sha256": "d1bae74693a7c38eb902dd69facb8d4f87041f586f109da751ed723ee66d4482"
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/README.md",
+      "sha256": "da761fbeb9673b7c71caae2d0b3ef9cad64bceebb50ff38581e34e7e7799c6f5"
     },
     {
       "path": "docs/platform/agent-coordination/verification/runtime-recovery/p00.md",
@@ -2426,6 +4061,14 @@
       "sha256": "629d7c61e9b2b583bad0efc658a2d8583258703b6d9c94f35b0276e7226ac1b7"
     },
     {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/current-cell.md",
+      "sha256": "9818be755de4ba9b5ce00a46f7ffda1062c5d41c627f85432e7edfe10bef0e36"
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/index.md",
+      "sha256": "3ec50d7db56e8c106d7d6d8b55ec0a5a2b6a656425ce35a5d23ff91f9141c6de"
+    },
+    {
       "path": "docs/platform/agent-coordination/verification/step-07-mvp/P01.1.md",
       "sha256": "6d96716bcc0a3015fd4bafd93ac4bafe9b310ef02cc170f97f52e443805d9a73"
     },
@@ -2464,14 +4107,6 @@
     {
       "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.3.md",
       "sha256": "c36ef7c7abb3d707ecd20aebc336005bcdfe1dea25e33f31b3cb391d111041ea"
-    },
-    {
-      "path": "docs/platform/agent-coordination/verification/step-07-mvp/current-cell.md",
-      "sha256": "9818be755de4ba9b5ce00a46f7ffda1062c5d41c627f85432e7edfe10bef0e36"
-    },
-    {
-      "path": "docs/platform/agent-coordination/verification/step-07-mvp/index.md",
-      "sha256": "3ec50d7db56e8c106d7d6d8b55ec0a5a2b6a656425ce35a5d23ff91f9141c6de"
     },
     {
       "path": "docs/platform/agent-coordination/verification/step-07-mvp/proof-1-standalone-inline-read-only.md",
@@ -2558,6 +4193,18 @@
       "sha256": "39e46283f73118bba8a264c558a27ac2c17ec51cfcb2f4ec562a800ec0876711"
     },
     {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
+      "sha256": "bbca28a6b23db02c131ca567c8392e64aab8ff6d714542ffaf6dc9b590b429e0"
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md",
+      "sha256": "d1894ead685351da39199eb027dbd7e135bbfb70e6546d4e982ac51d656ba00c"
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/index.md",
+      "sha256": "e05d8f8a9bce116cbe2b1c7389ba6b31691fd955c7368f65a5f55b79058861ca"
+    },
+    {
       "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
       "sha256": "55dc113e5e3f0d8d9abccc4d1a6d9e3cc74e6af5c0e979e53fad6517c0d18639"
     },
@@ -2630,16 +4277,8 @@
       "sha256": "c46f759dc74b717273b621606a6c9ec5b42e108090e29fa42dcf9aedf41af61c"
     },
     {
-      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
-      "sha256": "bbca28a6b23db02c131ca567c8392e64aab8ff6d714542ffaf6dc9b590b429e0"
-    },
-    {
-      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md",
-      "sha256": "d1894ead685351da39199eb027dbd7e135bbfb70e6546d4e982ac51d656ba00c"
-    },
-    {
-      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/index.md",
-      "sha256": "e05d8f8a9bce116cbe2b1c7389ba6b31691fd955c7368f65a5f55b79058861ca"
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+      "sha256": "66cb2406cf7e904beaffa3c106c3e8cff9947c1f0c4fdb5cb43442e7fa9c6c14"
     },
     {
       "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P00.3/codex-cli-live-proof.log",
@@ -3654,8 +5293,12 @@
       "sha256": "daa779832aad3622da9db329454d5f7e916e125a0850948df02ff527661486bb"
     },
     {
-      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
-      "sha256": "66cb2406cf7e904beaffa3c106c3e8cff9947c1f0c4fdb5cb43442e7fa9c6c14"
+      "path": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md",
+      "sha256": "d1565201149417659be6d82a7297d047896973acddccd20bc4741f1b217e6577"
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md",
+      "sha256": "5a49c8665a1eac9d782ce604e452bbbe84109eed54e3c1718b4d5bfa7d129865"
     },
     {
       "path": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md",
@@ -3682,20 +5325,20 @@
       "sha256": "969ce23a11aac755a2946618a4ca8142a4df27663f2279c5ac13cdeb0130806a"
     },
     {
-      "path": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md",
-      "sha256": "d1565201149417659be6d82a7297d047896973acddccd20bc4741f1b217e6577"
-    },
-    {
-      "path": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md",
-      "sha256": "5a49c8665a1eac9d782ce604e452bbbe84109eed54e3c1718b4d5bfa7d129865"
-    },
-    {
       "path": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
       "sha256": "e36851c448668276e6f5bb5c9a41262fc3c0b27019dffab7083b04db252a840c"
     },
     {
       "path": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/thin-launcher-surface-readiness.md",
       "sha256": "0315896a6dd7d4af230e5b687e908f40a31ea6b2e996edecc750f07d98b0f26b"
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md",
+      "sha256": "67a5b4801cdf690a19deb42e7780109a09f03c43351993a744f93d96c7f3a499"
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md",
+      "sha256": "f5cad6b1e3a53caca2ba7209dd1d78e9b8b836c551caeb3e1e7144ca96ab6600"
     },
     {
       "path": "docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P00.1.md",
@@ -3726,12 +5369,12 @@
       "sha256": "63809e8cc702720befcd72733ef4eb20b28106c5137a606f648b5a303fd0d4a3"
     },
     {
-      "path": "docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md",
-      "sha256": "67a5b4801cdf690a19deb42e7780109a09f03c43351993a744f93d96c7f3a499"
+      "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/current-cell.md",
+      "sha256": "ce8e285152aeec56d3a85c3fd0ffbe2ac43ea22e3925d80c4a2f82610c94ee2f"
     },
     {
-      "path": "docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md",
-      "sha256": "f5cad6b1e3a53caca2ba7209dd1d78e9b8b836c551caeb3e1e7144ca96ab6600"
+      "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md",
+      "sha256": "1bfba148b178533605bf6996be8982b4e5cfe745df71ccf77e270a6f28bec6e4"
     },
     {
       "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.1.md",
@@ -3918,14 +5561,6 @@
       "sha256": "bd1f08b9da60ddeaba373d2206613f2a9f93af6d0159dccae06fb40ef860e634"
     },
     {
-      "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/current-cell.md",
-      "sha256": "ce8e285152aeec56d3a85c3fd0ffbe2ac43ea22e3925d80c4a2f82610c94ee2f"
-    },
-    {
-      "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md",
-      "sha256": "1bfba148b178533605bf6996be8982b4e5cfe745df71ccf77e270a6f28bec6e4"
-    },
-    {
       "path": "docs/platform/agent-coordination/verification/team-dispatch-v1/current-cell.md",
       "sha256": "6ad54f6abeadf8d193e4796f13951d7e2edc6e9a99f4275cc2cd78d184250e4a"
     },
@@ -4070,10 +5705,6 @@
       "sha256": "b82a2d01f6552e09911c3e26cc0aa53f9b3c1337107b61d2702223f499ac9ab0"
     },
     {
-      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md",
-      "sha256": "e571f8c9e09863fb9df430e9d36e323fd7d8f905488446080c017780e9903422"
-    },
-    {
       "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-1-smoke.sh",
       "sha256": "49f9700f25a5625f896dab25a4ec92b582e01bf4ea0ca2033d00b62151935bd1"
     },
@@ -4102,6 +5733,10 @@
       "sha256": "90f7f34e432be99ee5353fd8e182ac45e497617a9b8bf996c2047492b1c2378b"
     },
     {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md",
+      "sha256": "e571f8c9e09863fb9df430e9d36e323fd7d8f905488446080c017780e9903422"
+    },
+    {
       "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/unshare-inner.sh",
       "sha256": "79502d3a1303442b260388fcaf133fb2150b0b285c309dd416157c1f8c198f5a"
     },
@@ -4118,10 +5753,6 @@
       "sha256": "10489471593b367b403a34a84f003e3587016f6d51096e4a04eaad668094be8c"
     },
     {
-      "path": "docs/platform/agent-coordination/vocabulary/README.md",
-      "sha256": "5c687417e9a05a64d35f66de12b46b4b462fef0c45f296e90ad17d5b19d42a09"
-    },
-    {
       "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "sha256": "f1d218d61037b623fd05d40247f36463cdd6461841278c4cc85c0c43a49c7803"
     },
@@ -4132,6 +5763,10 @@
     {
       "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "sha256": "f1af5a4cf9705322fd21d12ce41e4fa9a0138ca9792e1c14b5f32606a1fb6318"
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/README.md",
+      "sha256": "5c687417e9a05a64d35f66de12b46b4b462fef0c45f296e90ad17d5b19d42a09"
     },
     {
       "path": "docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg",
@@ -4163,7 +5798,7 @@
     },
     {
       "path": "docs/platform/component-boundary.md",
-      "sha256": "ccab81b65e2cd9b92bc2b902caf3446fa95119890088a735dc314b107f7c78ca"
+      "sha256": "dc6481146216ea1dd42fabab7cb5bdcb4c5b0329055c6619d774aef621c329d2"
     },
     {
       "path": "docs/platform/config/spec.md",
@@ -4206,10 +5841,6 @@
       "sha256": "3ef1aba54d0e3cfe7fa2d11ab8d70c7c6a4c814a636bedf21b7eb9014eca5645"
     },
     {
-      "path": "docs/platform/documentation/history/templates/README.md",
-      "sha256": "9610c219b52b87e6bc82e3bbadc200dd4199330464c95c080563d56f04fc1ba2"
-    },
-    {
       "path": "docs/platform/documentation/history/templates/architecture.md",
       "sha256": "500c3ac7b8fd82ffeaa106ca32aa26680533b858efdad70fadd7d3c8e3e6f7f6"
     },
@@ -4236,6 +5867,10 @@
     {
       "path": "docs/platform/documentation/history/templates/intent-preservation-ledger.md",
       "sha256": "ac84ad0bbf0dc4fbcb25595c0443a509e2c5b24b08e8e668c4cad8c34f1f1835"
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/README.md",
+      "sha256": "9610c219b52b87e6bc82e3bbadc200dd4199330464c95c080563d56f04fc1ba2"
     },
     {
       "path": "docs/platform/documentation/history/templates/spec.md",
@@ -4278,10 +5913,6 @@
       "sha256": "0e7d820925c594df12b2895a18158fdb91a2e2c5cf257f5d61463b3e9f7af536"
     },
     {
-      "path": "docs/platform/herdr-web-dashboard/README.md",
-      "sha256": "87a6a9af2251e06e320f06e9095009942f96889d3a045f54301d1f8750c5dc84"
-    },
-    {
       "path": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
       "sha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
     },
@@ -4294,6 +5925,10 @@
       "sha256": "1e6946675c09f08237ac65c65c4525b822ca219cd2fae6fcb99c72f3d63d105e"
     },
     {
+      "path": "docs/platform/herdr-web-dashboard/README.md",
+      "sha256": "87a6a9af2251e06e320f06e9095009942f96889d3a045f54301d1f8750c5dc84"
+    },
+    {
       "path": "docs/platform/herdr-web-dashboard/spec.md",
       "sha256": "7b5fe48ff585963bfbfc903ac1aa840fa7db58a80a51d72d8cbf73008d9cff80"
     },
@@ -4304,14 +5939,6 @@
     {
       "path": "docs/platform/holder-lock/spec.md",
       "sha256": "b3b06ff39ad72d33773a888b5c42cae601de120bab6699ed4a912823a7a1543f"
-    },
-    {
-      "path": "docs/platform/host-invocation-routing/README.md",
-      "sha256": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621"
-    },
-    {
-      "path": "docs/platform/host-invocation-routing/architecture/README.md",
-      "sha256": "de479c0ab0d3790d4d9150c07c9b5ae1ef77149bf42bbedc77e5813352ac8488"
     },
     {
       "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
@@ -4338,12 +5965,12 @@
       "sha256": "2660a8e9f0291a4c99f0dd06dc7dc4695d407965d6c937117639639690773c2e"
     },
     {
-      "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
-      "sha256": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9"
+      "path": "docs/platform/host-invocation-routing/architecture/README.md",
+      "sha256": "de479c0ab0d3790d4d9150c07c9b5ae1ef77149bf42bbedc77e5813352ac8488"
     },
     {
-      "path": "docs/platform/host-invocation-routing/contracts/README.md",
-      "sha256": "0d83c8d9b228d20578073982749a5d1a9a83d695007ef9927f78e9fd5d065617"
+      "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "sha256": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9"
     },
     {
       "path": "docs/platform/host-invocation-routing/contracts/command-route-descriptor.md",
@@ -4374,6 +6001,10 @@
       "sha256": "701eaf883e485b77fa8e0972a41ce4438d110affffd8da85fd748ad109f1813a"
     },
     {
+      "path": "docs/platform/host-invocation-routing/contracts/README.md",
+      "sha256": "0d83c8d9b228d20578073982749a5d1a9a83d695007ef9927f78e9fd5d065617"
+    },
+    {
       "path": "docs/platform/host-invocation-routing/decisions/README.md",
       "sha256": "f9c61bff1d4eb68373a99de76522ffafb033f93736022bb8d26c3cdb0a7b1ada"
     },
@@ -4402,16 +6033,16 @@
       "sha256": "a93b6eaa791dbde6be510d6f2f035102eccca8393a71093febd6924236dc5a27"
     },
     {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "sha256": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621"
+    },
+    {
       "path": "docs/platform/host-invocation-routing/roadmap.md",
       "sha256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
     },
     {
       "path": "docs/platform/host-invocation-routing/spec.md",
       "sha256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
-    },
-    {
-      "path": "docs/platform/host-invocation-routing/verification/README.md",
-      "sha256": "195ac902e325e8391ba2988de36025649158c77f2483f5307cf6d3813a0fb9ba"
     },
     {
       "path": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
@@ -4434,6 +6065,10 @@
       "sha256": "f8febf215e54b9302fb205b18e04efbfe94f11156d80682a874193dcd1b073a5"
     },
     {
+      "path": "docs/platform/host-invocation-routing/verification/README.md",
+      "sha256": "195ac902e325e8391ba2988de36025649158c77f2483f5307cf6d3813a0fb9ba"
+    },
+    {
       "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
       "sha256": "40b8f3d8ed14f9b9e7f3cb1fcb663dcceefb9fee23f0ddeb5bca82512170da89"
     },
@@ -4454,20 +6089,16 @@
       "sha256": "7b7d5bd462e55d6ac9ee993bbbb12607e37c8de19cb004e9d8bd4b020c605163"
     },
     {
-      "path": "docs/platform/observe/README.md",
-      "sha256": "8bf9f34ce3e795b1576813c8fe80005ef003613c4d68a3b90fb9fb96054f3be5"
-    },
-    {
       "path": "docs/platform/observe/decisions/observe-component-architecture.md",
       "sha256": "e9c67f18fb66c7ae9144db38da213de5adea71c258e95e6565c079f4e0ffd265"
     },
     {
-      "path": "docs/platform/observe/spec.md",
-      "sha256": "ac552c7d2f819abc1ac5044ac5140da3b602353dc835147b6978a57e63c77da5"
+      "path": "docs/platform/observe/README.md",
+      "sha256": "8bf9f34ce3e795b1576813c8fe80005ef003613c4d68a3b90fb9fb96054f3be5"
     },
     {
-      "path": "docs/platform/packaging-distribution/README.md",
-      "sha256": "de511be6b465433d260a468633f29c6849756cc68f0998749145cf3864a0b525"
+      "path": "docs/platform/observe/spec.md",
+      "sha256": "ac552c7d2f819abc1ac5044ac5140da3b602353dc835147b6978a57e63c77da5"
     },
     {
       "path": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
@@ -4542,6 +6173,10 @@
       "sha256": "440db2077af6b47a31de11c589ef06860b7bed61a892a62bdec02d7e6760266b"
     },
     {
+      "path": "docs/platform/packaging-distribution/README.md",
+      "sha256": "de511be6b465433d260a468633f29c6849756cc68f0998749145cf3864a0b525"
+    },
+    {
       "path": "docs/platform/packaging-distribution/reports/track-closeout.md",
       "sha256": "637a1c3c2a8fab87f188b508e59a9dc1b8480efb62ec6d1d4acd094777a924ef"
     },
@@ -4572,10 +6207,6 @@
     {
       "path": "docs/platform/process/spec.md",
       "sha256": "1ed03ecc353df1b180802791cdb904904f6141347720339347377cb5b48236db"
-    },
-    {
-      "path": "docs/platform/proposals/README.md",
-      "sha256": "be7220ab0032530d7f3913a59c2393318e94d5be4cc6f4408d3a2464e0dfca90"
     },
     {
       "path": "docs/platform/proposals/architecture-advisory-panel.md",
@@ -4618,6 +6249,10 @@
       "sha256": "86eeb55d9643c559469f49cdb6fd2981722cbe52bf7cac6a2b6365faa12fe113"
     },
     {
+      "path": "docs/platform/proposals/README.md",
+      "sha256": "be7220ab0032530d7f3913a59c2393318e94d5be4cc6f4408d3a2464e0dfca90"
+    },
+    {
       "path": "docs/platform/proposals/step-09-group-thinking-substrate.md",
       "sha256": "002c0b30a6d7073a8ad136907b5462d1150abbafa841697028bfa1f0e64be41f"
     },
@@ -4634,12 +6269,12 @@
       "sha256": "63b6988127e494a845e7ce09d64fc584f802221b61b2089cb78ee2c5f27ca858"
     },
     {
-      "path": "docs/platform/run-supervisor/spec.md",
-      "sha256": "91cb0302588801a989846109d6a7c9298c28b842709195618f7c22d02ef19011"
+      "path": "docs/platform/README.md",
+      "sha256": "1ced7aa146e2669d4ac346edba862422b5b4ee0af3fb86bbe4fea9b636d60ac0"
     },
     {
-      "path": "docs/platform/runner/README.md",
-      "sha256": "c636d7cc4539adb8ef7ab50114f8aa200195ffce421a9192bb9a50addb1fb7dc"
+      "path": "docs/platform/run-supervisor/spec.md",
+      "sha256": "91cb0302588801a989846109d6a7c9298c28b842709195618f7c22d02ef19011"
     },
     {
       "path": "docs/platform/runner/architecture/h-69197b459754.md",
@@ -4676,6 +6311,10 @@
     {
       "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
       "sha256": "e68528aa3987c7be6494fb02dcd8ce7372fece7e3c171780d489cac4accfc14b"
+    },
+    {
+      "path": "docs/platform/runner/README.md",
+      "sha256": "c636d7cc4539adb8ef7ab50114f8aa200195ffce421a9192bb9a50addb1fb7dc"
     },
     {
       "path": "docs/platform/runner/spec.md",
@@ -4758,10 +6397,6 @@
       "sha256": "c464ce042ccb9c29ff9471f3485f4c906ace06d848006e056494d0024c0bac94"
     },
     {
-      "path": "docs/platform/ui-spec/README.md",
-      "sha256": "648877eba79e0875045a0f145314d9805f2a61cd007c57ccfc5ac1f27a7336b0"
-    },
-    {
       "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
       "sha256": "23ff53b38e19a4560db14acd42183d23e792c6228221e7d066fd053e51e4a988"
     },
@@ -4830,16 +6465,16 @@
       "sha256": "f21c7e948d0a6223c351316c38515db1daf89f28388c1c6bb5b3d92360f9937b"
     },
     {
+      "path": "docs/platform/ui-spec/README.md",
+      "sha256": "648877eba79e0875045a0f145314d9805f2a61cd007c57ccfc5ac1f27a7336b0"
+    },
+    {
       "path": "docs/platform/ui-spec/spec.md",
       "sha256": "436782fa67de9576dd20c28c7f2b960a4a5c11316689afbd81ad7bdc0c6880d6"
     },
     {
       "path": "docs/platform/vision.md",
       "sha256": "682192b6df66b26feb445963d59a39ac3a366439923838e8904189056c91cb17"
-    },
-    {
-      "path": "docs/platform/work-state/README.md",
-      "sha256": "8d9967f96128ef6705ede2e3e74b617ad5884c7798c2a4e2f0214a1c00fdc22f"
     },
     {
       "path": "docs/platform/work-state/architecture/implementation-pointers.md",
@@ -4866,21 +6501,20 @@
       "sha256": "d434c42e3baae4705783125cfb2d91f34f66cb1573e36f8da6d72fb596dee2e7"
     },
     {
+      "path": "docs/platform/work-state/README.md",
+      "sha256": "8d9967f96128ef6705ede2e3e74b617ad5884c7798c2a4e2f0214a1c00fdc22f"
+    },
+    {
       "path": "docs/platform/work-state/spec.md",
       "sha256": "ad87f25480923800f65d16549f7d720519d856b8ee234f5fab20a0b3c5b8e2e8"
     },
     {
       "path": "docs/platform/workflow/spec.md",
-      "sha256": "0ce96d282b026df85d96aa20c42b3e934b3b3f739a13edcf0aee6905465e1d7c"
+      "sha256": "d6e57367a274f65638d4544651230e2605eaa1e42604bd9cfbcd800bcfa83eb8"
     },
     {
       "path": "docs/platform/yaml-document/spec.md",
       "sha256": "5761841f0f3b8f2d48193ab6f171184cfed6f92faa3a730a2c149c2dae364850"
     }
-  ],
-  "replayRecipe": {
-    "language": "node --no-addons",
-    "source": "import fs from 'node:fs';\nimport path from 'node:path';\nimport {execFileSync} from 'node:child_process';\nimport {marked} from '/home/vantt/.nvm/versions/node/v24.18.0/lib/node_modules/@earendil-works/pi-coding-agent/node_modules/marked/lib/marked.esm.js';\nconst files=[];function visit(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory())visit(p);else files.push(p);}}visit('docs/platform');\nconst candidates=[];let spans=0;\nfor(const file of files){const source=process.argv.includes('--before')&&['docs/platform/runner/architecture/h-7af1f0242611.md','docs/platform/work-state/spec.md','docs/platform/runner/subcomponents/h-6979005beaf7/spec.md'].includes(file)?execFileSync('git',['show',`HEAD:${file}`],{encoding:'utf8'}):fs.readFileSync(file,'utf8');const tokens=marked.lexer(source,{gfm:true});marked.walkTokens(tokens,t=>{if(t.type!=='codespan')return;spans++;if(t.raw.includes('](')){const positions=[];let i=0;while((i=source.indexOf(t.raw,i))>=0){positions.push({offset:i,line:source.slice(0,i).split('\\n').length});i+=t.raw.length;}candidates.push({file,raw:t.raw,text:t.text,positions});}});}\nconsole.log(JSON.stringify({tokenizer:'marked lexer + walkTokens (CommonMark/GFM), not a regex code-span scan',files:files.length,spans,candidates},null,2));\n",
-    "instructions": "Materialize in an exit-cleaned tempfile under /tmp/fgos-work; resolve an installed marked module (the recorded module/hash was used here). Run from repo root, once with --before and once without; --before reads the three changed docs at HEAD. No module was installed and no runtime dependency was added."
-  }
+  ]
 }

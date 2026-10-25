@@ -7,6 +7,9 @@ import copy
 import importlib.util
 import pathlib
 import unittest
+from unittest.mock import patch
+from types import SimpleNamespace
+import json
 
 spec = importlib.util.spec_from_file_location('g0_join', pathlib.Path(__file__).with_name('join.py'))
 join = importlib.util.module_from_spec(spec)
@@ -20,7 +23,8 @@ class VerdictJoin(unittest.TestCase):
         self.row['bindingSha256'] = join.digest(self.row)
         self.group = dict(file='new.json', pointer='/bindingRefresh/0', row=self.row,
                           origins=[], refs={('old.json', '/claims/0'), ('new.json', '/bindingRefresh/0')},
-                          ids={'claim_one'})
+                          ids={'claim_one'}, decisionCommit='0',
+                          rowFingerprint=join.row_fingerprint({'bindingRefresh': [self.row]}, '/bindingRefresh/0'))
 
     def review(self, verdict='APPROVE', epoch='2', **changes):
         value = dict(id='claim_one', file='old.json', pointer='/claims/0', verdict=verdict,
@@ -51,6 +55,66 @@ class VerdictJoin(unittest.TestCase):
 
     def test_a_stale_rework_does_not_reopen_a_different_current_binding(self):
         self.assertEqual(self.judge([self.review(), self.review('REWORK', bindingSha256='b' * 64)])['errors'], [])
+
+    def test_stale_verdict_cannot_approve_a_changed_decision_with_unchanged_digests(self):
+        self.group['decisionCommit'] = '3'
+        result = self.judge([self.review(epoch='2')])
+        self.assertEqual(result['errors'], ['stale'])
+        self.assertFalse(result['approvals'])
+        self.assertEqual(len(result['staleVerdicts']), 1)
+        self.assertFalse(self.judge([self.review('REWORK', epoch='2')])['openRework'])
+
+    def test_fresh_verdict_requires_git_ancestry_not_a_timestamp_or_pin(self):
+        self.group['decisionCommit'] = '2'
+        for commit in ('2', '3'):
+            self.assertFalse(self.judge([self.review(epoch=commit)])['errors'])
+        result = join.judge(self.group, [self.review(epoch='99')], lambda old, new: False)
+        self.assertEqual(result['errors'], ['stale'])
+
+    def test_matching_fingerprint_authenticates_the_current_decision_without_ancestry(self):
+        self.group['decisionCommit'] = '3'
+        self.assertFalse(self.judge([self.review(epoch='1', rowFingerprint=self.group['rowFingerprint'])])['errors'])
+        self.assertEqual(self.judge([self.review(epoch='1', rowFingerprint='wrong')])['errors'], ['stale'])
+        # A fingerprint does not excuse an incorrect binding or ambiguous review.
+        self.assertIn('mismatched', self.judge([self.review(
+            rowFingerprint=self.group['rowFingerprint'], bindingSha256='wrong')])['errors'])
+
+    def test_fingerprint_covers_decisions_and_inherited_claim_but_not_snapshots(self):
+        doc = {'claims': [dict(rationale='parent', disposition='move', bindings=[copy.deepcopy(self.row)])]}
+        pointer = '/claims/0/bindings/0'
+        original = join.row_fingerprint(doc, pointer)
+        for key, value in [('disposition', 'supersede'), ('rationale', 'new reason'),
+                           ('reason', 'overlay reason'), ('changedClauses', [{'oldWording': 'old'}]),
+                           ('supersedesBinding', {'pointer': '/claims/1'}), ('reviewStatus', 'pending'),
+                           ('targetAncestry', ['Changed']), ('bindingSha256', 'changed')]:
+            changed = copy.deepcopy(doc)
+            changed['claims'][0]['bindings'][0][key] = value
+            self.assertNotEqual(original, join.row_fingerprint(changed, pointer), key)
+        doc['claims'][0]['bindings'][0]['priorReview'] = {'rationale': 'snapshot'}
+        doc['claims'][0]['bindings'][0]['reviewNote'] = 'author metadata'
+        doc['claims'][0]['bindings'][0]['targetUnitWitnesses'] = [{'rationale': 'snapshot'}]
+        self.assertEqual(original, join.row_fingerprint(doc, pointer))
+        doc['claims'][0]['rationale'] = 'changed parent'
+        self.assertNotEqual(original, join.row_fingerprint(doc, pointer))
+
+    def test_last_decision_commit_ignores_other_rows_and_detects_reverts(self):
+        def document(rationale):
+            return {'claims': [dict(self.row, rationale=rationale)]}
+        current = document('current')
+        old = document('old')
+        cases = [
+            (b'4 3\n3 2\n2 1\n1\n', {'4': current, '3': current, '2': old, '1': current}, '3'),
+            # The merge's first parent lacks the decision, its second carries it.
+            # A linear interleaved log would incorrectly call the merge an edit.
+            (b'5 3 4\n3 1\n4 2\n2 1\n1\n',
+             {'5': current, '3': old, '4': current, '2': old, '1': old}, '4'),
+        ]
+        for history, versions, expected in cases:
+            with self.subTest(history=history), patch.object(join, 'git', return_value=history), patch.object(
+                    join.subprocess, 'run', side_effect=lambda argv, **kw: SimpleNamespace(
+                        returncode=0, stdout=json.dumps(versions[argv[-1].split(':')[0]]).encode())):
+                self.assertEqual(join.decision_commits('HEAD', {'one.json': current}),
+                                 {('one.json', '/claims/0'): expected})
 
     def test_aggregate_counts_do_not_expand_into_row_verdicts(self):
         data = {'verdict': 'APPROVE', 'counts': {'APPROVE': 1057}, 'items': [{'id': 'G0', 'verdict': 'APPROVE'}]}

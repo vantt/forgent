@@ -546,7 +546,7 @@ Agent Coordination Engine:
 
 Dispatch And Execution Engine:
   DispatchResolverPort   (superseded in naming by DispatchRuntimePort,
-                          [Component Authority Boundary Map §13](../architect/proposals/component-authority-boundary-map.md#13-draft-ports);
+                          [Component Authority Boundary Map §13](../proposals/component-authority-boundary-map.md#13-draft-ports);
                           same candidate facade, not two live ports)
   RunStorePort
   ExecutorAdapterPort

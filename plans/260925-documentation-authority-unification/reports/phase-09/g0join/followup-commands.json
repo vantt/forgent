@@ -1,0 +1,133 @@
+{
+  "nodeOptions": "--no-addons",
+  "commands": [
+    {
+      "label": "code-literals",
+      "argv": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/scan-code-literals.mjs",
+        "/home/vantt/.nvm/versions/node/v24.18.0/lib/node_modules/@earendil-works/pi-coding-agent/node_modules/marked/lib/marked.esm.js",
+        "docs/platform/git/spec.md@d4839a339"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "seconds": 7.848,
+      "output": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-code-span-scan.json",
+      "outputSha256": "680616786654bce341109c2c7427c54119dd0c727ef21dd8db0ca237adf117c8",
+      "stderr": ""
+    },
+    {
+      "label": "rebind-check",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+        "--check"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "seconds": 1.354,
+      "output": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/followup-rebind-check.json",
+      "outputSha256": "ed2a2564e763a83b92016c25d3c600bd24fc3f484b1eef4c8d4142ae7311bf64",
+      "stderr": ""
+    },
+    {
+      "label": "carries",
+      "argv": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "seconds": 3.408,
+      "output": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/followup-carries.txt",
+      "outputSha256": "c8106e77dd2b88201c7ce74970dc0489c933a8cb1470836ff9582bd988449486",
+      "stderr": ""
+    },
+    {
+      "label": "legacy-ratchet",
+      "argv": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "seconds": 0.066,
+      "output": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/followup-ratchet.txt",
+      "outputSha256": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319",
+      "stderr": ""
+    },
+    {
+      "label": "join-tests",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0join/test_join.py"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "seconds": 0.047,
+      "output": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/followup-join-tests.txt",
+      "outputSha256": "f70c5e12f81e6ca2a27c5a58d268b60f9b9764c638cc0c6fbef9bce3d25bd541",
+      "stderr": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.002s\n\nOK\n"
+    },
+    {
+      "label": "rebind-tests",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/test_rebind.py"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "seconds": 0.046,
+      "output": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/followup-rebind-tests.txt",
+      "outputSha256": "199ba496f288116d36c62f29346d4fbf0bd75745a1c893abfcbdaa4c6d5b1033",
+      "stderr": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.002s\n\nOK\n"
+    },
+    {
+      "label": "data-validation",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0join/validate_followup.py"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "seconds": 3.497,
+      "output": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/followup-validation.json",
+      "outputSha256": "6e97d5c1661ac6251f7e53299731047108994aaa29654331eb5bc3e3405445b5",
+      "stderr": ""
+    },
+    {
+      "label": "join-head",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0join/join.py",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 1,
+      "expectedExit": 1,
+      "seconds": 21.722,
+      "output": "plans/260925-documentation-authority-unification/reports/phase-09/g0join/followup-join-head.json",
+      "outputSha256": "d3f54a5c688bba3d2ed310f35879a1dc015b10790b1488dfb0555c21ced6f825",
+      "stderr": ""
+    },
+    {
+      "label": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "seconds": 0.051,
+      "output": null,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    }
+  ]
+}

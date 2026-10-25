@@ -417,7 +417,7 @@ activities:
       pattern: panel
       blind: true
       contextRefs: [core/agents/council-assumptions.yaml, core/agents/council-ship-maintain.yaml, core/agents/council-feedback-loops.yaml]
-      seats: [member-1, member-2, member-3, synthesizer]   # ghế khai tường minh, role producer ×3 + synthesizer ([seat-binding.md](../seat-binding/spec.md) mục 7.1)
+      seats: [member-1, member-2, member-3, synthesizer]   # ghế khai tường minh, role producer ×3 + synthesizer ([seat-binding.md](seat-binding.md) mục 7.1)
       params: { roleTasks: { member-1: ..., member-2: ..., member-3: ..., synthesizer: ... } }   # khoá theo ghế
 must:
   - id: independent-positions
