@@ -1,0 +1,958 @@
+{
+ "pin": "1967445897d028d73f41f62a0808ae8b81e8c63a",
+ "verdicts": [
+  {
+   "claimId": "claim_0dd6189a9d8ed1bcdd656127bf71774e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/77",
+   "bindingSha256": "01d7e6812a335c5fba4eae40f2c31e423ec575500a86ab283df8e5e922d7d41a",
+   "targetUnitDigest": "b0f4d04ac734632bcddc6d3be5dd9c984c033c9840edc4aeacfff83f9fe2b690",
+   "rowFingerprint": "02065bf51d8abfa37f088c4b7c5805a1e28fb2b2f2662ed1c32ba2ede4904e44",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. The source section is contained verbatim in the target section; the only addition is the next section's HTML anchor line (heading-composite context), as stated."
+  },
+  {
+   "claimId": "claim_e3c928a8fca5c645487d1b574f0c5d36",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/78",
+   "bindingSha256": "12d19736bc6c7539ac3791eb29bd991b3c548120029f2441f7c64f009ce2d7ff",
+   "targetUnitDigest": "9b3ff4bedb1e8747640191bfea313ad3c8e14772aa83430035793053454b84cf",
+   "rowFingerprint": "b03db7cd3f9317be7c15196d39ee7c271f39d5fe7b25a3d6355f2af6322370d2",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_386a8c90d7f9d79a52190add7a82f33f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/79",
+   "bindingSha256": "fda32b1030a9f6008271769a4f5186a941d6f44917dbb38d6cd3119cdfac9ecb",
+   "targetUnitDigest": "95bdd9de256a67e0fa8dd10401b1d7f0844d1870123518726e598b2c5bae3595",
+   "rowFingerprint": "0a9beaddb7f647680cb36fa902fa73f2692f57987e5a72f2675e65a67119cd75",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_aa28053a8a4b2ff13690fc6a20044b9f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/8",
+   "bindingSha256": "40237c29b91ec002a0336fb5efbfc33bd7b1095083f9a283fd4ef26858d10a23",
+   "targetUnitDigest": "69a415f020853dcf82a0db0e5d6f93a3223436771bc39d27c1d9b24d8741d906",
+   "rowFingerprint": "bf034e22241dc8797c1c833e0fa155005ff76f4ed326b232ca7d09819567e4d5",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Section scope equal apart from depth ## -> ####; the one changed payload clause (git rev-parse -> on-disk gitdir/commondir) is owned by claim_b5695d38 (g0 /bindingRefresh/9, supersede with changedClauses), as stated."
+  },
+  {
+   "claimId": "claim_3b4da5c5b12c6780b24e84b53ca73e49",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/80",
+   "bindingSha256": "05e66dab2fb05d5b34edf34825aed1735fd419c9d04d96a5919da146be2769ac",
+   "targetUnitDigest": "24cacb854eb926ac0ca1d2e0857cddeca8ae642c1e412f5f08515826e4b2dcce",
+   "rowFingerprint": "247806208f8afe9f5f7d44ae23375e49d70a43bb01940c30a7ae975b39bed506",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/81",
+   "bindingSha256": "c2b301dd4abee72a70e207a2f309a6221bd0b1ce7cef4113bc39dd478e431980",
+   "targetUnitDigest": "8a7417ab625a5dc520e04a13f9d0c9b3edb4635ed01d3aa81e0debb33293d120",
+   "rowFingerprint": "edd07bae5b9f4defca45f43b08ffd6e5040abdee5717e047e27b162e6b5221ca",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. The source section is contained verbatim in the target section; the only addition is the next section's HTML anchor line (heading-composite context), as stated."
+  },
+  {
+   "claimId": "claim_2d27908b73621a411fcf708b067b6ba2",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/82",
+   "bindingSha256": "9d8e75695092d63591318b1e3feac160eee25aaa53c513f35250fc41fbb41d60",
+   "targetUnitDigest": "f529cf675d973db5c441eb564349795365a178af00c24a64574e719574a90d9a",
+   "rowFingerprint": "5bb6555d2a0308be9a0cc07b3f5a911bb85f7932f24b15312b74f3f552f0e9bd",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_e68c14be45a430e3676761d7bdc9e6db",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/83",
+   "bindingSha256": "5a2d621f850faace62c68d2617ec05c393c4edd6ad6a4d741329553771593443",
+   "targetUnitDigest": "31a7f48e9cc16169ae86eca79b0e4f00c8db944f0459f712a74075403989eefe",
+   "rowFingerprint": "ab4dad92f87c2cf6f4805c4d70e78777bf88f98dabad62ba40a0d2272a75baf2",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/84",
+   "bindingSha256": "8291f1d879ea6d9a92f9c3082e15a5a8cde8ca7539e736c194e8972799069518",
+   "targetUnitDigest": "9b836a5af7fa427d6991eaabe7781f566d664801b58ca1f13b67277ea39ad7f0",
+   "rowFingerprint": "707749dfadc3dc9befe5b5894c624f496f25bf04c33b6caa29efcde9aba09a11",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/85",
+   "bindingSha256": "c0973b304af249c1caf189ae259b110ca5b65f5c5d2ce3ad82e3907c4b7aee0e",
+   "targetUnitDigest": "261b711fa046562a35014f434dbf1d8f6407b07a3ffd954587406a05682d15d4",
+   "rowFingerprint": "148288cf30afa6524fe2c02bde79d713c6b603034e3ce3a936f591061144ff9e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_9f56719f95c81edecfe6dfda00ca0268",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/86",
+   "bindingSha256": "cede87e677a9aaca7d79b55d1e2f85da9c0b06afa69630787ba3b24d48008534",
+   "targetUnitDigest": "5c944fd5d5e941cc4075438f60662e1e33b88846f7042621666b958a0dd8ba53",
+   "rowFingerprint": "83ffc8506849d52b312db729758651ac551d6cdbccfa1c637c7ab462cbc43142",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_4e04420f3322b42d6a313faa72216ae9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/87",
+   "bindingSha256": "d3c53135a8dae2056612adfa25a1cd0292a6ccacdb4353308b97c6f21d1e0921",
+   "targetUnitDigest": "58646cbd3a8ef4bdf7509e971395d7242ef08b5f751c3aa1504e628c8104d3c0",
+   "rowFingerprint": "3d2e36982bf4fc1d4648658f49bdbda06a0d6e3849ecbb38574a03218c530617",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_fe29583fb3eaae959e22d8ea42f76e6d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/88",
+   "bindingSha256": "9fcd0edc4c137e09c23553334d5ca2ec42b5c93a179b4e16757c9553e749f22e",
+   "targetUnitDigest": "e702d74cca4d01009f5dbc585dfbcf259ab9e39fc77e5b6e9a030296acc4248a",
+   "rowFingerprint": "1043e165abb14816ce1fe9adf0f916b6239050c6b7b7ddd28bf47224f9dfee6d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_e763e03b02e0c2d677ef4b49f30a9ad3",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/89",
+   "bindingSha256": "12d0a493609c8c2d471608d8d6712f65bec67d6ac430580287a9303a96628484",
+   "targetUnitDigest": "74fba64154edbbc6e201729f4e343a8732f9093280165fc98ea24e9b24a6042c",
+   "rowFingerprint": "a616500b047357c55118b1055aa83563ba03f66ce742f3164b8fd8111c863df2",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_a9ff1aae0ff13bbce2c3ba5e9f30b19e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/90",
+   "bindingSha256": "072617a06281e7665dd80bdfc0f0394e882dc3a1b1437f75f6c1814a7b6c7293",
+   "targetUnitDigest": "15548911bb940170cbac8c68e3685eeeb62471bdd37e175cf02b309002d32522",
+   "rowFingerprint": "f77eb056b6a9574e06bc4b7680c22736e009e8a7f72ec358ea2e8d4c27b83836",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_86e1127b120054dafe55e52585c2a1d9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/91",
+   "bindingSha256": "7fd855c7947edc00c40e4f3fd275a3708f54f2384e5db800c2aa80de40fb8cb4",
+   "targetUnitDigest": "1eb8c8df3524d600863bacba004507acd1f84bdcab79cdf00e1ddc726c24b575",
+   "rowFingerprint": "d90d20101f3ef5c43c6305613591161e25c188f153e587d27d99c7a70178ebeb",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_9974f7370cd9be4ca66f08057a94d3d7",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/92",
+   "bindingSha256": "29fa0111eb3a425ecccfdb8f1ff933a8d2d6adff399d3df2c8f5fe6ba85ec8ee",
+   "targetUnitDigest": "8ae8c5f37b83bcd7d940c00aa9528304f337f9e72990b5207415fc7ed62c9af4",
+   "rowFingerprint": "e481a8e145cd39f082e5fe7b7cf06a914f563e037b2169853a7f24c71a98630a",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_ebfb0421fa0d9c6693aaf57a262dd471",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/93",
+   "bindingSha256": "3bc3f83000ed5878223c09588f06f8112a36546a36ce5018a21cba6651077c63",
+   "targetUnitDigest": "c71c9558d2d278e6a0d2696cbbe222c2eb60f32c7b907fc07231437c0c2d97f0",
+   "rowFingerprint": "78e4cb7a9d07d2a838aa763c6bf077885971602c7775e00df01ab9dcf53d8af4",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_aa501f53cee0b7ec6adc656971266a97",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/94",
+   "bindingSha256": "b4be574b4a9c2581f31013d416cf5f5cf53c315e9f540d8f4a180b14b7b95aff",
+   "targetUnitDigest": "a70886dacf6f54f199f048c84403caa52e6fcf99c65dbea9169c71ec2202bae9",
+   "rowFingerprint": "643b10de039d8ee9334018b53c8b81768a18405207e38c9ed6291eb5114efb57",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_69ddf8650201dae7cbe8fe80373c6a7c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/95",
+   "bindingSha256": "5a489398d3c43d610cba45aa856c44fbc6a4a2da7350fb702eac9ac5ca673646",
+   "targetUnitDigest": "1c78b8c81620de3db87b5014b8eb841f44817b8e0fffb595a008ae70b1bcca69",
+   "rowFingerprint": "dc9898c84482b4006a753feae3902cfaab062bf20527f13d45b3cb2b684f0b8b",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_b1c9fa89736c52b8bff6d5ec328cc553",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/96",
+   "bindingSha256": "befc446dfbb8b5e8f0c313f382c717ddb420f065cd01554101d1b900a02bf27d",
+   "targetUnitDigest": "6b827c7b203c054cb640d2f707bed0f02545eee40a3085f6a9f37fd107bff94d",
+   "rowFingerprint": "31866810ad45947cb79358110f8954ca326f545f68f3256c048a5d83b7cfaad3",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_aa3cf298aaa31c6dc9b4c8382434bc9c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/97",
+   "bindingSha256": "a4e5610c92ff3fadc4b7b3afa0fee3d809db5a983b38d7aace52adb41adfc9db",
+   "targetUnitDigest": "8a864bfaf25cf07832117f7c05ee8ae61b7abb202998b3e7ad816bb10111da8c",
+   "rowFingerprint": "8dc32e61ae5c67971e9c9c4ee8b5598e2bd2058f825a64eaca5232df6059bdc0",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_818a58278988ed797931b14ca91614e2",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/98",
+   "bindingSha256": "d2de80fc0670c8283f80392af534bf9aaaa467789e4b4e2a4767e413d2596fcc",
+   "targetUnitDigest": "a06a29884a79a4ebab4677e90c1c1a1e9b2a4f8378e0ef8b769c2a78a9c1a701",
+   "rowFingerprint": "6b464f19fbf70fe6aaffb79dece6029c6050e403ee0a66948dd29f8a3e082151",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "claimId": "claim_466331635349f55e32c11e0fcf56d334",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/99",
+   "bindingSha256": "35ff871241b77208e38a39ebb4b3fa5532c98140d9df19148e2a1575ac940335",
+   "targetUnitDigest": "d76f5cf17475a3fbfcac8752ebf9fd616795b1b9d810e23235f38a8322acffa4",
+   "rowFingerprint": "9b16c4270f9b19412ebf435142e83f6108bfd3d8dad6bacf7fd4a25ddeb3fe76",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading unit equals the recorded source unit digest (verbatim carry), as the rationale says; promote/move label unchanged."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+   "pointer": "/sourceBindings/877",
+   "bindingSha256": "5f1efe93f6e6f5dc089fb73d9f97bdb45c5f24aa17f82d45a803aecde7e479de",
+   "targetUnitDigest": "17e86891b31441849e0a2d91751b94f2c01fb3fe13a987609e5f58a30816e212",
+   "rowFingerprint": "f6b3d47e19cfb90253e9ca0dfb94223b2ed5342d0748c1312640ccc241a6b717",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target equals the current legacy line; the RUL108 supersession label was inserted on main (d309519fa) and present in current source, explicitly qualifying the kept RUL101 history; added reason is true."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/374",
+   "bindingSha256": "371977f0d64fc2b6034f067047361f6d0dde4b99f4002738e52df303a5f1510c",
+   "targetUnitDigest": "63681a9476ea8ec336db4883b5930b9c19c84ee4f8be18bbc19c5f14bd349da4",
+   "rowFingerprint": "8c8671151b8af21a9e011e777f80bc5a92dff47412dde3415810e7efdb9bfe9e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Fenced-code literal restored to legacy bytes (L13-25.1); target equals the legacy unit apart from heading depth; reason is true."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/376",
+   "bindingSha256": "a113a3ae938b05c1ddc1906c1bbed9596c7d3a2200c4fd0b6f92a18934873a9a",
+   "targetUnitDigest": "1abf5d8f0829bf67f641cea7997ea93ce7c97ed85bc1185c0be88ffbcab569af",
+   "rowFingerprint": "feae3a80744ff9dba5a27a8f0aae5654d2298e4f93faafa4ecba73519c942c08",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Fenced-code literal restored to legacy bytes (L13-25.1); target equals the legacy unit apart from heading depth; reason is true."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/474",
+   "bindingSha256": "01c1c7c33c5d66bfed4ecedcb655d87100a6fbae6e791f799448934fc418b01d",
+   "targetUnitDigest": "88c6bc62d859bd8458a097628c7e442a73ec4521d789c8f433bf3e47617414bc",
+   "rowFingerprint": "f3ab246e38566823ed294f0566a432d023b9a514ec9b2ad715aad591e9a99789",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. 'Document type: Contract' is conserved in the holder metadata fence (line 4), not dropped; added reason is true."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/604",
+   "bindingSha256": "3520d49be4de33bb403197654c3fd2d7757427362a90a4d4b71dd379c538d098",
+   "targetUnitDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
+   "rowFingerprint": "028003bdfe84941b6608cb15cc4c927534d4e6c7db69a5aab5152fa8bba91f6b",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Fenced-code literal restored to legacy bytes (L13-25.1); target equals the legacy unit apart from heading depth; reason is true."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/611",
+   "bindingSha256": "4e53ac516889e8fda19cd8bea133bf97283a8d5c326d097f1e52a301c49afe84",
+   "targetUnitDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
+   "rowFingerprint": "d6f1bf9010e0c786a08d93b44db0bf33575f4805dc5243bb9c9434eb3652166f",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Fenced-code literal restored to legacy bytes (L13-25.1); target equals the legacy unit apart from heading depth; reason is true."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/8",
+   "bindingSha256": "0dc5159b21dc53fea55f4ca63c6e5d05c88281573d5523801d7609530d617993",
+   "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+   "rowFingerprint": "a9ec871346b561f139a645a0a9bb6bf659949e33e1f95fcf9087b58d48501745",
+   "verdict": "APPROVE",
+   "reason": "Explicit drop is right: the reference-004047 test reads runner.md and work-state.md only; the foundation target stays as the authenticated dropped-locus witness (digest unchanged); Work 0032 is owned once by s11 /conservedClaims/7/bindings/2 and Runner 0032 by bindings/3. Prior REWORK (duplicate effective row) resolved."
+  },
+  {
+   "claimId": "claim_233e60f81a8d1f6720b34de45ba20ebb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+   "pointer": "/claims/126",
+   "bindingSha256": "7df0db9ab204d1b8d872d2185d465f21d318727ba2a7e85896f2efad021a88f3",
+   "targetUnitDigest": "2037530f444b84893e4f4be7fd6c3a9a339a3e26aee0db7f05e6b8e4e5178bdb",
+   "rowFingerprint": "69b9f8f9b27fdedbc36233d57db8205d2534331c00f7bb44d28065310996687c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Rationale correction names the current target and SHA; target equals current legacy (V-013); move unchanged; prior evidence kept in g0ReworkBefore."
+  },
+  {
+   "claimId": "claim_4ff3a12817bb891341b26283460beea0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+   "pointer": "/claims/404",
+   "bindingSha256": "60258c57535838b873ceb9b92395fdcf65ab9e41118c5086e875654b6b02b252",
+   "targetUnitDigest": "b5288b6f94225cb832fcd635d42e51face82e815ebdbb0b6f196bc7d285a7b12",
+   "rowFingerprint": "65e718896509cb442d8fb814f31eb5bbf5952abeeb2b6dbff0065462dbc40a3c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Only the rationale's Target SHA changed, now equal to the bound digest; anchor and disposition unchanged and still right. Note: 'Target unchanged since last reviewed digest' and line ranges are stale prose."
+  },
+  {
+   "claimId": "claim_76d404ea624a10455d7a14debe2b2a95",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "pointer": "/registryGaps/16",
+   "bindingSha256": "9545236ed63c02f92a5695507d46458fbf6f6436b409e5b6c9f0bc99168afc91",
+   "targetUnitDigest": "ad50d1b4f22683791ffa9f8e122789a54e622c0cd5bc7c44c93f565f1fdaa646",
+   "rowFingerprint": "8330561e86f1f6c74b72bf559259828801b729f41099b1fd5ffabe15f1d6d74a",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Only the rationale's Target SHA changed, now equal to the bound digest; anchor and disposition unchanged and still right. Note: 'Target unchanged since last reviewed digest' and line ranges are stale prose."
+  },
+  {
+   "claimId": "claim_5b308c0d698cf4b6e679cefd4b72159e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/214",
+   "bindingSha256": "0439a85f72084d980010739335818880edd41b7544c8f7c571434beb4c3aac15",
+   "targetUnitDigest": "18f7037414eaa3e6682d49f5477a6f75321fd6b77ffd90110ab99539dc47298b",
+   "rowFingerprint": "5e79694e6bee38f6e0c00bb6e9558d5ff02bef653c4b6cb18ce59e19ec925bbd",
+   "verdict": "REWORK",
+   "reason": "Digests recompute, but the corrected rationale still names release-manifest.md:220#unheaded-block-17 under 'Retained Runtime Identity And Activation Source Detail' and a Legacy CLI link to docs/architect with 0 destination changes; the bound unit is unheaded-block-23 (line 258) under 'Canonical Release Tree Rules', and the link now resolves to docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md."
+  },
+  {
+   "claimId": "claim_40aafcee52b22eda087c5f85eacb9392",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+   "pointer": "/registryGaps/22",
+   "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+   "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+   "rowFingerprint": "2fa9517a0fbb8793a826796ee13b6fe5d1084c38aafa5e84633e635d3b968fe9",
+   "verdict": "APPROVE",
+   "reason": "Prior REWORK resolved: import2/partial-carry-residuals.json row now binds target e8167a0a and file sha 85a7a1f8; residual lines 1,2,5,9,10 recompute and residualSha256 matches; the code span at line 191 equals legacy. Note: rationale's residual enumeration and the row's placement.selected digest (299c5b49) are stale prose/snapshot."
+  },
+  {
+   "claimId": "claim_f033905b059f073c62ec27f0ee6da620",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+   "pointer": "/registryGaps/3",
+   "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+   "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+   "rowFingerprint": "dccb6fbe0ebf7ad084e1ce2145d4190428f737c5307e547264c4e9e62b97975f",
+   "verdict": "APPROVE",
+   "reason": "Prior REWORK resolved: import2/partial-carry-residuals.json row now binds target e8167a0a and file sha 85a7a1f8; residual lines 1,2,5,9,10 recompute and residualSha256 matches; the code span at line 191 equals legacy. Note: rationale's residual enumeration and the row's placement.selected digest (299c5b49) are stale prose/snapshot."
+  },
+  {
+   "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+   "pointer": "/registryGaps/35",
+   "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+   "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+   "rowFingerprint": "c37b1a6cb90efd93096e22612f3c7688f10bd4f5cceb95131a899b79198e5df1",
+   "verdict": "REWORK",
+   "reason": "Digests recompute, but the rationale's Target line (SHA-only correction) and its L12-44 note still name runner.md:1219-1269#unheaded-block-102; the bound unit is unheaded-block-101 at lines 1244-1294, and unheaded-block-102 is now a different unit (289d09c0)."
+  },
+  {
+   "claimId": "claim_c2cb6de3e8b1288ed15fcd60f3154bbb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+   "pointer": "/registryGaps/36",
+   "bindingSha256": "9545236ed63c02f92a5695507d46458fbf6f6436b409e5b6c9f0bc99168afc91",
+   "targetUnitDigest": "ad50d1b4f22683791ffa9f8e122789a54e622c0cd5bc7c44c93f565f1fdaa646",
+   "rowFingerprint": "309d69419a715b70fe9553418b4a67d6623079820cb3ba9068b6cf59f90cd272",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Only the rationale's Target SHA changed, now equal to the bound digest; anchor and disposition unchanged and still right. Note: 'Target unchanged since last reviewed digest' and line ranges are stale prose."
+  },
+  {
+   "claimId": "claim_941d92300739ce9696b16458dc45c7a4",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+   "pointer": "/claims/24",
+   "bindingSha256": "dbb0c2ca79a91d42964a91a8d2a44cf96ddfece2965e2b731e370060c1f5424e",
+   "targetUnitDigest": "8919787289b00624dbb1d0123d1ed8a35e51a18992cfd617a6a40e9cdd9c9747",
+   "rowFingerprint": "074cca22d72b5a3459fe7657a2e53260652b1d287f923ced5e62c719beb3a5df",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Rationale correction names the current target and SHA; the current legacy runner.md unit occurs verbatim inside the fenced historical section; merge unchanged; prior evidence kept in priorReview.g0ReworkBefore."
+  },
+  {
+   "claimId": "claim_78015ffe1d0ffa2f08d49170f46d00e5",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+   "pointer": "/claims/25",
+   "bindingSha256": "0767f2742a0c3660a12289ea8a9a32d1249ad9d1cc92730a68f6d7237f46c1a3",
+   "targetUnitDigest": "87e08249fbd99ae0d5c953a0bced0ec3b8e1984a3c7ef94097045e7113828fe6",
+   "rowFingerprint": "109d7ab7fe9ecfba625fadfa9882151c37ebb269fefd0fbf2ed8d3a356cfffb8",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Rationale correction names the current target and SHA; the current legacy runner.md unit occurs verbatim inside the fenced historical section; merge unchanged; prior evidence kept in priorReview.g0ReworkBefore."
+  },
+  {
+   "claimId": "claim_6dba574d27eb8f35739cfedf140d4775",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+   "pointer": "/registryGaps/0",
+   "bindingSha256": "c1b907e4fe26f6f3deeef5257b5a3be6e3d286de99ac835ddec7961edf16d0ac",
+   "targetUnitDigest": "83c4ce05b5d6a9b14dccd5a2365bec12ee589a80b555dec26a5a7275106b45ec",
+   "rowFingerprint": "957164f860b8320bfeb9a999ea79afc3299c74130c62e125cbe9901294aff376",
+   "verdict": "APPROVE",
+   "reason": "Prior REWORK resolved: changedClauses old wording now matches the bound source (2f0d4a550) exactly, applying them reproduces the target byte for byte, change sources hold (runner.md@0d200a3cd endpoints, seat-binding rigorToTier removal), and the N1 provenance (b919e2b9b, successor claim id) is kept."
+  },
+  {
+   "claimId": "claim_9175095c05d2486024a13dedc4ee6f8d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+   "pointer": "/registryGaps/1",
+   "bindingSha256": "17f0d5dccecee97be0c49787102db666c401f15719fdb33fb8cce0ee11c98f73",
+   "targetUnitDigest": "40414b50fe1dc4e6f041fd0fde8ca68afb2519c25ce3de0d798ba58b59bfc491",
+   "rowFingerprint": "bce62120ea4a8ff0179d3724ce3a67384257edf59f14defa01640e5829929b10",
+   "verdict": "APPROVE",
+   "reason": "Prior REWORK resolved: changedClauses old wording now matches the bound source (2f0d4a550) exactly, applying them reproduces the target byte for byte, change sources hold (runner.md@0d200a3cd endpoints, seat-binding rigorToTier removal), and the N1 provenance (b919e2b9b, successor claim id) is kept."
+  },
+  {
+   "claimId": "claim_daf2ec0996ad074a68903680fce85adb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+   "pointer": "/claims/145",
+   "bindingSha256": "e97c023929b63fd956290c52016b72ded8881cdb0cff269c6001d394b5d98f15",
+   "targetUnitDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+   "rowFingerprint": "a6ea52f59c0ff5d9980545a89dfeba0725cb4ecd9b3fa7d83975b93e24ff56a2",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale now names the bound anchor; reviewStatus reset to pending is right. Note: 'candidate lines' range is stale by 3-4 lines."
+  },
+  {
+   "claimId": "claim_73ae83a090b77eed0e84212e99fa6e7c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+   "pointer": "/claims/147",
+   "bindingSha256": "ae1f3dcc4e11a7f41ed3e153ce1d81b4997cb71b7b4f3ff3b6fea9e392ad5482",
+   "targetUnitDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+   "rowFingerprint": "6aadb2bb3a3bacdee1797f7de304cdbfe46f8b77fdcc215f252586735d718fa7",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale now names the bound anchor; reviewStatus reset to pending is right. Note: 'candidate lines' range is stale by 3-4 lines."
+  },
+  {
+   "claimId": "claim_cc0d485b1b93357edb755f4121a26206",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+   "pointer": "/claims/149",
+   "bindingSha256": "9b3d7df2cad43ccac183fd6ac9b9febfa8d4ab94f7fda4aa8b09845d3107053a",
+   "targetUnitDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+   "rowFingerprint": "1203c699614d026bd27df525274d211060502f92a0edd5d512811998d26c9625",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale now names the bound anchor; reviewStatus reset to pending is right. Note: 'candidate lines' range is stale by 3-4 lines."
+  },
+  {
+   "claimId": "claim_f1aeeff92e7bbf3f52b1cc88896cc41e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+   "pointer": "/claims/150",
+   "bindingSha256": "29ab0072af33d7c4b8465394439b798dbbb9daa805f0fb63375bfd5d90255860",
+   "targetUnitDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+   "rowFingerprint": "ca5bddaf1b4350d078b375d101e1ebf24c3cd612fda677ac1bcbc2736acc3381",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale now names the bound anchor; reviewStatus reset to pending is right. Note: 'candidate lines' range is stale by 3-4 lines."
+  },
+  {
+   "claimId": "claim_1538dad17e4fa44207a7f70dc2ca7b55",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+   "pointer": "/claims/151",
+   "bindingSha256": "9486b7940a454bb9490eef062c9b13432d1d9a660c4c6f73a1619c46320e1b54",
+   "targetUnitDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+   "rowFingerprint": "720913cd1f410f680c50ba97f85cda1c09d2458a0b91e03ab7720986b8aacb30",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale now names the bound anchor; reviewStatus reset to pending is right. Note: 'candidate lines' range is stale by 3-4 lines."
+  },
+  {
+   "claimId": "claim_daa730ce31dbd045d14a42c31c57f316",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+   "pointer": "/claims/152",
+   "bindingSha256": "98a35a389375ec00e9fae99ed0098f377b5d3dc320641df0fcfad7984e982961",
+   "targetUnitDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+   "rowFingerprint": "2e63457df9ed4243df9b347d383234e5e330643099198e2820d25b4e7662d601",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale now names the bound anchor; reviewStatus reset to pending is right. Note: 'candidate lines' range is stale by 3-4 lines."
+  },
+  {
+   "claimId": "claim_1a847c3e3266a47169a83f7ac836ef7b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+   "pointer": "/claims/154",
+   "bindingSha256": "99b38d16601f26952392d86148928653a07a0816c48a9ab48a5ebb3f290164cf",
+   "targetUnitDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+   "rowFingerprint": "34f71227dff8ea19e55dcd3109478794bf213e9ee5585aff9fae9e3d315c7258",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale now names the bound anchor; reviewStatus reset to pending is right. Note: 'candidate lines' range is stale by 3-4 lines."
+  },
+  {
+   "claimId": "claim_d4bc3fb932ca2d29e917119191f45f1c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+   "pointer": "/claims/155",
+   "bindingSha256": "3e58abffa135e5d87789c8e0f91b1a8fe677f793fb31753b150af21925e3a033",
+   "targetUnitDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+   "rowFingerprint": "baf8d620c3832aed71363b5809828e3aad160ff38e93fd9c5ae721c5326c15b7",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale now names the bound anchor; reviewStatus reset to pending is right. Note: 'candidate lines' range is stale by 3-4 lines."
+  },
+  {
+   "claimId": "claim_b1731956c352b9977eef7ffa07f88991",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+   "pointer": "/claims/158",
+   "bindingSha256": "a53ff66dd3db1c464d93a5912844315ec80ebf0bd5e18be13a3c9110994d424d",
+   "targetUnitDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+   "rowFingerprint": "30f9e06a1ac05b769fb8d7eae8a8e41d75baa7a4fcd50463ba6d793bcd8aedaf",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale now names the bound anchor; reviewStatus reset to pending is right. Note: 'candidate lines' range is stale by 3-4 lines."
+  },
+  {
+   "claimId": "claim_54f630d44a33c5624ebeca834cf25ceb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+   "pointer": "/claims/159",
+   "bindingSha256": "a2bd310ee49199d40fe4f99ee82903a09720e1dcffb3fc23616d7f268c6ebc06",
+   "targetUnitDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+   "rowFingerprint": "889a02580b90018851e7aaf0e43429dd9ab49e141dad09fce09a453fb5e9919d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale now names the bound anchor; reviewStatus reset to pending is right. Note: 'candidate lines' range is stale by 3-4 lines."
+  },
+  {
+   "claimId": "claim_220b8163566ad8b38cbf1d534c871e42",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+   "pointer": "/claims/160",
+   "bindingSha256": "ea3f72bb991b365e27b3e5f7cfd57660d1a049ddb62c16d675c6cd6b89e09a41",
+   "targetUnitDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+   "rowFingerprint": "fef151ee61579c15892a70c49d088a0a0a5d3389da2f447c6ba15e8234a67a15",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale now names the bound anchor; reviewStatus reset to pending is right. Note: 'candidate lines' range is stale by 3-4 lines."
+  },
+  {
+   "claimId": "claim_b2a51d5d39832d330879947bdbbcb227",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+   "pointer": "/claims/4",
+   "bindingSha256": "ebfcac2a9dff46497322d64d97dfb66f46efe61f1485e5bd8091cc6a6330a029",
+   "targetUnitDigest": "15cf2d08571be0557c0159bc4ce5e07b282a840ed14172cea109bbe4f4e544c5",
+   "rowFingerprint": "898b5f89eee09da35da35441173c142c10446d6fee638cd0525ff7bc056d41ea",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Only the rationale's Target SHA changed, now equal to the bound digest; anchor and disposition unchanged and still right. Note: 'Target unchanged since last reviewed digest' and line ranges are stale prose."
+  },
+  {
+   "claimId": "claim_bf1888a05f53ba3cd515eb792c5059b8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+   "pointer": "/registryGaps/2",
+   "bindingSha256": "72593be3c85e403df8b73a6a4fb15f54a9fa63a326b293554ed961702bdacb2e",
+   "targetUnitDigest": "516bd5db5c2ca2d7390dc20ddba2b6438a01dcce310bb225d2d2dc9d7d457eea",
+   "rowFingerprint": "b8a2f22d3c6071515c91bd6675488a846487e8e96505e37b80c81d47d64a224f",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Only the rationale's Target SHA changed, now equal to the bound digest; anchor and disposition unchanged and still right. Note: 'Target unchanged since last reviewed digest' and line ranges are stale prose."
+  },
+  {
+   "claimId": "claim_2c3300909e21da9dd0feb02e991c5f0a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/10",
+   "bindingSha256": "f786dc0748d00f4258c3a21479aa14d432d9f16858abf9907b88b3702a684af5",
+   "targetUnitDigest": "ebe762d7e34a8290e4103f5a0ae8adb7cc4efa4c0820b97be07cd42344f1ce8c",
+   "rowFingerprint": "9834146a4813f8bd81dde07a21e65c4282cc2557c7712af32ae7e31f873184f0",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Target heading equals the current legacy section (s13 /sourceBindings/341-342 adjudication of the 2026-10-21 rigor/tier contract); supersede and new rationale are true."
+  },
+  {
+   "claimId": "claim_0735a1a1ac2e5c08ab7dde6f393746f0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/12",
+   "bindingSha256": "ce604d7a23e8ad34fe86be6d4d3687dfec7e8e11dd4d8a5c255871ad39f50712",
+   "targetUnitDigest": "11acb9f9f0326bc74fa270823e169722679dcaed64cc6da150f5f2c7912d9400",
+   "rowFingerprint": "1f5f14c24142ef1a50a75bfaefa41c31be72928227bc66ae0742aa017af668b4",
+   "verdict": "REWORK",
+   "reason": "Supersede and target are right (target equals current legacy runner.md unheaded-block-11), but the new rationale cites the resync-a adjudication of runner.md unheaded-block-10; this paragraph's adjudication is unheaded-block-11 (s13-resync-a /sourceBindings/343). Block-10 is the rigor paragraph carried at target unheaded-block-4."
+  },
+  {
+   "claimId": "claim_d940e5b03dd1e19deb086af4a0a22fa2",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/155",
+   "bindingSha256": "cd47f51bfb8b4954115e1daefe6556675346690ba636e11f8b88bbe54bda4a40",
+   "targetUnitDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
+   "rowFingerprint": "00e86759b8795d633f8aa1e502c8043ad89c0e7e02ad7ed4ff1566c7d14f1294",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_ac655fa53e915603a6788b8cbf14d529",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/156",
+   "bindingSha256": "7ef3308fcf2e64fcfb7e3bacd7c3ff92b954fb95ac67b27dd8589a76204be6a6",
+   "targetUnitDigest": "604f27c0c0b41f7c810ab6fbdc753ca0554a9af27dbac7ef93d99156bf4cc7e9",
+   "rowFingerprint": "5238bb928fdcc15b47ef96401438b4eecba59802518022f82ddbab71f3610c82",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_1116c4f544e78436e0e564fa8d827cac",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/157",
+   "bindingSha256": "6a91599526f7f141367d7911d1e8fa4f445d9c992050ed5668f00cc687903ac4",
+   "targetUnitDigest": "b39158ae03ad6358028e813139d4157895186944f4a10ddd3e8756f61cbc8824",
+   "rowFingerprint": "f21bb0af950303e6509be34cb1c5d1723d58af7a262d0bf4c608a0af87c29d41",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_27d6318e5b61562f3521a24fece7d015",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/159",
+   "bindingSha256": "077f026edfdb22ca646e3f9509b77726730085e3840d9d3b775f1e6fa67d53b1",
+   "targetUnitDigest": "1dc2761ded279b2db8a63a37ab46622ee0857ac91ac6bddc70b647b6fd45659f",
+   "rowFingerprint": "c69ba0c19f235a6e869be3609473717bf4c6770d970653177358ad8bca366a48",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_64b0cdea180e4a5760597816f59d901b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/162",
+   "bindingSha256": "f5a5cc3379247dd0d839cd9e916eec3aba133c96bd41cd5b28833ff67b1fc9a9",
+   "targetUnitDigest": "025b8b721ce848ae9047ff219539a44ddcb48627029daad0566fd065a33c2a52",
+   "rowFingerprint": "82d493ccd0b1d719454472f611f1442e527334e9b1945277be4195d2e719aaa0",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_4cc8a229ab16588700d7367a2883e5e5",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/163",
+   "bindingSha256": "24965530bf5e047663d58827a75777863561aaec3cbcb1d1afd352c926331d6b",
+   "targetUnitDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+   "rowFingerprint": "6c2301b13e03ff2315f3708b81e89c82c95a7cffb4a2e6befbf9956473315b9d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_927f25d69eecea02a9f490ac358f9160",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/164",
+   "bindingSha256": "c44ab7e94712811da87c49d6566bd5c936764eb0ba0dbe3cea818be0a83e5cba",
+   "targetUnitDigest": "59d0cd5865c681d2535cd1fdfcfa91bb8062f779329ace7673d29537159e2163",
+   "rowFingerprint": "b27348d2c36490873967daab37b8052d2bbc86166a2840e9e6d4f1a43ca4887e",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_e1d796c4b41dd038701bdca812ad80e1",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/165",
+   "bindingSha256": "5e902f8963ea53f13c7f5ad63b83089c7e92eef0f90e2b1f32931ad4a486732f",
+   "targetUnitDigest": "04f51a4f5dfccd3bd32411d47268161e9a971db21e975f38699939e78a1f0c55",
+   "rowFingerprint": "30308b853acb73f666ad92ef95ec78af9fa241260057bda3446ff8978f1b704b",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_ee954f73b86887b8350bd2735d3640c8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/166",
+   "bindingSha256": "16e4aa570d737cc2b559291c2d577c6a0500f75f2ef582bbcc1833e763578dd6",
+   "targetUnitDigest": "124888c61ed54076f79cc849c645c99501bb225b3f323f33af973891f9a5749d",
+   "rowFingerprint": "392e4184db40f5c2cf4ce51e5cb1e8bccc0949a158100f6b28001f2437f4054a",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_bb7a322701d0d2aaafa73446c3ab66de",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/167",
+   "bindingSha256": "4e28b65556cc1eb2fe32acbcc44a49cf7c4973438710160426854fe7061697f3",
+   "targetUnitDigest": "c11d67db6566ba3bc0468506dfdcdc3333c4c43943db1813332d60a8e6be3278",
+   "rowFingerprint": "090000411613c3d268a146d8f83d5c2c935c296b8842e1405dc3e85ee8f217fb",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_9d234a2abbcec244d40fa6dd3439dd60",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/168",
+   "bindingSha256": "03ceea8e6e2cea767fa1f197511beabc44cfe7a4cef0765b11807b278a4b889b",
+   "targetUnitDigest": "a23e016ecbd901a3f370dd33b3fa87d0f679a24d9be45e178f34b4e24134334c",
+   "rowFingerprint": "6620548e44d44d01350fa34a3f4f0ef9e36403f3cb293dfe9f425ec942f6b9ff",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_5e0cf165c59b615201e26c123abc8099",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/171",
+   "bindingSha256": "e4949fb13c9b759de912a06c748085fef5f27b6595ed6fc528b220ee3c527dc3",
+   "targetUnitDigest": "67ff0ec2d25af01f6dcbc9715018d0d3113542ed4c3d9fd321c10748d2fad180",
+   "rowFingerprint": "a68f0a08db176c436cad8c8c50a5c24aa9c95203554d41dd6740d63d9d6c6a27",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_12073295363676caa66ef2cbc89bf5af",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/172",
+   "bindingSha256": "7bbb7c7cd47809b0120bb6c75e2defaed6970520154306837596fa15e0332c6f",
+   "targetUnitDigest": "455696e32c5e98ffca93441a2068682b5e085c16763e97e0605fa46948bff67b",
+   "rowFingerprint": "b8833aead52e6cd9b4b8ff17e04ac800c64d5ed38b4b6488e5c86eedd1cca70d",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_3f61f80f487a94e1e4bb0963bf6348b5",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/441",
+   "bindingSha256": "c0ec7cd87c7fbb9f62d1ac2cf7c9240eaf24cc104a1255e22988653d323d7380",
+   "targetUnitDigest": "b348235f25df183af98143ce5220b4b9731b2e44dd4578dcd41d9432a5461c48",
+   "rowFingerprint": "21fef5355ed1fd5843f1236c434d96ae8fac5bb9ae1840b44141b8fd53b62885",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_755111c889e95014f99c54a41a112ca3",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/443",
+   "bindingSha256": "84c755cca2031efc8b8335dea71b0791e6e5c7a4a3cdb6e3cb648e1cf8db9569",
+   "targetUnitDigest": "58e740e33a9a769ae192744c810c87b42186d4cdf7bd00141de737534efe7c0c",
+   "rowFingerprint": "a09e758faa045bc5516846527c915f22c16d78a9728fd96f1a34a2594bb064ae",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_dc3c8fc66a4e43d514339862bcc10846",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/444",
+   "bindingSha256": "a9d191a9f1fc2b3ec50c7b2a4c807e301249c4a115cf84769b48ec2517f0431b",
+   "targetUnitDigest": "28a2888fab360eae6e8483223120b6b767c32cddd3194d81541cc478bdc06af9",
+   "rowFingerprint": "38a29a1b5909b2802619772de63d094606b5f97c5dee02ac18f0c4569f7d7f04",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_0a282d6aafb1cee14928a469d20dbcf2",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/445",
+   "bindingSha256": "f4e68d4ea2211f96a467485d4958b6a1615901070f06bd700edc73c718bc3bcd",
+   "targetUnitDigest": "44dac5df762c5f87cc45d20804acdd3feb26cc918d6555421c131c555aea4fd4",
+   "rowFingerprint": "b21f58be83d7540f25bfb2de2e6abfebb57d82a79ff4a20b68f6ad5795836c38",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_44294c754f97f771769d49ebd6a0614d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/447",
+   "bindingSha256": "e0340fb6e6566ec4fd6e93a373097ed6ef62e7fab646c0f258a07d12ee33ddec",
+   "targetUnitDigest": "b65eccb0bfb36f2ca3b4aea4c026dfaaaa60367e4b4e0ee0b082bf19ad74d5eb",
+   "rowFingerprint": "194d97d475041d2932c266097db0536f6fc0c245423888f7dc714775e543716b",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_c7fbd134619006f07ca2281f69601c5d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/449",
+   "bindingSha256": "0b95e6d402886405ed6034a2163467d7fbfbc3e72fda1807d23fe470184b7b23",
+   "targetUnitDigest": "d0b9dc422c288c90827e052e3925c863364d5c1da85bdc9b591861a9fa4b5e82",
+   "rowFingerprint": "2f0e82e121b852530c5b7b755f35a6105dd2d5cd6f86e6ec05a4c68fae609c7f",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_65ec90fc672e6d1a8dff764c3e3dd516",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/451",
+   "bindingSha256": "fe390a7798f6bcd3f0b7201ee7fc71fbd0b4c599b03581eab94b03bbf700646f",
+   "targetUnitDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+   "rowFingerprint": "5b71b6e4c52d863b9dc94ab6f5196efb90926bfe3dc906d3285a3545752a2b06",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_6f695d26a139ec834153e132e8024107",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/453",
+   "bindingSha256": "24ad159bc32029ce5d209cc40e650040150033612ef3aa8be8f4b8f98d9252f5",
+   "targetUnitDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
+   "rowFingerprint": "8600a0877ca47b8e94ff8143f1c3487a20816b4952019d465132a4aba7b26ecc",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_5348a42561949a4c0042f0196fe52f56",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/455",
+   "bindingSha256": "5fa4d89274f84622dc3fc163f44f69fb4f33497fa85e1e422d7e240d20929cda",
+   "targetUnitDigest": "657e5b15bf7f9f37215c2f5ee49bc8e3138f6c678dc74b8d68a051604c85cd71",
+   "rowFingerprint": "033e11343adb491a5485c35b86e1e4256c2ab95abcc4382c1a4737b2290e8bca",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_0ff1945d9de2483e7c615450e71b8bcf",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/459",
+   "bindingSha256": "63353fe1d72c8c812b88f01717aa11555a2b2cc6e78b509a28898fbb0d5c8305",
+   "targetUnitDigest": "eb2ceb790602f8bd3310614dd469d2ca6038960a4985a5634d5a22a1030c7fe0",
+   "rowFingerprint": "8204c6917c6bc87663ccf48372b4390f5582145101c33d55db8de514a84621ef",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_46e3a4ecadf497d511207c7a4e5c87a8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/461",
+   "bindingSha256": "6b51abc9faab7b005fe09ee63b43f9cf4733a2453e3a4f24a9df9b38c8d4e464",
+   "targetUnitDigest": "6597c805f92af65a56d56360287e9afe803302ee3f92f4cb3e4c4171455a2494",
+   "rowFingerprint": "0cd455fc22b82f038f744410bb487dfa73d8d7504d08c788b6f062c36cf1d333",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_9152712f05f3390687f5b4d9ef102e75",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/463",
+   "bindingSha256": "563eae3683c5683cd1ffc117f4daf73d9d094eb50cb994af0928b3e37225f16b",
+   "targetUnitDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f",
+   "rowFingerprint": "9d8bddfcea5848eac3cbc25234a3de026bd5e28e095b061c57b48307afba6df5",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_a2f67de75a538ea78e1bb035e6d1c0a9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/465",
+   "bindingSha256": "67098c528699d0e4d7c39bddb2a8685c5f7648e95c3b663d2c93924e90bbb389",
+   "targetUnitDigest": "0e93cfa2f85e0e2dc551cea9ca8232742dd7c313288eb665c3a2e7e0bd1b84ac",
+   "rowFingerprint": "897275b28fa6a862bcc2c6fe8c7ce4dff6bce65db175fc1197f813f1b4061a73",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_9a5a4c7c4939080ea71ffaf460d87e7a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/467",
+   "bindingSha256": "8036eed0263d0e6d7db0f9b07f324b7532fec7ea56db8d94c6a4f7432ad84992",
+   "targetUnitDigest": "ede7acc66ef8ba5fd9d75af9ee37f824f703af0fe81bd8a982cad99337ffc068",
+   "rowFingerprint": "c6779f22164e78e43310e0a81ed8b2c5def80ef6e9a210c72ccb5a98ba895ac8",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_89cb129252c64e683e06902d3a1e2516",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/469",
+   "bindingSha256": "066a5aa770a4c8597ea7e0b1f193d54d97ee58f32e1f1c1a248eed0799aee390",
+   "targetUnitDigest": "d1f0faef5ca3de2ede25d801bf20fe9505d25e86b186aee4ee1f096bde63fc2e",
+   "rowFingerprint": "850bb04155cbc343bc3ab0804e10ae35b5a357809fca99fd6fa58531f7da46f5",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_2cc4d2b5012fb6dd687f1c357d95a466",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/471",
+   "bindingSha256": "5143a17d469805fafde66cbf6320dd93cf06255d7df6dce16c02d8e8f9d22c56",
+   "targetUnitDigest": "a51fdcfe7d7914c5336d3e233a6d0242cae8670f7e656299b43ba0f9e3d5de2d",
+   "rowFingerprint": "5a957bae920d5539d5fbb074a327d7502dd11ed14453fd954d49ce12413cfce6",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_ab04d755d36af00cb6ce157d829c8181",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/473",
+   "bindingSha256": "d837710aa50fdbfac6991a4d87db5757c830c289cfbc43f40aa3867c99be0170",
+   "targetUnitDigest": "19c9c45fdd93380e44d303b0a25bfb118193bcc69a36c4d91fdfc662055902d1",
+   "rowFingerprint": "1a4a970956510a35e673d39acb47911fded7da0b1a2a5edaecf5c8e1388cfdbe",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_b31ad90d68cd5644cca87a4c3f74a438",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/475",
+   "bindingSha256": "07c53f5fe6e065a813614b5bff4a33e3265d28b8f2aebee8e0faaddbb7a9f1f4",
+   "targetUnitDigest": "31edabdb888285eb12462dd50af24bf3f6edc9af3e4afc129909d11ccca3c2ae",
+   "rowFingerprint": "acc1d053fe86ff73420b4b64e6ddf163b03620b609cbdb41317e73f6d7eedc30",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_e1abc43e9b408449d93b9fa00a00dd68",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/477",
+   "bindingSha256": "764e91eecbd1093add1f39789e8d4bc605a408bbf017e12eb270ce669e592ba8",
+   "targetUnitDigest": "a1fa418f9e8efd39553b8f30c10b134e1192646b08b68db4225de81de04b5237",
+   "rowFingerprint": "d4861df9e1a395d632e23a004f00693a683e5f6cfc0711672ea4bdf5cbc6c08c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_77e723624e1ae0a9c2e5e7e043fca4be",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/479",
+   "bindingSha256": "b836af8342d7c51401aacc532252338e66493649df8ac6e5aea2cf505437df9c",
+   "targetUnitDigest": "0b962f5518dcbbfad67bcb4760aaddc4ab2d54aec66968d3eb0812340e318d06",
+   "rowFingerprint": "a2d3fb9c52a04ebabbcf7f436d2f259ce571c353e3315295164d96ada6cb89a7",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_6eb47bc2e3c271b4af46b09fc2c4e90c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/481",
+   "bindingSha256": "66b2a285654f39cb9ef34f6e7cd430f4f5e14902390512bae66a946c45f091b8",
+   "targetUnitDigest": "61e128436645d5127c2050899a6e209b13206523fe4a641557c4277ffda23d97",
+   "rowFingerprint": "673b8f7e98625cdd242deadea4ba01097e21826ca8cbec3eef2e9b1d80b4929c",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute; target equals source digest (verbatim move). Rationale anchor renumber matches the bound unit."
+  },
+  {
+   "claimId": "claim_55b85c1d204ea6a7b336fd6b066fc4f1",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/484",
+   "bindingSha256": "65dedaf6439f979be1b6791c5de394ff4b9f50649ae663f1fd697565e5ca7ddc",
+   "targetUnitDigest": "1ce68806e971b372fb45ad8f92cc55e0096b7aeca115a614bdd65554d27ac1e0",
+   "rowFingerprint": "24535a52f378ca19a7611c9704b2cfc412b5dc929aec60a5ea0cb6cd2a1d4597",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Only the rationale's Target SHA changed, now equal to the bound digest; anchor and disposition unchanged and still right. Note: 'Target unchanged since last reviewed digest' and line ranges are stale prose."
+  },
+  {
+   "claimId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/claims/9",
+   "bindingSha256": "752e30596de569f8b9533b0c4fd3a2fc211ccbe810c741606b3a539b168eed3c",
+   "targetUnitDigest": "de045416214e9431a47210ed32e61ade9efb33289ed7e589859f05736909f5eb",
+   "rowFingerprint": "e189401992c0491cf1446af3d3ee4c3279d4ec708657e6d49eb7dcfc10794e67",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Only the rationale's Target SHA changed, now equal to the bound digest; anchor and disposition unchanged and still right. Note: 'Target unchanged since last reviewed digest' and line ranges are stale prose."
+  },
+  {
+   "claimId": "claim_a63132a3f76d6b8ea05461c48c818836",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/registryGaps/0",
+   "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+   "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+   "rowFingerprint": "0e246760afc8e4e620d48b9ccf52bf52d3f63b9f02e38478c8760b911d4f12fe",
+   "verdict": "REWORK",
+   "reason": "Digests recompute, but the rationale's Target line (SHA-only correction) and its L12-44 note still name runner.md:1219-1269#unheaded-block-102; the bound unit is unheaded-block-101 at lines 1244-1294, and unheaded-block-102 is now a different unit (289d09c0)."
+  },
+  {
+   "claimId": "claim_5a944093894be93c5792a1c5e14990c6",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "pointer": "/registryGaps/33",
+   "bindingSha256": "aa03e06d0e01701e543241265265b1649063d3614607c8a419d73366be648e39",
+   "targetUnitDigest": "a943adf388f96e583638dab0a1b4278a0faf2b869916ed16b2d4c77416dffbf8",
+   "rowFingerprint": "4fe17864d37fb9459eba9bcdc9a1160e4028e6a135a1af79a89e905f848ebc5b",
+   "verdict": "APPROVE",
+   "reason": "Digests recompute. Only the rationale's Target SHA changed, now equal to the bound digest; anchor and disposition unchanged and still right. Note: 'Target unchanged since last reviewed digest' and line ranges are stale prose."
+  }
+ ]
+}
