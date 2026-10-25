@@ -220,3 +220,16 @@ Decided by the Lead under A42. Results of the w23 reviews: shard 1 got 229/34, s
 Decided by the Lead under A42. The strict join `g0join/join.py` at 608a4ada5 found 1,924 effective binding rows. Only 174 of them have a per-row APPROVE that matches both digests. 1,473 rows have no per-row verdict, 247 have related verdicts whose digests do not match, 3 have open REWORK, and 27 have a missing digest or an invalid stored hash. The earlier reviews were mostly aggregate: they approved the work, but did not write the `{id, pointer, bindingSha256, targetUnitDigest, verdict}` records that the G0 definition joins on.
 
 Ruling: build the verdict file now, through six independent review batches (`g0join/verdict-batches/batch-1..6.json`, 1,723 rows). At F, only the rows that F rebinds then need delta verdicts. The 27 rows in `held.json` first get a data fix (a Doer turn that recomputes the canonical hashes and restores the missing target digests), and are reviewed after that. Each reviewer judges the row's claim against the current target unit, not only the digests. An aggregate review cited as context does not replace the per-row judgment.
+
+## L13-23 — G9 dependency proposals and G0 verdict wave results (Lead, 2026-10-25 13:45)
+
+Decided by the Lead under A42.
+
+1. **Both Lead proposals in `g9/phase9-decisions.md` item 8 are accepted.** `scripts/generate-shipped-path-inventory.mjs` keeps its `docs/architect/` and `docs/specs/` classifiers. They classify immutable pinned trees, the existing-path branch already covers `docs/platform/`, and nothing in it changes. This agrees with audit check B's frozen hash for that script: no edit, so no re-freeze.
+2. **The G9 checker's scan reads deleted record files from the pin.** Turn 717 deleted the per-shard checkers, and the checker had listed files at its pin but scanned them on disk. The Lead fixed it to read pinned bytes for record files missing on disk. Non-record files must still exist.
+3. **The G0 per-row verdict wave stands at 1,882 of 1,924 rows approved.** Left are 15 REWORK rows, 27 rows with a hash or digest defect, and two systemic findings:
+   - the link rewriter changed text inside inline code spans;
+   - three newer rows duplicate older rows without a supersession link.
+
+   Brief: `w25-g0-rework-brief.md`.
+4. **The w8 and w9 component-boundary overlay approvals are conditional.** That is 44 rows in batch 1 and 90 in batch 5. They were checked against the prepared after-bytes of composition spec 424 and the `w8:gap05` relocation and history patches, because their target file does not exist at HEAD. At F, those patches are applied together with the overlays, or those approvals reopen. This goes into the G0 F duties.

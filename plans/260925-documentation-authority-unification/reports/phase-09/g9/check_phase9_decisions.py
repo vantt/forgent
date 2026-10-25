@@ -126,6 +126,14 @@ def scan_gateway(pin):
     drift = set(git('diff', '--name-only', pin, '--', *[p for p in files if not p.startswith('plans/')]).decode().splitlines())
     require(not drift, 'non-record scan inputs differ from sourcePin')
     hits = set()
+    # Record files deleted after the pin cannot be scanned on disk; read their
+    # pinned bytes directly so membership stays bound to the pin.
+    gone = [p for p in files if not (ROOT / p).exists()]
+    files = [p for p in files if (ROOT / p).exists()]
+    for path in gone:
+        require(path.startswith('plans/'), 'non-record scan input missing: ' + path)
+        if GATEWAY.encode() in blob(pin, path):
+            hits.add(path)
     for start in range(0, len(files), 150):
         args = ['rg', '--files-with-matches', '--null', '--fixed-strings', '--hidden',
                 '--no-ignore', '--', GATEWAY, *files[start:start + 150]]
@@ -135,7 +143,7 @@ def scan_gateway(pin):
     result = {}
     for path in sorted(hits):
         raw = blob(pin, path)
-        require((ROOT / path).read_bytes() == raw, 'scan input drift: ' + path)
+        require(not (ROOT / path).exists() or (ROOT / path).read_bytes() == raw, 'scan input drift: ' + path)
         lines = [i for i, s in enumerate(raw.decode().splitlines(), 1) if GATEWAY in s]
         require(lines, 'rg/pin membership differs: ' + path)
         result[path] = {'path': path, 'sha256': digest(raw), 'lines': lines}
