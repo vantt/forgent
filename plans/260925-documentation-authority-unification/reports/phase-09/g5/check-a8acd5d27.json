@@ -1,0 +1,519 @@
+{
+  "ok": false,
+  "legacyOk": true,
+  "survivingOk": false,
+  "spans": 10,
+  "missing": [],
+  "survivingMissing": [
+    {
+      "file": "docs/platform/holder-lock/spec.md",
+      "recordedLine": 8,
+      "foundLine": 8,
+      "sha256": "d26a554025faad2bbf11dfe26900c1882681572cce2861e57d68dfc92e029a29",
+      "legacyText": "Implementation status: Implemented. The Node facade reaches the crate in process on Linux and macOS through the `holderLock` namespace of the combined addon (2026-10-22), and through the `lock-hold` helper on Windows. The main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17; the hot state mutex is section 15.",
+      "surviving": {
+        "file": "docs/reading-map.md",
+        "status": "missing",
+        "line": null
+      }
+    }
+  ],
+  "rows": [
+    {
+      "file": "docs/platform/holder-lock/spec.md",
+      "recordedLine": 8,
+      "foundLine": 8,
+      "sha256": "d26a554025faad2bbf11dfe26900c1882681572cce2861e57d68dfc92e029a29",
+      "legacyText": "Implementation status: Implemented. The Node facade reaches the crate in process on Linux and macOS through the `holderLock` namespace of the combined addon (2026-10-22), and through the `lock-hold` helper on Windows. The main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17; the hot state mutex is section 15.",
+      "surviving": {
+        "file": "docs/reading-map.md",
+        "status": "missing",
+        "line": null
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 3,
+      "foundLine": 3,
+      "sha256": "94cdd23d21d400397d6bfd59042d1945b1451f0a70a28b22568d7c16c42ab7cb",
+      "legacyText": "> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md` và `docs/platform/README.md`",
+      "surviving": {
+        "file": "docs/reading-map.md",
+        "status": "restated",
+        "line": 89,
+        "restatement": "banner-entry-route",
+        "endLine": 108,
+        "text": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover."
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 4,
+      "foundLine": 4,
+      "sha256": "fb5311c374cfee920fe9c6028df70e5bae62361e5ab85d9512a35a4abaaa513b",
+      "legacyText": "> (hoặc tra cứu nhanh tại `docs/transitional-switchboard.md`), rồi dùng mapping current-source tường minh của",
+      "surviving": {
+        "file": "docs/reading-map.md",
+        "status": "restated",
+        "line": 89,
+        "restatement": "banner-switchboard-current-source",
+        "endLine": 108,
+        "text": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover."
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 5,
+      "foundLine": 5,
+      "sha256": "36e46e9cf9e5c6b6b0be3ee282c20dcac71cdba9732e8ea407d1661d234db85a",
+      "legacyText": "> portal area. Không suy authority từ path, ngày review, độ chi tiết, hoặc",
+      "surviving": {
+        "file": "docs/reading-map.md",
+        "status": "restated",
+        "line": 89,
+        "restatement": "banner-no-inferred-authority",
+        "endLine": 108,
+        "text": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover."
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 6,
+      "foundLine": 6,
+      "sha256": "16368141d63993234fad11e62e3e033f553e89c6b261947da4ed91ca74ae1095",
+      "legacyText": "> riêng metadata `Canonical:`. Bảng kiểm chứng Phase 00 sống tại",
+      "surviving": {
+        "file": "docs/reading-map.md",
+        "status": "restated",
+        "line": 89,
+        "restatement": "banner-metadata-and-snapshot",
+        "endLine": 108,
+        "text": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover."
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 7,
+      "foundLine": 7,
+      "sha256": "daf7bc246d780bdbd8723fd344d5b764928e4755caf6862efe1e3408a3a48fe1",
+      "legacyText": "> `plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md`;",
+      "surviving": {
+        "file": "docs/reading-map.md",
+        "status": "restated",
+        "line": 89,
+        "restatement": "banner-snapshot-link",
+        "endLine": 108,
+        "text": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover."
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 8,
+      "foundLine": 8,
+      "sha256": "9b75147a99731ae433b63f9d34a29f376184b662b40d78cea174d1d3437ee240",
+      "legacyText": "> bảng đó không promote, migrate hay retire source nào. Phase 00 và Phase 01 đã",
+      "surviving": {
+        "file": "docs/reading-map.md",
+        "status": "restated",
+        "line": 89,
+        "restatement": "banner-no-promotion-and-historical-counts",
+        "endLine": 108,
+        "text": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover."
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 9,
+      "foundLine": 9,
+      "sha256": "6a6e9f58c9717087e1ad44290d2e2e6004c6ed750c11d2c1308e63b41a64c710",
+      "legacyText": "> hoàn tất; Phase 02–09 vẫn chưa được authorize.",
+      "surviving": {
+        "file": "docs/reading-map.md",
+        "status": "restated",
+        "line": 89,
+        "restatement": "banner-no-migration-authorization",
+        "endLine": 108,
+        "text": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover."
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 34,
+      "foundLine": 34,
+      "sha256": "96a8f31e5bea9d070112c399c76d29510c6329ed47cdfc34c005ab621bc5c533",
+      "legacyText": "- `domains/coding/AGENTS.md` `## fgOS Workflow` + `.claude/skills/` (`.agents/skills/` mirror byte-identical) — lớp hướng dẫn P50: entry skill (`fgos-routing`) + skill giai đoạn (`fgos-coding-discovering`/`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`/`fgos-coding-knowledge`) trỏ một phiên tự mở tới đúng skill theo `stage` của item; từ str89-fgos-domain-skills, tra cứu này domain-pluggable — đọc trường `domain` + `stage` của item rồi tra qua `skillForStage`/`getDomain` (`src/state/workflow-stage-graphs.mjs`), không còn giả định ngầm domain `coding`; `fgos-routing` nay có hàng khoá theo **status** `retrospective → fgos-coding-knowledge` (skill tổng hợp cấp nhãn Diataxis + soạn tài liệu người-dùng-cuối) — stage `compound-learn` đã rút, việc tổng hợp nó từng canh nay là việc của status `retrospective`; skill ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify) đã rút (tsk-6ar) — `/fgOS:submit` bước 6 (`plugins/fgOS/skills/submit/SKILL.md`) nay tự chạy clarify+classify trong cùng phiên sống, cùng việc mà skill đó từng làm nhưng trên bản mô tả SẠCH hơn; spec: docs/specs/work-state.md §RUL60 (hành vi), docs/specs/runner.md (lớp hướng dẫn)",
+      "surviving": {
+        "file": "docs/reading-map.md",
+        "status": "restated",
+        "line": 156,
+        "restatement": "workflow-truth-correction",
+        "endLine": 156,
+        "text": "- `domains/coding/AGENTS.md` `## fgOS Workflow` + `.claude/skills/` (`.agents/skills/` mirror byte-identical) — lớp hướng dẫn P50: entry skill (`fgos-routing`) + skill giai đoạn (`fgos-coding-discovering`/`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`/`fgos-coding-knowledge`) trỏ một phiên tự mở tới đúng skill theo `stage` của item; từ str89-fgos-domain-skills, tra cứu này domain-pluggable — đọc trường `domain` + `stage` của item rồi tra qua `skillForStep`/`getDomain` (`src/state/domain-registry.mjs`), không còn giả định ngầm domain `coding`; `fgos-routing` nay có hàng khoá theo **status** `retrospective → fgos-coding-knowledge` (skill tổng hợp cấp nhãn Diataxis + soạn tài liệu người-dùng-cuối) — stage `compound-learn` đã rút, việc tổng hợp nó từng canh nay là việc của status `retrospective`; skill ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify) đã rút (tsk-6ar) — `/fgOS:submit` bước 6 (`plugins/fgOS/skills/submit/SKILL.md`) nay tự chạy clarify+classify trong cùng phiên sống, cùng việc mà skill đó từng làm nhưng trên bản mô tả SẠCH hơn; spec: docs/specs/work-state.md §RUL60 (hành vi), docs/specs/runner.md (lớp hướng dẫn) **Truth correction:** src/state/domain-registry.mjs:193,240; core/skills/fgos-routing/SKILL.md:124-136."
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 37,
+      "foundLine": 37,
+      "sha256": "3a0a7b4c3c719d32f22b4fd71b1aa76c06a53271ab4ea8bde39ecbc8808f477d",
+      "legacyText": "- `docs/how-to/`, `docs/tutorials/`, `docs/reference/`, `docs/explanation/` — tài liệu NGƯỜI-DÙNG-CUỐI theo bốn quadrant Diataxis (audience-facing, khác `docs/specs/` là BA-reference nội bộ); sinh bởi kỹ năng `fgos-coding-knowledge` ở status `retrospective` (grow-or-create một tài liệu SỐNG mỗi đường dẫn: gom mọi capture qua `fgos doc-sources` rồi tích luỹ không mất, ngăn Diataxis là trục cấu trúc duy nhất — write-side, spec: docs/specs/enduser-docs-authoring.md), quadrant khớp `docType` capture; `docs/explanation/` từ str64-backfill còn có 6 tài liệu chưng cất từ critical-patterns.md (learnings vận hành bee thật sự thuộc tiến trình hình thành fgOS); chỉ mục đọc-theo-tag máy-đọc-được: `docs/enduser-docs-index.json` (sinh bởi verb `fgos docs-index` / kỹ năng `fgos-indexing`, thay cho việc liệt-kê-tay từng tài liệu — supersedes con trỏ văn xuôi cũ, theo compound-learn-enduser-docs; ngăn `explanation` còn quét thêm `docs/decisions/` làm vị trí thay thế, theo str64-backfill); spec read-side: docs/specs/enduser-docs-index.md",
+      "surviving": {
+        "file": "docs/reading-map.md",
+        "status": "verbatim",
+        "line": 159,
+        "endLine": 159,
+        "text": "- `docs/how-to/`, `docs/tutorials/`, `docs/reference/`, `docs/explanation/` — tài liệu NGƯỜI-DÙNG-CUỐI theo bốn quadrant Diataxis (audience-facing, khác `docs/specs/` là BA-reference nội bộ); sinh bởi kỹ năng `fgos-coding-knowledge` ở status `retrospective` (grow-or-create một tài liệu SỐNG mỗi đường dẫn: gom mọi capture qua `fgos doc-sources` rồi tích luỹ không mất, ngăn Diataxis là trục cấu trúc duy nhất — write-side, spec: docs/specs/enduser-docs-authoring.md), quadrant khớp `docType` capture; `docs/explanation/` từ str64-backfill còn có 6 tài liệu chưng cất từ critical-patterns.md (learnings vận hành bee thật sự thuộc tiến trình hình thành fgOS); chỉ mục đọc-theo-tag máy-đọc-được: `docs/enduser-docs-index.json` (sinh bởi verb `fgos docs-index` / kỹ năng `fgos-indexing`, thay cho việc liệt-kê-tay từng tài liệu — supersedes con trỏ văn xuôi cũ, theo compound-learn-enduser-docs; ngăn `explanation` còn quét thêm `docs/decisions/` làm vị trí thay thế, theo str64-backfill); spec read-side: docs/specs/enduser-docs-index.md"
+      }
+    }
+  ],
+  "ownerAcceptance": [
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 3,
+      "sha256": "94cdd23d21d400397d6bfd59042d1945b1451f0a70a28b22568d7c16c42ab7cb",
+      "legacyText": "> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md` và `docs/platform/README.md`",
+      "restatement": "banner-entry-route",
+      "survivingFile": "docs/reading-map.md",
+      "survivingLine": 89,
+      "survivingEndLine": 108,
+      "proposedText": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover.",
+      "status": "pending-owner-acceptance"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 4,
+      "sha256": "fb5311c374cfee920fe9c6028df70e5bae62361e5ab85d9512a35a4abaaa513b",
+      "legacyText": "> (hoặc tra cứu nhanh tại `docs/transitional-switchboard.md`), rồi dùng mapping current-source tường minh của",
+      "restatement": "banner-switchboard-current-source",
+      "survivingFile": "docs/reading-map.md",
+      "survivingLine": 89,
+      "survivingEndLine": 108,
+      "proposedText": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover.",
+      "status": "pending-owner-acceptance"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 5,
+      "sha256": "36e46e9cf9e5c6b6b0be3ee282c20dcac71cdba9732e8ea407d1661d234db85a",
+      "legacyText": "> portal area. Không suy authority từ path, ngày review, độ chi tiết, hoặc",
+      "restatement": "banner-no-inferred-authority",
+      "survivingFile": "docs/reading-map.md",
+      "survivingLine": 89,
+      "survivingEndLine": 108,
+      "proposedText": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover.",
+      "status": "pending-owner-acceptance"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 6,
+      "sha256": "16368141d63993234fad11e62e3e033f553e89c6b261947da4ed91ca74ae1095",
+      "legacyText": "> riêng metadata `Canonical:`. Bảng kiểm chứng Phase 00 sống tại",
+      "restatement": "banner-metadata-and-snapshot",
+      "survivingFile": "docs/reading-map.md",
+      "survivingLine": 89,
+      "survivingEndLine": 108,
+      "proposedText": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover.",
+      "status": "pending-owner-acceptance"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 7,
+      "sha256": "daf7bc246d780bdbd8723fd344d5b764928e4755caf6862efe1e3408a3a48fe1",
+      "legacyText": "> `plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md`;",
+      "restatement": "banner-snapshot-link",
+      "survivingFile": "docs/reading-map.md",
+      "survivingLine": 89,
+      "survivingEndLine": 108,
+      "proposedText": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover.",
+      "status": "pending-owner-acceptance"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 8,
+      "sha256": "9b75147a99731ae433b63f9d34a29f376184b662b40d78cea174d1d3437ee240",
+      "legacyText": "> bảng đó không promote, migrate hay retire source nào. Phase 00 và Phase 01 đã",
+      "restatement": "banner-no-promotion-and-historical-counts",
+      "survivingFile": "docs/reading-map.md",
+      "survivingLine": 89,
+      "survivingEndLine": 108,
+      "proposedText": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover.",
+      "status": "pending-owner-acceptance"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 9,
+      "sha256": "6a6e9f58c9717087e1ad44290d2e2e6004c6ed750c11d2c1308e63b41a64c710",
+      "legacyText": "> hoàn tất; Phase 02–09 vẫn chưa được authorize.",
+      "restatement": "banner-no-migration-authorization",
+      "survivingFile": "docs/reading-map.md",
+      "survivingLine": 89,
+      "survivingEndLine": 108,
+      "proposedText": "The target structure is being introduced incrementally. When both legacy and\ntarget docs exist, **do not infer authority from path, newer date, richer prose,\nor more confident wording**. Follow the explicit current-source mapping in the\nplatform/area portal and surface any conflict. A target document marked partial\nor candidate does not outrank a declared legacy/current source merely because it\nlives under `docs/platform/**`.\n\nThe operative transitional authority switchboard is\n[transitional-switchboard.md](transitional-switchboard.md).\nThe verified Phase 00 snapshot is\n[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).\nIt records the explicit current route for every known area and root Markdown\nsurface; the switchboard operationalizes that route.\n\nThe full-horizon design is\n[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).\nThe proposed near-term authority migration is\n[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase\n00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence\ndoes not authorize migration or cutover.",
+      "status": "pending-owner-acceptance"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 34,
+      "sha256": "96a8f31e5bea9d070112c399c76d29510c6329ed47cdfc34c005ab621bc5c533",
+      "legacyText": "- `domains/coding/AGENTS.md` `## fgOS Workflow` + `.claude/skills/` (`.agents/skills/` mirror byte-identical) — lớp hướng dẫn P50: entry skill (`fgos-routing`) + skill giai đoạn (`fgos-coding-discovering`/`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`/`fgos-coding-knowledge`) trỏ một phiên tự mở tới đúng skill theo `stage` của item; từ str89-fgos-domain-skills, tra cứu này domain-pluggable — đọc trường `domain` + `stage` của item rồi tra qua `skillForStage`/`getDomain` (`src/state/workflow-stage-graphs.mjs`), không còn giả định ngầm domain `coding`; `fgos-routing` nay có hàng khoá theo **status** `retrospective → fgos-coding-knowledge` (skill tổng hợp cấp nhãn Diataxis + soạn tài liệu người-dùng-cuối) — stage `compound-learn` đã rút, việc tổng hợp nó từng canh nay là việc của status `retrospective`; skill ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify) đã rút (tsk-6ar) — `/fgOS:submit` bước 6 (`plugins/fgOS/skills/submit/SKILL.md`) nay tự chạy clarify+classify trong cùng phiên sống, cùng việc mà skill đó từng làm nhưng trên bản mô tả SẠCH hơn; spec: docs/specs/work-state.md §RUL60 (hành vi), docs/specs/runner.md (lớp hướng dẫn)",
+      "restatement": "workflow-truth-correction",
+      "survivingFile": "docs/reading-map.md",
+      "survivingLine": 156,
+      "survivingEndLine": 156,
+      "proposedText": "- `domains/coding/AGENTS.md` `## fgOS Workflow` + `.claude/skills/` (`.agents/skills/` mirror byte-identical) — lớp hướng dẫn P50: entry skill (`fgos-routing`) + skill giai đoạn (`fgos-coding-discovering`/`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`/`fgos-coding-knowledge`) trỏ một phiên tự mở tới đúng skill theo `stage` của item; từ str89-fgos-domain-skills, tra cứu này domain-pluggable — đọc trường `domain` + `stage` của item rồi tra qua `skillForStep`/`getDomain` (`src/state/domain-registry.mjs`), không còn giả định ngầm domain `coding`; `fgos-routing` nay có hàng khoá theo **status** `retrospective → fgos-coding-knowledge` (skill tổng hợp cấp nhãn Diataxis + soạn tài liệu người-dùng-cuối) — stage `compound-learn` đã rút, việc tổng hợp nó từng canh nay là việc của status `retrospective`; skill ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify) đã rút (tsk-6ar) — `/fgOS:submit` bước 6 (`plugins/fgOS/skills/submit/SKILL.md`) nay tự chạy clarify+classify trong cùng phiên sống, cùng việc mà skill đó từng làm nhưng trên bản mô tả SẠCH hơn; spec: docs/specs/work-state.md §RUL60 (hành vi), docs/specs/runner.md (lớp hướng dẫn) **Truth correction:** src/state/domain-registry.mjs:193,240; core/skills/fgos-routing/SKILL.md:124-136.",
+      "status": "pending-owner-acceptance"
+    }
+  ],
+  "ownerAcceptanceStatus": "pending",
+  "gateApproved": false,
+  "negativeControls": [
+    {
+      "control": "legacy-byte-changed",
+      "file": "docs/platform/holder-lock/spec.md",
+      "recordedLine": 8,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "legacy-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 3,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "restated-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 3,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "surviving-span-removed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 3,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "legacy-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 4,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "restated-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 4,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "surviving-span-removed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 4,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "legacy-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 5,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "restated-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 5,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "surviving-span-removed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 5,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "legacy-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 6,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "restated-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 6,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "surviving-span-removed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 6,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "legacy-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 7,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "restated-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 7,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "surviving-span-removed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 7,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "legacy-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 8,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "restated-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 8,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "surviving-span-removed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 8,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "legacy-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 9,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "restated-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 9,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "surviving-span-removed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 9,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "legacy-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 34,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "restated-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 34,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "surviving-span-removed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 34,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "legacy-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 37,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "verbatim-byte-changed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 37,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "surviving-span-removed",
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 37,
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "file-missing",
+      "file": "docs/platform/holder-lock/spec.md",
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "file-missing",
+      "file": "docs/specs/reading-map.md",
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    },
+    {
+      "control": "file-missing",
+      "file": "docs/reading-map.md",
+      "exercised": true,
+      "targetRejected": true,
+      "ok": true
+    }
+  ],
+  "negativeControlsOk": true,
+  "pin": "a8acd5d27d115bc1f91fb043bc9afff4ad8c1196",
+  "checkerSha256": "9ea004422c062cd95877fe14b432678b08b5b19377162553990533fc5fba8c24"
+}
