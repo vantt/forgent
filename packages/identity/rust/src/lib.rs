@@ -27,6 +27,8 @@ pub mod refusal;
 pub mod resolve;
 pub mod session;
 #[cfg(feature = "directory")]
+pub mod shared;
+#[cfg(feature = "directory")]
 pub mod signing;
 pub mod text;
 
@@ -45,6 +47,8 @@ pub use pins::{Pin, PinState, Recorded};
 pub use signing::{sign, verify, Signature, Verified};
 #[cfg(feature = "directory")]
 pub use project::{project_info, project_init, ProjectInfo, ProjectMinted};
+#[cfg(feature = "directory")]
+pub use shared::{EntryLog, LogDoor, MachineRef, RawEvent, SharedView};
 #[cfg(feature = "provider")]
 #[cfg(feature = "directory")]
 pub use refusal::{Candidate, Liveness, Refusal};

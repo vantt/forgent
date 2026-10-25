@@ -236,6 +236,7 @@ Per layer:
 35. **2026-10-25 09:15, owner: "Q3 a+c".** A secret is masked at append through the existing `secrets` door, and the manual remedy for a leaked pushed event is documented. No removal mechanism.
 36. **2026-10-25 09:15, owner: "Q4 ok".** HARDEN self-lands 04b's changes on fg-server2 after WORK reviews each one; the owner machine follows WORK's guide at a time the owner names.
 37. **2026-10-25 09:15, owner: "04a-Q3 bỏ".** The constant or always-zero `metrics harness` sections (`complexity`, `sessions`, `friction: "n/a (pre-F5)"`, `entropy.counts.frictions`) and the unbuilt `coordination-session` contract are removed: T3-04a phase 07 runs.
+38. **2026-10-25 10:02, owner: "2". Supersedes decision 35.** Scouting showed the `secrets` door has no production consumer, no config declares a secret, and no code path puts a resolved secret into an event (worker secrets go through the environment only; `executor.dispatch` records the unexpanded command). Masking at append would mask nothing and needs a secrets-spec exception, so it is not built now: the manual remedy is documented in the Event Store spec's known limits, and masking is backlog `p-nykfevjxqf`, to be done with the secrets door's first production use.
 
 ## Additions waiting for the owner (RUL104)
 

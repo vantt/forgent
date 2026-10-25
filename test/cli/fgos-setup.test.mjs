@@ -244,7 +244,7 @@ test('rebuild reconstructs state.json from the log alone after the view file is 
   assert.ok(rawPersistedView(cwd).cursor, 'the rebuilt view carries the cursor it was folded to');
   // The answer is a per-consumer summary, never the views themselves.
   const { rebuilt } = envelopeData(result.stdout);
-  assert.deepEqual(rebuilt.map((entry) => entry.consumer), ['work', 'porting']);
+  assert.deepEqual(rebuilt.map((entry) => entry.consumer), ['work', 'porting', 'identity']);
   assert.equal(rebuilt[0].counts.work, 2);
   assert.equal(rebuilt[0].counts.decisions, 0);
   assert.equal(rebuilt[0].revision, before.revision);

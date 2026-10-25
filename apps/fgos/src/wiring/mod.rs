@@ -2,3 +2,4 @@
 
 pub mod friction_sources;
 pub mod metrics_sources;
+pub mod identity_log;
