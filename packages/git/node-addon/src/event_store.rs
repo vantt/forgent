@@ -76,8 +76,8 @@ struct Input {
 }
 #[napi]
 impl EventStore {
-    /// Settle write admission outside the Work gate. It never refuses by
-    /// itself: the refusal is raised by the write that needs it.
+    /// Settle write admission outside the Work gate. A refusal is raised by
+    /// the write that needs it; only a failure that may clear is raised here.
     #[napi]
     pub fn admit_writes(&self, held_ranks: Vec<u32>, hot_lock_depth: u32) -> Result<()> {
         self.context(&held_ranks, hot_lock_depth)?;
@@ -243,12 +243,11 @@ fn stream_ids(streams: &[String]) -> Result<Vec<StreamId>> {
         .map(|s| StreamId::parse(s).map_err(error))
         .collect()
 }
-fn is_repository_state(code: fgos_event_store::errors::ErrorCode) -> bool {
-    use fgos_event_store::errors::ErrorCode;
-    matches!(
-        code,
-        ErrorCode::EventStoreMigrationRequired | ErrorCode::EventStoreRefspecMissing
-    )
+/// A missing pinned legacy ref is not settled: `fgos events sync` fetches it
+/// while a long-lived process keeps running. A required migration is, because
+/// it runs with every writer stopped.
+fn is_settled_refusal(code: fgos_event_store::errors::ErrorCode) -> bool {
+    matches!(code, fgos_event_store::errors::ErrorCode::EventStoreMigrationRequired)
 }
 impl EventStore {
     /// The reason writes are refused, or `None`. The answer is asked of Git
@@ -269,13 +268,12 @@ impl EventStore {
             &self.publication_remote,
         ) {
             Ok(()) => Ok(self.write_refusal.get_or_init(|| None).as_deref()),
-            // Only a refusal that names a repository state is a settled answer.
-            // Any other failure (a Git command or I/O error) may clear, so it
-            // is returned to this write and the next write asks again.
-            Err(e) if is_repository_state(e.code) => {
+            Err(e) if is_settled_refusal(e.code) => {
                 let asked = Some(e.to_string());
                 Ok(self.write_refusal.get_or_init(|| asked).as_deref())
             }
+            // Any other failure may clear (a fetch, a Git or I/O error), so it is
+            // returned to this write and the next write asks again.
             Err(e) => Err(error(e)),
         }
     }

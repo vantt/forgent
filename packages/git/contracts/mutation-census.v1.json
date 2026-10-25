@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b5e324446d3ddab8423f1e2d24b313f7dc51670020b203bc478c017293b77f17",
+  "payloadDigest": "ba8a72fc0319d9595997d35769fd5206037ff0c0608f3c76aa6154ac41f2172c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -339,7 +339,7 @@
     "packages/git/node-addon/src/canonical_json.rs": "e91f461709624467b89c145b906be459015ac77622522d9cf5e1b663a49bf14b",
     "packages/git/node-addon/src/config.rs": "fbf0737aaaa7b906ea21361da672e6f22e951c67b0de6a6ec6a6c585f7357093",
     "packages/git/node-addon/src/durable_file.rs": "92d33582a588824a105683b230a694f3b103657b1b1520fc0b86bac079c490e1",
-    "packages/git/node-addon/src/event_store.rs": "5e7f474f958127c8d6ac5906a7d7be73cf0e143f2d2b435d6ec12b6f585b1d82",
+    "packages/git/node-addon/src/event_store.rs": "ba50c372b36e3aca9de9a03fff332cc6b960cbd5038675c87d11a44276e26995",
     "packages/git/node-addon/src/git.rs": "1a4dc23284035ab7eb7932eee27bdb099ef2926f3e5e955e6c53509b5e2651be",
     "packages/git/node-addon/src/git/config.rs": "063357ef31bcf3abe4f73040f2ccb326ffc09ed60eaa57ac9ecb4c413e4b0b7f",
     "packages/git/node-addon/src/git/handover.rs": "8746ecbb13844722786507cdc20be16969cc4b27618d627c8932a0b9b3cdc803",
