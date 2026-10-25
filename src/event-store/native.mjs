@@ -17,12 +17,14 @@ function ranksOf(heldRanks) {
   }
   return ranks;
 }
+// The crate refuses rank 60 and a hot-lock depth on every route that takes ranks; only the entry points that pass no
+// ranks to native (they spawn Git themselves) need the depth refusal here.
+function outsideState() {
+  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
+}
 function outsideGate(heldRanks) {
   available();
-  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
-  const ranks = ranksOf(heldRanks);
-  if (ranks.includes(60)) throw refusal('event-store-seal-under-state');
-  return ranks;
+  return ranksOf(heldRanks);
 }
 function call(fn) {
   available();
@@ -49,7 +51,7 @@ const prepared = new Map();
 export function prepareStore(cwd, { stateRoot, trustedMain, loaderOptions, config } = {}) {
   available();
   const settings = eventStoreConfig(config);
-  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
+  outsideState();
   if (typeof trustedMain !== 'string' || !trustedMain) throw refusal('event-store-trusted-main-required');
   const root = path.resolve(cwd);
   const trusted = path.resolve(trustedMain);
@@ -66,7 +68,7 @@ export function prepareStore(cwd, { stateRoot, trustedMain, loaderOptions, confi
 /** Open only an opaque root obtained from Git's resolver outside the gate. */
 export function openStore(resolvedRoot, machineId, files, loaderOptions, remote = 'origin') {
   available();
-  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
+  outsideState();
   const native = call(() => loadNativeAddon(loaderOptions).openStore(resolvedRoot, machineId, files, remote));
   const views = new WeakMap();
   // The legacy history this store's last read returned, as the raw records native sent. The next read names its
@@ -164,7 +166,8 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
 
 /** Read facts without requiring a machine id or creating a store. */
 export function eventStoreFacts(cwd, { stateRoot, trustedMain = cwd, remote = 'origin', loaderOptions } = {}) {
-  outsideGate([]);
+  available();
+  outsideState();
   return call(() => loadNativeAddon(loaderOptions).eventStoreFacts(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote));
 }
 export function eventStoreAddonAvailable(loaderOptions) {

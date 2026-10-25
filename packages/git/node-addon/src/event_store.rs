@@ -219,6 +219,9 @@ pub fn open_store(
     if machine_id != resolved_root.machine {
         return Err(error("event-store-machine-id"));
     }
+    if let Some(remote) = &publication_remote {
+        fgos_event_store::refspec::mappings(remote).map_err(error)?;
+    }
     let mut registry = Registry::default();
     registry.load_files(&registry_files).map_err(error)?;
     Ok(EventStore {

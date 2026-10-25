@@ -126,6 +126,7 @@ test('native prepared authority binds append identity and has no raw constructor
   const { resolved, contracts } = fixture(t);
   assert.throws(() => new addon.EventStore('/tmp', []));
   assert.throws(() => openStore(resolved, 'other-machine', [contracts], loaderOptions), { code: 'event-store-machine-id' });
+  assert.throws(() => openStore(resolved, resolved.machineId, [contracts], loaderOptions, '../bad'), /invalid-fetch-mapping-remote/);
   const native = addon.openStore(resolved, resolved.machineId, [contracts]);
   const facade = openStore(resolved, resolved.machineId, [contracts], loaderOptions);
   assert.throws(() => facade.append('project', '/x/fgos-event-store-foo', {}, 'fixture', []), error => {

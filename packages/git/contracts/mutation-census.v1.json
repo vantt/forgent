@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "6b95510920d29ab7cf59d192c832f18a87c6f3abbeb4dd6748db1338a90ba9aa",
+  "payloadDigest": "50a8e108fa35c4a209df3c2f870b2e7272170e7539c701290e98b5b38a593026",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -353,7 +353,7 @@
     "packages/git/node-addon/src/canonical_json.rs": "e91f461709624467b89c145b906be459015ac77622522d9cf5e1b663a49bf14b",
     "packages/git/node-addon/src/config.rs": "66abc36525f4265deeb777a2bdf51a7a9541b21d192bf4a4c776481d252240ec",
     "packages/git/node-addon/src/durable_file.rs": "92d33582a588824a105683b230a694f3b103657b1b1520fc0b86bac079c490e1",
-    "packages/git/node-addon/src/event_store.rs": "7772b20c3ab4ebd30cf32bf529a2bb338c25a1834bf7ebc63b07ec8afb3834c7",
+    "packages/git/node-addon/src/event_store.rs": "24ce074962babe613fd0ace915a627e7c0cec596ece5202c39c1ca0eacdee947",
     "packages/git/node-addon/src/git.rs": "1a4dc23284035ab7eb7932eee27bdb099ef2926f3e5e955e6c53509b5e2651be",
     "packages/git/node-addon/src/git/config.rs": "063357ef31bcf3abe4f73040f2ccb326ffc09ed60eaa57ac9ecb4c413e4b0b7f",
     "packages/git/node-addon/src/git/handover.rs": "8746ecbb13844722786507cdc20be16969cc4b27618d627c8932a0b9b3cdc803",
@@ -888,11 +888,11 @@
     "src/convention/definition-names.mjs": "f845b39591111b910bea842945a32c37287cafdd53fb08fc3cd2b64767294678",
     "src/convention/identifier-rules.mjs": "f3b0fed979b522c53be7c6b756b49425723121a587fe056b1bf616deef81b615",
     "src/convention/seat-id.mjs": "034caeb689c869e09acc0a3cd748757742c3f36b2eb331ddd0302515c25b0f83",
-    "src/event-store/config.mjs": "c8c67bdae03ce24f4e70f6a74bba877811aa049f9d9c46007841dc8c40d28d6c",
-    "src/event-store/consumers.mjs": "211dee946e024e09b138f938293d641f2be1fff624e14e2f505d5bcd3344bd74",
+    "src/event-store/config.mjs": "81217ccc8a1e7d45a3ce420a5072fb231033862a3903e7dad113075075e9cb9b",
+    "src/event-store/consumers.mjs": "c47969fb96a24a3a31c001c1155d75bd72c13fa59fc084df5d199ebc69577b42",
     "src/event-store/index.mjs": "4432a0299d564d1c4edcd747d834fcb1ad76da2421d9658d419fca4f03289fae",
     "src/event-store/maintenance.mjs": "60489fa9e3d898d83feb6219ec8780022e77c6c7750e8ecac0508f64d6fb7379",
-    "src/event-store/native.mjs": "25c2a844d87b3b6a3199c3d77d405a8ace528e1ae2956ee1d7a3b2e4810553bc",
+    "src/event-store/native.mjs": "bc2b906cc957ca7b0f4daa122b493da89064304c1685505ca5e170f1ad2335d3",
     "src/event-store/seal-coalescing.mjs": "84eae01cdf29251f7e50e06ffbac46ea949457adb7b3f4ed20bda542448bd2c3",
     "src/evolve/iron-law.mjs": "c3dce0c23705a8fd1ec463a782fba000ee67f21889f47e7ff350043f7a7ff8d7",
     "src/git/config.mjs": "c630748f9c0b7f21d96d16211a829bc1c1fa4f50c735e7235e5995c62619b69a",
@@ -3006,7 +3006,7 @@
     {
       "path": "scripts/event-store/power-loss-driver.mjs",
       "line": 26,
-      "spawn": "openStore -> src/event-store/native.mjs:70",
+      "spawn": "openStore -> src/event-store/native.mjs:72",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -3020,7 +3020,7 @@
     {
       "path": "scripts/event-store/store-increment-worker.mjs",
       "line": 18,
-      "spawn": "openStore -> src/event-store/native.mjs:70",
+      "spawn": "openStore -> src/event-store/native.mjs:72",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
