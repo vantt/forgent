@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { readProjectConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { mailboxHookTimeoutSec, mailboxOptIn } from '../../src/setup/mailbox-limits.mjs';
 import { parseYaml } from '../../src/util/yaml.mjs';
+import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 
 import {
   installClaudeHook,
@@ -618,6 +619,15 @@ test('mailbox rows install only when the project opts in, and opting out removes
     assert.match(install(repoRoot).mailbox, /config:config-schema/, cli);
     assert.equal(fs.readFileSync(file, 'utf8'), installed, `${cli} extension untouched, its mailbox handlers kept`);
   }
+  // Doctor under a refused config: the hook checks neither require nor reject the mailbox rows (either
+  // extension form is ours), and the mailbox row passes, naming the refusal the config rows report.
+  for (const check of [checkClaudeHook, checkCodexHook, checkPiHook, checkOmpHook]) {
+    const verdict = check(repoRoot);
+    assert.equal(verdict.passed, true, `${check.name}: ${verdict.message}`);
+  }
+  const mailboxRow = DOCTOR_CHECKS.find((c) => c.id === 'mailbox-hook').check(repoRoot);
+  assert.equal(mailboxRow.passed, true, mailboxRow.message);
+  assert.match(mailboxRow.message, /opt-in unknown: the project config is refused \(config:config-schema in project:config\.yaml\)/);
   writeMailboxOptIn(repoRoot, true);
 
   // A user's own command that merely runs the same kind stays when the project opts out.
