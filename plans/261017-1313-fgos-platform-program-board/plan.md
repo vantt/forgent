@@ -43,7 +43,7 @@ Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (
 | MAIL | `lead:MAIL` | `claude-rgvd@fg-server` (đã nhận vai 10-23 11:10) | `fg-server` (xác nhận; dòng MAIL trước đây ghi "máy owner" là sai) |
 | HARDEN | `lead:HARDEN` | `claude-p74h@fg-server2` (IDENT điền từ dòng log 11:28 của HARDEN) | `fg-server2` |
 | TEST | `lead:TEST` | `claude-tt7r@fg-server2` (đã nhận vai 10-23 11:27) | `fg-server2` |
-| WORK | `lead:WORK`, `lead:ES` | `claude-uygd@fg-server2` (phiên `forgent-cd`) | `fg-server2` |
+| WORK | `lead:WORK`, `lead:ES` | `claude-uygd@fg-server2` (phiên `forgent-4e` từ 10-25 09:06 sau restart; trước là `forgent-cd`) | `fg-server2` |
 | OPC | `lead:OPC` | `claude-muyt@fg-server2` | `fg-server2` |
 | CFG | `lead:CFG` | `claude-hrpe@fg-server` | **Landed:** Slice A (crate `fgos-yaml-doc`, bỏ `serde_yaml`), Slice B (crate `fgos-config`, schema `core/config-schema/` + bộ chuẩn `core/config-standard/`, lock), Slice C landing A (YAML qua Rust, xoá js-yaml, RUL108), **Slice D 10-24** (verb `fgos config`, migrate có `--dry-run`/tombstone/backup, doctor findings + repair, `~/.fgos/private` bị che với mọi worker confine, `FGOS_CONFINED=1`). **Tiếp:** Slice C landing B (cửa `config` trên native door, facade) rồi landing C (cutover một merge: migrate file repo, chuyển mọi reader Node/gateway/account/token, xoá `src/config/`). fgOS vẫn đọc `.fgos/config.json` cách cũ tới landing C
 | COOK | `lead:COOK` | `claude-fkpc@fg-server` | `fg-server` |
