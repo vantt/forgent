@@ -46,7 +46,7 @@ import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalize
 import { EventLogError } from '../src/state/event-log.mjs';
 import { foldEvents, conflictsFor } from '../src/state/replay.mjs';
 import { deriveTitle, classify } from '../src/intake/classify.mjs';
-import { mintWorkId } from '../src/util/identity-mint.mjs';
+import { mintMachineId, mintWorkId } from '../src/util/identity-mint.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfigForDir, RunnerConfigError, runDispatchCli, runDoorHint, DispatchError } from '../src/runner/dispatch.mjs';
 import { resolveWorkForDispatch } from '../src/runner/work-dispatch.mjs';
@@ -135,7 +135,7 @@ import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocatio
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, createDoctorRun, integrationScriptPath, runFixes } from '../src/setup/checks.mjs';
 import { readConfig, initConfigFile } from '../src/config/facade.mjs';
-import { fixEventStoreMachineId, fixEventStoreLockDirs } from '../src/setup/event-store-fixes.mjs';
+import { fixEventStoreLockDirs } from '../src/setup/event-store-fixes.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
@@ -1045,9 +1045,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
     case 'init': {
       // `init` is the first step of setup, and the store cannot open without a machine id and its locks directory,
-      // which setup creates. Create them here through the same fixes (idempotent: an existing id is kept, and a
+      // which setup creates. Create them here through the Identity mint and the lock-dirs fix (idempotent: an existing id is kept, and a
       // clone's own `fgos.machineId` still wins).
-      fixEventStoreMachineId(path.dirname(dir));
+      mintMachineId(worktreeStateRoot().stateRoot);
       fixEventStoreLockDirs(path.dirname(dir));
       initStore(dir);
       // D4: detection/manifest writing must never fail init — a permissions
@@ -2908,7 +2908,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const ctx = { cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) };
       if (sub === 'sync') {
         const { syncUseCase } = await import('../src/verbs/events/sync.mjs');
-        return syncUseCase(ctx, { remote: flags.remote, noPush: flags['no-push'] });
+        return syncUseCase(ctx, { remote: flags.remote, noPush: flags['no-push'], opportunistic: flags.opportunistic });
       }
       if (sub === 'status') {
         const { statusUseCase } = await import('../src/verbs/events/status.mjs');
@@ -4760,11 +4760,18 @@ function handSealsToChild() {
     spawnDetachedCli({ cwd: root, args: ['events', 'seal', '--stream', stream, ...(checkpointPath ? ['--history', checkpointPath] : []), '--dir', root] });
   }
 }
-function opensEventStore(entry, verb, positional) {
+// The detached children (the seal child and the publish child) have no caller to read their error, so a child that
+// fails leaves a record whatever the verb's own classification is.
+function isEventStoreChild(verb, positional, flags) {
+  return verb === 'events' && (positional[0] === 'seal' || (positional[0] === 'sync' && flags.opportunistic === true));
+}
+function opensEventStore(entry, verb, positional, flags) {
   // `events migrate` imports the tracked history under its own quiesce check: no trigger may open the store around it.
   if (verb === 'events' && positional[0] === 'migrate') return false;
   // The seal child does exactly one seal: no start or end trigger (no second seal sweep, no publish) around it.
   if (verb === 'events' && positional[0] === 'seal') return false;
+  // The publish child does one opportunistic sync and nothing around it, or its own end trigger would start another child.
+  if (verb === 'events' && positional[0] === 'sync' && flags.opportunistic) return false;
   return !!(entry?.requiresExistingStore || STORE_MISSING_WARNING_VERBS.has(verb) || EVENT_STORE_LIFECYCLE_VERBS.has(verb));
 }
 
@@ -5060,6 +5067,7 @@ async function main() {
   // arg-parse fault never reached this catch at all and could not be recorded.
   let faultClass = 'arg-parse';
   let dir;
+  let parsed = null;
   // Set once the verb is known to open the Event Store: the facts both lifecycle triggers need (spec §16).
   let eventStoreLifecycle = null;
   let sweepsLand = false;
@@ -5067,6 +5075,7 @@ async function main() {
   if (currentDispatchDepth() === 0) processSealCoalescer.handOff();
   try {
     const { flags, positional } = parseArgs(rest);
+    parsed = { flags, positional };
 
     // Same rule as the Rust host: any exact `--help`/`-h` token asks for help,
     // even where the parser took it as the previous flag's value.
@@ -5169,7 +5178,7 @@ async function main() {
     // comes from `runVerb` unchanged.
     faultClass = entry ? null : 'unknown-verb';
     // The main checkout is resolved (it runs git) only for a verb that opens the store; the other verbs never pay for it.
-    if (opensEventStore(entry, verb, positional)) {
+    if (opensEventStore(entry, verb, positional, flags)) {
       eventStoreLifecycle = { trustedMain: path.dirname(getMainFgosDir(dir)), dispatched: currentDispatchDepth() > 0 };
       sweepsLand = landsWork(verb, positional);
       // `init` creates the store, so only its end trigger has anything to maintain. A command outside a dispatched worker
@@ -5220,7 +5229,7 @@ async function main() {
       fgosDir: dir,
       cwd: process.cwd(),
       verb,
-      faultClass,
+      faultClass: faultClass ?? (parsed && isEventStoreChild(verb, parsed.positional, parsed.flags) ? 'event-store-child' : null),
       message: err.message,
       argv: process.argv.slice(2),
     });
@@ -5238,7 +5247,11 @@ async function main() {
     // not a dispatched worker publishes (D13); sealing is always safe.
     handSealsToChild();
     if (eventStoreLifecycle) {
-      maintainEventStore(path.dirname(dir), { ...eventStoreLifecycle, end: true });
+      const maintained = maintainEventStore(path.dirname(dir), { ...eventStoreLifecycle, end: true });
+      // The command's answer is already out and a trigger never fails it, so a trigger that could not finish leaves its record.
+      if (maintained.error) {
+        recordInvocationFault({ fgosDir: dir, cwd: process.cwd(), verb, faultClass: 'event-store-end-trigger', message: maintained.error, argv: process.argv.slice(2) });
+      }
       // A dispatched worker never releases: only the clone owner's own session does (D13).
       if (sweepsLand && !eventStoreLifecycle.dispatched) {
         for (const warning of releaseRecordedLand(eventStoreLifecycle.trustedMain).warnings) process.stderr.write(`fgos: warning: Land candidate release: ${warning}\n`);

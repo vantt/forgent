@@ -45,7 +45,6 @@ test('real facade append, full read, seal, and published read retain the same en
   assert.equal(store.seal('project', scope).segments, 1);
   const after = store.read(query, []);
   assert.equal(after.events[0].h, result.events[0].h);
-  assert.equal(store.unpublishedSummary('origin', [])[0].sealedPushed, false);
   assert.equal(store.status([]).v, 1);
   assert.equal(store.sealIfDue('project', 60, []).segments, 0);
   assert.equal(store.sealAll(['project'], [50])[0].segments, 0);
@@ -53,7 +52,7 @@ test('real facade append, full read, seal, and published read retain the same en
 
 test('seal-like operations require held ranks and reject ranks 58 and 80 before native work', { skip: process.platform !== 'linux' }, t => {
   const { store } = fixture(t);
-  for (const invoke of [r => store.seal('project', r), r => store.sealAll(['project'], r), r => store.sealIfDue('project', 60, r), r => store.sync({}, r), r => store.read({ streams: ['project'] }, r), r => store.status(r), r => store.unpublishedSummary('origin', r)]) {
+  for (const invoke of [r => store.seal('project', r), r => store.sealAll(['project'], r), r => store.sealIfDue('project', 60, r), r => store.sync({}, r), r => store.read({ streams: ['project'] }, r), r => store.status(r)]) {
     assert.throws(() => invoke(undefined), { code: 'event-store-held-ranks-required' });
     for (const rank of [58, 70, 80]) assert.throws(() => invoke([rank]), { code: 'lock-order-violation' });
   }
@@ -67,7 +66,7 @@ test('prefetched store survives a hot transaction while every Git route refuses 
   withStateTx(hot, tx => {
     const result = store.append('project', [event], {}, 'fixture', [60]);
     assert.equal(store.readInGate(result.ack.origin, 'project', 0).events.length, 1);
-    for (const invoke of [() => store.seal('project', []), () => store.sealIfDue('project', 60, []), () => store.sealAll(['project'], []), () => store.read({ streams: ['project'] }, []), () => store.sync({}, []), () => store.status([]), () => store.unpublishedSummary('origin', [])]) {
+    for (const invoke of [() => store.seal('project', []), () => store.sealIfDue('project', 60, []), () => store.sealAll(['project'], []), () => store.read({ streams: ['project'] }, []), () => store.sync({}, []), () => store.status([])]) {
       assert.throws(invoke, { code: 'event-store-seal-under-state' });
     }
   }, { prefetched: { writer: 'fixture' } });
@@ -86,7 +85,6 @@ test('preparation caches resolution, honors Git machine config, and rejects non-
 test('empty stores read before the first append and linked worktrees share the prepared common directory', { skip: process.platform !== 'linux' }, t => {
   const { repo, store, git, temp, stateRoot } = fixture(t);
   assert.deepEqual(store.read({ streams: ['project'] }, []).events, []);
-  assert.deepEqual(store.unpublishedSummary('origin', []), []);
   git('-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '--allow-empty', '-qm', 'fixture');
   const linked = path.join(temp, 'linked');
   git('worktree', 'add', '--detach', '-q', linked);
@@ -128,6 +126,7 @@ test('native prepared authority binds append identity and has no raw constructor
   const { resolved, contracts } = fixture(t);
   assert.throws(() => new addon.EventStore('/tmp', []));
   assert.throws(() => openStore(resolved, 'other-machine', [contracts], loaderOptions), { code: 'event-store-machine-id' });
+  assert.throws(() => openStore(resolved, resolved.machineId, [contracts], loaderOptions, '../bad'), /invalid-fetch-mapping-remote/);
   const native = addon.openStore(resolved, resolved.machineId, [contracts]);
   const facade = openStore(resolved, resolved.machineId, [contracts], loaderOptions);
   assert.throws(() => facade.append('project', '/x/fgos-event-store-foo', {}, 'fixture', []), error => {

@@ -4,7 +4,7 @@ use fgos_event_store::{
     append::{append, AppendRequest, EventInput, Positions},
     envelope::Scope,
     layout::StreamId,
-    promote::{abandon, promote, PromoteRequest},
+    promote::{promote, PromoteRequest},
     receipt::Receipt,
     refs::own_ref,
     registry::{ConsumerContract, Registration, Registry},
@@ -37,7 +37,7 @@ fn registry() -> Registry {
     r
 }
 #[test]
-fn branch_and_local_refs_promote_two_parents_and_abandon_exact_old() {
+fn branch_and_local_refs_promote_two_parents_and_leave_local_untouched() {
     let r = Repo::new();
     r.append(1);
     let reg = registry();
@@ -150,8 +150,6 @@ fn branch_and_local_refs_promote_two_parents_and_abandon_exact_old() {
             .collect::<Vec<_>>(),
         vec!["work.add", "store.promote", "branch.note"]
     );
-    abandon(&d, &repo, &r.layout, "test-aa2345", &branch, &[], 0).unwrap();
-    assert!(!r.layout.stream(&branch).root.exists());
     let refs = d
         .list_refs(
             &repo,
@@ -160,7 +158,7 @@ fn branch_and_local_refs_promote_two_parents_and_abandon_exact_old() {
             100,
         )
         .unwrap();
-    assert!(!refs
+    assert!(refs
         .entries
         .iter()
         .any(|e| e.name == own_ref("test-aa2345", &branch).unwrap()));
@@ -184,7 +182,7 @@ fn branch_and_local_refs_promote_two_parents_and_abandon_exact_old() {
 }
 
 #[test]
-fn abandon_preserves_branch_until_pending_promote_is_sealed() {
+fn promote_refuses_when_the_project_stream_is_empty() {
     let r = Repo::new();
     let reg = registry();
     let branch = StreamId::parse("branch:pending").unwrap();
@@ -229,30 +227,4 @@ fn abandon_preserves_branch_until_pending_promote_is_sealed() {
         }
     )
     .is_err());
-    r.append(1);
-    let branch_tip = Receipt::read(&r.layout.stream(&branch).sealed())
-        .unwrap()
-        .commit;
-    append(&r.layout, &reg, AppendRequest { stream: &r.stream, events: &[EventInput { event_type: "store.promote".into(), schema_version: 1, payload: serde_json::json!({"stream":branch.as_str(),"throughSeq":1,"tip":branch_tip}), ts: "2026-10-18T05:00:01.000Z".into() }], cursor: &Positions::new(), writer: "test", machine: "test-aa2345", held_ranks: &[] }).unwrap();
-    for closed in [false, true] {
-        if closed {
-            fgos_event_store::rotate::rotate(&r.layout, "test-aa2345", &r.stream, &[]).unwrap();
-        }
-        assert!(abandon(&d, &repo, &r.layout, "test-aa2345", &branch, &[], 0).is_err());
-        assert!(r.layout.stream(&branch).root.exists());
-    }
-    seal(
-        &d,
-        &repo,
-        SealRequest {
-            layout: &r.layout,
-            machine: "test-aa2345",
-            stream: &r.stream,
-            held_ranks: &[],
-            hot_lock_depth: 0,
-            opportunistic: false,
-        },
-    )
-    .unwrap();
-    abandon(&d, &repo, &r.layout, "test-aa2345", &branch, &[], 0).unwrap();
 }

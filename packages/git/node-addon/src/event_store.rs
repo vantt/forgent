@@ -219,6 +219,9 @@ pub fn open_store(
     if machine_id != resolved_root.machine {
         return Err(error("event-store-machine-id"));
     }
+    if let Some(remote) = &publication_remote {
+        fgos_event_store::refspec::mappings(remote).map_err(error)?;
+    }
     let mut registry = Registry::default();
     registry.load_files(&registry_files).map_err(error)?;
     Ok(EventStore {
@@ -449,30 +452,6 @@ impl EventStore {
         fgos_event_store::diagnostics::maintenance(&self.layout).map_err(error)
     }
     #[napi]
-    pub fn unpublished_summary(
-        &self,
-        remote: String,
-        held_ranks: Vec<u32>,
-        hot_lock_depth: u32,
-    ) -> Result<Value> {
-        let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
-        let result = fgos_event_store::sync::guarded_unpublished_summary(
-            driver,
-            repo,
-            fgos_event_store::sync::SyncRequest {
-                layout: &self.layout,
-                machine,
-                remote: &remote,
-                no_push: true,
-                opportunistic: false,
-                held_ranks: &held_ranks,
-                hot_lock_depth,
-            },
-        )
-        .map_err(error)?;
-        Ok(Value::Array(result.into_iter().map(|v| json!({"stream":v.stream.as_str(),"sealedPushed":v.sealed_pushed,"oldestUnsealedAgeSec":v.oldest_unsealed_age_sec})).collect()))
-    }
-    #[napi]
     pub fn read(
         &self,
         request: EventStoreReadRequest,
@@ -595,24 +574,6 @@ pub fn event_store_facts(
     };
     fgos_event_store::diagnostics::facts(&driver, &repo, Path::new(&state_root), &remote)
         .map_err(error)
-}
-#[napi]
-pub fn ensure_event_store_refspecs(
-    cwd: String,
-    state_root: String,
-    trusted_main: String,
-    remote: String,
-) -> Result<()> {
-    available()?;
-    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
-    let repo = match driver
-        .resolve_repo(Path::new(&cwd), Path::new(&trusted_main))
-        .map_err(operation)?
-    {
-        ResolveRepo::Repository(repo) => repo,
-        ResolveRepo::NotARepository => return Err(error("event-store-no-repository")),
-    };
-    fgos_event_store::refspec::ensure_refspecs(&driver, &repo, &remote).map_err(error)
 }
 #[napi]
 impl EventStore {

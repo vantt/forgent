@@ -297,7 +297,14 @@ fn unordered_historical_mapping_records_read_as_no_provenance_until_setup_record
     assert!(error.detail.contains("fetch-provenance-order-unknown"));
     let facts = diagnostics::facts(&f.driver, &f.repo, &f.root, "origin").unwrap();
     assert!(facts["provenance"].is_null());
-    refspec::ensure_refspecs(&f.driver, &f.repo, "origin").unwrap();
+    fgos_git::RepositoryConfig::ensure_fetch_mapping(
+        &f.driver,
+        &f.repo,
+        "origin",
+        &fgos_git::publication_fetch_mappings("origin").unwrap(),
+        "test-mapping-setup",
+    )
+    .unwrap();
     assert_eq!(refspec::pinned_url(&f.driver, &f.repo, "origin").unwrap(), url);
     let facts = diagnostics::facts(&f.driver, &f.repo, &f.root, "origin").unwrap();
     assert_eq!(facts["provenance"]["url"], url);

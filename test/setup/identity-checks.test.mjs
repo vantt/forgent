@@ -46,6 +46,15 @@ test('warns while no machine id exists, mints once on fix, then passes without r
   assert.equal(fs.readFileSync(path.join(state, 'machine-id'), 'utf8').trim(), id);
 });
 
+test('minting resolves a state root beneath symlinked ancestors to its canonical directory', (t) => {
+  const { root, state } = withStateRoot(t);
+  const linked = path.join(root, 'linked-state');
+  fs.symlinkSync(state, linked);
+  assert.equal(fixIdentityMachineId(root, { stateRoot: path.join(linked, 'nested') }).changed, true);
+  assert.equal(fixIdentityMachineId(root, { stateRoot: path.join(linked, 'nested') }).changed, false);
+  assert.match(fs.readFileSync(path.join(state, 'nested/machine-id'), 'utf8'), /^[a-z0-9-]+\n$/);
+});
+
 test('key row warns while no key exists, mints once on fix, then shows the fingerprint without replacing the key', (t) => {
   assert.ok(HOST && fs.existsSync(HOST), 'set FGOS_HOST_BIN to a host built from this checkout');
   const { root, state } = withStateRoot(t);

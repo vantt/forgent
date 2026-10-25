@@ -21,6 +21,7 @@ test('combined ABI row checks every contract independently of package versions',
     assert.equal(compatibleGitContracts({ ...versions, contracts: { ...versions.contracts, [key]: 99 } }, floor), false);
   }
   assert.equal(compatibleGitContracts({ napi: 8 }, floor), false);
+  assert.equal(compatibleGitContracts(versions, { supported: false, probes: [{ passed: false }] }), false);
 });
 
 test('a malformed explicit addon remains a failing diagnostic', () => {

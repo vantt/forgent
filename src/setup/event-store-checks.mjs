@@ -46,7 +46,6 @@ export function checkEventStore(cwd, kind, options = {}) {
       ? pass('Event Store facade exports present; ABI evidence: git-component-compatible') : fail('Event Store facade exports missing; see git-component-compatible');
     const context = options.context ? options.context() : eventStoreSetupContext(cwd, options);
     const { config, facts } = context;
-    if (kind === 'event-store-git-version') return facts.floor.supported && facts.floor.probes.every(p => p.passed) ? pass(JSON.stringify(facts.floor)) : fail(JSON.stringify(facts.floor));
     if (kind === 'event-store-open-root') {
       const meta = fs.lstatSync(facts.openRoot);
       if (!meta.isDirectory() || meta.isSymbolicLink() || facts.guarantee.exclusion === 'none') return fail(`open root unavailable: ${JSON.stringify(facts.guarantee)}`);
@@ -70,8 +69,14 @@ export function checkEventStore(cwd, kind, options = {}) {
     switch (kind) {
       case 'event-store-machine-id': return status.machineRefShared ? warn(`event-store-machine-ref-shared: ${facts.machineId}; set git config fgos.machineId <other-id> in one clone`) : pass(facts.machineId);
       case 'event-store-unsealed': {
+        // Orphan branch streams are unsealed history nobody will seal: they warn on this row, and a failing age keeps its failure.
         const age = Math.max(0, ...status.streams.map(s => s.oldestUnsealedAgeSec));
-        return age > 3600 ? fail(`unsealed events age ${age}s exceeds 3600s`) : age > 2 * config.seal.intervalSec ? warn(`unsealed events age ${age}s exceeds twice seal interval`) : pass(`oldest unsealed age ${age}s`);
+        const tooOld = age > 3600;
+        const notes = [
+          tooOld ? `unsealed events age ${age}s exceeds 3600s` : age > 2 * config.seal.intervalSec && `unsealed events age ${age}s exceeds twice seal interval`,
+          status.orphanBranches.length > 0 && `orphan branch streams: ${status.orphanBranches.join(', ')}`,
+        ].filter(Boolean);
+        return tooOld ? fail(notes.join('; ')) : notes.length ? warn(notes.join('; ')) : pass(`oldest unsealed age ${age}s`);
       }
       case 'event-store-integrity': {
         // A peer's mirror the reader or the last sync refused is history this clone does not see: it fails the row
@@ -92,7 +97,6 @@ export function checkEventStore(cwd, kind, options = {}) {
         return !push || push.remote !== config.remote || push.error || now - push.time > 86400
           ? warn(`last push: ${JSON.stringify(push)}; ahead/behind: ${JSON.stringify(status.aheadBehind)}`) : pass(`last push ${push.time}; ahead/behind: ${JSON.stringify(status.aheadBehind)}`);
       }
-      case 'event-store-orphan-branches': return status.orphanBranches.length ? warn(`orphan branch streams: ${status.orphanBranches.join(', ')}`) : pass('no orphan branch streams');
       default: throw new Error(`unknown Event Store check: ${kind}`);
     }
   } catch (error) { return fail(error.message); }

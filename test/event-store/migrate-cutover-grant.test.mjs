@@ -23,6 +23,18 @@ function hostScan(t, scan) {
 }
 
 
+test('migrate refuses by name before any cut when the fetch mappings cannot be installed', async t => {
+  const f = fixture(t, { remote: true }); trackedLegacy(f);
+  // Every journaled Git write refuses without the activation fence, so the mapping fix is refused while the facts still read.
+  fs.rmSync(path.join(f.repo, '.fgos/locks/activation.lock'), { recursive: true });
+  const head = f.git('rev-parse', 'HEAD');
+  const scan = checkStopped({ workspaces: [f.repo], hostBin });
+  if (scan.status !== 'clean') { hostScan(t, scan); return; }
+  await assert.rejects(migrateUseCase({ ...f.ctx, hostBin, writer: 'fixture' }), { code: 'event-store-fetch-mapping-refused' });
+  assert.equal(f.git('for-each-ref', 'refs/fgos/legacy'), '');
+  assert.equal(f.git('rev-parse', 'HEAD'), head);
+});
+
 test('migrate --check runs real quiesce/setup/parity without publishing a ref or changing HEAD', async t => {
   const f = fixture(t, { machine: false }); trackedLegacy(f);
   fs.mkdirSync(path.join(f.repo, '.fgos/events'), { recursive: true });

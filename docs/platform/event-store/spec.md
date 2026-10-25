@@ -198,7 +198,7 @@ A consumer registers each type once in a versioned contract file of its own pack
 | `branch` | `refs/fgos/branch-events/<machine-id>/<branch-key>` | never | that branch's consumers; the project after promotion |
 | `local` | `refs/fgos/local-events/<machine-id>` | never | this clone only |
 
-Branch key: a slug of the worktree's branch name at the stream's first append, recorded in the stream; it survives a worktree move; a branch rename is not followed (known limit). Promotion at land is a `project` event `store.promote {stream, throughSeq, tip}` appended by the land operation (a consumer policy of the Git component, like the Iron Law gate); the seal commit that carries it has the branch tip as a second parent, so the branch objects travel with the project ref. Promoted branch events are ordered at the position of their promote event. Abandon deletes the branch ref and the branch open log; nothing in the project ever references them. A branch stream whose worktree is gone without land or abandon is an orphan: `fgos events status` and doctor list it, and nothing promotes it automatically. No consumer registers a `branch` type today; the contract is fixed now so the first one does not invent another path.
+Branch key: a slug of the worktree's branch name at the stream's first append, recorded in the stream; it survives a worktree move; a branch rename is not followed (known limit). Promotion at land is a `project` event `store.promote {stream, throughSeq, tip}` appended by the land operation (a consumer policy of the Git component, like the Iron Law gate); the seal commit that carries it has the branch tip as a second parent, so the branch objects travel with the project ref. Promoted branch events are ordered at the position of their promote event. The store has no abandon operation (it had no caller and was removed); nothing in the project references an unpromoted branch's ref or open log. A branch stream whose worktree is gone without land is an orphan: `fgos events status` and doctor list it, and nothing promotes it automatically. No consumer registers a `branch` type today; the contract is fixed now so the first one does not invent another path.
 
 ## 8. Open root (storage-location port)
 
@@ -446,6 +446,8 @@ Settled with the phase 05 review (2026-10-18):
 
 Triggers: the explicit verb; and the opportunistic check of section 16 when the last successful push is older than `eventStore.sync.intervalSec` (default 300; 0 means explicit only). Network calls never run inside the Work gate.
 
+Update, 2026-10-25: the opportunistic publish of a command's end trigger no longer runs in the command's own process. The end trigger decides that a push is due from the maintenance facts, starts one detached `fgos events sync --opportunistic` child through the same door as the seal child (`src/cli/detached-child.mjs`) and exits; the command's result never waits on the network or on the seal lock a sync holds. Publication of a command's events therefore lags by at most the child's runtime: a few seconds on a healthy remote and up to about 120 s on a slow one (the longest network call), as before but off the reader's path. No event is at risk in that window, because events are durable and readable locally before any sync. The child tries the seal lock and skips when another process holds it; once it holds the lock it writes its attempt time to `sync.json` before any network work, so commands that end while it runs see the push as attempted and start no second child (a short start-up race remains until the first child holds the lock, bounded by one process start per command); runs no start or end trigger, returns no status, and answers a failed attempt it has recorded itself (`sync.json`, shown by `event-store-sync`) as `{ error }`. A dispatched worker never starts it, and a child that cannot be started is the trigger's error.
+
 Offline: append, seal and read work fully; fetch and push fail, the failure is recorded, `status` shows "unpublished since", the next trigger retries; Work is never blocked by the network. A clone with no remote keeps everything local.
 
 Two clones on one machine share a machine id by default (one `stateRoot`), so both write `refs/fgos/events/<id>` in their own repositories with different store ids. The first push wins; the second sync finds a diverged mirror and writes a merge commit, so both chains converge on the remote with nothing lost and no shared sequence (store ids differ). Doctor warns `event-store-machine-ref-shared` when the mirror of the own id carries another store id, and names the fix: `git config fgos.machineId <other-id>` in one of the clones.
@@ -491,7 +493,7 @@ The usual verbs (`fgos list`, `show`, `ready` and the others) read the consumer'
 
 | Verb | Does |
 |---|---|
-| `fgos events sync` | Section 14 |
+| `fgos events sync [--opportunistic]` | Section 14; `--opportunistic` is the detached publish child's mode (try the seal lock, no status) |
 | `fgos events status [--json]` | Store id, machine id, every ref and tip, per stream unsealed count and oldest unsealed age, closed segments pending, last receipt, last fetch and push with result, own ref ahead/behind its mirror, a missing fetch refspec, orphan branch streams, deferred events and their missing predecessors (section 12), the guarantee level of the open root |
 | `fgos events seal --stream <s> [--history <file>]` | Certify the open events of one stream now, waiting at most 5 s for the seal lock (busy after that: exits 0); `--history` names the consumer's history checkpoint under `.fgos/cache` that the seal extends. The detached child of a CLI Work command runs it (section 16) |
 | `fgos events export [--stream <s>] [--since <cursor>] [--format jsonl|legacy-layout] --out <dir>` | Canonical-order JSONL, or the legacy file layout with a parity report (section 18) |
@@ -515,7 +517,7 @@ Update, 2026-10-23 17:57 (owner decision, supersedes M3 for long-running process
 
 Update, 2026-10-24 (owner decision, option c, supersedes the 2026-10-23 sentence "The CLI keeps sealing at once" for CLI commands): a CLI command no longer waits for the seal. It appends and fsyncs its event as before, releases the gate, prints its answer, then hands the seal to a short detached child and exits. The child is not a daemon: no timer, no loop; it takes the seal lock with the bounded wait of the inline seal, seals everything open in the stream (its own event and any earlier unsealed one), writes the receipt and the history checkpoint like the inline seal, and exits. Nothing open: it returns at once. If the lock is still held after the wait the child exits 0, because the holder, or the next seal, covers the backlog. A burst of commands starts one child per command; they serialize on the seal lock and the later ones find nothing to do. The loss window of a sealed-at-once CLI event becomes seconds (the child's start plus its seal), like the runner's coalescing, and nothing else changes: append durability, `fsync`, crash repair, the clean-exit row and the runner's in-process coalescing stand. Why: a CLI `move` on ext4 spent about 26 git children and 63 `fsync` calls in its own seal, 944 ms against 225 ms on main (`plans/reports/phase-lead-261023-2250-work-cli-move-overhead.md`).
 
-When no child runs, nothing is lost. A child that cannot be started (the spawn is refused, the host forbids a detached process) or that dies before it seals (killed, machine off) leaves the event durable in the open batch and readable, exactly the state a crash between an append and its seal always left: the next fgOS command's seal trigger, any later `sealOnWrite`, a clean writer exit, or the opportunistic seal once the event is older than `eventStore.seal.intervalSec` certifies it, and doctor `event-store-unsealed` reports a tail that stays. A dispatched worker (`FGOS_DISPATCH_DEPTH` above 0, the fact the end trigger already uses) never hands off: its CLI commands seal inline as before, so no detached child leaves the attempt's process domain on any platform (proof: `test/event-store/background-seal.test.mjs`, dispatched worker). In a bwrap domain the sandbox also leaves the project store read-only, so a Work command there is refused before it appends (proof: `test/event-store/background-seal-confined.test.mjs`). A seal child that keeps failing (the lock never free, the spawn refused every time) shows up only as doctor `event-store-unsealed`. The seal child runs no start or end trigger: no second seal sweep and no publish around it. A CLI command outside a dispatched worker runs only the end trigger, not a start trigger: it hands its seals to the child and the end trigger applies the same seal-if-due policy, so a start trigger would repeat that on the print path (a stale batch a crashed predecessor left is sealed by this end trigger or the child; proof: `test/event-store/triggers.test.mjs`). The runner process keeps its in-process coalescing and never hands off; the children it spawns (settle, finalize) are CLI commands and hand off like any other.
+When no child runs, nothing is lost. A child that cannot be started (the spawn is refused, the host forbids a detached process) or that dies before it seals (killed, machine off) leaves the event durable in the open batch and readable, exactly the state a crash between an append and its seal always left: the next fgOS command's seal trigger, any later `sealOnWrite`, a clean writer exit, or the opportunistic seal once the event is older than `eventStore.seal.intervalSec` certifies it, and doctor `event-store-unsealed` reports a tail that stays. A dispatched worker (`FGOS_DISPATCH_DEPTH` above 0, the fact the end trigger already uses) never hands off: its CLI commands seal inline as before, so no detached child leaves the attempt's process domain on any platform (proof: `test/event-store/background-seal.test.mjs`, dispatched worker). In a bwrap domain the sandbox also leaves the project store read-only, so a Work command there is refused before it appends (proof: `test/event-store/background-seal-confined.test.mjs`). A seal child that keeps failing (the lock never free, the spawn refused every time) shows up as doctor `event-store-unsealed`, and every failure of the seal child, of the publish child (before its sync could record its own attempt) or of an end trigger also leaves a record in the invocation-fault log (`event-store-child`, `event-store-end-trigger`), the one existing trace door for a failure with no caller to read it. The seal child runs no start or end trigger: no second seal sweep and no publish around it. A CLI command outside a dispatched worker runs only the end trigger, not a start trigger: it hands its seals to the child and the end trigger applies the same seal-if-due policy, so a start trigger would repeat that on the print path (a stale batch a crashed predecessor left is sealed by this end trigger or the child; proof: `test/event-store/triggers.test.mjs`). The runner process keeps its in-process coalescing and never hands off; the children it spawns (settle, finalize) are CLI commands and hand off like any other.
 
 Doctor (`event-store-unsealed`): passes when nothing unsealed is older than twice the interval; warns above that; fails when the oldest unsealed event is older than 3600 s. There is no event-count cap, because lifecycle events already seal at once. These thresholds are agent defaults that the owner accepted as spec v2 on 2026-10-17 15:13.
 
@@ -620,22 +622,20 @@ Config defaults merged by `fgos setup` (added only when missing, global then pro
 
 Repository-local git config, never tracked: the fetch refspecs of section 14 (`+refs/fgos/events/*:refs/fgos/remotes/<remote>/events/*` and the legacy one), and the optional `fgos.machineId`.
 
-Setup fixes: `event-store-refspec` (add the fetch refspecs when the remote exists and they are missing; never a push refspec); `event-store-lock-dirs` (create `<eventOpenRoot>/locks` with mode 0700). The machine id is minted by the Identity component (setup fix `identity-machine-id`, N-API `sessionIdentity.mintMachineId`), never by Event Store; `events migrate` calls the same mint when the id is missing.
+Setup fix: `event-store-lock-dirs` (create `<eventOpenRoot>/locks` with mode 0700). The machine id is minted by the Identity component (setup fix `identity-machine-id`, N-API `sessionIdentity.mintMachineId`) and the fetch refspecs are installed by the Git component (setup fix `git-publication-refspecs`, through RepositoryConfig; never a push refspec); Event Store has no fix for either. `events migrate` calls the same two doors when the id or the mappings are missing.
 
 Doctor checks, registered in `src/setup/registrations.mjs`:
 
 | Check | Fails when |
 |---|---|
-| `event-store-git-version` | Git's floor verdict is unsupported or a required probe failed. The floor is Git's (`packages/git/contracts/git-floor.v1.json`, Git phase 01 req 3), read through `gitFloorVerdict`; this spec keeps no version number of its own |
 | `event-store-open-root` | root does not resolve, not a git repository, or guarantee `none`; prints the guarantee level |
 | `event-store-machine-id` | missing or malformed; warns `event-store-machine-ref-shared` (section 14) |
 | `event-store-refspec` | remote configured but fetch refspec missing; a positive push refspec whose source can match `refs/fgos/`; a positive fetch refspec matching `refs/fgos/local-events` or `refs/fgos/branch-events` (negative exclusions are safe) |
-| `event-store-unsealed` | section 16 thresholds |
+| `event-store-unsealed` | section 16 thresholds; warns per orphan branch stream (a branch stream whose worktree is gone), listing them in the same message |
 | `event-store-integrity` | a seal blob whose hash differs from `seal.json`, an event `h` that does not verify, a batch commit marker that does not verify inside a closed segment or a sealed blob, a sequence gap in an own stream, `event-store-seq-conflict`, `event-store-seq-recovery-conflict` that a seal did not resolve, `event-store-order-cycle`, `event-store-ref-moved` or `seal-mismatch` recorded |
 | `event-store-sync` | warns when the last push failed or is older than 24 h with unpublished events and a remote configured; reports ahead/behind |
-| `event-store-native-addon` | the combined N-API addon of section 17 (linking `fgos-event-store` and `fgos-git`) is missing from the active payload, fails to load, or was built for another Node ABI or platform. Git spec section 4 requires one ABI row for the combined addon, so the Git plan merges this check's ABI evidence with Git's `git-component-compatible` rather than adding a second ABI row |
+| `event-store-native-addon` | (kept as its own row: the Event Store facade exports are checked here and the contract version only in `git-component-compatible`, so merging would lose the export check) the combined N-API addon of section 17 (linking `fgos-event-store` and `fgos-git`) is missing from the active payload, fails to load, or was built for another Node ABI or platform. Git spec section 4 requires one ABI row for the combined addon, so the Git plan merges this check's ABI evidence with Git's `git-component-compatible` rather than adding a second ABI row |
 | `event-store-legacy-layout` | after cutover: tracked event files, `.fgos/events/`, tracked `state.json` or backups, or a `merge=union` line for events exist; `refs/fgos/legacy` missing or its tree differs from `seal.json.treeOfFgosEvents` |
-| `event-store-orphan-branches` | warns per orphan branch stream |
 
 Clarification, 2026-10-22: only the automatic triggers are gated by the dispatched-worker rule. A dispatched worker may run `fgos events sync` explicitly, because that is a request; the end-of-command push and the Land candidate release never run in one. A shared config file that exists but does not parse never lends its defaults to a publish decision: the `events` verbs and doctor refuse with `event-store-config`, and the write path and the triggers use a config that never pushes (`sync.intervalSec` 0), so a trigger still seals.
 
@@ -882,9 +882,7 @@ paths and ids must each be unique.
 The shared exec guard and `hotLockDepth` now live in
 `src/holder-lock/hot-guard.mjs`; `src/state/hot-lock.mjs` re-exports the depth and
 error for existing consumers. Entering a hot section returns a one-shot release
-that cannot decrement the depth twice. Unpublished summary validates repository
-and layout before taking `event-seal`; this read-only operation waits behind an
-active seal or sync. The strace gate proof covers ordinary append/readInGate and recovery of a lost
+that cannot decrement the depth twice. The strace gate proof covers ordinary append/readInGate and recovery of a lost
 high-water mark plus a torn active tail. Holder reclaim additionally relies on
 the Rust structural no-port boundary and existing crate regression tests.
 
@@ -954,12 +952,12 @@ Export stream discovery uses the configured remote and skips status entirely
 when `--stream` is explicit. Only warning-capable checks emit
 `warning:`; sync passes when no unpublished events and no push error exist.
 
-The machine-id setup fix uses the crate's atomic durable-file install-once door;
+The machine id is minted by Identity's mint, which uses the atomic durable-file install-once door;
 concurrent mints expose exactly one complete identity. The state root is
 canonicalized so symlinked ancestors are supported; the machine-id leaf remains
-protected by the atomic installer. Refspec setup calls the
-crate's existing `ensure_refspecs`, hence Git's journaled `ensure_fetch_mapping`.
-It never writes push mappings. Doctor additionally refuses fetch wildcards that
+protected by the atomic installer. Git's `fixGitFetchMapping` owns the fetch
+mappings, through Git's journaled `ensure_fetch_mapping`, and never writes push
+mappings. Doctor additionally refuses fetch wildcards that
 could include local/branch event namespaces. Lock-directory setup refuses symlink
 ancestors and ensures mode 0700.
 
@@ -998,7 +996,7 @@ historical log, and measures parity from the exported restorable bytes.
 `--check` computes the inventory, reader order, parity and commit plan without
 writing objects or refs. It reports the computed legacy commit OID and whether
 the observed ref will be created, reused or replaced as an unfenced stale import;
-its three setup repairs can create local identity/lock
+its setup repairs (the Identity mint, the lock directories and Git's fetch mappings) can create local identity/lock
 state and Git mapping provenance. It refuses `event-store-migration-fence-ignored`
 when the checkout's ignore rules exclude `.fgos/events`, since the cutover commit
 could not track the fence. An untracked legacy file that is empty holds no history:
@@ -1170,7 +1168,7 @@ Dated clarifications with no protocol change, made with the store part of the se
 
 - Section 5 names `project:<name>` consumer streams (plan D9: porting uses `project:porting`, Work keeps `project`). The crate already accepted them and seals them onto the machine's `events` ref with their own `seq` (`seal_publication.rs`, `project_consumer_streams_share_one_ref_without_false_move_or_sequence_reuse`).
 - Section 10 step 2.3 now names Git's Publication port instead of `gix` or `git -c core.fsync=...`: Git fsyncs directories itself and treats `core.fsync` only as a backend input (Git spec section 10). The store's own barriers (step 1, step 2.4 and 2.5) are unchanged.
-- Section 21 `event-store-git-version` points to Git's floor (`git-floor.v1.json` through `gitFloorVerdict`, 2.53.0 with four required probes today) instead of 2.31 and 2.36; section 8's "git 2.31 or newer" likewise. The check body already read Git's verdict.
+- Section 21: the Git floor is judged by Git's own row `git-component-compatible` (the old `event-store-git-version` row is gone; Git guarantees a supported verdict only when every required probe passed), and it points to Git's floor (`git-floor.v1.json` through `gitFloorVerdict`, 2.53.0 with four required probes today) instead of 2.31 and 2.36; section 8's "git 2.31 or newer" likewise. The check body already read Git's verdict.
 - Section 8 records the measured topology result: `--separate-git-dir` and absorbed submodules are refused by Git's resolver (`trusted-main-gitfile-unsupported`), not resolved as experiment 1 suggested.
 - Sections 15 and 19 cite current source lines; the `events.lock` row says its read-check-append role already moved to the `state` hot mutex.
 
@@ -1182,7 +1180,7 @@ Dated clarifications with no protocol change, made with the Work triggers and th
 - Section 16: every trigger (command start and end, each runner poll, session end, gateway and runner stop) reads `store.maintenance` facts and never `status`. A poll seals only streams whose oldest unsealed event is older than `eventStore.seal.intervalSec`; a session end, a gateway stop and a runner stop seal every open stream; the runner loop never publishes. The main checkout is resolved only by a verb that opens the store.
 - Land policy (Work's, per section 5 and the Git spec's "seal before land"): Work seals `project` before the Git Land, and a store that cannot seal refuses the land before anything is published. After publication Work promotes the landed branch's stream under the crate's branch key (`branch:<branchKey(branch)>`, through the facade). A promote that fails then is a recorded, retryable result on the `merged` outcome (`promotion: { stream, error, retryable: true }`), never a throw that turns a landed merge into an error; promoting again is safe because a stream the project already names is left alone.
 - Section 12 (conflicts are not durable records): an event the fold recorded as a conflict never took effect. The Land idempotence lookup and the Land release sweep read only events that applied, so a delivery that became a conflict is not returned as a prior success on a retried approve and releases no candidate. `fgos show <id>` lists the conflicts recorded against an item and the doctor row `work-recorded-conflicts` warns when the view holds any; resolving one is not part of this change.
-- Section 5 and the setup fixes of section 21: `fgos init` runs the `event-store-machine-id` and `event-store-lock-dirs` fixes before it opens the store. `fgctl`'s runtime tail runs `fgos init` before `fgos doctor --fix`, and the store cannot open without a machine id and its locks directory, so a machine that never ran setup would otherwise fail its first `fgctl init`. Both fixes are idempotent and a clone's own `fgos.machineId` still wins; the refspec fix stays with setup and doctor, since it changes the repository's remote configuration.
+- Section 5 and the setup fixes of section 21: `fgos init` mints the machine id through the Identity mint and runs the `event-store-lock-dirs` fix before it opens the store. `fgctl`'s runtime tail runs `fgos init` before `fgos doctor --fix`, and the store cannot open without a machine id and its locks directory, so a machine that never ran setup would otherwise fail its first `fgctl init`. Both fixes are idempotent and a clone's own `fgos.machineId` still wins; the fetch mappings stay with setup and doctor (`git-publication-refspecs`), since they change the repository's remote configuration.
 
 ## Store read batching (2026-10-23)
 

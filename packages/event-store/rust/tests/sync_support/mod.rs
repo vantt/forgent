@@ -6,7 +6,6 @@ use fgos_event_store::{
     identity::StoreIdentity,
     layout::{Layout, StreamId},
     read::{read, ReadRequest},
-    refspec::ensure_refspecs,
     sync::{sync, SyncRequest, Synced},
 };
 use fgos_git::*;
@@ -102,9 +101,20 @@ pub struct Clone {
     pub layout: Layout,
     pub machine: String,
 }
+static SETUPS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
 impl Clone {
     pub fn setup(&self) {
-        ensure_refspecs(&self.driver, &self.repo, "origin").unwrap()
+        fgos_git::RepositoryConfig::ensure_fetch_mapping(
+            &self.driver,
+            &self.repo,
+            "origin",
+            &fgos_git::publication_fetch_mappings("origin").unwrap(),
+            &format!(
+                "test-mapping-setup-{}",
+                SETUPS.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+            ),
+        )
+        .unwrap();
     }
     pub fn append(&self, n: usize) {
         self.append_stream("project", n)

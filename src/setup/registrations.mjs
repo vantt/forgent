@@ -113,7 +113,7 @@ import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { computeKnowledgeProjection } from '../report/knowledge-projection.mjs';
 import { prepareWorkStore } from '../state/work-event-store.mjs';
 import { eventStoreDoctor } from './event-store-checks.mjs';
-import { fixEventStoreMachineId, fixEventStoreRefspec, fixEventStoreLockDirs } from './event-store-fixes.mjs';
+import { fixEventStoreLockDirs } from './event-store-fixes.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { resolveDocPath } from '../report/knowledge-resolver.mjs';
 import { isLiveDocLifecycle } from '../state/knowledge-registry.mjs';
@@ -5365,12 +5365,10 @@ registerCheck({
   check: (cwd) => checkObserveRunCoverage(cwd),
 });
 
-// Event Store: three setup fixes and ten doctor rows. A doctor run builds one `eventStoreDoctor`
+// Event Store: one setup fix and eight doctor rows. A doctor run builds one `eventStoreDoctor`
 // (its lazy store snapshot is read at most once) and every row asks it; a row called without a run gets a private one.
-registerFix({ id: 'event-store-machine-id', fix: cwd => fixEventStoreMachineId(cwd) });
-registerFix({ id: 'event-store-refspec', fix: cwd => fixEventStoreRefspec(cwd) });
 registerFix({ id: 'event-store-lock-dirs', fix: cwd => fixEventStoreLockDirs(cwd) });
-for (const name of ['git-version', 'open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout', 'orphan-branches']) {
+for (const name of ['open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout']) {
   const id = `event-store-${name}`;
   registerCheck({ id, description: `Event Store ${name}`, check: (cwd, run = createDoctorRun()) => run.once(`event-store-doctor:${cwd}`, () => eventStoreDoctor(cwd))(id) });
 }

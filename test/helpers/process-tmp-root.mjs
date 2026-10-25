@@ -15,7 +15,7 @@ import path from 'node:path';
 const PRIVATE_ROOT_PREFIX = 'fgos-tp-';
 const SEAL_CHILD_WAIT_MS = 20000;
 
-// A CLI Work command hands its seal to a short detached `fgos events seal` child and exits, so a test that drove one
+// A CLI Work command hands its seal to a short detached `fgos events seal` child (and a due publish to an `fgos events sync` child) and exits, so a test that drove one
 // can end before the child does. Before the root is removed this process waits, through the process door (identity,
 // never a bare pid), for the seal children of its own root to finish. Test code only: the product has no such wait.
 let processDoor = null;
@@ -32,7 +32,7 @@ function sealChildrenOf(root) {
   if (views === 'unsupported') return [];
   return views.filter((view) => {
     const args = Array.isArray(view.cmdline) ? view.cmdline.join(' ') : String(view.cmdline ?? '');
-    return view.pid !== process.pid && args.includes(root + path.sep) && / events seal /.test(` ${args} `);
+    return view.pid !== process.pid && args.includes(root + path.sep) && / events (?:seal|sync) /.test(` ${args} `);
   });
 }
 
