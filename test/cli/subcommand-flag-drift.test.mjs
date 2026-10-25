@@ -257,7 +257,8 @@ test('the scanner sees what it claims to: known reads in known regions', () => {
 // metrics_cli/<sub>.rs file; friction -> its match arm in friction_cli.rs;
 // config, convention and identity -> one parser shared by every sub-verb (cli_projector.rs),
 // mailbox -> one parser in apps/fgos/src/wiring/mailbox_verbs.rs, so
-// its flags must equal the union of the sub-verbs' schemas.
+// its flags must equal the union of the sub-verbs' schemas; its sub-verb names
+// live in mailbox_surface.rs, shared by every platform build.
 const RUST = (rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
 const NATIVE_SOURCES = {
   metrics: {
@@ -286,7 +287,7 @@ const NATIVE_SOURCES = {
     },
   },
   mailbox: {
-    subs: RUST('apps/fgos/src/wiring/mailbox_verbs.rs'),
+    subs: RUST('apps/fgos/src/wiring/mailbox_surface.rs'),
     shared: () => {
       const src = RUST('apps/fgos/src/wiring/mailbox_verbs.rs');
       const start = src.indexOf('pub fn project_mailbox_request');
