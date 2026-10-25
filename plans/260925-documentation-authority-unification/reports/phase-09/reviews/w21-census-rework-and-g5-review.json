@@ -1,0 +1,181 @@
+{
+  "items": [
+    {
+      "id": "pc-d-0446",
+      "kind": "census-row",
+      "verdict": "APPROVE",
+      "summary": "Re-pointed to T:491; setup at T:492 passes nonempty llmAccounts (T:494-497), so F:157 takes the truthy branch and runs F:158-160.",
+      "evidence": "test/runner/execution/run-provider-failover.test.mjs:491-497, test/helpers/failover-fixture.mjs:157-160 at 5820ca678"
+    },
+    {
+      "id": "pc-d-0448",
+      "kind": "census-row",
+      "verdict": "APPROVE",
+      "summary": "T:19 calls summaryOf at T:51, reaching F:182.",
+      "evidence": "test/runner/execution/run-provider-failover.test.mjs:51, test/helpers/failover-fixture.mjs:182"
+    },
+    {
+      "id": "pc-d-0450",
+      "kind": "census-row",
+      "verdict": "APPROVE",
+      "summary": "T:179 evaluates panel('u-panel-rotate') at T:189, reaching the [1,2,3].map at F:188.",
+      "evidence": "test/runner/execution/run-provider-failover.test.mjs:189, test/helpers/failover-fixture.mjs:187-188"
+    },
+    {
+      "id": "pc-d-0453",
+      "kind": "census-row",
+      "verdict": "APPROVE",
+      "summary": "T:331 calls unitRuns at T:341 and T:347; F:202 is unconditional.",
+      "evidence": "test/runner/execution/run-provider-failover.test.mjs:341,347, test/helpers/failover-fixture.mjs:201-203"
+    },
+    {
+      "id": "pc-d-0454",
+      "kind": "census-row",
+      "verdict": "APPROVE",
+      "summary": "T:360 calls unitRuns at T:363; F:202 runs before the existsSync branch.",
+      "evidence": "test/runner/execution/run-provider-failover.test.mjs:363, test/helpers/failover-fixture.mjs:202"
+    },
+    {
+      "id": "pc-d-0479",
+      "kind": "census-row",
+      "verdict": "APPROVE",
+      "summary": "L:67 calls f.worktree() and f.worktree('other') at L:68. That runs the closure at L:37, including the default 'holder' branch.",
+      "evidence": "test/runner/documentation-cutover-lease.test.mjs:37,67-68"
+    },
+    {
+      "id": "pc-d-0480",
+      "kind": "census-row",
+      "verdict": "APPROVE",
+      "summary": "Same as pc-d-0479: same closure, same caller.",
+      "evidence": "test/runner/documentation-cutover-lease.test.mjs:37,67-68"
+    },
+    {
+      "id": "pc-d-0447",
+      "kind": "census-row",
+      "verdict": "APPROVE",
+      "summary": "The detail now describes attemptsOf (F:181), called at T:501 by T:491.",
+      "evidence": "test/runner/execution/run-provider-failover.test.mjs:501, test/helpers/failover-fixture.mjs:181"
+    },
+    {
+      "id": "pc-d-0449",
+      "kind": "census-row",
+      "verdict": "APPROVE",
+      "summary": "The detail now describes selectedAccount -> runFile, called at T:510. T:510 is correct: T:508 only starts the next run, so the review's suggested :508 was wrong.",
+      "evidence": "test/runner/execution/run-provider-failover.test.mjs:508-510, test/helpers/failover-fixture.mjs:183-184"
+    },
+    {
+      "id": "pc-d-0924",
+      "kind": "census-row",
+      "verdict": "APPROVE",
+      "summary": "Now binds bin/fgos.mjs:3868 (the JSON return), not :3867. REJECT holds.",
+      "evidence": "bin/fgos.mjs:3866-3868 at 5820ca678"
+    },
+    {
+      "id": "pc-d-1101",
+      "kind": "census-row",
+      "verdict": "APPROVE",
+      "summary": "Now says the expression survives at line 30 as the fgosDir passed to createSeatBindingClient (runtime/config state). REJECT holds.",
+      "evidence": "src/setup/seat-binding-checks.mjs:28-31"
+    },
+    {
+      "id": "pc-d-0245",
+      "kind": "census-row",
+      "verdict": "APPROVE",
+      "summary": "Extra fix from the audit: restricted to the :155 test. f.setupLease() :157 -> cli :106 -> rawCli :100 -> body :96. :122 never calls rawCli.",
+      "evidence": "test/e2e/documentation-cutover-lease-hooks.test.mjs:96-110,122-166"
+    },
+    {
+      "id": "pc-d-0288",
+      "kind": "census-row",
+      "verdict": "APPROVE",
+      "severity": "low",
+      "summary": "Owned park is correct. :34 is reached only through hostScan's assert.fail arm. Every caller returns at :30 (clean) or skips at :31-32. No test takes the failure arm on purpose. join.json has status judgment-required, owningProofs [], and a named owner. Low note: it still needs the before-F rejudge it names.",
+      "evidence": "test/event-store/migrate-cutover-grant.test.mjs:29-35,42,61,80,109,132,149,165; join.json"
+    },
+    {
+      "id": "A-audit-sample",
+      "kind": "audit",
+      "verdict": "APPROVE",
+      "summary": "Spot-checked 20 of the 125 retained audit rows: 16 JS and 4 Rust, one per file, seeded random. JS: every helper-audit call-chain evidence line matches the pinned bytes and names its callee. Every first call line falls inside its named test. Test titles equal the join.json owningProofs. Helper bodies have no branch that skips the cited line: the git-core fixture site :24 comes after if(conflict); pc-d-0548 is module initialization. Rust: candidate() is called at :99-100 inside the :59 test. legacy(&f,true) takes the porting branch. In scoped_commit_sync :488, the else arm runs when the :561 loop (in the :560 test) has sync=false. The recovery_matrix WorktreeCreate arm runs through KINDS -> interrupt -> ignored child. Population boundary: module constants and setup hooks are excluded by definition (for example pc-d-0462 WORKER_BODY, whose owner :60 calls setupRepo). I did not re-enumerate the population independently.",
+      "evidence": "ids: pc-d-0882,0689,0749,0811,0656,0477,0548,0835,0558,0855,0881,0242,0685,0228,0563,0898,0204,0163,0160,0186"
+    },
+    {
+      "id": "A-replay",
+      "kind": "proof",
+      "verdict": "APPROVE",
+      "summary": "Ran join.py --pin 5820ca6780ff… twice in a scratch git clone --shared at 25aa41510 (NODE_OPTIONS=--no-addons). Both exit 0. stdout and stderr are byte-identical across runs. After both runs the clone shows no git status change, so join.json, residue.json, settlement.json, citation-bindings.json and pointer-patches.json equal the committed bytes. Counts: 779 joined + 289 + 53 + 4 + 1 park = 1,126.",
+      "evidence": "stdout sha256 d7bcace9…; settlement counts joined 135, park 1, additionalDrift 4, additionalHelperCorrections 2"
+    },
+    {
+      "id": "A-join-py",
+      "kind": "code",
+      "verdict": "APPROVE",
+      "summary": "The only checker change admits ids listed in sameFileHelperCorrections. They must be disjoint from the original and residue ids, and must replace an existing same-file automatic join. The park branch now clears owningProofs. additionalDrift is not inflated.",
+      "evidence": "git show 25aa41510 -- census-join/join.py"
+    },
+    {
+      "id": "A-archive-receipt",
+      "kind": "records",
+      "verdict": "APPROVE",
+      "summary": "archive/receipt.json gains exactly one 5-line postMeasurementEdits entry for 25e8842d3. Its text matches what that commit did: status verified-local, historicalBlocker, verifier/rehearsal flags, leadRunCommit 5c3b57347, and JSON reformatting.",
+      "evidence": "git show 25aa41510 -- archive/receipt.json; git show 25e8842d3 -- archive/receipt.json"
+    },
+    {
+      "id": "B-scope",
+      "kind": "gate-definition",
+      "verdict": "APPROVE",
+      "summary": "The scoping matches G5 row 5. Clause 1 says each retentionReceipts span is found at its own file. Clause 2 says the reading-map entry-union keeps the L11-25 banner and both compounding->knowledge lines (lines 34 and 37). The holder-lock header belongs to clause 1 only. The brief's \"every span\" was broader than the gate.",
+      "evidence": "preflip-execution-plan.md:21; g5/check.py check(); receipt.md Lead section 4"
+    },
+    {
+      "id": "B-check-exit",
+      "kind": "proof",
+      "verdict": "APPROVE",
+      "summary": "check.py (83916a31f bytes) --pin b57e79625 exits 0 on two runs, and the output is byte-identical to check-b57e79625.json. legacy 10/10. Surviving map: 1 verbatim (37->159), 8 restated, 1 not-applicable. 31 controls OK. gateApproved=false. The G5 inputs are unchanged from b57e79625 to HEAD 6bb1c7d61.",
+      "evidence": "scratch clone run; git diff b57e79625 HEAD on the 4 input files is empty"
+    },
+    {
+      "id": "B-restatement-binding",
+      "kind": "check-logic",
+      "verdict": "APPROVE",
+      "summary": "RESTATEMENTS is keyed by (recorded line, recorded sha256) and matched as an exact LF-split whole-line block. There is no normalization or prefix/suffix rule. Removing the line-34 suffix, changing it, adding a trailing space, using CRLF, or inserting one line into the banner block each turns the affected rows to missing.",
+      "evidence": "in-memory mutations of the pinned files via the module check()"
+    },
+    {
+      "id": "B-owner-acceptance",
+      "kind": "records",
+      "verdict": "APPROVE",
+      "summary": "ownerAcceptance holds exactly the 8 restated rows (lines 3-9 and 34). Each legacyText equals the pinned legacy line, and each proposedText equals the pinned surviving lines 89-108 or 156. All are pending-owner-acceptance. Line 34 also changes skillForStage/workflow-stage-graphs to skillForStep/domain-registry, as the receipt discloses.",
+      "evidence": "byte compare against git show b57e79625"
+    },
+    {
+      "id": "B-negative-controls",
+      "kind": "proof",
+      "verdict": "APPROVE",
+      "summary": "Built-in controls run the real check() and confirm the input changed. My own controls also fail: a mid-block banner byte (7 missing), the line-159 tail and CRLF, a byte in holder-lock line 8, a missing holder-lock file, and an unpinned real-file run with a trailing space on docs/reading-map.md:159 (exit 1, survivingMissing [37]). The clone was restored.",
+      "evidence": "scratch clone"
+    },
+    {
+      "id": "B-holder-lock",
+      "kind": "proof",
+      "verdict": "APPROVE",
+      "summary": "docs/platform/holder-lock/spec.md:8 is found byte-exact at its recorded line. The file is in the surviving docs/platform tree. legacy-byte-changed and file-missing controls reject it.",
+      "evidence": "check-b57e79625.json rows[0]"
+    },
+    {
+      "id": "B-receipt-stale",
+      "kind": "records",
+      "verdict": "NOTE",
+      "severity": "low",
+      "summary": "g5/receipt.md still opens with the superseded result (\"Check exit 1\", \"1 missing\", holder-lock missing) and has two \"## 4.\" headings. The section 3 reproduction script asserts exit 1, byte equality with check-a8acd5d27.json, and 33 controls. That script fails with the current check.py: I re-ran the current checker at a8acd5d27, and it exits 0 with different bytes. The Lead section 4 supersedes this, but sections 1 and 3 do not say so.",
+      "evidence": "scratch run of check.py --pin a8acd5d27 -> exit 0, differs from check-a8acd5d27.json"
+    },
+    {
+      "id": "B-met-local",
+      "kind": "gate-assessment",
+      "verdict": "APPROVE",
+      "summary": "Apart from owner acceptance of the 8 restatements (external, L13-10), G5 can be met-local. Both clauses are proved at b57e79625, exactly and with real negative controls. The F rerun stays in atFinalPinUnderLease. The register still reads partial, with old evidence and remaining text. The Lead needs to update it to cite check-b57e79625.json and this review.",
+      "evidence": "preflip-gate-status.json G5 entry"
+    }
+  ]
+}

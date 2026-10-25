@@ -173,3 +173,10 @@ Decided by the Lead under A42, from the w18 review (5 APPROVE / 1 REWORK).
 Decided by the Lead under A42. The G8 row asks for a repository-local archive ref before F. The partition is bound to d3efc70c5 and gets rebuilt at F (W3/W4), and `archive/design.md` makes the archive ref create-only: it refuses an existing ref that points at a different target. So a local ref created now would point at a commit the F rebuild replaces, and it would then block the correct ref at F.
 
 Ruling: create the local archive ref at F, from the F rebuild, with its custody evidence (commit, partition hash, path, blob, size and SHA256 agreement), before the G10 rehearsal. Before F, G8 needs only the independent re-review of f67e0f676. Publishing the ref stays in the owner's cutover approval (S2).
+
+## L13-19 — Census park pc-d-0288 and the register catch-up (Lead, 2026-10-25 12:05)
+
+Decided by the Lead under A42, from the w21 review (24 APPROVE / 0 REWORK).
+
+1. **pc-d-0288 is a REJECT, not a park.** The literal is the message template of an `assert.fail` inside a test helper (`hostScan`, `test/event-store/migrate-cutover-grant.test.mjs:34`). It is test diagnostic output that renders only when the test fails. It is not a document citation and not data a product path reads. So it is non-document rendering, which is the REJECT class. Adding a test that fails on purpose, just to own it, would add nothing.
+2. **The register catches up.** Settling 0288 leaves G2 with no open judgment. G5 is met-local, apart from the owner's acceptance of the 8 restatements (L13-10) and the rerun at F (w21 B). Under L13-18, G8 needs nothing more before F, because w20 C approved f67e0f676. `gate-reconcile/reconcile.py` stays the only generator of the register.
