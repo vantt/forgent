@@ -478,6 +478,7 @@ impl MailboxState {
             wake: req.wake,
             effective_wake,
             body_bytes: req.body.len() as u64,
+            body_rendered_bytes: Some(frame::rendered_body_len(req.body)),
             body_kept: true,
             recorded_at: now,
             changed_at: now,
@@ -648,7 +649,10 @@ impl MailboxState {
             Pick::Message(i) => {
                 let header = &self.messages[i];
                 let item = self.mail_item(header, header.offers.saturating_add(1));
-                frame::worst_case_len(&item, header.body_bytes, limits)
+                match header.body_rendered_bytes {
+                    Some(rendered) => frame::bounded_len(&item, rendered, limits),
+                    None => frame::worst_case_len(&item, header.body_bytes, limits),
+                }
             }
             Pick::Notice(i) => {
                 frame::worst_case_len(&self.notice_item(&self.notices[i]), 0, limits)

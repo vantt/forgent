@@ -275,28 +275,49 @@ fn render_notice(item: &ClaimedItem, facts: &NoticeFacts, limits: &Limits) -> St
 const ENTITY_GROWTH: usize = 5;
 const GUTTER_GROWTH: usize = GUTTER.len();
 
-/// The largest size the frame of `item` can render to when its body holds
-/// `body_bytes` bytes, or when the body cannot be read: the frame around
-/// an empty body, plus `5 × body_bytes` (entity growth) and
+/// The bytes `body` takes inside its frame once escaped and guttered: the
+/// exact figure, kept with the message so a step's fit check never has to
+/// assume the worst case for a body it can measure.
+pub fn rendered_body_len(body: &str) -> u64 {
+    escape_body(body).len() as u64
+}
+
+/// The most a body of `body_bytes` bytes can take inside its frame when its
+/// text is not known: `5 × body_bytes` (entity growth) and
 /// `2 × (body_bytes + 1)` (a gutter on every line; a body of only line
-/// breaks has one more line than bytes), or the body-missing line when that
-/// is longer. A notice has no body; its size is its rendered size.
+/// breaks has one more line than bytes).
+fn worst_case_body_len(body_bytes: u64) -> u64 {
+    let bytes = usize::try_from(body_bytes).unwrap_or(usize::MAX);
+    let worst = bytes
+        .saturating_mul(ENTITY_GROWTH)
+        .saturating_add(bytes.saturating_add(1).saturating_mul(GUTTER_GROWTH));
+    u64::try_from(worst).unwrap_or(u64::MAX)
+}
+
+/// The largest size the frame of `item` can render to when its body holds
+/// `body_bytes` bytes and its escaped form is not known: see
+/// [`bounded_len`] with the worst case for those bytes.
 pub fn worst_case_len(item: &ClaimedItem, body_bytes: u64, limits: &Limits) -> usize {
+    bounded_len(item, worst_case_body_len(body_bytes), limits)
+}
+
+/// The largest size the frame of `item` can render to when its body takes
+/// `rendered_body` bytes once escaped ([`rendered_body_len`]), or when the
+/// body cannot be read: the frame around an empty body, plus the body, or
+/// the body-missing line when that is longer. The handle is derived after
+/// the claim, so the frame is measured with the longest handle a header
+/// holds. A notice has no body; its size is its rendered size.
+pub fn bounded_len(item: &ClaimedItem, rendered_body: u64, limits: &Limits) -> usize {
     match &item.what {
         ClaimedWhat::Notice(facts) => render_notice(item, facts, limits).len(),
         ClaimedWhat::Mail(from) => {
-            let bytes = usize::try_from(body_bytes).unwrap_or(usize::MAX);
-            // The handle is derived after the claim, so the frame around
-            // the body is measured with the longest handle a header holds.
             let longest = MailFrom {
                 head: None,
                 handle: Some("x".repeat(limits.frame.max_header_chars as usize)),
                 ..from.clone()
             };
             let around = render_message(item, &longest, Some(""), limits).len();
-            let body = bytes
-                .saturating_mul(ENTITY_GROWTH)
-                .saturating_add(bytes.saturating_add(1).saturating_mul(GUTTER_GROWTH));
+            let body = usize::try_from(rendered_body).unwrap_or(usize::MAX);
             let label = escape_header(&from.label, limits);
             let missing = fill(section("message.body-missing"), &[("from", &label)]).len();
             around.saturating_add(body.max(missing))

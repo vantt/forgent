@@ -203,6 +203,7 @@ fn largest_header_bytes(limits: &Limits) -> u64 {
                 "answered": true,
                 "body_bytes": limits.max_body_bytes,
                 "body_kept": true,
+                "body_rendered_bytes": u64::MAX,
                 "changed_at": u64::MAX,
                 "depth": limits.chain.max_depth,
                 "effective_wake": true,
