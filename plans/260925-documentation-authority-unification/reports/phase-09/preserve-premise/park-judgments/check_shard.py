@@ -338,7 +338,13 @@ def inspect_rows(number, document, proof, patches, states, replayer, moving, tra
                         findings.append(finding('conflictsWithChain', file, rowId=rid, shard=number,
                                                 chainEntryId=owners[-1], reason='preserved occurrence changed by chain', line=n))
                         break
-        if row['disposition'] in {'repoint', 'successor-bound'} or marker:
+        if row['disposition'] == 'successor-bound':
+            # A successor binding answers "the source file is removed at cutover";
+            # its operands may legitimately survive, so check the source instead.
+            if not cutover_removes(file, moving, tracked):
+                findings.append(finding('successorOfSurvivingSource', file, rowId=rid, shard=number,
+                                        reason='source file survives the cutover; a successor binding is not needed'))
+        elif row['disposition'] == 'repoint' or marker:
             operands = original['normalizedOperands']
             require(operands, rid + ': missing operand facts')
             unaffected = [o for o in operands if not cutover_removes(o['path'], moving, tracked)]

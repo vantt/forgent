@@ -133,3 +133,7 @@ are covered.
 
 This is diagnostic evidence, not row acceptance, permission to apply the patches,
 final-pin parity, gate closure or cutover readiness.
+
+## Lead correction (L13-21.1 scope)
+
+The brief applied the "operand must be removed or moved" rule to successor-bound rows too. A successor binding answers a different question: its *source file* is removed at cutover, while its operands may survive. The Lead changed `check_shard.py`. A successor-bound row is now checked for a removed source (`successorOfSurvivingSource`), and only repoint and `alreadyComposed` rows keep the operand rule. Rerun at c804a3213 ([chain-check-c804a3213.json](chain-check-c804a3213.json)): 75 unresolved findings, of which 33 conflictsWithChain, 23 duplicateOfChain, 15 staleChainEntry, 2 repointOfSurvivingPath and 2 successorOfSurvivingSource. The 83 earlier successor-bound operand findings were false positives of that rule.
