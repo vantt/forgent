@@ -1,0 +1,72 @@
+{
+  "pin": "a91edadbe91d31a543fecf0363848df96ddd80e7",
+  "reviewer": "independent code-reviewer (read-only; only these two report files written)",
+  "commandsRun": [
+    {"argv": "python3 -B P/g0rework/verify.py", "exit": 0, "result": "status partial, ok false, recordProofsPassed true; 15/15 nested commands exit 0; liveOwnershipPassed true; both manifests raw drift 23, unaccounted 0, noNewDoubleOwnership true, native duplicates 0, new active pairs []; script hashes equal the receipt table"},
+    {"argv": "python3 -B P/rebind/rebind.py --check", "exit": 0, "result": "drift 0, authenticatedSupersededOrigins 7, authenticatedIdenticalUnitGroups 16"},
+    {"argv": "python3 -B P/g0rework/refresh-carries.py --check", "exit": 0, "result": "status pass, parityRows 346, liveHeadingRows 91"},
+    {"argv": "independent extraction via rebind.py extract() on virtual copies of e88d4e283^/e88d4e283 work-state/spec.md and 5a849befc^/5a849befc component-boundary.md", "exit": 0, "result": "all 6 old/new digests, anchors and ancestries equal; changed-unit sets are exactly the 6 edged units"},
+    {"argv": "independent negative-control harness in tempfile copies under /tmp/fgos-work (different rows from test-accounting.py), rebind --check plus both ownership/audit pairs from both manifests", "exit": 0, "result": "stale digest without successor (b-io-contract.json#/claims/36): rebind 1, ownership 0, audit 1 x2, unaccounted exactly that claim; group with FIRST member non-matching (s9-runner-01.json#/registryGaps/18): rebind 1, audit 1 x2, unaccounted exactly that claim; extra: superseded origin whose successor is broken (s14-resync-b.json#/bindingRefresh/604): rebind 1, audit 1 x2, unaccounted exactly the origin claim"}
+  ],
+  "notReproduced": [
+    "phase-08/audit-report.py and checks.mjs were never run (forbidden). The Lead's report that the audit is ok at 4a4fefbe8 is not reproduced here; item 5 was checked statically against checks.mjs's own offender predicate."
+  ],
+  "items": [
+    {
+      "id": "73e89962e",
+      "verdict": "APPROVE",
+      "severity": "Low",
+      "summary": "Six edges, records 149 to 154 in rebind/g0-rework-rebindings.json, are correct. Old and new digests, anchors and ancestries match rebind.py's own extractor at each cause commit's parent and at the cause commit. e88d4e283 changed exactly 4 bound units of work-state/spec.md, and 5a849befc changed exactly 2 bound units of component-boundary.md; each has one edge. The reasons match the diff lines (74, 83, 516 and 549). The affectedBindings lists equal the full set of ledger and pilot rows that bind each anchor with its old or new digest: no row is missing and none is extra. Witnesses are reused by witnessSource pointers into last-rows-rebindings.json and followup-rebindings.json. The inline beforeWitness and afterWitness keep only 6 identity keys, which equal the source witness's selected unit field for field. The 22 older records instead copy the full witness. Low: records 149 and 150 key file/pointer on the refreshed g0 overlay row, while 151 to 154 key on the origin row. verify.py resolves targetOwner either way, so there is no functional effect.",
+      "evidence": [
+        "extract() dual-version run: records 149..154 old/new textDigest, anchor, ancestry all True; startLines 58/60/428/514/485/536",
+        "changed units e88d4e283: 3-work-item-data-dictionary, unheaded-block-4, 6-domain-model, unheaded-block-54; 5a849befc: 9-hexagonal-architecture-view, unheaded-block-70",
+        "bindings.rows() over ledger/decisions + pilot/decisions at 73e89962e: missing-from-affected = {} and extra = {} for all six",
+        "witness subset equality vs witnessSource .selected: True x6"
+      ]
+    },
+    {
+      "id": "98d71bef2",
+      "verdict": "APPROVE",
+      "severity": "None",
+      "summary": "verify.py now runs both live ownership.mjs and audit-ownership.mjs for both manifests unconditionally. Their exits enter `commands`, and recordProofsPassed requires all of them to be 0. liveOwnershipPassed adds a requirement of no failing rows, and ownershipPassed now depends on it. Exit 1 follows when it fails. NODE_OPTIONS is now set outright to '--no-addons --require=<dlopen guard>' instead of appended to the inherited value, which is stricter. CLAUDE_CODE_SESSION_ID is popped. Only the library, ownership.mjs and audit-ownership.mjs are materialized; checks.mjs is never written or run, and no nested proof references checks.mjs or audit-report.py. No assertion was weakened. The dropped `Path(name).name == name` guard is moot because the written names are now fixed literals.",
+      "evidence": [
+        "git show 98d71bef2 -- verify.py: liveCommands loop, liveOwnershipPassed, env lines",
+        "grep checks.mjs|audit-report in misc-fix/verify.py, carries/verify-carries.mjs, refresh-carries.py, test-accounting.py, rebind.py: no hits",
+        "verify.py run at pin: exit 0 with 4 live commands exit 0"
+      ]
+    },
+    {
+      "id": "ca3179b3c",
+      "verdict": "APPROVE",
+      "severity": "Low",
+      "summary": "In both manifests only ownership.mjs and audit-ownership.mjs changed; checks.mjs, the libraries and every other key are byte-identical to ca3179b3c^. ownership.mjs keeps targetDigestDrift and its raw predicate unchanged. When drift is non-empty, it calls `python3 -B rebind.py --check` and builds an authenticated set from authenticatedSupersededOrigins (keyed on originBinding) and authenticatedIdenticalUnitGroups. It then partitions the raw rows into accounted and unaccounted by the exact key (file, claimId, targetOwner, targetAnchor, targetUnitDigest). That is set membership only, so no matching logic is copied into JavaScript. The script fails closed on a spawn error, an exit other than 0 or 1, or malformed JSON. audit-ownership.mjs swaps only !targetDigestDrift.length for !unaccountedTargetDigestDrift.length, and both duplicate and new-pair checks stay. rebind.py adds claimId and originBinding to superseded entries and a groups list, filtered by its unchanged matches(), which requires every member to match. verify.py additionally asserts that accounted plus unaccounted is a multiset partition of the raw rows, and it now also requires noNewDoubleOwnership to be true. test-accounting.py removes only its print line. Both receipt negative controls hold, and so do my three independent variants. Low: the verify.py comment that live target drift must have an exact recorded rebind now applies only to the 127 overlay rows. The 23 audit rows are judged by rebind --check, per L13-27; the module docstring says so.",
+      "evidence": [
+        "embedded-string diff ca3179b3c^..ca3179b3c: changed scripts = ['ownership.mjs','audit-ownership.mjs'] in both manifests; top-level changed key only scripts/readOnlyScripts",
+        "HEAD script hashes: round5 ownership 22f475f8..., audit 384f81cd...; sync4d ownership e0f7e53f..., audit c00a47df... (= receipt)",
+        "negative controls: see commandsRun[4]; raw rows retained (24 or 23), accounted 23 or 22, unaccounted exactly the mutated claim, noNewDoubleOwnership false, audit exit 1 with assert message"
+      ]
+    },
+    {
+      "id": "c3882df26",
+      "verdict": "APPROVE",
+      "severity": "Low",
+      "summary": "unaccountedTargetDigestDrift is the right field. audit-ownership.mjs spreads the ownership census into its output and writes it to the same *-target-ownership.json, so the field is present after both scripts run. The report still fails on any unaccounted drift in two ways: failingRows must be [], and audit-ownership.mjs exits 1 through assert(noNewDoubleOwnership), which now keys off unaccounted drift. If the field is ever absent, the helper throws, check_output raises, and the report fails closed. Low: report.json no longer surfaces the raw targetDigestDrift rows or their count. They remain only in the scratch census files. Consider adding a raw-row count beside failingRows so the report keeps the diagnostic.",
+      "evidence": [
+        "audit-report.py:43 reads .unaccountedTargetDigestDrift; :56-58 ok requires all exits 0 and failingRows == []",
+        "audit-ownership.mjs: noNewDoubleOwnership = dup==0 && !introduced.length && !unaccountedTargetDigestDrift.length; assert(current.noNewDoubleOwnership)"
+      ]
+    },
+    {
+      "id": "4a4fefbe8",
+      "verdict": "APPROVE",
+      "severity": "Low",
+      "summary": "In each manifest only checks.mjs changed, through one pure insertion: the old text is unchanged and the 5,819 prior exceptions keep their order. The same 346 entries go into both manifests. All carry authority L12-137 and the shape {commit, path, authority}, with no duplicates. Every commit lies in 6bb1c7d61..4a4fefbe8^, and that range is all plan-branch work. The 16 commits that are not first-parent come from the merged plan/260925-w1-dN sub-branches, and none is on main. Every (commit, path) pair is a real change in that commit. Under checks.mjs's own offender predicate (diff-tree over --no-merges commits, minus allowed-paths.json), the range has 317 offender pairs, and all 317 are covered, none missing. Low: 29 inserted entries cover pairs on already-allowed paths: 24 under ledger/decisions and 5 under docs/platform. They are no-ops today, because accountOf only consults offender pairs. But they pre-authorize docs/platform edits under L12-137 if allowed-paths.json ever narrows, and 23 other allowed pairs in the same range were not listed, so the selection rule is inconsistent. There is precedent: 29 older L12-137 entries are also on allowed paths. Not blocking.",
+      "evidence": [
+        "prefix/suffix diff 4a4fefbe8^..4a4fefbe8: old-mid '' in both manifests; new[:5819] == old",
+        "rev-list 6bb1c7d61..4a4fefbe8^: 77 commits (61 first-parent); 0 entries outside; merges are 'Merge branch plan/260925-w1-dN'",
+        "offenders 317, covered 346, missing 0, extra 29 (all allowed-path)"
+      ]
+    }
+  ],
+  "counts": {"APPROVE": 5, "REWORK": 0, "total": 5, "reworkBySeverity": {}, "lowFindings": 4}
+}
