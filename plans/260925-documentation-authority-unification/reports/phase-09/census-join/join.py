@@ -236,7 +236,11 @@ def main():
         assert len(original_ids) == 187
         decisions = {r['id']: r for r in settlement['rows']}
         assert len(decisions) == len(settlement['rows'])
-        assert set(decisions) == original_ids | {r['id'] for r in residue}, 'Unlisted or unrelated current judgment'
+        helper_corrections = set(settlement.get('sameFileHelperCorrections', []))
+        assert helper_corrections.isdisjoint(original_ids | {r['id'] for r in residue})
+        assert helper_corrections <= {r['id'] for r in rows if r['status'] == 'joined-owning-test'
+                                      and any(p['file'] == r['file'] for p in r['owningProofs'])}, 'Helper correction must replace an existing same-file join'
+        assert set(decisions) == original_ids | {r['id'] for r in residue} | helper_corrections, 'Unlisted or unrelated current judgment'
         citations = {}
         if any(d['disposition'] == 'joined-by-citation' for d in decisions.values()):
             subprocess.run(['python3', '-B', str(HERE / 'citations.py'), '--pin', pin, '--check'],
@@ -296,7 +300,7 @@ def main():
             else:
                 assert disposition == 'owned park' and decision['owner'] and decision['nextAction']
                 assert not proofs
-                row.update(status='judgment-required', owner=decision['owner'],
+                row.update(status='judgment-required', owningProofs=[], owner=decision['owner'],
                            blocker=decision['detail'], nextAction=decision['nextAction'])
                 detail.update(owner=decision['owner'], nextAction=decision['nextAction'])
             if disposition != 'owned park':
@@ -307,7 +311,8 @@ def main():
         assert len(settled_rows) == len(decisions)
         dump(args.out / 'settlement.json', dict(sourceCommit=pin, baselinePin=settlement['baselinePin'],
              decisionsSha256=sha(settlement_path.read_bytes()), independentApproval=False,
-             originalOwnedJudgments=len(original_ids), additionalDrift=len(decisions)-len(original_ids),
+             originalOwnedJudgments=len(original_ids), additionalDrift=len(decisions)-len(original_ids)-len(helper_corrections),
+             additionalHelperCorrections=len(helper_corrections),
              counts=dict(collections.Counter(r['disposition'] for r in settled_rows)),
              originalCounts=dict(collections.Counter(r['disposition'] for r in settled_rows if r['originalOwnedJudgment'])),
              groups=settlement['groups'], rows=settled_rows))

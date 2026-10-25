@@ -1,0 +1,57 @@
+{
+  "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
+  "status": "passed",
+  "exit": 0,
+  "checks": {
+    "auditedRowIdsUniqueAndCounted": 129,
+    "jsHelperRows": 116,
+    "rustHelperAndSubprocessRows": 13,
+    "digestBoundSpansRevalidated": 1081,
+    "censusIdsRetained": 1126,
+    "settlementRows": 193,
+    "changedOriginalDecisionIds": [
+      "pc-d-0446",
+      "pc-d-0447",
+      "pc-d-0448",
+      "pc-d-0449",
+      "pc-d-0450",
+      "pc-d-0453",
+      "pc-d-0454",
+      "pc-d-0479",
+      "pc-d-0480",
+      "pc-d-0924",
+      "pc-d-1101"
+    ],
+    "additionalHelperCorrectionIds": [
+      "pc-d-0245",
+      "pc-d-0288"
+    ],
+    "deterministicReplayHashesStillMatch": true,
+    "gateOutputsOutsideScopeByteIdenticalToStart": true,
+    "registerByteIdenticalToStart": true,
+    "G2": "partial",
+    "archiveOnlyPostMeasurementEditsChanged": true,
+    "allNineGateControlsRejected": true,
+    "joinPythonSyntaxValid": true,
+    "gitDiffCheckExit": 0,
+    "onlyScopedFilesChanged": true
+  },
+  "paths": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/receipt.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/citation-bindings.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/gate-controls.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/gate-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/helper-audit.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/pointer-patches.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/receipt.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/receipt.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/residue.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/settlement-decisions.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/settlement.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/validation.json"
+  ],
+  "limits": "Read-only record validation, not product-suite execution, independent semantic approval or final-pin F coverage."
+}

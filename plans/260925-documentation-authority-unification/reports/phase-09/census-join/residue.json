@@ -1,5 +1,38 @@
 {
-  "count": 0,
-  "rows": [],
-  "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
+  "count": 1,
+  "rows": [
+    {
+      "blocker": "The :34 template runs only in hostScan's assert.fail arm, after clean returns at :30 and namespace-refusal skips at :31-32. All seven named callers use real baseline scans; none deliberately takes :34. The blocked-child checks do not call hostScan. No owning test for this branch is proved.",
+      "currentLine": 34,
+      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "exactExpressionBound": true,
+      "expressionLinesAtPin": [
+        34
+      ],
+      "file": "test/event-store/migrate-cutover-grant.test.mjs",
+      "helperCallChain": [
+        "hostScan"
+      ],
+      "id": "pc-d-0288",
+      "inventory": "newDocumentationDynamicSites",
+      "inventoryExpressionSha256": "5f9524ae6758ca7090a6485540bb804f0642f70a4be6fa854c3e784de449269a",
+      "inventoryIndex": 288,
+      "inventoryOperand": "template-string",
+      "mappedUnchangedLine": 34,
+      "nextAction": "Before F, independently rejudge this assertion-message occurrence as non-document rendering, or bind a test deliberately reaching hostScan's failure arm. No product test is added or run in this records slice.",
+      "originalLine": 34,
+      "owner": "Documentation integration Lead / independent census reviewer (L13-17)",
+      "owningProofs": [],
+      "roleHint": "fixture-literal",
+      "settlement": {
+        "group": "same-file-helper-audit",
+        "id": "pc-d-0288",
+        "path": "census-join/settlement.json"
+      },
+      "sourcePresent": true,
+      "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e",
+      "status": "judgment-required"
+    }
+  ],
+  "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
 }

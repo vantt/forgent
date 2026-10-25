@@ -1,0 +1,54 @@
+{
+  "status": "passed",
+  "asOf": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
+  "positive": "passed",
+  "negativeControls": [
+    {
+      "name": "Missing evidence path is rejected",
+      "result": "rejected",
+      "error": "missing evidence path: gate-reconcile/absent-negative-control.json"
+    },
+    {
+      "name": "Existing commit outside the snapshot ancestry is rejected",
+      "result": "rejected",
+      "error": "clearedBy/asOf 42c5a0a55 not ancestor of 53de2207e1ea8a9417ac131f785704d6ab72ba2c"
+    },
+    {
+      "name": "Invented verdict quotation is rejected",
+      "result": "rejected",
+      "error": "not an exact review verdict quote: The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F."
+    },
+    {
+      "name": "Met-local with local before-F work is rejected",
+      "result": "rejected",
+      "error": "G3 has before-F local work"
+    },
+    {
+      "name": "Omitted original occurrence is rejected",
+      "result": "rejected",
+      "error": "missing/extra/altered original occurrence"
+    },
+    {
+      "name": "False before/after counts are rejected",
+      "result": "rejected",
+      "error": "before/after counts drift"
+    },
+    {
+      "name": "False snapshot fingerprint is rejected",
+      "result": "rejected",
+      "error": "snapshot hash drift: plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md"
+    },
+    {
+      "name": "False follow-up fingerprint is rejected",
+      "result": "rejected",
+      "error": "follow-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md"
+    },
+    {
+      "name": "False W19 review fingerprint is rejected",
+      "result": "rejected",
+      "error": "review follow-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/reviews/w19-live-parity-and-rebinds-review.json"
+    }
+  ],
+  "count": 9,
+  "method": "In-memory copies at the read_json test seam; real owning check(), path inspection and read-only git; no source file or assertion weakened."
+}

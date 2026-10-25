@@ -6,7 +6,8 @@
       "confirmed-grade-record-REJECT": 289,
       "confirmed-settlement-REJECT": 53,
       "joined-by-citation": 4,
-      "joined-owning-test": 780
+      "joined-owning-test": 779,
+      "judgment-required": 1
     }
   },
   "finalPinCoverage": false,
@@ -511,7 +512,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/forgentx-runner.json:92; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -553,7 +554,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/forgentx-runner.json:113; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -595,7 +596,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/forgentx-runner.json:135; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -637,7 +638,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/forgentx-runner.json:154; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -679,7 +680,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/forgentx-runner.json:175; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -721,7 +722,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/global-runner.json:101; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -763,7 +764,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/global-runner.json:112; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -805,7 +806,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/global-runner.json:123; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -847,7 +848,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/global-runner.json:133; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -889,7 +890,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/global-runner.json:143; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -1021,7 +1022,7 @@
         "patchPath": "census-join/pointer-patches.json",
         "reason": "Both the tier-composition procedure (5.4) and per-property precedence table (6.3) retain their explicit late-area ledger mappings.",
         "reviewStatus": "pending",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "212d891228b7a4819bf0c58f3f719fe8847d9ae1575466143119cef00df841ba"
       },
       "currentLine": 1,
@@ -1562,7 +1563,7 @@
         "patchPath": "census-join/pointer-patches.json",
         "reason": "The original Entry Points & Triggers heading maps through the packaging ledger and carries/source-heading-parity.json, not the separate top-level 2. Entry Points table.",
         "reviewStatus": "pending",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "46e8283ba343663b23fb303f74cdfea9e8bd875de1780b4ea0d218240c2cffee"
       },
       "currentLine": 6,
@@ -1894,7 +1895,7 @@
         "patchPath": "census-join/pointer-patches.json",
         "reason": "The complete RUL-WF-27 block remains under 6. Business Rules, including the binding-as-rebuildable-view clause cited by this comment.",
         "reviewStatus": "pending",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c"
       },
       "currentLine": 6354,
@@ -1961,7 +1962,7 @@
         "patchPath": "census-join/pointer-patches.json",
         "reason": "The complete RUL-WF-27 block remains under 6. Business Rules, including the binding-as-rebuildable-view clause cited by this comment.",
         "reviewStatus": "pending",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "de600986a2325b0a3653835bed153a11ffc447aa31212db8cd4e9d90dd67ed59"
       },
       "currentLine": 2,
@@ -9931,7 +9932,7 @@
     },
     {
       "currentLine": 96,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. Test :155 calls f.setupLease() at :157 -> cli at :106 -> rawCli at :100 -> spawnSync/path.join at :96, with default json=true. Keep this explicit owner, not all fixture(t) callers: fixture construction only declares rawCli; test :122 never calls it.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         96
@@ -9953,180 +9954,18 @@
       "owningProofs": [
         {
           "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 122,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:both commit hooks observe the real main-checkout borrowed description",
-          "testTitle": "both commit hooks observe the real main-checkout borrowed description"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
           "line": 155,
           "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:pre-commit refuses non-holder commit touching scoped paths",
+          "sourceSha256": "094ca303910a340c6e3f07910f67c9ce41ba386a315904eeb1173243d99e816e",
           "testTitle": "pre-commit refuses non-holder commit touching scoped paths"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 168,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:pre-commit allows holder commit touching scoped paths",
-          "testTitle": "pre-commit allows holder commit touching scoped paths"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 183,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:pre-commit allows out-of-scope commit by non-holder while lease is held",
-          "testTitle": "pre-commit allows out-of-scope commit by non-holder while lease is held"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 195,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:reference-transaction hook catches --no-verify commit touching scoped paths",
-          "testTitle": "reference-transaction hook catches --no-verify commit touching scoped paths"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 208,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:reference-transaction refuses git update-ref on target branch for scoped changes",
-          "testTitle": "reference-transaction refuses git update-ref on target branch for scoped changes"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 239,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:reference-transaction refuses fast-forward merge on scoped paths for non-holder",
-          "testTitle": "reference-transaction refuses fast-forward merge on scoped paths for non-holder"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 266,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:reference-transaction allows ref updates touching only .fgos/ (Work checkpoint)",
-          "testTitle": "reference-transaction allows ref updates touching only .fgos/ (Work checkpoint)"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 290,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:linked-worktree holder and non-holder have separate token authority",
-          "testTitle": "linked-worktree holder and non-holder have separate token authority"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 315,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:both hooks ignore forged working-tree sidecars",
-          "testTitle": "both hooks ignore forged working-tree sidecars"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 342,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:git clean -fdX does not reopen the freeze in worktrees",
-          "testTitle": "git clean -fdX does not reopen the freeze in worktrees"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 363,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:pre-commit refuses renaming a scoped file outside scope",
-          "testTitle": "pre-commit refuses renaming a scoped file outside scope"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 376,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:non-ASCII paths are refused with and without --no-verify",
-          "testTitle": "non-ASCII paths are refused with and without --no-verify"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 394,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:pre-commit refuses a scoped file changed to a symlink",
-          "testTitle": "pre-commit refuses a scoped file changed to a symlink"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 408,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:CLI release and non-holder owner abandon each commit one legal sidecar transition",
-          "testTitle": "CLI release and non-holder owner abandon each commit one legal sidecar transition"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 440,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:`CLI human-mode ${sub} exits successfully and renders stable text`",
-          "testTitle": "`CLI human-mode ${sub} exits successfully and renders stable text`"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 481,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:reference hook preserves NUL boundaries for multi-path commits and renames with --no-verify",
-          "testTitle": "reference hook preserves NUL boundaries for multi-path commits and renames with --no-verify"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 496,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:raw main movement into frozen scope is refused even from the holder checkout without an expected old value",
-          "testTitle": "raw main movement into frozen scope is refused even from the holder checkout without an expected old value"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 508,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:reference guard preserves held main through aliases, batches, deletion and reset",
-          "testTitle": "reference guard preserves held main through aliases, batches, deletion and reset"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 530,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:both hooks fail closed when their path diff fails under a held production lease",
-          "testTitle": "both hooks fail closed when their path diff fails under a held production lease"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 545,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:corrupt or unknown committed sidecars are rejected consistently by both hooks and CLI acquire",
-          "testTitle": "corrupt or unknown committed sidecars are rejected consistently by both hooks and CLI acquire"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 598,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:a real main borrower cannot rewrite a held lease, change its hash, expand paths or change its parent",
-          "testTitle": "a real main borrower cannot rewrite a held lease, change its hash, expand paths or change its parent"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 635,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:CLI release reports raw hook-disabled drift and commits the release without reopening early",
-          "testTitle": "CLI release reports raw hook-disabled drift and commits the release without reopening early"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 645,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:failed scope reads refuse CLI acquire before recording holder evidence",
-          "testTitle": "failed scope reads refuse CLI acquire before recording holder evidence"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 660,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:concurrent raw main move during CLI acquire returns base-moved without retrying",
-          "testTitle": "concurrent raw main move during CLI acquire returns base-moved without retrying"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 688,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:reference shell skips Node outside prepared main updates, including batched refs",
-          "testTitle": "reference shell skips Node outside prepared main updates, including batched refs"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 713,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:no-lease branch five commits and five-commit rebase stay close to no-hook cost",
-          "testTitle": "no-lease branch five commits and five-commit rebase stay close to no-hook cost"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 739,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:failed CLI transitions restore main sidecar bytes and remove only freshly written tokens",
-          "testTitle": "failed CLI transitions restore main sidecar bytes and remove only freshly written tokens"
-        },
-        {
-          "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
-          "line": 792,
-          "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:`reference guard refuses ${operation} of scoped changes onto main`",
-          "testTitle": "`reference guard refuses ${operation} of scoped changes onto main`"
         }
       ],
       "roleHint": "fixture-literal",
+      "settlement": {
+        "group": "shared-fixture-callers",
+        "id": "pc-d-0245",
+        "path": "census-join/settlement.json"
+      },
       "sourcePresent": true,
       "sourceSha256": "094ca303910a340c6e3f07910f67c9ce41ba386a315904eeb1173243d99e816e",
       "status": "joined-owning-test"
@@ -11413,6 +11252,7 @@
       "status": "joined-owning-test"
     },
     {
+      "blocker": "The :34 template runs only in hostScan's assert.fail arm, after clean returns at :30 and namespace-refusal skips at :31-32. All seven named callers use real baseline scans; none deliberately takes :34. The blocked-child checks do not call hostScan. No owning test for this branch is proved.",
       "currentLine": 34,
       "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
       "exactExpressionBound": true,
@@ -11429,55 +11269,19 @@
       "inventoryIndex": 288,
       "inventoryOperand": "template-string",
       "mappedUnchangedLine": 34,
+      "nextAction": "Before F, independently rejudge this assertion-message occurrence as non-document rendering, or bind a test deliberately reaching hostScan's failure arm. No product test is added or run in this records slice.",
       "originalLine": 34,
-      "owningProofs": [
-        {
-          "file": "test/event-store/migrate-cutover-grant.test.mjs",
-          "line": 38,
-          "locator": "test/event-store/migrate-cutover-grant.test.mjs:migrate --check runs real quiesce/setup/parity without publishing a ref or changing HEAD",
-          "testTitle": "migrate --check runs real quiesce/setup/parity without publishing a ref or changing HEAD"
-        },
-        {
-          "file": "test/event-store/migrate-cutover-grant.test.mjs",
-          "line": 56,
-          "locator": "test/event-store/migrate-cutover-grant.test.mjs:real Git 05 hook migration and second-run no-op",
-          "testTitle": "real Git 05 hook migration and second-run no-op"
-        },
-        {
-          "file": "test/event-store/migrate-cutover-grant.test.mjs",
-          "line": 78,
-          "locator": "test/event-store/migrate-cutover-grant.test.mjs:real hook rejection restores baseline-only inputs and rerun uses a fresh WAL attempt",
-          "testTitle": "real hook rejection restores baseline-only inputs and rerun uses a fresh WAL attempt"
-        },
-        {
-          "file": "test/event-store/migrate-cutover-grant.test.mjs",
-          "line": 105,
-          "locator": "test/event-store/migrate-cutover-grant.test.mjs:a process working inside the fixture workspace or one of its linked worktrees blocks migrate before any Git or ref effect",
-          "testTitle": "a process working inside the fixture workspace or one of its linked worktrees blocks migrate before any Git or ref effect"
-        },
-        {
-          "file": "test/event-store/migrate-cutover-grant.test.mjs",
-          "line": 130,
-          "locator": "test/event-store/migrate-cutover-grant.test.mjs:pre-commit filesystem failure restores deleted inputs without naming a Git record",
-          "testTitle": "pre-commit filesystem failure restores deleted inputs without naming a Git record"
-        },
-        {
-          "file": "test/event-store/migrate-cutover-grant.test.mjs",
-          "line": 147,
-          "locator": "test/event-store/migrate-cutover-grant.test.mjs:checkStopped does not count a pid the caller declares as its own, and counts every other matching pid",
-          "testTitle": "checkStopped does not count a pid the caller declares as its own, and counts every other matching pid"
-        },
-        {
-          "file": "test/event-store/migrate-cutover-grant.test.mjs",
-          "line": 161,
-          "locator": "test/event-store/migrate-cutover-grant.test.mjs:checkStopped counts a process working in a linked worktree only when the caller lists that worktree",
-          "testTitle": "checkStopped counts a process working in a linked worktree only when the caller lists that worktree"
-        }
-      ],
+      "owner": "Documentation integration Lead / independent census reviewer (L13-17)",
+      "owningProofs": [],
       "roleHint": "fixture-literal",
+      "settlement": {
+        "group": "same-file-helper-audit",
+        "id": "pc-d-0288",
+        "path": "census-join/settlement.json"
+      },
       "sourcePresent": true,
       "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e",
-      "status": "joined-owning-test"
+      "status": "judgment-required"
     },
     {
       "currentLine": 42,
@@ -16568,7 +16372,7 @@
     },
     {
       "currentLine": 157,
-      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. setup writes runner/project/global config and capacity state; the named test calls setup with recentlyUsed and then run/solo, verifying account rotation and its receipt. The llmAccounts-only branch is assigned separately.",
+      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. The test at run-provider-failover.test.mjs:491 calls setup at :492 with nonempty llmAccounts at :494-497. setup reaches failover-fixture.mjs:157, whose truthy llmAccounts branch maps both pools and their accounts into pool homes/login files (:158-160). Unlike the former :19 caller, this test takes the cited branch.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         157
@@ -16587,10 +16391,10 @@
       "owningProofs": [
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 19,
-          "locator": "test/runner/execution/run-provider-failover.test.mjs:a dead login moves the seat to another account of the same provider, not to another provider",
+          "line": 491,
+          "locator": "test/runner/execution/run-provider-failover.test.mjs:a dead login in one pool leaves the other pool of the same family eligible, and a quota hit quarantines only that account",
           "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "testTitle": "a dead login moves the seat to another account of the same provider, not to another provider"
+          "testTitle": "a dead login in one pool leaves the other pool of the same family eligible, and a quota hit quarantines only that account"
         }
       ],
       "roleHint": "fixture-literal",
@@ -16605,7 +16409,7 @@
     },
     {
       "currentLine": 181,
-      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. The llmAccounts branch creates pool homes/login files from WALK_POOLS-derived account data; this test passes explicit llmAccounts (quota/live), exercising the branch rather than a default null inventory.",
+      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. The test at run-provider-failover.test.mjs:491 calls attemptsOf(fx.repoRoot, res) at :501. attemptsOf at failover-fixture.mjs:181 calls unitDirOf(:180), joins unit.json, reads it through readJson(:179), and selects bindings[producer/1]. This row is the attempts reader, not the llmAccounts branch.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         181
@@ -16642,7 +16446,7 @@
     },
     {
       "currentLine": 182,
-      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. The llmAccounts branch creates pool homes/login files from WALK_POOLS-derived account data; this test passes explicit llmAccounts (quota/live), exercising the branch rather than a default null inventory.",
+      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. The test at run-provider-failover.test.mjs:19 calls summaryOf(fx.repoRoot, res) at :51 after its successful run. summaryOf at failover-fixture.mjs:182 calls unitDirOf(:180), joins unit-summary.json and reads it through readJson(:179). The former :491 test never calls summaryOf.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         182
@@ -16661,10 +16465,10 @@
       "owningProofs": [
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 491,
-          "locator": "test/runner/execution/run-provider-failover.test.mjs:a dead login in one pool leaves the other pool of the same family eligible, and a quota hit quarantines only that account",
+          "line": 19,
+          "locator": "test/runner/execution/run-provider-failover.test.mjs:a dead login moves the seat to another account of the same provider, not to another provider",
           "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "testTitle": "a dead login in one pool leaves the other pool of the same family eligible, and a quota hit quarantines only that account"
+          "testTitle": "a dead login moves the seat to another account of the same provider, not to another provider"
         }
       ],
       "roleHint": "fixture-literal",
@@ -16679,7 +16483,7 @@
     },
     {
       "currentLine": 183,
-      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. The llmAccounts branch creates pool homes/login files from WALK_POOLS-derived account data; this test passes explicit llmAccounts (quota/live), exercising the branch rather than a default null inventory.",
+      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. The test at run-provider-failover.test.mjs:491 calls selectedAccount(fx.repoRoot, next, '1') at :510 (the review suggested :508, which actually starts the next run). selectedAccount at failover-fixture.mjs:184 invokes runFile(:183) with provider-capacity-selection.json; runFile calls unitDirOf(:180) and readJson(:179). This is the run-file reader, not the llmAccounts branch.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         183
@@ -16717,7 +16521,7 @@
     },
     {
       "currentLine": 188,
-      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. setup writes runner/project/global config and capacity state; the named test calls setup with recentlyUsed and then run/solo, verifying account rotation and its receipt. The llmAccounts-only branch is assigned separately.",
+      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. The test at run-provider-failover.test.mjs:179 evaluates panel('u-panel-rotate') at :189 before run. panel at failover-fixture.mjs:187-188 maps the nonempty [1, 2, 3] array to member-${n} seats and appends the synthesizer. The former :19 caller uses solo only.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         188
@@ -16736,10 +16540,10 @@
       "owningProofs": [
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 19,
-          "locator": "test/runner/execution/run-provider-failover.test.mjs:a dead login moves the seat to another account of the same provider, not to another provider",
+          "line": 179,
+          "locator": "test/runner/execution/run-provider-failover.test.mjs:a panel seat that rotated keeps its role and the unit passes",
           "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "testTitle": "a dead login moves the seat to another account of the same provider, not to another provider"
+          "testTitle": "a panel seat that rotated keeps its role and the unit passes"
         }
       ],
       "roleHint": "fixture-literal",
@@ -16828,7 +16632,7 @@
     },
     {
       "currentLine": 202,
-      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. panel() builds member-${n} seat ids; the named test calls panel(u-panel-rotate), runs a real panel and checks member-1 attempt provenance.",
+      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. Test run-provider-failover.test.mjs:331 calls unitRuns(fx) at :341 and :347. unitRuns at failover-fixture.mjs:201-203 unconditionally constructs the assignments directory at :202 before existsSync; a prior run exists here. The former panel test :179 never calls unitRuns.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         202
@@ -16847,10 +16651,10 @@
       "owningProofs": [
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 179,
-          "locator": "test/runner/execution/run-provider-failover.test.mjs:a panel seat that rotated keeps its role and the unit passes",
+          "line": 331,
+          "locator": "test/runner/execution/run-provider-failover.test.mjs:a quarantined pinned account is refused before any unit run exists, and a resume of a run pinned to it too",
           "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "testTitle": "a panel seat that rotated keeps its role and the unit passes"
+          "testTitle": "a quarantined pinned account is refused before any unit run exists, and a resume of a run pinned to it too"
         }
       ],
       "roleHint": "fixture-literal",
@@ -16865,7 +16669,7 @@
     },
     {
       "currentLine": 202,
-      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. panel() builds member-${n} seat ids; the named test calls panel(u-panel-rotate), runs a real panel and checks member-1 attempt provenance.",
+      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. Test run-provider-failover.test.mjs:360 calls unitRuns(fx) at :363 after the invalid account pin is refused. unitRuns at failover-fixture.mjs:201-203 constructs the assignments directory at :202 before existsSync, even when it returns an empty result. The former :179 caller never invokes this helper.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         202
@@ -16884,10 +16688,10 @@
       "owningProofs": [
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 179,
-          "locator": "test/runner/execution/run-provider-failover.test.mjs:a panel seat that rotated keeps its role and the unit passes",
+          "line": 360,
+          "locator": "test/runner/execution/run-provider-failover.test.mjs:an account of a provider no candidate of the seat belongs to is refused before any unit run exists",
           "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "testTitle": "a panel seat that rotated keeps its role and the unit passes"
+          "testTitle": "an account of a provider no candidate of the seat belongs to is refused before any unit run exists"
         }
       ],
       "roleHint": "fixture-literal",
@@ -18215,7 +18019,7 @@
     },
     {
       "currentLine": 37,
-      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. The module stateRoot/environment and sourceRoot/fixture return are used by fixture(t) and acquire; the named test reads the sidecar and asserts only that path committed.",
+      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. Test documentation-cutover-lease.test.mjs:67 calls fixture(t), then f.worktree() and f.worktree('other') at :68. These invoke the returned closure at :37, evaluating path.join(temp, branch) and git worktree add, including default branch holder. Merely constructing the fixture, as the former :52 owner does, never runs this closure.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         37
@@ -18234,10 +18038,10 @@
       "owningProofs": [
         {
           "file": "test/runner/documentation-cutover-lease.test.mjs",
-          "line": 52,
-          "locator": "test/runner/documentation-cutover-lease.test.mjs:production acquire commits exactly the sidecar with base evidence and keeps the token private",
+          "line": 67,
+          "locator": "test/runner/documentation-cutover-lease.test.mjs:holder release from a subdirectory uses the checkout-root token and lands on main",
           "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46",
-          "testTitle": "production acquire commits exactly the sidecar with base evidence and keeps the token private"
+          "testTitle": "holder release from a subdirectory uses the checkout-root token and lands on main"
         }
       ],
       "roleHint": "fixture-literal",
@@ -18252,7 +18056,7 @@
     },
     {
       "currentLine": 37,
-      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. The module stateRoot/environment and sourceRoot/fixture return are used by fixture(t) and acquire; the named test reads the sidecar and asserts only that path committed.",
+      "custody": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption. Test documentation-cutover-lease.test.mjs:67 calls fixture(t), then f.worktree() and f.worktree('other') at :68. These invoke the returned closure at :37, evaluating path.join(temp, branch) and git worktree add, including default branch holder. Merely constructing the fixture, as the former :52 owner does, never runs this closure.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         37
@@ -18271,10 +18075,10 @@
       "owningProofs": [
         {
           "file": "test/runner/documentation-cutover-lease.test.mjs",
-          "line": 52,
-          "locator": "test/runner/documentation-cutover-lease.test.mjs:production acquire commits exactly the sidecar with base evidence and keeps the token private",
+          "line": 67,
+          "locator": "test/runner/documentation-cutover-lease.test.mjs:holder release from a subdirectory uses the checkout-root token and lands on main",
           "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46",
-          "testTitle": "production acquire commits exactly the sidecar with base evidence and keeps the token private"
+          "testTitle": "holder release from a subdirectory uses the checkout-root token and lands on main"
         }
       ],
       "roleHint": "fixture-literal",
@@ -30210,7 +30014,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: the dynamic scanner matched prose resembling a path-key declaration inside a line comment. The exact matched fragment is not executable and contains no documentation target; a nearby documentation cue does not make it a document reader/default. The exact construction is \"path: in a\" at line 3, within the comment \"no addon-less Git read path: in a\". It is neither a config path key nor a document citation/operand. Re-grade this lexical false positive REJECT, retaining the separate real distribution citation pc-l-0056 as a park.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "46e8283ba343663b23fb303f74cdfea9e8bd875de1780b4ea0d218240c2cffee"
       },
       "sourcePresent": true,
@@ -30722,7 +30526,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-checks.test.mjs:99; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -30764,7 +30568,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-checks.test.mjs:100; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -30806,7 +30610,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-checks.test.mjs:107; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -30848,7 +30652,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-checks.test.mjs:120; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -30890,7 +30694,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:49; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -30932,7 +30736,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:50; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -30974,7 +30778,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:51; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -31016,7 +30820,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:76; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -31058,7 +30862,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:137; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -31100,7 +30904,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:228; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -31142,7 +30946,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:243; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -31184,7 +30988,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:245; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -31226,7 +31030,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:269; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -31268,7 +31072,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:281; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -31310,7 +31114,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-fence.test.mjs:53; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -31352,7 +31156,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-fence.test.mjs:53; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -31394,7 +31198,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-fence.test.mjs:57; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourcePresent": false,
@@ -36359,15 +36163,15 @@
           },
           {
             "file": "bin/fgos.mjs",
-            "line": 3867,
-            "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+            "line": 3868,
+            "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
             "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e",
-            "text": "        const res = acquireDocumentationCutoverLease({ repoRoot: cwd, worktree: flags.worktree ? path.resolve(flags.worktree) : undefined });"
+            "text": "        if (flags.json) return { result: res.result, tokenHash: res.tokenHash, tokenPath: res.tokenPath, sidecar: res.sidecar };"
           }
         ],
         "nonDocumentUse": true,
-        "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The acquisition options still resolve only the caller-owned worktree flag; no document default is introduced. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The graded span is the JSON response return at bin/fgos.mjs:3868, not acquire options at :3867. It returns scalar result/tokenHash/tokenPath/sidecar fields for outer rendering, not a documentation read or default. Re-grade REJECT: the response-envelope rendering refactor preserves the non-document use.",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "sourceChanged": true,
@@ -36433,7 +36237,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The former console.log acquisition text is now returned for outer rendering; res.tokenHash is a scalar lease diagnostic. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "sourceChanged": true,
@@ -36499,7 +36303,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The not-held message moved from console.log to a returned scalar using res.state. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "sourceChanged": true,
@@ -36565,7 +36369,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The held-status age/kernelLock message is now part of one returned human rendering, not a docs read. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "sourceChanged": true,
@@ -36631,7 +36435,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. holderTokenHash moved into the same returned held-status rendering; it is not dereferenced. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "sourceChanged": true,
@@ -36697,7 +36501,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. res.worktree moved into the same returned human rendering; displaying a checkout is not opening documentation. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "sourceChanged": true,
@@ -36806,7 +36610,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The release timestamp/drift list moved from console.log into a returned message; drift.join only formats diagnostics. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "sourceChanged": true,
@@ -36916,7 +36720,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The abandon reason moved from console.log into a returned message; the reason string is not a filesystem operand. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "sourceChanged": true,
@@ -37197,7 +37001,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. literal_paths now calls crate::fgos_scope_literal(p) instead of inlining canonicalize(p). The operand remains a caller-supplied repository-relative path validator, not a documentation reader or authority default. REJECT remains correct under the centralized predicate.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "d900d81f350dabd1973c1f4265fa01f843bfe4e1605a0923068a5cf650aa066b"
       },
       "sourceChanged": true,
@@ -37783,7 +37587,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The seeded empty LockScope remains in config mutation; only map_err(error) became map_err(failed). It acquires repo-config under .fgos/locks; the empty seed is not a documentation root. REJECT is unchanged.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "40a9792c910b87a3fd8f7756de5a78674a3572cb492e8de8dcfb9bb1ddd46ed9"
       },
       "sourceChanged": true,
@@ -37849,7 +37653,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The seeded empty LockScope remains in config mutation; only map_err(error) became map_err(failed). It acquires repo-config under .fgos/locks; the empty seed is not a documentation root. REJECT is unchanged.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "40a9792c910b87a3fd8f7756de5a78674a3572cb492e8de8dcfb9bb1ddd46ed9"
       },
       "sourceChanged": true,
@@ -39535,7 +39339,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The obsolete runner.schema/rigorToTier conversion refusal was removed with one-shot setup conversion. There is no current expression at the old line: bootstrapDefaultExecutor now begins here. Re-grade the retired diagnostic REJECT, not a grade for whatever occupies line 417 today.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "3d8268ee84f1f61c64f5cf8a709cb00502a0838f6f8e92973868e9a4ba5fdc0c"
       },
       "sourceChanged": true,
@@ -43230,7 +43034,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The retained-Land-candidate warning was extracted from {passed:true,message:...} to a returned string. rows.join still formats a diagnostic, never reads a document. REJECT is unchanged.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "2f84c6baab84e772487158c9364ecdd436509c6626a4221c1faa57f85605f44d"
       },
       "sourceChanged": true,
@@ -43432,7 +43236,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "sourceChanged": true,
@@ -43505,7 +43309,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "sourceChanged": true,
@@ -43578,7 +43382,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "sourceChanged": true,
@@ -43651,7 +43455,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "sourceChanged": true,
@@ -43718,15 +43522,15 @@
           },
           {
             "file": "src/setup/seat-binding-checks.mjs",
-            "line": 66,
-            "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+            "line": 30,
+            "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
             "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f",
-            "text": "export async function checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConfig }) {"
+            "text": "    ladder = ladderCommentLines(createSeatBindingClient({ cwd, fgosDir: path.join(cwd, '.fgos') }).tierLadder().definitions);"
           }
         ],
         "nonDocumentUse": true,
-        "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old assignment-directory enumeration at :85 retired, but join.json uniquely rebinds path.join(cwd, '.fgos') to current :30. The surviving construction supplies fgosDir to createSeatBindingClient for the config-ladder check: fgOS runtime/config state, not a documentation root or reader. Re-grade the surviving occurrence REJECT; the expression is not absent.",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "sourceChanged": true,
@@ -43799,7 +43603,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "sourceChanged": true,
@@ -43872,7 +43676,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "sourceChanged": true,
@@ -43945,7 +43749,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "sourceChanged": true,
@@ -44018,7 +43822,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "sourceChanged": true,
@@ -44091,7 +43895,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "sourceChanged": true,
@@ -44164,7 +43968,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "sourceChanged": true,
@@ -44225,7 +44029,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The retired rigorToTier diagnostic belonged only to the removed conversion validator; the deletion eliminates this scalar message, not a document reader/default. The original non-document REJECT still holds by explicit retirement.",
         "retiredSource": true,
-        "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
         "sourceSha256": null
       },
       "sourceChanged": true,
@@ -46398,7 +46202,7 @@
   ],
   "settlement": {
     "path": "census-join/settlement.json",
-    "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
+    "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
   },
-  "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
+  "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
 }

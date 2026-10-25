@@ -67,7 +67,7 @@
       "patchPath": "census-join/pointer-patches.json",
       "reason": "Both the tier-composition procedure (5.4) and per-property precedence table (6.3) retain their explicit late-area ledger mappings.",
       "reviewStatus": "pending",
-      "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+      "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
       "sourceSha256": "212d891228b7a4819bf0c58f3f719fe8847d9ae1575466143119cef00df841ba"
     },
     {
@@ -111,7 +111,7 @@
       "patchPath": "census-join/pointer-patches.json",
       "reason": "The original Entry Points & Triggers heading maps through the packaging ledger and carries/source-heading-parity.json, not the separate top-level 2. Entry Points table.",
       "reviewStatus": "pending",
-      "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+      "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
       "sourceSha256": "46e8283ba343663b23fb303f74cdfea9e8bd875de1780b4ea0d218240c2cffee"
     },
     {
@@ -152,7 +152,7 @@
       "patchPath": "census-join/pointer-patches.json",
       "reason": "The complete RUL-WF-27 block remains under 6. Business Rules, including the binding-as-rebuildable-view clause cited by this comment.",
       "reviewStatus": "pending",
-      "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+      "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
       "sourceSha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c"
     },
     {
@@ -193,9 +193,9 @@
       "patchPath": "census-join/pointer-patches.json",
       "reason": "The complete RUL-WF-27 block remains under 6. Business Rules, including the binding-as-rebuildable-view clause cited by this comment.",
       "reviewStatus": "pending",
-      "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+      "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
       "sourceSha256": "de600986a2325b0a3653835bed153a11ffc447aa31212db8cd4e9d90dd67ed59"
     }
   ],
-  "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
+  "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
 }

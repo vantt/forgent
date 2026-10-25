@@ -1,19 +1,21 @@
 {
-  "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+  "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
   "gateId": "non-behavioral-census-join",
-  "authority": "L13-17; w19-cleanup-brief.md",
-  "status": "records-complete-four-citation-joins-independent-review-open",
+  "authority": "L12-137 / L13-17; w20-census-join-rework-brief.md",
+  "status": "records-reworked-independent-review-open-one-owned-park",
+  "registerStatus": "partial",
+  "registerEdited": false,
   "independentApproval": false,
   "finalPinCoverage": false,
-  "supersedesReceiptAtCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+  "supersedesReceiptAtCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
   "historicalReceiptSourceCommit": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
   "counts": {
     "sites": 1126,
     "files": 140,
-    "joinedOwningTest": 780,
+    "joinedOwningTest": 779,
     "confirmedOriginalGradeREJECT": 289,
     "confirmedSettlementREJECT": 53,
-    "ownedParks": 0,
+    "ownedParks": 1,
     "joinedByCitation": 4,
     "originalOwnedJudgments": 187,
     "originalJudgmentDispositions": {"joined": 134, "confirmed REJECT": 49, "joined-by-citation": 4, "owned park": 0},
@@ -23,44 +25,84 @@
       "other": {"joined": 2, "confirmed REJECT": 1, "joined-by-citation": 4, "owned park": 0, "total": 7}
     },
     "additionalDriftedGrades": 4,
-    "additionalDriftedGradeREJECTs": 4
+    "additionalDriftedGradeREJECTs": 4,
+    "additionalHelperCorrections": 2,
+    "settlementRows": 193
+  },
+  "requestedRejoins": {
+    "pc-d-0446": {"file": "test/runner/execution/run-provider-failover.test.mjs", "testLine": 491, "callLines": [492, 494, 495]},
+    "pc-d-0448": {"file": "test/runner/execution/run-provider-failover.test.mjs", "testLine": 19, "callLines": [51]},
+    "pc-d-0450": {"file": "test/runner/execution/run-provider-failover.test.mjs", "testLine": 179, "callLines": [189]},
+    "pc-d-0453": {"file": "test/runner/execution/run-provider-failover.test.mjs", "testLine": 331, "callLines": [341, 347]},
+    "pc-d-0454": {"file": "test/runner/execution/run-provider-failover.test.mjs", "testLine": 360, "callLines": [363]},
+    "pc-d-0479": {"file": "test/runner/documentation-cutover-lease.test.mjs", "testLine": 67, "callLines": [68]},
+    "pc-d-0480": {"file": "test/runner/documentation-cutover-lease.test.mjs", "testLine": 67, "callLines": [68]}
+  },
+  "descriptionCorrections": {
+    "pc-d-0447": "attemptsOf call at run-provider-failover.test.mjs:501, not the llmAccounts branch",
+    "pc-d-0449": "selectedAccount call at :510 -> failover-fixture.mjs:184 -> runFile at :183; the review-suggested :508 starts the next run",
+    "pc-d-0924": "JSON response return at bin/fgos.mjs:3868, not acquire options at :3867; REJECT preserved",
+    "pc-d-1101": "surviving path.join(cwd, '.fgos') at src/setup/seat-binding-checks.mjs:30 supplies runtime/config state; REJECT preserved, expression not absent"
+  },
+  "helperAudit": {
+    "evidence": "helper-audit.json",
+    "auditedRows": 129,
+    "jsRows": 116,
+    "rustHelperAndSubprocessRows": 13,
+    "fixedRows": 4,
+    "knownReviewFixes": 2,
+    "otherRowsAudited": 127,
+    "otherRowsFixed": 2,
+    "fixedIds": ["pc-d-0245", "pc-d-0288", "pc-d-0479", "pc-d-0480"],
+    "additionalCorrections": {
+      "pc-d-0245": "rawCli is joined to the verified setupLease/cli caller at test/e2e/documentation-cutover-lease-hooks.test.mjs:155, not all callers that merely declare the fixture closure",
+      "pc-d-0288": "hostScan assert.fail template at test/event-store/migrate-cutover-grant.test.mjs:34 is not deliberately taken by any named test; owned park with empty proofs"
+    },
+    "limits": "Static branch-aware custody only, including the explicit pc-d-0618 helper successor join. All three same-file currentLine=null successor rows were checked; the other two are direct lexical test sites. Module imports/constants and direct lexical/template-title joins are not indirect helper rows. No product test executed."
   },
   "artifacts": {
     "pinnedInput": "settlement-decisions.json",
     "perIdDispositions": "settlement.json",
     "currentCensus": "join.json",
     "currentParks": "residue.json",
+    "helperAudit": "helper-audit.json",
     "replayEvidence": "replay.json",
     "citationBindings": "citation-bindings.json",
     "unappliedCommentRetargets": "pointer-patches.json",
-    "gateProofEvidence": "../gate-reconcile/reproduction.json"
+    "gateVerifier": "gate-verification.json",
+    "gateControls": "gate-controls.json",
+    "validation": "validation.json"
   },
-  "joinGrammar": "Existing JS lexical/same-file helper and Rust test/helper custody, extended only at the settlement pin to name unevaluated JS template titles. Shared setup/loader callers have explicit pinned evidence. Every proof names file, test title expression, test line and source digest; Rust also names functionLine. No test or native addon was executed.",
-  "gradePolicy": "Original phase-08 grade records are untouched. New REJECTs name historical spans, old grade-record member/line where present, current evidence and source digests, or an exact deleting commit for retired source. A comment fragment path: in a is rejected as a lexical false positive, not confused with the separate real distribution citation.",
   "remainingOwners": {
-    "fourFormerCitationParks": {
+    "pc-d-0288": {
+      "owner": "Documentation integration Lead / independent census reviewer (L13-17)",
+      "nextAction": "Before F, independently rejudge the exact assertion-message occurrence as non-document rendering, or bind a test that deliberately takes hostScan's failure arm."
+    },
+    "fourCitationJoins": {
       "owner": "Documentation integration Lead (L13-17.1)",
       "ids": ["pc-l-0042", "pc-l-0056", "pc-l-0077", "pc-l-0078"],
-      "nextAction": "Before F, independently review this turn’s four citation joins and turn 707’s settlement, then co-compose the four unapplied comment retargets with the full owning-file chain. Current holder sections and digests are in citation-bindings.json. G2 remains partial."
+      "nextAction": "Independently review the joins and co-compose the four unapplied comment retargets with their full owning-file chain. G2 remains partial."
     },
     "settlementIndependentReview": "Independent census reviewer / Lead",
     "eightHistoricalPostPinLiteralJudgments": "Documentation integration owner / final-pin census reviewer",
     "finalPinRefreshAndAccounting": "Lead"
   },
   "proofs": [
-    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py --pin 98d9201f1905e433a40b94d8d8b0fb9fefda1452", "runs": 2, "exits": [0, 0], "stdoutAndThreeOutputsByteIdentical": true, "evidence": "replay.json"},
-    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py --pin 3d0169f390e21c67bc3fc69081fd1bc07186599f --rescan --out <tempfile directory>", "exit": 0, "fourOutputsByteIdenticalToHistoricalCommittedArtifacts": true, "historicalProofNotRerunThisTurn": true, "evidence": "replay.json#/previousSettlementReplay"},
-    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py", "exit": 0, "evidence": "../gate-reconcile/verification.json", "checkedAtHead": "98d9201f1905e433a40b94d8d8b0fb9fefda1452"},
-    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py", "exit": 0, "negativeControls": 9, "evidence": "../gate-reconcile/controls.json"},
-    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/citations.py --pin 98d9201f1905e433a40b94d8d8b0fb9fefda1452 --check", "exit": 0, "zeroFuzzPatchReplays": 8, "evidence": "pointer-patches.json"},
-    {"command": "node plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs", "exit": 0, "evidence": "../carries/cleanup-verification.json"},
-    {"command": "node plans/260925-documentation-authority-unification/reports/phase-09/carries/controls.mjs", "exit": 0, "negativeControls": 5, "evidence": "../carries/controls.json"},
-    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py", "exit": 0, "outputOnlyScratchAdapter": true, "evidence": "../gate-reconcile/misc-replay.json"}
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py --pin 5820ca6780ff6eec28afe09a128ac95fcd11d06c", "runs": 2, "exits": [0, 0], "stdoutAndThreeOutputsByteIdentical": true, "evidence": "replay.json"},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py", "exit": 0, "outputOnlyScratchAdapter": true, "evidence": "gate-verification.json", "checkedAtHead": "5820ca6780ff6eec28afe09a128ac95fcd11d06c"},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py", "exit": 0, "negativeControls": 9, "outputOnlyScratchAdapter": true, "evidence": "gate-controls.json"},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/citations.py --pin 5820ca6780ff6eec28afe09a128ac95fcd11d06c --check", "exit": 0, "zeroFuzzPatchReplays": 8, "evidence": "pointer-patches.json"},
+    {"command": "record assertions after the final replay", "exit": 0, "evidence": "replay.json#/recordAssertions"},
+    {"command": "git diff --check and scoped artifact validation", "exit": 0, "evidence": "validation.json"}
   ],
-  "historicalReplayRepair": "The first historical comparison detected registerSha256 drift because the old script read the working-tree register. Reading that whole register blob at --pin restores byte-identical old outputs without changing census identities or old grades.",
-  "postPinArtifacts": "post-pin-literals.json and post-pin-dynamics.json remain at 3d0169f39; no new-pin or final-pin delta coverage is claimed by this original-judgment settlement.",
-  "priorArt": ["bade6b6b3 introduced the join", "b25dadae2 added pin/delta custody", "5a33989fa removed one-shot seat conversion and its fixtures", "Existing Acorn locator, Rust helper grammar and gate reconciliation generator reused"],
-  "impactAnalysis": "degraded/unqueried: fgOS CLI forbidden by brief and no impact-analysis MCP exposed",
+  "gateOutputCustody": "Unmodified gate scripts execute with runpy as __main__; only their final Path.write_text destinations are redirected to tempfile outputs, whose exact bytes are copied into census-join. No check/input/assertion/git behavior is changed. gate-reconcile/verification.json and controls.json, including volatile fields, remain byte-identical; preserved hashes and the complete adapter source are in replay.json.",
+  "archiveReceiptChange": {"onlyField": "postMeasurementEdits", "addedCommit": "25e8842d3dcc2e359dc930de086484629a275357", "allOtherFieldsUnchanged": true},
+  "joinGrammar": "Existing JS lexical/same-file helper and Rust test/helper custody reused. The pinned decision layer admits explicitly listed corrections of already-joined same-file helpers, and parks clear superseded automatic proofs. No scanner grammar or product mechanism added.",
+  "gradePolicy": "Original grade records unchanged. Corrected REJECT descriptions retain source-bound non-document reasons, including the surviving runtime-state expression at pc-d-1101.",
+  "postPinArtifacts": "post-pin-literals.json and post-pin-dynamics.json remain at 3d0169f39; no new-pin delta or final-pin coverage claimed.",
+  "historicalReplay": "Prior replay custody is preserved under replay.json#/previousSettlementReplay; historical rescan, carries and misc proofs were not rerun this turn.",
+  "priorArt": ["bade6b6b3 introduced join", "b25dadae2 added pin/delta custody", "4e49c3008 added the pinned settlement layer", "408078b9a bound citations", "Existing Acorn locator, Rust grammar, settlement/park update and gate verifier/controls reused"],
+  "impactAnalysis": "degraded/unqueried: fgOS CLI forbidden by brief and no impact-analysis MCP exposed; direct source/history review",
   "notRun": ["product tests", "npm test", "scripts/run-tests.mjs", "cargo test --workspace", "phase-08/audit-report.py", "native addons", "fgos CLI", "lifecycle verbs", "pair accounting", "final-pin F census", "independent semantic review", "markdown preview service"],
   "needsWrites": []
 }

@@ -1,18 +1,19 @@
 {
-  "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+  "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
   "status": "passed",
-  "nativeAddons": "NODE_OPTIONS=--no-addons --require <scratch process.dlopen block>; inherited by every Node child",
+  "nativeAddons": "NODE_OPTIONS=--no-addons plus scratch process.dlopen block inherited by every Node child",
   "commands": [
     {
       "argv": [
         "python3",
         "-B",
-        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/citations.py",
         "--pin",
-        "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
+        "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
+        "--check"
       ],
       "exit": 0,
-      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-by-citation\": 4, \"joined-owning-test\": 780}}\n",
+      "stdout": "{\"bindings\": 5, \"checkOnly\": true, \"citations\": 4, \"sourceCommit\": \"5820ca6780ff6eec28afe09a128ac95fcd11d06c\", \"status\": \"passed\", \"unappliedPatches\": 4, \"zeroFuzzReplays\": 8}\n",
       "stderr": ""
     },
     {
@@ -21,26 +22,179 @@
         "-B",
         "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
         "--pin",
-        "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
+        "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
       ],
       "exit": 0,
-      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-by-citation\": 4, \"joined-owning-test\": 780}}\n",
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-by-citation\": 4, \"joined-owning-test\": 779, \"judgment-required\": 1}}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+        "--pin",
+        "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
+      ],
+      "exit": 0,
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-by-citation\": 4, \"joined-owning-test\": 779, \"judgment-required\": 1}}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/census-rework-5i8nk8r8/gate-output-adapter.py",
+        "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py",
+        "/tmp/fgos-work/census-rework-5i8nk8r8/gate-verification.json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"status\": \"passed\",\n  \"exit\": 0,\n  \"asOf\": \"53de2207e1ea8a9417ac131f785704d6ab72ba2c\",\n  \"checkedAtHead\": \"5820ca6780ff6eec28afe09a128ac95fcd11d06c\",\n  \"originalOccurrences\": 87,\n  \"gates\": 12,\n  \"reviewFiles\": 110,\n  \"snapshotInputs\": 169,\n  \"followUpPin\": \"a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6\",\n  \"followUpInputs\": 4,\n  \"reviewFollowUpPin\": \"98d9201f1905e433a40b94d8d8b0fb9fefda1452\",\n  \"reviewFollowUpInputs\": 3,\n  \"evidenceAndReviewPaths\": 113,\n  \"clearedEntries\": 20,\n  \"exactVerdictQuotes\": 20,\n  \"clearedByCommits\": [\n    \"0fe6c4381\",\n    \"25e8842d3\",\n    \"33cc5539d\",\n    \"4c9e1f31e\",\n    \"4f08d504d\",\n    \"53499dc9d\",\n    \"5a3f7580a\",\n    \"5c3b57347\",\n    \"5fe778624\",\n    \"63c3db9c6\",\n    \"63c884240\",\n    \"6f5b9419d\",\n    \"928f5cc14\",\n    \"984829939\",\n    \"a8ea05c50\",\n    \"bc2a6a014\",\n    \"c25e8cf6a\",\n    \"c5586146c\",\n    \"d22072da2\",\n    \"d786e305e\",\n    \"daa87810b\",\n    \"db023f065\"\n  ],\n  \"checks\": [\n    \"original occurrence coverage and text\",\n    \"path existence\",\n    \"clearedBy ancestry at snapshot and HEAD\",\n    \"committed exact review quotes\",\n    \"before/after counts\",\n    \"met-local has no local before-F blockers\",\n    \"immutable input fingerprints and all-review coverage\",\n    \"separate immutable follow-up input fingerprints\",\n    \"separate committed W19 review fingerprints and quotes\"\n  ],\n  \"limits\": \"Record integrity only. No independent semantic approval, F gate execution or full product-suite claim.\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/census-rework-5i8nk8r8/gate-output-adapter.py",
+        "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py",
+        "/tmp/fgos-work/census-rework-5i8nk8r8/gate-controls.json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"status\": \"passed\",\n  \"asOf\": \"53de2207e1ea8a9417ac131f785704d6ab72ba2c\",\n  \"positive\": \"passed\",\n  \"negativeControls\": [\n    {\n      \"name\": \"Missing evidence path is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"missing evidence path: gate-reconcile/absent-negative-control.json\"\n    },\n    {\n      \"name\": \"Existing commit outside the snapshot ancestry is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"clearedBy/asOf 42c5a0a55 not ancestor of 53de2207e1ea8a9417ac131f785704d6ab72ba2c\"\n    },\n    {\n      \"name\": \"Invented verdict quotation is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"not an exact review verdict quote: The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F.\"\n    },\n    {\n      \"name\": \"Met-local with local before-F work is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"G3 has before-F local work\"\n    },\n    {\n      \"name\": \"Omitted original occurrence is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"missing/extra/altered original occurrence\"\n    },\n    {\n      \"name\": \"False before/after counts are rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"before/after counts drift\"\n    },\n    {\n      \"name\": \"False snapshot fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"snapshot hash drift: plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md\"\n    },\n    {\n      \"name\": \"False follow-up fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"follow-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md\"\n    },\n    {\n      \"name\": \"False W19 review fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"review follow-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/reviews/w19-live-parity-and-rebinds-review.json\"\n    }\n  ],\n  \"count\": 9,\n  \"method\": \"In-memory copies at the read_json test seam; real owning check(), path inspection and read-only git; no source file or assertion weakened.\"\n}\n",
       "stderr": ""
     }
   ],
   "currentPinReplay": {
     "runs": 2,
     "stdoutByteIdentical": true,
+    "stderrByteIdentical": true,
     "artifactsByteIdentical": true,
     "sha256": {
-      "join.json": "999a9f1dfd268e181b5af629f0692bb22c6ceeb2723bc0a1d26beba271a7c539",
-      "residue.json": "85dd5e5598f92fbff1eba7fe3fe13a2e5a104404d798dbf7461ee71f60472386",
-      "settlement.json": "c037e5a76c69bcbcd1d48e135b866624e8aa544f54a64358b84184d53329d056"
+      "join.json": "6bc9b7820cd447d5addb8da569ef9caf100644441995a0449c250962de09a336",
+      "residue.json": "227430ce093133356b05de2a7d280d32a65bc26c6802c66966aa87da8add171d",
+      "settlement.json": "544e6e93e37ce2259f1ae11bf78d56ae3e960af7505987cd2c91c70b4f971a48"
     }
   },
-  "previousSettlementReplay": {
-    "sourceCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+  "recordAssertions": {
     "status": "passed",
+    "sevenReworkedOwnersMatchVerifiedCallers": true,
+    "additionalRawCliOwner": 155,
+    "hostScanParkHasNoOwningProofsInBothJoinAndResidue": true,
+    "originalOwnedJudgments": 187,
+    "additionalDriftedGrades": 4,
+    "additionalHelperCorrections": 2,
+    "settlementRows": 193
+  },
+  "gateProofs": [
+    {
+      "script": "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py",
+      "exit": 0,
+      "evidence": "gate-verification.json",
+      "sha256": "2b09bcd880707f2dbdc369be07402aab30454ec7984f480de1d35252e4620465",
+      "outputOnlyScratchAdapter": true
+    },
+    {
+      "script": "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py",
+      "exit": 0,
+      "evidence": "gate-controls.json",
+      "sha256": "36f9953c989dcc44553028c80eea7ec21a08aad30cc26f5d24b918b2f9689a87",
+      "outputOnlyScratchAdapter": true
+    }
+  ],
+  "outputOnlyAdapter": {
+    "source": "import pathlib, runpy, sys\nscript = pathlib.Path(sys.argv[1]).resolve()\nout = pathlib.Path(sys.argv[2]).resolve()\nexpected = script.with_name('verification.json' if script.name == 'verify.py' else 'controls.json')\noriginal = pathlib.Path.write_text\ndef redirected(self, data, *args, **kwargs):\n    if self.resolve() != expected:\n        raise AssertionError('Unexpected write: ' + str(self))\n    return original(out, data, *args, **kwargs)\npathlib.Path.write_text = redirected\nsys.argv = [str(script)]\nrunpy.run_path(str(script), run_name='__main__')\n",
+    "method": "runpy executes each unmodified gate script as __main__. Only its final Path.write_text destination is redirected to scratch; all checks, input reads, git and failure paths are unchanged. Exact emitted outputs copied into census-join. No volatile-field write outside scope occurs.",
+    "preservedSha256": {
+      "verification.json": "613e0175204d8c5c678daa90a2c135533dfa2b48a31aea9f972f0045d476c0f9",
+      "controls.json": "36f9953c989dcc44553028c80eea7ec21a08aad30cc26f5d24b918b2f9689a87"
+    }
+  },
+  "earlierAttempt": {
+    "command": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+      "--pin",
+      "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
+    ],
+    "exit": 1,
+    "reason": "Exact evidence-line validation rejected the review-suggested selectedAccount line 508: it is the next run call. Corrected pc-d-0449 to the actual selectedAccount call at 510, then both complete replays passed."
+  },
+  "earlierSuccessfulReplay": {
+    "commands": [
+      {
+        "argv": [
+          "python3",
+          "-B",
+          "plans/260925-documentation-authority-unification/reports/phase-09/census-join/citations.py",
+          "--pin",
+          "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
+        ],
+        "exit": 0,
+        "stdout": "{\"bindings\": 5, \"checkOnly\": false, \"citations\": 4, \"sourceCommit\": \"5820ca6780ff6eec28afe09a128ac95fcd11d06c\", \"status\": \"passed\", \"unappliedPatches\": 4, \"zeroFuzzReplays\": 8}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "python3",
+          "-B",
+          "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+          "--pin",
+          "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
+        ],
+        "exit": 0,
+        "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-by-citation\": 4, \"joined-owning-test\": 779, \"judgment-required\": 1}}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "python3",
+          "-B",
+          "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+          "--pin",
+          "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
+        ],
+        "exit": 0,
+        "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-by-citation\": 4, \"joined-owning-test\": 779, \"judgment-required\": 1}}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "python3",
+          "-B",
+          "/tmp/fgos-work/census-rework-1boqypvw/gate-output-adapter.py",
+          "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py",
+          "/tmp/fgos-work/census-rework-1boqypvw/gate-verification.json"
+        ],
+        "exit": 0,
+        "stdout": "{\n  \"status\": \"passed\",\n  \"exit\": 0,\n  \"asOf\": \"53de2207e1ea8a9417ac131f785704d6ab72ba2c\",\n  \"checkedAtHead\": \"5820ca6780ff6eec28afe09a128ac95fcd11d06c\",\n  \"originalOccurrences\": 87,\n  \"gates\": 12,\n  \"reviewFiles\": 110,\n  \"snapshotInputs\": 169,\n  \"followUpPin\": \"a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6\",\n  \"followUpInputs\": 4,\n  \"reviewFollowUpPin\": \"98d9201f1905e433a40b94d8d8b0fb9fefda1452\",\n  \"reviewFollowUpInputs\": 3,\n  \"evidenceAndReviewPaths\": 113,\n  \"clearedEntries\": 20,\n  \"exactVerdictQuotes\": 20,\n  \"clearedByCommits\": [\n    \"0fe6c4381\",\n    \"25e8842d3\",\n    \"33cc5539d\",\n    \"4c9e1f31e\",\n    \"4f08d504d\",\n    \"53499dc9d\",\n    \"5a3f7580a\",\n    \"5c3b57347\",\n    \"5fe778624\",\n    \"63c3db9c6\",\n    \"63c884240\",\n    \"6f5b9419d\",\n    \"928f5cc14\",\n    \"984829939\",\n    \"a8ea05c50\",\n    \"bc2a6a014\",\n    \"c25e8cf6a\",\n    \"c5586146c\",\n    \"d22072da2\",\n    \"d786e305e\",\n    \"daa87810b\",\n    \"db023f065\"\n  ],\n  \"checks\": [\n    \"original occurrence coverage and text\",\n    \"path existence\",\n    \"clearedBy ancestry at snapshot and HEAD\",\n    \"committed exact review quotes\",\n    \"before/after counts\",\n    \"met-local has no local before-F blockers\",\n    \"immutable input fingerprints and all-review coverage\",\n    \"separate immutable follow-up input fingerprints\",\n    \"separate committed W19 review fingerprints and quotes\"\n  ],\n  \"limits\": \"Record integrity only. No independent semantic approval, F gate execution or full product-suite claim.\"\n}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "python3",
+          "-B",
+          "/tmp/fgos-work/census-rework-1boqypvw/gate-output-adapter.py",
+          "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py",
+          "/tmp/fgos-work/census-rework-1boqypvw/gate-controls.json"
+        ],
+        "exit": 0,
+        "stdout": "{\n  \"status\": \"passed\",\n  \"asOf\": \"53de2207e1ea8a9417ac131f785704d6ab72ba2c\",\n  \"positive\": \"passed\",\n  \"negativeControls\": [\n    {\n      \"name\": \"Missing evidence path is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"missing evidence path: gate-reconcile/absent-negative-control.json\"\n    },\n    {\n      \"name\": \"Existing commit outside the snapshot ancestry is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"clearedBy/asOf 42c5a0a55 not ancestor of 53de2207e1ea8a9417ac131f785704d6ab72ba2c\"\n    },\n    {\n      \"name\": \"Invented verdict quotation is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"not an exact review verdict quote: The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F.\"\n    },\n    {\n      \"name\": \"Met-local with local before-F work is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"G3 has before-F local work\"\n    },\n    {\n      \"name\": \"Omitted original occurrence is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"missing/extra/altered original occurrence\"\n    },\n    {\n      \"name\": \"False before/after counts are rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"before/after counts drift\"\n    },\n    {\n      \"name\": \"False snapshot fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"snapshot hash drift: plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md\"\n    },\n    {\n      \"name\": \"False follow-up fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"follow-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md\"\n    },\n    {\n      \"name\": \"False W19 review fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"review follow-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/reviews/w19-live-parity-and-rebinds-review.json\"\n    }\n  ],\n  \"count\": 9,\n  \"method\": \"In-memory copies at the read_json test seam; real owning check(), path inspection and read-only git; no source file or assertion weakened.\"\n}\n",
+        "stderr": ""
+      }
+    ],
+    "supersededSha256": {
+      "join.json": "e01f7fd9e648bd9c9f38a2479be43f7c8d61ac678580dd6867104c14f0039a07",
+      "residue.json": "f4df4bd3bccb309731d7c96c8679dcd0e858d4d02d6de93a1f71f9b35f39858c",
+      "settlement.json": "544e6e93e37ce2259f1ae11bf78d56ae3e960af7505987cd2c91c70b4f971a48"
+    },
+    "note": "After that replay, code inspection found parked automatic joins retained their old owningProofs. The existing owned-park update now clears them; the final runs above verify empty proofs in both join and residue. No product behavior changed."
+  },
+  "previousSettlementReplay": {
+    "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+    "status": "passed",
+    "nativeAddons": "NODE_OPTIONS=--no-addons --require <scratch process.dlopen block>; inherited by every Node child",
     "commands": [
       {
         "argv": [
@@ -48,10 +202,10 @@
           "-B",
           "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
           "--pin",
-          "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
+          "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
         ],
         "exit": 0,
-        "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-owning-test\": 780, \"judgment-required\": 4}}\n",
+        "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-by-citation\": 4, \"joined-owning-test\": 780}}\n",
         "stderr": ""
       },
       {
@@ -60,25 +214,10 @@
           "-B",
           "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
           "--pin",
-          "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
+          "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
         ],
         "exit": 0,
-        "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-owning-test\": 780, \"judgment-required\": 4}}\n",
-        "stderr": ""
-      },
-      {
-        "argv": [
-          "python3",
-          "-B",
-          "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
-          "--pin",
-          "3d0169f390e21c67bc3fc69081fd1bc07186599f",
-          "--rescan",
-          "--out",
-          "/tmp/fgos-work/w2-d4b/judgments-vqsq_kjo/old-pin-wg8k5jqe"
-        ],
-        "exit": 0,
-        "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 293, \"joined-owning-test\": 646, \"judgment-required\": 187}}\n",
+        "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-by-citation\": 4, \"joined-owning-test\": 780}}\n",
         "stderr": ""
       }
     ],
@@ -87,22 +226,79 @@
       "stdoutByteIdentical": true,
       "artifactsByteIdentical": true,
       "sha256": {
-        "join.json": "31fa55ad92bd4bc0bc9ee893489370e7f54801f1db5dbd9fc22291d7f09d01eb",
-        "residue.json": "bee6f4ca2fdad9a2b145a1274adfdb73410c5a7b6542a8f2f507409172f3a0c3",
-        "settlement.json": "b1449ca1a6627eb0d481edf6f3bf88babb615c045cbd6f1891bc2b4c41467fe3"
+        "join.json": "999a9f1dfd268e181b5af629f0692bb22c6ceeb2723bc0a1d26beba271a7c539",
+        "residue.json": "85dd5e5598f92fbff1eba7fe3fe13a2e5a104404d798dbf7461ee71f60472386",
+        "settlement.json": "c037e5a76c69bcbcd1d48e135b866624e8aa544f54a64358b84184d53329d056"
       }
     },
-    "historicalReplay": {
-      "pin": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
-      "byteIdenticalToCommittedArtifactsAt": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-      "sha256": {
-        "join.json": "d9db05e7e785c2147bddcc0f0b4c2fe8accd094bf5496be353f7a9214f572534",
-        "residue.json": "d1cc0974109c7361bd5d766ccdd23b144cfd45e06e9af5be144576d23605c6ad",
-        "post-pin-literals.json": "3e5d0903e448a58999423e60984476968f170acc4796d37fac0b66d7e8861653",
-        "post-pin-dynamics.json": "43046e0a9b276ca1fa10f493c3ad9ab07b651a35d95d9a78095234cdb93aff67"
-      }
+    "previousSettlementReplay": {
+      "sourceCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+      "status": "passed",
+      "commands": [
+        {
+          "argv": [
+            "python3",
+            "-B",
+            "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+            "--pin",
+            "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
+          ],
+          "exit": 0,
+          "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-owning-test\": 780, \"judgment-required\": 4}}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "python3",
+            "-B",
+            "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+            "--pin",
+            "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
+          ],
+          "exit": 0,
+          "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-owning-test\": 780, \"judgment-required\": 4}}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "python3",
+            "-B",
+            "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+            "--pin",
+            "3d0169f390e21c67bc3fc69081fd1bc07186599f",
+            "--rescan",
+            "--out",
+            "/tmp/fgos-work/w2-d4b/judgments-vqsq_kjo/old-pin-wg8k5jqe"
+          ],
+          "exit": 0,
+          "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 293, \"joined-owning-test\": 646, \"judgment-required\": 187}}\n",
+          "stderr": ""
+        }
+      ],
+      "currentPinReplay": {
+        "runs": 2,
+        "stdoutByteIdentical": true,
+        "artifactsByteIdentical": true,
+        "sha256": {
+          "join.json": "31fa55ad92bd4bc0bc9ee893489370e7f54801f1db5dbd9fc22291d7f09d01eb",
+          "residue.json": "bee6f4ca2fdad9a2b145a1274adfdb73410c5a7b6542a8f2f507409172f3a0c3",
+          "settlement.json": "b1449ca1a6627eb0d481edf6f3bf88babb615c045cbd6f1891bc2b4c41467fe3"
+        }
+      },
+      "historicalReplay": {
+        "pin": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
+        "byteIdenticalToCommittedArtifactsAt": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+        "sha256": {
+          "join.json": "d9db05e7e785c2147bddcc0f0b4c2fe8accd094bf5496be353f7a9214f572534",
+          "residue.json": "d1cc0974109c7361bd5d766ccdd23b144cfd45e06e9af5be144576d23605c6ad",
+          "post-pin-literals.json": "3e5d0903e448a58999423e60984476968f170acc4796d37fac0b66d7e8861653",
+          "post-pin-dynamics.json": "43046e0a9b276ca1fa10f493c3ad9ab07b651a35d95d9a78095234cdb93aff67"
+        }
+      },
+      "limits": "Records-only replay; named owning tests were not run; no independent semantic approval or final-pin coverage."
     },
-    "limits": "Records-only replay; named owning tests were not run; no independent semantic approval or final-pin coverage."
+    "limits": "Four navigation joins are not owning-test proofs; patches remain unapplied, independent review and final F coverage remain open."
   },
-  "limits": "Four navigation joins are not owning-test proofs; patches remain unapplied, independent review and final F coverage remain open."
+  "historicalProofsNotRerun": true,
+  "scratchRemovedAtCompletion": true
 }

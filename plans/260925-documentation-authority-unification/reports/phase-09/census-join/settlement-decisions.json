@@ -19,12 +19,43 @@
     "rust-helper-callers": {
       "reason": "The construction is in a same-file Rust fixture helper. The named non-ignored #[test] calls that helper (possibly through another explicit same-file helper); the proof locator names the test attribute and function line, not the helper."
     },
+    "same-file-helper-audit": {
+      "reason": "Audit the exact helper/closure expression and branch, not just a helper name or enclosing fixture declaration. Unproved branches stay owned parks."
+    },
     "shared-fixture-callers": {
       "reason": "A shared fixture, module constant or setup hook is consumed by the named owning test. The per-row evidence binds its declaration, loader/caller and test at this source pin; this is a static custody join, not a product-test run or a generic fixture exemption."
     }
   },
-  "method": "Pinned additive judgments over the 187 original residue ids plus four newly drifted grades. Old source/grade records are read, not rewritten. Evidence spans and proof locators are verified by join.py.",
+  "method": "Pinned judgments over 187 original residue ids, four drifted grades and two same-file helper audit corrections. Old source/grades are read, not rewritten. join.py verifies evidence/proof locators; helper-audit.json records the audited population.",
+  "sameFileHelperCorrections": ["pc-d-0245", "pc-d-0288"],
   "rows": [
+    {
+      "id": "pc-d-0245", "file": "test/e2e/documentation-cutover-lease-hooks.test.mjs", "group": "shared-fixture-callers", "disposition": "joined",
+      "sourceSha256": "094ca303910a340c6e3f07910f67c9ce41ba386a315904eeb1173243d99e816e",
+      "detail": "Test :155 calls f.setupLease() at :157 -> cli at :106 -> rawCli at :100 -> spawnSync/path.join at :96, with default json=true. Keep this explicit owner, not all fixture(t) callers: fixture construction only declares rawCli; test :122 never calls it.",
+      "proofs": [{"file": "test/e2e/documentation-cutover-lease-hooks.test.mjs", "testTitle": "pre-commit refuses non-holder commit touching scoped paths"}],
+      "evidence": [
+        {"file": "test/e2e/documentation-cutover-lease-hooks.test.mjs", "line": 96, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "094ca303910a340c6e3f07910f67c9ce41ba386a315904eeb1173243d99e816e", "text": "  const rawCli = (args, cwd = repo, extraEnv = {}, json = true) => spawnSync(process.execPath, ['--import', cliBootstrap, path.join(sourceRoot, 'bin/fgos.mjs'), 'docs-lease', ...args, ...(json ? ['--json'] : [])], {"},
+        {"file": "test/e2e/documentation-cutover-lease-hooks.test.mjs", "line": 100, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "094ca303910a340c6e3f07910f67c9ce41ba386a315904eeb1173243d99e816e", "text": "    const res = rawCli(args, cwd);"},
+        {"file": "test/e2e/documentation-cutover-lease-hooks.test.mjs", "line": 106, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "094ca303910a340c6e3f07910f67c9ce41ba386a315904eeb1173243d99e816e", "text": "    const result = cli(['acquire', '--worktree', worktree ?? addWorktree('lease-holder')]);"},
+        {"file": "test/e2e/documentation-cutover-lease-hooks.test.mjs", "line": 157, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "094ca303910a340c6e3f07910f67c9ce41ba386a315904eeb1173243d99e816e", "text": "  f.setupLease();"},
+        {"file": "test/e2e/documentation-cutover-lease-hooks.test.mjs", "line": 155, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "094ca303910a340c6e3f07910f67c9ce41ba386a315904eeb1173243d99e816e", "text": "test('pre-commit refuses non-holder commit touching scoped paths', (t) => {"}
+      ]
+    },
+    {
+      "id": "pc-d-0288", "file": "test/event-store/migrate-cutover-grant.test.mjs", "group": "same-file-helper-audit", "disposition": "owned park",
+      "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e",
+      "detail": "The :34 template runs only in hostScan's assert.fail arm, after clean returns at :30 and namespace-refusal skips at :31-32. All seven named callers use real baseline scans; none deliberately takes :34. The blocked-child checks do not call hostScan. No owning test for this branch is proved.",
+      "owner": "Documentation integration Lead / independent census reviewer (L13-17)",
+      "nextAction": "Before F, independently rejudge this assertion-message occurrence as non-document rendering, or bind a test deliberately reaching hostScan's failure arm. No product test is added or run in this records slice.",
+      "proofs": [],
+      "evidence": [
+        {"file": "test/event-store/migrate-cutover-grant.test.mjs", "line": 34, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e", "text": "  assert.fail(`a process is working inside the fixture workspace before migration: ${JSON.stringify(scan)}`);"},
+        {"file": "test/event-store/migrate-cutover-grant.test.mjs", "line": 30, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e", "text": "  if (scan.status === 'clean') return true;"},
+        {"file": "test/event-store/migrate-cutover-grant.test.mjs", "line": 31, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e", "text": "  if (scan.status === 'needs-attest' && scan.blockers.length === 0 && scan.scans.every(s => s.result === 'unavailable' && s.detail === namespaceRefusal)) {"},
+        {"file": "test/event-store/migrate-cutover-grant.test.mjs", "line": 42, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e", "text": "  if (scan.status !== 'clean' && typeof gitPorts.createGitScopedCommit === 'function') { hostScan(t, scan); return; }"}
+      ]
+    },
     {
       "detail": "trackedLegacy(f) uses default porting=true, writes the two historical porting files, then its owning inventory test asserts the exact portingLog and returned tracked bytes.",
       "disposition": "joined",
@@ -2633,7 +2664,7 @@
       "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc"
     },
     {
-      "detail": "setup writes runner/project/global config and capacity state; the named test calls setup with recentlyUsed and then run/solo, verifying account rotation and its receipt. The llmAccounts-only branch is assigned separately.",
+      "detail": "The test at run-provider-failover.test.mjs:491 calls setup at :492 with nonempty llmAccounts at :494-497. setup reaches failover-fixture.mjs:157, whose truthy llmAccounts branch maps both pools and their accounts into pool homes/login files (:158-160). Unlike the former :19 caller, this test takes the cited branch.",
       "disposition": "joined",
       "evidence": [
         {
@@ -2645,17 +2676,31 @@
         },
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 22,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+          "line": 492,
+          "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
           "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "    { recentlyUsed: { alpha: ['live1'] } },"
+          "text": "  const fx = setup({ alpha: { family: 'alpha' }, beta: { family: 'beta' } }, {"
         },
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 19,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+          "line": 494,
+          "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
           "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "test('a dead login moves the seat to another account of the same provider, not to another provider', { skip: SKIP }, async () => {"
+          "text": "    llmAccounts: {"
+        },
+        {
+          "file": "test/runner/execution/run-provider-failover.test.mjs",
+          "line": 495,
+          "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
+          "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
+          "text": "      alpha: { a1: { family: 'alpha', login: 'quota' }, a2: { family: 'alpha', login: 'live' } },"
+        },
+        {
+          "file": "test/runner/execution/run-provider-failover.test.mjs",
+          "line": 491,
+          "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
+          "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
+          "text": "test('a dead login in one pool leaves the other pool of the same family eligible, and a quota hit quarantines only that account', { skip: SKIP }, async () => {"
         }
       ],
       "file": "test/helpers/failover-fixture.mjs",
@@ -2664,13 +2709,13 @@
       "proofs": [
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "testTitle": "a dead login moves the seat to another account of the same provider, not to another provider"
+          "testTitle": "a dead login in one pool leaves the other pool of the same family eligible, and a quota hit quarantines only that account"
         }
       ],
       "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc"
     },
     {
-      "detail": "The llmAccounts branch creates pool homes/login files from WALK_POOLS-derived account data; this test passes explicit llmAccounts (quota/live), exercising the branch rather than a default null inventory.",
+      "detail": "The test at run-provider-failover.test.mjs:491 calls attemptsOf(fx.repoRoot, res) at :501. attemptsOf at failover-fixture.mjs:181 calls unitDirOf(:180), joins unit.json, reads it through readJson(:179), and selects bindings[producer/1]. This row is the attempts reader, not the llmAccounts branch.",
       "disposition": "joined",
       "evidence": [
         {
@@ -2682,17 +2727,10 @@
         },
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 493,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+          "line": 501,
+          "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
           "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "    ...WALK_POOLS,"
-        },
-        {
-          "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 499,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "  const res = await run(fx, solo('u-quota-order'));"
+          "text": "  assert.deepEqual(attemptsOf(fx.repoRoot, res).map((a) => [a.binding.pool, a.outcome]), [['alpha', 'provider-limit'], ['alpha', 'pass']]);"
         },
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
@@ -2714,7 +2752,7 @@
       "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc"
     },
     {
-      "detail": "The llmAccounts branch creates pool homes/login files from WALK_POOLS-derived account data; this test passes explicit llmAccounts (quota/live), exercising the branch rather than a default null inventory.",
+      "detail": "The test at run-provider-failover.test.mjs:19 calls summaryOf(fx.repoRoot, res) at :51 after its successful run. summaryOf at failover-fixture.mjs:182 calls unitDirOf(:180), joins unit-summary.json and reads it through readJson(:179). The former :491 test never calls summaryOf.",
       "disposition": "joined",
       "evidence": [
         {
@@ -2726,24 +2764,17 @@
         },
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 493,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+          "line": 51,
+          "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
           "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "    ...WALK_POOLS,"
+          "text": "  const seat = summaryOf(fx.repoRoot, res).seats[0];"
         },
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 499,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+          "line": 19,
+          "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
           "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "  const res = await run(fx, solo('u-quota-order'));"
-        },
-        {
-          "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 491,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "test('a dead login in one pool leaves the other pool of the same family eligible, and a quota hit quarantines only that account', { skip: SKIP }, async () => {"
+          "text": "test('a dead login moves the seat to another account of the same provider, not to another provider', { skip: SKIP }, async () => {"
         }
       ],
       "file": "test/helpers/failover-fixture.mjs",
@@ -2752,13 +2783,13 @@
       "proofs": [
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "testTitle": "a dead login in one pool leaves the other pool of the same family eligible, and a quota hit quarantines only that account"
+          "testTitle": "a dead login moves the seat to another account of the same provider, not to another provider"
         }
       ],
       "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc"
     },
     {
-      "detail": "The llmAccounts branch creates pool homes/login files from WALK_POOLS-derived account data; this test passes explicit llmAccounts (quota/live), exercising the branch rather than a default null inventory.",
+      "detail": "The test at run-provider-failover.test.mjs:491 calls selectedAccount(fx.repoRoot, next, '1') at :510 (the review suggested :508, which actually starts the next run). selectedAccount at failover-fixture.mjs:184 invokes runFile(:183) with provider-capacity-selection.json; runFile calls unitDirOf(:180) and readJson(:179). This is the run-file reader, not the llmAccounts branch.",
       "disposition": "joined",
       "evidence": [
         {
@@ -2769,18 +2800,18 @@
           "text": "export const runFile = (repoRoot, res, subdir, file, role = 'producer') => readJson(path.join(unitDirOf(repoRoot, res), role, subdir, 'runs', '01', file));"
         },
         {
-          "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 493,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "    ...WALK_POOLS,"
+          "file": "test/helpers/failover-fixture.mjs",
+          "line": 184,
+          "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
+          "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc",
+          "text": "export const selectedAccount = (repoRoot, res, subdir) => runFile(repoRoot, res, subdir, 'provider-capacity-selection.json').accountId;"
         },
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 499,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+          "line": 510,
+          "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
           "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "  const res = await run(fx, solo('u-quota-order'));"
+          "text": "  assert.equal(selectedAccount(fx.repoRoot, next, '1'), 'a2');"
         },
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
@@ -2802,7 +2833,7 @@
       "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc"
     },
     {
-      "detail": "setup writes runner/project/global config and capacity state; the named test calls setup with recentlyUsed and then run/solo, verifying account rotation and its receipt. The llmAccounts-only branch is assigned separately.",
+      "detail": "The test at run-provider-failover.test.mjs:179 evaluates panel('u-panel-rotate') at :189 before run. panel at failover-fixture.mjs:187-188 maps the nonempty [1, 2, 3] array to member-${n} seats and appends the synthesizer. The former :19 caller uses solo only.",
       "disposition": "joined",
       "evidence": [
         {
@@ -2814,17 +2845,17 @@
         },
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 22,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+          "line": 189,
+          "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
           "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "    { recentlyUsed: { alpha: ['live1'] } },"
+          "text": "  const res = await run(fx, panel('u-panel-rotate'), { pattern: 'panel' });"
         },
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 19,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+          "line": 179,
+          "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
           "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "test('a dead login moves the seat to another account of the same provider, not to another provider', { skip: SKIP }, async () => {"
+          "text": "test('a panel seat that rotated keeps its role and the unit passes', { skip: SKIP }, async () => {"
         }
       ],
       "file": "test/helpers/failover-fixture.mjs",
@@ -2833,7 +2864,7 @@
       "proofs": [
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "testTitle": "a dead login moves the seat to another account of the same provider, not to another provider"
+          "testTitle": "a panel seat that rotated keeps its role and the unit passes"
         }
       ],
       "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc"
@@ -2913,77 +2944,31 @@
       "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc"
     },
     {
-      "detail": "panel() builds member-${n} seat ids; the named test calls panel(u-panel-rotate), runs a real panel and checks member-1 attempt provenance.",
+      "detail": "Test run-provider-failover.test.mjs:331 calls unitRuns(fx) at :341 and :347. unitRuns at failover-fixture.mjs:201-203 unconditionally constructs the assignments directory at :202 before existsSync; a prior run exists here. The former panel test :179 never calls unitRuns.",
       "disposition": "joined",
       "evidence": [
-        {
-          "file": "test/helpers/failover-fixture.mjs",
-          "line": 202,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc",
-          "text": "  const dir = path.join(fx.repoRoot, '.fgos', 'assignments');"
-        },
-        {
-          "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 189,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "  const res = await run(fx, panel('u-panel-rotate'), { pattern: 'panel' });"
-        },
-        {
-          "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 179,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "test('a panel seat that rotated keeps its role and the unit passes', { skip: SKIP }, async () => {"
-        }
+        {"file": "test/helpers/failover-fixture.mjs", "line": 202, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc", "text": "  const dir = path.join(fx.repoRoot, '.fgos', 'assignments');"},
+        {"file": "test/runner/execution/run-provider-failover.test.mjs", "line": 341, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638", "text": "  const before = unitRuns(fx);"},
+        {"file": "test/runner/execution/run-provider-failover.test.mjs", "line": 331, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638", "text": "test('a quarantined pinned account is refused before any unit run exists, and a resume of a run pinned to it too', { skip: SKIP }, async () => {"}
       ],
       "file": "test/helpers/failover-fixture.mjs",
       "group": "shared-fixture-callers",
       "id": "pc-d-0453",
-      "proofs": [
-        {
-          "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "testTitle": "a panel seat that rotated keeps its role and the unit passes"
-        }
-      ],
+      "proofs": [{"file": "test/runner/execution/run-provider-failover.test.mjs", "testTitle": "a quarantined pinned account is refused before any unit run exists, and a resume of a run pinned to it too"}],
       "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc"
     },
     {
-      "detail": "panel() builds member-${n} seat ids; the named test calls panel(u-panel-rotate), runs a real panel and checks member-1 attempt provenance.",
+      "detail": "Test run-provider-failover.test.mjs:360 calls unitRuns(fx) at :363 after the invalid account pin is refused. unitRuns at failover-fixture.mjs:201-203 constructs the assignments directory at :202 before existsSync, even when it returns an empty result. The former :179 caller never invokes this helper.",
       "disposition": "joined",
       "evidence": [
-        {
-          "file": "test/helpers/failover-fixture.mjs",
-          "line": 202,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc",
-          "text": "  const dir = path.join(fx.repoRoot, '.fgos', 'assignments');"
-        },
-        {
-          "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 189,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "  const res = await run(fx, panel('u-panel-rotate'), { pattern: 'panel' });"
-        },
-        {
-          "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "line": 179,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638",
-          "text": "test('a panel seat that rotated keeps its role and the unit passes', { skip: SKIP }, async () => {"
-        }
+        {"file": "test/helpers/failover-fixture.mjs", "line": 202, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc", "text": "  const dir = path.join(fx.repoRoot, '.fgos', 'assignments');"},
+        {"file": "test/runner/execution/run-provider-failover.test.mjs", "line": 363, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638", "text": "  assert.deepEqual(unitRuns(fx), []);"},
+        {"file": "test/runner/execution/run-provider-failover.test.mjs", "line": 360, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "444ce0795fd9df4672f5819b28092afcec340bc7257d2e20801c07caac2e6638", "text": "test('an account of a provider no candidate of the seat belongs to is refused before any unit run exists', { skip: SKIP }, async () => {"}
       ],
       "file": "test/helpers/failover-fixture.mjs",
       "group": "shared-fixture-callers",
       "id": "pc-d-0454",
-      "proofs": [
-        {
-          "file": "test/runner/execution/run-provider-failover.test.mjs",
-          "testTitle": "a panel seat that rotated keeps its role and the unit passes"
-        }
-      ],
+      "proofs": [{"file": "test/runner/execution/run-provider-failover.test.mjs", "testTitle": "an account of a provider no candidate of the seat belongs to is refused before any unit run exists"}],
       "sourceSha256": "70234c22b41c3fb35010a56dfd72c3cd7c7c0e4efbf7befb6fbe7858ffe81fbc"
     },
     {
@@ -3304,77 +3289,31 @@
       "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46"
     },
     {
-      "detail": "The module stateRoot/environment and sourceRoot/fixture return are used by fixture(t) and acquire; the named test reads the sidecar and asserts only that path committed.",
+      "detail": "Test documentation-cutover-lease.test.mjs:67 calls fixture(t), then f.worktree() and f.worktree('other') at :68. These invoke the returned closure at :37, evaluating path.join(temp, branch) and git worktree add, including default branch holder. Merely constructing the fixture, as the former :52 owner does, never runs this closure.",
       "disposition": "joined",
       "evidence": [
-        {
-          "file": "test/runner/documentation-cutover-lease.test.mjs",
-          "line": 37,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46",
-          "text": "  const worktree = (branch = 'holder') => { const root = path.join(temp, branch); git(['worktree', 'add', '-qb', branch, root]); return root; };"
-        },
-        {
-          "file": "test/runner/documentation-cutover-lease.test.mjs",
-          "line": 53,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46",
-          "text": "  const f = fixture(t); const before = f.git(['rev-parse', 'HEAD']);"
-        },
-        {
-          "file": "test/runner/documentation-cutover-lease.test.mjs",
-          "line": 52,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46",
-          "text": "test('production acquire commits exactly the sidecar with base evidence and keeps the token private', t => {"
-        }
+        {"file": "test/runner/documentation-cutover-lease.test.mjs", "line": 37, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46", "text": "  const worktree = (branch = 'holder') => { const root = path.join(temp, branch); git(['worktree', 'add', '-qb', branch, root]); return root; };"},
+        {"file": "test/runner/documentation-cutover-lease.test.mjs", "line": 68, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46", "text": "  const f = fixture(t); const holder = f.worktree(); const other = f.worktree('other');"},
+        {"file": "test/runner/documentation-cutover-lease.test.mjs", "line": 67, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46", "text": "test('holder release from a subdirectory uses the checkout-root token and lands on main', t => {"}
       ],
       "file": "test/runner/documentation-cutover-lease.test.mjs",
       "group": "shared-fixture-callers",
       "id": "pc-d-0479",
-      "proofs": [
-        {
-          "file": "test/runner/documentation-cutover-lease.test.mjs",
-          "testTitle": "production acquire commits exactly the sidecar with base evidence and keeps the token private"
-        }
-      ],
+      "proofs": [{"file": "test/runner/documentation-cutover-lease.test.mjs", "testTitle": "holder release from a subdirectory uses the checkout-root token and lands on main"}],
       "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46"
     },
     {
-      "detail": "The module stateRoot/environment and sourceRoot/fixture return are used by fixture(t) and acquire; the named test reads the sidecar and asserts only that path committed.",
+      "detail": "Test documentation-cutover-lease.test.mjs:67 calls fixture(t), then f.worktree() and f.worktree('other') at :68. These invoke the returned closure at :37, evaluating path.join(temp, branch) and git worktree add, including default branch holder. Merely constructing the fixture, as the former :52 owner does, never runs this closure.",
       "disposition": "joined",
       "evidence": [
-        {
-          "file": "test/runner/documentation-cutover-lease.test.mjs",
-          "line": 37,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46",
-          "text": "  const worktree = (branch = 'holder') => { const root = path.join(temp, branch); git(['worktree', 'add', '-qb', branch, root]); return root; };"
-        },
-        {
-          "file": "test/runner/documentation-cutover-lease.test.mjs",
-          "line": 53,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46",
-          "text": "  const f = fixture(t); const before = f.git(['rev-parse', 'HEAD']);"
-        },
-        {
-          "file": "test/runner/documentation-cutover-lease.test.mjs",
-          "line": 52,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-          "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46",
-          "text": "test('production acquire commits exactly the sidecar with base evidence and keeps the token private', t => {"
-        }
+        {"file": "test/runner/documentation-cutover-lease.test.mjs", "line": 37, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46", "text": "  const worktree = (branch = 'holder') => { const root = path.join(temp, branch); git(['worktree', 'add', '-qb', branch, root]); return root; };"},
+        {"file": "test/runner/documentation-cutover-lease.test.mjs", "line": 68, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46", "text": "  const f = fixture(t); const holder = f.worktree(); const other = f.worktree('other');"},
+        {"file": "test/runner/documentation-cutover-lease.test.mjs", "line": 67, "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46", "text": "test('holder release from a subdirectory uses the checkout-root token and lands on main', t => {"}
       ],
       "file": "test/runner/documentation-cutover-lease.test.mjs",
       "group": "shared-fixture-callers",
       "id": "pc-d-0480",
-      "proofs": [
-        {
-          "file": "test/runner/documentation-cutover-lease.test.mjs",
-          "testTitle": "production acquire commits exactly the sidecar with base evidence and keeps the token private"
-        }
-      ],
+      "proofs": [{"file": "test/runner/documentation-cutover-lease.test.mjs", "testTitle": "holder release from a subdirectory uses the checkout-root token and lands on main"}],
       "sourceSha256": "5832f234c540c47e297b2c36898008719a01491d66ace91428e53f8d71e77b46"
     },
     {
@@ -5256,7 +5195,7 @@
       "sourceSha256": "d9742c095d842d50cf8ca00514949f236b5aa7cfce45f28dee781e545348a1c0"
     },
     {
-      "detail": "The acquisition options still resolve only the caller-owned worktree flag; no document default is introduced. Re-grade REJECT: rendering refactor does not change the non-document grade.",
+      "detail": "The graded span is the JSON response return at bin/fgos.mjs:3868, not acquire options at :3867. It returns scalar result/tokenHash/tokenPath/sidecar fields for outer rendering, not a documentation read or default. Re-grade REJECT: the response-envelope rendering refactor preserves the non-document use.",
       "disposition": "confirmed REJECT",
       "evidence": [
         {
@@ -5268,10 +5207,10 @@
         },
         {
           "file": "bin/fgos.mjs",
-          "line": 3867,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+          "line": 3868,
+          "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
           "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e",
-          "text": "        const res = acquireDocumentationCutoverLease({ repoRoot: cwd, worktree: flags.worktree ? path.resolve(flags.worktree) : undefined });"
+          "text": "        if (flags.json) return { result: res.result, tokenHash: res.tokenHash, tokenPath: res.tokenPath, sidecar: res.sidecar };"
         }
       ],
       "file": "bin/fgos.mjs",
@@ -5709,7 +5648,7 @@
       "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
     },
     {
-      "detail": "The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
+      "detail": "The old assignment-directory enumeration at :85 retired, but join.json uniquely rebinds path.join(cwd, '.fgos') to current :30. The surviving construction supplies fgosDir to createSeatBindingClient for the config-ladder check: fgOS runtime/config state, not a documentation root or reader. Re-grade the surviving occurrence REJECT; the expression is not absent.",
       "disposition": "confirmed REJECT",
       "evidence": [
         {
@@ -5728,10 +5667,10 @@
         },
         {
           "file": "src/setup/seat-binding-checks.mjs",
-          "line": 66,
-          "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+          "line": 30,
+          "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c",
           "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f",
-          "text": "export async function checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConfig }) {"
+          "text": "    ladder = ladderCommentLines(createSeatBindingClient({ cwd, fgosDir: path.join(cwd, '.fgos') }).tierLadder().definitions);"
         }
       ],
       "file": "src/setup/seat-binding-checks.mjs",
@@ -5952,5 +5891,5 @@
       "sourceSha256": null
     }
   ],
-  "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
+  "sourceCommit": "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
 }

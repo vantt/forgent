@@ -144,6 +144,11 @@
   "deferred": [],
   "postMeasurementEdits": [
     {
+      "commit": "25e8842d3dcc2e359dc930de086484629a275357",
+      "path": "receipt.json",
+      "change": "After the Lead measurement at 5c3b57347, set status to verified-local, retained the former status as historicalBlocker, and added verifierExit=0, verifierStatus=verified, rehearsalRerunCompleted=true, newTimingRuns=6, coldCacheEvidence=true, checkARevalidated=true, runtimeExercised=true and leadRunCommit=5c3b57347. Also expanded existing JSON formatting; the sandbox proofs, coldRunImplementation and deferred values were not yet corrected in that commit."
+    },
+    {
       "path": "design.md",
       "change": "Line 3 status sentence corrected from the sandbox-blocked status to the verified Lead run. rehearsal.json measuredMainArtifacts keeps the sha256 of the bytes that were measured; the archive is rebuilt and retimed at F, which regenerates both."
     },
