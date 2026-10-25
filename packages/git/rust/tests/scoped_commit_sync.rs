@@ -158,6 +158,67 @@ fn hook_tree_tampering_reports_real_effect() {
     assert_eq!(git(&f.tree, &["show", "HEAD:a"]), "hook");
 }
 #[test]
+fn a_hook_refusal_closes_the_operation_with_the_same_cause_on_a_merge_head_as_on_a_plain_head() {
+    use std::os::unix::fs::PermissionsExt;
+    let mut causes = Vec::new();
+    for merge in [false, true] {
+        let f = Fixture::new();
+        if merge {
+            fs::write(f.main.join("incoming"), "target\n").unwrap();
+            git(&f.main, &["add", "."]);
+            git(&f.main, &["commit", "-qm", "target"]);
+            fs::write(f.tree.join("own"), "producer\n").unwrap();
+            git(&f.tree, &["add", "own"]);
+            git(&f.tree, &["commit", "-qm", "producer"]);
+            git(&f.tree, &["merge", "-q", "--no-ff", "-m", "merge target", "trunk"]);
+            let parents = git(&f.tree, &["rev-list", "--parents", "-n1", "HEAD"]);
+            assert_eq!(parents.split_whitespace().count(), 3);
+        }
+        let hooks = f.main.join("hooks");
+        fs::create_dir(&hooks).unwrap();
+        let hook = hooks.join("pre-commit");
+        fs::write(&hook, "#!/bin/sh\necho refused >&2\nexit 1\n").unwrap();
+        fs::set_permissions(&hook, fs::Permissions::from_mode(0o755)).unwrap();
+        git(&f.main, &["config", "core.hooksPath", "hooks"]);
+        let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
+        fs::write(f.tree.join("a"), "producer").unwrap();
+        let request = CommitRequest {
+            writes: vec!["a".into()],
+            message: "commit".into(),
+            cutover_grant: None,
+        };
+        let error = f
+            .driver
+            .scoped_commit(
+                &f.repo,
+                f.held(),
+                &baseline,
+                &request,
+                "fixture",
+                "refused",
+                &wal::OsFileSystem,
+            )
+            .unwrap_err();
+        let outcome = f
+            .driver
+            .recover_scoped_commit(
+                &f.repo,
+                f.held(),
+                "fixture",
+                "refused",
+                &wal::OsFileSystem,
+            )
+            .unwrap();
+        assert!(
+            matches!(&outcome, wal::Outcome::CommitRejected { cause } if *cause == error.cause),
+            "{outcome:?} vs {error:?}"
+        );
+        assert_eq!(git(&f.tree, &["rev-parse", "HEAD"]), baseline.head);
+        causes.push(error.cause);
+    }
+    assert_eq!(causes[0], causes[1]);
+}
+#[test]
 fn sync_clean_and_conflict_resolution_have_exact_parents() {
     for conflict in [false, true] {
         let f = Fixture::new();
