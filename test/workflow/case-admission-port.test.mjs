@@ -6,12 +6,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { createCaseAdmissionPort } from '../../src/workflow/case-admission-port.mjs';
+import { createCaseAdmissionPort, activityUnitOf } from '../../src/workflow/case-admission-port.mjs';
 import { assertCaseAdmissionPort, seatLaunchesOf } from '../../src/runner/execution/case-admission-port.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { readReservationFiles } from '../../src/workflow/case-runtime.mjs';
 import { readBinding, listBindingRecords } from '../../src/workflow/case-bindings.mjs';
-import { appendAll, FRAME, eventsOf, openCase, projectionOf, withHold } from '../helpers/workflow-case-fixture.mjs';
+import { appendAll, FRAME, eventsOf, openCase, projectionOf, withHold, conductorWorkflow } from '../helpers/workflow-case-fixture.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 const planned = (options) => {
@@ -166,4 +166,78 @@ test('the port resolves a binding for a standalone caller: unbound, or whose it 
   const wt = makeFixtureDir('fgos-port-binding-');
   assert.equal(port.resolveBinding({ worktree: wt }).answer, 'unbound');
   assert.equal(port.resolveBinding({ worktree: path.join(wt, 'gone') }).answer, 'worktree-missing');
+});
+
+test('activityUnitOf: returns { pattern, params } from pinned guide snapshot or null per requirement 2', () => {
+  const workflow = conductorWorkflow({
+    activities: [
+      { id: 'act-pattern-params', entry: ['request-received'], produces: [], effects: 'none', unit: { pattern: 'reviewed', params: { reviewer: 'human' } } },
+      { id: 'act-pattern-bare', entry: ['request-received'], produces: [], effects: 'none', unit: { pattern: 'solo' } },
+      { id: 'act-integrate', entry: ['request-received'], produces: [], effects: 'writes', unit: { kind: 'integrate' } },
+      { id: 'act-no-unit', entry: ['request-received'], produces: [], effects: 'none' },
+      { id: 'act-playbook', entry: ['request-received'], produces: [], effects: 'none', unit: { step: 'step-a', units: ['unit-1'] } },
+    ],
+    decisions: [],
+  });
+  const run = openCase({ workflow });
+
+  // 1. with unit: { pattern, params }
+  assert.deepEqual(
+    activityUnitOf({ mainRoot: run.repoRoot, caseId: run.caseId, activity: 'act-pattern-params' }),
+    { pattern: 'reviewed', params: { reviewer: 'human' } },
+  );
+
+  // with unit: { pattern } (params defaults to {})
+  assert.deepEqual(
+    activityUnitOf({ mainRoot: run.repoRoot, caseId: run.caseId, activity: 'act-pattern-bare' }),
+    { pattern: 'solo', params: {} },
+  );
+
+  // 2. with unit: { kind: 'integrate' }
+  assert.equal(
+    activityUnitOf({ mainRoot: run.repoRoot, caseId: run.caseId, activity: 'act-integrate' }),
+    null,
+  );
+
+  // 3. without unit
+  assert.equal(
+    activityUnitOf({ mainRoot: run.repoRoot, caseId: run.caseId, activity: 'act-no-unit' }),
+    null,
+  );
+
+  // 4. playbook-derived (unit is { step, units })
+  assert.equal(
+    activityUnitOf({ mainRoot: run.repoRoot, caseId: run.caseId, activity: 'act-playbook' }),
+    null,
+  );
+
+  // 5. unknown activity id
+  assert.equal(
+    activityUnitOf({ mainRoot: run.repoRoot, caseId: run.caseId, activity: 'act-unknown' }),
+    null,
+  );
+
+  // plus: missing case id
+  assert.equal(
+    activityUnitOf({ mainRoot: run.repoRoot, caseId: 'wf-missing-case-id', activity: 'act-pattern-params' }),
+    null,
+  );
+
+  // reads without taking advance: succeeds even when advance lock is held
+  withHold(run, () => {
+    assert.deepEqual(
+      activityUnitOf({ mainRoot: run.repoRoot, caseId: run.caseId, activity: 'act-pattern-params' }),
+      { pattern: 'reviewed', params: { reviewer: 'human' } },
+    );
+  });
+});
+
+test('activityUnitOf: corrupt ledger propagates rather than returning null', () => {
+  const run = openCase();
+  const eventsFile = path.join(run.repoRoot, '.fgos', 'workflow-runs', run.caseId, 'events.jsonl');
+  fs.appendFileSync(eventsFile, 'not-valid-json\n');
+  assert.throws(
+    () => activityUnitOf({ mainRoot: run.repoRoot, caseId: run.caseId, activity: 'plan' }),
+    { code: 'workflow-ledger-corrupt' },
+  );
 });

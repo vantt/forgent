@@ -51,6 +51,26 @@ function readCase(mainRoot, caseId) {
 }
 
 /**
+ * What a case's pinned workflow snapshot says about an activity's Unit pattern and params.
+ * Reads without taking advance; returns null when the case or activity has no Unit pattern.
+ */
+export function activityUnitOf({ mainRoot, caseId, activity }) {
+  if (!mainRoot || !caseId || typeof mainRoot !== 'string' || typeof caseId !== 'string' || !fs.existsSync(caseDirOf(mainRoot, caseId))) {
+    return null;
+  }
+  const { projection } = readCase(mainRoot, caseId);
+  const found = projection?.guide?.activities?.find((a) => a.id === activity);
+  if (!found?.unit || typeof found.unit !== 'object') return null;
+  const { unit } = found;
+  if ('step' in unit && 'units' in unit) return null;
+  if (typeof unit.pattern !== 'string' || unit.pattern.trim() === '') return null;
+  return {
+    pattern: unit.pattern,
+    params: unit.params ?? {},
+  };
+}
+
+/**
  * What a conductor case's settle proposes as achieved: each milestone the reservation's activity declares
  * it produces, with the digest of its subject as it is now, and the receipts that back it. A delivery
  * milestone's subject is the paths the Unit was allowed to write, read in its worktree, and each of its
