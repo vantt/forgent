@@ -173,7 +173,7 @@
       "rollbackSha256": "a5ba7f72d3fea8e1b2111f9df7aebcbe11b93e2a6df3cf284a4bd09ba1d63b79"
     }
   ],
-  "sourcePin": "cf13e2bd22ce390344837560b35b41adf7da1238",
+  "sourcePin": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
   "status": "composed-not-applied-pending-shared-file-integration",
   "version": 1
 }

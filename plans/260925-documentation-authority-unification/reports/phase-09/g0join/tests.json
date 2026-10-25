@@ -1,0 +1,22 @@
+[
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g0join/test_join.py"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "..........\n----------------------------------------------------------------------\nRan 10 tests in 0.001s\n\nOK\n"
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/census-join/test_locators.py"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.010s\n\nOK\n"
+  }
+]

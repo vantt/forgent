@@ -86,6 +86,40 @@ def map_line(line, hunks):
     return line+delta
 
 
+def settlement_locator(decision, pin):
+    """Use the recorded correction, otherwise the newest same-file witness.
+
+    A new pin must never select an unrelated/older first evidence span. Multiple
+    spans at the same witness pin retain the author's primary-evidence order.
+    Every returned locator is an already validated evidence span, not a guessed
+    line in the new source.
+    """
+    evidence = [s for s in decision['evidence'] if s['file'] == decision['file']]
+    corrected = decision.get('correctedLocator')
+    if corrected:
+        evidence = [s for s in evidence if all(s[k] == corrected[k] for k in ('pin', 'file', 'line'))]
+        assert len(evidence) == 1, (decision['id'], 'corrected locator lacks unique evidence')
+        assert decision['sourceSha256'] is None or evidence[0]['sourceSha256'] == decision['sourceSha256'], (decision['id'], 'corrected locator source drift')
+        return evidence[0]
+    assert evidence, (decision['id'], 'no same-file locator evidence at', pin)
+    anchor = evidence[0]
+    for span in evidence[1:]:
+        if span['pin'] == anchor['pin']:
+            continue
+        older = subprocess.run(['git', '-C', str(ROOT), 'merge-base', '--is-ancestor',
+                                anchor['pin'], span['pin']], capture_output=True)
+        if older.returncode == 0:
+            anchor = span
+        else:
+            assert older.returncode == 1
+            newer = subprocess.run(['git', '-C', str(ROOT), 'merge-base', '--is-ancestor',
+                                    span['pin'], anchor['pin']], capture_output=True)
+            assert newer.returncode == 0, (decision['id'], 'incomparable locator witnesses')
+    if decision['sourceSha256'] is not None:
+        assert anchor['sourceSha256'] == decision['sourceSha256'], (decision['id'], 'locator source drift; record a corrected locator')
+    return anchor
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--out', type=pathlib.Path, default=HERE)
@@ -270,7 +304,7 @@ def main():
                           sourceSha256=row['sourceSha256'], originalLine=row['originalLine'],
                           currentLine=row['currentLine'], evidence=evidence, owningProofs=proofs,
                           previousStatus=row['status'])
-            anchor = next((s for s in evidence if s['pin'] == pin and s['file'] == row['file']), evidence[0])
+            anchor = settlement_locator(decision, pin)
             detail['locator'] = {key: anchor[key] for key in ['pin', 'file', 'line']}
             if 'gradeRecord' in row:
                 detail['priorGradeRecord'] = {key: row['gradeRecord'][key] for key in ['path', 'line', 'memberId']}

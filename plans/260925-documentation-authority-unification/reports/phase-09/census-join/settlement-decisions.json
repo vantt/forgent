@@ -2825,6 +2825,7 @@
       "file": "test/helpers/failover-fixture.mjs",
       "group": "shared-fixture-callers",
       "id": "pc-d-0449",
+    "correctedLocator": {"pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "file": "test/helpers/failover-fixture.mjs", "line": 184},
       "proofs": [
         {
           "file": "test/runner/execution/run-provider-failover.test.mjs",
@@ -5217,6 +5218,7 @@
       "file": "bin/fgos.mjs",
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-0924",
+    "correctedLocator": {"pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "file": "bin/fgos.mjs", "line": 3868},
       "proofs": [],
       "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
     },
@@ -5677,6 +5679,7 @@
       "file": "src/setup/seat-binding-checks.mjs",
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-1101",
+    "correctedLocator": {"pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c", "file": "src/setup/seat-binding-checks.mjs", "line": 30},
       "proofs": [],
       "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
     },
@@ -5892,5 +5895,5 @@
       "sourceSha256": null
     }
   ],
-  "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238"
+  "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb"
 }

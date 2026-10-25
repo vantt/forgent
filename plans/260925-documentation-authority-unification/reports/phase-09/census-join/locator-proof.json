@@ -1,0 +1,56 @@
+{
+  "pin": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/citations.py",
+        "--pin",
+        "608a4ada5f195b0d0b9d3568a71b8dde4954aacb"
+      ],
+      "exit": 0,
+      "stdout": "{\"bindings\": 5, \"checkOnly\": false, \"citations\": 4, \"sourceCommit\": \"608a4ada5f195b0d0b9d3568a71b8dde4954aacb\", \"status\": \"passed\", \"unappliedPatches\": 4, \"zeroFuzzReplays\": 8}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+        "--pin",
+        "608a4ada5f195b0d0b9d3568a71b8dde4954aacb"
+      ],
+      "exit": 0,
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 54, \"joined-by-citation\": 4, \"joined-owning-test\": 779}}\n",
+      "stderr": "",
+      "outputs": {
+        "census-join/join.json": "d7cd97ec0597f69df53f85f713d3bc48f547cbf82516a16293b548389e287d9b",
+        "census-join/residue.json": "8c71faf6d077318d8ce5ca646edc12d5fa70f885cade300247e7612bce3643bc",
+        "census-join/settlement.json": "4e1cc0248daadff70c8639f5ea388184d35acdaf931e48d45b1107121d80a7c4",
+        "census-join/citation-bindings.json": "1c53980dff3e8d08f54353dc4a539d730627a287d241ddb6a092845993a23273",
+        "census-join/pointer-patches.json": "ba6bc185541a1999601feec3d57c6838eceb59d58de496208264e8d675936e38"
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+        "--pin",
+        "608a4ada5f195b0d0b9d3568a71b8dde4954aacb"
+      ],
+      "exit": 0,
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 54, \"joined-by-citation\": 4, \"joined-owning-test\": 779}}\n",
+      "stderr": "",
+      "outputs": {
+        "census-join/join.json": "d7cd97ec0597f69df53f85f713d3bc48f547cbf82516a16293b548389e287d9b",
+        "census-join/residue.json": "8c71faf6d077318d8ce5ca646edc12d5fa70f885cade300247e7612bce3643bc",
+        "census-join/settlement.json": "4e1cc0248daadff70c8639f5ea388184d35acdaf931e48d45b1107121d80a7c4",
+        "census-join/citation-bindings.json": "1c53980dff3e8d08f54353dc4a539d730627a287d241ddb6a092845993a23273",
+        "census-join/pointer-patches.json": "ba6bc185541a1999601feec3d57c6838eceb59d58de496208264e8d675936e38"
+      }
+    }
+  ],
+  "byteIdentical": true
+}

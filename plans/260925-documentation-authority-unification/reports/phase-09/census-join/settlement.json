@@ -7,7 +7,7 @@
     "joined": 135,
     "joined-by-citation": 4
   },
-  "decisionsSha256": "90ae1b1bf534c004297a1f7df47797b954d3ac48539b20dcf8a73ebdaa12534b",
+  "decisionsSha256": "64d6e6f87a357850aad084f98701fd9a5ebf8a4e32e7dcd4ce49e78994ac0844",
   "groups": {
     "drifted-grade-rejudgment": {
       "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage."
@@ -175,7 +175,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/forgentx-runner.json:92; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -222,7 +222,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/forgentx-runner.json:113; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -269,7 +269,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/forgentx-runner.json:135; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -316,7 +316,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/forgentx-runner.json:154; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -363,7 +363,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/forgentx-runner.json:175; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -410,7 +410,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/global-runner.json:101; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -457,7 +457,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/global-runner.json:112; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -504,7 +504,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/global-runner.json:123; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -551,7 +551,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/global-runner.json:133; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -598,7 +598,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/fixtures/seat-binding-config/global-runner.json:143; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -682,7 +682,7 @@
         "patchPath": "census-join/pointer-patches.json",
         "reason": "Both the tier-composition procedure (5.4) and per-property precedence table (6.3) retain their explicit late-area ledger mappings.",
         "reviewStatus": "pending",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "212d891228b7a4819bf0c58f3f719fe8847d9ae1575466143119cef00df841ba"
       },
       "currentLine": 1,
@@ -870,7 +870,7 @@
         "patchPath": "census-join/pointer-patches.json",
         "reason": "The original Entry Points & Triggers heading maps through the packaging ledger and carries/source-heading-parity.json, not the separate top-level 2. Entry Points table.",
         "reviewStatus": "pending",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "46e8283ba343663b23fb303f74cdfea9e8bd875de1780b4ea0d218240c2cffee"
       },
       "currentLine": 6,
@@ -941,7 +941,7 @@
         "patchPath": "census-join/pointer-patches.json",
         "reason": "The complete RUL-WF-27 block remains under 6. Business Rules, including the binding-as-rebuildable-view clause cited by this comment.",
         "reviewStatus": "pending",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c"
       },
       "currentLine": 6354,
@@ -1012,7 +1012,7 @@
         "patchPath": "census-join/pointer-patches.json",
         "reason": "The complete RUL-WF-27 block remains under 6. Business Rules, including the binding-as-rebuildable-view clause cited by this comment.",
         "reviewStatus": "pending",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "de600986a2325b0a3653835bed153a11ffc447aa31212db8cd4e9d90dd67ed59"
       },
       "currentLine": 2,
@@ -2141,7 +2141,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Confirmed REJECT / non-document rendering under owner-answers.md L13-19.1: an assert.fail message template is test diagnostic output, not a document citation or data read by a product path. No deliberately failing test is needed to own this occurrence. test/event-store/migrate-cutover-grant.test.mjs:34 is hostScan's assert.fail message template, evaluated only on failure after clean returns at :30 and namespace-refusal skips at :31-32. It renders a test diagnostic, not a documentation citation or product-path input. L13-19.1 settles the W21 A pc-d-0288 park as confirmed REJECT; no branch-owning test is claimed or added.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "8f62dbbdd45e22fc0bb6101d5810025a300c98612830afabd73a3fabeb7d5e0e"
       },
       "group": "test-diagnostic-rendering",
@@ -4452,8 +4452,8 @@
       "id": "pc-d-0449",
       "locator": {
         "file": "test/helpers/failover-fixture.mjs",
-        "line": 183,
-        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
+        "line": 184,
+        "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
       },
       "originalLine": 182,
       "originalOwnedJudgment": true,
@@ -6641,7 +6641,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: the dynamic scanner matched prose resembling a path-key declaration inside a line comment. The exact matched fragment is not executable and contains no documentation target; a nearby documentation cue does not make it a document reader/default. The exact construction is \"path: in a\" at line 3, within the comment \"no addon-less Git read path: in a\". It is neither a config path key nor a document citation/operand. Re-grade this lexical false positive REJECT, retaining the separate real distribution citation pc-l-0056 as a park.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "46e8283ba343663b23fb303f74cdfea9e8bd875de1780b4ea0d218240c2cffee"
       },
       "group": "lexical-comment-fragment",
@@ -6688,7 +6688,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-checks.test.mjs:99; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -6735,7 +6735,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-checks.test.mjs:100; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -6782,7 +6782,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-checks.test.mjs:107; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -6829,7 +6829,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-checks.test.mjs:120; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -6876,7 +6876,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:49; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -6923,7 +6923,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:50; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -6970,7 +6970,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:51; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -7017,7 +7017,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:76; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -7064,7 +7064,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:137; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -7111,7 +7111,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:228; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -7158,7 +7158,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:243; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -7205,7 +7205,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:245; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -7252,7 +7252,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:269; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -7299,7 +7299,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-conversion.test.mjs:281; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -7346,7 +7346,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-fence.test.mjs:53; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -7393,7 +7393,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-fence.test.mjs:53; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -7440,7 +7440,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented. Retired test/config fixture occurrence at 244a0435466a46e56cd95b4a70bfe03f54670996:test/setup/seat-binding-fence.test.mjs:57; deletion 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 removes the complete source. It no longer contributes any live documentation route.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "retired-seat-conversion-fixtures",
@@ -8236,15 +8236,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The graded span is the JSON response return at bin/fgos.mjs:3868, not acquire options at :3867. It returns scalar result/tokenHash/tokenPath/sidecar fields for outer rendering, not a documentation read or default. Re-grade REJECT: the response-envelope rendering refactor preserves the non-document use.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-0924",
       "locator": {
         "file": "bin/fgos.mjs",
-        "line": 3862,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 3868,
+        "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
       },
       "originalLine": 3862,
       "originalOwnedJudgment": true,
@@ -8300,15 +8300,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The former console.log acquisition text is now returned for outer rendering; res.tokenHash is a scalar lease diagnostic. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-0925",
       "locator": {
         "file": "bin/fgos.mjs",
-        "line": 3863,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 3869,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 3863,
       "originalOwnedJudgment": true,
@@ -8364,15 +8364,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The not-held message moved from console.log to a returned scalar using res.state. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-0926",
       "locator": {
         "file": "bin/fgos.mjs",
-        "line": 3870,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 3875,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 3870,
       "originalOwnedJudgment": true,
@@ -8428,15 +8428,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The held-status age/kernelLock message is now part of one returned human rendering, not a docs read. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-0927",
       "locator": {
         "file": "bin/fgos.mjs",
-        "line": 3872,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 3876,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 3872,
       "originalOwnedJudgment": true,
@@ -8492,15 +8492,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. holderTokenHash moved into the same returned held-status rendering; it is not dereferenced. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-0928",
       "locator": {
         "file": "bin/fgos.mjs",
-        "line": 3873,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 3876,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 3873,
       "originalOwnedJudgment": true,
@@ -8556,15 +8556,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. res.worktree moved into the same returned human rendering; displaying a checkout is not opening documentation. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-0929",
       "locator": {
         "file": "bin/fgos.mjs",
-        "line": 3874,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 3876,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 3874,
       "originalOwnedJudgment": true,
@@ -8620,7 +8620,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The release timestamp/drift list moved from console.log into a returned message; drift.join only formats diagnostics. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "group": "drifted-grade-rejudgment",
@@ -8628,7 +8628,7 @@
       "locator": {
         "file": "bin/fgos.mjs",
         "line": 3881,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 3881,
       "originalOwnedJudgment": true,
@@ -8684,15 +8684,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The abandon reason moved from console.log into a returned message; the reason string is not a filesystem operand. Re-grade REJECT: rendering refactor does not change the non-document grade.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-0933",
       "locator": {
         "file": "bin/fgos.mjs",
-        "line": 3891,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 3890,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 3891,
       "originalOwnedJudgment": true,
@@ -8748,15 +8748,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. literal_paths now calls crate::fgos_scope_literal(p) instead of inlining canonicalize(p). The operand remains a caller-supplied repository-relative path validator, not a documentation reader or authority default. REJECT remains correct under the centralized predicate.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "d900d81f350dabd1973c1f4265fa01f843bfe4e1605a0923068a5cf650aa066b"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-0948",
       "locator": {
         "file": "packages/git/rust/src/inspect.rs",
-        "line": 131,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 117,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 131,
       "originalOwnedJudgment": false,
@@ -8812,15 +8812,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The seeded empty LockScope remains in config mutation; only map_err(error) became map_err(failed). It acquires repo-config under .fgos/locks; the empty seed is not a documentation root. REJECT is unchanged.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "40a9792c910b87a3fd8f7756de5a78674a3572cb492e8de8dcfb9bb1ddd46ed9"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-0960",
       "locator": {
         "file": "packages/git/rust/src/repository_config.rs",
-        "line": 172,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 144,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 172,
       "originalOwnedJudgment": false,
@@ -8876,15 +8876,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The seeded empty LockScope remains in config mutation; only map_err(error) became map_err(failed). It acquires repo-config under .fgos/locks; the empty seed is not a documentation root. REJECT is unchanged.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "40a9792c910b87a3fd8f7756de5a78674a3572cb492e8de8dcfb9bb1ddd46ed9"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-0961",
       "locator": {
         "file": "packages/git/rust/src/repository_config.rs",
-        "line": 172,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 144,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 172,
       "originalOwnedJudgment": false,
@@ -8940,15 +8940,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The obsolete runner.schema/rigorToTier conversion refusal was removed with one-shot setup conversion. There is no current expression at the old line: bootstrapDefaultExecutor now begins here. Re-grade the retired diagnostic REJECT, not a grade for whatever occupies line 417 today.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "3d8268ee84f1f61c64f5cf8a709cb00502a0838f6f8e92973868e9a4ba5fdc0c"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-1001",
       "locator": {
         "file": "src/runner/dispatch/config.mjs",
-        "line": 417,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 402,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 417,
       "originalOwnedJudgment": true,
@@ -9004,7 +9004,7 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The retained-Land-candidate warning was extracted from {passed:true,message:...} to a returned string. rows.join still formats a diagnostic, never reads a document. REJECT is unchanged.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "2f84c6baab84e772487158c9364ecdd436509c6626a4221c1faa57f85605f44d"
       },
       "group": "drifted-grade-rejudgment",
@@ -9012,7 +9012,7 @@
       "locator": {
         "file": "src/setup/git-checks.mjs",
         "line": 164,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 164,
       "originalOwnedJudgment": false,
@@ -9082,15 +9082,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-1097",
       "locator": {
         "file": "src/setup/seat-binding-checks.mjs",
-        "line": 69,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 19,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 69,
       "originalOwnedJudgment": true,
@@ -9160,15 +9160,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-1098",
       "locator": {
         "file": "src/setup/seat-binding-checks.mjs",
-        "line": 81,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 19,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 81,
       "originalOwnedJudgment": true,
@@ -9238,15 +9238,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-1099",
       "locator": {
         "file": "src/setup/seat-binding-checks.mjs",
-        "line": 81,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 19,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 81,
       "originalOwnedJudgment": true,
@@ -9316,15 +9316,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-1100",
       "locator": {
         "file": "src/setup/seat-binding-checks.mjs",
-        "line": 85,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 19,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 85,
       "originalOwnedJudgment": true,
@@ -9394,15 +9394,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old assignment-directory enumeration at :85 retired, but join.json uniquely rebinds path.join(cwd, '.fgos') to current :30. The surviving construction supplies fgosDir to createSeatBindingClient for the config-ladder check: fgOS runtime/config state, not a documentation root or reader. Re-grade the surviving occurrence REJECT; the expression is not absent.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-1101",
       "locator": {
         "file": "src/setup/seat-binding-checks.mjs",
-        "line": 85,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 30,
+        "pin": "5820ca6780ff6eec28afe09a128ac95fcd11d06c"
       },
       "originalLine": 85,
       "originalOwnedJudgment": true,
@@ -9472,15 +9472,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-1102",
       "locator": {
         "file": "src/setup/seat-binding-checks.mjs",
-        "line": 96,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 19,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 96,
       "originalOwnedJudgment": true,
@@ -9550,15 +9550,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-1103",
       "locator": {
         "file": "src/setup/seat-binding-checks.mjs",
-        "line": 102,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 19,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 102,
       "originalOwnedJudgment": true,
@@ -9628,15 +9628,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-1104",
       "locator": {
         "file": "src/setup/seat-binding-checks.mjs",
-        "line": 106,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 19,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 106,
       "originalOwnedJudgment": true,
@@ -9706,15 +9706,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-1105",
       "locator": {
         "file": "src/setup/seat-binding-checks.mjs",
-        "line": 111,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 19,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 111,
       "originalOwnedJudgment": true,
@@ -9784,15 +9784,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-1106",
       "locator": {
         "file": "src/setup/seat-binding-checks.mjs",
-        "line": 111,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 19,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 111,
       "originalOwnedJudgment": true,
@@ -9862,15 +9862,15 @@
         ],
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The old listed/legacy-run diagnostic or assignment-directory enumeration in sourceSpans was removed when the legacy pre-seat-run check retired. The surviving file now has config-ladder and workflow dry-bind checks only; neither inherits an authoritative docs default from the removed expression. Re-grade this retired scalar/runtime-state occurrence REJECT; do not map its old numeric line to an unrelated dry-bind message.",
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f"
       },
       "group": "drifted-grade-rejudgment",
       "id": "pc-d-1107",
       "locator": {
         "file": "src/setup/seat-binding-checks.mjs",
-        "line": 114,
-        "pin": "5e03159334df726e43ffe9505ad4ed43f72ba94d"
+        "line": 19,
+        "pin": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
       },
       "originalLine": 114,
       "originalOwnedJudgment": true,
@@ -9914,7 +9914,7 @@
         "nonDocumentUse": true,
         "reason": "Re-grade each drifted record from its historical graded span and the named current source/retirement evidence. The original REJECT record is retained verbatim; the new grade is bound to this full source pin and gives the specific semantic reason instead of inheriting an obsolete passage. The retired rigorToTier diagnostic belonged only to the removed conversion validator; the deletion eliminates this scalar message, not a document reader/default. The original non-document REJECT still holds by explicit retirement.",
         "retiredSource": true,
-        "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
+        "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
         "sourceSha256": null
       },
       "group": "drifted-grade-rejudgment",
@@ -9937,5 +9937,5 @@
       "sourceSha256": null
     }
   ],
-  "sourceCommit": "cf13e2bd22ce390344837560b35b41adf7da1238"
+  "sourceCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb"
 }
