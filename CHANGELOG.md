@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos metrics harness` no longer prints the `complexity`, `sessions` and `friction` keys (a typed-in route count, an always-zero session summary, the fixed text `n/a (pre-F5)`), and `fgos metrics entropy` no longer prints `counts.frictions` (always 0); it is faster by the repository-wide line count it made on every call. The unbuilt `coordination-session.read.v1` contract is removed.
 - Moving a clone's directory (`mv`) no longer locks its Event Store with `event-store-store-moved`: the store keeps its id while the machine id and the Git common directory's device and inode are unchanged. A copied clone and a changed `fgos.machineId` are still refused, now each with its own message and next step.
 - `fgos events import-legacy --file <shard> [--check]` replays a legacy event file that a machine wrote but never committed before its Event Store cutover. Each event keeps its type, payload and original time; lines already in history are skipped and named, and a receipt next to the file prevents a second import.
 - `fgos doctor` `event-store-legacy-layout` passes on every clone after the Work cutover: it recomputes the imported data tree's id from the published `refs/fgos/legacy` commit instead of reading that tree's object, which only the clone that ran `fgos events migrate` has. Before, every other clone reported "legacy ref missing or differs from fence" with correct data.
