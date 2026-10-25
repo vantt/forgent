@@ -1,6 +1,15 @@
 import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+
+import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
+import { readProjectConfig, writeProjectConfig } from '../../helpers/config-fixture.mjs';
+import {
+  SKIP, setup, run, writer, readJson, unitDirOf, attemptsOf,
+} from '../../helpers/failover-fixture.mjs';
 
 // Observe the real resume check without replacing its native custody/recovery behavior.
 // A separate process keeps the module observer out of other runner tests.
@@ -68,4 +77,62 @@ try {
 } finally { fs.rmSync(temp,{recursive:true,force:true}); }
 `,
   });
+});
+
+// The environment is fixed between a run and its resume: the failing seat's executor is replaced by a working one.
+function replaceFailingExecutor(fx) {
+  const config = readProjectConfig(fx.repoRoot);
+  const { runner } = config;
+  runner.executors.gamma = JSON.parse(JSON.stringify(runner.executors.beta).replaceAll('spentquota', 'gamma').replaceAll('beta-cli', 'gamma-cli'));
+  runner.modelPolicies.gamma = runner.modelPolicies.spentquota;
+  for (const tier of Object.keys(runner.tierFallback)) runner.tierFallback[tier] = ['alpha', 'gamma'];
+  runner.capabilities['docs:write'].prefer = [{ executor: 'alpha', invocation: 'alpha-cli' }, { executor: 'gamma', invocation: 'gamma-cli' }];
+  writeProjectConfig(fx.repoRoot, config);
+}
+const resume = (fx, unitRunId) => runUnit({
+  resumeUnitRunId: unitRunId, repoRoot: fx.repoRoot, cwd: fx.worktreeDir, worktree: fx.worktreeDir,
+  session: { herdrPresent: false, headless: true }, providerCapacityRuntimeDir: fx.runtimeDir,
+});
+const runDirs = (fx, res, seat, sub) => fs.readdirSync(path.join(unitDirOf(fx.repoRoot, res), seat, sub, 'runs'));
+
+test('a resumed run re-binds a seat that did not pass from the current config and keeps the binding of a seat that passed', { skip: SKIP }, async () => {
+  const fx = setup({ alpha: { family: 'alpha' }, beta: { family: 'spentquota' } });
+  const first = await run(fx, { ...writer('u-resume-rebind'), pattern: 'reviewed' }, { pattern: 'reviewed' });
+  assert.notEqual(first.outcome, 'pass', JSON.stringify(first.results.map((r) => [r.role, r.outcome])));
+  const producerBefore = attemptsOf(fx.repoRoot, first, 'producer/1');
+  assert.deepEqual(producerBefore.map((a) => [a.binding.executor, a.outcome]), [['alpha', 'pass']]);
+  assert.deepEqual(attemptsOf(fx.repoRoot, first, 'reviewer/1').map((a) => [a.binding.executor, a.outcome]), [['beta', 'provider-limit']]);
+
+  replaceFailingExecutor(fx);
+  const resumed = await resume(fx, first.unitRunId);
+  assert.equal(resumed.outcome, 'pass', JSON.stringify(resumed.results.map((r) => [r.role, r.outcome, r.fallbackExhausted])));
+
+  // The failed seat got a new attempt from the current config; the old attempt stays as it was.
+  const reviewer = attemptsOf(fx.repoRoot, resumed, 'reviewer/1');
+  assert.deepEqual(reviewer.map((a) => [a.binding.executor, a.outcome]), [['beta', 'provider-limit'], ['gamma', 'pass']]);
+  assert.equal(reviewer[1].assignmentId, `${resumed.unitRunId}/reviewer/1-fb1`);
+  const record = readJson(path.join(unitDirOf(fx.repoRoot, resumed), 'unit.json'));
+  assert.notEqual(reviewer[0].configHash, reviewer[1].configHash, 'each attempt names the config it was bound from');
+  assert.equal(reviewer[1].configHash, record.configSnapshot.hash);
+
+  // The seat that passed is not run again and keeps its binding.
+  assert.deepEqual(attemptsOf(fx.repoRoot, resumed, 'producer/1').map(({ configHash, ...a }) => a), producerBefore);
+  assert.deepEqual(runDirs(fx, resumed, 'producer', '1'), ['01']);
+});
+
+test('a resumed attempt that has a binding but no recorded outcome is adopted, never started a second time', { skip: SKIP }, async () => {
+  const fx = setup({ alpha: { family: 'alpha' }, beta: { family: 'spentquota' } });
+  const first = await run(fx, { ...writer('u-resume-adopt'), pattern: 'reviewed' }, { pattern: 'reviewed' });
+  const file = path.join(unitDirOf(fx.repoRoot, first), 'unit.json');
+  // The controller died before it read the reviewer's answer.
+  const record = readJson(file);
+  delete record.bindings['reviewer/1'][0].outcome;
+  fs.writeFileSync(file, JSON.stringify(record, null, 2));
+
+  replaceFailingExecutor(fx);
+  const resumed = await resume(fx, first.unitRunId);
+  const reviewer = attemptsOf(fx.repoRoot, resumed, 'reviewer/1');
+  assert.equal(reviewer[0].binding.executor, 'beta', 'the attempt with no outcome keeps its binding');
+  assert.equal(reviewer[0].outcome, 'provider-limit', 'its settled result is adopted');
+  assert.deepEqual(runDirs(fx, resumed, 'reviewer', '1'), ['01'], 'no second run started for that attempt');
 });
