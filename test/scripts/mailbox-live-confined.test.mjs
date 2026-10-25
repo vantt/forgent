@@ -530,9 +530,12 @@ test('a confined Codex run lists no MCP server and has its connectors off, and t
   assert.equal(flag(await zeroModel('run-features-on', ['features', 'list'], withoutOff), 'apps'), 'true', 'the falsifier: connectors are on by default');
 });
 
-/** pi's and omp's installs (the confined launch's one definition), when installed here. */
+/**
+ * pi's and omp's installs (the confined launch's one definition), when installed here. Looked up
+ * under the real home: the suite gives every test process an empty HOME, where nothing is installed.
+ */
 function piOmpInstall() {
-  const install = confinedPiOmpInstall();
+  const install = confinedPiOmpInstall(REAL_HOME);
   return install.installed ? { ...install, piBin: install.pi } : null;
 }
 
