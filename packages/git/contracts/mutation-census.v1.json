@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "25f54e31ef7cfc765af3d953e3af9a5cbfe32d68943f1fdba5dda9cceb2ea9d0",
+  "payloadDigest": "67cb3e0e96744253823f29b84d54a3746f2095bbd4e3de5f5fb7c36c06bba3a3",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -76,7 +76,7 @@
     "apps/fgos-gateway/src/cf_access.rs": "3c9fd890e36eabbf4f9bbb9971c0acb32f5689bec2adefa414d6361b88c93040",
     "apps/fgos-gateway/src/gateway.rs": "037b6108a3a6af81e24d9cdb7d324419ea5ee5b2d7d3758677959ce9f4b11887",
     "apps/fgos-gateway/src/lib.rs": "32d594b18ae0c15f09c3b06c69d82bb142f1370e6fffb6b95d104378b0ffa3fd",
-    "apps/fgos-gateway/src/main.rs": "41e1922dd426ca7d9c26aa17ef72ba70f03e3a627d8fa9599666582cc475c928",
+    "apps/fgos-gateway/src/main.rs": "8184c8e2edfb686747243fbb2916582781687195d602fd63e5837b4383edc47e",
     "apps/fgos-gateway/src/mcp.rs": "d1c162643e93c2547656b1e034b84967efab2adb20090a1c058859593f36e6f8",
     "apps/fgos-gateway/src/ports.rs": "f639e87f4a9119eedf765fa10de38dc0a68315a9482b041543a5f294ca0d1999",
     "apps/fgos-gateway/src/remote_invocation.rs": "b0f0ad004ce73d737c7e09b22e5e1d445db64abbca77425b4d282f4859b1388a",
