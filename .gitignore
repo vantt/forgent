@@ -73,6 +73,7 @@ output.txt
 /.agents/skills/*
 !/.agents/skills/fgos-*/
 !/.agents/skills/distill/
+!/.agents/skills/instruction-audit/
 !/.agents/skills/_shared/
 /.codex/
 /.omp/
