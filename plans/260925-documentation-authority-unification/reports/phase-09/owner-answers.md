@@ -309,3 +309,12 @@ Ruling:
    - The `fchain/check.py` finding `linkIntoMoveSet` becomes `linkGuard`. It resolves the file and the anchor of every link in the composed `docs/platform/**`, Related headers included, using the anchor rule of the unit extractor.
    - This check is the pre-F witness of guard 3. The guard itself is built in the cutover change, and it must agree with this check; that is an F duty.
 5. **Gateway contract.** The YAML descriptions in `fgos-gateway-api-v1.yaml` that name retired paths, and the `x-docs` entries that name decision files already gone, are fixed in the same record.
+
+## L13-29 — The packet goes out at w38; its low notes refresh the register before the lease (Lead under A42, 2026-10-26 03:20)
+
+Finding: the register update e7e6c129c was reviewed in w38: 11 APPROVE, 0 REWORK, 5 low notes. The notes are citation and wording details: the rebind status should also cite W26; the `linkIntoMoveSet` field is a constant after its rename to `linkGuard`; the register pins the ownership audit at 4a4fefbe8, while the later accounting is 23e3c34b7; two citations are loose; and the summary still says the update awaits review. Each change to the register needs a new review, so fixing these first would delay the packet by another cycle and change no gate status.
+
+Rulings:
+1. The cutover approval packet goes out now, at met-local (L13-6). It cites w38 and states the ownership audit at 23e3c34b7: 0 unaccounted pairs, B ok, reproduction 8/8. The 58 exceptions for already-allowed paths are dropped, as w33 recommended.
+2. The five w38 low notes and the two uncarried w33 ownership follow-ups (raw drift count; consistent keying of records 149–150) are applied in one register refresh through `reconcile.py`. The refresh runs after the owner answers and before the lease, with a light review. `linkIntoMoveSet` is removed from the register, `verify.py` and its control, not left as a constant.
+3. Record commits after 23e3c34b7 (reviews, this ruling, the packet) are pair-accounted at the next accounting, at the latest in the F import accounting.
