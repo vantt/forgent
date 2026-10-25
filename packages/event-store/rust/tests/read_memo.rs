@@ -49,6 +49,7 @@ fn read_holding(
         ReadRequest {
             layout: &f.layout,
             origin,
+            machine: "test-aa",
             streams: &streams,
             cursor: held.map_or(&empty, |h| &h.cursor),
             folded: held.map_or(&[], |h| &h.sequence),
@@ -275,6 +276,7 @@ fn a_caller_that_holds_another_history_than_the_memo_gets_a_full_read() {
         ReadRequest {
             layout: &f.layout,
             origin: &reader(),
+            machine: "test-aa",
             streams: &other,
             cursor: &first.cursor,
             folded: &first.sequence,

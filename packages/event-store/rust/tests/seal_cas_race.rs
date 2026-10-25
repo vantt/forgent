@@ -1,3 +1,4 @@
+#![cfg(target_os = "linux")]
 mod common;
 use common::Repo;
 use fgos_event_store::{
