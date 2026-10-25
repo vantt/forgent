@@ -858,8 +858,9 @@ Every G-001..G-234 appears once. Frozen obligation text lives in `plans/reports/
 Rows G-135–G-165, G-167–G-169, G-171–G-180, G-182, G-185–G-201 are **not dropped**. Their frozen obligation text and A's per-row port mapping remain in force except where the precedence rule or the override table replaces a retired lock/event mechanism. Appendix A below carries A's per-row matrix with these overrides applied; omitting a G-id is a defect. Structural count 234 (G-001..G-234; freeze line v2.1 adds G-234). Older catalogue header “233” is stale.
 
 
-E3 typed ScopedCommit (1.5× p95) and Land (1.2× p95) budgets remain **unproven**:
-unit 13 does not execute E3. Paired samples alternate legacy/port order to reduce
+E3 typed ScopedCommit and Land budgets are absolute since the owner's amendments
+(Land 2026-10-20, ScopedCommit p95 ≤ 250 ms 2026-10-21, `plans/261018-0914-git-component-fgos-git/e3-budgets.md`);
+the ratio to the legacy path is reported, not budgeted. Unit 13 does not execute E3. Paired samples alternate legacy/port order to reduce
 warm-cache bias; no passing performance claim follows from the script alone.
 
 ## 17. Acceptance, remaining uncertainty, prohibited claims
