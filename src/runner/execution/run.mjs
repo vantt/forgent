@@ -637,6 +637,16 @@ async function runUnitBody(options, scope) {
 
     assertAttemptsResumable(unitRunId, unitRecord, assignmentsDir);
 
+    // A resume reads the config as it is now: a seat that did not pass is bound again from it (see runRole).
+    // Attempts bound before this change are stamped with the config they were bound from first.
+    const currentSnapshot = snapshotRunnerConfig(mainRoot, liveConfig());
+    if (currentSnapshot.hash !== unitRecord.configSnapshot?.hash) {
+      for (const attempts of Object.values(unitRecord.bindings ?? {})) {
+        for (const attempt of attempts) attempt.configHash ??= unitRecord.configSnapshot?.hash;
+      }
+      unitRecord.configSnapshot = currentSnapshot;
+    }
+
     // A mutating dispatch holds the worktree's dispatch-cwd lock while its
     // worker runs; resuming under a live holder would launch a second worker
     // into the same worktree.
@@ -867,10 +877,19 @@ async function runUnitBody(options, scope) {
   const seatLedger = createSeatLedger();
 
   // Bindings recorded in unit.json, per seat/round, one entry per attempt (the first binding,
-  // then one per provider-limit fallback). A resumed run reuses them instead of binding again,
-  // so a resume never changes which executor or transport a seat was already given.
+  // then one per provider-limit fallback or resume re-bind), each stamped with the hash of the config it
+  // was bound from. A resumed run reuses the last binding of a seat that passed, or whose commit or
+  // adopt result is still pending; a seat whose last attempt ended without a pass is bound again
+  // from the current config as a new attempt.
   if (!unitRecord.bindings || typeof unitRecord.bindings !== 'object') unitRecord.bindings = {};
+  const rebindsOnResume = (attempts) => {
+    const last = attempts.at(-1);
+    return options.resumeUnitRunId !== undefined && last?.outcome !== undefined && last.outcome !== 'pass'
+      && !commitPending(last, unitRecord.worktree, mainRoot, scope.custody);
+  };
   for (const attempts of Object.values(unitRecord.bindings)) {
+    // A seat about to be bound again no longer holds the executor of its failed attempt.
+    if (rebindsOnResume(attempts)) continue;
     for (const attempt of attempts) seatLedger.note(attempt.seat, attempt.binding?.executor);
   }
   // Pools whose login failed in this unit and that a seat then walked away from: no later fallback
@@ -1055,7 +1074,9 @@ async function runUnitBody(options, scope) {
 
     const key = `${seatId}/${round}`;
     const recorded = unitRecord.bindings[key] ?? [];
-    let attemptNo = recorded.length > 0 ? recorded.length - 1 : 0;
+    // A resumed seat whose last attempt did not pass is bound again, as the attempt after the last one.
+    const rebinding = recorded.length > 0 && rebindsOnResume(recorded);
+    let attemptNo = rebinding ? recorded.length : recorded.length > 0 ? recorded.length - 1 : 0;
     // Ledger read, bind and publish are one queued step: seats started together bind one after the other
     // in the order they were listed, each seeing the executors its earlier siblings were just given, even
     // when a bind takes time.
@@ -1064,7 +1085,7 @@ async function runUnitBody(options, scope) {
       bound = await seatLedger.serialize(() => {
         // A seat that already ran an earlier round of this unit keeps that round's executor, model and effort.
         const kept = keptBindingOf(unitRecord, seatId, round);
-        const first = recorded.length > 0 ? recorded[recorded.length - 1].binding : bind(askOf(), bindCtxFor(attemptNo), kept ? { walk: { continuity: kept } } : {});
+        const first = recorded.length > 0 && !rebinding ? recorded[recorded.length - 1].binding : bind(askOf(), bindCtxFor(attemptNo), kept ? { walk: { continuity: kept } } : {});
         if (!first.refused) {
           seatLedger.note(seatId, first.executor);
           seatLedger.noteDependence(seatId, independentOf);
@@ -1184,7 +1205,7 @@ async function runUnitBody(options, scope) {
       if (attempts[attemptNo]?.dispatchRetryId === undefined && seatLaunchCeiling !== null && seatLaunchesUsed(unitRecord) >= seatLaunchCeiling) {
         scope.ceilingHit = true;
         const detail = `the seat-launch ceiling of ${seatLaunchCeiling} for this Unit is spent`;
-        if (attemptNo === 0) return { outcome: 'policy-refusal', ...seatTag, round, refused: { reason: SEAT_LAUNCH_CEILING, detail } };
+        if (attemptNo === 0 || (rebinding && lastResult === null)) return { outcome: 'policy-refusal', ...seatTag, round, refused: { reason: SEAT_LAUNCH_CEILING, detail } };
         return {
           ...(lastResult ?? { outcome: 'provider-limit', ...seatTag, round }),
           fallbackExhausted: {
@@ -1206,6 +1227,7 @@ async function runUnitBody(options, scope) {
           fallbackFrom: bound.provenance?.fallbackFrom ?? null,
           ...(readOnly ? {} : { preExistingInScope, nativeBaseline }),
           boundAt: new Date().toISOString(),
+          configHash: unitRecord.configSnapshot.hash,
         });
         persistUnitRecord();
       }
