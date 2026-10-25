@@ -573,24 +573,6 @@ pub fn event_store_facts(
         .map_err(error)
 }
 #[napi]
-pub fn ensure_event_store_refspecs(
-    cwd: String,
-    state_root: String,
-    trusted_main: String,
-    remote: String,
-) -> Result<()> {
-    available()?;
-    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
-    let repo = match driver
-        .resolve_repo(Path::new(&cwd), Path::new(&trusted_main))
-        .map_err(operation)?
-    {
-        ResolveRepo::Repository(repo) => repo,
-        ResolveRepo::NotARepository => return Err(error("event-store-no-repository")),
-    };
-    fgos_event_store::refspec::ensure_refspecs(&driver, &repo, &remote).map_err(error)
-}
-#[napi]
 impl EventStore {
     #[napi]
     pub fn status(

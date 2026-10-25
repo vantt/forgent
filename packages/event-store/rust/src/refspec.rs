@@ -1,21 +1,11 @@
 //! Mirror configuration is owned and journaled by Git, never by the store.
 use crate::{
     errors::{Error, ErrorCode},
-    seal::operation_id,
     walk::git_error,
 };
-use fgos_git::{Inspect, RepoHandle, RepositoryConfig};
+use fgos_git::{Inspect, RepoHandle};
 pub fn mappings(remote: &str) -> Result<Vec<String>, Error> {
     fgos_git::publication_fetch_mappings(remote).map_err(git_error)
-}
-pub fn ensure_refspecs(
-    git: &impl RepositoryConfig,
-    repo: &RepoHandle,
-    remote: &str,
-) -> Result<(), Error> {
-    git.ensure_fetch_mapping(repo, remote, &mappings(remote)?, &operation_id()?)
-        .map_err(git_error)?;
-    Ok(())
 }
 pub fn pinned_url(git: &dyn Inspect, repo: &RepoHandle, remote: &str) -> Result<String, Error> {
     let wanted = mappings(remote)?;

@@ -620,7 +620,7 @@ Config defaults merged by `fgos setup` (added only when missing, global then pro
 
 Repository-local git config, never tracked: the fetch refspecs of section 14 (`+refs/fgos/events/*:refs/fgos/remotes/<remote>/events/*` and the legacy one), and the optional `fgos.machineId`.
 
-Setup fixes: `event-store-refspec` (add the fetch refspecs when the remote exists and they are missing; never a push refspec); `event-store-lock-dirs` (create `<eventOpenRoot>/locks` with mode 0700). The machine id is minted by the Identity component (setup fix `identity-machine-id`, N-API `sessionIdentity.mintMachineId`), never by Event Store; `events migrate` calls the same mint when the id is missing.
+Setup fix: `event-store-lock-dirs` (create `<eventOpenRoot>/locks` with mode 0700). The machine id is minted by the Identity component (setup fix `identity-machine-id`, N-API `sessionIdentity.mintMachineId`) and the fetch refspecs are installed by the Git component (setup fix `git-publication-refspecs`, through RepositoryConfig; never a push refspec); Event Store has no fix for either. `events migrate` calls the same two doors when the id or the mappings are missing.
 
 Doctor checks, registered in `src/setup/registrations.mjs`:
 
@@ -996,7 +996,7 @@ historical log, and measures parity from the exported restorable bytes.
 `--check` computes the inventory, reader order, parity and commit plan without
 writing objects or refs. It reports the computed legacy commit OID and whether
 the observed ref will be created, reused or replaced as an unfenced stale import;
-its three setup repairs can create local identity/lock
+its setup repairs (the Identity mint, the lock directories and Git's fetch mappings) can create local identity/lock
 state and Git mapping provenance. It refuses `event-store-migration-fence-ignored`
 when the checkout's ignore rules exclude `.fgos/events`, since the cutover commit
 could not track the fence. An untracked legacy file that is empty holds no history:
@@ -1180,7 +1180,7 @@ Dated clarifications with no protocol change, made with the Work triggers and th
 - Section 16: every trigger (command start and end, each runner poll, session end, gateway and runner stop) reads `store.maintenance` facts and never `status`. A poll seals only streams whose oldest unsealed event is older than `eventStore.seal.intervalSec`; a session end, a gateway stop and a runner stop seal every open stream; the runner loop never publishes. The main checkout is resolved only by a verb that opens the store.
 - Land policy (Work's, per section 5 and the Git spec's "seal before land"): Work seals `project` before the Git Land, and a store that cannot seal refuses the land before anything is published. After publication Work promotes the landed branch's stream under the crate's branch key (`branch:<branchKey(branch)>`, through the facade). A promote that fails then is a recorded, retryable result on the `merged` outcome (`promotion: { stream, error, retryable: true }`), never a throw that turns a landed merge into an error; promoting again is safe because a stream the project already names is left alone.
 - Section 12 (conflicts are not durable records): an event the fold recorded as a conflict never took effect. The Land idempotence lookup and the Land release sweep read only events that applied, so a delivery that became a conflict is not returned as a prior success on a retried approve and releases no candidate. `fgos show <id>` lists the conflicts recorded against an item and the doctor row `work-recorded-conflicts` warns when the view holds any; resolving one is not part of this change.
-- Section 5 and the setup fixes of section 21: `fgos init` runs the `event-store-machine-id` and `event-store-lock-dirs` fixes before it opens the store. `fgctl`'s runtime tail runs `fgos init` before `fgos doctor --fix`, and the store cannot open without a machine id and its locks directory, so a machine that never ran setup would otherwise fail its first `fgctl init`. Both fixes are idempotent and a clone's own `fgos.machineId` still wins; the refspec fix stays with setup and doctor, since it changes the repository's remote configuration.
+- Section 5 and the setup fixes of section 21: `fgos init` mints the machine id through the Identity mint and runs the `event-store-lock-dirs` fix before it opens the store. `fgctl`'s runtime tail runs `fgos init` before `fgos doctor --fix`, and the store cannot open without a machine id and its locks directory, so a machine that never ran setup would otherwise fail its first `fgctl init`. Both fixes are idempotent and a clone's own `fgos.machineId` still wins; the fetch mappings stay with setup and doctor (`git-publication-refspecs`), since they change the repository's remote configuration.
 
 ## Store read batching (2026-10-23)
 

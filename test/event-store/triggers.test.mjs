@@ -11,7 +11,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { maintainEventStore } from '../../src/event-store/maintenance.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
-import { fixEventStoreRefspec } from '../../src/setup/event-store-fixes.mjs';
+import { fixGitFetchMapping } from '../../src/setup/git-checks.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 
@@ -23,7 +23,7 @@ function workRepo(t, { remote = false } = {}) {
   if (remote) {
     execFileSync('git', ['init', '--bare', '-q', path.join(temp, 'remote')]);
     execFileSync('git', ['-C', repo, 'remote', 'add', 'origin', path.join(temp, 'remote')]);
-    fixEventStoreRefspec(repo);
+    fixGitFetchMapping(repo);
   }
   return { temp, repo, dir, store: prepareWorkStore(dir, dir).store };
 }

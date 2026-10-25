@@ -84,6 +84,19 @@ fn mint_refuses_a_hostname_without_slug_characters() {
 }
 
 #[test]
+fn mint_refuses_and_preserves_an_invalid_or_symlinked_existing_id() {
+    let root = state_root();
+    let file = root.join("machine-id");
+    fs::write(&file, "INVALID").unwrap();
+    assert!(matches!(machine::mint(&root, "a-host"), Err(Error::Invalid(_))));
+    assert_eq!(fs::read_to_string(&file).unwrap(), "INVALID");
+    fs::remove_file(&file).unwrap();
+    std::os::unix::fs::symlink(root.join("elsewhere"), &file).unwrap();
+    assert!(matches!(machine::mint(&root, "a-host"), Err(Error::Invalid(_))));
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
 fn handle_drops_the_suffix_prefixes_a_leading_digit_and_cuts_to_forty() {
     assert_eq!(machine::handle("fg-server-abc234", None), "fg-server");
     assert_eq!(machine::handle("4f-server-abc234", None), "m-4f-server");

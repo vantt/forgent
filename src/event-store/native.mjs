@@ -167,15 +167,11 @@ export function eventStoreFacts(cwd, { stateRoot, trustedMain = cwd, remote = 'o
   outsideGate([]);
   return call(() => loadNativeAddon(loaderOptions).eventStoreFacts(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote));
 }
-export function ensureEventStoreRefspecs(cwd, { stateRoot, trustedMain = cwd, remote = 'origin', loaderOptions } = {}) {
-  outsideGate([]);
-  return call(() => loadNativeAddon(loaderOptions).ensureEventStoreRefspecs(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote));
-}
 export function eventStoreAddonAvailable(loaderOptions) {
   outsideGate([]);
   const native = call(() => loadNativeAddon(loaderOptions));
   return typeof native.resolveEventStore === 'function' && typeof native.openStore === 'function'
-    && typeof native.eventStoreFacts === 'function' && typeof native.ensureEventStoreRefspecs === 'function'
+    && typeof native.eventStoreFacts === 'function'
     && typeof native.eventStoreBranchKey === 'function'
     && ['read', 'append', 'admitWrites', 'promote', 'sync', 'maintenance', 'status', 'exportJsonl', 'exportLegacyLayout', 'readLegacyFromHead', 'importLegacy', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
 }

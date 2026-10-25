@@ -3,13 +3,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fixture, append } from './phase07-fixture.mjs';
+import { fixture, append, installFetchMapping } from './phase07-fixture.mjs';
 import { statusUseCase } from '../../src/verbs/events/status.mjs';
 import { syncUseCase } from '../../src/verbs/events/sync.mjs';
 import { exportUseCase } from '../../src/verbs/events/export.mjs';
 import { rebuildStoreUseCase } from '../../src/verbs/events/rebuild.mjs';
 import { EVENT_STORE_DEFAULTS, eventStoreConfig, readEventStoreConfig } from '../../src/event-store/index.mjs';
-import { fixEventStoreRefspec } from '../../src/setup/event-store-fixes.mjs';
 import { readStandardValue } from '../../src/config/facade.mjs';
 import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -36,7 +35,7 @@ test('status never prints the credentials of a remote URL: Git redacts userinfo 
   assert.doesNotMatch(JSON.stringify(got), /ghp_secret|querysecret/, 'neither the status fields nor the whole facts carry the credential');
 });
 test('sync waits, seals and records actual fetch/push; no-push preserves last push', t => {
-  const f = fixture(t, { remote: true }); fixEventStoreRefspec(f.repo, f.ctx); append(f.store, [{}]);
+  const f = fixture(t, { remote: true }); installFetchMapping(f); append(f.store, [{}]);
   const got = syncUseCase(f.ctx);
   assert.equal(got.status.aheadBehind.ahead, 0); assert.ok(got.status.lastPush.time); assert.ok(got.status.lastFetch.time);
   const second = syncUseCase(f.ctx, { noPush: true });

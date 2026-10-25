@@ -46,7 +46,7 @@ import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalize
 import { EventLogError } from '../src/state/event-log.mjs';
 import { foldEvents, conflictsFor } from '../src/state/replay.mjs';
 import { deriveTitle, classify } from '../src/intake/classify.mjs';
-import { mintWorkId } from '../src/util/identity-mint.mjs';
+import { mintMachineId, mintWorkId } from '../src/util/identity-mint.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfigForDir, RunnerConfigError, runDispatchCli, runDoorHint, DispatchError } from '../src/runner/dispatch.mjs';
 import { resolveWorkForDispatch } from '../src/runner/work-dispatch.mjs';
@@ -135,7 +135,7 @@ import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocatio
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, createDoctorRun, integrationScriptPath, runFixes } from '../src/setup/checks.mjs';
 import { readConfig, initConfigFile } from '../src/config/facade.mjs';
-import { fixEventStoreMachineId, fixEventStoreLockDirs } from '../src/setup/event-store-fixes.mjs';
+import { fixEventStoreLockDirs } from '../src/setup/event-store-fixes.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
@@ -1045,9 +1045,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
     case 'init': {
       // `init` is the first step of setup, and the store cannot open without a machine id and its locks directory,
-      // which setup creates. Create them here through the same fixes (idempotent: an existing id is kept, and a
+      // which setup creates. Create them here through the Identity mint and the lock-dirs fix (idempotent: an existing id is kept, and a
       // clone's own `fgos.machineId` still wins).
-      fixEventStoreMachineId(path.dirname(dir));
+      mintMachineId(worktreeStateRoot().stateRoot);
       fixEventStoreLockDirs(path.dirname(dir));
       initStore(dir);
       // D4: detection/manifest writing must never fail init — a permissions
