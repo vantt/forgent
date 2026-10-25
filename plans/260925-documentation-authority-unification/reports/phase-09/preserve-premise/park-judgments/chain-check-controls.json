@@ -1,0 +1,226 @@
+{
+  "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
+  "command": "python3 -B inline checker controls (recorded cases below)",
+  "checks": [
+    {
+      "case": "all shard bindings, digests, coverage and patch pre/post-images validate",
+      "passed": true
+    },
+    {
+      "case": "shard 1 rejects missing row",
+      "passed": true
+    },
+    {
+      "case": "shard 1 rejects duplicate row",
+      "passed": true
+    },
+    {
+      "case": "shard 1 rejects forged span text",
+      "passed": true
+    },
+    {
+      "case": "shard 1 rejects forged file digest",
+      "passed": true
+    },
+    {
+      "case": "shard 1 rejects diff inconsistent with declared replacements",
+      "passed": true
+    },
+    {
+      "case": "shard 2 rejects missing row",
+      "passed": true
+    },
+    {
+      "case": "shard 2 rejects duplicate row",
+      "passed": true
+    },
+    {
+      "case": "shard 2 rejects forged span text",
+      "passed": true
+    },
+    {
+      "case": "shard 2 rejects forged file digest",
+      "passed": true
+    },
+    {
+      "case": "shard 2 rejects diff inconsistent with declared replacements",
+      "passed": true
+    },
+    {
+      "case": "shard 3 rejects missing row",
+      "passed": true
+    },
+    {
+      "case": "shard 3 rejects duplicate row",
+      "passed": true
+    },
+    {
+      "case": "shard 3 rejects forged span text",
+      "passed": true
+    },
+    {
+      "case": "shard 3 rejects forged file digest",
+      "passed": true
+    },
+    {
+      "case": "shard 3 rejects diff inconsistent with declared replacements",
+      "passed": true
+    },
+    {
+      "case": "clean row patch applies forward and reverses exactly",
+      "passed": true
+    },
+    {
+      "case": "changed neighbour fails at fuzz zero",
+      "passed": true
+    },
+    {
+      "case": "rewrapped path post-image is duplicate",
+      "passed": true
+    },
+    {
+      "case": "old token retained is not a duplicate",
+      "passed": true
+    },
+    {
+      "case": "unrelated prose cannot prove duplicate",
+      "passed": true
+    },
+    {
+      "case": "removed directory and wildcard are recognized",
+      "passed": true
+    },
+    {
+      "case": "partly retained directory is not removed",
+      "passed": true
+    },
+    {
+      "case": "already absent operand is not a cutover removal",
+      "passed": true
+    },
+    {
+      "case": "duplicate attributed to exact chain entry",
+      "passed": true
+    },
+    {
+      "case": "valid alreadyComposed with patch removed resolves duplicate",
+      "passed": true
+    },
+    {
+      "case": "unknown alreadyComposed is refused",
+      "passed": true
+    },
+    {
+      "case": "alreadyComposed cannot leave parallel patch",
+      "passed": true
+    },
+    {
+      "case": "alreadyComposed cannot waive stale chain input",
+      "passed": true
+    },
+    {
+      "case": "preserved occurrence changed by chain is a conflict",
+      "passed": true
+    },
+    {
+      "case": "--shard 1 exits 1 with findings, no traceback",
+      "passed": true
+    },
+    {
+      "case": "--shard 2 exits 1 with findings, no traceback",
+      "passed": true
+    },
+    {
+      "case": "--shard 3 exits 1 with findings, no traceback",
+      "passed": true
+    },
+    {
+      "case": "--all exits 1 with expected unresolved findings, no traceback",
+      "passed": true
+    },
+    {
+      "case": "all review-named duplicateOfChain rows are detected",
+      "passed": true
+    },
+    {
+      "case": "all review-named conflictsWithChain rows are detected",
+      "passed": true
+    },
+    {
+      "case": "valid alreadyComposed retains a resolved duplicate finding; wrong-file entry is refused",
+      "passed": true
+    }
+  ],
+  "passed": 37,
+  "failed": 0,
+  "reviewCrossCheck": {
+    "duplicateRows": [
+      "f00148",
+      "f00156",
+      "f00158",
+      "f00161",
+      "f00162",
+      "f00163",
+      "f00175",
+      "f00177",
+      "f00178",
+      "f00181",
+      "f00187",
+      "f00189",
+      "f00191",
+      "f00193",
+      "f00478",
+      "f00183",
+      "f08496",
+      "f08634",
+      "f08665"
+    ],
+    "conflictRows": [
+      "f00102",
+      "f00106",
+      "f00117",
+      "f00118",
+      "f00477",
+      "f07380",
+      "f07398",
+      "f07697",
+      "f07698",
+      "f07701",
+      "f08012",
+      "f08013",
+      "f08021",
+      "f08024",
+      "f08033",
+      "f08044",
+      "f08046",
+      "f08047"
+    ],
+    "missing": [],
+    "inputs": [
+      {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-1-review.json",
+        "rows": 263,
+        "sha256": "13971635259cf05a64b30786fb40e5703f42abb56b3b003031eaf01239cfc6f4"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-2-review.json",
+        "rows": 263,
+        "sha256": "280bb5d075d30ce54e93635fa8239f47762a39fec55b3ce2093553f03fa46d34"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w23-g6-shard-3-review.json",
+        "rows": 261,
+        "sha256": "2f41b218a497debee221aaf8a25da78b576b0f0df8b8113c0b653d751317c595"
+      }
+    ],
+    "classificationExceptions": [
+      {
+        "rowId": "f00183",
+        "notReportedAs": "conflictsWithChain",
+        "reportedAs": "duplicateOfChain",
+        "reason": "Duplicate-first rule: exact retarget path survives the chain line rewrap; replay failure remains in the file patchReplays evidence."
+      }
+    ]
+  },
+  "limits": "Checker-only synthetic controls and read-only chain replay; no product tests or source application."
+}
