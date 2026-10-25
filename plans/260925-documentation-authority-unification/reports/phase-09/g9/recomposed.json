@@ -2081,7 +2081,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:.githooks/pre-commit"
+      ]
     },
     {
       "id": "g9:AGENTS.md",
@@ -2140,7 +2143,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:AGENTS.md",
+        "scope-consumer:AGENTS.md"
+      ]
     },
     {
       "id": "g9:apps/fgos-gateway/Cargo.toml",
@@ -2179,7 +2186,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:predecessor:apps/fgos-gateway/Cargo.toml"
+      ]
     },
     {
       "id": "g9:apps/fgos-gateway/src/gateway.rs",
@@ -2218,7 +2228,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:apps/fgos-gateway/src/gateway.rs"
+      ]
     },
     {
       "id": "g9:apps/fgos-gateway/src/mcp.rs",
@@ -2257,7 +2270,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:predecessor:apps/fgos-gateway/src/mcp.rs"
+      ]
     },
     {
       "id": "g9:apps/fgos-gateway/web/src/App.test.tsx",
@@ -2296,7 +2312,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:apps/fgos-gateway/web/src/App.test.tsx"
+      ]
     },
     {
       "id": "g9:apps/fgos-gateway/web/src/App.tsx",
@@ -2335,7 +2354,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:apps/fgos-gateway/web/src/App.tsx"
+      ]
     },
     {
       "id": "g9:apps/fgos-gateway/web/src/api/client.ts",
@@ -2374,7 +2396,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:apps/fgos-gateway/web/src/api/client.ts"
+      ]
     },
     {
       "id": "g9:apps/fgos-gateway/web/src/api/errors.ts",
@@ -2413,7 +2438,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:apps/fgos-gateway/web/src/api/errors.ts"
+      ]
     },
     {
       "id": "g9:apps/fgos-gateway/web/src/api/types.ts",
@@ -2452,7 +2480,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:apps/fgos-gateway/web/src/api/types.ts"
+      ]
     },
     {
       "id": "g9:apps/fgos-gateway/web/src/lib/network.ts",
@@ -2491,7 +2522,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:apps/fgos-gateway/web/src/lib/network.ts"
+      ]
     },
     {
       "id": "g9:apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
@@ -2530,7 +2564,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:apps/fgos-gateway/web/src/screens/TaskDetail.tsx"
+      ]
     },
     {
       "id": "g9:apps/fgos-gateway/web/src/screens/Taskboard.tsx",
@@ -2569,7 +2606,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:apps/fgos-gateway/web/src/screens/Taskboard.tsx"
+      ]
     },
     {
       "id": "g9:bin/fgos.mjs",
@@ -2628,7 +2668,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:repin:scope-consumer:bin/fgos.mjs",
+        "w8:repin:hunk-park:bin/fgos.mjs"
+      ]
     },
     {
       "id": "g9:core/instructions/platform-laws.md",
@@ -2667,7 +2711,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:core/instructions/platform-laws.md"
+      ]
     },
     {
       "id": "g9:core/skills/_shared/catchup-self-recovery.md",
@@ -2706,7 +2753,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:core/skills/_shared/catchup-self-recovery.md"
+      ]
     },
     {
       "id": "g9:core/skills/_shared/citation-format.md",
@@ -2765,7 +2815,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:core/skills/_shared/citation-format.md",
+        "convention:citation-homes"
+      ]
     },
     {
       "id": "g9:core/skills/_shared/executor-dispatch-fallback.md",
@@ -2804,7 +2858,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:core/skills/_shared/executor-dispatch-fallback.md"
+      ]
     },
     {
       "id": "g9:core/skills/fgos-clarifying/SKILL.md",
@@ -2843,7 +2900,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:core/skills/fgos-clarifying/SKILL.md"
+      ]
     },
     {
       "id": "g9:core/skills/fgos-indexing/SKILL.md",
@@ -2882,7 +2942,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:core/skills/fgos-indexing/SKILL.md"
+      ]
     },
     {
       "id": "g9:core/skills/fgos-researching/SKILL.md",
@@ -2941,7 +3004,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:core/skills/fgos-researching/SKILL.md",
+        "w8:gloss:researching-source"
+      ]
     },
     {
       "id": "g9:core/task-specs/fgos-indexing.md",
@@ -2980,7 +3047,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:core/task-specs/fgos-indexing.md"
+      ]
     },
     {
       "id": "g9:docs/README.md",
@@ -3019,7 +3089,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "status-units:docs/README.md"
+      ]
     },
     {
       "id": "g9:docs/coexistence.md",
@@ -3058,7 +3131,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/coexistence.md"
+      ]
     },
     {
       "id": "g9:docs/contracts/fgos-gateway-api-v1.yaml",
@@ -3097,7 +3173,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/contracts/fgos-gateway-api-v1.yaml"
+      ]
     },
     {
       "id": "g9:docs/distillery/porting-log.md",
@@ -3136,7 +3215,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/distillery/porting-log.md"
+      ]
     },
     {
       "id": "g9:docs/doc-governance.md",
@@ -3175,7 +3257,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "status-units:docs/doc-governance.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/assert-plan-evidence-current-tree-fallback.md",
@@ -3214,7 +3299,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/assert-plan-evidence-current-tree-fallback.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/branch-content-mismatch-fgos-exclusion.md",
@@ -3253,7 +3341,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/branch-content-mismatch-fgos-exclusion.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/d3-goal-check-rationale-trace.md",
@@ -3292,7 +3383,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/d3-goal-check-rationale-trace.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/eventlog-sweep-checkpoint-redesign.md",
@@ -3331,7 +3425,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/eventlog-sweep-checkpoint-redesign.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/events-jsonl-opportunistic-truncation-check.md",
@@ -3370,7 +3467,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/events-jsonl-opportunistic-truncation-check.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md",
@@ -3409,7 +3509,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/herdr-orchestrator-terminology-boundary.md",
@@ -3448,7 +3551,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/herdr-orchestrator-terminology-boundary.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/herdr-spawn-adapter-fresh-pane.md",
@@ -3487,7 +3593,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/herdr-spawn-adapter-fresh-pane.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/main-checkout-reset-ancestor-commit-loss-guard.md",
@@ -3526,7 +3635,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/main-checkout-reset-ancestor-commit-loss-guard.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/mergedsha-missing-unreproduced-race.md",
@@ -3565,7 +3677,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/mergedsha-missing-unreproduced-race.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md",
@@ -3604,7 +3719,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/return-approve-background-execution-guidance.md",
@@ -3643,7 +3761,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/return-approve-background-execution-guidance.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/skill-prose-cleanup-design.md",
@@ -3682,7 +3803,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/skill-prose-cleanup-design.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/worker-prompt-iron-law-evidence-timing.md",
@@ -3721,7 +3845,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/worker-prompt-iron-law-evidence-timing.md"
+      ]
     },
     {
       "id": "g9:docs/explanation/worktree-manual-merge-fgos-blob-safety-net.md",
@@ -3760,7 +3887,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/explanation/worktree-manual-merge-fgos-blob-safety-net.md"
+      ]
     },
     {
       "id": "g9:docs/how-to/compare-discussion-setups-with-metrics-eval.md",
@@ -3799,7 +3929,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/how-to/compare-discussion-setups-with-metrics-eval.md"
+      ]
     },
     {
       "id": "g9:docs/how-to/configure-and-operate-agent-confinement.md",
@@ -3838,7 +3971,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/how-to/configure-and-operate-agent-confinement.md"
+      ]
     },
     {
       "id": "g9:docs/how-to/coordination-examples/architecture-advisory-panel-v1-alternative-and-composite-reopen.md",
@@ -3877,7 +4013,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-alternative-and-composite-reopen.md"
+      ]
     },
     {
       "id": "g9:docs/how-to/coordination-examples/architecture-advisory-panel-v1-clarification-and-challenge.md",
@@ -3916,7 +4055,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-clarification-and-challenge.md"
+      ]
     },
     {
       "id": "g9:docs/how-to/coordination-examples/architecture-advisory-panel-v1-clear-start.md",
@@ -3955,7 +4097,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-clear-start.md"
+      ]
     },
     {
       "id": "g9:docs/how-to/coordination-examples/architecture-advisory-panel-v1-decision-request-and-resume.md",
@@ -3994,7 +4139,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-decision-request-and-resume.md"
+      ]
     },
     {
       "id": "g9:docs/how-to/coordination-examples/architecture-advisory-panel-v1-final-decision-and-defer.md",
@@ -4033,7 +4181,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-final-decision-and-defer.md"
+      ]
     },
     {
       "id": "g9:docs/how-to/coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md",
@@ -4072,7 +4223,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md"
+      ]
     },
     {
       "id": "g9:docs/how-to/coordination-examples/architecture-advisory-panel-v1-material-context-reopen.md",
@@ -4111,7 +4265,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-material-context-reopen.md"
+      ]
     },
     {
       "id": "g9:docs/how-to/coordination-examples/architecture-advisory-panel-v1-unclear-start.md",
@@ -4150,7 +4307,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-unclear-start.md"
+      ]
     },
     {
       "id": "g9:docs/how-to/fix-bare-citation-findings.md",
@@ -4189,7 +4349,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "rework:docs/how-to/fix-bare-citation-findings.md"
+      ]
     },
     {
       "id": "g9:docs/how-to/use-fgos-architecture-panel.md",
@@ -4228,7 +4391,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/how-to/use-fgos-architecture-panel.md"
+      ]
     },
     {
       "id": "g9:docs/io-contract.md",
@@ -4299,7 +4465,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:docs/io-contract.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
@@ -4338,7 +4507,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
@@ -4377,7 +4549,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md",
@@ -4416,7 +4591,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md",
@@ -4455,7 +4633,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md",
@@ -4494,7 +4675,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/fgos-choke-point-survey-ranked-priority-table/fgos-choke-point-ranked-priority.md",
@@ -4533,7 +4717,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/fgos-choke-point-survey-ranked-priority-table/fgos-choke-point-ranked-priority.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
@@ -4572,7 +4759,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md",
@@ -4611,7 +4801,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
@@ -4650,7 +4843,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
@@ -4689,7 +4885,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling/fgos-slots-verb-output-fields.md",
@@ -4728,7 +4927,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling/fgos-slots-verb-output-fields.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
@@ -4767,7 +4969,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
@@ -4806,7 +5011,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
@@ -4845,7 +5053,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
@@ -4884,7 +5095,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
@@ -4923,7 +5137,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md",
@@ -4962,7 +5179,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
@@ -5001,7 +5221,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md",
@@ -5040,7 +5263,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
@@ -5079,7 +5305,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md",
@@ -5118,7 +5347,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
@@ -5157,7 +5389,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
@@ -5196,7 +5431,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md",
@@ -5235,7 +5473,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md",
@@ -5274,7 +5515,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md",
@@ -5313,7 +5557,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-declare-footprint-when-fgos-coding-planning-splits-an/declare-footprint-when-fgos-planning-splits-an-item.md",
@@ -5352,7 +5599,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-declare-footprint-when-fgos-coding-planning-splits-an/declare-footprint-when-fgos-planning-splits-an-item.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
@@ -5391,7 +5641,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md",
@@ -5430,7 +5683,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
@@ -5469,7 +5725,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos/pass-a-caller-supplied-verdict-to-discover-or-decompose.md",
@@ -5508,7 +5767,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos/pass-a-caller-supplied-verdict-to-discover-or-decompose.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s/recognize-a-claude-code-hook-spawn-enoent-failure.md",
@@ -5547,7 +5809,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s/recognize-a-claude-code-hook-spawn-enoent-failure.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md",
@@ -5586,7 +5851,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
@@ -5625,7 +5893,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md",
@@ -5664,7 +5935,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
@@ -5703,7 +5977,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
@@ -5742,7 +6019,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
@@ -5781,7 +6061,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
@@ -5820,7 +6103,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
@@ -5859,7 +6145,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
@@ -5898,7 +6187,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
@@ -5937,7 +6229,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
@@ -5976,7 +6271,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
@@ -6015,7 +6313,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
@@ -6054,7 +6355,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
@@ -6093,7 +6397,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md",
@@ -6132,7 +6439,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
@@ -6171,7 +6481,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
@@ -6210,7 +6523,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md",
@@ -6249,7 +6565,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md",
@@ -6288,7 +6607,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-c/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md",
@@ -6327,7 +6649,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-c/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/sync-an-fgos-item-whose-fix-already-shipped-outside-the-norm/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md",
@@ -6366,7 +6691,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/sync-an-fgos-item-whose-fix-already-shipped-outside-the-norm/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/test-suite-legibility-dedup-cleanup-before-after-numbers/test-suite-legibility-cleanup-numbers.md",
@@ -6405,7 +6733,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/test-suite-legibility-dedup-cleanup-before-after-numbers/test-suite-legibility-cleanup-numbers.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/the-9-findings-from-the-2026-08-14-fable-code-review-audit-o/worktree-merge-lifecycle-audit-260814-findings.md",
@@ -6444,7 +6775,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/the-9-findings-from-the-2026-08-14-fable-code-review-audit-o/worktree-merge-lifecycle-audit-260814-findings.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md",
@@ -6483,7 +6817,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/the-coding-classify-intake-executor-s-full-lifecycle-created/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md",
@@ -6522,7 +6859,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/the-coding-classify-intake-executor-s-full-lifecycle-created/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md",
@@ -6561,7 +6901,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
@@ -6600,7 +6943,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
@@ -6639,7 +6985,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
@@ -6678,7 +7027,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-a-leaf-claim-can-now-be-refused-and-why-status-done-alre/pick-leaf-fork-and-sibling-merge-guard.md",
@@ -6717,7 +7069,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-a-leaf-claim-can-now-be-refused-and-why-status-done-alre/pick-leaf-fork-and-sibling-merge-guard.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md",
@@ -6756,7 +7111,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
@@ -6795,7 +7153,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md",
@@ -6834,7 +7195,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-a-work-branch-must-never-be-git-checkout-d-directly-on-t/direct-branch-checkout-on-main-checkout-instead-of-worktree.md",
@@ -6873,7 +7237,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-a-work-branch-must-never-be-git-checkout-d-directly-on-t/direct-branch-checkout-on-main-checkout-instead-of-worktree.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-an-is-ancestor-of-main-verify-check-can-never-pass-throu/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md",
@@ -6912,7 +7279,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-an-is-ancestor-of-main-verify-check-can-never-pass-throu/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md",
@@ -6951,7 +7321,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md",
@@ -6990,7 +7363,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-o/why-the-retrospective-content-gate-checked-the-wrong-fields.md",
@@ -7029,7 +7405,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-o/why-the-retrospective-content-gate-checked-the-wrong-fields.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
@@ -7088,7 +7467,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+        "description:cas-evidence-correction"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
@@ -7127,7 +7510,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s/context-md-enforcement-scope.md",
@@ -7166,7 +7552,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s/context-md-enforcement-scope.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-decide-for-execute-for-impact-analysis-reported-unavaila/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md",
@@ -7205,7 +7594,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-decide-for-execute-for-impact-analysis-reported-unavaila/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md",
@@ -7244,7 +7636,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-dispatch-binding-moved-from-name-keying-to-needs-for-cap/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md",
@@ -7283,7 +7678,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-dispatch-binding-moved-from-name-keying-to-needs-for-cap/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-execution-fan-out-reuses-computeschedule-not-selectwave/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md",
@@ -7322,7 +7720,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-execution-fan-out-reuses-computeschedule-not-selectwave/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md",
@@ -7361,7 +7762,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
@@ -7400,7 +7804,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-cleanup-next-keeps-exit-code-classification-instead/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md",
@@ -7439,7 +7846,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-cleanup-next-keeps-exit-code-classification-instead/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
@@ -7478,7 +7888,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
@@ -7517,7 +7930,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md",
@@ -7556,7 +7972,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-detects-post-land-drift-among-sibling-leaves-by-int/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md",
@@ -7595,7 +8014,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-detects-post-land-drift-among-sibling-leaves-by-int/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-discover-could-overwrite-an-already-locked-verify-c/discovery-decompose-reporoot-verify-overwrite.md",
@@ -7634,7 +8056,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-discover-could-overwrite-an-already-locked-verify-c/discovery-decompose-reporoot-verify-overwrite.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-discover-next-shrank-to-a-picker/why-discover-next-shrank-to-a-picker.md",
@@ -7673,7 +8098,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-discover-next-shrank-to-a-picker/why-discover-next-shrank-to-a-picker.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-dispatch-splits-into-gather-packets-with-a-second-e/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md",
@@ -7712,7 +8140,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-dispatch-splits-into-gather-packets-with-a-second-e/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolati/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md",
@@ -7751,7 +8182,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolati/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-fgos-runner-died-in-every-agent-shell/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md",
@@ -7790,7 +8224,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-fgos-runner-died-in-every-agent-shell/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
@@ -7829,7 +8266,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
@@ -7868,7 +8308,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-keeps-growing-the-same-decision-logic-in-more-than/fgos-choke-point-pattern.md",
@@ -7907,7 +8350,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-keeps-growing-the-same-decision-logic-in-more-than/fgos-choke-point-pattern.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md",
@@ -7946,7 +8392,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md",
@@ -7985,7 +8434,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
@@ -8024,7 +8476,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
@@ -8063,7 +8518,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
@@ -8102,7 +8560,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
@@ -8141,7 +8602,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md",
@@ -8180,7 +8644,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
@@ -8219,7 +8686,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md",
@@ -8258,7 +8728,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
@@ -8297,7 +8770,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md",
@@ -8336,7 +8812,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md",
@@ -8375,7 +8854,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
@@ -8414,7 +8896,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
@@ -8453,7 +8938,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-intake-classification-moved-to-after-clarify-and-back-to/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md",
@@ -8492,7 +8980,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-intake-classification-moved-to-after-clarify-and-back-to/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md",
@@ -8531,7 +9022,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
@@ -8570,7 +9064,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md",
@@ -8609,7 +9106,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md",
@@ -8648,7 +9148,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-mergetree-groups-by-parent-and-sorts-recursively-by-bloc/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md",
@@ -8687,7 +9190,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-mergetree-groups-by-parent-and-sorts-recursively-by-bloc/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md",
@@ -8726,7 +9232,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-resolveplan-s-decompose-verdict-no-longer-treats-the-pre/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md",
@@ -8765,7 +9274,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-resolveplan-s-decompose-verdict-no-longer-treats-the-pre/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-return-s-blocked-friction-hint-checks-real-output-not-th/why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match.md",
@@ -8804,7 +9316,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-return-s-blocked-friction-hint-checks-real-output-not-th/why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-runner-config-splits-capability-curated-vocab-executor-n/why-capability-executor-and-capacity-are-three-separate-concepts.md",
@@ -8843,7 +9358,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-runner-config-splits-capability-curated-vocab-executor-n/why-capability-executor-and-capacity-are-three-separate-concepts.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
@@ -8882,7 +9400,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
@@ -8921,7 +9442,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
@@ -8960,7 +9484,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
@@ -8999,7 +9526,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
@@ -9038,7 +9568,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
@@ -9077,7 +9610,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
@@ -9116,7 +9652,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
@@ -9155,7 +9694,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
@@ -9194,7 +9736,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
@@ -9233,7 +9778,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
@@ -9272,7 +9820,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
@@ -9311,7 +9862,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
@@ -9350,7 +9904,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md",
@@ -9389,7 +9946,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md",
@@ -9428,7 +9988,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md",
@@ -9467,7 +10030,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
@@ -9506,7 +10072,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/work-item-priority-calculated-formula-and-intent-s-retiremen/priority-formula-and-intent-retirement.md",
@@ -9545,7 +10114,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/work-item-priority-calculated-formula-and-intent-s-retiremen/priority-formula-and-intent-retirement.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
@@ -9584,7 +10156,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md"
+      ]
     },
     {
       "id": "g9:docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md",
@@ -9623,7 +10198,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md"
+      ]
     },
     {
       "id": "g9:docs/operator-runbook-herdr-cockpit.md",
@@ -9662,7 +10240,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/operator-runbook-herdr-cockpit.md"
+      ]
     },
     {
       "id": "g9:docs/platform/README.md",
@@ -9701,7 +10282,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:status:docs/platform/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-confinement/README.md",
@@ -9740,7 +10324,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-confinement/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
@@ -9783,7 +10370,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:docs/platform/agent-confinement/contracts/confinement-authority-v1.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
@@ -9826,7 +10416,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
@@ -9869,7 +10462,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:docs/platform/agent-confinement/history/rollout-and-settled-facts.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-confinement/spec.md",
@@ -9928,7 +10524,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:base:docs/platform/agent-confinement/spec.md",
+        "w8:repin:carry:credential-store-setup"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/README.md",
@@ -9967,7 +10567,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/architecture/README.md",
@@ -10006,7 +10609,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/architecture/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
@@ -10045,7 +10651,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/architecture/dispatch-control-plane.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/architecture/evidence-and-results.md",
@@ -10084,7 +10693,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/architecture/evidence-and-results.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
@@ -10123,7 +10735,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/architecture/executor-health-and-fallback.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
@@ -10162,7 +10777,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/architecture/protocol-model.md",
@@ -10201,7 +10819,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/architecture/protocol-model.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/architecture/run-handle.md",
@@ -10240,7 +10861,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/architecture/run-handle.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/architecture/runtime-model.md",
@@ -10279,7 +10903,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/architecture/runtime-model.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
@@ -10318,7 +10945,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/architecture/runtime-recovery-design.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
@@ -10357,7 +10987,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/architecture/visibility-and-herdr.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/architecture/work-integration.md",
@@ -10396,7 +11029,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/architecture/work-integration.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
@@ -10455,7 +11091,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "description:work-boundary"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
@@ -10494,7 +11134,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/contracts/workflow-stage-operation.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
@@ -10533,7 +11176,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
@@ -10572,7 +11218,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
@@ -10611,7 +11260,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
@@ -10670,7 +11322,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "description:mutation-admission"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
@@ -10709,7 +11365,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
@@ -10748,7 +11407,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/decisions/README.md",
@@ -10791,7 +11453,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:docs/platform/agent-coordination/decisions/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
@@ -10830,7 +11495,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
@@ -10869,7 +11537,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
@@ -10908,7 +11579,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/documentation-migration/proposal-status.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/README.md",
@@ -10947,7 +11621,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
@@ -10986,7 +11663,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
@@ -11025,7 +11705,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
@@ -11064,7 +11747,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
@@ -11103,7 +11789,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md",
@@ -11142,7 +11831,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md",
@@ -11181,7 +11873,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
@@ -11220,7 +11915,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
@@ -11259,7 +11957,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
@@ -11298,7 +11999,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
@@ -11337,7 +12041,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
@@ -11376,7 +12083,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
@@ -11415,7 +12125,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md",
@@ -11454,7 +12167,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md",
@@ -11493,7 +12209,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
@@ -11532,7 +12251,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
@@ -11571,7 +12293,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
@@ -11610,7 +12335,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
@@ -11649,7 +12377,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
@@ -11688,7 +12419,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
@@ -11727,7 +12461,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
@@ -11766,7 +12503,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
@@ -11805,7 +12545,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
@@ -11844,7 +12587,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
@@ -11883,7 +12629,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
@@ -11922,7 +12671,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
@@ -11961,7 +12713,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
@@ -12000,7 +12755,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
@@ -12039,7 +12797,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
@@ -12078,7 +12839,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
@@ -12117,7 +12881,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
@@ -12156,7 +12923,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
@@ -12195,7 +12965,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
@@ -12234,7 +13007,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
@@ -12273,7 +13049,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
@@ -12312,7 +13091,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
@@ -12351,7 +13133,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
@@ -12390,7 +13175,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
@@ -12429,7 +13217,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
@@ -12468,7 +13259,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
@@ -12507,7 +13301,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
@@ -12546,7 +13343,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
@@ -12585,7 +13385,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
@@ -12624,7 +13427,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
@@ -12663,7 +13469,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
@@ -12702,7 +13511,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
@@ -12741,7 +13553,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
@@ -12780,7 +13595,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
@@ -12819,7 +13637,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
@@ -12858,7 +13679,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
@@ -12897,7 +13721,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
@@ -12936,7 +13763,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
@@ -12975,7 +13805,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
@@ -13014,7 +13847,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
@@ -13053,7 +13889,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
@@ -13092,7 +13931,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
@@ -13131,7 +13973,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
@@ -13170,7 +14015,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/spec.md",
@@ -13209,7 +14057,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
@@ -13248,7 +14099,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
@@ -13287,7 +14141,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/verification/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
@@ -13326,7 +14183,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/vision.md",
@@ -13365,7 +14225,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/vision.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
@@ -13404,7 +14267,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
@@ -13443,7 +14309,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
@@ -13482,7 +14351,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
@@ -13521,7 +14393,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
@@ -13560,7 +14435,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
@@ -13599,7 +14477,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md",
@@ -13638,7 +14519,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
@@ -13677,7 +14561,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/legacy/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md",
@@ -13716,7 +14603,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
@@ -13755,7 +14645,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/playbooks/README.md",
@@ -13794,7 +14687,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/playbooks/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
@@ -13833,7 +14729,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
@@ -13872,7 +14771,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
@@ -13911,7 +14813,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
@@ -13950,7 +14855,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/playbooks/coordination-operating-harness.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
@@ -13989,7 +14897,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
@@ -14048,7 +14959,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+        "description:read-first"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/proposals/README.md",
@@ -14087,7 +15002,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/proposals/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
@@ -14126,7 +15044,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
@@ -14165,7 +15086,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/spec.md",
@@ -14224,7 +15148,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/spec.md",
+        "w2:guard:retired-schema-qualification"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/verification/README.md",
@@ -14263,7 +15191,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/verification/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/vision.md",
@@ -14302,7 +15233,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/vision.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/vocabulary/README.md",
@@ -14341,7 +15275,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/vocabulary/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
@@ -14380,7 +15317,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/vocabulary/canonical-concepts.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/vocabulary/concept-relationships.md",
@@ -14419,7 +15359,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
@@ -14478,7 +15421,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+        "w2:description:participant"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-mailbox/spec.md",
@@ -14517,7 +15464,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:gloss:docs/platform/agent-mailbox/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/agent-protocol/spec.md",
@@ -14576,7 +15526,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/agent-protocol/spec.md",
+        "w8:gloss:docs/platform/agent-protocol/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/architecture-map.md",
@@ -14615,7 +15569,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/architecture-map.md"
+      ]
     },
     {
       "id": "g9:docs/platform/claude-plugin/README.md",
@@ -14654,7 +15611,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/claude-plugin/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/claude-plugin/spec.md",
@@ -14693,7 +15653,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/claude-plugin/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/coexistence/spec.md",
@@ -14752,7 +15715,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/coexistence/spec.md",
+        "w8:gloss:docs/platform/coexistence/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/component-boundary.md",
@@ -14811,7 +15778,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:repin:w2:predecessor:docs/platform/component-boundary.md",
+        "w8:gap05:relocation"
+      ]
     },
     {
       "id": "g9:docs/platform/config/spec.md",
@@ -14850,7 +15821,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:gloss:docs/platform/config/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/decision-citation-drift/README.md",
@@ -14889,7 +15863,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/decision-citation-drift/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/distillery/README.md",
@@ -14928,7 +15905,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/distillery/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/documentation/operations/portals/docs-portal.md",
@@ -14967,7 +15947,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "status-units:docs/platform/documentation/operations/portals/docs-portal.md"
+      ]
     },
     {
       "id": "g9:docs/platform/documentation/switchboard.md",
@@ -15006,7 +15989,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:status-complete:docs/platform/documentation/switchboard.md"
+      ]
     },
     {
       "id": "g9:docs/platform/event-store/spec.md",
@@ -15045,7 +16031,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:gloss:docs/platform/event-store/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/git/spec.md",
@@ -15104,7 +16093,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:repin:w2:predecessor:docs/platform/git/spec.md",
+        "w8:gloss:docs/platform/git/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/governance.md",
@@ -15163,7 +16156,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:convention:area-holder-table",
+        "w8:status-units:docs/platform/governance.md"
+      ]
     },
     {
       "id": "g9:docs/platform/herdr-web-dashboard/README.md",
@@ -15202,7 +16199,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:predecessor:docs/platform/herdr-web-dashboard/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
@@ -15241,7 +16241,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+      ]
     },
     {
       "id": "g9:docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
@@ -15280,7 +16283,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/herdr-web-dashboard/operations/operator-runbook.md"
+      ]
     },
     {
       "id": "g9:docs/platform/herdr-web-dashboard/spec.md",
@@ -15319,7 +16325,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/herdr-web-dashboard/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/holder-lock/spec.md",
@@ -15378,7 +16387,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:repin:w2:predecessor:docs/platform/holder-lock/spec.md",
+        "w8:gloss:docs/platform/holder-lock/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/host-invocation-routing/README.md",
@@ -15417,7 +16430,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "status-units:docs/platform/host-invocation-routing/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
@@ -15456,7 +16472,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "status-units:docs/platform/host-invocation-routing/verification/source-preservation-audit.md"
+      ]
     },
     {
       "id": "g9:docs/platform/identity/spec.md",
@@ -15515,7 +16534,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:repin:hunk-park:identity-successor",
+        "w8:gloss:docs/platform/identity/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/migration-authoring-rules.md",
@@ -15554,7 +16577,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "status-units:docs/platform/migration-authoring-rules.md"
+      ]
     },
     {
       "id": "g9:docs/platform/observe/README.md",
@@ -15593,7 +16619,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/observe/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/observe/decisions/observe-component-architecture.md",
@@ -15632,7 +16661,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/observe/decisions/observe-component-architecture.md"
+      ]
     },
     {
       "id": "g9:docs/platform/packaging-distribution/README.md",
@@ -15671,7 +16703,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:status:docs/platform/packaging-distribution/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/packaging-distribution/code-panel-rollout-plan.md",
@@ -15710,7 +16745,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/packaging-distribution/code-panel-rollout-plan.md"
+      ]
     },
     {
       "id": "g9:docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
@@ -15749,7 +16787,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md"
+      ]
     },
     {
       "id": "g9:docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
@@ -15788,7 +16829,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:gloss:docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md"
+      ]
     },
     {
       "id": "g9:docs/platform/packaging-distribution/history/distribution-baseline.md",
@@ -15827,7 +16871,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/packaging-distribution/history/distribution-baseline.md"
+      ]
     },
     {
       "id": "g9:docs/platform/packaging-distribution/spec.md",
@@ -15866,7 +16913,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:gloss:docs/platform/packaging-distribution/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/platform-foundations.md",
@@ -15925,7 +16975,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:repin:w2:status:docs/platform/platform-foundations.md",
+        "w8:gloss:docs/platform/platform-foundations.md"
+      ]
     },
     {
       "id": "g9:docs/platform/process/spec.md",
@@ -15984,7 +17038,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "hunk-park:docs/platform/process/spec.md",
+        "w8:gloss:docs/platform/process/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/proposals/documentation-system-unification.md",
@@ -16023,7 +17081,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "status-units:docs/platform/proposals/documentation-system-unification.md"
+      ]
     },
     {
       "id": "g9:docs/platform/run-supervisor/spec.md",
@@ -16082,7 +17143,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/run-supervisor/spec.md",
+        "w8:gloss:docs/platform/run-supervisor/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/README.md",
@@ -16121,7 +17186,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:predecessor:docs/platform/runner/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/architecture/h-69197b459754.md",
@@ -16171,7 +17239,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:docs/platform/runner/architecture/h-69197b459754.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/architecture/h-7af1f0242611.md",
@@ -16214,7 +17285,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/architecture/h-e53a3a9829a8.md",
@@ -16253,7 +17327,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/runner/architecture/h-e53a3a9829a8.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
@@ -16292,7 +17369,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/runner/contracts/h-b3eb60fb4d2b.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/contracts/routing-handoff.md",
@@ -16331,7 +17411,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/runner/contracts/routing-handoff.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/decisions/h-36d872fbb0e5.md",
@@ -16390,7 +17473,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:base:docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "w8:gloss:docs/platform/runner/decisions/h-36d872fbb0e5.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/decisions/h-aabefc85f0c9.md",
@@ -16429,7 +17516,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/runner/decisions/h-aabefc85f0c9.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/operations/h-51f5cd7279fd.md",
@@ -16468,7 +17558,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/runner/operations/h-51f5cd7279fd.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/spec.md",
@@ -16507,7 +17600,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:gloss:docs/platform/runner/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
@@ -16566,7 +17662,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:base:docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "w8:gloss:docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
@@ -16605,7 +17705,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/runner/subcomponents/h-2e032393add1/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
@@ -16644,7 +17747,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/runner/subcomponents/h-37aced3896a8/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
@@ -16708,7 +17814,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
@@ -16747,7 +17856,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
@@ -16786,7 +17898,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
@@ -16825,7 +17940,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
@@ -16864,7 +17982,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/system-architecture/architecture/architecture-intent.md",
@@ -16943,7 +18064,12 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/system-architecture/architecture/architecture-intent.md",
+        "w2:description:architecture-intent-self-route",
+        "w8:description:architecture-intent-complete"
+      ]
     },
     {
       "id": "g9:docs/platform/system-architecture/architecture/roadmap.md",
@@ -16982,7 +18108,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:status:docs/platform/system-architecture/architecture/roadmap.md"
+      ]
     },
     {
       "id": "g9:docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
@@ -17021,7 +18150,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:status:docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md"
+      ]
     },
     {
       "id": "g9:docs/platform/system-architecture/architecture/workspace-topology-audit.md",
@@ -17060,7 +18192,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:status:docs/platform/system-architecture/architecture/workspace-topology-audit.md"
+      ]
     },
     {
       "id": "g9:docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
@@ -17099,7 +18234,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:status:docs/platform/system-architecture/architecture/workspace-topology-roadmap.md"
+      ]
     },
     {
       "id": "g9:docs/platform/system-architecture/architecture/workspace-topology.md",
@@ -17138,7 +18276,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:status:docs/platform/system-architecture/architecture/workspace-topology.md"
+      ]
     },
     {
       "id": "g9:docs/platform/system-architecture/history/component-boundary-source-carriage.md",
@@ -17177,7 +18318,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:gap05:history"
+      ]
     },
     {
       "id": "g9:docs/platform/system-overview/spec.md",
@@ -17256,7 +18400,12 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:base:docs/platform/system-overview/spec.md",
+        "w8:repin:w2:description:system-overview-partial",
+        "w8:description:system-overview-complete"
+      ]
     },
     {
       "id": "g9:docs/platform/terminal-control/spec.md",
@@ -17315,7 +18464,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:base:docs/platform/terminal-control/spec.md",
+        "w8:gloss:docs/platform/terminal-control/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/ui-spec/architecture/components/C01-item-card.md",
@@ -17354,7 +18507,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/ui-spec/architecture/components/C01-item-card.md"
+      ]
     },
     {
       "id": "g9:docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
@@ -17393,7 +18549,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/ui-spec/architecture/modals/M01-answer-question.md"
+      ]
     },
     {
       "id": "g9:docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
@@ -17432,7 +18591,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/ui-spec/architecture/modals/M02-approve-merge.md"
+      ]
     },
     {
       "id": "g9:docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
@@ -17471,7 +18633,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md"
+      ]
     },
     {
       "id": "g9:docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
@@ -17510,7 +18675,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/ui-spec/architecture/screens/S01-sign-in.md"
+      ]
     },
     {
       "id": "g9:docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
@@ -17549,7 +18717,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/ui-spec/architecture/screens/S02-taskboard.md"
+      ]
     },
     {
       "id": "g9:docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
@@ -17588,7 +18759,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/ui-spec/architecture/screens/S03-task-detail.md"
+      ]
     },
     {
       "id": "g9:docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
@@ -17627,7 +18801,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md"
+      ]
     },
     {
       "id": "g9:docs/platform/ui-spec/architecture/spec.config.yaml",
@@ -17666,7 +18843,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/ui-spec/architecture/spec.config.yaml"
+      ]
     },
     {
       "id": "g9:docs/platform/ui-spec/contracts/20-domain-rules.md",
@@ -17705,7 +18885,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ]
     },
     {
       "id": "g9:docs/platform/ui-spec/contracts/30-states-and-errors.md",
@@ -17744,7 +18927,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ]
     },
     {
       "id": "g9:docs/platform/ui-spec/spec.md",
@@ -17783,7 +18969,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/ui-spec/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/vision.md",
@@ -17822,7 +19011,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:status:docs/platform/vision.md"
+      ]
     },
     {
       "id": "g9:docs/platform/work-state/README.md",
@@ -17861,7 +19053,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:status:docs/platform/work-state/README.md"
+      ]
     },
     {
       "id": "g9:docs/platform/work-state/contracts/cli-io-contract.md",
@@ -17900,7 +19095,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/work-state/contracts/cli-io-contract.md"
+      ]
     },
     {
       "id": "g9:docs/platform/work-state/history/multi-role-harness-distill-record.md",
@@ -17939,7 +19137,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/platform/work-state/history/multi-role-harness-distill-record.md"
+      ]
     },
     {
       "id": "g9:docs/platform/work-state/spec.md",
@@ -17978,7 +19179,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:gloss:docs/platform/work-state/spec.md"
+      ]
     },
     {
       "id": "g9:docs/platform/workflow/spec.md",
@@ -18017,7 +19221,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:hunk-park:workflow-holder"
+      ]
     },
     {
       "id": "g9:docs/platform/yaml-document/spec.md",
@@ -18056,7 +19263,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:gloss:docs/platform/yaml-document/spec.md"
+      ]
     },
     {
       "id": "g9:docs/reading-map.md",
@@ -18232,7 +19442,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:docs/reading-map.md"
+      ]
     },
     {
       "id": "g9:docs/reference/dispatch-module-boundaries.md",
@@ -18271,7 +19484,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/reference/dispatch-module-boundaries.md"
+      ]
     },
     {
       "id": "g9:docs/routing-handoff-contract.md",
@@ -18310,7 +19526,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/routing-handoff-contract.md"
+      ]
     },
     {
       "id": "g9:docs/transitional-switchboard.md",
@@ -18349,7 +19568,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:status-complete:docs/transitional-switchboard.md"
+      ]
     },
     {
       "id": "g9:docs/ui-spec/00-overview.md",
@@ -18388,7 +19610,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/ui-spec/00-overview.md"
+      ]
     },
     {
       "id": "g9:docs/ui-spec/20-domain-rules.md",
@@ -18427,7 +19652,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/ui-spec/20-domain-rules.md"
+      ]
     },
     {
       "id": "g9:docs/ui-spec/30-states-and-errors.md",
@@ -18466,7 +19694,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/ui-spec/30-states-and-errors.md"
+      ]
     },
     {
       "id": "g9:docs/ui-spec/components/C01-item-card.md",
@@ -18505,7 +19736,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/ui-spec/components/C01-item-card.md"
+      ]
     },
     {
       "id": "g9:docs/ui-spec/generated/wireframe-v2.html",
@@ -18603,7 +19837,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/ui-spec/modals/M01-answer-question.md"
+      ]
     },
     {
       "id": "g9:docs/ui-spec/modals/M02-approve-merge.md",
@@ -18642,7 +19879,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/ui-spec/modals/M02-approve-merge.md"
+      ]
     },
     {
       "id": "g9:docs/ui-spec/modals/M03-add-edit-item.md",
@@ -18681,7 +19921,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/ui-spec/modals/M03-add-edit-item.md"
+      ]
     },
     {
       "id": "g9:docs/ui-spec/screens/S01-sign-in.md",
@@ -18720,7 +19963,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/ui-spec/screens/S01-sign-in.md"
+      ]
     },
     {
       "id": "g9:docs/ui-spec/screens/S02-taskboard.md",
@@ -18759,7 +20005,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/ui-spec/screens/S02-taskboard.md"
+      ]
     },
     {
       "id": "g9:docs/ui-spec/screens/S03-task-detail.md",
@@ -18798,7 +20047,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/ui-spec/screens/S03-task-detail.md"
+      ]
     },
     {
       "id": "g9:docs/ui-spec/screens/S04-questions-needing-answer.md",
@@ -18837,7 +20089,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/ui-spec/screens/S04-questions-needing-answer.md"
+      ]
     },
     {
       "id": "g9:docs/ui-spec/spec.config.yaml",
@@ -18876,7 +20131,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:docs/ui-spec/spec.config.yaml"
+      ]
     },
     {
       "id": "g9:docs/user/README.md",
@@ -18915,7 +20173,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "status-units:docs/user/README.md"
+      ]
     },
     {
       "id": "g9:domains/coding/AGENTS.md",
@@ -18954,7 +20215,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:domains/coding/AGENTS.md"
+      ]
     },
     {
       "id": "g9:domains/coding/skills/fgos-coding-discovering/SKILL.md",
@@ -18993,7 +20257,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:domains/coding/skills/fgos-coding-discovering/SKILL.md"
+      ]
     },
     {
       "id": "g9:domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
@@ -19032,7 +20299,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md"
+      ]
     },
     {
       "id": "g9:domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
@@ -19071,7 +20341,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md"
+      ]
     },
     {
       "id": "g9:domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
@@ -19110,7 +20383,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
+      ]
     },
     {
       "id": "g9:domains/coding/skills/fgos-coding-shaping/SKILL.md",
@@ -19149,7 +20425,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:domains/coding/skills/fgos-coding-shaping/SKILL.md"
+      ]
     },
     {
       "id": "g9:herdr-dashboard/src/pane_scan.rs",
@@ -19188,7 +20467,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:herdr-dashboard/src/pane_scan.rs"
+      ]
     },
     {
       "id": "g9:packages/distribution/rust/src/manifest.rs",
@@ -19227,7 +20509,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:packages/distribution/rust/src/manifest.rs"
+      ]
     },
     {
       "id": "g9:packages/distribution/rust/src/workspace.rs",
@@ -19266,7 +20551,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json#/patches/4"
+      ]
     },
     {
       "id": "g9:packages/herdr-fgos-common/rust/src/fgos.rs",
@@ -19305,7 +20593,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "hunk-park:packages/herdr-fgos-common/rust/src/fgos.rs"
+      ]
     },
     {
       "id": "g9:plans/reports/phase-lead-261018-2025-controller-death-p06-doctor-docs-changelog.md",
@@ -19344,7 +20635,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:plans/reports/phase-lead-261018-2025-controller-death-p06-doctor-docs-changelog.md"
+      ]
     },
     {
       "id": "g9:plugins/fgOS/skills/_shared/ak-cook-worker-contract.md",
@@ -19656,7 +20950,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:plugins/fgOS/skills/cleanup-loop/SKILL.md"
+      ]
     },
     {
       "id": "g9:plugins/fgOS/skills/fgos-clarifying/SKILL.md",
@@ -20436,7 +21733,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:plugins/fgOS/skills/retro-loop/SKILL.md"
+      ]
     },
     {
       "id": "g9:plugins/fgOS/skills/terminal/SKILL.md",
@@ -20479,7 +21779,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:plugins/fgOS/skills/terminal/SKILL.md"
+      ]
     },
     {
       "id": "g9:scripts/backfill-status-category.mjs",
@@ -20518,7 +21821,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:scripts/backfill-status-category.mjs"
+      ]
     },
     {
       "id": "g9:scripts/check-decision-citation-drift.mjs",
@@ -20577,7 +21883,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "scan:recursive-platform-citations",
+        "w8:scan:exclude-successor-history"
+      ]
     },
     {
       "id": "g9:scripts/check-doc-candidate-status.mjs",
@@ -20616,7 +21926,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:scripts/check-doc-candidate-status.mjs"
+      ]
     },
     {
       "id": "g9:scripts/herdr-cockpit.sh",
@@ -20655,7 +21968,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:scripts/herdr-cockpit.sh"
+      ]
     },
     {
       "id": "g9:scripts/next-doc-id.mjs",
@@ -20694,7 +22010,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:scripts/next-doc-id.mjs"
+      ]
     },
     {
       "id": "g9:scripts/test-proof-inventory.mjs",
@@ -20733,7 +22052,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "scan:proof-inventory-comment"
+      ]
     },
     {
       "id": "g9:src/cli/command-registry.mjs",
@@ -20792,7 +22114,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:repin:w2:predecessor:src/cli/command-registry.mjs",
+        "w8:repin:scope-consumer:src/cli/command-registry.mjs"
+      ]
     },
     {
       "id": "g9:src/intake/discovery.mjs",
@@ -20831,7 +22157,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:src/intake/discovery.mjs"
+      ]
     },
     {
       "id": "g9:src/intake/plan.mjs",
@@ -20870,7 +22199,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:src/intake/plan.mjs"
+      ]
     },
     {
       "id": "g9:src/intake/verify-pattern-check.mjs",
@@ -20909,7 +22241,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:src/intake/verify-pattern-check.mjs"
+      ]
     },
     {
       "id": "g9:src/runner/dispatch/assignment-runner.mjs",
@@ -20952,7 +22287,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:src/runner/dispatch/assignment-runner.mjs"
+      ]
     },
     {
       "id": "g9:src/runner/dispatch/confinement/authority.mjs",
@@ -20991,7 +22329,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:src/runner/dispatch/confinement/authority.mjs"
+      ]
     },
     {
       "id": "g9:src/runner/dispatch/confinement/backend-registry.mjs",
@@ -21030,7 +22371,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:src/runner/dispatch/confinement/backend-registry.mjs"
+      ]
     },
     {
       "id": "g9:src/runner/dispatch/confinement/policies.mjs",
@@ -21073,7 +22417,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:src/runner/dispatch/confinement/policies.mjs"
+      ]
     },
     {
       "id": "g9:src/runner/dispatch/confinement/request.mjs",
@@ -21112,7 +22459,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:src/runner/dispatch/confinement/request.mjs"
+      ]
     },
     {
       "id": "g9:src/runner/dispatch/herdr-round.mjs",
@@ -21155,7 +22505,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:src/runner/dispatch/herdr-round.mjs"
+      ]
     },
     {
       "id": "g9:src/runner/dispatch/run-lock.mjs",
@@ -21194,7 +22547,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:src/runner/dispatch/run-lock.mjs"
+      ]
     },
     {
       "id": "g9:src/runner/dispatch/transport.mjs",
@@ -21233,7 +22589,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:src/runner/dispatch/transport.mjs"
+      ]
     },
     {
       "id": "g9:src/runner/merge.mjs",
@@ -21272,7 +22631,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:repin:hunk-park:src/runner/merge.mjs"
+      ]
     },
     {
       "id": "g9:src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
@@ -21311,7 +22673,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:src/runner/prompt-templates/worker-prompt-skill-pointer.txt"
+      ]
     },
     {
       "id": "g9:src/runner/worktree.mjs",
@@ -21350,7 +22715,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:predecessor:src/runner/worktree.mjs"
+      ]
     },
     {
       "id": "g9:src/setup/git-hooks.mjs",
@@ -21428,7 +22796,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w8:repin:w2:predecessor:src/setup/registrations.mjs"
+      ]
     },
     {
       "id": "g9:src/state/events-jsonl-truncation-guard.mjs",
@@ -21467,7 +22838,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:src/state/events-jsonl-truncation-guard.mjs"
+      ]
     },
     {
       "id": "g9:src/state/gate-bypass.mjs",
@@ -21506,7 +22880,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:src/state/gate-bypass.mjs"
+      ]
     },
     {
       "id": "g9:src/state/priority-formula.mjs",
@@ -21545,7 +22922,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:src/state/priority-formula.mjs"
+      ]
     },
     {
       "id": "g9:src/state/replay.mjs",
@@ -21584,7 +22964,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:src/state/replay.mjs"
+      ]
     },
     {
       "id": "g9:src/state/store.mjs",
@@ -21623,7 +23006,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "scope-consumer:src/state/store.mjs"
+      ]
     },
     {
       "id": "g9:test/cli/fgos-merge.test.mjs",
@@ -21662,7 +23048,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "rework:test/cli/fgos-merge.test.mjs"
+      ]
     },
     {
       "id": "g9:test/docs/decisions-corpus-retired.test.mjs",
@@ -21701,7 +23090,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:test/docs/decisions-corpus-retired.test.mjs"
+      ]
     },
     {
       "id": "g9:test/intake/plan.test.mjs",
@@ -21740,7 +23132,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:test/intake/plan.test.mjs"
+      ]
     },
     {
       "id": "g9:test/report/enduser-index.test.mjs",
@@ -21779,7 +23174,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:test/report/enduser-index.test.mjs"
+      ]
     },
     {
       "id": "g9:test/report/helpers/docs-index-state-fixture.mjs",
@@ -21818,7 +23216,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:test/report/helpers/docs-index-state-fixture.mjs"
+      ]
     },
     {
       "id": "g9:test/runner/dead-vocabulary-guard.test.mjs",
@@ -21877,7 +23278,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "scan:successor-dead-vocabulary",
+        "w2:scan:live-successor-specs"
+      ]
     },
     {
       "id": "g9:test/runner/dispatch-executor-profile.test.mjs",
@@ -21916,7 +23321,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:predecessor:test/runner/dispatch-executor-profile.test.mjs"
+      ]
     },
     {
       "id": "g9:test/runner/dispatch-worker-home.test.mjs",
@@ -21955,7 +23363,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:test/runner/dispatch-worker-home.test.mjs"
+      ]
     },
     {
       "id": "g9:test/runner/dispatch-worker-session.test.mjs",
@@ -21998,7 +23409,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "recomposed-predecessor:test/runner/dispatch-worker-session.test.mjs"
+      ]
     },
     {
       "id": "g9:test/runner/merge.test.mjs",
@@ -22037,7 +23451,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "hunk-park:test/runner/merge.test.mjs"
+      ]
     },
     {
       "id": "g9:test/runner/prompt-templates.test.mjs",
@@ -22076,7 +23493,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:test/runner/prompt-templates.test.mjs"
+      ]
     },
     {
       "id": "g9:test/runner/worktree.test.mjs",
@@ -22115,7 +23535,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "w2:predecessor:test/runner/worktree.test.mjs"
+      ]
     },
     {
       "id": "g9:test/scripts/check-decision-citation-drift.test.mjs",
@@ -22174,7 +23597,11 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "proof:recursive-platform-citation-scan",
+        "w8:proof:history-exclusion-negative-control"
+      ]
     },
     {
       "id": "g9:test/state/status-category.test.mjs",
@@ -22213,7 +23640,10 @@
           ]
         }
       ],
-      "independentAcceptance": false
+      "independentAcceptance": false,
+      "composedBy": [
+        "file:test/state/status-category.test.mjs"
+      ]
     }
   ],
   "historicalDrift": [

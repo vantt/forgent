@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Pin-bound records proof, not product proof. Run with python3 -B.
 
-Reuses the F chain's effectiveSpecIds/replaces convention and GNU patch. At this
-pin the consolidated check_shard.py helper does not exist. Only relevant chain
-files are replayed, in tempfile directories; no product tooling is imported.
+All prepared replay goes through fchain/check.py. Source citations and plans/
+scan membership remain frozen at sourcePin, independently of current proposals.
+No product tooling is imported.
 """
 import argparse
 from collections import Counter
@@ -12,12 +12,12 @@ import difflib
 from functools import lru_cache
 import gzip
 import hashlib
+import importlib.util
 import json
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import re
 import subprocess
 import sys
-import tempfile
 
 ROOT = Path(__file__).resolve().parents[5]
 HERE = Path(__file__).resolve().parent
@@ -28,8 +28,6 @@ ADDITIONS = P9 + 'g9/f-composition-additions.json'
 GATEWAY = 'docs/contracts/fgos-gateway-api-v1.yaml'
 OUTPUTS = {P9 + 'g9/' + p for p in ('phase9-decisions.json', 'phase9-decisions.md',
            'check_phase9_decisions.py', 'f-composition-additions.json')}
-RETAINED = {'docs/decisions/index.md', 'docs/enduser-docs-index.json',
-            'docs/architecture-manifest.json'}
 
 
 def require(condition, message):
@@ -126,14 +124,14 @@ def scan_gateway(pin):
     drift = set(git('diff', '--name-only', pin, '--', *[p for p in files if not p.startswith('plans/')]).decode().splitlines())
     require(not drift, 'non-record scan inputs differ from sourcePin')
     hits = set()
-    # Record files deleted after the pin cannot be scanned on disk; read their
-    # pinned bytes directly so membership stays bound to the pin.
-    gone = [p for p in files if not (ROOT / p).exists()]
-    files = [p for p in files if (ROOT / p).exists()]
-    for path in gone:
-        require(path.startswith('plans/'), 'non-record scan input missing: ' + path)
+    # Every record is evidence from the pin, whether later edited or deleted.
+    # Non-record inputs still require exact checkout agreement.
+    records = [p for p in files if p.startswith('plans/')]
+    files = [p for p in files if not p.startswith('plans/')]
+    for path in records:
         if GATEWAY.encode() in blob(pin, path):
             hits.add(path)
+    require(all((ROOT / path).is_file() for path in files), 'non-record scan input missing')
     for start in range(0, len(files), 150):
         args = ['rg', '--files-with-matches', '--null', '--fixed-strings', '--hidden',
                 '--no-ignore', '--', GATEWAY, *files[start:start + 150]]
@@ -143,7 +141,7 @@ def scan_gateway(pin):
     result = {}
     for path in sorted(hits):
         raw = blob(pin, path)
-        require(not (ROOT / path).exists() or (ROOT / path).read_bytes() == raw, 'scan input drift: ' + path)
+        require(path.startswith('plans/') or (ROOT / path).read_bytes() == raw, 'scan input drift: ' + path)
         lines = [i for i, s in enumerate(raw.decode().splitlines(), 1) if GATEWAY in s]
         require(lines, 'rg/pin membership differs: ' + path)
         result[path] = {'path': path, 'sha256': digest(raw), 'lines': lines}
@@ -166,56 +164,13 @@ def exclusion_reason(path):
     return None
 
 
-def chain_sources(pin, path):
-    """Same root selection as composition/verify-effective.py, also for S7-only files."""
-    approved = document(pin, P8 + 'step-07-composed-patches.json')['patches']
-    packet = document(pin, P9 + 'composition/patch-specs.json')
-    by_id = {s['id']: (i, s) for i, s in enumerate(packet['patches'])}
-    require(len(packet['effectiveSpecIds']) == len(set(packet['effectiveSpecIds'])), 'duplicate F chain id')
-    specs = [(P9 + 'composition/patch-specs.json', '/patches/' + str(by_id[i][0]), by_id[i][1])
-             for i in packet['effectiveSpecIds'] if by_id[i][1]['path'] == path]
-    prior = next(((P8 + 'step-07-composed-patches.json', '/patches/' + str(i), s)
-                  for i, s in enumerate(approved) if s['path'] == path), None)
-    current = blob(pin, path)
-    if prior and (not specs or (digest(current) != specs[0][2]['beforeSha256'] and
-                              specs[0][2].get('replaces') != prior[2]['patchSpecId'])):
-        specs.insert(0, prior)
-    return specs
-
-
-def replay(path, before, patch):
-    safe_path(path)
-    require(path == patch['path'], 'patch file identity')
-    require(digest(before) == patch['beforeSha256'], 'patch source digest: ' + path)
-    diff = patch.get('diff', patch.get('forwardDiff'))
-    require(isinstance(diff, str) and diff, 'prepared patch missing diff')
-    # Confine the patch tool to the named file; no extra headers/path traversal.
-    headers = [s for s in diff.splitlines() if s.startswith(('--- ', '+++ '))]
-    require(headers == ['--- a/' + path, '+++ b/' + path], 'patch touches unexpected file')
-    root = Path('/tmp/fgos-work')
-    created = not root.exists()
-    root.mkdir(parents=True, exist_ok=True)
-    try:
-        with tempfile.TemporaryDirectory(prefix='g9-replay-', dir=root) as temporary:
-            target = Path(temporary) / path
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes(before)
-            run = subprocess.run(['patch', '--batch', '--fuzz=0', '--forward', '-p1'],
-                                 input=diff.encode(), cwd=temporary, capture_output=True)
-            require(run.returncode == 0 and b'offset' not in run.stdout.lower(),
-                    'patch replay failed/offset: ' + path)
-            after = target.read_bytes() if target.exists() else b''
-            require(digest(after) == patch['expectedAfterSha256'], 'patch result digest: ' + path)
-            rollback = patch.get('rollbackDiff')
-            require(bool(rollback), 'rollback diff required')
-            run = subprocess.run(['patch', '--batch', '--fuzz=0', '-p1'], input=rollback.encode(),
-                                 cwd=temporary, capture_output=True)
-            require(run.returncode == 0 and b'offset' not in run.stdout.lower(), 'rollback replay failed')
-            require(target.read_bytes() == before, 'rollback bytes differ')
-            return after
-    finally:
-        if created:
-            root.rmdir()
+@lru_cache(maxsize=8)
+def fchain_result(serialized_additions):
+    spec = importlib.util.spec_from_file_location('g9_shared_fchain', HERE.parent / 'fchain/check.py')
+    shared = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(shared)
+    current = git('rev-parse', 'HEAD').decode().strip()
+    return shared.compose(current, additions=json.loads(serialized_additions))
 
 
 def effective_overlay(pin):
@@ -249,35 +204,24 @@ def check(data, requested_pin=None, additions=None):
     require(len({p['id'] for p in patches}) == len(patches), 'duplicate addition patch')
     rebases = {(r['original']['path'], r['original']['pointer']): r for r in additions['chainRebases']}
     require(len(rebases) == len(additions['chainRebases']), 'duplicate chain rebase')
-    after_chain, after_additions, chains = {}, {}, {}
+    require(not rebases, 'rebase proposals must go through the shared F manifest')
+    composition, states = fchain_result(json.dumps(additions, sort_keys=True))
+    require(composition['exit'] == 0, 'shared F composition failed: ' + str(composition['counts']))
+    after_chain = {path: state['text'].encode() for path, state in states.items()}
+    after_additions = after_chain
+    chains = {path: [t.get('chainEntryId', t.get('id')) for t in state['trace']]
+              for path, state in states.items()}
     used_rebases = set()
 
     def chain(path):
-        if path not in after_chain:
-            current = blob(pin, path)
-            trace = []
-            for source, selector, original in chain_sources(pin, path):
-                ref_key = (source, selector)
-                if ref_key in rebases:
-                    record = rebases[ref_key]
-                    require(cite(pin, record['original']) == original, 'rebase original differs')
-                    require(record['patch']['beforeSha256'] != original['beforeSha256'], 'unnecessary rebase')
-                    current = replay(path, current, record['patch'])
-                    trace.append(record['patch']['id'])
-                    used_rebases.add(ref_key)
-                else:
-                    current = replay(path, current, original)
-                    trace.append(original.get('id', original.get('patchSpecId')))
-            after_chain[path] = current
-            chains[path] = trace
-        return after_chain[path]
+        return after_chain.get(path, blob(pin, path))
 
     for patch in patches:
-        path = patch['path']
-        require(path not in after_additions, 'duplicate same-file addition; consolidate')
-        before = chain(path)
-        require(patch['sourceCommit'] == pin and patch['status'] == 'prepared-not-applied', 'patch pin/status')
-        after_additions[path] = replay(path, before, patch)
+        if patch.get('composedBy') and not patch.get('predecessor'):
+            require(not any(k in patch for k in ('diff', 'forwardDiff', 'rollbackDiff')),
+                    'linked G9 copy must not retain an executable patch')
+        else:
+            require(patch['sourceCommit'] == pin and patch['status'] == 'prepared-not-applied', 'patch pin/status')
 
     def patch_ref(ref):
         if ref.get('artifact') == 'f-composition-additions.json':
@@ -301,11 +245,12 @@ def check(data, requested_pin=None, additions=None):
         dep = re.fullmatch(r'Phase 9 retention-or-move decision for (.+)', parked['dependency'])
         if dep:
             require(entry['file'] == dep[1], 'wrong file for original dependency')
-            wanted = 'retained-in-place' if dep[1] in RETAINED else 'moved'
-            require(entry['decision'] == wanted, 'decision type contradicts path ruling')
             owner_quotes = [r.get('quote', '') for r in entry['source'] if r['path'] == P8 + 'owner-answers.md']
-            verb = 'Keep' if dep[1] == 'docs/decisions/index.md' else 'Retain' if wanted == 'retained-in-place' else 'Move'
-            require(any(verb in q and '`' + dep[1] + '`' in q for q in owner_quotes), 'ruling quote not tied to own file')
+            retained = any(re.search(r'\b(?:Keep|Retain)\s+`' + re.escape(dep[1]) + '`', q) for q in owner_quotes)
+            moved = any(re.search(r'\bMove\s+(?:`[^`]+`\s*(?:and|,)\s*)*`' + re.escape(dep[1]) + '`', q) for q in owner_quotes)
+            require(retained != moved, 'ruling quote not tied unambiguously to own file')
+            wanted = 'retained-in-place' if retained else 'moved'
+            require(entry['decision'] == wanted, 'decision type contradicts path ruling')
         elif 'native Land' in parked['dependency']:
             require(entry['decision'] == 'retained-in-place' and entry['file'] == row['file'], 'native Land retained')
             require(any('dormant in this repo' in r.get('quote', '') for r in entry['source']), 'native Land ruling required')
@@ -321,6 +266,13 @@ def check(data, requested_pin=None, additions=None):
                     entry['successor']['anchor'] == binding['targetAnchor'], 'wrong clause successor')
         elif row['file'] == 'AGENTS.md':
             require(entry['decision'] == 'retired' and entry.get('successor'), 'old root routing retired')
+            successor = entry['successor']
+            require(successor['path'] == 'docs/platform/governance.md' and
+                    successor['anchor'] == 'decision-scope-to-holder-table', 'AGENTS successor path/anchor differs')
+            target = chain(successor['path']).decode()
+            require('## Decision scope to holder table' in target.splitlines(), 'AGENTS successor anchor absent')
+            require(successor['path'] + '#' + successor['anchor'] in chain('AGENTS.md').decode(),
+                    'AGENTS does not route to successor anchor')
         else:
             require(row['file'] == 'scripts/generate-shipped-path-inventory.mjs' and
                     entry['decision'] == 'retained-in-place' and entry['leadDecisionProposed'], 'unsettled scan policy needs explicit proposal')
@@ -340,7 +292,11 @@ def check(data, requested_pin=None, additions=None):
                 own = [patch_ref(r) for r in refs]
                 if reader.get('alreadyComposed'):
                     chain(path)
-                    require(set(reader['alreadyComposed']) <= set(chains[path]), 'unknown alreadyComposed id')
+                    known = set(chains[path])
+                    for prior in composition['baseChain']['predecessors']:
+                        if prior['file'] == path and prior.get('replacedBy') in known:
+                            known.add(prior['chainEntryId'])
+                    require(set(reader['alreadyComposed']) <= known, 'unknown alreadyComposed id')
                     require(not own, 'alreadyComposed must not duplicate a patch')
                     require(entry.get('destination', entry.get('successor', {}).get('path', '')) in after_chain[path].decode(), 'chain lacks successor')
                 else:
@@ -348,7 +304,12 @@ def check(data, requested_pin=None, additions=None):
                     require(path in after_additions, 'reader patch not replayed on F chain')
                 if entry['decision'] == 'moved':
                     effective = after_additions.get(path, after_chain[path]).decode()
-                    require(entry['destination'] in effective and entry['file'] not in effective,
+                    # Preserved historical/correction occurrences may coexist
+                    # with live retargets in the same file. Their G6 row owns
+                    # that choice; never require whole-file token eradication.
+                    preserved = bool(reader.get('g6Rows'))
+                    require((entry['destination'] in effective or preserved) and
+                            (entry['file'] not in effective or preserved),
                             'reader did not retarget moved operand')
         if entry['id'] in claim_by_id and entry['id'] != 'author-s4-08912b8301b10321':
             require(resolved or any(r.get('alreadyComposed') for r in entry['readers']),
@@ -400,24 +361,75 @@ def check(data, requested_pin=None, additions=None):
         require(row['reason'] == exclusion_reason(row['path']) and row['reason'], 'unsupported reader exclusion')
     active = set(scan) - {r['path'] for r in excluded}
     require(active == {r['path'] for r in data['gatewayReaders']}, 'rg active readers missing/extra')
+    shard_rows = {r['rowId']: (n, i, r) for n in (1, 2, 3)
+                  for i, r in enumerate(document(pin, P9 + f'preserve-premise/park-judgments/shard-{n}.json')['rows'])}
+    expected_g6 = {}
+    proof_rows = {r['rowId']: r for r in document(pin, P9 + 'preserve-premise/proof.json')['rows']}
+    for rid, (_, _, row) in shard_rows.items():
+        original = proof_rows[rid]
+        if any(o['path'] == GATEWAY for o in original['normalizedOperands']):
+            expected_g6.setdefault(original['file'], set()).add(rid)
     for reader in data['gatewayReaders']:
         if reader['path'].startswith('docs/'):
+            require(set(reader.get('g6Rows', [])) == expected_g6.get(reader['path'], set()),
+                    'gateway shard ownership omitted or relabeled: ' + reader['path'])
             require(reader.get('g6Rows') or reader.get('compositionAddition'), 'doc reader needs G6 or F owner')
             if reader.get('g6Rows'):
                 owning_rows = [cite(pin, ref) for ref in reader['g6Refs']]
                 require({r['rowId'] for r in owning_rows} == set(reader['g6Rows']) and
                         all(r['file'] == reader['path'] for r in owning_rows), 'G6 owner/file differs')
+                require(reader.get('composedBy'), 'gateway G6 reader must link its actual judgment/patch owner')
+                for ref in reader['composedBy']:
+                    number, index = ref['shard'], ref['row']
+                    actual = document(pin, P9 + f'preserve-premise/park-judgments/shard-{number}.json')['rows'][index]
+                    require(actual['rowId'] == ref['rowId'] and ref['rowId'] in reader['g6Rows'], 'wrong shard owner link')
             else:
                 require(any(p['id'] == reader['compositionAddition'] and p['path'] == reader['path']
                             for p in patches), 'missing F document composition entry')
+    reader_spec = importlib.util.spec_from_file_location('g9_root_readers', HERE.parent / 'fchain/readers.py')
+    reader_module = importlib.util.module_from_spec(reader_spec); reader_spec.loader.exec_module(reader_module)
+    root_scan = reader_module.census(pin)
+    census = data['rootDocReaderCensus']
+    require(census['sourcePin'] == pin and len(census['occurrences']) == len(root_scan), 'root document reader population differs')
+    for actual, observed in zip(census['occurrences'], root_scan):
+        require(all(actual[k] == v for k, v in observed.items()), 'root document reader evidence differs')
+        for ref in actual['shardOwners']:
+            n, index, owner = shard_rows[ref['rowId']]
+            require((n, index) == (ref['shard'], ref['row']), 'root reader shard selector differs')
+            source = owner.get('source') or next(e for e in owner['evidence'] if e.get('role') == 'source-unit')
+            require(source.get('file', source.get('path')) == actual['path'] and
+                    source.get('lineStart', source.get('startLine')) <= actual['line'] <= source.get('lineEnd', source.get('endLine')),
+                    'root reader shard occurrence unbound')
+        if actual['readerKind'] == 'surviving':
+            require(actual['shardOwners'] or actual['chainOwners'] or actual.get('owningPatch'), 'ownerless live document reader')
+            if actual.get('owningPatch'):
+                patch = patch_ref(actual['owningPatch'])
+                require(patch['path'] == actual['path'] and 'docs/platform/' + actual['oldPath'][5:] in chain(actual['path']).decode(),
+                        'root reader owning patch does not retarget')
+        elif actual['readerKind'] == 'confirmed-history':
+            require(actual['proofOwners'] and all(proof_rows[r['rowId']]['result'] == 'preserve-source-confirmed-history'
+                    and proof_rows[r['rowId']]['file'] == actual['path'] for r in actual['proofOwners']), 'unproved historical reader exclusion')
+        elif actual['readerKind'] == 'completed-work-history':
+            require(actual['path'] == 'docs/backlog.md' and actual['text'].endswith('— done'), 'not completed-work evidence')
+        elif actual['readerKind'] == 'retained-decision-projection':
+            require(actual['path'] in {'docs/decisions/index.md', 'docs/knowledge/decisions-index/decision-record.md'} and
+                    re.search(r'\d{4}-\d\d-\d\dT', actual['text']), 'not a dated decision projection')
+        else:
+            require(actual['readerKind'] in {'removed-with-source', 'historical'}, 'unknown reader classification')
+    for entry in entries:
+        if entry['file'] in reader_module.OLD and entry['decision'] == 'moved':
+            require(entry['documentReaderOccurrences'] == [i for i, h in enumerate(root_scan) if h['oldPath'] == entry['file']],
+                    'move omits document reader occurrences')
     counts = dict(sorted(Counter(e['decision'] for e in entries).items()))
     require(counts == data['counts'], 'decision counts mismatch')
     return {'status': 'pass', 'pin': pin, 'entries': len(entries), 'records': 29,
             'counts': counts, 'leadDecisionProposed': sum(e['leadDecisionProposed'] for e in entries),
             'gatewayScanFiles': len(scan), 'gatewayActiveReaders': len(active),
-            'patchesReplayed': len(patches), 'chainRebasesReplayed': len(used_rebases),
+            'preparedAdditions': len(patches), 'linkedAdditions': sum(bool(p.get('composedBy')) for p in patches),
+            'rootDocumentOccurrences': len(root_scan), 'sharedCompositionFiles': len(composition['files']),
+            'chainRebasesReplayed': len(used_rebases),
             'chainFiles': len(after_chain),
-            'limits': 'Relevant-file F-chain replay and record bindings only; not product parity, approval, F or gate closure.'}
+            'limits': 'Complete shared prepared-byte F-chain replay and pinned record bindings only; not product parity, approval, F or gate closure.'}
 
 
 def negative_controls(data, additions):
@@ -449,8 +461,7 @@ def negative_controls(data, additions):
         d['entries'][retained]['retirementScope'] = 'fabricated'
         d['counts'] = dict(Counter(e['decision'] for e in d['entries']))
     add('retention flipped with adjusted counts', flip)
-    add('patch cannot apply on F chain', lambda d, a: a['patches'][0].update(
-        beforeSha256=digest(blob(d['sourcePin'], 'bin/fgos.mjs'))))
+    add('patch cannot apply on F chain', lambda d, a: a['patches'][5].update(diff='malformed prepared diff'))
     def omit_reader_and_census(d, a):
         path = 'docs/platform/config/spec.md'
         d['gatewayReaders'] = [r for r in d['gatewayReaders'] if r['path'] != path]
@@ -484,6 +495,20 @@ def negative_controls(data, additions):
         for reader in entry['readers']:
             reader['patchRefs'] = []
     add('retired clause pointer patch omitted', omit_clause_patch)
+    def strip_g6(d, a):
+        for reader in d['gatewayReaders']:
+            if reader.get('g6Rows'):
+                reader.pop('g6Rows'); reader.pop('g6Refs'); reader.pop('composedBy')
+                reader['compositionAddition'] = next(p['id'] for p in a['patches'] if p['path'] == reader['path'])
+        for entry in d['entries']:
+            if entry['file'] == GATEWAY:
+                entry['readers'] = copy.deepcopy(d['gatewayReaders'])
+    add('gateway shard owners relabeled as additions', strip_g6)
+    agents = next(i for i, e in enumerate(data['entries']) if e['consumerFile'] == 'AGENTS.md')
+    add('AGENTS successor anchor forged', lambda d, a: d['entries'][agents]['successor'].update(anchor='bogus-anchor'))
+    add('AGENTS successor path swapped', lambda d, a: d['entries'][agents]['successor'].update(path='docs/reading-map.md'))
+    add('root document reader census truncated', lambda d, a: d['rootDocReaderCensus']['occurrences'].pop())
+    add('move document reader coverage omitted', lambda d, a: d['entries'][root_move].update(documentReaderOccurrences=[]))
     outcomes = []
     for name, mutate in cases:
         candidate, patches = copy.deepcopy(data), copy.deepcopy(additions)

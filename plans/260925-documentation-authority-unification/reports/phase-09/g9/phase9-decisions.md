@@ -1,5 +1,35 @@
 # Dependency decisions and prepared F deltas
 
+## Current replay representation — one F door (L13-24)
+
+The 158 decisions below are unchanged. Execute prepared bytes only through
+[`../fchain/manifest.json`](../fchain/manifest.json) and
+[`../fchain/check.py`](../fchain/check.py); see the current
+[receipt](../fchain/receipt.md) for counts and exact proof commands.
+
+- Gateway additions `/2`, `/3`, `/4`, `/6`, `/7`, `/8` are link-only records:
+  f03917, f04343, f04357, f06830/f06831/f06837, f07976 and f07985 own them.
+  **f04343 and f06830/f06831 remain preserved**, not retargeted. Only `/5`
+  owns a new gateway document retarget, rebased after the distinct premise delta.
+- Map addition `/1` links f00527. `/0`, `/9`–`/12`, `/17`, `/18` link carries.
+  `/19` links carry 3 and retains only its independent map/heading residual;
+  its named predecessor guards the exact carry result. No repeated carry diff
+  remains executable in these G9 records.
+- `/22` owns the late mailbox map citation. The pinned root-document census
+  records all 136 occurrences, including 42 surviving reader occurrences,
+  with shard/chain/new-patch owners and individually evidenced non-live cases.
+- All `plans/` evidence, including changed or deleted scan members and G6
+  judgment rows, is read at `sourcePin`. Current prepared replay separately
+  uses the shared manifest. The checker validates both AGENTS successor path
+  and its composed anchor, and refuses gateway ownership relabeling.
+
+The following narrative and tables are the **historical authoring receipt at
+56b3c3ebf**, not the current application order or executable patch list. Historical
+fallback/count statements do not supersede the shared door above. L13-23.1 has
+also accepted the two classifier proposals; their original provenance flags stay.
+
+## Historical authoring receipt
+
 Status: **authored records slice; not independently accepted; no cutover authorization**.
 
 Source pin: `56b3c3ebffddca273154e482e581591113c394da`.

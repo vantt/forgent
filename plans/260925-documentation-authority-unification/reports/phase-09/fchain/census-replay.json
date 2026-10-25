@@ -1,0 +1,62 @@
+{
+  "exit": 0,
+  "pin": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
+  "sourceSha256": "525bb4ed313141459b6dad8f7aaf798e5997f76ecaa2c4c07445ff6668819c99",
+  "adapter": "import runpy,sys,pathlib\nscript,output,pin=sys.argv[1:]\nns=runpy.run_path(script)\nmain=ns['main']; original=ns['dump']; target=pathlib.Path(output)\nmain.__globals__['dump']=lambda path,data: original(target/path.name,data)\nsys.argv=[script,'--pin',pin]\nmain()\n",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import runpy,sys,pathlib\nscript,output,pin=sys.argv[1:]\nns=runpy.run_path(script)\nmain=ns['main']; original=ns['dump']; target=pathlib.Path(output)\nmain.__globals__['dump']=lambda path,data: original(target/path.name,data)\nsys.argv=[script,'--pin',pin]\nmain()\n",
+        "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+        "/tmp/fgos-work/fchain-census-andh4sox/1",
+        "608a4ada5f195b0d0b9d3568a71b8dde4954aacb"
+      ],
+      "exit": 0,
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 54, \"joined-by-citation\": 4, \"joined-owning-test\": 779}}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import runpy,sys,pathlib\nscript,output,pin=sys.argv[1:]\nns=runpy.run_path(script)\nmain=ns['main']; original=ns['dump']; target=pathlib.Path(output)\nmain.__globals__['dump']=lambda path,data: original(target/path.name,data)\nsys.argv=[script,'--pin',pin]\nmain()\n",
+        "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+        "/tmp/fgos-work/fchain-census-andh4sox/2",
+        "608a4ada5f195b0d0b9d3568a71b8dde4954aacb"
+      ],
+      "exit": 0,
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 54, \"joined-by-citation\": 4, \"joined-owning-test\": 779}}\n",
+      "stderr": ""
+    }
+  ],
+  "identicalReplays": true,
+  "outputs": {
+    "residue.json": {
+      "sha256": "8c71faf6d077318d8ce5ca646edc12d5fa70f885cade300247e7612bce3643bc",
+      "bytes": 93
+    },
+    "join.json": {
+      "sha256": "d7cd97ec0597f69df53f85f713d3bc48f547cbf82516a16293b548389e287d9b",
+      "bytes": 2271427
+    },
+    "settlement.json": {
+      "sha256": "4e1cc0248daadff70c8639f5ea388184d35acdaf931e48d45b1107121d80a7c4",
+      "bytes": 574539
+    }
+  },
+  "counts": {
+    "files": 140,
+    "sites": 1126,
+    "statuses": {
+      "confirmed-grade-record-REJECT": 289,
+      "confirmed-settlement-REJECT": 54,
+      "joined-by-citation": 4,
+      "joined-owning-test": 779
+    }
+  },
+  "relocation": "Only dump output sink redirected to auto-cleaned tempfile; original input checks, main and citations --check unchanged."
+}

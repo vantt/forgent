@@ -22,7 +22,10 @@
         "expectedAfterSha256": "2fbb15efb976305c8601c59da700075e38e3ba44ca63999307c650fc4e597d77",
         "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-patch-order.json#file:AGENTS.md",
         "integrationStatus": "Not applied or overwritten. D1 owns this exact current-pin delta; shared-file owner must compose the full approved set once at its final pin."
-      }
+      },
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json#/patches/0"
+      ]
     },
     {
       "path": "test/docs/rul11-anchor-phrase.test.mjs",
@@ -71,7 +74,10 @@
         "expectedAfterSha256": "ad75b5b8ed52d221fb8a6455f55182cefd8cd1ab36da4c5fc5613a0fcddd0c4d",
         "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-patch-order.json#file:test/docs/decisions-corpus-retired.test.mjs",
         "integrationStatus": "Not applied or overwritten. D1 owns this exact current-pin delta; shared-file owner must compose the full approved set once at its final pin."
-      }
+      },
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json#/patches/1"
+      ]
     },
     {
       "path": "core/skills/_shared/executor-dispatch-fallback.md",
@@ -358,7 +364,10 @@
         "expectedAfterSha256": "3b78b9a0452240c153aef85a3b505be5c4ef4ea2c6b4ffe396764386ca9a3e98",
         "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-patch-order.json#file:apps/fgos-gateway/web/src/lib/network.ts",
         "integrationStatus": "Not applied or overwritten. D1 owns this exact current-pin delta; shared-file owner must compose the full approved set once at its final pin."
-      }
+      },
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json#/patches/2"
+      ]
     },
     {
       "path": "packages/distribution/rust/src/canonical.rs",
@@ -414,7 +423,10 @@
       "rationale": "Exact common-directory versus worktree top-level discovery distinction; no stale numeric locator.",
       "generated": false,
       "reviewStatus": "pending",
-      "applied": false
+      "applied": false,
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json#/patches/4"
+      ]
     },
     {
       "path": "docs/backlog.md",
@@ -428,7 +440,10 @@
       "rationale": "Preserve STR70a as proposed and its complete decision/outcome precedent; preserve full vendored parser integrity/parity/hash/advisory procedure.",
       "generated": false,
       "reviewStatus": "pending",
-      "applied": false
+      "applied": false,
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json#/patches/3"
+      ]
     }
   ],
   "retiredConsumers": [

@@ -261,7 +261,7 @@ def finding(kind, file, **fields):
     return dict(kind=kind, file=file, resolved=False, **fields)
 
 
-def replay_chain(pin, replayer):
+def replay_chain(pin, replayer, check_checkout=True):
     approved = load(P8 / 'step-07-composed-patches.json')['patches']
     packet = load(PHASE / 'composition/patch-specs.json')
     byid = {s['id']: s for s in packet['patches']}
@@ -277,7 +277,8 @@ def replay_chain(pin, replayer):
         raw = blob(pin, file); text = (raw or b'').decode(); trace = []; strict = True
         current = ROOT / file
         require(not current.is_symlink(), 'symlink input: ' + file)
-        require((current.read_bytes() if current.is_file() else None) == raw, 'checkout drift: ' + file)
+        if check_checkout:
+            require((current.read_bytes() if current.is_file() else None) == raw, 'checkout drift: ' + file)
         prior = predecessors.get(file); specs = selected[file]
         # The chain's selection rule replaces an old predecessor when the first
         # effective spec is rooted directly in the current file (W9 replay).
@@ -532,8 +533,15 @@ def main():
                ('shard' not in f and f.get('file') in files)]
         summary['counts'] = dict(sorted(Counter(f['kind'] for f in own).items()))
         summary['unresolved'] = sum(not f['resolved'] for f in own)
+    # Record-level checks above retain their owning cases. One wiring check
+    # subjects the result to every other prepared source through the F door.
+    spec = importlib.util.spec_from_file_location('premise_shared_fchain', PHASE / 'fchain/check.py')
+    shared = importlib.util.module_from_spec(spec); spec.loader.exec_module(shared)
+    composed, _ = shared.compose(pin)
+    if composed['exit']:
+        findings.append(dict(kind='sharedFchainConflict', resolved=False, counts=composed['counts']))
     unresolved = sum(not f['resolved'] for f in findings)
-    report = dict(sourceCommit=pin, command='python3 -B ' + str(Path(__file__).relative_to(ROOT)) +
+    report = dict(sharedFchain=dict(exit=composed['exit'], files=len(composed['files']), counts=composed['counts']), sourceCommit=pin, command='python3 -B ' + str(Path(__file__).relative_to(ROOT)) +
                   (' --all' if args.all else f' --shard {args.shard}'), exit=1 if unresolved else 0,
                   scope='Mechanical chain/coverage proof only; no semantic approval or cutover readiness.',
                   reuse='composition/compose.py apply_diff + baseline; phase-08 step-07-assemble.py hunk_edits + locate_edit',
