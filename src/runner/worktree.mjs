@@ -214,9 +214,12 @@ function recordPlaced(worktreePath, rel, placed) {
  * every new untracked or ignored path, a file with its content digest, and
  * the dependency directory `provisionDependencies` installed declared as
  * regenerable. The record is written even when a step fails, so a half
- * provisioned checkout can still be removed.
+ * provisioned checkout can still be removed. `disposable` marks a checkout
+ * fgOS made only to run a check in: removal then takes back every untracked
+ * or ignored byte there, since all of it came from provisioning or from that
+ * check.
  */
-export function provisionWorktree(worktreePath, repoRoot, stateRoot) {
+export function provisionWorktree(worktreePath, repoRoot, stateRoot, { disposable = false } = {}) {
   const before = new Set(untrackedEntries(worktreePath));
   const regenerable = [];
   try {
@@ -230,7 +233,7 @@ export function provisionWorktree(worktreePath, repoRoot, stateRoot) {
     }
     const { dev, ino } = fs.statSync(worktreePath);
     const file = provisioningRecordPath(stateRoot, worktreePath);
-    const record = { contract: PROVISIONING_CONTRACT, worktree: realpathOrSelf(worktreePath), identity: { dev, ino }, regenerable, placed };
+    const record = { contract: PROVISIONING_CONTRACT, worktree: realpathOrSelf(worktreePath), identity: { dev, ino }, regenerable, placed, ...(disposable ? { disposable } : {}) };
     fs.mkdirSync(path.dirname(file), { recursive: true });
     const tmp = `${file}.${uniqueTmpTag()}.tmp`;
     fs.writeFileSync(tmp, `${JSON.stringify(record, null, 2)}\n`);
@@ -262,8 +265,9 @@ function stillAsPlaced(abs, entry) {
  * taken out once it is empty. A worker-edited copy, or any byte the record
  * does not name, stays where it is and the port refuses on it.
  * `restore()` puts everything back (the port refused); `discard()` deletes
- * the moved bytes and the record (the port removed the checkout). Without a
- * record for this checkout nothing moves.
+ * the moved bytes and the record (the port removed the checkout). A record
+ * marked disposable also sets aside every other untracked or ignored byte.
+ * Without a record for this checkout nothing moves.
  */
 function setProvisionedAside(stateRoot, worktreePath) {
   const recordFile = provisioningRecordPath(stateRoot, worktreePath);
@@ -286,6 +290,7 @@ function setProvisionedAside(stateRoot, worktreePath) {
     moved.push(rel);
   };
   try {
+    if (record.disposable) for (const entry of untrackedEntries(worktreePath)) move(entry.replace(/\/$/, ''));
     for (const rel of record.regenerable ?? []) if (fs.existsSync(path.join(worktreePath, rel))) move(rel);
     for (const entry of record.placed ?? []) if (entry.kind !== 'dir' && stillAsPlaced(path.join(worktreePath, entry.path), entry)) move(entry.path);
     const dirs = (record.placed ?? []).filter(e => e.kind === 'dir').map(e => e.path).sort((a, b) => b.length - a.length);
@@ -1248,8 +1253,9 @@ export function refreshUnstartedBranch(repoRoot, branch, targetRef, checkoutPath
  * commit, so this never inspects, moves or removes any checkout of the
  * branch itself, including one a person keeps open (docs/history/
  * merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md D1). It is
- * provisioned like a Land candidate, with what that placed recorded; the
- * caller always removes it with `removeWorktree`. A provisioning failure
+ * provisioned like a Land candidate, with what that placed recorded and the
+ * record marked disposable, so `removeWorktree` also takes back what the
+ * verification run built there; the caller always removes it that way. A provisioning failure
  * removes the checkout before the error is rethrown.
  */
 export function createVerifyCheckout(repoRoot, commit) {
@@ -1269,7 +1275,7 @@ export function createVerifyCheckout(repoRoot, commit) {
     throw new WorktreeError(`git worktree add --detach failed at ${commit}: ${err.message}`, { worktreePath });
   }
   try {
-    provisionWorktree(worktreePath, repoRoot, provisioningStateRoot());
+    provisionWorktree(worktreePath, repoRoot, provisioningStateRoot(), { disposable: true });
   } catch (err) {
     try { removeWorktree(repoRoot, worktreePath, { force: true }); } catch { /* the provisioning error is the one to report */ }
     throw err;
