@@ -6,192 +6,141 @@
   "independentAcceptance": false,
   "chainOrder": [
     "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json"
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/pointer-patches.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-1.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/prepared-patches.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json"
   ],
-  "selectionRule": "Reuse composition effectiveSpecIds and its replacement roots, then apply chainRebases only to their exact named original, then these consolidated per-file deltas. No historical approval transfer. Replay relevant files only.",
+  "selectionRule": "Replay only through fchain/manifest.json. Link-only entries have no executable payload; a linked residual names its exact predecessor and carries only its independent delta. No historical approval transfer or standalone G9 replay.",
   "chainRebases": [],
   "patches": [
     {
       "id": "g9:dependencies:bin/fgos.mjs",
       "path": "bin/fgos.mjs",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "1756414ad9721b55f54b6587dbd108336b37cec88e86cd363cf9398b1df2e666",
-      "expectedAfterSha256": "e7c609bb8b20fc9904a20a201e8c8398891532af32b74f18ba526d6f80e11d33",
-      "diff": "--- a/bin/fgos.mjs\n+++ b/bin/fgos.mjs\n@@ -1753,7 +1753,7 @@\n           return { attested: false, reason: 'docRegistry.enforce is off and this path does not resolve to a single registered currentPath', docPath, captureId };\n         }\n \n-        // docs/architect/knowledge-registry-redesign.md §7.4: an\n+        // docs/platform/work-state/contracts/knowledge-registry.md §7.4: an\n         // attestation links a real capture (a work item id) to this doc\n         // slot -- \"the precise replacement for the old 'compound stores\n         // docType/docPath' meaning\". --capture-id is required: this verb's\n@@ -1817,7 +1817,7 @@\n         if (!existsAtHead(repoRoot, docPath)) {\n           throw new StoreError('validation', `compound: --doc-path \"${docPath}\" is not committed at the main checkout's HEAD (\"${repoRoot}\") — write and commit the document there before tagging it.`);\n         }\n-        // docs/architect/knowledge-registry-redesign.md §8: \"The new\n+        // docs/platform/work-state/contracts/knowledge-registry.md §8: \"The new\n         // producer gate extends [the HEAD-commit rule]: require registry\n         // enforcement active, require path equals a registered document\n         // currentPath, reject alias paths\". This legacy verb is deprecated\n@@ -3566,7 +3566,7 @@\n       //\n       // A REGISTERED session worktree (`fgos session start`) is deliberately\n       // EXEMPT -- unlike `approve`, which refuses ANY worktree including a\n-      // registered session (docs/specs/runner.md: \"a session worktree is\n+      // registered session (docs/platform/runner/contracts/conserved-dispatch-doctrine.md#session-participation-and-merge-isolation: \"a session worktree is\n       // structurally the wrong place for a merge-into-main to happen\"),\n       // `return`'s own progress check (aheadCount + verify) is spike-proven\n       // correct from inside a session worktree and is documented there as\n",
-      "rollbackDiff": "--- a/bin/fgos.mjs\n+++ b/bin/fgos.mjs\n@@ -1753,7 +1753,7 @@\n           return { attested: false, reason: 'docRegistry.enforce is off and this path does not resolve to a single registered currentPath', docPath, captureId };\n         }\n \n-        // docs/platform/work-state/contracts/knowledge-registry.md §7.4: an\n+        // docs/architect/knowledge-registry-redesign.md §7.4: an\n         // attestation links a real capture (a work item id) to this doc\n         // slot -- \"the precise replacement for the old 'compound stores\n         // docType/docPath' meaning\". --capture-id is required: this verb's\n@@ -1817,7 +1817,7 @@\n         if (!existsAtHead(repoRoot, docPath)) {\n           throw new StoreError('validation', `compound: --doc-path \"${docPath}\" is not committed at the main checkout's HEAD (\"${repoRoot}\") — write and commit the document there before tagging it.`);\n         }\n-        // docs/platform/work-state/contracts/knowledge-registry.md §8: \"The new\n+        // docs/architect/knowledge-registry-redesign.md §8: \"The new\n         // producer gate extends [the HEAD-commit rule]: require registry\n         // enforcement active, require path equals a registered document\n         // currentPath, reject alias paths\". This legacy verb is deprecated\n@@ -3566,7 +3566,7 @@\n       //\n       // A REGISTERED session worktree (`fgos session start`) is deliberately\n       // EXEMPT -- unlike `approve`, which refuses ANY worktree including a\n-      // registered session (docs/platform/runner/contracts/conserved-dispatch-doctrine.md#session-participation-and-merge-isolation: \"a session worktree is\n+      // registered session (docs/specs/runner.md: \"a session worktree is\n       // structurally the wrong place for a merge-into-main to happen\"),\n       // `return`'s own progress check (aheadCount + verify) is spike-proven\n       // correct from inside a session worktree and is documented there as\n",
-      "independentVerdict": "pending",
-      "rationale": "Reuse carries/pointer-patches.json exact clause retargets after F chain, not the stale whole-file body.",
-      "predecessorIds": [
-        "w8:repin:scope-consumer:bin/fgos.mjs",
-        "w8:repin:hunk-park:bin/fgos.mjs"
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/13"
       ]
     },
     {
       "id": "g9:dependencies:docs/architecture-manifest.json",
       "path": "docs/architecture-manifest.json",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
-      "expectedAfterSha256": "1b14cde163df5bc87ee71cbcfeadbdaf6a5061b7aa4aa6a3edbdb8ce45510d4b",
-      "diff": "--- a/docs/architecture-manifest.json\n+++ b/docs/architecture-manifest.json\n@@ -1,6 +1,6 @@\n {\n   \"contract\": \"architecture-manifest.v1\",\n-  \"map\": \"docs/architecture-map.md\",\n+  \"map\": \"docs/platform/architecture-map.md\",\n   \"layers\": [\n     \"entry\",\n     \"use-case\",\n",
-      "rollbackDiff": "--- a/docs/architecture-manifest.json\n+++ b/docs/architecture-manifest.json\n@@ -1,6 +1,6 @@\n {\n   \"contract\": \"architecture-manifest.v1\",\n-  \"map\": \"docs/platform/architecture-map.md\",\n+  \"map\": \"docs/architecture-map.md\",\n   \"layers\": [\n     \"entry\",\n     \"use-case\",\n",
-      "independentVerdict": "pending",
-      "rationale": "R26 content-checked governance/architecture read or fixed metadata co-cut",
-      "predecessorIds": []
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-1.json#/rows/42/patch"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
     },
     {
       "id": "g9:dependencies:docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md",
       "path": "docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "0ece875aa2ec77b6f1794a1121f0bb53f842f2625d39f0594d84244ceb464987",
-      "expectedAfterSha256": "32b70ea095ffb92ec16f7f3509a5df9e57d460954f730eefda5a35b67b6daa99",
-      "diff": "--- a/docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md\n+++ b/docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md\n@@ -10,7 +10,7 @@\n # fgOS Gateway API (CTR010)\n \n The OpenAPI 3.1 spec for the fgOS interface daemon's HTTP+JSON surface\n-lives at `docs/contracts/fgos-gateway-api-v1.yaml`, tagged\n+lives at `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`, tagged\n `x-contract: \"CTR010 · fgos-gateway.v1\"` — joining the existing numbered\n CTR family (CTR001 one-door-write, CTR002 single-writer-lock, CTR006\n routing-handoff, CTR008 attention envelope) per decision `0011`. See\n",
-      "rollbackDiff": "--- a/docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md\n+++ b/docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md\n@@ -10,7 +10,7 @@\n # fgOS Gateway API (CTR010)\n \n The OpenAPI 3.1 spec for the fgOS interface daemon's HTTP+JSON surface\n-lives at `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`, tagged\n+lives at `docs/contracts/fgos-gateway-api-v1.yaml`, tagged\n `x-contract: \"CTR010 · fgos-gateway.v1\"` — joining the existing numbered\n CTR family (CTR001 one-door-write, CTR002 single-writer-lock, CTR006\n routing-handoff, CTR008 attention envelope) per decision `0011`. See\n",
-      "independentVerdict": "pending",
-      "rationale": "gateway reader path retarget, L13-21.5",
-      "predecessorIds": [
-        "file:docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md"
-      ]
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/25/patch"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
     },
     {
       "id": "g9:dependencies:docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
       "path": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "3c57ed83d73a6c1658babb63b4e47d0091b92d3641ce97281012322b108bc33d",
-      "expectedAfterSha256": "fbd479308955635737638185ef286d2c8400f1b3150f5e58b99856fc1ac749d6",
-      "diff": "--- a/docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md\n+++ b/docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md\n@@ -47,7 +47,7 @@\n ## Why this route had to land before tsk-2ok, not after\n \n This item's own footprint (`herdr-plugin/src/gateway.rs`,\n-`docs/contracts/fgos-gateway-api-v1.yaml`) overlaps two siblings already\n+`docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`) overlaps two siblings already\n touching the same file — `tsk-54y` (CORS + bind) and `tsk-48w`\n (static-serving) — so none of the three could run concurrently with each\n other; they had to sequence through `gateway.rs` one at a time.\n",
-      "rollbackDiff": "--- a/docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md\n+++ b/docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md\n@@ -47,7 +47,7 @@\n ## Why this route had to land before tsk-2ok, not after\n \n This item's own footprint (`herdr-plugin/src/gateway.rs`,\n-`docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`) overlaps two siblings already\n+`docs/contracts/fgos-gateway-api-v1.yaml`) overlaps two siblings already\n touching the same file — `tsk-54y` (CORS + bind) and `tsk-48w`\n (static-serving) — so none of the three could run concurrently with each\n other; they had to sequence through `gateway.rs` one at a time.\n",
-      "independentVerdict": "pending",
-      "rationale": "gateway reader path retarget, L13-21.5",
-      "predecessorIds": [
-        "file:docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md"
-      ]
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/108"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
     },
     {
       "id": "g9:dependencies:docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
       "path": "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "e6858a7d7cfcbe1d0ffab4664986019ce24ddd049d73ee3a436332e4dcd57231",
-      "expectedAfterSha256": "6dcf3c24015d6c8425a5d5365ba30e37974bc9d13a0ce9f6c84bbdf731c686e1",
-      "diff": "--- a/docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md\n+++ b/docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md\n@@ -130,7 +130,7 @@\n `herdr-fgos` binary (that door was closed by `tsk-7l9` D8), but a screen\n in an **independent web client** calling the gateway's HTTP API. Every\n endpoint the screen uses is sourced from exactly one place —\n-`docs/contracts/fgos-gateway-api-v1.yaml` (18 paths, matching 1:1 against\n+`docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml` (18 paths, matching 1:1 against\n the 17 routes actually registered in `gateway.rs` plus `/contract`\n itself) — the item is explicit that no endpoint gets re-described\n independently in either the item text or the code; every reference cites\n",
-      "rollbackDiff": "--- a/docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md\n+++ b/docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md\n@@ -130,7 +130,7 @@\n `herdr-fgos` binary (that door was closed by `tsk-7l9` D8), but a screen\n in an **independent web client** calling the gateway's HTTP API. Every\n endpoint the screen uses is sourced from exactly one place —\n-`docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml` (18 paths, matching 1:1 against\n+`docs/contracts/fgos-gateway-api-v1.yaml` (18 paths, matching 1:1 against\n the 17 routes actually registered in `gateway.rs` plus `/contract`\n itself) — the item is explicit that no endpoint gets re-described\n independently in either the item text or the code; every reference cites\n",
-      "independentVerdict": "pending",
-      "rationale": "gateway reader path retarget, L13-21.5",
-      "predecessorIds": [
-        "file:docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md"
-      ]
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/110/patch"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
     },
     {
       "id": "g9:dependencies:docs/platform/config/spec.md",
       "path": "docs/platform/config/spec.md",
       "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
       "status": "prepared-not-applied",
-      "beforeSha256": "99a0e0b2dcf4c231b424761e94f9c2f32e951834acc8e576505ae528307e9be3",
-      "expectedAfterSha256": "17d7dc0caf285b82d619066d702894c789bb7f7ac87e148e42a2e42b0efbc7f6",
+      "beforeSha256": "4ffb09e0ca4823579e9c3db0ed5c24b651041f9253262a7516be52536c45ab01",
+      "expectedAfterSha256": "e29e4ceef82a69dc8581cdcf68368b9ec556a9c7ac642ce7df36d86460899dca",
       "diff": "--- a/docs/platform/config/spec.md\n+++ b/docs/platform/config/spec.md\n@@ -80,7 +80,7 @@\n \n ## 4. Schema and standard\n \n-Config files are YAML, so people can edit them and keep comments. Their schema invents no syntax: it is **JSON Schema draft 2020-12**, the dialect of fgOS's other contracts (`packages/*/contracts/*.schema*.json`, and `docs/contracts/fgos-gateway-api-v1.yaml` through OpenAPI 3.1). What matters is standard fields; syntax and validator are the best existing ones, and developers maintain the schema with ordinary JSON Schema tooling (owner, 2026-10-23).\n+Config files are YAML, so people can edit them and keep comments. Their schema invents no syntax: it is **JSON Schema draft 2020-12**, the dialect of fgOS's other contracts (`packages/*/contracts/*.schema*.json`, and `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml` through OpenAPI 3.1). What matters is standard fields; syntax and validator are the best existing ones, and developers maintain the schema with ordinary JSON Schema tooling (owner, 2026-10-23).\n \n **Shape and values are separate files** (owner, 2026-10-23 11:45), so developers maintain shape in the schema and values in the standard, and a person can open the standard, copy from it or edit it:\n \n",
       "rollbackDiff": "--- a/docs/platform/config/spec.md\n+++ b/docs/platform/config/spec.md\n@@ -80,7 +80,7 @@\n \n ## 4. Schema and standard\n \n-Config files are YAML, so people can edit them and keep comments. Their schema invents no syntax: it is **JSON Schema draft 2020-12**, the dialect of fgOS's other contracts (`packages/*/contracts/*.schema*.json`, and `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml` through OpenAPI 3.1). What matters is standard fields; syntax and validator are the best existing ones, and developers maintain the schema with ordinary JSON Schema tooling (owner, 2026-10-23).\n+Config files are YAML, so people can edit them and keep comments. Their schema invents no syntax: it is **JSON Schema draft 2020-12**, the dialect of fgOS's other contracts (`packages/*/contracts/*.schema*.json`, and `docs/contracts/fgos-gateway-api-v1.yaml` through OpenAPI 3.1). What matters is standard fields; syntax and validator are the best existing ones, and developers maintain the schema with ordinary JSON Schema tooling (owner, 2026-10-23).\n \n **Shape and values are separate files** (owner, 2026-10-23 11:45), so developers maintain shape in the schema and values in the standard, and a person can open the standard, copy from it or edit it:\n \n",
       "independentVerdict": "pending",
       "rationale": "gateway reader path retarget, L13-21.5",
-      "predecessorIds": []
+      "predecessorIds": [],
+      "fchainBasis": []
     },
     {
       "id": "g9:dependencies:docs/platform/herdr-web-dashboard/spec.md",
       "path": "docs/platform/herdr-web-dashboard/spec.md",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "a050353e97a05c4f6707fbe6c756bd94b57808e085f2c3761b42fde2282d00eb",
-      "expectedAfterSha256": "5448db40e8eae46d1cf1fd8d1b4f35a129a4e4119b8fa9dff12243396c1b7753",
-      "diff": "--- a/docs/platform/herdr-web-dashboard/spec.md\n+++ b/docs/platform/herdr-web-dashboard/spec.md\n@@ -27,7 +27,7 @@\n Superseded by: None\n ```\n \n-> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:5-8; docs/specs/platform-foundations.md:179-184; docs/decisions/index.md:1; apps/fgos-gateway/src/gateway.rs:42,174; src/setup/registrations.mjs:3468-3470; docs/contracts/fgos-gateway-api-v1.yaml:82-599 (19 path keys); docs/contracts/fgos-gateway-api-v1.yaml:212-222; apps/fgos-gateway/src/gateway.rs:687-707. A22 rebindings are pending; no truth approval carried.\n+> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:5-8; docs/specs/platform-foundations.md:179-184; docs/decisions/index.md:1; apps/fgos-gateway/src/gateway.rs:42,174; src/setup/registrations.mjs:3468-3470; docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:82-599 (19 path keys); docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:212-222; apps/fgos-gateway/src/gateway.rs:687-707. A22 rebindings are pending; no truth approval carried.\n \n \n ## Purpose\n@@ -296,7 +296,7 @@\n   scope, not this spec's, and not something to be improvised inside the web\n   client.\n - **The gateway's own API contract now exists** —\n-  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 19\n+  `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 19\n   paths; the gateway also registers `GET /runtime` and nests `/mcp` outside\n   this contract.\n   This spec still describes operations in product terms rather than\n",
-      "rollbackDiff": "--- a/docs/platform/herdr-web-dashboard/spec.md\n+++ b/docs/platform/herdr-web-dashboard/spec.md\n@@ -27,7 +27,7 @@\n Superseded by: None\n ```\n \n-> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:5-8; docs/specs/platform-foundations.md:179-184; docs/decisions/index.md:1; apps/fgos-gateway/src/gateway.rs:42,174; src/setup/registrations.mjs:3468-3470; docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:82-599 (19 path keys); docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:212-222; apps/fgos-gateway/src/gateway.rs:687-707. A22 rebindings are pending; no truth approval carried.\n+> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:5-8; docs/specs/platform-foundations.md:179-184; docs/decisions/index.md:1; apps/fgos-gateway/src/gateway.rs:42,174; src/setup/registrations.mjs:3468-3470; docs/contracts/fgos-gateway-api-v1.yaml:82-599 (19 path keys); docs/contracts/fgos-gateway-api-v1.yaml:212-222; apps/fgos-gateway/src/gateway.rs:687-707. A22 rebindings are pending; no truth approval carried.\n \n \n ## Purpose\n@@ -296,7 +296,7 @@\n   scope, not this spec's, and not something to be improvised inside the web\n   client.\n - **The gateway's own API contract now exists** —\n-  `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 19\n+  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 19\n   paths; the gateway also registers `GET /runtime` and nests `/mcp` outside\n   this contract.\n   This spec still describes operations in product terms rather than\n",
-      "independentVerdict": "pending",
-      "rationale": "gateway reader path retarget, L13-21.5",
-      "predecessorIds": [
-        "file:docs/platform/herdr-web-dashboard/spec.md"
-      ]
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/190",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/191",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/192/patch"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
     },
     {
       "id": "g9:dependencies:docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
       "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "e5e083d3c879ab2328933af5f2952db104b52d0378a22cc0d4713297efb3efe6",
-      "expectedAfterSha256": "885ed89d0674224b733eb698af85e05d789e77a65998d2a149e24a7f43c7b767",
-      "diff": "--- a/docs/platform/ui-spec/architecture/screens/S03-task-detail.md\n+++ b/docs/platform/ui-spec/architecture/screens/S03-task-detail.md\n@@ -118,7 +118,7 @@\n ### What CONTEXT actually shows (D17)\n \n `GET /work/{id}`'s `work` object (the `WorkItem` schema,\n-`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\n+`docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\n status this screen showed before D17 — CONTEXT surfaces the full set that\n is meaningful to a person deciding whether to trust the answer they are\n about to give, in this order:\n",
-      "rollbackDiff": "--- a/docs/platform/ui-spec/architecture/screens/S03-task-detail.md\n+++ b/docs/platform/ui-spec/architecture/screens/S03-task-detail.md\n@@ -118,7 +118,7 @@\n ### What CONTEXT actually shows (D17)\n \n `GET /work/{id}`'s `work` object (the `WorkItem` schema,\n-`docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\n+`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\n status this screen showed before D17 — CONTEXT surfaces the full set that\n is meaningful to a person deciding whether to trust the answer they are\n about to give, in this order:\n",
-      "independentVerdict": "pending",
-      "rationale": "gateway reader path retarget, L13-21.5",
-      "predecessorIds": [
-        "file:docs/platform/ui-spec/architecture/screens/S03-task-detail.md"
-      ]
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json#/rows/88/patch"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
     },
     {
       "id": "g9:dependencies:docs/platform/ui-spec/contracts/15-system-events.md",
       "path": "docs/platform/ui-spec/contracts/15-system-events.md",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "85044a1bcbeea7c3687205669a62bcce0aaa8550c1eabb526abb304f12904e59",
-      "expectedAfterSha256": "0e3cf6d81d2349c6bd3d7d47473415e1f7b7bd5f93724073fea7ff47a1867446",
-      "diff": "--- a/docs/platform/ui-spec/contracts/15-system-events.md\n+++ b/docs/platform/ui-spec/contracts/15-system-events.md\n@@ -35,7 +35,7 @@\n **These are client-derived events, not server-pushed ones.** The gateway\n has no SSE and no WebSocket — its only change-detection surface is a cheap\n poll of `GET /v1/state/digest`, which returns a `data_hash`\n-(`docs/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a\n+(`docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a\n stream). The client polls that digest, and when the hash differs from the\n one it last saw, it re-reads whatever the open screen needs and raises the\n events below itself. Nothing in the gateway emits them.\n",
-      "rollbackDiff": "--- a/docs/platform/ui-spec/contracts/15-system-events.md\n+++ b/docs/platform/ui-spec/contracts/15-system-events.md\n@@ -35,7 +35,7 @@\n **These are client-derived events, not server-pushed ones.** The gateway\n has no SSE and no WebSocket — its only change-detection surface is a cheap\n poll of `GET /v1/state/digest`, which returns a `data_hash`\n-(`docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a\n+(`docs/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a\n stream). The client polls that digest, and when the hash differs from the\n one it last saw, it re-reads whatever the open screen needs and raises the\n events below itself. Nothing in the gateway emits them.\n",
-      "independentVerdict": "pending",
-      "rationale": "gateway reader path retarget, L13-21.5",
-      "predecessorIds": []
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json#/rows/93/patch"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
     },
     {
       "id": "g9:dependencies:packages/distribution/rust/src/canonical.rs",
       "path": "packages/distribution/rust/src/canonical.rs",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "15ea0f48882aa65ed613554dea8a708618d84e94771deb1af2949fedfe682379",
-      "expectedAfterSha256": "6393eb2ae3203601b37945293dadcb1385a33b074362d5cf7fa3fe95e8a5c364",
-      "diff": "--- a/packages/distribution/rust/src/canonical.rs\n+++ b/packages/distribution/rust/src/canonical.rs\n@@ -1,6 +1,6 @@\n //! Release tree canonicalization and validation.\n //!\n-//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §5.\n+//! Enforces rules from `docs/platform/packaging-distribution/contracts/release-manifest.md#canonical-release-tree-rules`.\n \n use crate::manifest::{ManifestFileEntry, ReleaseManifest};\n use std::collections::HashSet;\n",
-      "rollbackDiff": "--- a/packages/distribution/rust/src/canonical.rs\n+++ b/packages/distribution/rust/src/canonical.rs\n@@ -1,6 +1,6 @@\n //! Release tree canonicalization and validation.\n //!\n-//! Enforces rules from `docs/platform/packaging-distribution/contracts/release-manifest.md#canonical-release-tree-rules`.\n+//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §5.\n \n use crate::manifest::{ManifestFileEntry, ReleaseManifest};\n use std::collections::HashSet;\n",
-      "independentVerdict": "pending",
-      "rationale": "Reuse carries/pointer-patches.json exact clause retargets after F chain, not the stale whole-file body.",
-      "predecessorIds": []
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/19"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
     },
     {
       "id": "g9:dependencies:packages/distribution/rust/src/init.rs",
       "path": "packages/distribution/rust/src/init.rs",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "1cfecbbe025a6485495b6e76bf5076d1fa3238ae27a01cf755c83c085a4ebf1c",
-      "expectedAfterSha256": "1b2a8674aef1f2b782b1aba4e1d590b2c4b04bd96df9d6c04609736860ab55c8",
-      "diff": "--- a/packages/distribution/rust/src/init.rs\n+++ b/packages/distribution/rust/src/init.rs\n@@ -2,7 +2,7 @@\n //!\n //! Implements the acquire -> stage -> verify -> preflight -> publish -> tail pipeline\n //! per `phase-12-fgctl-init-and-activation.md` and\n-//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §3, §6, §14.\n+//! `docs/platform/packaging-distribution/contracts/activation-binding.md#init-pipeline-and-root-binding`.\n \n use crate::canonical::canonicalize_manifest_files;\n use crate::lock::check_main_checkout_lock;\n",
-      "rollbackDiff": "--- a/packages/distribution/rust/src/init.rs\n+++ b/packages/distribution/rust/src/init.rs\n@@ -2,7 +2,7 @@\n //!\n //! Implements the acquire -> stage -> verify -> preflight -> publish -> tail pipeline\n //! per `phase-12-fgctl-init-and-activation.md` and\n-//! `docs/platform/packaging-distribution/contracts/activation-binding.md#init-pipeline-and-root-binding`.\n+//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §3, §6, §14.\n \n use crate::canonical::canonicalize_manifest_files;\n use crate::lock::check_main_checkout_lock;\n",
-      "independentVerdict": "pending",
-      "rationale": "Reuse carries/pointer-patches.json exact clause retargets after F chain, not the stale whole-file body.",
-      "predecessorIds": []
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/21"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
     },
     {
       "id": "g9:dependencies:packages/distribution/rust/src/verify.rs",
       "path": "packages/distribution/rust/src/verify.rs",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "45abf2dc964ec6fe1687d1cac3bc46654a6b32552ffe8d12d0f1c5753f42b800",
-      "expectedAfterSha256": "a59d4756e30f92eb45e26d706974e5ab1bbcb4684cf8bddfda5522309253263e",
-      "diff": "--- a/packages/distribution/rust/src/verify.rs\n+++ b/packages/distribution/rust/src/verify.rs\n@@ -1,6 +1,6 @@\n //! Manifest digest recomputation and per-file verification.\n //!\n-//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §5.\n+//! Matches `docs/platform/packaging-distribution/contracts/release-manifest.md#canonical-release-tree-rules`.\n \n use crate::canonical::{canonicalize_manifest_files, CanonicalError};\n use crate::manifest::{read_manifest_from_path, ReleaseManifest};\n",
-      "rollbackDiff": "--- a/packages/distribution/rust/src/verify.rs\n+++ b/packages/distribution/rust/src/verify.rs\n@@ -1,6 +1,6 @@\n //! Manifest digest recomputation and per-file verification.\n //!\n-//! Matches `docs/platform/packaging-distribution/contracts/release-manifest.md#canonical-release-tree-rules`.\n+//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §5.\n \n use crate::canonical::{canonicalize_manifest_files, CanonicalError};\n use crate::manifest::{read_manifest_from_path, ReleaseManifest};\n",
-      "independentVerdict": "pending",
-      "rationale": "Reuse carries/pointer-patches.json exact clause retargets after F chain, not the stale whole-file body.",
-      "predecessorIds": []
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/20"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
     },
     {
       "id": "g9:dependencies:packages/distribution/rust/src/workspace.rs",
       "path": "packages/distribution/rust/src/workspace.rs",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "a1ed550bb846d8a256048134a8a631afa2801f78163ba6f39b73c4ecb19e1f3f",
-      "expectedAfterSha256": "2e5c46776e48b663226c42349a6c98f4f77fbbf5fffd66449105d29aae04b075",
-      "diff": "--- a/packages/distribution/rust/src/workspace.rs\n+++ b/packages/distribution/rust/src/workspace.rs\n@@ -1,6 +1,6 @@\n //! Workspace root, workspaceId, and workStateId resolution.\n //!\n-//! Follows `docs/specs/distribution.md:297` for workspace root discovery: the\n+//! Follows `docs/platform/packaging-distribution/contracts/activation-binding.md#git-common-directory-discovery` for workspace root discovery: the\n //! main checkout of the repository holding the start directory, as the Git\n //! component resolves it (never the linked worktree's own top level).\n //!\n",
-      "rollbackDiff": "--- a/packages/distribution/rust/src/workspace.rs\n+++ b/packages/distribution/rust/src/workspace.rs\n@@ -1,6 +1,6 @@\n //! Workspace root, workspaceId, and workStateId resolution.\n //!\n-//! Follows `docs/platform/packaging-distribution/contracts/activation-binding.md#git-common-directory-discovery` for workspace root discovery: the\n+//! Follows `docs/specs/distribution.md:297` for workspace root discovery: the\n //! main checkout of the repository holding the start directory, as the Git\n //! component resolves it (never the linked worktree's own top level).\n //!\n",
-      "independentVerdict": "pending",
-      "rationale": "Reuse carries/pointer-patches.json exact clause retargets after F chain, not the stale whole-file body.",
-      "predecessorIds": []
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/22"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
     },
     {
       "id": "g9:dependencies:scripts/check-doc-constitution.mjs",
@@ -248,43 +197,42 @@
     {
       "id": "g9:dependencies:src/runner/dispatch/operation-prompt-templates.mjs",
       "path": "src/runner/dispatch/operation-prompt-templates.mjs",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "932f932d239ccec0ef3debd919576d25ab068c50cb990d1f15afd03ff30f46af",
-      "expectedAfterSha256": "19a15d560c4ba017932a5456aa079e5c0459b2943a29ebaaf987ed3d5949dc1c",
-      "diff": "--- a/src/runner/dispatch/operation-prompt-templates.mjs\n+++ b/src/runner/dispatch/operation-prompt-templates.mjs\n@@ -1,6 +1,6 @@\n // dispatch/operation-prompt-templates.mjs — operation prompt-template registry,\n // deterministic resolver, bounded variable renderer, and provenance tracker (Unit I04 / Phase 3),\n-// per docs/architect/agent-coordination/contracts/flow-definition.md and\n+// per docs/platform/runner/contracts/conserved-dispatch-doctrine.md#operation-prompt-templates and\n // plans/260919-coordination-skill-harness-simplification/plan.md.\n //\n // Layer: infra (same layer as src/runner/dispatch/assignment.mjs).\n",
-      "rollbackDiff": "--- a/src/runner/dispatch/operation-prompt-templates.mjs\n+++ b/src/runner/dispatch/operation-prompt-templates.mjs\n@@ -1,6 +1,6 @@\n // dispatch/operation-prompt-templates.mjs — operation prompt-template registry,\n // deterministic resolver, bounded variable renderer, and provenance tracker (Unit I04 / Phase 3),\n-// per docs/platform/runner/contracts/conserved-dispatch-doctrine.md#operation-prompt-templates and\n+// per docs/architect/agent-coordination/contracts/flow-definition.md and\n // plans/260919-coordination-skill-harness-simplification/plan.md.\n //\n // Layer: infra (same layer as src/runner/dispatch/assignment.mjs).\n",
-      "independentVerdict": "pending",
-      "rationale": "Reuse carries/pointer-patches.json exact clause retargets after F chain, not the stale whole-file body.",
-      "predecessorIds": []
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/16"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
     },
     {
       "id": "g9:dependencies:src/state/knowledge-registry.mjs",
       "path": "src/state/knowledge-registry.mjs",
-      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
-      "status": "prepared-not-applied",
-      "beforeSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
-      "expectedAfterSha256": "31761c730b9080c3d15e6aef6b6c0300650a9a30a4091cc1269c7e68578e60d7",
-      "diff": "--- a/src/state/knowledge-registry.mjs\n+++ b/src/state/knowledge-registry.mjs\n@@ -17,7 +17,7 @@\n   'retired',\n ]);\n \n-// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\n+// docs/platform/work-state/contracts/knowledge-registry.md §5.5/§14.1: only 'diataxis'\n // is a registered framework today, and its 4 modes are a closed set --\n // growing either list is a real product decision (a new writing framework,\n // or a new Diataxis mode), never a typo a reducer should silently accept.\n@@ -85,7 +85,7 @@\n \n /**\n  * Enforces the narrow, mechanical slice of the closed role/framework/mode\n- * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1\n+ * vocabulary that docs/platform/work-state/contracts/knowledge-registry.md §7.2 rule 1\n  * already states unconditionally: framework must be a registered one, mode\n  * must be one of that framework's own modes, and role must never equal a\n  * mode name (\"a role name must not equal any framework mode name\"). This\n@@ -207,8 +207,8 @@\n /**\n  * Resolves a doc's identity from an explicit docId, or by searching for the\n  * doc whose (topicId, role) match -- never by reconstructing `${topicId}:\n- * ${role}` as a string. docId is a durable identity (docs/architect/\n- * knowledge-registry-redesign.md §7.3) that topic.split intentionally never\n+ * ${role}` as a string. docId is a durable identity (docs/platform/work-state/contracts/\n+ * knowledge-registry.md §7.3) that topic.split intentionally never\n  * rewrites even though it does move the doc's own topicId onto the successor\n  * -- so a caller holding only (topicId, role) after a split must look the\n  * doc up by field, or it silently misses every doc whose id predates the\n@@ -534,7 +534,7 @@\n           `doc.register: doc '${id}' already exists with topicId='${existing.topicId}', role='${existing.role}', currentPath='${existing.currentPath}' — register cannot change a doc's identity or path. Use \"fgos topic split\"/\"fgos topic merge\" to change topicId/role (with lineage), or \"fgos doc move-path\" to change currentPath (preserves the old path as an alias).`\n         );\n       }\n-      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is\n+      // docs/platform/work-state/contracts/knowledge-registry.md §7.3: doc.promote is\n       // the sole provisional->active gate, doc.supersede/doc.retire are the\n       // sole way out of 'active'. Re-registering an EXISTING docId must\n       // never itself move the lifecycle beyond one narrow, already-tested\n@@ -643,7 +643,7 @@\n       break;\n     }\n \n-    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration\n+    // docs/platform/work-state/contracts/knowledge-registry.md §13.5 rule 6: migration\n     // \"leaves every migrated document provisional unless explicitly\n     // promoted\" -- an active doc whose content moved out from under it\n     // needs re-verification before it counts as authoritative again, but\n@@ -730,11 +730,11 @@\n       break;\n     }\n \n-    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation\n+    // docs/platform/work-state/contracts/knowledge-registry.md §7.4: \"Attestation\n     // links a capture to a document slot ... the precise replacement for\n     // the old 'compound stores docType/docPath' meaning.\" Modeled as\n     // accumulating into the SAME `sourceCaptureIds` field `doc.register`\n-    // already seeds from bootstrap (docs/architect/...md §7.2's own\n+    // already seeds from bootstrap (docs/platform/work-state/contracts/knowledge-registry.md §7.2's own\n     // example schema) -- one array of every capture that has ever\n     // justified this doc's content, never overwritten, mirroring\n     // an accumulate-never-replace fold rule.\n@@ -745,7 +745,7 @@\n       if (!doc) {\n         throw new KnowledgeValidationError(`doc.attest: doc '${id}' not found`);\n       }\n-      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation\n+      // docs/platform/work-state/contracts/knowledge-registry.md §14.3: \"attestation\n       // rejects retired topics and retired documents\". This must live here,\n       // in the reducer, not only in the CLI's resolveDocPath-based\n       // pre-check -- any caller using the write facade directly (attest-\n",
-      "rollbackDiff": "--- a/src/state/knowledge-registry.mjs\n+++ b/src/state/knowledge-registry.mjs\n@@ -17,7 +17,7 @@\n   'retired',\n ]);\n \n-// docs/platform/work-state/contracts/knowledge-registry.md §5.5/§14.1: only 'diataxis'\n+// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\n // is a registered framework today, and its 4 modes are a closed set --\n // growing either list is a real product decision (a new writing framework,\n // or a new Diataxis mode), never a typo a reducer should silently accept.\n@@ -85,7 +85,7 @@\n \n /**\n  * Enforces the narrow, mechanical slice of the closed role/framework/mode\n- * vocabulary that docs/platform/work-state/contracts/knowledge-registry.md §7.2 rule 1\n+ * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1\n  * already states unconditionally: framework must be a registered one, mode\n  * must be one of that framework's own modes, and role must never equal a\n  * mode name (\"a role name must not equal any framework mode name\"). This\n@@ -207,8 +207,8 @@\n /**\n  * Resolves a doc's identity from an explicit docId, or by searching for the\n  * doc whose (topicId, role) match -- never by reconstructing `${topicId}:\n- * ${role}` as a string. docId is a durable identity (docs/platform/work-state/contracts/\n- * knowledge-registry.md §7.3) that topic.split intentionally never\n+ * ${role}` as a string. docId is a durable identity (docs/architect/\n+ * knowledge-registry-redesign.md §7.3) that topic.split intentionally never\n  * rewrites even though it does move the doc's own topicId onto the successor\n  * -- so a caller holding only (topicId, role) after a split must look the\n  * doc up by field, or it silently misses every doc whose id predates the\n@@ -534,7 +534,7 @@\n           `doc.register: doc '${id}' already exists with topicId='${existing.topicId}', role='${existing.role}', currentPath='${existing.currentPath}' — register cannot change a doc's identity or path. Use \"fgos topic split\"/\"fgos topic merge\" to change topicId/role (with lineage), or \"fgos doc move-path\" to change currentPath (preserves the old path as an alias).`\n         );\n       }\n-      // docs/platform/work-state/contracts/knowledge-registry.md §7.3: doc.promote is\n+      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is\n       // the sole provisional->active gate, doc.supersede/doc.retire are the\n       // sole way out of 'active'. Re-registering an EXISTING docId must\n       // never itself move the lifecycle beyond one narrow, already-tested\n@@ -643,7 +643,7 @@\n       break;\n     }\n \n-    // docs/platform/work-state/contracts/knowledge-registry.md §13.5 rule 6: migration\n+    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration\n     // \"leaves every migrated document provisional unless explicitly\n     // promoted\" -- an active doc whose content moved out from under it\n     // needs re-verification before it counts as authoritative again, but\n@@ -730,11 +730,11 @@\n       break;\n     }\n \n-    // docs/platform/work-state/contracts/knowledge-registry.md §7.4: \"Attestation\n+    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation\n     // links a capture to a document slot ... the precise replacement for\n     // the old 'compound stores docType/docPath' meaning.\" Modeled as\n     // accumulating into the SAME `sourceCaptureIds` field `doc.register`\n-    // already seeds from bootstrap (docs/platform/work-state/contracts/knowledge-registry.md §7.2's own\n+    // already seeds from bootstrap (docs/architect/...md §7.2's own\n     // example schema) -- one array of every capture that has ever\n     // justified this doc's content, never overwritten, mirroring\n     // an accumulate-never-replace fold rule.\n@@ -745,7 +745,7 @@\n       if (!doc) {\n         throw new KnowledgeValidationError(`doc.attest: doc '${id}' not found`);\n       }\n-      // docs/platform/work-state/contracts/knowledge-registry.md §14.3: \"attestation\n+      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation\n       // rejects retired topics and retired documents\". This must live here,\n       // in the reducer, not only in the CLI's resolveDocPath-based\n       // pre-check -- any caller using the write facade directly (attest-\n",
-      "independentVerdict": "pending",
-      "rationale": "Reuse carries/pointer-patches.json exact clause retargets after F chain, not the stale whole-file body.",
-      "predecessorIds": []
+      "status": "composed-by-owner",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/14"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
     },
     {
       "id": "g9:dependencies:test/docs/decisions-corpus-retired.test.mjs",
       "path": "test/docs/decisions-corpus-retired.test.mjs",
       "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
       "status": "prepared-not-applied",
-      "beforeSha256": "ad75b5b8ed52d221fb8a6455f55182cefd8cd1ab36da4c5fc5613a0fcddd0c4d",
+      "beforeSha256": "9f13a0753ac5bc11ecb1624d62a0def29606a35848eafcec8fca804139bf562c",
       "expectedAfterSha256": "dd920fc1d57057ec402075d186cc4f2e5b875ba10ea8df84bd587c90eaa832a6",
-      "diff": "--- a/test/docs/decisions-corpus-retired.test.mjs\n+++ b/test/docs/decisions-corpus-retired.test.mjs\n@@ -42,10 +42,10 @@\n ];\n \n const NARRATIVE_TARGETS = [\n-  'docs/specs/platform-foundations.md',\n-  'docs/specs/work-state.md',\n+  'docs/platform/platform-foundations.md',\n+  'docs/platform/work-state/decisions/retired-decision-history.md',\n   'docs/platform/runner/decisions/h-36d872fbb0e5.md',\n-  'docs/architecture-map.md',\n+  'docs/platform/architecture-map.md',\n   'docs/platform/system-overview/spec.md',\n ];\n \n@@ -64,19 +64,22 @@\n   assert.equal(fs.statSync(DECISIONS_DIR).isDirectory(), true);\n });\n \n-test('every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/architecture-map.md \"Lịch sử quyết định\" section', () => {\n-  const combined = NARRATIVE_TARGETS.map((rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8')).join('\\n');\n+test('every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/platform/architecture-map.md \"Lịch sử quyết định\" section', () => {\n+  const combined = NARRATIVE_TARGETS.map((rel) => ({ rel, content: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8') }));\n   const missing = [];\n   for (const id of RETIRED_ADR_HEADINGS) {\n-    const headingPattern = new RegExp(`^### ${id} `, 'm');\n-    if (!headingPattern.test(combined)) missing.push(id);\n+    const present = combined.some(({ rel, content }) => {\n+      const depth = rel === 'docs/platform/architecture-map.md' ? '#####' : '###';\n+      return new RegExp(`^${depth} ${id} `, 'm').test(content);\n+    });\n+    if (!present) missing.push(id);\n   }\n   assert.deepEqual(missing, [], `every retired ADR id must have a \"### <id> ...\" heading somewhere in ${NARRATIVE_TARGETS.join(', ')}`);\n });\n \n test('the real 0032 numbering collision migrated as two distinct sections (both topics preserved, neither silently dropped)', () => {\n   const runner = fs.readFileSync(path.join(REPO_ROOT, 'docs/platform/runner/decisions/h-36d872fbb0e5.md'), 'utf8');\n-  const workState = fs.readFileSync(path.join(REPO_ROOT, 'docs/specs/work-state.md'), 'utf8');\n+  const workState = fs.readFileSync(path.join(REPO_ROOT, 'docs/platform/work-state/decisions/retired-decision-history.md'), 'utf8');\n   assert.match(runner, /### 0032 — Cổng Iron Law/, 'the Iron Law 0032 record must be in runner.md');\n   assert.match(workState, /### 0032 — Multi-role Team Harness/, 'the Team Harness 0032 record must be in work-state.md');\n });\n@@ -84,7 +87,9 @@\n test('each target spec file carries the \"Lịch sử quyết định retired\" section heading exactly once', () => {\n   for (const rel of NARRATIVE_TARGETS) {\n     const content = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');\n-    const matches = content.match(/^## Lịch sử quyết định retired từ docs\\/decisions\\/ \\(tsk-1lv-4\\)$/gm) ?? [];\n+    const depth = rel === 'docs/platform/architecture-map.md' ? '####' : '##';\n+    const section = new RegExp(`^${depth} Lịch sử quyết định retired từ docs/decisions/ \\\\(tsk-1lv-4\\\\)$`, 'gm');\n+    const matches = content.match(section) ?? [];\n     assert.equal(matches.length, 1, `${rel} must carry exactly one \"Lịch sử quyết định retired\" heading`);\n   }\n });\n",
-      "rollbackDiff": "--- a/test/docs/decisions-corpus-retired.test.mjs\n+++ b/test/docs/decisions-corpus-retired.test.mjs\n@@ -42,10 +42,10 @@\n ];\n \n const NARRATIVE_TARGETS = [\n-  'docs/platform/platform-foundations.md',\n-  'docs/platform/work-state/decisions/retired-decision-history.md',\n+  'docs/specs/platform-foundations.md',\n+  'docs/specs/work-state.md',\n   'docs/platform/runner/decisions/h-36d872fbb0e5.md',\n-  'docs/platform/architecture-map.md',\n+  'docs/architecture-map.md',\n   'docs/platform/system-overview/spec.md',\n ];\n \n@@ -64,22 +64,19 @@\n   assert.equal(fs.statSync(DECISIONS_DIR).isDirectory(), true);\n });\n \n-test('every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/platform/architecture-map.md \"Lịch sử quyết định\" section', () => {\n-  const combined = NARRATIVE_TARGETS.map((rel) => ({ rel, content: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8') }));\n+test('every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/architecture-map.md \"Lịch sử quyết định\" section', () => {\n+  const combined = NARRATIVE_TARGETS.map((rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8')).join('\\n');\n   const missing = [];\n   for (const id of RETIRED_ADR_HEADINGS) {\n-    const present = combined.some(({ rel, content }) => {\n-      const depth = rel === 'docs/platform/architecture-map.md' ? '#####' : '###';\n-      return new RegExp(`^${depth} ${id} `, 'm').test(content);\n-    });\n-    if (!present) missing.push(id);\n+    const headingPattern = new RegExp(`^### ${id} `, 'm');\n+    if (!headingPattern.test(combined)) missing.push(id);\n   }\n   assert.deepEqual(missing, [], `every retired ADR id must have a \"### <id> ...\" heading somewhere in ${NARRATIVE_TARGETS.join(', ')}`);\n });\n \n test('the real 0032 numbering collision migrated as two distinct sections (both topics preserved, neither silently dropped)', () => {\n   const runner = fs.readFileSync(path.join(REPO_ROOT, 'docs/platform/runner/decisions/h-36d872fbb0e5.md'), 'utf8');\n-  const workState = fs.readFileSync(path.join(REPO_ROOT, 'docs/platform/work-state/decisions/retired-decision-history.md'), 'utf8');\n+  const workState = fs.readFileSync(path.join(REPO_ROOT, 'docs/specs/work-state.md'), 'utf8');\n   assert.match(runner, /### 0032 — Cổng Iron Law/, 'the Iron Law 0032 record must be in runner.md');\n   assert.match(workState, /### 0032 — Multi-role Team Harness/, 'the Team Harness 0032 record must be in work-state.md');\n });\n@@ -87,9 +84,7 @@\n test('each target spec file carries the \"Lịch sử quyết định retired\" section heading exactly once', () => {\n   for (const rel of NARRATIVE_TARGETS) {\n     const content = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');\n-    const depth = rel === 'docs/platform/architecture-map.md' ? '####' : '##';\n-    const section = new RegExp(`^${depth} Lịch sử quyết định retired từ docs/decisions/ \\\\(tsk-1lv-4\\\\)$`, 'gm');\n-    const matches = content.match(section) ?? [];\n+    const matches = content.match(/^## Lịch sử quyết định retired từ docs\\/decisions\\/ \\(tsk-1lv-4\\)$/gm) ?? [];\n     assert.equal(matches.length, 1, `${rel} must carry exactly one \"Lịch sử quyết định retired\" heading`);\n   }\n });\n",
+      "diff": "--- a/test/docs/decisions-corpus-retired.test.mjs\n+++ b/test/docs/decisions-corpus-retired.test.mjs\n@@ -45,7 +45,7 @@\n   'docs/platform/platform-foundations.md',\n   'docs/platform/work-state/decisions/retired-decision-history.md',\n   'docs/platform/runner/decisions/h-36d872fbb0e5.md',\n-  'docs/architecture-map.md',\n+  'docs/platform/architecture-map.md',\n   'docs/platform/system-overview/spec.md',\n ];\n \n@@ -64,12 +64,15 @@\n   assert.equal(fs.statSync(DECISIONS_DIR).isDirectory(), true);\n });\n \n-test('every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/architecture-map.md \"Lịch sử quyết định\" section', () => {\n-  const combined = NARRATIVE_TARGETS.map((rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8')).join('\\n');\n+test('every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/platform/architecture-map.md \"Lịch sử quyết định\" section', () => {\n+  const combined = NARRATIVE_TARGETS.map((rel) => ({ rel, content: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8') }));\n   const missing = [];\n   for (const id of RETIRED_ADR_HEADINGS) {\n-    const headingPattern = new RegExp(`^### ${id} `, 'm');\n-    if (!headingPattern.test(combined)) missing.push(id);\n+    const present = combined.some(({ rel, content }) => {\n+      const depth = rel === 'docs/platform/architecture-map.md' ? '#####' : '###';\n+      return new RegExp(`^${depth} ${id} `, 'm').test(content);\n+    });\n+    if (!present) missing.push(id);\n   }\n   assert.deepEqual(missing, [], `every retired ADR id must have a \"### <id> ...\" heading somewhere in ${NARRATIVE_TARGETS.join(', ')}`);\n });\n@@ -84,7 +87,9 @@\n test('each target spec file carries the \"Lịch sử quyết định retired\" section heading exactly once', () => {\n   for (const rel of NARRATIVE_TARGETS) {\n     const content = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');\n-    const matches = content.match(/^## Lịch sử quyết định retired từ docs\\/decisions\\/ \\(tsk-1lv-4\\)$/gm) ?? [];\n+    const depth = rel === 'docs/platform/architecture-map.md' ? '####' : '##';\n+    const section = new RegExp(`^${depth} Lịch sử quyết định retired từ docs/decisions/ \\\\(tsk-1lv-4\\\\)$`, 'gm');\n+    const matches = content.match(section) ?? [];\n     assert.equal(matches.length, 1, `${rel} must carry exactly one \"Lịch sử quyết định retired\" heading`);\n   }\n });\n",
+      "rollbackDiff": "--- a/test/docs/decisions-corpus-retired.test.mjs\n+++ b/test/docs/decisions-corpus-retired.test.mjs\n@@ -45,7 +45,7 @@\n   'docs/platform/platform-foundations.md',\n   'docs/platform/work-state/decisions/retired-decision-history.md',\n   'docs/platform/runner/decisions/h-36d872fbb0e5.md',\n-  'docs/platform/architecture-map.md',\n+  'docs/architecture-map.md',\n   'docs/platform/system-overview/spec.md',\n ];\n \n@@ -64,15 +64,12 @@\n   assert.equal(fs.statSync(DECISIONS_DIR).isDirectory(), true);\n });\n \n-test('every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/platform/architecture-map.md \"Lịch sử quyết định\" section', () => {\n-  const combined = NARRATIVE_TARGETS.map((rel) => ({ rel, content: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8') }));\n+test('every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/architecture-map.md \"Lịch sử quyết định\" section', () => {\n+  const combined = NARRATIVE_TARGETS.map((rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8')).join('\\n');\n   const missing = [];\n   for (const id of RETIRED_ADR_HEADINGS) {\n-    const present = combined.some(({ rel, content }) => {\n-      const depth = rel === 'docs/platform/architecture-map.md' ? '#####' : '###';\n-      return new RegExp(`^${depth} ${id} `, 'm').test(content);\n-    });\n-    if (!present) missing.push(id);\n+    const headingPattern = new RegExp(`^### ${id} `, 'm');\n+    if (!headingPattern.test(combined)) missing.push(id);\n   }\n   assert.deepEqual(missing, [], `every retired ADR id must have a \"### <id> ...\" heading somewhere in ${NARRATIVE_TARGETS.join(', ')}`);\n });\n@@ -87,9 +84,7 @@\n test('each target spec file carries the \"Lịch sử quyết định retired\" section heading exactly once', () => {\n   for (const rel of NARRATIVE_TARGETS) {\n     const content = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');\n-    const depth = rel === 'docs/platform/architecture-map.md' ? '####' : '##';\n-    const section = new RegExp(`^${depth} Lịch sử quyết định retired từ docs/decisions/ \\\\(tsk-1lv-4\\\\)$`, 'gm');\n-    const matches = content.match(section) ?? [];\n+    const matches = content.match(/^## Lịch sử quyết định retired từ docs\\/decisions\\/ \\(tsk-1lv-4\\)$/gm) ?? [];\n     assert.equal(matches.length, 1, `${rel} must carry exactly one \"Lịch sử quyết định retired\" heading`);\n   }\n });\n",
       "independentVerdict": "pending",
       "rationale": "R26 content-checked governance/architecture read or fixed metadata co-cut Reuse carries/pointer-patches.json /patches/3 plus exact architecture holder heading depth. Conserved work-state narratives; no old source read remains.",
       "predecessorIds": [
         "file:test/docs/decisions-corpus-retired.test.mjs"
-      ]
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/3"
+      ],
+      "predecessor": {
+        "patchSpecId": "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/3",
+        "expectedAfterSha256": "9f13a0753ac5bc11ecb1624d62a0def29606a35848eafcec8fca804139bf562c"
+      }
     },
     {
       "id": "g9:dependencies:test/scripts/check-doc-candidate-status.test.mjs",
@@ -311,6 +259,18 @@
       "independentVerdict": "pending",
       "rationale": "R26 content-checked governance/architecture read or fixed metadata co-cut",
       "predecessorIds": []
+    },
+    {
+      "id": "g9:dependencies:mailbox-map-reader",
+      "path": "docs/platform/agent-mailbox/spec.md",
+      "sourceCommit": "56b3c3ebffddca273154e482e581591113c394da",
+      "status": "prepared-not-applied",
+      "beforeSha256": "c9db17997add6fe300c1326bac618002ea89ff37bbdeec57f70cadce066e899e",
+      "expectedAfterSha256": "e8a859818559db8ae2e598265ddcdce3f8723a5b0f24a4f0958463cfa543fae2",
+      "diff": "--- a/docs/platform/agent-mailbox/spec.md\n+++ b/docs/platform/agent-mailbox/spec.md\n@@ -599,7 +599,7 @@\n \n ### 15.7 Headless workers (not in the first slice)\n \n-fgOS starts some workers headless (`cli-spawn`: no pane, no tty) and some in a pane (`herdr-spawn`). Owner, 2026-10-20: the terminal case is the fuller one and comes first; a headless worker is not built first. Differences recorded for later: a headless worker cannot be woken by a typed signal and has no idle state to wake (it runs one Unit and exits), so it can only be reached at a checkpoint (tier `turn`); hooks do run in print mode (the Stop gate was measured on `claude -p`, `codex exec` and the others, `plans/reports/research-261019-1653-mailbox-delivery-cli-probe.md` measurement 1). Steering a running Unit belongs to the runner (section 15.4). A worker confined by the sandbox (bwrap is in use in this repository, per `docs/architecture-map.md`) can neither read nor write mailbox state (section 8, item 6); reaching it would need the confinement to expose the state through a registered resource, or the adapter to refuse with a reason such as `blind-confinement` (the reason name comes from the panel's summary and is unverified). A worker the runner starts is not addressable at all (section 1).\n+fgOS starts some workers headless (`cli-spawn`: no pane, no tty) and some in a pane (`herdr-spawn`). Owner, 2026-10-20: the terminal case is the fuller one and comes first; a headless worker is not built first. Differences recorded for later: a headless worker cannot be woken by a typed signal and has no idle state to wake (it runs one Unit and exits), so it can only be reached at a checkpoint (tier `turn`); hooks do run in print mode (the Stop gate was measured on `claude -p`, `codex exec` and the others, `plans/reports/research-261019-1653-mailbox-delivery-cli-probe.md` measurement 1). Steering a running Unit belongs to the runner (section 15.4). A worker confined by the sandbox (bwrap is in use in this repository, per `docs/platform/architecture-map.md`) can neither read nor write mailbox state (section 8, item 6); reaching it would need the confinement to expose the state through a registered resource, or the adapter to refuse with a reason such as `blind-confinement` (the reason name comes from the panel's summary and is unverified). A worker the runner starts is not addressable at all (section 1).\n \n ### 15.8 Typed nudge for an idle agy session, and the shared terminal adapter (later part)\n \n",
+      "rollbackDiff": "--- a/docs/platform/agent-mailbox/spec.md\n+++ b/docs/platform/agent-mailbox/spec.md\n@@ -599,7 +599,7 @@\n \n ### 15.7 Headless workers (not in the first slice)\n \n-fgOS starts some workers headless (`cli-spawn`: no pane, no tty) and some in a pane (`herdr-spawn`). Owner, 2026-10-20: the terminal case is the fuller one and comes first; a headless worker is not built first. Differences recorded for later: a headless worker cannot be woken by a typed signal and has no idle state to wake (it runs one Unit and exits), so it can only be reached at a checkpoint (tier `turn`); hooks do run in print mode (the Stop gate was measured on `claude -p`, `codex exec` and the others, `plans/reports/research-261019-1653-mailbox-delivery-cli-probe.md` measurement 1). Steering a running Unit belongs to the runner (section 15.4). A worker confined by the sandbox (bwrap is in use in this repository, per `docs/platform/architecture-map.md`) can neither read nor write mailbox state (section 8, item 6); reaching it would need the confinement to expose the state through a registered resource, or the adapter to refuse with a reason such as `blind-confinement` (the reason name comes from the panel's summary and is unverified). A worker the runner starts is not addressable at all (section 1).\n+fgOS starts some workers headless (`cli-spawn`: no pane, no tty) and some in a pane (`herdr-spawn`). Owner, 2026-10-20: the terminal case is the fuller one and comes first; a headless worker is not built first. Differences recorded for later: a headless worker cannot be woken by a typed signal and has no idle state to wake (it runs one Unit and exits), so it can only be reached at a checkpoint (tier `turn`); hooks do run in print mode (the Stop gate was measured on `claude -p`, `codex exec` and the others, `plans/reports/research-261019-1653-mailbox-delivery-cli-probe.md` measurement 1). Steering a running Unit belongs to the runner (section 15.4). A worker confined by the sandbox (bwrap is in use in this repository, per `docs/architecture-map.md`) can neither read nor write mailbox state (section 8, item 6); reaching it would need the confinement to expose the state through a registered resource, or the adapter to refuse with a reason such as `blind-confinement` (the reason name comes from the panel's summary and is unverified). A worker the runner starts is not addressable at all (section 1).\n \n ### 15.8 Typed nudge for an idle agy session, and the shared terminal adapter (later part)\n \n",
+      "rationale": "Live old-map reader in the late-added mailbox contract; exact path-only co-cut."
     }
-  ]
+  ],
+  "manifestRef": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/manifest.json"
 }

@@ -1,0 +1,100 @@
+{
+  "exit": 0,
+  "controls": [
+    {
+      "case": "second independent owner changes the same original line",
+      "rejectedBy": "sameLinesTwice",
+      "findings": [
+        {
+          "kind": "sameLinesTwice",
+          "file": "sample.md",
+          "patch": "two",
+          "previous": [
+            "one"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "zero-fuzz conflict on actual patch boundary",
+      "rejectedBy": "conflict",
+      "findings": [
+        {
+          "kind": "conflict",
+          "file": "sample.md",
+          "patch": "one",
+          "reason": "exact composed preimage hash differs"
+        }
+      ]
+    },
+    {
+      "case": "patch without an owning row",
+      "rejectedBy": "ownerless",
+      "findings": [
+        {
+          "kind": "ownerless",
+          "file": "sample.md",
+          "patch": "orphan"
+        }
+      ]
+    },
+    {
+      "case": "identical change in a second source without composedBy",
+      "rejectedBy": "duplicateWithoutLink",
+      "findings": [
+        {
+          "kind": "duplicateWithoutLink",
+          "file": "sample.md",
+          "patch": "duplicate",
+          "previous": "one"
+        }
+      ]
+    },
+    {
+      "case": "self-consistent diff with forged postimage digest",
+      "rejectedBy": "conflict",
+      "findings": [
+        {
+          "kind": "conflict",
+          "file": "sample.md",
+          "patch": "one",
+          "reason": "declared postimage hash differs"
+        }
+      ]
+    },
+    {
+      "case": "already-applied forward delta must not auto-reverse",
+      "rejectedBy": "conflict",
+      "findings": [
+        {
+          "kind": "conflict",
+          "file": "sample.md",
+          "patch": "one",
+          "reason": "prepared forward patch was auto-reversed; requires an explicit composedBy owner"
+        }
+      ]
+    },
+    {
+      "case": "second path cannot escape the named file",
+      "rejectedBy": "conflict",
+      "findings": [
+        {
+          "kind": "conflict",
+          "file": "sample.md",
+          "patch": "one",
+          "reason": "diff must touch exactly the named safe file"
+        }
+      ]
+    },
+    {
+      "case": "plans evidence edited after pin still scans frozen bytes",
+      "passed": true
+    },
+    {
+      "case": "plans evidence deleted after pin still scans frozen bytes",
+      "passed": true
+    }
+  ],
+  "count": 9,
+  "reuse": "Real apply_one with compose.apply_diff; real G9 scan_gateway with immutable Git fixture replies."
+}

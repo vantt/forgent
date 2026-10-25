@@ -1,0 +1,121 @@
+{
+  "exit": 0,
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/fchain/check.py",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "{\"exit\": 0, \"counts\": {}, \"files\": 548, \"executed\": 141, \"links\": 20}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/fchain/controls.py"
+      ],
+      "exit": 0,
+      "stdout": "{\"exit\": 0, \"controls\": 9}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard_controls.py"
+      ],
+      "exit": 0,
+      "stdout": "{\"exit\": 0, \"passed\": 69, \"failed\": 0}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard.py",
+        "--all"
+      ],
+      "exit": 0,
+      "stdout": "{\"counts\": {\"duplicateOfChain\": 24}, \"exit\": 0, \"report\": \"plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/chain-check-72d516ba5.json\", \"sourceCommit\": \"72d516ba54692c7eacb38fde4b3fef9f6d1edc0b\", \"unresolved\": 0}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/g9/check_phase9_decisions.py"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"chainFiles\": 548,\n  \"chainRebasesReplayed\": 0,\n  \"counts\": {\n    \"moved\": 24,\n    \"retained-in-place\": 96,\n    \"retired\": 38\n  },\n  \"entries\": 158,\n  \"gatewayActiveReaders\": 12,\n  \"gatewayScanFiles\": 473,\n  \"leadDecisionProposed\": 2,\n  \"limits\": \"Complete shared prepared-byte F-chain replay and pinned record bindings only; not product parity, approval, F or gate closure.\",\n  \"linkedAdditions\": 15,\n  \"pin\": \"56b3c3ebffddca273154e482e581591113c394da\",\n  \"preparedAdditions\": 23,\n  \"records\": 29,\n  \"rootDocumentOccurrences\": 136,\n  \"sharedCompositionFiles\": 548,\n  \"status\": \"pass\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/g9/check_phase9_decisions.py",
+        "--self-test"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"chainFiles\": 548,\n  \"chainRebasesReplayed\": 0,\n  \"counts\": {\n    \"moved\": 24,\n    \"retained-in-place\": 96,\n    \"retired\": 38\n  },\n  \"entries\": 158,\n  \"gatewayActiveReaders\": 12,\n  \"gatewayScanFiles\": 473,\n  \"leadDecisionProposed\": 2,\n  \"limits\": \"Complete shared prepared-byte F-chain replay and pinned record bindings only; not product parity, approval, F or gate closure.\",\n  \"linkedAdditions\": 15,\n  \"negativeControls\": [\n    \"missing entry\",\n    \"duplicate entry\",\n    \"wrong pointer\",\n    \"nonexistent path\",\n    \"bad digest\",\n    \"absent quote\",\n    \"bad JSON pointer\",\n    \"outside move set\",\n    \"missing reader\",\n    \"missing patch\",\n    \"wrong retained file\",\n    \"wrong successor\",\n    \"wrong physical hash\",\n    \"wrong pin\",\n    \"retention quote belongs to other file\",\n    \"retention flipped with adjusted counts\",\n    \"patch cannot apply on F chain\",\n    \"rg doc reader and census both omitted\",\n    \"fixture exclusion without reason\",\n    \"effective overlay relabeled\",\n    \"ratchet token omitted\",\n    \"content comparison relabeled\",\n    \"G6 row not bound to doc reader\",\n    \"stale bin patch mislabeled\",\n    \"retired clause pointer patch omitted\",\n    \"gateway shard owners relabeled as additions\",\n    \"AGENTS successor anchor forged\",\n    \"AGENTS successor path swapped\",\n    \"root document reader census truncated\",\n    \"move document reader coverage omitted\"\n  ],\n  \"pin\": \"56b3c3ebffddca273154e482e581591113c394da\",\n  \"preparedAdditions\": 23,\n  \"records\": 29,\n  \"rootDocumentOccurrences\": 136,\n  \"sharedCompositionFiles\": 548,\n  \"status\": \"pass\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "node",
+        "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"status\": \"pass\",\n  \"claims\": 44,\n  \"candidateUnits\": 1009,\n  \"refreshedDecisions\": 121,\n  \"droppedClaims\": 17,\n  \"pointerFiles\": 24,\n  \"currentSourceUnits\": 346,\n  \"historicalHeadingWitnesses\": 91,\n  \"liveHeadingRows\": 91,\n  \"liveSectionBlocks\": 321,\n  \"livePointerPatchDrift\": [\n    {\n      \"path\": \"bin/fgos.mjs\",\n      \"beforeSha256\": \"4ad9ed0cb07518ae19774ddcf058d78484b53de25b850ae641b7b53011010d5f\",\n      \"liveSha256\": \"1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e\",\n      \"finalPinDuty\": {\n        \"path\": \"bin/fgos.mjs\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    },\n    {\n      \"path\": \"docs/backlog.md\",\n      \"beforeSha256\": \"344552da9931e8c5ca9f946e49e0a25c40ff42b61dbf6d99c73310d5e14b7c33\",\n      \"liveSha256\": \"d0fb356de66a0bdfffac2f9835678bd4001d68779003c381e34a4f2bc9e49306\",\n      \"finalPinDuty\": {\n        \"path\": \"docs/backlog.md\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    }\n  ],\n  \"finalPinDuties\": {\n    \"version\": 1,\n    \"pointerPatchDrift\": [\n      {\n        \"path\": \"bin/fgos.mjs\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      },\n      {\n        \"path\": \"docs/backlog.md\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    ]\n  },\n  \"witnessPin\": \"f534aeaea59ebdc39613aab02c109dbd30fd36b8\",\n  \"currentLedgerSuccessors\": {\n    \"status\": \"pass\",\n    \"origins\": 1208,\n    \"currentBindings\": 1208\n  },\n  \"sourceParityQualification\": \"Current rows require exact source anchor/digest and normalized full-source inclusion at a named current target. Split/adapted rows also check target digests; explicit zero-fuzz adaptations are not false equality. Original heading census, placement and unapplied patch witnesses replay at witnessPin. Live heading census, direct-section block coverage and pointer-patch drift also check working-tree bytes; only explicitly listed final-pin duties permit drift. Patch recomposition and authority/cutover acceptance are not certified.\",\n  \"reviewStatus\": \"pending; no gate accepted\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/fchain/prove.py",
+        "--census"
+      ],
+      "exit": 0,
+      "stdout": "{\"exit\": 0, \"pin\": \"608a4ada5f195b0d0b9d3568a71b8dde4954aacb\", \"sourceSha256\": \"525bb4ed313141459b6dad8f7aaf798e5997f76ecaa2c4c07445ff6668819c99\", \"identicalReplays\": true, \"outputs\": {\"residue.json\": {\"sha256\": \"8c71faf6d077318d8ce5ca646edc12d5fa70f885cade300247e7612bce3643bc\", \"bytes\": 93}, \"join.json\": {\"sha256\": \"d7cd97ec0597f69df53f85f713d3bc48f547cbf82516a16293b548389e287d9b\", \"bytes\": 2271427}, \"settlement.json\": {\"sha256\": \"4e1cc0248daadff70c8639f5ea388184d35acdaf931e48d45b1107121d80a7c4\", \"bytes\": 574539}}, \"counts\": {\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 54, \"joined-by-citation\": 4, \"joined-owning-test\": 779}}, \"relocation\": \"Only dump output sink redirected to auto-cleaned tempfile; original input checks, main and citations --check unchanged.\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/fchain/prove.py",
+        "--roots"
+      ],
+      "exit": 0,
+      "stdout": "{\"exit\": 0, \"roots\": 423}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/fchain/prove.py",
+        "--composition"
+      ],
+      "exit": 0,
+      "stdout": "{\"sourceCommit\": \"eb744281deba853f201cda15dcb4876300a1d638\", \"exit\": 0, \"effectiveSpecs\": 94, \"deferredFinalPinFSpecs\": 14, \"files\": 89, \"patchInvocations\": 251, \"interpretation\": \"Byte evidence, not source conservation acceptance, semantic approval, gate closure or full-suite parity.\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/fchain/audit.py"
+      ],
+      "exit": 0,
+      "stdout": "{\"exit\": 0, \"judgmentsUnchanged\": 787, \"dependencyDecisionsUnchanged\": 158, \"existingBodiesUnchanged\": 546, \"carriesOnlyComposedBy\": true, \"changedPaths\": 25, \"allDiffBearingRecordFiles\": 18, \"interpretation\": \"Raw diff objects include shared shard copies, historical observations, unit adaptations and generator witnesses; not a count of executable patches.\"}\n",
+      "stderr": ""
+    }
+  ]
+}

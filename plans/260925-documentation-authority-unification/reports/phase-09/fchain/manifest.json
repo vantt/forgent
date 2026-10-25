@@ -1,0 +1,674 @@
+{
+  "contract": "fchain-manifest.v1",
+  "authority": "L13-24",
+  "order": "Source array is apply order: Step 7 -> selected composition -> exact replacement carry roots -> carries -> census -> premise shards -> confirmed G6 patch -> G9 additions; witness-only readers do not apply twice.",
+  "sources": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json",
+      "reader": "step7",
+      "read": "patches[]; root selection delegated to check_shard.replay_chain"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
+      "reader": "composition",
+      "read": "effectiveSpecIds + finalPinFSpecIds in order; other entries non-executable"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json",
+      "reader": "pointer",
+      "read": "patches[].diff; exact current-chain residuals; original carry ownership linked, not duplicated"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json",
+      "reader": "pointer",
+      "read": "patches[].forwardDiff"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/pointer-patches.json",
+      "reader": "pointer",
+      "read": "patches[].forwardDiff"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-1.json",
+      "reader": "premise",
+      "read": "rows[].patch.patch, once per file; rowIds must match attached rows (check_shard owner)"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json",
+      "reader": "premise",
+      "read": "rows[].patch.patch, once per file; rowIds must match attached rows (check_shard owner)"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json",
+      "reader": "premise",
+      "read": "rows[].patch.patch, once per file; rowIds must match attached rows (check_shard owner)"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/prepared-patches.json",
+      "reader": "prepared",
+      "read": "patches[].patch; G6 confirmed repoint judgments, including f07526/f07527/f07528"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json",
+      "reader": "additions",
+      "read": "patches[].diff; composedBy tombstones have no payload; linked residuals name an exact predecessor"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+      "reader": "recomposed",
+      "read": "specs[]; co-composed full-body witnesses linked to their selected owners; no duplicate application"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-supplemental-specs.json",
+      "reader": "historical",
+      "read": "patches[]; witness for g9/recomposed predecessorChain, not additive"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/gap05-placement-proposal.json",
+      "reader": "historical",
+      "read": "patches[] superseded explicitly by currentPatchSpecIds"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/generator-all-output-deltas.json",
+      "reader": "generator-evidence",
+      "read": "deltas[] are generator evidence, never hand-apply"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/skill-regeneration.json",
+      "reader": "generator-evidence",
+      "read": "patches[] are generator evidence, never hand-apply"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w2-skill-regeneration.json",
+      "reader": "generator-evidence",
+      "read": "allOutputChanges[]; historical generator witnesses, current bodies in g9/recomposed.json"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w2-gap05-verification.json",
+      "reader": "historical",
+      "read": "proposalPatches[]; old proposal superseded by w8 gap05 placement and effective composition IDs"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-review-evidence.json",
+      "reader": "historical",
+      "read": "deltas[].diff compares old/new source evidence for judgments, not prepared application patches"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/source-parity.json",
+      "reader": "historical",
+      "read": "accounting.forwardDiff adapts extracted units for conservation proof, not repository file patches; owning verify-carries.mjs replays them"
+    }
+  ],
+  "resolutions": {
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/0": {
+      "owners": [
+        "reference-000232",
+        "reference-000235",
+        "reference-000236"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/13"
+      ],
+      "evidence": [
+        "        // docs/platform/work-state/contracts/knowledge-registry.md §7.4: an",
+        "        // docs/platform/work-state/contracts/knowledge-registry.md §8: \"The new",
+        "      // registered session (docs/platform/runner/contracts/conserved-dispatch-doctrine.md#session-participation-and-merge-isolation: \"a session worktree is"
+      ],
+      "reason": "Same three clause retargets as carry 13; offsets do not create a second owner."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/1": {
+      "owners": [
+        "f00527"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-1.json#/rows/42/patch"
+      ],
+      "evidence": [
+        "  \"map\": \"docs/platform/architecture-map.md\","
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/2": {
+      "owners": [
+        "f03917"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/25/patch"
+      ],
+      "evidence": [
+        "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/3": {
+      "owners": [
+        "f04343"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/108"
+      ],
+      "evidence": [
+        "This item's own footprint (`herdr-plugin/src/gateway.rs`,\n`docs/contracts/fgos-gateway-api-v1.yaml`) overlaps two siblings already\ntouching the same file — `tsk-54y` (CORS + bind) and `tsk-48w`\n(static-serving) — so none of the three could run concurrently with each\nother; they had to sequence through `gateway.rs` one at a time."
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/4": {
+      "owners": [
+        "f04357"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/110/patch"
+      ],
+      "evidence": [
+        "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/5": {
+      "owners": [
+        "reference-000177",
+        "dynamic-000664",
+        "dynamic-000665",
+        "reference-000200",
+        "dynamic-000767",
+        "dynamic-000768"
+      ]
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/6": {
+      "owners": [
+        "f06830",
+        "f06831",
+        "f06837"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/190",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/191",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/192/patch"
+      ],
+      "evidence": [
+        "> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:5-8; docs/specs/platform-foundations.md:179-184; docs/decisions/index.md:1; apps/fgos-gateway/src/gateway.rs:42,174; src/setup/registrations.mjs:3468-3470; docs/contracts/fgos-gateway-api-v1.yaml:82-599 (19 path keys); docs/contracts/fgos-gateway-api-v1.yaml:212-222; apps/fgos-gateway/src/gateway.rs:687-707. A22 rebindings are pending; no truth approval carried.",
+        "> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:5-8; docs/specs/platform-foundations.md:179-184; docs/decisions/index.md:1; apps/fgos-gateway/src/gateway.rs:42,174; src/setup/registrations.mjs:3468-3470; docs/contracts/fgos-gateway-api-v1.yaml:82-599 (19 path keys); docs/contracts/fgos-gateway-api-v1.yaml:212-222; apps/fgos-gateway/src/gateway.rs:687-707. A22 rebindings are pending; no truth approval carried.",
+        "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/7": {
+      "owners": [
+        "f07976"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json#/rows/88/patch"
+      ],
+      "evidence": [
+        "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/8": {
+      "owners": [
+        "f07985"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json#/rows/93/patch"
+      ],
+      "evidence": [
+        "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/9": {
+      "owners": [
+        "reference-002291"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/19"
+      ],
+      "evidence": [
+        "//! Enforces rules from `docs/platform/packaging-distribution/contracts/release-manifest.md#canonical-release-tree-rules`."
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/10": {
+      "owners": [
+        "reference-002292"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/21"
+      ],
+      "evidence": [
+        "//! `docs/platform/packaging-distribution/contracts/activation-binding.md#init-pipeline-and-root-binding`."
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/11": {
+      "owners": [
+        "reference-002294"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/20"
+      ],
+      "evidence": [
+        "//! Matches `docs/platform/packaging-distribution/contracts/release-manifest.md#canonical-release-tree-rules`."
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/12": {
+      "owners": [
+        "reference-002295"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/22"
+      ],
+      "evidence": [
+        "docs/platform/packaging-distribution/contracts/activation-binding.md",
+        "Git Common Directory Discovery"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/13": {
+      "owners": [
+        "reference-002482",
+        "reference-002483",
+        "reference-002484",
+        "reference-002485",
+        "dynamic-006599",
+        "dynamic-006602",
+        "dynamic-006642",
+        "reference-004586",
+        "reference-004589",
+        "dynamic-031770",
+        "dynamic-031771",
+        "author-s67-governance-baseline-94",
+        "author-s67-governance-baseline-163",
+        "reference-004651",
+        "reference-004659",
+        "dynamic-032029",
+        "dynamic-032030"
+      ]
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/14": {
+      "owners": [
+        "reference-003545",
+        "reference-003546",
+        "reference-003547",
+        "reference-003548",
+        "reference-003549",
+        "reference-003550",
+        "reference-003551",
+        "dynamic-007143",
+        "dynamic-007161",
+        "dynamic-007162",
+        "dynamic-007163",
+        "dynamic-007164",
+        "dynamic-007165",
+        "dynamic-007166",
+        "dynamic-007167",
+        "dynamic-007172",
+        "dynamic-007179",
+        "dynamic-007225"
+      ]
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/15": {
+      "owners": [
+        "reference-003545",
+        "reference-003546",
+        "reference-003547",
+        "reference-003548",
+        "reference-003549",
+        "reference-003550",
+        "reference-003551",
+        "dynamic-007143",
+        "dynamic-007161",
+        "dynamic-007162",
+        "dynamic-007163",
+        "dynamic-007164",
+        "dynamic-007165",
+        "dynamic-007166",
+        "dynamic-007167",
+        "dynamic-007172",
+        "dynamic-007179",
+        "dynamic-007225"
+      ]
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/16": {
+      "owners": [
+        "reference-003545",
+        "reference-003546",
+        "reference-003547",
+        "reference-003548",
+        "reference-003549",
+        "reference-003550",
+        "reference-003551",
+        "dynamic-007143",
+        "dynamic-007161",
+        "dynamic-007162",
+        "dynamic-007163",
+        "dynamic-007164",
+        "dynamic-007165",
+        "dynamic-007166",
+        "dynamic-007167",
+        "dynamic-007172",
+        "dynamic-007179",
+        "dynamic-007225"
+      ]
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/17": {
+      "owners": [
+        "reference-003727"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/16"
+      ],
+      "evidence": [
+        "// per docs/platform/runner/contracts/conserved-dispatch-doctrine.md#operation-prompt-templates and"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/18": {
+      "owners": [
+        "reference-003892",
+        "reference-003893",
+        "reference-003894",
+        "reference-003895",
+        "reference-003896",
+        "reference-003897",
+        "reference-003898",
+        "reference-003899"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/14"
+      ],
+      "evidence": [
+        "// docs/platform/work-state/contracts/knowledge-registry.md §5.5/§14.1: only 'diataxis'",
+        " * vocabulary that docs/platform/work-state/contracts/knowledge-registry.md §7.2 rule 1",
+        " * ${role}` as a string. docId is a durable identity (docs/platform/work-state/contracts/",
+        " * knowledge-registry.md §7.3) that topic.split intentionally never",
+        "      // docs/platform/work-state/contracts/knowledge-registry.md §7.3: doc.promote is",
+        "    // docs/platform/work-state/contracts/knowledge-registry.md §13.5 rule 6: migration",
+        "    // docs/platform/work-state/contracts/knowledge-registry.md §7.4: \"Attestation",
+        "    // already seeds from bootstrap (docs/platform/work-state/contracts/knowledge-registry.md §7.2's own",
+        "      // docs/platform/work-state/contracts/knowledge-registry.md §14.3: \"attestation"
+      ],
+      "reason": "L13-24: one owner; duplicate G9 proposal removed; preserve judgments unchanged"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/19": {
+      "owners": [
+        "reference-004035"
+      ],
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/3"
+      ],
+      "evidence": [
+        "  'docs/platform/platform-foundations.md',",
+        "  'docs/platform/work-state/decisions/retired-decision-history.md',"
+      ],
+      "reason": "Carry retargets removed and linked; this named-predecessor residual owns only map placement and its heading-depth adaptation."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/20": {
+      "owners": [
+        "reference-002482",
+        "reference-002483",
+        "reference-002484",
+        "reference-002485",
+        "dynamic-006599",
+        "dynamic-006602",
+        "dynamic-006642",
+        "reference-004586",
+        "reference-004589",
+        "dynamic-031770",
+        "dynamic-031771",
+        "author-s67-governance-baseline-94",
+        "author-s67-governance-baseline-163",
+        "reference-004651",
+        "reference-004659",
+        "dynamic-032029",
+        "dynamic-032030"
+      ]
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/21": {
+      "owners": [
+        "reference-002482",
+        "reference-002483",
+        "reference-002484",
+        "reference-002485",
+        "dynamic-006599",
+        "dynamic-006602",
+        "dynamic-006642",
+        "reference-004586",
+        "reference-004589",
+        "dynamic-031770",
+        "dynamic-031771",
+        "author-s67-governance-baseline-94",
+        "author-s67-governance-baseline-163",
+        "reference-004651",
+        "reference-004659",
+        "dynamic-032029",
+        "dynamic-032030"
+      ]
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/22": {
+      "owners": [
+        "reference-004035"
+      ]
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/0": {
+      "owners": [
+        "reference-000126",
+        "reference-000127",
+        "reference-000130",
+        "reference-000135"
+      ],
+      "ownerFile": "AGENTS.md",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json#/patches/0"
+      ],
+      "evidence": [
+        "## Ranh giới sứ mệnh (D-ADR0035, docs/platform/platform-foundations.md)",
+        "fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi \"sửa fgOS\" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + bằng chứng: docs/platform/platform-foundations.md's \"Lịch sử quyết định\" § D-ADR0035 (docs/decisions/*.md corpus đã retired tsk-1lv-4).",
+        "## RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/platform/platform-foundations.md)",
+        "## RUL104 — tốt hơn, không to hơn (D-ADR0062, supersedes D-ADR0061, docs/platform/platform-foundations.md)"
+      ],
+      "reason": "Same four carry operands on the exact F result; unrelated runner-priority context already changed by the chain."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/1": {
+      "owners": [
+        "dynamic-018755"
+      ],
+      "ownerFile": "test/docs/rul11-anchor-phrase.test.mjs"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/2": {
+      "owners": [
+        "dynamic-018749"
+      ],
+      "ownerFile": "test/docs/rul104-anchor-phrase.test.mjs"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/3": {
+      "owners": [
+        "reference-004034",
+        "reference-004040",
+        "reference-004047",
+        "reference-004048",
+        "dynamic-018738",
+        "dynamic-018742",
+        "dynamic-018743"
+      ],
+      "ownerFile": "test/docs/decisions-corpus-retired.test.mjs",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json#/patches/1"
+      ],
+      "evidence": [
+        "  'docs/platform/platform-foundations.md',",
+        "  'docs/platform/work-state/decisions/retired-decision-history.md',"
+      ],
+      "reason": "Two already-retargeted runner lines stay with Step 7; remaining carry replacements replay on that state."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/4": {
+      "owners": [
+        "reference-000023",
+        "reference-000025"
+      ],
+      "ownerFile": ".agents/skills/_shared/executor-dispatch-fallback.md"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/5": {
+      "owners": [
+        "reference-000023",
+        "reference-000025"
+      ],
+      "ownerFile": ".agents/skills/_shared/executor-dispatch-fallback.md"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/6": {
+      "owners": [
+        "reference-002327",
+        "reference-002329"
+      ],
+      "ownerFile": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/7": {
+      "owners": [
+        "reference-000046"
+      ],
+      "ownerFile": ".agents/skills/fgos-clarifying/SKILL.md"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/8": {
+      "owners": [
+        "reference-000046"
+      ],
+      "ownerFile": ".agents/skills/fgos-clarifying/SKILL.md"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/9": {
+      "owners": [
+        "reference-002354"
+      ],
+      "ownerFile": "plugins/fgOS/skills/fgos-clarifying/SKILL.md"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/10": {
+      "owners": [
+        "reference-000064"
+      ],
+      "ownerFile": ".agents/skills/fgos-coding-knowledge/SKILL.md"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/11": {
+      "owners": [
+        "reference-000064"
+      ],
+      "ownerFile": ".agents/skills/fgos-coding-knowledge/SKILL.md"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/12": {
+      "owners": [
+        "reference-002372"
+      ],
+      "ownerFile": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/13": {
+      "owners": [
+        "reference-000235",
+        "reference-000236",
+        "reference-000232"
+      ],
+      "ownerFile": "bin/fgos.mjs"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/14": {
+      "owners": [
+        "reference-003892",
+        "reference-003893",
+        "reference-003894",
+        "reference-003895",
+        "reference-003896",
+        "reference-003897",
+        "reference-003898",
+        "reference-003899"
+      ],
+      "ownerFile": "src/state/knowledge-registry.mjs"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/15": {
+      "owners": [
+        "reference-003726"
+      ],
+      "ownerFile": "src/runner/dispatch/mechanism.mjs"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/16": {
+      "owners": [
+        "reference-003727"
+      ],
+      "ownerFile": "src/runner/dispatch/operation-prompt-templates.mjs"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/17": {
+      "owners": [
+        "reference-000161",
+        "reference-000182"
+      ],
+      "ownerFile": "apps/fgos-gateway/src/gateway.rs"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/18": {
+      "owners": [
+        "reference-000209"
+      ],
+      "ownerFile": "apps/fgos-gateway/web/src/lib/network.ts",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json#/patches/2"
+      ],
+      "evidence": [
+        "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md#reachable-on-network"
+      ],
+      "reason": "Specific conserved R5 clause supersedes the chain generic rule link; yaml contract chain retarget retained."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/19": {
+      "owners": [
+        "reference-002291"
+      ],
+      "ownerFile": "packages/distribution/rust/src/canonical.rs"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/20": {
+      "owners": [
+        "reference-002294"
+      ],
+      "ownerFile": "packages/distribution/rust/src/verify.rs"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/21": {
+      "owners": [
+        "reference-002292"
+      ],
+      "ownerFile": "packages/distribution/rust/src/init.rs"
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/22": {
+      "owners": [
+        "reference-002295"
+      ],
+      "ownerFile": "packages/distribution/rust/src/workspace.rs",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json#/patches/4"
+      ],
+      "evidence": [
+        "docs/platform/packaging-distribution/contracts/activation-binding.md",
+        "Git Common Directory Discovery"
+      ],
+      "reason": "The G9 supplemental workspace body and carry 22 are one clause; retain the fuller reviewed G9 wording as its single composed owner."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json#/patches/23": {
+      "owners": [
+        "author-s4-a20431be6e7a6997",
+        "author-s4-08912b8301b10321"
+      ],
+      "ownerFile": "docs/backlog.md",
+      "composedBy": [
+        "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json#/patches/3"
+      ],
+      "evidence": [
+        "repo/docs/platform/work-state/contracts/non-transitioning-records.md"
+      ],
+      "reason": "The advisory row is already retired/done (G9 entry 43), not resurrected; only the still-live STR70a precedent is retargeted."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json#/patches/2": {
+      "composesChain": [
+        "file:apps/fgos-gateway/web/src/lib/network.ts"
+      ],
+      "reason": "Co-compose the existing exact chain and the section-specific pointer on one final line; no second apply owner."
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/176/patch": {
+      "composesChain": [
+        "w8:gloss:docs/platform/event-store/spec.md"
+      ],
+      "reason": "Co-compose the existing exact chain and the section-specific pointer on one final line; no second apply owner."
+    }
+  }
+}

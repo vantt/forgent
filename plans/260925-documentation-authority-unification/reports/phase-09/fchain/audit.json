@@ -1,0 +1,120 @@
+{
+  "exit": 0,
+  "judgmentsUnchanged": 787,
+  "dependencyDecisionsUnchanged": 158,
+  "existingBodiesUnchanged": 546,
+  "carriesOnlyComposedBy": true,
+  "changedPaths": 25,
+  "allDiffBearingRecordFiles": 18,
+  "sourceDiscovery": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/pointer-patches.json",
+      "diffObjects": 24,
+      "reader": "pointer",
+      "sha256": "fe87c638a814a93024d1fc55c6ecf77c601c80110ee84d7d81feff38697c169b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/carries/source-parity.json",
+      "diffObjects": 4,
+      "reader": "historical",
+      "sha256": "aaedf40862ffa2a9c4a4cd136524fda8989a6de0aed0100c45b8606a0f34533c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/pointer-patches.json",
+      "diffObjects": 4,
+      "reader": "pointer",
+      "sha256": "ba6bc185541a1999601feec3d57c6838eceb59d58de496208264e8d675936e38"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/gap05-placement-proposal.json",
+      "diffObjects": 2,
+      "reader": "historical",
+      "sha256": "133e94ac452c0ed7928e6945fbd80eb0f746219d6634d0758381d068c7d23e59"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/generator-all-output-deltas.json",
+      "diffObjects": 33,
+      "reader": "generator-evidence",
+      "sha256": "24fdcdaa259830bc2186ccf4f2a7ad89a92e8d5b3d04cdf5431fac7e77a2992d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
+      "diffObjects": 136,
+      "reader": "composition",
+      "sha256": "3e6cbd0cb438426176b55b1eb7f61afb81ae789ca52479398aa2a12a81fc6d2f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/skill-regeneration.json",
+      "diffObjects": 24,
+      "reader": "generator-evidence",
+      "sha256": "bb9e1590e87502d566a0f7b00d3950bd99824f238ce5872607d88c3103c73248"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w2-gap05-verification.json",
+      "diffObjects": 2,
+      "reader": "historical",
+      "sha256": "1b66b5483c53ab43eee1eb28dbe459b4a053ef0478b2cf0050416b88ffcede4f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w2-skill-regeneration.json",
+      "diffObjects": 33,
+      "reader": "generator-evidence",
+      "sha256": "a724f895e9d3df4e1b8849f0f655fbe3d0a164071d82cb5dfeb55590ada094e6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json",
+      "diffObjects": 5,
+      "reader": "pointer",
+      "sha256": "39d89b2ff93051d8d35bb8b778c6d705bc783656bc5a577e8133624e9c1008ab"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json",
+      "diffObjects": 9,
+      "reader": "additions",
+      "sha256": "f20e4c74e05564abf5fb2a8e09e384952183b4ee5b48cdc849da33531dded1df"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-review-evidence.json",
+      "diffObjects": 4113,
+      "reader": "historical",
+      "sha256": "72657e3d1389ace306d93e4aa3aa78f10c7349f55921a4aaf8ed6dcd16d27510"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-supplemental-specs.json",
+      "diffObjects": 1,
+      "reader": "historical",
+      "sha256": "4affda2c2bf1ecc31376aca5d0f622e60042944f859619b62353ba4ee3051253"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+      "diffObjects": 500,
+      "reader": "recomposed",
+      "sha256": "81d60b1d4ca9f64be416bd9d7d5ffa96d0875930885593774d62af4811226e12"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-1.json",
+      "diffObjects": 37,
+      "reader": "premise",
+      "sha256": "fd3806d3ad22acce8070fb056198c205608546f80abf42de6b31f8563819fbf6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json",
+      "diffObjects": 64,
+      "reader": "premise",
+      "sha256": "e1a2a7ded6326020dfd98a8f2a1c79df38423dcc9b57318b6428ebc12adf8138"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json",
+      "diffObjects": 73,
+      "reader": "premise",
+      "sha256": "1a289310f935b6954d856c60b2c68ff339919c0eaa00a307a909a94ec855206d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/prepared-patches.json",
+      "diffObjects": 1,
+      "reader": "prepared",
+      "sha256": "56f51603d5cd65c1af2a8d17e11dc72408693a4e526b14a4423ec57abc1e4b5a"
+    }
+  ],
+  "interpretation": "Raw diff objects include shared shard copies, historical observations, unit adaptations and generator witnesses; not a count of executable patches."
+}
