@@ -259,7 +259,9 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, ext
       guard();
       if (!staging || !commitEvents) throw new HotLockError('state-tx-consumer-required', 'append requires a prepared consumer gate');
       if (typeof opts?.type !== 'string' || !opts.type.trim()) throw new HotLockError('validation', 'event type is required');
-      const event = { type: opts.type.trim(), payload: structuredClone(opts.payload ?? null), ts: new Date().toISOString() };
+      // An import of historical events keeps each one's original time; every other write is stamped now.
+      if (opts.ts !== undefined && (typeof opts.ts !== 'string' || Number.isNaN(Date.parse(opts.ts)))) throw new HotLockError('validation', 'event ts must be an ISO time');
+      const event = { type: opts.type.trim(), payload: structuredClone(opts.payload ?? null), ts: opts.ts ?? new Date().toISOString() };
       events.push(event);
       return event;
     },

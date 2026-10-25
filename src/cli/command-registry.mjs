@@ -1551,7 +1551,7 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'events',
-    invoke: 'fgos events <sync|status|seal|export|migrate>',
+    invoke: 'fgos events <sync|status|seal|export|migrate|import-legacy>',
     description: 'Synchronize, inspect, export or migrate the repository Event Store. `sync` and `migrate` write (sync pushes event refs to the remote); `status` and `export` only read.',
     subcommands: {
       sync: { description: 'Fetch event refs and publish this clone\'s own, unless --no-push.', examples: ['fgos events sync', 'fgos events sync --no-push'], parameters: { type: 'object', properties: { remote: { type: 'string', description: 'Remote name (default: eventStore.remote).' }, 'no-push': { type: 'boolean', description: 'Fetch only; publish nothing.' } }, required: [] } },
@@ -1559,6 +1559,7 @@ export const COMMAND_REGISTRY = [
       seal: { description: 'Certify the open events of one stream now, waiting for the seal lock; the detached child every Work command hands its seal to.', examples: ['fgos events seal --stream project'], parameters: { type: 'object', properties: { stream: { type: 'string', description: 'Stream to seal (for Work: project).' }, history: { type: 'string', description: 'History checkpoint file under .fgos/cache that the seal extends.' } }, required: ['stream'] } },
       export: { description: 'Write event history to a new directory, as canonical JSONL or the legacy file layout.', examples: ['fgos events export --out ./export', 'fgos events export --out ./legacy --format legacy-layout'], parameters: { type: 'object', properties: { out: { type: 'string', description: 'Directory to create; refused when it exists.' }, format: { type: 'string', enum: ['jsonl', 'legacy-layout'] }, stream: { type: 'string' }, since: { type: 'string', description: 'A cursor, as JSON.' } }, required: ['out'] } },
       migrate: { description: 'Import the tracked legacy event files into the store and install the fence that retires them.', examples: ['fgos events migrate --check', 'fgos events migrate'], parameters: { type: 'object', properties: { check: { type: 'boolean', description: 'Plan and report parity; change nothing.' }, baseline: { type: 'string', description: 'A recorded view to compare parity against.' } }, required: [] } },
+      'import-legacy': { description: 'Replay one legacy event file that never reached a commit into the Work stream, keeping each event\'s type, payload and time; lines already in history are skipped; --check writes nothing.', examples: ['fgos events import-legacy --file .fgos/runtime/tmp/landing-es-cutover-261024/untracked-events/<shard>.jsonl --check'], parameters: { type: 'object', properties: { file: { type: 'string', description: 'Legacy event file (JSONL) to replay.' }, check: { type: 'boolean', description: 'Report what would be imported and skipped without writing.' } }, required: ['file'] } },
     },
     examples: ['fgos events status', 'fgos events sync --no-push', 'fgos events export --out ./export', 'fgos events migrate --check'],
     touchesState: true,
