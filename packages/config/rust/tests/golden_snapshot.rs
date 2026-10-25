@@ -193,3 +193,35 @@ fn a_comment_only_edit_changes_the_revision_and_not_the_value() {
     assert_ne!(before.revisions["project"], after.revisions["project"]);
     let _ = fs::remove_dir_all(&dir);
 }
+
+/// A capability confinement is one decision, so a higher layer replaces the standard's whole entry.
+/// A project that sets `mode: unconfined` must not inherit the standard's `policy`, which the
+/// runner refuses for an unconfined mode. The fixture cases use their own schemas, so only the
+/// bundled schema can show that this entry carries the replace rule.
+#[test]
+fn an_unconfined_capability_does_not_inherit_the_standard_policy() {
+    let (schemas, digest) = Schemas::bundled().unwrap();
+    let standard = Standard::bundled(&schemas).unwrap();
+    let ctx = Context {
+        schemas: &schemas,
+        standard: &standard,
+        digest: &digest,
+        detectors: &Fixed(json!({})),
+    };
+    let path = "runner.capabilities.advise.confinement";
+    assert!(at(standard.value(), &format!("{path}.policy")).is_some());
+    let dir = common::temp("snap", "confinement-replace");
+    let req = common::lay_out(
+        &dir,
+        &json!({"files": {"project/.fgos/config.yaml": [
+            "runner:",
+            "  capabilities:",
+            "    advise:",
+            "      confinement:",
+            "        mode: unconfined"
+        ]}}),
+    );
+    let snap = snapshot(&ctx, &req).unwrap();
+    assert_eq!(at(&snap.value, path), Some(&json!({"mode": "unconfined"})));
+    let _ = fs::remove_dir_all(&dir);
+}

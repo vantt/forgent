@@ -9,7 +9,7 @@
 // barrel. See `docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md` D7 for the split rationale.
 
-import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, normalizePreferCandidates } from './config.mjs';
+import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, EXECUTOR_MISSING_MESSAGE, normalizePreferCandidates } from './config.mjs';
 import { credentialStoreOf } from './provider-capacity.mjs';
 
 /**
@@ -411,8 +411,9 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
         : resolvedViaAgentType
           ? buildAgentTypeExecutor(cfg.executor, effectiveAgentType)
           : undefined;
-  const executor = byExecutor ?? (cfg && cfg.executor);
-  if (!executor || typeof executor.command !== 'string' || !Array.isArray(executor.args)) {
+  if (!byExecutor && !cfg?.executor) throw new RunnerConfigError(EXECUTOR_MISSING_MESSAGE, { code: 'runner-executor-missing' });
+  const executor = byExecutor ?? cfg.executor;
+  if (typeof executor.command !== 'string' || !Array.isArray(executor.args)) {
     throw new RunnerConfigError('runner config "executor" must have a string "command" and an "args" array.');
   }
 

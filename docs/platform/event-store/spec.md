@@ -559,7 +559,7 @@ Today's tracked truth: `.fgos/events.jsonl` (frozen baseline) and 90 shards `.fg
 
 Stop-everything cutover, one change, on all three machines and every workspace (holder-lock section 12 pattern):
 
-1. Stop every fgOS writer (quiesce scan) on every machine. Each machine commits and pushes its tracked event changes to main (they still merge by `merge=union`).
+1. Stop every fgOS writer on every machine: a procedure the operator carries out on all three machines, not something one scan can see. `fgos events migrate` runs the quiesce scan only for the workspace it migrates; it finds that workspace's writers (cwd in its root or a listed worktree, or a typed `--dir`/`--worktree`/`--cwd`/`-C` root) and is blind to every other machine and to processes of other workspaces on this one, which do not block it. A launcher that serves the workspace from another directory (`fgos-gateway`, a run supervisor) is not found either: its children run inside the workspace and are found while they run, and one started after the scan meets write admission and the fence, but the operator stops such launchers as part of this step. Each machine commits and pushes its tracked event changes to main (they still merge by `merge=union`).
 2. On one machine, pull main. Record the pre-cutover Work view (view and `revision`; the `snapshot` anchor is excluded because the cursor replaces it).
 3. Import once: one commit on `refs/fgos/legacy` whose tree holds the tracked files byte for byte under their current names (`events.jsonl`, `events/<name>.jsonl`), plus `porting/events.jsonl` of any workspace that has one, and `seal.json {kind: "legacy", fromCommit, treeOfFgosEvents}`. Keeping names keeps the legacy order `(ts, file, seq)` of `src/state/replay.mjs:876-880` identical.
 4. Rebuild the Work view through the new reader and compare with step 2 byte for byte. Any difference stops the cutover.
@@ -1034,7 +1034,7 @@ Preparation records write admission before any hot gate: tracked legacy data
 without a fence refuses `event-store-migration-required`; a pinned clone without
 the matching legacy ref or configured publication-remote mapping refuses
 `event-store-refspec-missing`. Prepared admission is valid for that process
-lifetime: stop-everything migration requires ending old writer processes.
+lifetime: stop-everything migration requires ending old writer processes of the workspace, on every machine; the scan proves only this workspace on this machine.
 
 A normal cutover failure restores tracked input bytes only for explicit Git
 pre-attempt refusal codes or `commit-rejected` after Git's snapshot restoration,

@@ -1306,13 +1306,16 @@ test('loadRunnerConfigForDir on a project with no config file reads the standard
   assert.equal(fs.existsSync(path.join(dir, '.fgos')), false);
 });
 
-test('loadRunnerConfigForDir with no executor set and no assistant CLI on PATH names the command that sets one', () => {
+test('with no executor set and no assistant CLI on PATH the config loads, a named executor resolves, and the default refuses where it is used, naming the command that sets one', () => {
   const dir = mkTempDir();
+  writeProjectConfig(dir, { runner: { executors: { fake: { kind: 'agent', carries: 'repo-content', allowCrossProvider: true, invocations: [{ via: 'cli', command: 'fake-cli', args: ['{prompt}'] }] } } } });
+  const cfg = withHome(mkTempDir(), () => withOnlyOnPath([], () => loadRunnerConfigForDir(dir)));
+  assert.equal(cfg.executor, undefined);
+  assert.equal(resolveExecutorConfig(cfg, 'standard', 'fake', undefined, 'repo-content').command, 'fake-cli');
   assert.throws(
-    () => withHome(mkTempDir(), () => withOnlyOnPath([], () => loadRunnerConfigForDir(dir))),
+    () => resolveExecutorConfig(cfg, 'standard', undefined),
     (err) => err instanceof RunnerConfigError && err.code === 'runner-executor-missing' && /fgos config set runner\.executor/.test(err.message),
   );
-  assert.equal(fs.existsSync(path.join(dir, '.fgos')), false);
 });
 
 test('loadRunnerConfigForDir refuses a project file that does not parse, with the door\'s failure id', () => {

@@ -97,6 +97,10 @@ export function withDefaultExecutor(rawCfg) {
  * `phase` is `'pre-admission'` (refused before any Run identity was
  * committed) or `'post-admission'` (refused after commit, e.g. control
  * fencing on an already-admitted Run). */
+/** The refusal of a run that needs the default executor where none is set and no assistant CLI is on PATH. */
+export const EXECUTOR_MISSING_MESSAGE =
+  'no runner.executor: none set and no assistant CLI found on PATH; set one with fgos config set runner.executor ... --reason ...';
+
 export class RunnerConfigError extends Error {
   constructor(message, { code, phase } = {}) {
     super(message);
@@ -200,12 +204,6 @@ export function loadRunnerConfigForDir(dir) {
   } catch (err) {
     if (err instanceof ConfigDoorError) throw new RunnerConfigError(err.message, { code: err.code });
     throw err;
-  }
-  if (!runner.executor) {
-    throw new RunnerConfigError(
-      'no runner.executor: none set and no assistant CLI found on PATH; set one with fgos config set runner.executor ... --reason ...',
-      { code: 'runner-executor-missing' },
-    );
   }
   // The facade's objects have no prototype; the runner code and its callers take ordinary objects (a JSON round trip
   // keeps every key an own key, `__proto__` included).
@@ -1496,7 +1494,9 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   if (cfg.placementPolicy !== undefined) {
     validatePlacementPolicyShape(cfg.placementPolicy, `${sourceLabel} placementPolicy`);
   }
-  validateExecutorShape(cfg.executor, `${sourceLabel} executor`);
+  // The default executor is optional: none set and no assistant CLI on PATH still loads, so a caller
+  // that names its executor runs; resolving the default refuses where it is used (resolveExecutorConfig).
+  if (cfg.executor !== undefined) validateExecutorShape(cfg.executor, `${sourceLabel} executor`);
   // OPTIONAL cfg.capabilities catalog (D4/D14, tsk-in1-3): additive, same
   // style as `executors` below — absent keeps today's behavior byte-
   // identical. Deliberately a DIFFERENT field from `executors` (D3 kept

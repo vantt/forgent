@@ -855,7 +855,7 @@
    "expect": {
     "code": "config-migrate-equivalence-failed",
     "paths": [
-     "rep.a"
+     "rep"
     ]
    }
   },

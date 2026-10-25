@@ -13,18 +13,6 @@ import { trackedLegacy } from './phase08-fixture.mjs';
 import { migrateUseCase, checkStopped } from '../../src/verbs/events/migrate.mjs';
 import { ensureHostBin } from '../../scripts/lib/git-addon-stage.mjs';
 const hostBin = ensureHostBin();
-/**
- * Production quiesce scans the whole machine (a stop-everything cutover), so
- * what other sessions or sibling test files run would decide these tests. The
- * fixture hands migrate the host's own workspace-scoped scan (`--workspace-only`):
- * the real scan still runs, but only processes working in the fixture
- * workspace count. Every other host route passes through untouched.
- */
-const scopedHost = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-es-p08-host-')), 'workspace-scoped-host.sh');
-fs.writeFileSync(scopedHost, `#!/bin/sh
-if [ "$2" = "quiesce-scan" ]; then exec "${hostBin}" "$@" --workspace-only; fi
-exec "${hostBin}" "$@"
-`, { mode: 0o755 });
 const namespaceRefusal = "the scan runs inside a PID namespace that hides the host's processes; run it from the host";
 function hostScan(t, scan) {
   if (scan.status === 'clean') return true;
@@ -40,15 +28,15 @@ test('migrate --check runs real quiesce/setup/parity without publishing a ref or
   fs.mkdirSync(path.join(f.repo, '.fgos/events'), { recursive: true });
   fs.writeFileSync(path.join(f.repo, '.fgos/events/stray-empty.jsonl'), '');
   const head = f.git('rev-parse', 'HEAD');
-  const scan = checkStopped({ workspaces: [f.repo], hostBin: scopedHost });
+  const scan = checkStopped({ workspaces: [f.repo], hostBin });
   if (scan.status !== 'clean' && typeof gitPorts.createGitScopedCommit === 'function') { hostScan(t, scan); return; }
   if (scan.status !== 'clean') {
-    await assert.rejects(migrateUseCase({ ...f.ctx, hostBin: scopedHost }, { check: true }), { code: 'event-store-writers-active' });
+    await assert.rejects(migrateUseCase({ ...f.ctx, hostBin }, { check: true }), { code: 'event-store-writers-active' });
     assert.equal(f.git('for-each-ref', 'refs/fgos/legacy'), '');
     t.diagnostic(`Real quiesce correctly refused: ${scan.detail}; successful command-level check needs a host scan`);
     return;
   }
-  const result = await migrateUseCase({ ...f.ctx, hostBin: scopedHost }, { check: true });
+  const result = await migrateUseCase({ ...f.ctx, hostBin }, { check: true });
   assert.equal(result.parity.equal, true); assert.equal(result.check, true);
   assert.equal(f.git('for-each-ref', 'refs/fgos/legacy'), ''); assert.equal(f.git('rev-parse', 'HEAD'), head);
   assert.ok(result.plan.deletions.includes('docs/distillery/state/porting/state.json'));
@@ -61,7 +49,7 @@ test('real Git 05 hook migration and second-run no-op', { skip: typeof gitPorts.
   const f = fixture(t); trackedLegacy(f);
   fs.appendFileSync(path.join(f.repo, '.gitattributes'), 'other-events/*.jsonl merge=union\n');
   f.git('add', '.gitattributes'); f.git('commit', '-qm', 'unrelated union rule');
-  const scan = checkStopped({ workspaces: [f.repo], hostBin: scopedHost });
+  const scan = checkStopped({ workspaces: [f.repo], hostBin });
   if (!hostScan(t, scan)) return;
   const oldHost = process.env.FGOS_HOST_BIN, oldState = process.env.FGOS_STATE_ROOT;
   process.env.FGOS_HOST_BIN = hostBin; process.env.FGOS_STATE_ROOT = f.stateRoot;
@@ -72,19 +60,19 @@ test('real Git 05 hook migration and second-run no-op', { skip: typeof gitPorts.
   f.git('config', 'core.hooksPath', path.join(root, '.githooks'));
   fs.mkdirSync(path.join(f.repo, '.fgos/events'), { recursive: true });
   fs.writeFileSync(path.join(f.repo, '.fgos/events/stray-empty.jsonl'), '');
-  const result = await migrateUseCase({ ...f.ctx, hostBin: scopedHost, writer: 'fixture' });
+  const result = await migrateUseCase({ ...f.ctx, hostBin, writer: 'fixture' });
   assert.equal(result.commit.status, 'committed');
   assert.deepEqual(result.plan.emptyLegacy, ['.fgos/events/stray-empty.jsonl']);
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(f.repo, '.fgos/events'))), result.pin);
   for (const p of result.plan.deletions) assert.equal(fs.existsSync(path.join(f.repo, p)), false, p);
   assert.equal(fs.readFileSync(path.join(f.repo, '.gitattributes'), 'utf8'), '*.txt text\nother-events/*.jsonl merge=union\n');
-  assert.equal((await migrateUseCase({ ...f.ctx, hostBin: scopedHost, writer: 'fixture' })).unchanged, true);
+  assert.equal((await migrateUseCase({ ...f.ctx, hostBin, writer: 'fixture' })).unchanged, true);
   assert.throws(() => fs.writeFileSync(path.join(f.repo, '.fgos/events/old-release.jsonl'), ''), { code: 'ENOTDIR' });
 });
 
 test('real hook rejection restores baseline-only inputs and rerun uses a fresh WAL attempt', { skip: typeof gitPorts.createGitScopedCommit !== 'function' ? 'Requires Git 05 merge and activated release; no substitute Git writer' : false }, async t => {
   const f = fixture(t); const files = trackedLegacy(f, { porting: false, shards: false });
-  if (!hostScan(t, checkStopped({ workspaces: [f.repo], hostBin: scopedHost }))) return;
+  if (!hostScan(t, checkStopped({ workspaces: [f.repo], hostBin }))) return;
   fs.writeFileSync(path.join(f.repo, '.gitattributes'), '.fgos/events*.jsonl merge=union\n');
   f.git('add', '.gitattributes'); f.git('commit', '-qm', 'only event attributes');
   const head = f.git('rev-parse', 'HEAD');
@@ -92,12 +80,12 @@ test('real hook rejection restores baseline-only inputs and rerun uses a fresh W
   fs.writeFileSync(path.join(hooks, 'pre-commit'), '#!/bin/sh\necho "fixture hook refuses the cutover" >&2\nexit 1\n', { mode: 0o755 });
   f.git('config', 'core.hooksPath', hooks);
   let rejected;
-  await assert.rejects(migrateUseCase({ ...f.ctx, hostBin: scopedHost, writer: 'fixture' }), error => { rejected = error; return error.code === 'commit-rejected' && error.message.includes('fixture hook refuses the cutover'); });
+  await assert.rejects(migrateUseCase({ ...f.ctx, hostBin, writer: 'fixture' }), error => { rejected = error; return error.code === 'commit-rejected' && error.message.includes('fixture hook refuses the cutover'); });
   assert.equal(f.git('rev-parse', 'HEAD'), head);
   for (const [p, bytes] of Object.entries(files).filter(([p]) => p !== '.gitattributes')) assert.equal(fs.readFileSync(path.join(f.repo, p), 'utf8'), bytes);
   assert.equal(f.git('diff', '--cached', '--name-only'), '');
   fs.unlinkSync(path.join(hooks, 'pre-commit'));
-  const result = await migrateUseCase({ ...f.ctx, hostBin: scopedHost, writer: 'fixture' });
+  const result = await migrateUseCase({ ...f.ctx, hostBin, writer: 'fixture' });
   assert.notEqual(result.operationId, rejected.operationId);
   assert.equal(result.commit.status, 'committed');
   assert.notEqual(f.git('rev-parse', 'HEAD'), head);
@@ -113,16 +101,16 @@ test('a process working inside the fixture workspace or one of its linked worktr
   const f = fixture(t); trackedLegacy(f);
   const linked = path.join(f.temp, 'linked');
   f.git('worktree', 'add', '-q', '--detach', linked);
-  if (!hostScan(t, checkStopped({ workspaces: [{ root: f.repo, worktrees: [linked] }], hostBin: scopedHost }))) return;
+  if (!hostScan(t, checkStopped({ workspaces: [{ root: f.repo, worktrees: [linked] }], hostBin }))) return;
   const head = f.git('rev-parse', 'HEAD');
   for (const cwd of [f.repo, linked]) {
     const child = spawn(process.execPath, ['-e', "process.stdout.write('ready\\n'); setInterval(() => {}, 1000)", path.join(root, 'bin/fgos.mjs'), 'events', 'migrate'], { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
     try {
       await once(child.stdout, 'data');
-      const scan = checkStopped({ workspaces: [{ root: f.repo, worktrees: [linked] }], hostBin: scopedHost });
+      const scan = checkStopped({ workspaces: [{ root: f.repo, worktrees: [linked] }], hostBin });
       assert.equal(scan.status, 'blocked', JSON.stringify(scan));
       assert.ok(scan.blockers.some(p => p.pid === child.pid), JSON.stringify(scan));
-      await assert.rejects(migrateUseCase({ ...f.ctx, hostBin: scopedHost, writer: 'fixture' }), error => {
+      await assert.rejects(migrateUseCase({ ...f.ctx, hostBin, writer: 'fixture' }), error => {
         assert.equal(error.code, 'event-store-writers-active', cwd);
         assert.ok(error.message.includes(String(child.pid)), error.message);
         return true;
@@ -136,12 +124,12 @@ test('a process working inside the fixture workspace or one of its linked worktr
 
 test('pre-commit filesystem failure restores deleted inputs without naming a Git record', { skip: typeof gitPorts.createGitScopedCommit !== 'function' ? 'Requires Git 05 merge and activated release; no substitute Git writer' : false }, async t => {
   const f = fixture(t); const files = trackedLegacy(f);
-  if (!hostScan(t, checkStopped({ workspaces: [f.repo], hostBin: scopedHost }))) return;
+  if (!hostScan(t, checkStopped({ workspaces: [f.repo], hostBin }))) return;
   const head = f.git('rev-parse', 'HEAD');
   // Empty directories are invisible to Git's clean-tree check. This real
   // filesystem obstruction makes rmdir fail after the tracked deletions.
   fs.mkdirSync(path.join(f.repo, '.fgos/events/empty'));
-  await assert.rejects(migrateUseCase({ ...f.ctx, hostBin: scopedHost, writer: 'fixture' }), error => {
+  await assert.rejects(migrateUseCase({ ...f.ctx, hostBin, writer: 'fixture' }), error => {
     assert.equal(error.code, 'ENOTEMPTY');
     assert.equal(error.message.includes('inspect Git ScopedCommit record'), false);
     return true;
@@ -153,14 +141,14 @@ test('pre-commit filesystem failure restores deleted inputs without naming a Git
 
 test('checkStopped does not count a pid the caller declares as its own, and counts every other matching pid', async t => {
   const f = fixture(t, { machine: false });
-  if (!hostScan(t, checkStopped({ workspaces: [f.repo], hostBin: scopedHost }))) return;
+  if (!hostScan(t, checkStopped({ workspaces: [f.repo], hostBin }))) return;
   // boundary: the host's quiesce-scan route decides what a process is; only a real process shows that checkStopped passes --exclude-pid through to it.
   const child = spawn(process.execPath, ['-e', "process.stdout.write('ready\\n'); setInterval(() => {}, 1000)", path.join(root, 'bin/fgos.mjs')], { cwd: f.repo, stdio: ['ignore', 'pipe', 'pipe'] });
   try {
     await once(child.stdout, 'data');
-    const counted = checkStopped({ workspaces: [f.repo], hostBin: scopedHost });
+    const counted = checkStopped({ workspaces: [f.repo], hostBin });
     assert.ok(counted.blockers.some(p => p.pid === child.pid), JSON.stringify(counted));
-    const excluded = checkStopped({ workspaces: [f.repo], hostBin: scopedHost, excludePids: [child.pid] });
+    const excluded = checkStopped({ workspaces: [f.repo], hostBin, excludePids: [child.pid] });
     assert.ok(!excluded.blockers.some(p => p.pid === child.pid), JSON.stringify(excluded));
   } finally { child.kill(); await once(child, 'exit'); }
 });
@@ -169,15 +157,13 @@ test('checkStopped counts a process working in a linked worktree only when the c
   const f = fixture(t, { machine: false }); trackedLegacy(f);
   const linked = path.join(f.temp, 'linked-listing');
   f.git('worktree', 'add', '-q', '--detach', linked);
-  if (!hostScan(t, checkStopped({ workspaces: [{ root: f.repo, worktrees: [linked] }], hostBin: scopedHost }))) return;
-  // Not an fgOS process: only its cwd can name it, so the pinned state root stays out of its environment.
-  const { FGOS_STATE_ROOT: _pinned, ...plainEnv } = process.env;
+  if (!hostScan(t, checkStopped({ workspaces: [{ root: f.repo, worktrees: [linked] }], hostBin }))) return;
   // boundary: only a real process with its cwd in a worktree shows that checkStopped passes the listed --dir values through to the host's quiesce-scan.
-  const sleeper = spawn('sleep', ['30'], { cwd: linked, env: plainEnv, stdio: 'ignore' });
+  const sleeper = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { cwd: linked, stdio: 'ignore' });
   try {
-    const unlisted = checkStopped({ workspaces: [f.repo], hostBin: scopedHost });
+    const unlisted = checkStopped({ workspaces: [f.repo], hostBin });
     assert.ok(!unlisted.blockers.some(p => p.pid === sleeper.pid), JSON.stringify(unlisted));
-    const listed = checkStopped({ workspaces: [{ root: f.repo, worktrees: [linked] }], hostBin: scopedHost });
+    const listed = checkStopped({ workspaces: [{ root: f.repo, worktrees: [linked] }], hostBin });
     const found = listed.blockers.find(p => p.pid === sleeper.pid);
     assert.ok(found, JSON.stringify(listed));
     assert.equal(found.matched, 'cwd');
