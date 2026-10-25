@@ -1,0 +1,88 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc Limits of the agent mailbox, and whether a project opts in to its hooks.
+mailbox:
+  # @fgos:doc Size cap of a message body; a larger body is refused and the sender is told to send a path or link. In bytes. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Default: 16384.
+  maxBodyBytes: 16384
+  # @fgos:doc Reply chain limits.
+  chain:
+    # @fgos:doc Chain depth cap, counted on the derived reply chain only. In messages. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 6.
+    maxDepth: 6
+  # @fgos:doc Send limits of one sender session.
+  session:
+    # @fgos:doc Agent-origin send attempts by one sender inside the rolling window; refused attempts count too. In send attempts. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 20.
+    budget: 20
+    # @fgos:doc Send attempts by one sender generation over its whole life, never reset. In send attempts. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 200.
+    lifetimeCap: 200
+  # @fgos:doc The window of the session budget.
+  human:
+    # @fgos:doc The rolling window of the session budget, used on every CLI instead of a human-input signal. In seconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Default: 600.
+    fallbackWindowSec: 600
+  # @fgos:doc The loop guard between two heads.
+  loop:
+    # @fgos:doc Messages between one ordered pair inside the loop window before the loop guard refuses. In messages. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 12.
+    maxPerWindow: 12
+    # @fgos:doc Length of the loop guard window. In seconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Default: 600.
+    windowSec: 600
+  # @fgos:doc Pending-message limits per recipient.
+  queue:
+    # @fgos:doc Pending messages per recipient; the newest is refused when full. In messages. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 50.
+    cap: 50
+    # @fgos:doc Pending messages one sender may hold in one recipient's queue. In messages. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 10.
+    perSender: 10
+  # @fgos:doc Size bound of the refusal and notice counters.
+  counters:
+    # @fgos:doc Size bound of the per-party refusal and notice counters in a snapshot; the least recently bumped entry is evicted. In entries. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 64.
+    maxKeys: 64
+  # @fgos:doc Message age limits of the mailbox record.
+  record:
+    # @fgos:doc A message still recorded after this age is refused with a notice. In seconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Default: 86400.
+    ttlSec: 86400
+    # @fgos:doc The body of an offered or refused message is dropped this long after its last state change. In seconds. The owner set it equal to mailbox.record.ttlSec, so a settled header is kept one day instead of seven. Minimum: 0. Default: 86400.
+    bodyRetentionSec: 86400
+  # @fgos:doc Time an unfinished claim hides a message; must exceed the adapters' measured latency. In seconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Default: 120.
+  inFlightTtlSec: 120
+  # @fgos:doc Offers per message before it is refused with a notice. In offers. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 3.
+  maxOffers: 3
+  # @fgos:doc Limits on waking a recipient.
+  wake:
+    # @fgos:doc A silence of at least this long between two heads starts a new exchange. In seconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Default: 600.
+    exchangeGapSec: 600
+    # @fgos:doc Wake sends that take effect within one exchange, both directions together. In wakes. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 5.
+    maxPerExchange: 5
+    # @fgos:doc Wake sends that took effect by one sender generation to one recipient, never reset. In wakes. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 50.
+    lifetimeCap: 50
+  # @fgos:doc Notice limits per address.
+  notices:
+    # @fgos:doc Notices held per address; the oldest is dropped on overflow. In notices. Borrowed from mailbox.queue.perSender, not yet measured. Minimum: 0. Maximum: 4294967295. Default: 10.
+    cap: 10
+    # @fgos:doc At most one notice per (sender, reason) inside this window. In seconds. Borrowed from mailbox.loop.windowSec, not yet measured. Minimum: 0. Default: 600.
+    windowSec: 600
+  # @fgos:doc Limits of a frame header.
+  frame:
+    # @fgos:doc Length bound of a frame header value, and so of a short name, of a writer key and of a binding's handle the core accepts. In characters. Borrowed from the longest session id Identity accepts, not yet measured. Minimum: 0. Maximum: 4294967295. Default: 200.
+    maxHeaderChars: 200
+  # @fgos:doc Limits on blocking a Stop hook.
+  stopBlock:
+    # @fgos:doc Consecutive Stop blocks that were written and finished for one head generation; the count returns to zero when a Stop passes without blocking or a new turn starts. In blocks. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 3.
+    max: 3
+  # @fgos:doc Limits of one hook call.
+  hook:
+    # @fgos:doc Longest wait for the mailbox lock before a hook skips its drain. In milliseconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Default: 100.
+    lockWaitMs: 100
+    # @fgos:doc Whole-hook failure ceiling, not a target: a hook call still running when it passes exits 0 without printing, unless its stdout write has started. In milliseconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Default: 8000.
+    budgetMs: 8000
+    # @fgos:doc Largest foreign JSON document the hook reads: its stdin payload and the CLI's own session file; a larger one is refused (stdin: the drain is skipped with the quiet reason OverReadCap, which the entry records in runtime/mailbox/hook-outcome.json, and the mail stays pending; session file: no head). In bytes. Borrowed from the repository's two bounds on a foreign input read, both 1 MiB (terminal control's stdin and observe's file reads), not yet measured. Minimum: 0. Default: 1048576.
+    maxReadBytes: 1048576
+    # @fgos:doc The circuit breaker of the hook.
+    breaker:
+      # @fgos:doc Consecutive counted hook failures (a record error other than lock contention, or a caught panic) after which the circuit breaker opens and hook calls skip the drain. In failures. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 3.
+      failures: 3
+      # @fgos:doc How long an open circuit breaker keeps hook calls quiet before the next call drains again. In seconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Default: 60.
+      pauseSec: 60
+  # @fgos:doc Limits of the mailbox verbs.
+  verbs:
+    # @fgos:doc Longest wait of fgos mailbox send, inbox and inbox --claim for the mailbox lock, polling with backoff, before they answer lock-busy; a person or agent waits on these verbs, so they outwait a hook call holding the lock (a registering call writes and fsyncs) instead of refusing at the hook's skip budget. In milliseconds. About 15 times the longest measured hold: a registering hook call held the lock up to 135 ms at p95 on ext4 under load. Minimum: 0. Default: 2000.
+    lockWaitMs: 2000
+  # @fgos:doc Whether fgos setup and doctor --fix install the mailbox hook rows into this project's Claude Code and Codex hook files; false removes the rows they installed. Off by default: the mailbox is opt-in until the owner decides spec section 16 item 23. Default: false.
+  enabled: false
