@@ -272,6 +272,51 @@ test('runReviewed propagates execution-failure and other hard error outcomes', a
   }
 });
 
+// What a writing seat settles when it claimed done but changed no files: no evidence, inconclusive.
+const changedNothing = (seat = 'producer') => ({
+  seat,
+  outcome: 'execution-failure',
+  posture: { readOnly: false },
+  runResult: { classification: {
+    confidence: { level: 'no-evidence', basis: [] },
+    assessment: { verdict: 'inconclusive' },
+    failure: null,
+  } },
+});
+
+test('a producer that changed nothing is still reviewed, and the reviewer\'s verdict decides the round', async () => {
+  const unit = { id: 'u-no-change', capability: 'docs:write' };
+  const run = async (reviewerOutcome) => {
+    const calls = [];
+    const runRole = async (opts) => {
+      calls.push(opts.seat.seat);
+      if (opts.seat.seat === 'producer') return changedNothing();
+      return { seat: 'reviewer', outcome: reviewerOutcome, ...(reviewerOutcome === 'findings' ? { findings: ['wrong'] } : {}) };
+    };
+    return { res: await runReviewed(unit, {}, { runRole }, { maxRounds: 1 }), calls };
+  };
+
+  const passed = await run('pass');
+  assert.equal(passed.res.outcome, 'pass');
+  assert.ok(passed.calls.includes('reviewer'), 'the reviewer runs after a producer that changed nothing');
+
+  const found = await run('findings');
+  assert.equal(found.res.outcome, 'findings');
+  assert.deepEqual(found.res.findings, ['wrong']);
+});
+
+test('a producer that crashed stops the round before any reviewer', async () => {
+  const calls = [];
+  const runRole = async (opts) => {
+    calls.push(opts.seat.seat);
+    return { seat: 'producer', outcome: 'execution-failure', posture: { readOnly: false },
+      runResult: { classification: { confidence: { level: 'failed', basis: [] }, assessment: { verdict: 'inconclusive' }, failure: { code: 'crash' } } } };
+  };
+  const res = await runReviewed({ id: 'u-crash', capability: 'docs:write' }, {}, { runRole });
+  assert.equal(res.outcome, 'execution-failure');
+  assert.deepEqual(calls, ['producer']);
+});
+
 test('runReviewed resumes from history across settled rounds and pending roles', async () => {
   const calls = [];
   const unit = {
