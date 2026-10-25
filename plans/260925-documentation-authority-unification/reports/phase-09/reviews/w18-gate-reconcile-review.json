@@ -1,0 +1,62 @@
+{
+  "verdict": "5 APPROVE / 1 REWORK",
+  "scope": "Met-local claims G2/G3/G4/G6/G7/G9 and all 16 cleared entries of 969425890 (brief w17-gate-register-reconcile-brief.md, inputs 53de2207e)",
+  "commit": "969425890",
+  "metLocal": {"G2": "REWORK", "G3": "APPROVE", "G4": "APPROVE", "G6": "APPROVE", "G7": "APPROVE", "G9": "APPROVE"},
+  "clearedEntriesSupported": "16/16",
+  "originalEntriesCovered": "87/87",
+  "proofs": [
+    {"command": "python3 -B P/gate-reconcile/verify.py", "exit": 0, "note": "only verification.json checkedAtHead changed; restored"},
+    {"command": "python3 -B P/gate-reconcile/controls.py", "exit": 0, "note": "7 controls"}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "medium",
+      "verdict": "REWORK",
+      "gate": "G2",
+      "summary": "G2 met-local rests on a new F duty 'settle/review the 187 original owned judgments' with no L13 ruling or review deferral; it is local Lead work and execution plan G2 Met requires each of 1,126 ids joined to proof or REJECT. Record a Lead ruling deferring them to F, or list them before F and set G2 partial.",
+      "evidence": ["preflip-gate-status.json /gates/2/atFinalPinUnderLease/0", "census-join/receipt.md:8,32", "preflip-execution-plan.md §2 row 2, §3 W3", "owner-answers.md L13-9.4", "old register G2 remaining (no 187 clause)"]
+    },
+    {
+      "id": "F2",
+      "severity": "low",
+      "verdict": "NOTE",
+      "gate": "G9",
+      "summary": "Note says all former 338 parks were reviewed; W15 sampled 60 of 288 still-valid rows (exhaustive only for 5 parks, 32 superseded, 13 recompose). Clearing is acceptable; reword.",
+      "evidence": ["reviews/w15-g9-parks-review.md §2-§5", "preflip-gate-status.json /gates/9/note"]
+    },
+    {
+      "id": "F3",
+      "severity": "low",
+      "verdict": "NOTE",
+      "gate": "G6",
+      "summary": "W8 exhaustive reviews predate db023f065, which confirmed 319 former parks plus 20 operand rows; W9 approved those by rule with a 56-row spot check. Also the new F item for owned-park actions cites no ruling placing them at F (L13-10 says pre-flip Lead action).",
+      "evidence": ["reviews/w9-g6-fix-review.md item 3", "preserve-premise/receipt.md file-level framing", "owner-answers.md L13-10", "preflip-gate-status.json /gates/6/atFinalPinUnderLease/1"]
+    },
+    {
+      "id": "F4",
+      "severity": "low",
+      "verdict": "NOTE",
+      "gate": "G6",
+      "summary": "c5586146c carried two W7 REWORK fixes; W8 approved the verify.py pin but REWORKed the misc-fix receipt counts, fixed by the Lead in 25e8842d3 with no named independent re-review (W14 covered only its archive part).",
+      "evidence": ["reviews/w8-lead-fixes-review.json misc-receipt-stale-claims", "git show 25e8842d3 -- misc-fix/receipt.md", "reviews/w14-g8-retention-timing-review.md:40"]
+    },
+    {
+      "id": "F5",
+      "severity": "low",
+      "verdict": "CARRY",
+      "gate": "G0",
+      "summary": "W16 F5 (duplicate effective rows /bindingRefresh/124..126 must follow any in-place rebind of /6,/20,/21) was neither fixed in W17 nor carried in the register; add to the G0 F join duty. Current a8ea05c50 rebinds do not touch them.",
+      "evidence": ["reviews/w16-g0-rework-and-park-rule-review.md F5", "carries/current-binding-refresh.json changes (all s11 /unitCarries)"]
+    },
+    {
+      "id": "F6",
+      "severity": "info",
+      "verdict": "NOTE",
+      "gate": "all",
+      "summary": "Receipt labels: beforeFinalPin/4 'still open' though its part is cleared; gates/9/blockers/1 'moved to F' though cleared. G3 F item cites execution plan W3, which does not name G3 (placement pre-existed). G9 cleared item cites W12 but not W13/W14 that close its open M1-M3.",
+      "evidence": ["gate-reconcile/receipt.json decisions", "preflip-execution-plan.md §3 W3", "reviews/w13-misc-pin-and-gloss-review.json", "reviews/w14-check-hardening-review.json"]
+    }
+  ]
+}
