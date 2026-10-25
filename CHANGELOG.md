@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Moving a clone's directory (`mv`) no longer locks its Event Store with `event-store-store-moved`: the store keeps its id while the machine id and the Git common directory's device and inode are unchanged. A copied clone and a changed `fgos.machineId` are still refused, now each with its own message and next step.
 - `fgos events import-legacy --file <shard> [--check]` replays a legacy event file that a machine wrote but never committed before its Event Store cutover. Each event keeps its type, payload and original time; lines already in history are skipped and named, and a receipt next to the file prevents a second import.
 - `fgos doctor` `event-store-legacy-layout` passes on every clone after the Work cutover: it recomputes the imported data tree's id from the published `refs/fgos/legacy` commit instead of reading that tree's object, which only the clone that ran `fgos events migrate` has. Before, every other clone reported "legacy ref missing or differs from fence" with correct data.
 - A terminal attempt stopped on a used-up quota now records `terminal:blocked:usage-limit` instead of `terminal:needs-human`. On a terminal screen a dead-login wording now counts only at the start of a line (after an `error`, `warning` or `fatal` label), so an agent quoting `run /login` mid-sentence no longer reads as a blocked login.
