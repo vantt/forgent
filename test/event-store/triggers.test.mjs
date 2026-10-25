@@ -14,6 +14,8 @@ import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
 import { fixGitFetchMapping } from '../../src/setup/git-checks.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import { scan } from '../../src/runner/dispatch/process-identity.mjs';
+import { resolveFaultLogPath } from '../../src/cli/invocation-fault-log.mjs';
 
 function workRepo(t, { remote = false } = {}) {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-triggers-'));
@@ -62,18 +64,43 @@ test('every trigger mode reads maintenance facts and never the integrity status'
   assert.deepEqual(calls, { status: 0, maintenance: 3 });
 });
 
-test('the end trigger publishes from an owner session once per interval and never from a dispatched worker', (t) => {
-  const { repo, store } = workRepo(t, { remote: true });
+const waitFor = async (what, predicate, timeoutMs = 30000) => {
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    const value = predicate();
+    if (value) return value;
+    if (Date.now() > deadline) assert.fail(`timed out waiting for ${what}`);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+};
+/** The detached `fgos events sync` children that name this repository. */
+const syncChildren = (repo) => {
+  const views = scan({});
+  return views === 'unsupported' ? [] : views.filter((view) => {
+    const args = Array.isArray(view.cmdline) ? view.cmdline.join(' ') : String(view.cmdline);
+    return view.pid !== process.pid && args.includes(' events sync ') && args.includes(repo);
+  });
+};
+
+test('the end trigger hands a due publish to a detached child, never waits for it, and never publishes from a dispatched worker', async (t) => {
+  const { temp, repo, store } = workRepo(t, { remote: true });
+  // A remote whose receive hook takes seconds: an in-process publish would hold the trigger that long.
+  fs.writeFileSync(path.join(temp, 'remote/hooks/pre-receive'), '#!/bin/sh\nsleep 4\n', { mode: 0o755 });
   addAt(store, 3600);
   assert.equal(maintainEventStore(repo, { trustedMain: repo }).error, null);
-  assert.equal(store.maintenance([]).lastPush, null, 'a start trigger never publishes');
+  assert.deepEqual(syncChildren(repo), [], 'a start trigger never publishes');
   maintainEventStore(repo, { trustedMain: repo, end: true, dispatched: true });
-  assert.equal(store.maintenance([]).lastPush, null, 'a dispatched worker never publishes');
+  assert.deepEqual(syncChildren(repo), [], 'a dispatched worker never publishes');
+  const started = Date.now();
   assert.equal(maintainEventStore(repo, { trustedMain: repo, end: true }).error, null);
-  const first = store.maintenance([]).lastPush;
+  assert.ok(Date.now() - started < 3000, 'the end trigger returned without waiting for the slow remote');
+  assert.equal(syncChildren(repo).length, 1, 'the due publish runs in one detached child');
+  assert.equal(store.maintenance([]).lastPush, null, 'the push has not landed when the trigger returns');
+  const first = await waitFor('the child to publish', () => store.maintenance([]).lastPush);
   assert.equal(first.error, null);
   assert.equal(first.remote, 'origin');
   maintainEventStore(repo, { trustedMain: repo, end: true });
+  assert.deepEqual(syncChildren(repo), [], 'a push inside the interval starts no child');
   assert.deepEqual(store.maintenance([]).lastPush, first, 'a push inside the interval is not repeated');
 });
 
@@ -152,4 +179,40 @@ test('only a Land verb in a non-dispatched session sweeps retained Land candidat
   }
   assert.equal(sweeps(['list'], { dispatched: false }), 0, 'a verb that does not land never sweeps');
   assert.equal(sweeps(['merge', 'list'], { dispatched: false }), 0, '`merge list` does not land');
+});
+
+/** The fault records of a repository's invocation-fault log, oldest first. */
+function faultRecords(repo, dir) {
+  const file = resolveFaultLogPath(dir, repo);
+  return file && fs.existsSync(file) ? fs.readFileSync(file, 'utf8').trim().split('\n').filter(Boolean).map((line) => JSON.parse(line)) : [];
+}
+const BIN = path.resolve(import.meta.dirname, '../../bin/fgos.mjs');
+/** A group-writable locks directory makes every seal refuse, while a read verb never takes that lock. */
+const refuseSeals = (repo) => fs.chmodSync(path.join(repo, '.git/fgos/events/locks'), 0o775);
+
+test('a failing end trigger leaves a record, and the command it ended still succeeds', (t) => {
+  const { repo, dir, store } = workRepo(t);
+  addAt(store, 3600);
+  refuseSeals(repo);
+  const env = { ...process.env }; delete env.FGOS_DISPATCH_DEPTH;
+  const list = spawnSync(process.execPath, [BIN, 'list', '--dir', dir], { cwd: repo, encoding: 'utf8', env });
+  assert.equal(list.status, 0, list.stderr);
+  const [record, ...rest] = faultRecords(repo, dir);
+  assert.deepEqual(rest, []);
+  assert.equal(record.faultClass, 'event-store-end-trigger');
+  assert.match(record.message, /fgos setup/);
+});
+
+test('a detached seal or sync child that fails leaves a record and exits non-zero', (t) => {
+  const { repo, dir, store } = workRepo(t, { remote: true });
+  addAt(store, 3600);
+  refuseSeals(repo);
+  const env = { ...process.env }; delete env.FGOS_DISPATCH_DEPTH;
+  for (const args of [['events', 'seal', '--stream', 'project'], ['events', 'sync', '--opportunistic']]) {
+    const result = spawnSync(process.execPath, [BIN, ...args, '--dir', repo], { cwd: repo, encoding: 'utf8', env });
+    assert.notEqual(result.status, 0, `${args.join(' ')} fails with the locks directory refused`);
+  }
+  const faults = faultRecords(repo, dir).filter((record) => record.faultClass === 'event-store-child');
+  assert.deepEqual(faults.map((record) => record.argv.slice(0, 2)), [['events', 'seal'], ['events', 'sync']]);
+  for (const record of faults) assert.match(record.message, /fgos setup/);
 });
