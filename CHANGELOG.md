@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A capability's `confinement` set in a higher layer now replaces the lower layer's whole entry. A project or global file that set `mode: unconfined` used to inherit the standard's `policy`, and the runner then refused every dispatch with `disallowed key "policy" for mode "unconfined"`. `fgos config migrate` now lists such a machine override at the entry's own path (`runner.capabilities.<id>.confinement`), the path the global file holds it under.
 - `fgos config migrate` run in a linked worktree now lists the machine overrides among command values (such as a capability's `confinement` or an executor's `invocations`). It compared both files with the main checkout's command values, so a global value that a dropped project value had hidden went unlisted and won after the cutover.
 - `fgctl stage` on a fresh machine now creates the fgOS state root owner-only (mode 0700) whatever the umask, so a home set up under umask 002 no longer makes the Git door refuse with `untrusted-driver-directory` until `fgos doctor --fix` runs.
 - `fgos config migrate --global` (stage 1) and the `doctor --fix` copy no longer read the project's `.fgos/config.json`: run inside a project whose file is not migrated yet and still holds `gateway.*`, they used to stop half-way with `config-key-out-of-scope` or `config-key-in-wrong-file` after the gateway token was already copied. Stage 1 now concerns the global file and the machine files only.

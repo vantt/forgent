@@ -393,7 +393,8 @@ $defs:
     $comment: "justification: read from the trusted main checkout, spec section 5 rule 6; the entry decides what runs on this machine"
     x-fgos-scope: both
     x-fgos-sensitivity: command
-    description: "How a capability is confined: required or preferred names a confinement policy, unconfined runs without one."
+    x-fgos-merge: replace
+    description: "How a capability is confined: required or preferred names a confinement policy, unconfined runs without one. A higher layer replaces the whole entry, so an unconfined entry never inherits a lower layer's policy."
     type: object
     properties:
       mode:

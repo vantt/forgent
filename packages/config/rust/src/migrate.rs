@@ -19,7 +19,7 @@ use crate::files::{is_tombstone, read_beneath, LoadedFile};
 use crate::files::{JSON_NAME, TOMBSTONE, YAML_NAME};
 use crate::grammar::{doc_lines, is_grammar_line, Actor, Reason};
 use crate::locks::{hold, PROJECT_CONFIG};
-use crate::schema::{json_at, json_put};
+use crate::schema::{json_at, json_put, Schemas};
 use crate::scope::{judge, SourceKind};
 use crate::snapshot::{Context, SessionClass, SnapshotError, SnapshotRequest};
 use crate::write::{conflict, dir_identity, io_error, produce};
@@ -229,12 +229,24 @@ fn attach_notes(
     Ok(doc.to_bytes())
 }
 
-fn differing(a: &Value, b: &Value, path: &mut Vec<Segment>, out: &mut BTreeSet<String>) {
-    if let (Value::Object(x), Value::Object(y)) = (a, b) {
+fn differing(
+    schemas: &Schemas,
+    a: &Value,
+    b: &Value,
+    path: &mut Vec<Segment>,
+    out: &mut BTreeSet<String>,
+) {
+    // A value a higher layer replaces whole is one decision: it is listed at its own path, the
+    // path a machine file holds it under, never at the keys it carries or drops.
+    let whole = matches!(
+        schemas.resolve(path).and_then(|r| r.merge),
+        Some("replace" | "leaf")
+    );
+    if let (Value::Object(x), Value::Object(y), false) = (a, b, whole) {
         for key in x.keys().chain(y.keys()).collect::<BTreeSet<_>>() {
             path.push(Segment::Key(key.clone()));
             match (x.get(key), y.get(key)) {
-                (Some(p), Some(q)) => differing(p, q, path, out),
+                (Some(p), Some(q)) => differing(schemas, p, q, path, out),
                 _ => drop(out.insert(format_path(path))),
             }
             path.pop();
@@ -266,7 +278,13 @@ fn differences(
     let read =
         |bytes| snapshot_with(ctx, &isolated, "project", bytes).map(|snapshot| snapshot.value);
     let mut found = BTreeSet::new();
-    differing(&read(old)?, &read(new)?, &mut Vec::new(), &mut found);
+    differing(
+        ctx.schemas,
+        &read(old)?,
+        &read(new)?,
+        &mut Vec::new(),
+        &mut found,
+    );
     Ok(found.into_iter().collect())
 }
 
