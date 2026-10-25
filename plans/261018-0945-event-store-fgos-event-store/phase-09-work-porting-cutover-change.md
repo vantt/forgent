@@ -1,7 +1,7 @@
 # Phase 09: Work and porting cutover change
 
 - **Depends on:** phases 06, 07, 08 merged; 4.3-S landed (`withStateTx` on `state` and `porting-events`, done 2026-10-17). Stays on its branch; lands only through phase 11 as one reviewed commit.
-- **Branch / worktree:** `es/p09-cutover`, `.claude/worktrees/es-p09`; sub-lanes `es/p09-<family>` merge into it.
+- **Branch / worktree:** first attempt `es/p09-cutover` (deleted 2026-10-25; its two review reports are in `plans/reports/review-261020-1110-es-p09-*.md`); the phase shipped from `work/es-cutover`.
 - **Model / effort:** sonnet (advanced) for the mechanical switch and deletions, opus for the gate, the reducer conflict rule and review; 40h.
 - **Blocks:** phase 10.
 
