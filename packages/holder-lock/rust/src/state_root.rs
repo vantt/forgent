@@ -1,7 +1,7 @@
 //! The one resolution of the fgOS state root and of the lock root under it.
 //! Vectors: `packages/holder-lock/contracts/state-root.vectors.v1.json`.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// The variable a resolved root is pinned under. The host exports it before
 /// exec of the Node payload, and dispatch pins it into every child so a
@@ -42,6 +42,20 @@ impl Source {
 /// The state root of this process's environment and the input that decided it.
 pub fn state_root() -> (PathBuf, Source) {
     state_root_from(|key| std::env::var(key).ok())
+}
+
+/// Creates the state root (and any missing parent) when absent, owner-only on
+/// Unix whatever the process umask, so the Git door's trust check accepts it.
+/// An existing directory is left exactly as it is.
+pub fn create_state_root(root: &Path) -> std::io::Result<()> {
+    let mut builder = std::fs::DirBuilder::new();
+    builder.recursive(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        builder.mode(0o700);
+    }
+    builder.create(root)
 }
 
 /// The lock root: `<state root>/locks`.

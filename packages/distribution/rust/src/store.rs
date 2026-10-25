@@ -142,7 +142,7 @@ pub fn stage_release(store_root: &Path, from_path: &Path) -> Result<StageOutcome
         return Err(StageError::SourceNotFound(from_path.to_path_buf()));
     }
 
-    std::fs::create_dir_all(store_root)?;
+    fgos_holder_lock::state_root::create_state_root(store_root)?;
 
     // 1. Take the kernel install.lock
     let _lock = InstallLockGuard::acquire(store_root)?;
