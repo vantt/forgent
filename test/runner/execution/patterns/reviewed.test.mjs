@@ -305,6 +305,25 @@ test('a producer that changed nothing is still reviewed, and the reviewer\'s ver
   assert.deepEqual(found.res.findings, ['wrong']);
 });
 
+test('a checker that settled with no evidence still ends the round', async () => {
+  const unit = { id: 'u-checker-no-evidence', capability: 'docs:write' };
+  // A history record carries no posture, so only the seat can tell a checker from the producer.
+  const silentReviewer = () => { const { posture, ...record } = changedNothing('reviewer'); return record; };
+
+  const live = await runReviewed(unit, {}, {
+    runRole: async (opts) => (opts.seat.seat === 'producer' ? { seat: 'producer', outcome: 'pass' } : silentReviewer()),
+  });
+  assert.equal(live.outcome, 'execution-failure');
+
+  const history = [{ seat: 'producer', round: 1, outcome: 'pass' }, { ...silentReviewer(), round: 1 }];
+  const resumed = await runReviewed(unit, {}, {
+    history,
+    runRole: () => assert.fail('a fully settled history must never dispatch'),
+  });
+  assert.equal(resumed.outcome, 'execution-failure');
+  assert.equal(reviewedHistoryOutcome(unit, {}, history), 'execution-failure');
+});
+
 test('a producer that crashed stops the round before any reviewer', async () => {
   const calls = [];
   const runRole = async (opts) => {
