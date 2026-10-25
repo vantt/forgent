@@ -4760,6 +4760,11 @@ function handSealsToChild() {
     spawnDetachedCli({ cwd: root, args: ['events', 'seal', '--stream', stream, ...(checkpointPath ? ['--history', checkpointPath] : []), '--dir', root] });
   }
 }
+// The detached children (the seal child and the publish child) have no caller to read their error, so a child that
+// fails leaves a record whatever the verb's own classification is.
+function isEventStoreChild(verb, positional, flags) {
+  return verb === 'events' && (positional[0] === 'seal' || (positional[0] === 'sync' && flags.opportunistic === true));
+}
 function opensEventStore(entry, verb, positional, flags) {
   // `events migrate` imports the tracked history under its own quiesce check: no trigger may open the store around it.
   if (verb === 'events' && positional[0] === 'migrate') return false;
@@ -5062,6 +5067,7 @@ async function main() {
   // arg-parse fault never reached this catch at all and could not be recorded.
   let faultClass = 'arg-parse';
   let dir;
+  let parsed = null;
   // Set once the verb is known to open the Event Store: the facts both lifecycle triggers need (spec §16).
   let eventStoreLifecycle = null;
   let sweepsLand = false;
@@ -5069,6 +5075,7 @@ async function main() {
   if (currentDispatchDepth() === 0) processSealCoalescer.handOff();
   try {
     const { flags, positional } = parseArgs(rest);
+    parsed = { flags, positional };
 
     // Same rule as the Rust host: any exact `--help`/`-h` token asks for help,
     // even where the parser took it as the previous flag's value.
@@ -5222,7 +5229,7 @@ async function main() {
       fgosDir: dir,
       cwd: process.cwd(),
       verb,
-      faultClass,
+      faultClass: faultClass ?? (parsed && isEventStoreChild(verb, parsed.positional, parsed.flags) ? 'event-store-child' : null),
       message: err.message,
       argv: process.argv.slice(2),
     });
@@ -5240,7 +5247,11 @@ async function main() {
     // not a dispatched worker publishes (D13); sealing is always safe.
     handSealsToChild();
     if (eventStoreLifecycle) {
-      maintainEventStore(path.dirname(dir), { ...eventStoreLifecycle, end: true });
+      const maintained = maintainEventStore(path.dirname(dir), { ...eventStoreLifecycle, end: true });
+      // The command's answer is already out and a trigger never fails it, so a trigger that could not finish leaves its record.
+      if (maintained.error) {
+        recordInvocationFault({ fgosDir: dir, cwd: process.cwd(), verb, faultClass: 'event-store-end-trigger', message: maintained.error, argv: process.argv.slice(2) });
+      }
       // A dispatched worker never releases: only the clone owner's own session does (D13).
       if (sweepsLand && !eventStoreLifecycle.dispatched) {
         for (const warning of releaseRecordedLand(eventStoreLifecycle.trustedMain).warnings) process.stderr.write(`fgos: warning: Land candidate release: ${warning}\n`);
