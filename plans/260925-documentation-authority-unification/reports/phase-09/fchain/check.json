@@ -1,6 +1,6 @@
 {
   "contract": "fchain-check.v1",
-  "sourceCommit": "5cb7d0cddabb93f5d5fcd7a0a85468447209fb2b",
+  "sourceCommit": "2c5093b57954790cda1639b36821f71bd2a00c08",
   "exit": 0,
   "counts": {},
   "findings": [],
@@ -13,7 +13,7 @@
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
       "reader": "composition",
-      "sha256": "d4871ba440aa3510db4f716f5d5d2bf6b656d6a9fa988eac3fae4f3b35254537"
+      "sha256": "4c62b118ec5c92fe967362f1c3bdb2a58c2097b202b16bb99f2b9acbcae194d0"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json",
@@ -43,7 +43,7 @@
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json",
       "reader": "premise",
-      "sha256": "fc8144ea4ad9c17c2002e18c3253d57f55e0e02b1164e55121252a0af953678e"
+      "sha256": "ee9d330aa6887d4597fd5b665f73338535ef9ca7240b9a44c56cbb6bc06597bc"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/prepared-patches.json",
@@ -56,9 +56,14 @@
       "sha256": "f20e4c74e05564abf5fb2a8e09e384952183b4ee5b48cdc849da33531dded1df"
     },
     {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json",
+      "reader": "link-retargets",
+      "sha256": "568d401ab9815f458f597f8a22761c0f8c01ccf5113dcfd1c8f6d8022fc0f40e"
+    },
+    {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
       "reader": "recomposed",
-      "sha256": "fb8bc12273b1d50060b61023dbcdff1841b60e66a850a688be007684b0ea62f9"
+      "sha256": "b2e9d39f69b843a87f783eaa7b839ca62ab99eb0e46431eeffe1b1b900633924"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-supplemental-specs.json",
@@ -2720,7 +2725,7 @@
       "w8:gloss:docs/platform/runner/decisions/h-36d872fbb0e5.md",
       "w8:gloss:docs/platform/runner/spec.md",
       "w8:gloss:docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
-      "rebased:w8:gloss:docs/platform/work-state/spec.md",
+      "rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md",
       "w8:gloss:researching-source",
       "recomposed-predecessor:.githooks/pre-commit",
       "recomposed-predecessor:docs/io-contract.md",
@@ -2787,7 +2792,8 @@
       "w8:render-evidence:.agents/skills/fgos-researching/SKILL.md",
       "w8:render-evidence:plugins/fgOS/skills/fgos-researching/SKILL.md",
       "recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md",
-      "recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md"
+      "recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "rebased:w8:gloss:docs/platform/work-state/spec.md"
     ],
     "selectionRule": "Use effectiveSpecIds in order; then finalPinFSpecIds ONLY under the docs lease at final pin F with a current byte guard. Historical entries are not executable alternatives. Generator diffs are evidence, not an apply door.",
     "files": [
@@ -8045,12 +8051,12 @@
       {
         "file": "docs/platform/work-state/spec.md",
         "strict": true,
-        "resultSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597",
+        "resultSha256": "05877684d20439a82df922f40eff00afe49e9008e9cab1ecc2c5bfb86489e92b",
         "steps": [
           {
-            "chainEntryId": "rebased:w8:gloss:docs/platform/work-state/spec.md",
-            "beforeSha256": "ad87f25480923800f65d16549f7d720519d856b8ee234f5fab20a0b3c5b8e2e8",
-            "afterSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597",
+            "chainEntryId": "rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md",
+            "beforeSha256": "3683948b5bb2272c2c9fd4bc0cfd0fac87a37396b3dd64f44c32bed34a85754f",
+            "afterSha256": "05877684d20439a82df922f40eff00afe49e9008e9cab1ecc2c5bfb86489e92b",
             "diagnostic": false
           }
         ]
@@ -12948,8 +12954,8 @@
     "docs/platform/work-state/spec.md": [
       {
         "source": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
-        "pointer": "/patches/141",
-        "id": "rebased:w8:gloss:docs/platform/work-state/spec.md"
+        "pointer": "/patches/143",
+        "id": "rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md"
       }
     ],
     "docs/platform/workflow/spec.md": [
@@ -17698,9 +17704,9 @@
       "file": "docs/platform/work-state/spec.md",
       "mode": "composedBy-selected-chain",
       "composedBy": [
-        "rebased:w8:gloss:docs/platform/work-state/spec.md"
+        "rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md"
       ],
-      "afterSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597"
+      "afterSha256": "05877684d20439a82df922f40eff00afe49e9008e9cab1ecc2c5bfb86489e92b"
     },
     {
       "id": "g9:docs/platform/workflow/spec.md",
@@ -18710,7 +18716,48 @@
     "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/19",
     "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/20",
     "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/21",
-    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/22"
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/f-composition-additions.json#/patches/22",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/0",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/1",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/2",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/3",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/4",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/5",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/6",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/7",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/8",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/9",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/10",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/11",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/12",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/13",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/14",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/15",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/16",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/17",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/18",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/19",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/20",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/21",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/22",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/23",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/24",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/25",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/26",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/27",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/28",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/29",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/30",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/31",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/32",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/33",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/34",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/35",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/36",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/37",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/38",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/39",
+    "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/40"
   ],
   "links": [
     {
@@ -21318,7 +21365,7 @@
     },
     {
       "file": "docs/platform/README.md",
-      "afterSha256": "85b8c44955fa739bc330fe4fd3b41d66fbabf295b2b5731546df10f7ed3528b5",
+      "afterSha256": "607bc3e4fcfcc611dc1b390ee65d5d77dd2a8ca63353b10ccc69e884bb0a1287",
       "steps": [
         {
           "chainEntryId": "w2:status:docs/platform/README.md",
@@ -21330,6 +21377,18 @@
           "afterSha256": "85b8c44955fa739bc330fe4fd3b41d66fbabf295b2b5731546df10f7ed3528b5",
           "owners": [
             "f04443"
+          ]
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/0",
+          "beforeSha256": "85b8c44955fa739bc330fe4fd3b41d66fbabf295b2b5731546df10f7ed3528b5",
+          "afterSha256": "607bc3e4fcfcc611dc1b390ee65d5d77dd2a8ca63353b10ccc69e884bb0a1287",
+          "owners": [
+            "L13-26:link:1",
+            "L13-26:link:2",
+            "L13-26:link:3",
+            "L13-26:link:4",
+            "L13-26:link:5"
           ]
         }
       ]
@@ -21641,6 +21700,61 @@
         {
           "chainEntryId": "file:docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
           "diagnostic": false
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+      "afterSha256": "40c8ff69f3e59682e7e2b0a3d4d3f0c4c2c842c15c4b61851003d8277177a355",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/1",
+          "beforeSha256": "875a2f7fe2989d987c980470959b1e64219b5a455f9db401db98928241a1f865",
+          "afterSha256": "40c8ff69f3e59682e7e2b0a3d4d3f0c4c2c842c15c4b61851003d8277177a355",
+          "owners": [
+            "L13-26:link:6",
+            "L13-26:link:7",
+            "L13-26:link:8",
+            "L13-26:link:9",
+            "L13-26:link:10",
+            "L13-26:link:11",
+            "L13-26:link:12",
+            "L13-26:link:13",
+            "L13-26:link:14",
+            "L13-26:link:15"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
+      "afterSha256": "03481f50f20082a0114764796f67ae4fcb9be53cb1aa3039ed0aca2c668f559e",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/2",
+          "beforeSha256": "c470ced668aab375c2b846672efce763561beb71f13867607b4de87b9b740ccc",
+          "afterSha256": "03481f50f20082a0114764796f67ae4fcb9be53cb1aa3039ed0aca2c668f559e",
+          "owners": [
+            "L13-26:link:16",
+            "L13-26:link:17",
+            "L13-26:link:18",
+            "L13-26:link:19",
+            "L13-26:link:20"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "afterSha256": "22ef5ed9301bc456c86effdeb423dc8d78c502582cf1395b03cf69149bd634ac",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/3",
+          "beforeSha256": "90f07b2fe30267ed4b0d86dfa7d1d38e69b62dcfe81195f05dcf4e1c17e66279",
+          "afterSha256": "22ef5ed9301bc456c86effdeb423dc8d78c502582cf1395b03cf69149bd634ac",
+          "owners": [
+            "L13-26:link:21"
+          ]
         }
       ]
     },
@@ -22650,7 +22764,7 @@
     },
     {
       "file": "docs/platform/component-boundary.md",
-      "afterSha256": "6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db",
+      "afterSha256": "61cd146dae1dc6c2c30a1fd64280a6608adebc19e8a5a8a4e8bf4c5e39803bbd",
       "steps": [
         {
           "chainEntryId": "rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md",
@@ -22659,6 +22773,19 @@
         {
           "chainEntryId": "rebased:w8:gap05:relocation",
           "diagnostic": false
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/4",
+          "beforeSha256": "6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db",
+          "afterSha256": "61cd146dae1dc6c2c30a1fd64280a6608adebc19e8a5a8a4e8bf4c5e39803bbd",
+          "owners": [
+            "L13-26:link:22",
+            "L13-26:link:23",
+            "L13-26:link:24",
+            "L13-26:link:25",
+            "L13-26:link:26",
+            "L13-26:link:27"
+          ]
         }
       ]
     },
@@ -22734,6 +22861,20 @@
       ]
     },
     {
+      "file": "docs/platform/documentation/architecture/documentation-system-design.md",
+      "afterSha256": "5834873fcf9fd944ba1e592d8220773bf643f8d1dafe9669da1720cc832721d7",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/5",
+          "beforeSha256": "004bb912d6e4e132ac65a486c8b209e4b5e33c89fd19032c23738679743d842b",
+          "afterSha256": "5834873fcf9fd944ba1e592d8220773bf643f8d1dafe9669da1720cc832721d7",
+          "owners": [
+            "L13-26:link:28"
+          ]
+        }
+      ]
+    },
+    {
       "file": "docs/platform/documentation/history/id-systems-audit.md",
       "afterSha256": "5b505682d1a01343ffb5f403b85635dbf029f8904e6b9141442639ec12b55518",
       "steps": [
@@ -22743,6 +22884,20 @@
           "afterSha256": "5b505682d1a01343ffb5f403b85635dbf029f8904e6b9141442639ec12b55518",
           "owners": [
             "f06591"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+      "afterSha256": "07a72b86db244c9c1606d6dcb8dc18df6a3cdb737ccf482de2eec8a26af1f187",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/6",
+          "beforeSha256": "3ef1aba54d0e3cfe7fa2d11ab8d70c7c6a4c814a636bedf21b7eb9014eca5645",
+          "afterSha256": "07a72b86db244c9c1606d6dcb8dc18df6a3cdb737ccf482de2eec8a26af1f187",
+          "owners": [
+            "L13-26:link:29"
           ]
         }
       ]
@@ -22818,6 +22973,20 @@
       ]
     },
     {
+      "file": "docs/platform/domainization/architecture/domainization.md",
+      "afterSha256": "5f034e745c373beb6d9244c15619b8bda4aade1c7e9d5faec8fb2c44ca8d3400",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/7",
+          "beforeSha256": "286644bd4a86e60c872cb890bb73d3aa05da605364e0dfc4c87831a79e9fd1cb",
+          "afterSha256": "5f034e745c373beb6d9244c15619b8bda4aade1c7e9d5faec8fb2c44ca8d3400",
+          "owners": [
+            "L13-26:link:30"
+          ]
+        }
+      ]
+    },
+    {
       "file": "docs/platform/event-store/spec.md",
       "afterSha256": "5459a73eb6e6a3bcf4fc579c8d22629bd3f54defeb209b9a9530c7febc3be197",
       "steps": [
@@ -22887,11 +23056,20 @@
     },
     {
       "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
-      "afterSha256": "a25588dae948fd652926e1390c72d11912d88b6badd8980c5550ebd2875840b9",
+      "afterSha256": "20aefbbaf37dec3c1fa36b9d1fa5fdf5cbea4c0fc07bc8b47fc25fb31e32a796",
       "steps": [
         {
           "chainEntryId": "file:docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
           "diagnostic": false
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/8",
+          "beforeSha256": "a25588dae948fd652926e1390c72d11912d88b6badd8980c5550ebd2875840b9",
+          "afterSha256": "20aefbbaf37dec3c1fa36b9d1fa5fdf5cbea4c0fc07bc8b47fc25fb31e32a796",
+          "owners": [
+            "L13-26:x-specs:1",
+            "L13-26:x-specs:2"
+          ]
         }
       ]
     },
@@ -22960,7 +23138,7 @@
     },
     {
       "file": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
-      "afterSha256": "6b298bdcf3a59a63c1bf8442d38bb5de0efd52e838db00643b2ba21beb375607",
+      "afterSha256": "c5042e0f8efab56bdac25d69c65cfdc07d30e6c49dd099e2924c2bb94871e6fd",
       "steps": [
         {
           "id": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/196/patch",
@@ -22969,12 +23147,21 @@
           "owners": [
             "f06861"
           ]
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/9",
+          "beforeSha256": "6b298bdcf3a59a63c1bf8442d38bb5de0efd52e838db00643b2ba21beb375607",
+          "afterSha256": "c5042e0f8efab56bdac25d69c65cfdc07d30e6c49dd099e2924c2bb94871e6fd",
+          "owners": [
+            "L13-26:link:31",
+            "L13-26:link:32"
+          ]
         }
       ]
     },
     {
       "file": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
-      "afterSha256": "5b871bce7d825b20a6656f822db8be84389aff45fff65e766fac4db19278b04e",
+      "afterSha256": "0e8e2d2e19f3e285f91a9b5a7907d6343bba409606a9feb6343b3d725fe1df48",
       "steps": [
         {
           "id": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/197/patch",
@@ -22982,6 +23169,14 @@
           "afterSha256": "5b871bce7d825b20a6656f822db8be84389aff45fff65e766fac4db19278b04e",
           "owners": [
             "f06871"
+          ]
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/10",
+          "beforeSha256": "5b871bce7d825b20a6656f822db8be84389aff45fff65e766fac4db19278b04e",
+          "afterSha256": "0e8e2d2e19f3e285f91a9b5a7907d6343bba409606a9feb6343b3d725fe1df48",
+          "owners": [
+            "L13-26:link:33"
           ]
         }
       ]
@@ -23002,7 +23197,7 @@
     },
     {
       "file": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
-      "afterSha256": "5bef4071065e0f246c4a4084cd26f56faa5b29e6531b0ba615e38697c14e3236",
+      "afterSha256": "f0c19fc777fc584d36bd73082f2c0151e274b2b5346165d05ff50f89f9ec8593",
       "steps": [
         {
           "id": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/199/patch",
@@ -23011,12 +23206,24 @@
           "owners": [
             "f06883"
           ]
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/11",
+          "beforeSha256": "5bef4071065e0f246c4a4084cd26f56faa5b29e6531b0ba615e38697c14e3236",
+          "afterSha256": "f0c19fc777fc584d36bd73082f2c0151e274b2b5346165d05ff50f89f9ec8593",
+          "owners": [
+            "L13-26:link:34",
+            "L13-26:link:35",
+            "L13-26:link:36",
+            "L13-26:link:37",
+            "L13-26:link:38"
+          ]
         }
       ]
     },
     {
       "file": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
-      "afterSha256": "611ad79b7d1b6d9be49cdd0301edfa26cd7aa23b2febe8855ef9fe4aa9c02074",
+      "afterSha256": "5ef2331c361378c7d3868df93b462b2f659d67ba44fd9cbbe2e534a47213de7f",
       "steps": [
         {
           "id": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/200/patch",
@@ -23024,6 +23231,16 @@
           "afterSha256": "611ad79b7d1b6d9be49cdd0301edfa26cd7aa23b2febe8855ef9fe4aa9c02074",
           "owners": [
             "f06900"
+          ]
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/12",
+          "beforeSha256": "611ad79b7d1b6d9be49cdd0301edfa26cd7aa23b2febe8855ef9fe4aa9c02074",
+          "afterSha256": "5ef2331c361378c7d3868df93b462b2f659d67ba44fd9cbbe2e534a47213de7f",
+          "owners": [
+            "L13-26:link:39",
+            "L13-26:link:40",
+            "L13-26:link:41"
           ]
         }
       ]
@@ -23044,7 +23261,7 @@
     },
     {
       "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
-      "afterSha256": "7073a815479d1a54be29c46a173f929a2e9c6935caa83d9497395d77683478a8",
+      "afterSha256": "901fb9130514e18557f7ac7a5b3fa4a72307caa9ba6d4fef04c78903f1d9a261",
       "steps": [
         {
           "id": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/207/patch",
@@ -23054,12 +23271,21 @@
             "f06920",
             "f06924"
           ]
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/13",
+          "beforeSha256": "7073a815479d1a54be29c46a173f929a2e9c6935caa83d9497395d77683478a8",
+          "afterSha256": "901fb9130514e18557f7ac7a5b3fa4a72307caa9ba6d4fef04c78903f1d9a261",
+          "owners": [
+            "L13-26:link:42",
+            "L13-26:link:43"
+          ]
         }
       ]
     },
     {
       "file": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
-      "afterSha256": "f889864fced64aa82321f1362fecfcf499e61606a192f2177332dce534d26c19",
+      "afterSha256": "0204f7c3552ee8df9a922fa497a628f7d9f757fed9056bf871e429d5e1a1dc2f",
       "steps": [
         {
           "id": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-2.json#/rows/214/patch",
@@ -23067,6 +23293,29 @@
           "afterSha256": "f889864fced64aa82321f1362fecfcf499e61606a192f2177332dce534d26c19",
           "owners": [
             "f06933"
+          ]
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/14",
+          "beforeSha256": "f889864fced64aa82321f1362fecfcf499e61606a192f2177332dce534d26c19",
+          "afterSha256": "0204f7c3552ee8df9a922fa497a628f7d9f757fed9056bf871e429d5e1a1dc2f",
+          "owners": [
+            "L13-26:link:44"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "afterSha256": "f0456903327157e3ee31db6c455a057eaf8fcefcb6afef986a8eb8137efd06c6",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/15",
+          "beforeSha256": "19a69423f450586e21e98f5c932dcb5c1520ab1ccee370ccc0dcac14b2815714",
+          "afterSha256": "f0456903327157e3ee31db6c455a057eaf8fcefcb6afef986a8eb8137efd06c6",
+          "owners": [
+            "L13-26:link:45",
+            "L13-26:link:46"
           ]
         }
       ]
@@ -23109,6 +23358,103 @@
           "afterSha256": "b9283d649b9d63569b9dfcdcdc3cee064af4c75ee5c7d729d5c12f57f9c21d07",
           "owners": [
             "f06956"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+      "afterSha256": "a6ad35fa4d51cf13207e4741c9ed2348d33ac6119250877a1ab8639f6c3c25e4",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/16",
+          "beforeSha256": "165f732b474ace314c8f890888082544e13573d15291c94871b7de58655238a4",
+          "afterSha256": "a6ad35fa4d51cf13207e4741c9ed2348d33ac6119250877a1ab8639f6c3c25e4",
+          "owners": [
+            "L13-26:link:47"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/history/source-inventory.md",
+      "afterSha256": "1bab2058d3f94bc5b6cd56a356d8d214087a660e5d18433c91154739a6bbabe2",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/17",
+          "beforeSha256": "60189711d4193579d0acc5213ec765adb17224f6d81a275fdc7e7fc3abe5c01b",
+          "afterSha256": "1bab2058d3f94bc5b6cd56a356d8d214087a660e5d18433c91154739a6bbabe2",
+          "owners": [
+            "L13-26:link:48",
+            "L13-26:link:49",
+            "L13-26:link:50",
+            "L13-26:link:51",
+            "L13-26:link:52",
+            "L13-26:link:53",
+            "L13-26:link:54"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "afterSha256": "bb74a9e56e1f44971e124fc4225652c7e6986127b58a377d196fc90e7171c4f8",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/18",
+          "beforeSha256": "aaf8bfe8bf316eb9a0f052efaff3e39878386f79572c6e110201d0ce404b1878",
+          "afterSha256": "bb74a9e56e1f44971e124fc4225652c7e6986127b58a377d196fc90e7171c4f8",
+          "owners": [
+            "L13-26:link:55",
+            "L13-26:link:56",
+            "L13-26:link:57",
+            "L13-26:link:58",
+            "L13-26:link:59",
+            "L13-26:link:60",
+            "L13-26:link:61",
+            "L13-26:link:62",
+            "L13-26:link:63",
+            "L13-26:link:64",
+            "L13-26:link:65",
+            "L13-26:link:66",
+            "L13-26:link:67",
+            "L13-26:link:68",
+            "L13-26:link:69",
+            "L13-26:link:70",
+            "L13-26:link:71",
+            "L13-26:link:72",
+            "L13-26:link:73",
+            "L13-26:link:74",
+            "L13-26:link:75",
+            "L13-26:link:76",
+            "L13-26:link:77",
+            "L13-26:link:78",
+            "L13-26:link:79",
+            "L13-26:link:80",
+            "L13-26:link:81",
+            "L13-26:link:82",
+            "L13-26:link:83",
+            "L13-26:link:84",
+            "L13-26:link:85",
+            "L13-26:link:86",
+            "L13-26:link:87",
+            "L13-26:link:88",
+            "L13-26:link:89",
+            "L13-26:link:90",
+            "L13-26:link:91",
+            "L13-26:link:92",
+            "L13-26:link:93",
+            "L13-26:link:94",
+            "L13-26:link:95",
+            "L13-26:link:96",
+            "L13-26:link:97",
+            "L13-26:link:98",
+            "L13-26:link:99",
+            "L13-26:link:100",
+            "L13-26:link:101",
+            "L13-26:link:102",
+            "L13-26:link:103",
+            "L13-26:link:104"
           ]
         }
       ]
@@ -23292,11 +23638,20 @@
     },
     {
       "file": "docs/platform/packaging-distribution/README.md",
-      "afterSha256": "2fb3c8e6e5488f660d4adaa0a541e287bfb44134ffd241e196c61021d4bd04c0",
+      "afterSha256": "17e163959f7c926af0f2dedece715869d3f27717451a638c04de9030027858ce",
       "steps": [
         {
           "chainEntryId": "w2:status:docs/platform/packaging-distribution/README.md",
           "diagnostic": false
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/19",
+          "beforeSha256": "2fb3c8e6e5488f660d4adaa0a541e287bfb44134ffd241e196c61021d4bd04c0",
+          "afterSha256": "17e163959f7c926af0f2dedece715869d3f27717451a638c04de9030027858ce",
+          "owners": [
+            "L13-26:link:105",
+            "L13-26:link:106"
+          ]
         }
       ]
     },
@@ -23364,7 +23719,7 @@
     },
     {
       "file": "docs/platform/packaging-distribution/spec.md",
-      "afterSha256": "41cdd732802407c3c645702e0e2310d8c4c902bacd2246d3270dabe80de140cc",
+      "afterSha256": "c5d5e0cd3c95baaae3f188ef5d6e64d7da6ff92b6f13c4959c936f5d7cf7e3ee",
       "steps": [
         {
           "chainEntryId": "w8:gloss:docs/platform/packaging-distribution/spec.md",
@@ -23376,6 +23731,16 @@
           "afterSha256": "41cdd732802407c3c645702e0e2310d8c4c902bacd2246d3270dabe80de140cc",
           "owners": [
             "f07293"
+          ]
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/20",
+          "beforeSha256": "41cdd732802407c3c645702e0e2310d8c4c902bacd2246d3270dabe80de140cc",
+          "afterSha256": "c5d5e0cd3c95baaae3f188ef5d6e64d7da6ff92b6f13c4959c936f5d7cf7e3ee",
+          "owners": [
+            "L13-26:link:107",
+            "L13-26:link:108",
+            "L13-26:link:109"
           ]
         }
       ]
@@ -23432,8 +23797,118 @@
       ]
     },
     {
+      "file": "docs/platform/proposals/README.md",
+      "afterSha256": "29ea7314472521d3ebe99a787056cf1366c42144731e2f18d982e053ad79332a",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/21",
+          "beforeSha256": "be7220ab0032530d7f3913a59c2393318e94d5be4cc6f4408d3a2464e0dfca90",
+          "afterSha256": "29ea7314472521d3ebe99a787056cf1366c42144731e2f18d982e053ad79332a",
+          "owners": [
+            "L13-26:link:110"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/architecture-advisory-panel.md",
+      "afterSha256": "59cfd9e1db9e42ec424d0795b950342cb116a394e352238c5748abe446d3d909",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/22",
+          "beforeSha256": "6d9ccca7be37d1174b1d122598a2003800fc816b9d6c45d8c2d08c3271c424c2",
+          "afterSha256": "59cfd9e1db9e42ec424d0795b950342cb116a394e352238c5748abe446d3d909",
+          "owners": [
+            "L13-26:link:111"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "afterSha256": "33a615d62b4b38dbe757d3329d8847380e673bddd28227c0ca3e338862382b87",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/23",
+          "beforeSha256": "f6b4e0d096d2fbe33f727f2d6736deb69f51e07486157f48b79b243ae36abd12",
+          "afterSha256": "33a615d62b4b38dbe757d3329d8847380e673bddd28227c0ca3e338862382b87",
+          "owners": [
+            "L13-26:link:112",
+            "L13-26:link:113",
+            "L13-26:link:114",
+            "L13-26:link:115",
+            "L13-26:link:116",
+            "L13-26:link:117",
+            "L13-26:link:118",
+            "L13-26:link:119",
+            "L13-26:link:120",
+            "L13-26:link:121",
+            "L13-26:link:122",
+            "L13-26:link:123"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/coordination-capability-envelope.md",
+      "afterSha256": "9ae33a288b5a19eb5231897834f60779f9ff781cb7ea209d597c567ee3f4cd62",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/24",
+          "beforeSha256": "cb550ddf91b56b91cabac628285a1d8c224a3a93ac91c08dbbbe089bbaf7df13",
+          "afterSha256": "9ae33a288b5a19eb5231897834f60779f9ff781cb7ea209d597c567ee3f4cd62",
+          "owners": [
+            "L13-26:link:124",
+            "L13-26:link:125"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/coordination-dispatch-contract.md",
+      "afterSha256": "72341f323b9980aaad7116ecbc2c2754c80110a4f6c8b41d4ef387368540f5c1",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/25",
+          "beforeSha256": "9b58b9d781eb2dfd2a67aa8e635e0b02a9beede172d38325adedd7bbd68aa402",
+          "afterSha256": "72341f323b9980aaad7116ecbc2c2754c80110a4f6c8b41d4ef387368540f5c1",
+          "owners": [
+            "L13-26:link:126"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/coordination-envelope-probe-contract.md",
+      "afterSha256": "29e014b56928ffc2092e999781987295ce0aae74b668ac1441b2773035a1e986",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/26",
+          "beforeSha256": "d294fc201b1ff9b73b18899b366e8e0366faaf3e2e910f3eeca7ca603569b24b",
+          "afterSha256": "29e014b56928ffc2092e999781987295ce0aae74b668ac1441b2773035a1e986",
+          "owners": [
+            "L13-26:link:127"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+      "afterSha256": "3143946d90fd0075b15b02612ba9e5c1b7568e73da718d0e579f37b46b1c4f31",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/27",
+          "beforeSha256": "0f7a5b0db1cf1cb22c22fd0d270306af2e34010c48e09a651d1764c1b7e226f9",
+          "afterSha256": "3143946d90fd0075b15b02612ba9e5c1b7568e73da718d0e579f37b46b1c4f31",
+          "owners": [
+            "L13-26:link:128"
+          ]
+        }
+      ]
+    },
+    {
       "file": "docs/platform/proposals/dispatch-control-plane-redesign.md",
-      "afterSha256": "7fca563ff0a9c05e1f6c9fae34f6004a9f7d9983c6ce34c202736cdafa13a18a",
+      "afterSha256": "489c8ee1a2bd928b0022b7a2aa5537771406dd01bf359dcf9a17cbb18262b615",
       "steps": [
         {
           "id": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/prepared-patches.json#/patches/0",
@@ -23443,6 +23918,14 @@
             "f07526",
             "f07527",
             "f07528"
+          ]
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/28",
+          "beforeSha256": "7fca563ff0a9c05e1f6c9fae34f6004a9f7d9983c6ce34c202736cdafa13a18a",
+          "afterSha256": "489c8ee1a2bd928b0022b7a2aa5537771406dd01bf359dcf9a17cbb18262b615",
+          "owners": [
+            "L13-26:link:129"
           ]
         }
       ]
@@ -23466,8 +23949,92 @@
       ]
     },
     {
+      "file": "docs/platform/proposals/doing-coordination-redesign.md",
+      "afterSha256": "de5c6813a781d179152a8c4b1b214fe76ae30e6df3160adb7e6a4d9f1ac31014",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/29",
+          "beforeSha256": "65b9928c8644826a64a73c6eacda9e5bff15c16696b8eab4e64944e9e644c28f",
+          "afterSha256": "de5c6813a781d179152a8c4b1b214fe76ae30e6df3160adb7e6a4d9f1ac31014",
+          "owners": [
+            "L13-26:link:130"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "afterSha256": "8d92723c337c0eb97ef632a173975723a4ff1e6e6bf7f68b8d15e2d092b1b922",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/30",
+          "beforeSha256": "86eeb55d9643c559469f49cdb6fd2981722cbe52bf7cac6a2b6365faa12fe113",
+          "afterSha256": "8d92723c337c0eb97ef632a173975723a4ff1e6e6bf7f68b8d15e2d092b1b922",
+          "owners": [
+            "L13-26:link:131"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "afterSha256": "b4cbe8a5f7947286fbb5fbe7a2e0c5ed27420ee589808a87344de5056916c85e",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/31",
+          "beforeSha256": "002c0b30a6d7073a8ad136907b5462d1150abbafa841697028bfa1f0e64be41f",
+          "afterSha256": "b4cbe8a5f7947286fbb5fbe7a2e0c5ed27420ee589808a87344de5056916c85e",
+          "owners": [
+            "L13-26:link:132"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "afterSha256": "361ce9a324b02541fcaa066e46b10aa69b69f6ee405b5dd6f1d156ce7bf47866",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/32",
+          "beforeSha256": "4c421a90ae1c48bbbd6fef7e781010ed8aa2b26af8edc63f07ad2945c26ab46e",
+          "afterSha256": "361ce9a324b02541fcaa066e46b10aa69b69f6ee405b5dd6f1d156ce7bf47866",
+          "owners": [
+            "L13-26:link:133"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "afterSha256": "e8de3efe50703ed44a87ef939b087dac386033a96d9132c899f5c3a935e5fd9a",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/33",
+          "beforeSha256": "7285d2a7d7ec8da851731f6215760640e31fbb226d869358708b8529a73e67f4",
+          "afterSha256": "e8de3efe50703ed44a87ef939b087dac386033a96d9132c899f5c3a935e5fd9a",
+          "owners": [
+            "L13-26:link:134"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "afterSha256": "12bd277caeafb228aab5e40ad288c2ca91125a8d5b9a7e1271fce2fca16e652c",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/34",
+          "beforeSha256": "63b6988127e494a845e7ce09d64fc584f802221b61b2089cb78ee2c5f27ca858",
+          "afterSha256": "12bd277caeafb228aab5e40ad288c2ca91125a8d5b9a7e1271fce2fca16e652c",
+          "owners": [
+            "L13-26:link:135"
+          ]
+        }
+      ]
+    },
+    {
       "file": "docs/platform/run-supervisor/spec.md",
-      "afterSha256": "4ed3fd5c0449afc6280d80f1f63f28576579f8d49c7cbcde368dbb4fbb1307c1",
+      "afterSha256": "5567f9516ac3333ef400d00766b917b384d88e6c42b55629161fb438dd3cad4b",
       "steps": [
         {
           "chainEntryId": "file:docs/platform/run-supervisor/spec.md",
@@ -23476,6 +24043,16 @@
         {
           "chainEntryId": "w8:gloss:docs/platform/run-supervisor/spec.md",
           "diagnostic": false
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/35",
+          "beforeSha256": "4ed3fd5c0449afc6280d80f1f63f28576579f8d49c7cbcde368dbb4fbb1307c1",
+          "afterSha256": "5567f9516ac3333ef400d00766b917b384d88e6c42b55629161fb438dd3cad4b",
+          "owners": [
+            "L13-26:link:136",
+            "L13-26:link:137",
+            "L13-26:link:138"
+          ]
         }
       ]
     },
@@ -23551,7 +24128,7 @@
     },
     {
       "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-      "afterSha256": "d8e336015a9afa856fc54fafa14ef1b6ae996069fb40049451322981972a03bc",
+      "afterSha256": "1defded8c9dbbec0db67aaac86e9b99dfe7676983cf187840d1e04876fca1589",
       "steps": [
         {
           "chainEntryId": "w8:base:docs/platform/runner/decisions/h-36d872fbb0e5.md",
@@ -23560,6 +24137,14 @@
         {
           "chainEntryId": "w8:gloss:docs/platform/runner/decisions/h-36d872fbb0e5.md",
           "diagnostic": false
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/36",
+          "beforeSha256": "d8e336015a9afa856fc54fafa14ef1b6ae996069fb40049451322981972a03bc",
+          "afterSha256": "1defded8c9dbbec0db67aaac86e9b99dfe7676983cf187840d1e04876fca1589",
+          "owners": [
+            "L13-26:link:139"
+          ]
         }
       ]
     },
@@ -23768,6 +24353,34 @@
         {
           "chainEntryId": "w2:status:docs/platform/system-architecture/architecture/workspace-topology.md",
           "diagnostic": false
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/system-architecture/history/architect-readme.md",
+      "afterSha256": "d603d3de70ca9c36a9f802cb14130bf586d49937cc2e333af130109c44a98516",
+      "steps": [
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/37",
+          "beforeSha256": "c5f844433fb08effcc472c7e251e8389f6edc3022fc9e1daf4a8011be08c903b",
+          "afterSha256": "d603d3de70ca9c36a9f802cb14130bf586d49937cc2e333af130109c44a98516",
+          "owners": [
+            "L13-26:link:140",
+            "L13-26:link:141",
+            "L13-26:link:142",
+            "L13-26:link:143",
+            "L13-26:link:144",
+            "L13-26:link:145",
+            "L13-26:link:146",
+            "L13-26:link:147",
+            "L13-26:link:148",
+            "L13-26:link:149",
+            "L13-26:link:150",
+            "L13-26:link:151",
+            "L13-26:link:152",
+            "L13-26:link:153",
+            "L13-26:link:154"
+          ]
         }
       ]
     },
@@ -24109,7 +24722,7 @@
     },
     {
       "file": "docs/platform/vision.md",
-      "afterSha256": "89f7c19bb04cfbae59b9a9b0c79ebda4039f816948b9a9a64bd6837313d1e25e",
+      "afterSha256": "124bca8f5705784006fbec7ee15a89efdeb22b5677716a72ca5755300b580cd2",
       "steps": [
         {
           "chainEntryId": "w2:status:docs/platform/vision.md",
@@ -24123,12 +24736,20 @@
             "f08007",
             "f08008"
           ]
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/38",
+          "beforeSha256": "89f7c19bb04cfbae59b9a9b0c79ebda4039f816948b9a9a64bd6837313d1e25e",
+          "afterSha256": "124bca8f5705784006fbec7ee15a89efdeb22b5677716a72ca5755300b580cd2",
+          "owners": [
+            "L13-26:link:155"
+          ]
         }
       ]
     },
     {
       "file": "docs/platform/work-state/README.md",
-      "afterSha256": "2b8d9ef4c6b7f976b2f061a26a0fe343f0acae814006829fa1d60369cdd49af4",
+      "afterSha256": "18f2e5a8625abbff5e92a35c5413afec9dd2970ed05b7b8276dca33904a42c7d",
       "steps": [
         {
           "chainEntryId": "w2:status:docs/platform/work-state/README.md",
@@ -24143,6 +24764,17 @@
             "f08013",
             "f08021",
             "f08024"
+          ]
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/39",
+          "beforeSha256": "2b8d9ef4c6b7f976b2f061a26a0fe343f0acae814006829fa1d60369cdd49af4",
+          "afterSha256": "18f2e5a8625abbff5e92a35c5413afec9dd2970ed05b7b8276dca33904a42c7d",
+          "owners": [
+            "L13-26:link:156",
+            "L13-26:link:157",
+            "L13-26:link:158",
+            "L13-26:link:159"
           ]
         }
       ]
@@ -24203,20 +24835,28 @@
     },
     {
       "file": "docs/platform/work-state/spec.md",
-      "afterSha256": "30be7cddba2ecfa79f9ba78581fc75b1131cdcdbf17918a5029a073cd7479fe3",
+      "afterSha256": "0adc6649fe6497152332508c6c177a58a4198e389e8585694b778aadf24fb511",
       "steps": [
         {
-          "chainEntryId": "rebased:w8:gloss:docs/platform/work-state/spec.md",
+          "chainEntryId": "rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md",
           "diagnostic": false
         },
         {
           "id": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json#/rows/118/patch",
-          "beforeSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597",
-          "afterSha256": "30be7cddba2ecfa79f9ba78581fc75b1131cdcdbf17918a5029a073cd7479fe3",
+          "beforeSha256": "05877684d20439a82df922f40eff00afe49e9008e9cab1ecc2c5bfb86489e92b",
+          "afterSha256": "4d4188f64c457d3f2f1250a26dec4c61498d55343babe0fcbe070851c3fff8c8",
           "owners": [
             "f08069",
             "f08076",
             "f08084"
+          ]
+        },
+        {
+          "id": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json#/patches/40",
+          "beforeSha256": "4d4188f64c457d3f2f1250a26dec4c61498d55343babe0fcbe070851c3fff8c8",
+          "afterSha256": "0adc6649fe6497152332508c6c177a58a4198e389e8585694b778aadf24fb511",
+          "owners": [
+            "L13-26:link:160"
           ]
         }
       ]

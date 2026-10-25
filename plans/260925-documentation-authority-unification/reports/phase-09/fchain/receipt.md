@@ -1,4 +1,120 @@
-# One F composition door — current-doc rebase receipt
+# One F composition door — link retarget and work-state rebase receipt
+
+Status: **all required mechanical records proofs pass; no product application,
+semantic approval, lease, gate closure or cutover authorization.** Authority:
+L13-21, L13-24, L13-25 and L13-26; scope: [w30 brief](../w30-fchain-link-retargets-brief.md).
+Replay pin: `2c5093b57954790cda1639b36821f71bd2a00c08` (`HEAD`). Immutable G9,
+premise and census evidence pins remain unchanged.
+
+## Current evidence and counts
+
+| Measure | Before | After |
+| --- | ---: | ---: |
+| Stale work-state findings (3 conflict + 1 ownerless) | 4 | 0 |
+| Clickable Markdown links into move-set sources | 160 in 40 files | 0 |
+| Stale gateway YAML `x-specs` entries | 2 | 0 |
+| Prepared L13-26 rows / file patches | 0 / 0 | 162 / 41 |
+| No-successor links made literal | 0 | 1 |
+| Composed files / executable proposals | 548 / 141 | 572 / 182 |
+| Existing explicit composition links | 20 | 20 |
+| Historical composition specs preserved | 143 | 143, plus 1 appended replacement |
+| F controls | 13 | 19 |
+
+[link-retargets.json](link-retargets.json) owns one row per link and both YAML
+list entries, with source coordinates, old/new targets, move-set selectors,
+exact alias ids where the move set splits a file, and forward/rollback diffs.
+The source is in [manifest.json](manifest.json) **after G9 additions**. The
+scanner uses every pinned `docs/platform/**/*.md`, replacing bytes with the F
+result wherever composed; new chain-created files are included too. Code spans,
+backtick/tilde fences and comments are excluded. Used reference definitions are
+also scanned. The one no-successor link (`docs/specs/reading-map.md`) becomes a
+code span with its original text retained. Already-retargeted links never enter
+this record. The scan's 160/40 population independently matches w28.
+
+[check.json](check.json) binds all final after-hashes and source hashes.
+[link-scan-before.json](link-scan-before.json) retains the complete initial link
+census. [link-validation.json](link-validation.json) verifies all 41 exact
+roundtrips, 49 existing destination files, 64 real destination anchors, unchanged
+judgments/evidence and unchanged historical spec objects. Exact commands,
+stdout/stderr/exits and the reproducible validation source are in
+[link-commands.json](link-commands.json).
+
+## Reused doors and bounded corrections
+
+- Reused `check_shard.replay_chain`, `composition/compose.py::apply_diff`,
+  `replacement_result`, the existing pointer-patch reader, exact co-composition
+  edges and the move set's draft-alias ids. Git history shows the earlier rebase
+  and one-door consolidation; no retired alternate apply path was restored.
+- Appended `rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md`;
+  selected it instead of its stale predecessor, refreshed the three copies of
+  the existing shard-3 chain-basis patch and the one G9 whole-body witness,
+  including its source pin and predecessor metadata. All old specs remain
+  unchanged; old shard proposals and the full old witness are retained in
+  [link-rebase-history.json](link-rebase-history.json). No decision changes.
+- Three retargets share a line with earlier **status framing**, not an earlier
+  retarget. Their manifest edges name the complete exact base chain, while the
+  before-hash also binds intervening disjoint residuals. `apply_one` now reads
+  only actual `chainEntryId` trace entries for that existing base-chain edge,
+  not residual entries' absent keys. Independent same-line owners still fail;
+  controls prove both the valid edge and rejection of a wrong edge.
+- `check.py` now reports `linkIntoMoveSet` on the final composed state; its
+  negative control injects a real prepared link through `compose()` and observes
+  failure. Conflicting record/manifest `composedBy` fields now fail rather than
+  silently choosing the record. The zero-fuzz control disables its exact-base
+  guard, asserts that the real `patch --fuzz=0` command fails, and separately
+  verifies that pure offsets remain valid. No check is bypassed for green.
+- Corrected the stale f07667/f07871 notes. The existing G0 receipt now names
+  `rebased:w8:gap05:relocation` and its full step after-hash
+  `6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db` in its
+  [F-duty supplement](../g0rework/final-pin-duties.json). Its later final-file
+  hash is distinct; the 134 overlay approvals remain conditional and require
+  final-F rebind/delta review. The register and ledger were not edited.
+
+## Commands and exits (current turn)
+
+Run from the repository root with `P=plans/260925-documentation-authority-unification/reports/phase-09`
+and `NODE_OPTIONS=--no-addons`. Every Python invocation uses `-B`.
+
+| Command | Exit / result |
+| --- | --- |
+| `python3 -B $P/fchain/check.py --pin HEAD` | **0**; 572 files, 182 executed, 20 links, zero findings including `linkIntoMoveSet` |
+| `python3 -B $P/fchain/controls.py` | **0**; 19 controls |
+| `python3 -B $P/preserve-premise/park-judgments/check_shard.py --all` | **0**; 787 rows, zero unresolved, 24 existing resolved markers |
+| `python3 -B $P/g9/check_phase9_decisions.py` | **0**; all 158 decisions, 136 root occurrences, 12 gateway readers |
+| `node $P/carries/verify-carries.mjs` | **0**; 44 claims, 24 pointer files, 1,208 bindings; existing two final-pin duties unchanged |
+| `python3 -B $P/fchain/prove.py --census` | **0**; original `census-join/join.py --pin 608a4ada5f195b0d0b9d3568a71b8dde4954aacb` twice, both **0**, all three JSON outputs byte-identical; 140 files / 1,126 sites |
+| `python3 -B $P/preserve-premise/park-judgments/check_shard_controls.py` | **0**; 82 controls |
+| `python3 -B -c <validation source recorded in link-commands.json>` | **0**; history, judgment, target, anchor and exact replacement conservation |
+| `git diff --check` | **0** |
+
+Initial diagnostics: F check exited **1** with four work-state findings. The
+scratch rebase author exited **0**, then the F replay had zero old findings and
+reported the 160 links. The retarget author exited **0**, but its replay reported
+**1** with three status-line overlaps; the explicit existing co-composition
+edges above resolve those. One intermediate scratch manifest-edit attempt exited
+**1** on a residual trace's absent `chainEntryId`, before saving any file; the
+base-chain filter above resolves the actual issue. Preliminary controls (**17**,
+then **19**) and required proof reruns all exited **0**. No failed replay is
+counted as a passing proof.
+
+Only volatile census argv/tempfile paths and the controls' HEAD field were
+restored after semantic equality checks; the transient HEAD-named shard report
+was removed. The current invocation and nested census evidence remain in
+`link-commands.json`. Scratch was confined to disposable `/tmp/fgos-work/`
+folders and removed. No `docs/`, ledger, register, review, product file or private
+state was written; no git write, fgOS CLI, native addon, product/full-suite test,
+forbidden audit driver or pair accounting ran. Markdown preview was not started
+because this records-only task forbids extra state/service writes.
+
+Impact-analysis: **degraded** under the no-CLI/no-MCP boundary. Static affected
+callers are the shared F door, premise/G9 checker wiring and owning controls;
+no complete blast-radius claim is made. All 787 judgments, 158 G9 decisions,
+Step-7 packet and carry/census authoring packets remain unchanged. Independent
+review, final-F current-truth acceptance and cutover duties remain open.
+
+---
+
+# Previous current-doc rebase receipt (historical)
 
 Status: **mechanical records proof passes; no product application, semantic approval,
 gate closure or cutover authorization.** Authority: L13-21.1 and L13-24, under the

@@ -1,5 +1,29 @@
 # G0 content rework receipt
 
+## Current F-duty supplement: selected relocation and final link retargets
+
+[L13-23.4](../owner-answers.md) makes 44 heading + 90 body overlay approvals
+conditional on applying the component-boundary predecessor, relocation and history
+steps together with those overlays. The writable evidence supplement is
+[final-pin-duties.json](final-pin-duties.json), linked from this existing G0 receipt;
+the gate register and ledger remain untouched.
+
+Use **`rebased:w8:gap05:relocation`**, `composition/patch-specs.json#/patches/138`,
+in place of historical `w8:gap05:relocation`. Its input hash is
+`53d407ed2e7b626329e334a06b083a964e3bfcc059dfd971d3801beb2ed83904` and its
+step after-hash is
+`6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db`.
+The paired `w8:gap05:history` is unchanged. The relocation change set remains
+identical; these are not new semantic approvals.
+
+After the later L13-26 link patch (`fchain/link-retargets.json#/patches/4`),
+`docs/platform/component-boundary.md` has composed hash
+`61cd146dae1dc6c2c30a1fd64280a6608adebc19e8a5a8a4e8bf4c5e39803bbd` at
+`2c5093b57954790cda1639b36821f71bd2a00c08`. Do not confuse this final-file
+hash with the relocation step hash. Recompute/rebind affected units and obtain
+matching delta verdicts at the actual F pin; otherwise reopen the conditional
+approvals. No gate, lease or cutover is accepted by this supplement.
+
 ## Current verifier accounting and heading deduplication
 
 Input HEAD: `39528fa211f9a7e558b1e95467eeae1f66b68a3d`. **All four required scoped proofs exit 0; the full audit remains partial, `ok: false`.** Evidence: [accounting-proof.json](accounting-proof.json).

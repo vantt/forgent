@@ -1,0 +1,30 @@
+{
+  "contract": "g0-final-pin-duty-supplement.v1",
+  "authority": "L13-23.4; L13-26; w28 review low note",
+  "sourceCommit": "2c5093b57954790cda1639b36821f71bd2a00c08",
+  "status": "pending-at-F; no approval transfer or gate closure",
+  "registerRef": "../preflip-gate-status.json#/gates/0/atFinalPinUnderLease",
+  "compositionRef": "../composition/patch-specs.json",
+  "conditionalOverlayApprovals": {
+    "headingRows": 44,
+    "bodyRows": 90,
+    "total": 134,
+    "condition": "Apply the selected component-boundary predecessor, relocation and history steps together with their overlays; otherwise reopen these conditional approvals. Rebind and delta-review every changed final unit at F.",
+    "relocation": {
+      "historicalId": "w8:gap05:relocation",
+      "selectedId": "rebased:w8:gap05:relocation",
+      "selector": "/patches/138",
+      "path": "docs/platform/component-boundary.md",
+      "beforeSha256": "53d407ed2e7b626329e334a06b083a964e3bfcc059dfd971d3801beb2ed83904",
+      "expectedAfterSha256": "6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db",
+      "qualification": "This is the relocation step's after-hash, not the final composed file hash. Its change set is unchanged by the rebase."
+    },
+    "pairedHistoryId": "w8:gap05:history",
+    "finalComposedFile": {
+      "manifest": "../fchain/manifest.json",
+      "linkRetargetPatch": "../fchain/link-retargets.json#/patches/4",
+      "afterSha256": "61cd146dae1dc6c2c30a1fd64280a6608adebc19e8a5a8a4e8bf4c5e39803bbd",
+      "qualification": "Recompute at the actual F pin. Link retargets are not a grant of semantic approval to this hash."
+    }
+  }
+}
