@@ -278,6 +278,19 @@ mod tests {
         validate_predecessor_scan(&serde_json::to_vec(&clean).unwrap(), Some(0)).unwrap();
     }
     #[test]
+    fn predecessor_scan_reads_the_program_from_the_exact_argv_not_the_joined_text() {
+        let scan = |argv: serde_json::Value| {
+            let cmdline = argv.as_array().unwrap().iter().map(|a| a.as_str().unwrap()).collect::<Vec<_>>().join(" ");
+            serde_json::to_vec(&serde_json::json!({"v":1,"protocol":1,"result":"processes","unreadable":0,"processes":[{"pid":7,"cmdline":cmdline,"argv":argv}]})).unwrap()
+        };
+        assert!(
+            validate_predecessor_scan(&scan(serde_json::json!(["/opt/my dir/fgos", "run"])), Some(10)).is_err(),
+            "a fgOS binary under a path with a space is still a writer"
+        );
+        validate_predecessor_scan(&scan(serde_json::json!(["/usr/bin/zsh", "-c", "fgos run x; fgctl upgrade"])), Some(10)).unwrap();
+        assert!(validate_predecessor_scan(&scan(serde_json::json!(["node", "/my dir/bin/fgos.mjs"])), Some(10)).is_err());
+    }
+    #[test]
     fn non_git_non_wal_admission_needs_no_git_or_state_root() {
         let root =
             std::env::temp_dir().join(format!("fgos-nongit-admission-{}", std::process::id()));
