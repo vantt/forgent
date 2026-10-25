@@ -19,6 +19,7 @@ fn request<'a>(
     ReadRequest {
         layout: &f.layout,
         origin,
+        machine: "test-aa",
         streams,
         cursor,
         folded,
@@ -424,50 +425,62 @@ fn a_ref_hole_is_not_silently_skipped_and_input_cursor_stays_unchanged() {
     );
     assert_eq!(c, Cursor::default());
 }
+/// A long-lived reader holding its cursor sees a mirror rewind. A peer's
+/// mirror keeps the tip the cursor authenticated: the read answers with the
+/// same history, names the mirror, and the next read from that answer does the
+/// same. The mirror of the reader's own machine refuses and leaves the
+/// caller's cursor unchanged.
 #[test]
-fn mirror_rewind_refuses_and_preserves_the_previous_cursor() {
-    let f = Fixture::new();
-    let mut h = f.handle();
-    let streams = [StreamId::parse("project").unwrap()];
-    let own = "d".repeat(32);
-    let p = f.port(&mut h, "refs/fgos/remotes/origin/events/test-bb");
-    let a = seal(&p, &f.repo, vec![], &[event('b', 1, 1)], "test-bb");
-    let b = seal(&p, &f.repo, vec![a.clone()], &[event('b', 2, 2)], "test-bb");
-    publish(
-        &p,
-        &f.repo,
-        "refs/fgos/remotes/origin/events/test-bb",
-        None,
-        b.clone(),
-        "advance",
-    );
-    let first = read(
-        &p,
-        &f.repo,
-        request(&f, &own, &streams, &Cursor::default(), &[]),
-    )
-    .unwrap();
-    let saved = first.cursor.canonical_bytes().unwrap();
-    publish(
-        &p,
-        &f.repo,
-        "refs/fgos/remotes/origin/events/test-bb",
-        Some(b),
-        a,
-        "rewind",
-    );
-    assert_eq!(
-        read(
-            &p,
-            &f.repo,
-            request(&f, &own, &streams, &first.cursor, &first.sequence)
-        )
-        .unwrap_err()
-        .code
-        .as_str(),
-        "event-store-mirror-rewound"
-    );
-    assert_eq!(first.cursor.canonical_bytes().unwrap(), saved);
+fn a_rewound_mirror_keeps_the_peer_baseline_and_refuses_for_the_own_machine() {
+    for machine in ["test-aa", "test-bb"] {
+        let f = Fixture::new();
+        let mut h = f.handle();
+        let streams = [StreamId::parse("project").unwrap()];
+        let own = "d".repeat(32);
+        let name = "refs/fgos/remotes/origin/events/test-bb";
+        let p = f.port(&mut h, "refs/fgos/events/test-aa");
+        let a = seal(&p, &f.repo, vec![], &[event('b', 1, 1)], "test-bb");
+        let b = seal(&p, &f.repo, vec![a.clone()], &[event('b', 2, 2)], "test-bb");
+        plant_foreign_mirror(&f, "test-bb", &b);
+        let at = |cursor: &Cursor, folded: &[fgos_event_store::envelope::Envelope]| {
+            read(
+                &p,
+                &f.repo,
+                ReadRequest {
+                    machine,
+                    ..request(&f, &own, &streams, cursor, folded)
+                },
+            )
+        };
+        let first = at(&Cursor::default(), &[]).unwrap();
+        let saved = first.cursor.canonical_bytes().unwrap();
+        plant_foreign_mirror(&f, "test-bb", &a);
+        if machine == "test-bb" {
+            let error = at(&first.cursor, &first.sequence).unwrap_err();
+            assert_eq!(error.code.as_str(), "event-store-mirror-rewound");
+            assert_eq!(first.cursor.canonical_bytes().unwrap(), saved);
+            continue;
+        }
+        let mut cursor = first.cursor.clone();
+        let mut folded = first.sequence.clone();
+        for _ in 0..2 {
+            let next = at(&cursor, &folded).unwrap();
+            assert_eq!(
+                next.sequence, first.sequence,
+                "the authenticated history stays"
+            );
+            assert_eq!(
+                next.skipped_mirrors
+                    .iter()
+                    .map(|m| (m.ref_name.as_str(), m.code.as_str()))
+                    .collect::<Vec<_>>(),
+                [(name, "event-store-mirror-rewound")]
+            );
+            assert_eq!(next.cursor.mirror_tips, first.cursor.mirror_tips);
+            cursor = next.cursor;
+            folded = next.sequence;
+        }
+    }
 }
 
 #[test]

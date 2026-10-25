@@ -21,6 +21,18 @@ function readStore(store, request, heldRanks) {
     throw error;
   }
 }
+// A read that answered without a peer's mirror as it stands, or without its checkpoint, still answers; the
+// reason is named on stderr once per process, never dropped.
+const warned = new Set();
+function warnAbout(read) {
+  const notes = read.skippedMirrors.map(m => `${m.code} ${m.refName}: ${m.detail}`);
+  if (read.checkpoint?.ignored) notes.push(`event-store-checkpoint-ignored: ${read.checkpoint.ignored}`);
+  for (const note of notes) {
+    if (warned.has(note)) continue;
+    warned.add(note);
+    process.stderr.write(`fgos: warning: ${note}\n`);
+  }
+}
 
 export function prepareWorkStore(dir, mainFgosDir) {
   const config = readEventStoreConfig(path.dirname(mainFgosDir));
@@ -51,9 +63,17 @@ const retained = new WeakMap();
 export function readWorkState(store, { cachePath, historyPath, heldRanks = [], requireComplete = false, rebuild = false } = {}) {
   if (hotLockDepth() > 0) throw refusal('event-store-full-read-under-state');
   const prior = cachePath ? retained.get(store) : undefined;
-  const read = readStore(store, { streams: ['project'], ...(prior ? { cursor: prior.cursor, folded: prior.folded } : {}),
-    ...(historyPath ? { checkpoint: { path: historyPath, reuse: !rebuild } } : {}) }, heldRanks);
+  let read;
+  try {
+    read = readStore(store, { streams: ['project'], ...(prior ? { cursor: prior.cursor, folded: prior.folded } : {}),
+      ...(historyPath ? { checkpoint: { path: historyPath, reuse: !rebuild } } : {}) }, heldRanks);
+  } catch (error) {
+    // A catch-up the store refused is not continued from: the next read starts over.
+    retained.delete(store);
+    throw error;
+  }
   retained.set(store, { cursor: read.cursor, folded: read.sequence });
+  warnAbout(read);
   if (requireComplete && (read.deferred.length || read.missing.length)) throw refusal('event-store-incomplete-history');
   const events = [...read.legacy.map(record => record.event), ...read.sequence];
   // A cache never establishes coverage: first authenticate it against the

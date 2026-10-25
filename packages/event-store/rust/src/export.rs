@@ -19,6 +19,7 @@ use std::{
 pub struct ExportRequest<'a> {
     pub layout: &'a Layout,
     pub origin: &'a str,
+    pub machine: &'a str,
     pub streams: &'a [StreamId],
     pub since: &'a Cursor,
     pub out: &'a Path,
@@ -94,6 +95,7 @@ fn query(
         ReadRequest {
             layout: req.layout,
             origin: req.origin,
+            machine: req.machine,
             streams: req.streams,
             cursor: &Cursor::default(),
             folded: &[],

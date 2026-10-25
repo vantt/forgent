@@ -507,6 +507,7 @@ impl EventStore {
         let request = fgos_event_store::read::ReadRequest {
             layout: &self.layout,
             origin: &origin,
+            machine,
             streams: &stream_ids(&streams)?,
             cursor: &cursor,
             folded: &folded,
@@ -566,7 +567,7 @@ impl EventStore {
         };
         Ok(EventStoreRead {
             view,
-            result: json!({"events":result.events,"sequence":&result.sequence[sequence_prefix..],"sequencePrefix":sequence_prefix,"legacy":legacy,"legacyUnchanged":legacy_unchanged,"deferred":result.deferred,"missing":result.missing,"concurrent":result.concurrent,"cursor":result.cursor,"fold":fold,"checkpoint":{"continued":result.checkpoint.continued,"ignored":result.checkpoint.ignored,"written":result.checkpoint.written,"writeError":result.checkpoint.write_error}}),
+            result: json!({"events":result.events,"sequence":&result.sequence[sequence_prefix..],"sequencePrefix":sequence_prefix,"legacy":legacy,"legacyUnchanged":legacy_unchanged,"deferred":result.deferred,"missing":result.missing,"concurrent":result.concurrent,"cursor":result.cursor,"fold":fold,"checkpoint":{"continued":result.checkpoint.continued,"ignored":result.checkpoint.ignored,"written":result.checkpoint.written,"writeError":result.checkpoint.write_error},"skippedMirrors":result.skipped_mirrors}),
         })
     }
 }
@@ -678,6 +679,7 @@ impl EventStore {
         let request = fgos_event_store::export::ExportRequest {
             layout: &self.layout,
             origin: &origin,
+            machine,
             streams: &streams,
             since: &since,
             out: Path::new(&out),

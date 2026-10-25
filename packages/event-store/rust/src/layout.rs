@@ -1,7 +1,7 @@
-//! Pure storage-location port: Git resolves the common directory outside this crate.
+//! Storage locations: Git resolves the common directory outside this crate.
 use crate::{
     envelope::Scope,
-    errors::{Error, ErrorCode},
+    errors::{io, Error, ErrorCode},
 };
 use std::path::{Path, PathBuf};
 
@@ -87,6 +87,30 @@ impl Layout {
         StreamLayout {
             root: self.root.join(stream.as_str()),
         }
+    }
+    /// The streams with a directory under the open root, sorted. A clone that
+    /// never stored an event has no open root yet: it has no streams.
+    pub fn streams(&self) -> Result<Vec<StreamId>, Error> {
+        let entries = match std::fs::read_dir(&self.root) {
+            Ok(entries) => entries,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+            Err(e) => return Err(io(e)),
+        };
+        let mut streams = Vec::new();
+        for entry in entries {
+            let entry = entry.map_err(io)?;
+            if let Some(stream) = entry
+                .file_name()
+                .to_str()
+                .and_then(|n| StreamId::parse(n).ok())
+            {
+                if entry.file_type().map_err(io)?.is_dir() {
+                    streams.push(stream);
+                }
+            }
+        }
+        streams.sort_by(|a, b| a.as_str().cmp(b.as_str()));
+        Ok(streams)
     }
 }
 #[derive(Debug, Clone)]

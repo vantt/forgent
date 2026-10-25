@@ -68,7 +68,7 @@ fn read_children(f: &Fixture) -> Vec<String> {
         read(
             &f.driver,
             &f.repo,
-            ReadRequest { layout: &f.layout, origin: &own, streams: &streams, cursor: &Cursor::default(), folded: &[], project: true },
+            ReadRequest { layout: &f.layout, origin: &own, machine: "test-aa", streams: &streams, cursor: &Cursor::default(), folded: &[], project: true },
         )
         .unwrap()
     };
