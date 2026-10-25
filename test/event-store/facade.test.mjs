@@ -201,6 +201,8 @@ test('a write refused by a transient Git failure is admitted once the failure cl
   assert.equal(store.append('project', [event], {}, 'fixture', []).events.length, 1, 'the refusal outlived the failure that caused it');
 });
 
+// Kept on purpose: `fgos events migrate` runs with every writer stopped and the runbook restarts them, so a process that
+// started before the migration never needs to see it clear.
 test('a write refused for a repository state stays refused after that state changes', { skip: process.platform !== 'linux' }, t => {
   const { store, repo, git } = fixture(t);
   fs.writeFileSync(path.join(repo, '.fgos/events.jsonl'), JSON.stringify({ ts: '2026-01-01T00:00:00.000Z', seq: 1, type: 'work.add', payload: { id: 'item-1', title: 'legacy' }, v: 4 }) + '\n');
