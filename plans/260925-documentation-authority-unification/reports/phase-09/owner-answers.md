@@ -284,3 +284,28 @@ Ruling: the audit's drift test asks the one door that already decides drift, ins
 - Raw diagnostics stay in the audit's output.
 - Ledger history is not rewritten.
 - The pair-accounting exception list in `checks.mjs` is not touched.
+
+## L13-28 — Every link in docs/platform resolves after F (Lead, 2026-10-25 23:45)
+
+Decided by the Lead under A42 and RUL11, from the w33 link-retarget review: 4 APPROVE, 1 REWORK and 3 notes.
+
+At cutover, guard 3 lands: the link and anchor check inside `docs/platform/**` (L12-89). The composed tree after F would still fail that guard on three populations:
+- 67 Related-header entries in 59 files that point at moved files;
+- 411 relative links that are already broken at the pin, mostly in snapshots of the retired engine;
+- 24 broken links in files that F creates.
+
+L13-26 covered only clickable links into the move set. That is one slice of the guard's population, not all of it. The size of the rest is no reason to exempt it.
+
+Ruling:
+1. **The whole population.** Guard 3's population is every link and every anchor in the composed `docs/platform/**`, Related headers included. All of them must resolve after F, with no exemptions.
+2. **Rules for each link, in this order:**
+   1. Retarget to the successor. The successor comes from the move set, from the surviving file under G5, or from the record of anchor renames.
+   2. If the target was removed and has no successor, turn the link into a code span. This is the lineage rule of L13-21.4, and it covers retired-engine snapshots too.
+   3. A link that would point at its own file goes to the matching anchor in that file if one exists; otherwise it becomes a code span.
+   4. A link label that shows the old path shows the new path.
+3. **Row `L13-26:link:125`** retargets to `../../reading-map.md`, as w33 gives it. That file is the G5 surviving file.
+4. **One record and one check.**
+   - The fixes extend `fchain/link-retargets.json`; no second record is added.
+   - The `fchain/check.py` finding `linkIntoMoveSet` becomes `linkGuard`. It resolves the file and the anchor of every link in the composed `docs/platform/**`, Related headers included, using the anchor rule of the unit extractor.
+   - This check is the pre-F witness of guard 3. The guard itself is built in the cutover change, and it must agree with this check; that is an F duty.
+5. **Gateway contract.** The YAML descriptions in `fgos-gateway-api-v1.yaml` that name retired paths, and the `x-docs` entries that name decision files already gone, are fixed in the same record.
