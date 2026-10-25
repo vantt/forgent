@@ -233,3 +233,20 @@ Decided by the Lead under A42.
 
    Brief: `w25-g0-rework-brief.md`.
 4. **The w8 and w9 component-boundary overlay approvals are conditional.** That is 44 rows in batch 1 and 90 in batch 5. They were checked against the prepared after-bytes of composition spec 424 and the `w8:gap05` relocation and history patches, because their target file does not exist at HEAD. At F, those patches are applied together with the overlays, or those approvals reopen. This goes into the G0 F duties.
+
+## L13-24 — One F composition door for every prepared patch (Lead, 2026-10-25 14:00)
+
+Decided by the Lead under A42 and RUL11. The w25 G9 review approved all 158 decisions, but found prepared patches from different records that edit the same lines:
+- the G9 gateway and map patches repeat or override premise-shard patches;
+- the G9 bin and pointer patches restate `carries/pointer-patches.json` with no link between them.
+
+These patches live in five places:
+- `phase-08/step-07-composed-patches.json`;
+- `composition/patch-specs.json`;
+- `carries/pointer-patches.json`;
+- `census-join/pointer-patches.json`;
+- the premise shards and `g9/f-composition-additions.json`.
+
+Each record has its own checker, and none of them sees the others. That is the mess itself, not a size problem.
+
+Ruling: one ordered F composition manifest names every prepared-patch source, and one checker composes them all on the pin. It fails on two patches for the same lines, on a conflict, and on a patch without one owning row. Each changed line has exactly one owning patch. Every other record that mentions that change links to it by id, and carries no second copy. The per-record checkers keep their record-level checks, and their replay goes through this one door. This consolidates the existing replay code (`composition/compose.py` `apply_diff` and `check_shard.py`'s chain builder) rather than adding a new engine. The G9 checker reads `plans/` evidence from the pin, not from disk, so later record edits do not break it.

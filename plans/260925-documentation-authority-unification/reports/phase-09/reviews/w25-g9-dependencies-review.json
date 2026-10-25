@@ -1,0 +1,1037 @@
+{
+ "items": [
+  {
+   "id": "reference-002463",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/0; record phase-08/step-05-records/citation-ratchet-roots.jsonl:5 /parked/0; source phase-08/owner-answers.md; phase8 /rows/2016=preserve"
+  },
+  {
+   "id": "dynamic-006492",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/1; record phase-08/step-05-records/citation-ratchet-roots.jsonl:5 /parked/2; source phase-08/owner-answers.md; phase8 /rows/2017=preserve"
+  },
+  {
+   "id": "dynamic-006509",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/2; record phase-08/step-05-records/citation-ratchet-roots.jsonl:5 /parked/5; source phase-08/owner-answers.md; phase8 /rows/2018=preserve"
+  },
+  {
+   "id": "dynamic-006514",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/3; record phase-08/step-05-records/citation-ratchet-roots.jsonl:5 /parked/7; source phase-08/owner-answers.md; phase8 /rows/2019=preserve"
+  },
+  {
+   "id": "reference-003545",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/4; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/0; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2165=parked"
+  },
+  {
+   "id": "reference-003546",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/5; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/1; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2166=parked"
+  },
+  {
+   "id": "reference-003547",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/6; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/2; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2167=parked"
+  },
+  {
+   "id": "reference-003548",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/7; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/3; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2168=parked"
+  },
+  {
+   "id": "reference-003549",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/8; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/4; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2169=parked"
+  },
+  {
+   "id": "reference-003550",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/9; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/5; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2170=parked"
+  },
+  {
+   "id": "reference-003551",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/10; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/6; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2171=parked"
+  },
+  {
+   "id": "dynamic-007143",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/11; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/7; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2172=parked"
+  },
+  {
+   "id": "dynamic-007161",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/12; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/8; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2173=parked"
+  },
+  {
+   "id": "dynamic-007162",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/13; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/9; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2174=parked"
+  },
+  {
+   "id": "dynamic-007163",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/14; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/10; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2175=parked"
+  },
+  {
+   "id": "dynamic-007164",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/15; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/11; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2176=parked"
+  },
+  {
+   "id": "dynamic-007165",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/16; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/12; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2177=parked"
+  },
+  {
+   "id": "dynamic-007166",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/17; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/13; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2178=parked"
+  },
+  {
+   "id": "dynamic-007167",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/18; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/14; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2179=parked"
+  },
+  {
+   "id": "dynamic-007172",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/19; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/15; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2180=parked"
+  },
+  {
+   "id": "dynamic-007179",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/20; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/16; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2181=parked"
+  },
+  {
+   "id": "dynamic-007225",
+   "verdict": "APPROVE",
+   "summary": "Retired as one unit with the L12-89 replacement guards (phase-08 L12-86/89 quote + phase-09 plan guard paragraph); deletions /14-/16 are conditional and replay clean. Still parked at Step 7, stated.",
+   "evidence": "/entries/21; record phase-08/step-05-records/citation-ratchet-roots.jsonl:8 /parked/17; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2182=parked"
+  },
+  {
+   "id": "reference-003646",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/22; record phase-08/step-05-records/cli-help-messages.jsonl:3 /parked/2; source phase-08/owner-answers.md; phase8 /rows/2021=preserve"
+  },
+  {
+   "id": "reference-003651",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/23; record phase-08/step-05-records/cli-help-messages.jsonl:3 /parked/3; source phase-08/owner-answers.md; phase8 /rows/2022=preserve"
+  },
+  {
+   "id": "author-s4-fix2-284fae1afd0a9579",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/24; record phase-08/step-05-records/cli-help-messages.jsonl:3 /parked/8; source phase-08/owner-answers.md; phase8 /rows/2067=preserve"
+  },
+  {
+   "id": "author-s67-command-registry-manifest-861",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/25; record phase-08/step-05-records/cli-help-messages.jsonl:3 /parked/11; source phase-08/owner-answers.md; phase8 /rows/2068=preserve"
+  },
+  {
+   "id": "reference-000177",
+   "verdict": "REWORK",
+   "severity": "high",
+   "summary": "Moved decision is right (phase-08 owner-answers L12-96 quote; move set /paths/993; Phase-8 overlay already 'patch'). But its patchRefs carry additions /2,/4,/6(line 299),/7,/8 that duplicate G6 premise-shard repoint patches (f03917,f04357,f06837,f07976,f07985) and /3 plus /6 line 30 that rewrite text G6 judged preserve-confirmed (f04343,f06830,f06831). The two cannot both be composed at F.",
+   "evidence": "/entries/26; record phase-08/step-05-records/gateway-contract.jsonl:1 /parked/1; source phase-08/owner-answers.md; phase-08/step-05-cutover-move-set.json/paths/993; phase-08/step-05-proposed-move-read-units.json/units/4; phase8 /rows/2298=patch; see item gateway-g6-ownership"
+  },
+  {
+   "id": "dynamic-000664",
+   "verdict": "REWORK",
+   "severity": "high",
+   "summary": "Moved decision is right (phase-08 owner-answers L12-96 quote; move set /paths/993; Phase-8 overlay already 'patch'). But its patchRefs carry additions /2,/4,/6(line 299),/7,/8 that duplicate G6 premise-shard repoint patches (f03917,f04357,f06837,f07976,f07985) and /3 plus /6 line 30 that rewrite text G6 judged preserve-confirmed (f04343,f06830,f06831). The two cannot both be composed at F.",
+   "evidence": "/entries/27; record phase-08/step-05-records/gateway-contract.jsonl:1 /parked/3; source phase-08/owner-answers.md; phase-08/step-05-cutover-move-set.json/paths/993; phase-08/step-05-proposed-move-read-units.json/units/4; phase8 /rows/2299=patch; see item gateway-g6-ownership"
+  },
+  {
+   "id": "dynamic-000665",
+   "verdict": "REWORK",
+   "severity": "high",
+   "summary": "Moved decision is right (phase-08 owner-answers L12-96 quote; move set /paths/993; Phase-8 overlay already 'patch'). But its patchRefs carry additions /2,/4,/6(line 299),/7,/8 that duplicate G6 premise-shard repoint patches (f03917,f04357,f06837,f07976,f07985) and /3 plus /6 line 30 that rewrite text G6 judged preserve-confirmed (f04343,f06830,f06831). The two cannot both be composed at F.",
+   "evidence": "/entries/28; record phase-08/step-05-records/gateway-contract.jsonl:1 /parked/4; source phase-08/owner-answers.md; phase-08/step-05-cutover-move-set.json/paths/993; phase-08/step-05-proposed-move-read-units.json/units/4; phase8 /rows/2300=patch; see item gateway-g6-ownership"
+  },
+  {
+   "id": "reference-000200",
+   "verdict": "REWORK",
+   "severity": "high",
+   "summary": "Moved decision is right (phase-08 owner-answers L12-96 quote; move set /paths/993; Phase-8 overlay already 'patch'). But its patchRefs carry additions /2,/4,/6(line 299),/7,/8 that duplicate G6 premise-shard repoint patches (f03917,f04357,f06837,f07976,f07985) and /3 plus /6 line 30 that rewrite text G6 judged preserve-confirmed (f04343,f06830,f06831). The two cannot both be composed at F.",
+   "evidence": "/entries/29; record phase-08/step-05-records/gateway-contract.jsonl:2 /parked/0; source phase-08/owner-answers.md; phase-08/step-05-cutover-move-set.json/paths/993; phase-08/step-05-proposed-move-read-units.json/units/4; phase8 /rows/2301=patch; see item gateway-g6-ownership"
+  },
+  {
+   "id": "dynamic-000767",
+   "verdict": "REWORK",
+   "severity": "high",
+   "summary": "Moved decision is right (phase-08 owner-answers L12-96 quote; move set /paths/993; Phase-8 overlay already 'patch'). But its patchRefs carry additions /2,/4,/6(line 299),/7,/8 that duplicate G6 premise-shard repoint patches (f03917,f04357,f06837,f07976,f07985) and /3 plus /6 line 30 that rewrite text G6 judged preserve-confirmed (f04343,f06830,f06831). The two cannot both be composed at F.",
+   "evidence": "/entries/30; record phase-08/step-05-records/gateway-contract.jsonl:2 /parked/1; source phase-08/owner-answers.md; phase-08/step-05-cutover-move-set.json/paths/993; phase-08/step-05-proposed-move-read-units.json/units/4; phase8 /rows/2302=patch; see item gateway-g6-ownership"
+  },
+  {
+   "id": "dynamic-000768",
+   "verdict": "REWORK",
+   "severity": "high",
+   "summary": "Moved decision is right (phase-08 owner-answers L12-96 quote; move set /paths/993; Phase-8 overlay already 'patch'). But its patchRefs carry additions /2,/4,/6(line 299),/7,/8 that duplicate G6 premise-shard repoint patches (f03917,f04357,f06837,f07976,f07985) and /3 plus /6 line 30 that rewrite text G6 judged preserve-confirmed (f04343,f06830,f06831). The two cannot both be composed at F.",
+   "evidence": "/entries/31; record phase-08/step-05-records/gateway-contract.jsonl:2 /parked/2; source phase-08/owner-answers.md; phase-08/step-05-cutover-move-set.json/paths/993; phase-08/step-05-proposed-move-read-units.json/units/4; phase8 /rows/2303=patch; see item gateway-g6-ownership"
+  },
+  {
+   "id": "dynamic-009758",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/32; record phase-08/step-05-records/generators-decision-index.jsonl:2 /parked/0; source phase-08/owner-answers.md; phase8 /rows/2028=preserve"
+  },
+  {
+   "id": "dynamic-009759",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/33; record phase-08/step-05-records/generators-decision-index.jsonl:2 /parked/1; source phase-08/owner-answers.md; phase8 /rows/2029=preserve"
+  },
+  {
+   "id": "dynamic-009760",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/34; record phase-08/step-05-records/generators-decision-index.jsonl:2 /parked/2; source phase-08/owner-answers.md; phase8 /rows/2030=preserve"
+  },
+  {
+   "id": "dynamic-009761",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/35; record phase-08/step-05-records/generators-decision-index.jsonl:2 /parked/3; source phase-08/owner-answers.md; phase8 /rows/2031=preserve"
+  },
+  {
+   "id": "dynamic-009767",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/36; record phase-08/step-05-records/generators-decision-index.jsonl:2 /parked/4; source phase-08/owner-answers.md; phase8 /rows/2032=preserve"
+  },
+  {
+   "id": "dynamic-009768",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/37; record phase-08/step-05-records/generators-enduser-index.jsonl:3 /parked/0; source phase-08/owner-answers.md; phase8 /rows/2069=preserve"
+  },
+  {
+   "id": "dynamic-009769",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/38; record phase-08/step-05-records/generators-enduser-index.jsonl:3 /parked/1; source phase-08/owner-answers.md; phase8 /rows/2070=preserve"
+  },
+  {
+   "id": "dynamic-009772",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/39; record phase-08/step-05-records/generators-enduser-index.jsonl:3 /parked/2; source phase-08/owner-answers.md; phase8 /rows/2071=preserve"
+  },
+  {
+   "id": "dynamic-009773",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/40; record phase-08/step-05-records/generators-enduser-index.jsonl:3 /parked/3; source phase-08/owner-answers.md; phase8 /rows/2072=preserve"
+  },
+  {
+   "id": "dynamic-009788",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/41; record phase-08/step-05-records/generators-enduser-index.jsonl:3 /parked/4; source phase-08/owner-answers.md; phase8 /rows/2033=preserve"
+  },
+  {
+   "id": "dynamic-009791",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/42; record phase-08/step-05-records/generators-enduser-index.jsonl:4 /parked/0; source phase-08/owner-answers.md; phase8 /rows/2034=preserve"
+  },
+  {
+   "id": "author-s4-08912b8301b10321",
+   "verdict": "APPROVE",
+   "summary": "Retired: backlog row p-8d04c7f1 is already marked done with no docs/specs/distribution.md pointer at the pin; claim-carries /claims/38 successor vendored-yaml-parser.md heading exists; no stale replay.",
+   "evidence": "/entries/43; record phase-08/step-05-records/generators-skills-and-support.jsonl:66 /parked/0; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase-09/carries/claim-carries.json/claims/38; plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json/conservedClaims/38; docs/backlog.md; docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md; phase-09/g9/judgments.json/rows/46; phase8 /rows/2277=parked"
+  },
+  {
+   "id": "reference-002482",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/44; record phase-08/step-05-records/generators-skills-and-support.jsonl:168 /parked/0; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2183=parked"
+  },
+  {
+   "id": "reference-002483",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/45; record phase-08/step-05-records/generators-skills-and-support.jsonl:168 /parked/1; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2184=parked"
+  },
+  {
+   "id": "reference-002484",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/46; record phase-08/step-05-records/generators-skills-and-support.jsonl:168 /parked/2; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2185=parked"
+  },
+  {
+   "id": "reference-002485",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/47; record phase-08/step-05-records/generators-skills-and-support.jsonl:168 /parked/3; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2186=parked"
+  },
+  {
+   "id": "dynamic-006599",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/48; record phase-08/step-05-records/generators-skills-and-support.jsonl:168 /parked/4; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2187=parked"
+  },
+  {
+   "id": "dynamic-006602",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/49; record phase-08/step-05-records/generators-skills-and-support.jsonl:168 /parked/5; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2188=parked"
+  },
+  {
+   "id": "dynamic-006642",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/50; record phase-08/step-05-records/generators-skills-and-support.jsonl:168 /parked/6; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2189=parked"
+  },
+  {
+   "id": "reference-003579",
+   "verdict": "APPROVE",
+   "summary": "Lead proposal (retain immutable-commit classifiers) accepted by L13-23.1; packet still flags leadDecisionProposed=true because it predates the ruling.",
+   "evidence": "/entries/51; record phase-08/step-05-records/generators-skills-and-support.jsonl:191 /parked/0; source scripts/generate-shipped-path-inventory.mjs; scripts/generate-shipped-path-inventory.mjs; phase8 /rows/2103=parked"
+  },
+  {
+   "id": "reference-003588",
+   "verdict": "APPROVE",
+   "summary": "Lead proposal (retain immutable-commit classifiers) accepted by L13-23.1; packet still flags leadDecisionProposed=true because it predates the ruling.",
+   "evidence": "/entries/52; record phase-08/step-05-records/generators-skills-and-support.jsonl:191 /parked/1; source scripts/generate-shipped-path-inventory.mjs; scripts/generate-shipped-path-inventory.mjs; phase8 /rows/2104=parked"
+  },
+  {
+   "id": "reference-000145",
+   "verdict": "APPROVE",
+   "summary": "Retired generic legacy route; existing AGENTS F chain (file:AGENTS.md, scope-consumer:AGENTS.md) already names docs/platform/governance.md#decision-scope-to-holder-table, which the chain adds (heading at line 504 after w8:convention:area-holder-table). Successor quote at pin is only the H1; anchor proven by my replay, not by the checker.",
+   "evidence": "/entries/53; record phase-08/step-05-records/runtime-judgment-part-22.jsonl:2 /parked/5; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2270=parked"
+  },
+  {
+   "id": "reference-000151",
+   "verdict": "APPROVE",
+   "summary": "Retired generic legacy route; existing AGENTS F chain (file:AGENTS.md, scope-consumer:AGENTS.md) already names docs/platform/governance.md#decision-scope-to-holder-table, which the chain adds (heading at line 504 after w8:convention:area-holder-table). Successor quote at pin is only the H1; anchor proven by my replay, not by the checker.",
+   "evidence": "/entries/54; record phase-08/step-05-records/runtime-judgment-part-22.jsonl:2 /parked/6; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2271=parked"
+  },
+  {
+   "id": "author-seam8-agents-decision-home-74",
+   "verdict": "APPROVE",
+   "summary": "Retired generic legacy route; existing AGENTS F chain (file:AGENTS.md, scope-consumer:AGENTS.md) already names docs/platform/governance.md#decision-scope-to-holder-table, which the chain adds (heading at line 504 after w8:convention:area-holder-table). Successor quote at pin is only the H1; anchor proven by my replay, not by the checker.",
+   "evidence": "/entries/55; record phase-08/step-05-records/runtime-judgment-part-22.jsonl:2 /parked/7; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase8 /rows/2272=parked"
+  },
+  {
+   "id": "reference-000232",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: claim-carries operand and successor match; addition /0 rebuilds the three comment retargets after the bin F chain; S28 /patches/13 correctly declared stale (before 4ad9ed0c vs pin 1c50f564). Successor text verified (session rule present in conserved-dispatch-doctrine.md).",
+   "evidence": "/entries/56; record phase-08/step-05-records/runtime-judgment-part-22.jsonl:13 /parked/3; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase-09/carries/claim-carries.json/claims/32; plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json/conservedClaims/32; phase8 /rows/2263=parked"
+  },
+  {
+   "id": "reference-000235",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: claim-carries operand and successor match; addition /0 rebuilds the three comment retargets after the bin F chain; S28 /patches/13 correctly declared stale (before 4ad9ed0c vs pin 1c50f564). Successor text verified (session rule present in conserved-dispatch-doctrine.md).",
+   "evidence": "/entries/57; record phase-08/step-05-records/runtime-judgment-part-22.jsonl:13 /parked/4; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase-09/carries/claim-carries.json/claims/15; plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json/conservedClaims/15; phase8 /rows/2246=parked"
+  },
+  {
+   "id": "reference-000236",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: claim-carries operand and successor match; addition /0 rebuilds the three comment retargets after the bin F chain; S28 /patches/13 correctly declared stale (before 4ad9ed0c vs pin 1c50f564). Successor text verified (session rule present in conserved-dispatch-doctrine.md).",
+   "evidence": "/entries/58; record phase-08/step-05-records/runtime-judgment-part-22.jsonl:13 /parked/5; source phase-08/owner-answers.md; plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md; phase-09/carries/claim-carries.json/claims/16; plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json/conservedClaims/16; phase8 /rows/2247=parked"
+  },
+  {
+   "id": "dynamic-001360",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/59; record phase-08/step-05-records/runtime-judgment-part-22.jsonl:13 /parked/23; source phase-08/owner-answers.md; phase8 /rows/2035=preserve"
+  },
+  {
+   "id": "dynamic-001361",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/60; record phase-08/step-05-records/runtime-judgment-part-22.jsonl:13 /parked/24; source phase-08/owner-answers.md; phase8 /rows/2036=preserve"
+  },
+  {
+   "id": "dynamic-001363",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/61; record phase-08/step-05-records/runtime-judgment-part-22.jsonl:13 /parked/25; source phase-08/owner-answers.md; phase8 /rows/2037=preserve"
+  },
+  {
+   "id": "dynamic-001454",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/62; record phase-08/step-05-records/runtime-judgment-part-22.jsonl:13 /parked/33; source phase-08/owner-answers.md; phase8 /rows/2073=preserve"
+  },
+  {
+   "id": "author-seam8-output-2071",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/63; record phase-08/step-05-records/runtime-judgment-part-22.jsonl:13 /parked/40; source phase-08/owner-answers.md; phase8 /rows/2038=preserve"
+  },
+  {
+   "id": "author-seam8-output-2074",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/64; record phase-08/step-05-records/runtime-judgment-part-22.jsonl:13 /parked/41; source phase-08/owner-answers.md; phase8 /rows/2039=preserve"
+  },
+  {
+   "id": "author-seam8-output-3029",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/65; record phase-08/step-05-records/runtime-judgment-part-22.jsonl:13 /parked/42; source phase-08/owner-answers.md; phase8 /rows/2074=preserve"
+  },
+  {
+   "id": "reference-002291",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: operand 'docs/architect/packaging-distribution/runtime-identity-and-activation.md' and successor docs/platform/packaging-distribution/contracts/release-manifest.md#canonical-release-tree-rules match claim-carries; prepared comment retarget replays clean on the F chain. Same changed lines as carries/pointer-patches.json with no supersession link (see carries-supersession).",
+   "evidence": "/entries/66; record phase-08/step-05-records/runtime-judgment-part-23.jsonl:1 /parked/0; source phase-08/owner-answers.md; phase-09/carries/claim-carries.json/claims/40; phase8 /rows/2279=parked"
+  },
+  {
+   "id": "reference-002292",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: operand 'docs/architect/packaging-distribution/runtime-identity-and-activation.md' and successor docs/platform/packaging-distribution/contracts/activation-binding.md#init-pipeline-and-root-binding match claim-carries; prepared comment retarget replays clean on the F chain. Same changed lines as carries/pointer-patches.json with no supersession link (see carries-supersession).",
+   "evidence": "/entries/67; record phase-08/step-05-records/runtime-judgment-part-23.jsonl:5 /parked/0; source phase-08/owner-answers.md; phase-09/carries/claim-carries.json/claims/41; phase8 /rows/2280=parked"
+  },
+  {
+   "id": "reference-002294",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: operand 'docs/architect/packaging-distribution/runtime-identity-and-activation.md' and successor docs/platform/packaging-distribution/contracts/release-manifest.md#canonical-release-tree-rules match claim-carries; prepared comment retarget replays clean on the F chain. Same changed lines as carries/pointer-patches.json with no supersession link (see carries-supersession).",
+   "evidence": "/entries/68; record phase-08/step-05-records/runtime-judgment-part-23.jsonl:11 /parked/0; source phase-08/owner-answers.md; phase-09/carries/claim-carries.json/claims/42; phase8 /rows/2281=parked"
+  },
+  {
+   "id": "reference-002295",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: operand 'docs/specs/distribution.md:297' and successor docs/platform/packaging-distribution/contracts/activation-binding.md#git-common-directory-discovery match claim-carries; prepared comment retarget replays clean on the F chain. Same changed lines as carries/pointer-patches.json with no supersession link (see carries-supersession).",
+   "evidence": "/entries/69; record phase-08/step-05-records/runtime-judgment-part-23.jsonl:12 /parked/0; source phase-08/owner-answers.md; phase-09/carries/claim-carries.json/claims/43; phase8 /rows/2282=parked"
+  },
+  {
+   "id": "reference-003727",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: operand 'docs/architect/agent-coordination/contracts/flow-definition.md' and successor docs/platform/runner/contracts/conserved-dispatch-doctrine.md#operation-prompt-templates match claim-carries; prepared comment retarget replays clean on the F chain. Same changed lines as carries/pointer-patches.json with no supersession link (see carries-supersession).",
+   "evidence": "/entries/70; record phase-08/step-05-records/runtime-judgment-part-26.jsonl:44 /parked/0; source phase-08/owner-answers.md; phase-09/carries/claim-carries.json/claims/35; phase8 /rows/2266=parked"
+  },
+  {
+   "id": "reference-003747",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Native Land ... stays as is: dormant in this repo' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/71; record phase-08/step-05-records/runtime-judgment-part-27.jsonl:38 /parked/0; source phase-08/owner-answers.md; phase8 /rows/2283=preserve"
+  },
+  {
+   "id": "reference-003754",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Native Land ... stays as is: dormant in this repo' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/72; record phase-08/step-05-records/runtime-judgment-part-27.jsonl:38 /parked/1; source phase-08/owner-answers.md; phase8 /rows/2284=preserve"
+  },
+  {
+   "id": "reference-003762",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Native Land ... stays as is: dormant in this repo' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/73; record phase-08/step-05-records/runtime-judgment-part-27.jsonl:38 /parked/2; source phase-08/owner-answers.md; phase8 /rows/2285=preserve"
+  },
+  {
+   "id": "dynamic-012990",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Native Land ... stays as is: dormant in this repo' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/74; record phase-08/step-05-records/runtime-judgment-part-27.jsonl:38 /parked/3; source phase-08/owner-answers.md; phase8 /rows/2286=preserve"
+  },
+  {
+   "id": "author-seam8-native-legacy-decision-writer",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Native Land ... stays as is: dormant in this repo' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/75; record phase-08/step-05-records/runtime-judgment-part-27.jsonl:38 /parked/4; source phase-08/owner-answers.md; phase8 /rows/2287=preserve"
+  },
+  {
+   "id": "author-seam8-native-legacy-index-writer",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Native Land ... stays as is: dormant in this repo' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/76; record phase-08/step-05-records/runtime-judgment-part-27.jsonl:38 /parked/5; source phase-08/owner-answers.md; phase8 /rows/2288=preserve"
+  },
+  {
+   "id": "author-seam8-native-legacy-target-reader",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Native Land ... stays as is: dormant in this repo' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/77; record phase-08/step-05-records/runtime-judgment-part-27.jsonl:38 /parked/6; source phase-08/owner-answers.md; phase8 /rows/2289=preserve"
+  },
+  {
+   "id": "author-seam8-native-legacy-source-reader",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Native Land ... stays as is: dormant in this repo' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/78; record phase-08/step-05-records/runtime-judgment-part-27.jsonl:38 /parked/7; source phase-08/owner-answers.md; phase8 /rows/2290=preserve"
+  },
+  {
+   "id": "reference-003892",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: operand 'docs/architect/knowledge-registry-redesign.md' and successor docs/platform/work-state/contracts/knowledge-registry.md#55-role match claim-carries; prepared comment retarget replays clean on the F chain. Same changed lines as carries/pointer-patches.json with no supersession link (see carries-supersession).",
+   "evidence": "/entries/79; record phase-08/step-05-records/runtime-judgment-part-28.jsonl:22 /parked/0; source phase-08/owner-answers.md; phase-09/carries/claim-carries.json/claims/17; phase8 /rows/2248=parked"
+  },
+  {
+   "id": "reference-003893",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: operand 'docs/architect/knowledge-registry-redesign.md' and successor docs/platform/work-state/contracts/knowledge-registry.md#135-apply match claim-carries; prepared comment retarget replays clean on the F chain. Same changed lines as carries/pointer-patches.json with no supersession link (see carries-supersession).",
+   "evidence": "/entries/80; record phase-08/step-05-records/runtime-judgment-part-28.jsonl:22 /parked/1; source phase-08/owner-answers.md; phase-09/carries/claim-carries.json/claims/18; phase8 /rows/2249=parked"
+  },
+  {
+   "id": "reference-003894",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: operand 'docs/architect/knowledge-registry-redesign.md' and successor docs/platform/work-state/contracts/knowledge-registry.md#74-attestation match claim-carries; prepared comment retarget replays clean on the F chain. Same changed lines as carries/pointer-patches.json with no supersession link (see carries-supersession).",
+   "evidence": "/entries/81; record phase-08/step-05-records/runtime-judgment-part-28.jsonl:22 /parked/2; source phase-08/owner-answers.md; phase-09/carries/claim-carries.json/claims/19; phase8 /rows/2250=parked"
+  },
+  {
+   "id": "reference-003895",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: operand 'docs/architect/knowledge-registry-redesign.md' and successor docs/platform/work-state/contracts/knowledge-registry.md#73-document-events match claim-carries; prepared comment retarget replays clean on the F chain. Same changed lines as carries/pointer-patches.json with no supersession link (see carries-supersession).",
+   "evidence": "/entries/82; record phase-08/step-05-records/runtime-judgment-part-28.jsonl:22 /parked/3; source phase-08/owner-answers.md; phase-09/carries/claim-carries.json/claims/20; phase8 /rows/2251=parked"
+  },
+  {
+   "id": "reference-003896",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: operand 'docs/architect/knowledge-registry-redesign.md' and successor docs/platform/work-state/contracts/knowledge-registry.md#143-producer-gate-harness match claim-carries; prepared comment retarget replays clean on the F chain. Same changed lines as carries/pointer-patches.json with no supersession link (see carries-supersession).",
+   "evidence": "/entries/83; record phase-08/step-05-records/runtime-judgment-part-28.jsonl:22 /parked/4; source phase-08/owner-answers.md; phase-09/carries/claim-carries.json/claims/21; phase8 /rows/2252=parked"
+  },
+  {
+   "id": "reference-003897",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: operand 'docs/architect/...md' and successor docs/platform/work-state/contracts/knowledge-registry.md#72-role-registry match claim-carries; prepared comment retarget replays clean on the F chain. Same changed lines as carries/pointer-patches.json with no supersession link (see carries-supersession).",
+   "evidence": "/entries/84; record phase-08/step-05-records/runtime-judgment-part-28.jsonl:22 /parked/5; source phase-08/owner-answers.md; phase-09/carries/claim-carries.json/claims/22; phase8 /rows/2253=parked"
+  },
+  {
+   "id": "reference-003898",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: operand 'docs/architect/knowledge-registry-redesign.md' and successor docs/platform/work-state/contracts/knowledge-registry.md#72-role-registry match claim-carries; prepared comment retarget replays clean on the F chain. Same changed lines as carries/pointer-patches.json with no supersession link (see carries-supersession).",
+   "evidence": "/entries/85; record phase-08/step-05-records/runtime-judgment-part-28.jsonl:22 /parked/6; source phase-08/owner-answers.md; phase-09/carries/claim-carries.json/claims/23; phase8 /rows/2254=parked"
+  },
+  {
+   "id": "reference-003899",
+   "verdict": "APPROVE",
+   "summary": "Retired clause pointer: operand 'docs/architect/' and successor docs/platform/work-state/contracts/knowledge-registry.md#73-document-events match claim-carries; prepared comment retarget replays clean on the F chain. Same changed lines as carries/pointer-patches.json with no supersession link (see carries-supersession).",
+   "evidence": "/entries/86; record phase-08/step-05-records/runtime-judgment-part-28.jsonl:22 /parked/7; source phase-08/owner-answers.md; phase-09/carries/claim-carries.json/claims/24; phase8 /rows/2255=parked"
+  },
+  {
+   "id": "reference-003798",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/87; record phase-08/step-05-records/setup-doctor-roots.jsonl:17 /parked/0; source phase-08/owner-answers.md; phase8 /rows/2040=preserve"
+  },
+  {
+   "id": "dynamic-013969",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/88; record phase-08/step-05-records/setup-doctor-roots.jsonl:17 /parked/1; source phase-08/owner-answers.md; phase8 /rows/2041=preserve"
+  },
+  {
+   "id": "dynamic-013983",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/architecture-manifest.json` (family 22)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/89; record phase-08/step-05-records/setup-doctor-roots.jsonl:17 /parked/2; source phase-08/owner-answers.md; phase8 /rows/2304=preserve"
+  },
+  {
+   "id": "dynamic-013984",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/architecture-manifest.json` (family 22)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/90; record phase-08/step-05-records/setup-doctor-roots.jsonl:17 /parked/3; source phase-08/owner-answers.md; phase8 /rows/2305=preserve"
+  },
+  {
+   "id": "dynamic-013985",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/architecture-manifest.json` (family 22)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/91; record phase-08/step-05-records/setup-doctor-roots.jsonl:17 /parked/4; source phase-08/owner-answers.md; phase8 /rows/2306=preserve"
+  },
+  {
+   "id": "dynamic-013986",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/architecture-manifest.json` (family 22)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/92; record phase-08/step-05-records/setup-doctor-roots.jsonl:17 /parked/5; source phase-08/owner-answers.md; phase8 /rows/2307=preserve"
+  },
+  {
+   "id": "dynamic-013987",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/architecture-manifest.json` (family 22)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/93; record phase-08/step-05-records/setup-doctor-roots.jsonl:17 /parked/6; source phase-08/owner-answers.md; phase8 /rows/2308=preserve"
+  },
+  {
+   "id": "dynamic-014034",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/94; record phase-08/step-05-records/setup-doctor-roots.jsonl:17 /parked/7; source phase-08/owner-answers.md; phase8 /rows/2042=preserve"
+  },
+  {
+   "id": "dynamic-014035",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/95; record phase-08/step-05-records/setup-doctor-roots.jsonl:17 /parked/8; source phase-08/owner-answers.md; phase8 /rows/2043=preserve"
+  },
+  {
+   "id": "reference-003816",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/96; record phase-08/step-05-records/setup-doctor-roots.jsonl:21 /parked/1; source phase-08/owner-answers.md; phase8 /rows/2044=preserve"
+  },
+  {
+   "id": "dynamic-014318",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/97; record phase-08/step-05-records/setup-doctor-roots.jsonl:21 /parked/6; source phase-08/owner-answers.md; phase8 /rows/2075=preserve"
+  },
+  {
+   "id": "dynamic-014329",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/98; record phase-08/step-05-records/setup-doctor-roots.jsonl:21 /parked/7; source phase-08/owner-answers.md; phase8 /rows/2076=preserve"
+  },
+  {
+   "id": "dynamic-014330",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/99; record phase-08/step-05-records/setup-doctor-roots.jsonl:21 /parked/8; source phase-08/owner-answers.md; phase8 /rows/2077=preserve"
+  },
+  {
+   "id": "dynamic-014334",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/100; record phase-08/step-05-records/setup-doctor-roots.jsonl:21 /parked/9; source phase-08/owner-answers.md; phase8 /rows/2045=preserve"
+  },
+  {
+   "id": "dynamic-014335",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/101; record phase-08/step-05-records/setup-doctor-roots.jsonl:21 /parked/10; source phase-08/owner-answers.md; phase8 /rows/2046=preserve"
+  },
+  {
+   "id": "dynamic-014336",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/102; record phase-08/step-05-records/setup-doctor-roots.jsonl:21 /parked/11; source phase-08/owner-answers.md; phase8 /rows/2047=preserve"
+  },
+  {
+   "id": "dynamic-014337",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/103; record phase-08/step-05-records/setup-doctor-roots.jsonl:21 /parked/12; source phase-08/owner-answers.md; phase8 /rows/2048=preserve"
+  },
+  {
+   "id": "dynamic-014343",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/104; record phase-08/step-05-records/setup-doctor-roots.jsonl:21 /parked/13; source phase-08/owner-answers.md; phase8 /rows/2049=preserve"
+  },
+  {
+   "id": "dynamic-014344",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/105; record phase-08/step-05-records/setup-doctor-roots.jsonl:21 /parked/14; source phase-08/owner-answers.md; phase8 /rows/2050=preserve"
+  },
+  {
+   "id": "author-s4-fix2-2a45460821f48dec",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/106; record phase-08/step-05-records/setup-doctor-roots.jsonl:21 /parked/36; source phase-08/owner-answers.md; phase8 /rows/2078=preserve"
+  },
+  {
+   "id": "author-s4-fix2-a8e9503a9eafcad1",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/107; record phase-08/step-05-records/setup-doctor-roots.jsonl:21 /parked/37; source phase-08/owner-answers.md; phase8 /rows/2079=preserve"
+  },
+  {
+   "id": "author-s4-fix2-70cc3f725650c613",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/108; record phase-08/step-05-records/setup-doctor-roots.jsonl:21 /parked/38; source phase-08/owner-answers.md; phase8 /rows/2051=preserve"
+  },
+  {
+   "id": "dynamic-016778",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/architecture-manifest.json` (family 22)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/109; record phase-08/step-05-records/tests-judgment-batch4.jsonl:2 /parked/0; source phase-08/owner-answers.md; phase8 /rows/2309=preserve"
+  },
+  {
+   "id": "reference-004305",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/110; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/0; source phase-08/owner-answers.md; phase8 /rows/2052=preserve"
+  },
+  {
+   "id": "reference-004307",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/111; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/1; source phase-08/owner-answers.md; phase8 /rows/2053=preserve"
+  },
+  {
+   "id": "reference-004308",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/112; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/2; source phase-08/owner-answers.md; phase8 /rows/2054=preserve"
+  },
+  {
+   "id": "reference-004311",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/113; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/3; source phase-08/owner-answers.md; phase8 /rows/2080=preserve"
+  },
+  {
+   "id": "reference-004319",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/114; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/4; source phase-08/owner-answers.md; phase8 /rows/2081=preserve"
+  },
+  {
+   "id": "reference-004320",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/115; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/5; source phase-08/owner-answers.md; phase8 /rows/2082=preserve"
+  },
+  {
+   "id": "reference-004321",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/116; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/6; source phase-08/owner-answers.md; phase8 /rows/2055=preserve"
+  },
+  {
+   "id": "reference-004330",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already patch (content-regeneration patch, not a path change).",
+   "evidence": "/entries/117; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/7; source phase-08/owner-answers.md; phase8 /integrationReevaluations/91=patch"
+  },
+  {
+   "id": "reference-004331",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/118; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/8; source phase-08/owner-answers.md; phase8 /rows/2056=preserve"
+  },
+  {
+   "id": "reference-004332",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/119; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/9; source phase-08/owner-answers.md; phase8 /rows/2084=preserve"
+  },
+  {
+   "id": "reference-004343",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/120; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/10; source phase-08/owner-answers.md; phase8 /rows/2057=preserve"
+  },
+  {
+   "id": "reference-004344",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already patch (content-regeneration patch, not a path change).",
+   "evidence": "/entries/121; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/11; source phase-08/owner-answers.md; phase8 /integrationReevaluations/92=patch"
+  },
+  {
+   "id": "reference-004345",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/122; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/12; source phase-08/owner-answers.md; phase8 /rows/2086=preserve"
+  },
+  {
+   "id": "reference-004346",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/123; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/13; source phase-08/owner-answers.md; phase8 /rows/2058=preserve"
+  },
+  {
+   "id": "reference-004347",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/124; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/14; source phase-08/owner-answers.md; phase8 /rows/2087=preserve"
+  },
+  {
+   "id": "reference-004348",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/125; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/15; source phase-08/owner-answers.md; phase8 /rows/2088=preserve"
+  },
+  {
+   "id": "reference-004349",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/126; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/16; source phase-08/owner-answers.md; phase8 /rows/2059=preserve"
+  },
+  {
+   "id": "reference-004351",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/127; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/17; source phase-08/owner-answers.md; phase8 /rows/2089=preserve"
+  },
+  {
+   "id": "dynamic-021513",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already patch (content-regeneration patch, not a path change).",
+   "evidence": "/entries/128; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/18; source phase-08/owner-answers.md; phase8 /integrationReevaluations/90=patch"
+  },
+  {
+   "id": "dynamic-021514",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/129; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/19; source phase-08/owner-answers.md; phase8 /rows/2091=preserve"
+  },
+  {
+   "id": "dynamic-021515",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/130; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/20; source phase-08/owner-answers.md; phase8 /rows/2092=preserve"
+  },
+  {
+   "id": "dynamic-021542",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/131; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/21; source phase-08/owner-answers.md; phase8 /rows/2060=preserve"
+  },
+  {
+   "id": "dynamic-021545",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/132; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/23; source phase-08/owner-answers.md; phase8 /rows/2061=preserve"
+  },
+  {
+   "id": "dynamic-021547",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/133; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/24; source phase-08/owner-answers.md; phase8 /rows/2062=preserve"
+  },
+  {
+   "id": "dynamic-021548",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/134; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/25; source phase-08/owner-answers.md; phase8 /rows/2063=preserve"
+  },
+  {
+   "id": "dynamic-021549",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/135; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/26; source phase-08/owner-answers.md; phase8 /rows/2064=preserve"
+  },
+  {
+   "id": "author-s5-b5-enduser-index-154-35",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/136; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/27; source phase-08/owner-answers.md; phase8 /rows/2094=preserve"
+  },
+  {
+   "id": "author-s5-b5-enduser-index-334-129",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/137; record phase-08/step-05-records/tests-judgment-batch5.jsonl:2 /parked/28; source phase-08/owner-answers.md; phase8 /rows/2095=preserve"
+  },
+  {
+   "id": "author-s5-b6-closure-manifest-reader-187",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/138; record phase-08/step-05-records/tests-judgment-batch5.jsonl:11 /parked/0; source phase-08/owner-answers.md; phase8 /rows/2096=preserve"
+  },
+  {
+   "id": "author-s5-b6-closure-manifest-reader-188",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/139; record phase-08/step-05-records/tests-judgment-batch5.jsonl:11 /parked/1; source phase-08/owner-answers.md; phase8 /rows/2097=preserve"
+  },
+  {
+   "id": "author-s5-b6-closure-manifest-reader-198",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/140; record phase-08/step-05-records/tests-judgment-batch5.jsonl:11 /parked/2; source phase-08/owner-answers.md; phase8 /rows/2098=preserve"
+  },
+  {
+   "id": "author-s5-b6-closure-manifest-reader-201",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/141; record phase-08/step-05-records/tests-judgment-batch5.jsonl:11 /parked/3; source phase-08/owner-answers.md; phase8 /rows/2099=preserve"
+  },
+  {
+   "id": "author-s5-b6-closure-manifest-reader-212",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/142; record phase-08/step-05-records/tests-judgment-batch5.jsonl:11 /parked/4; source phase-08/owner-answers.md; phase8 /rows/2100=preserve"
+  },
+  {
+   "id": "author-s5-b6-closure-manifest-reader-216",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/143; record phase-08/step-05-records/tests-judgment-batch5.jsonl:11 /parked/5; source phase-08/owner-answers.md; phase8 /rows/2101=preserve"
+  },
+  {
+   "id": "dynamic-017973",
+   "verdict": "APPROVE",
+   "summary": "Retained: L12-96 'Retain `docs/enduser-docs-index.json` (family 7)' quote; Phase 8 overlay already preserve.",
+   "evidence": "/entries/144; record phase-08/step-05-records/tests-judgment-batch6.jsonl:1 /parked/0; source phase-08/owner-answers.md; phase8 /rows/2102=preserve"
+  },
+  {
+   "id": "reference-004586",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/145; record phase-08/step-05-records/tests-judgment-batch6.jsonl:21 /parked/0; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2190=parked"
+  },
+  {
+   "id": "reference-004589",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/146; record phase-08/step-05-records/tests-judgment-batch6.jsonl:21 /parked/1; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2191=parked"
+  },
+  {
+   "id": "dynamic-031770",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/147; record phase-08/step-05-records/tests-judgment-batch6.jsonl:21 /parked/2; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2192=parked"
+  },
+  {
+   "id": "dynamic-031771",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/148; record phase-08/step-05-records/tests-judgment-batch6.jsonl:21 /parked/3; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2193=parked"
+  },
+  {
+   "id": "author-s67-governance-baseline-94",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/149; record phase-08/step-05-records/tests-judgment-batch6.jsonl:21 /parked/4; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2194=parked"
+  },
+  {
+   "id": "author-s67-governance-baseline-163",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/150; record phase-08/step-05-records/tests-judgment-batch6.jsonl:21 /parked/5; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2195=parked"
+  },
+  {
+   "id": "reference-004651",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/151; record phase-08/step-05-records/tests-judgment-batch6.jsonl:23 /parked/0; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2196=parked"
+  },
+  {
+   "id": "reference-004659",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/152; record phase-08/step-05-records/tests-judgment-batch6.jsonl:23 /parked/1; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2197=parked"
+  },
+  {
+   "id": "dynamic-032029",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/153; record phase-08/step-05-records/tests-judgment-batch6.jsonl:23 /parked/2; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2198=parked"
+  },
+  {
+   "id": "dynamic-032030",
+   "verdict": "APPROVE",
+   "summary": "Conditional move to docs/platform/governance.md: L12-96 quote, destination in move set, content check reproduces (only component-boundary link label differs; H2 set equal plus candidate metadata). Code/test readers patched (/13,/20,/21), replay clean. Doc-reader census not recorded (see governance-map-reader-census).",
+   "evidence": "/entries/154; record phase-08/step-05-records/tests-judgment-batch6.jsonl:23 /parked/3; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/7; phase8 /rows/2199=parked"
+  },
+  {
+   "id": "reference-004035",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Conditional move is sourced (L12-96 quote + content check whose diff is the phase-07 A45 contract correction, A45 not cited). But addition /1 (docs/architecture-manifest.json \"map\" line 3) duplicates G6 shard-1 f00527's prepared repoint of the same line; after either one, the other fails with 'Reversed (or previously applied)'.",
+   "evidence": "/entries/155; record phase-08/step-05-records/tests-real-file.jsonl:1 /parked/1; source phase-08/owner-answers.md; phase-08/step-05-proposed-move-read-units.json/units/2; phase8 /rows/2310=parked; shard-1.json f00527 replacements line 3"
+  },
+  {
+   "id": "dynamic-018734",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/156; record phase-08/step-05-records/tests-real-file.jsonl:1 /parked/5; source phase-08/owner-answers.md; phase8 /rows/2065=preserve"
+  },
+  {
+   "id": "dynamic-018735",
+   "verdict": "APPROVE",
+   "summary": "Retained: phase-08 L12-96 'Keep `docs/decisions/index.md` as the generated projection' quote names its own file; Phase 8 overlay already preserve.",
+   "evidence": "/entries/157; record phase-08/step-05-records/tests-real-file.jsonl:1 /parked/6; source phase-08/owner-answers.md; phase8 /rows/2066=preserve"
+  },
+  {
+   "id": "population-158",
+   "verdict": "APPROVE",
+   "summary": "Independent re-derivation: parked entries whose dependency matches phase[ -]?9 across all 33 step-05 JSONL = 158 in 29 records, equal to the packet keys; id/dependency/physical-line SHA-256 all match. Broader blockedReason match adds 3 citation-convention-and-scan rows (reference-000012, author-s67-citation-core-96-44, reference-002316); their dependency names another packet and phase-09 composition/member-joins owns them.",
+   "evidence": "scratch derive.py; packet==dep True; any=161"
+  },
+  {
+   "id": "overlay-counts",
+   "verdict": "APPROVE",
+   "summary": "Step-7 effective overlay: 91 preserve, 9 patch, 58 parked; new 125 = 65 preserve + 6 patch + 54 parked; old 33 = 26+3+4. The packet's 54 (not the brief's 53) is right. No decision of the 33 changed.",
+   "evidence": "step-07-park-resolution-applied.json rows+reevaluations; e05261fc9^ packet"
+  },
+  {
+   "id": "gateway-reader-census",
+   "verdict": "APPROVE",
+   "summary": "git grep at the pin (outside plans/.fgos/.gitnexus) finds 40 files with the full old path: the 12 readers plus 28 reasoned exclusions (22 docs/history, 3 legacy counterparts in the move set, 1 dated audit, 2 yaml-doc). Basename-only hits (client.test.ts, errors.ts, network.ts, docs/platform/architecture-map.md, herdr README) are not old-path reads. 433 plans/ exclusions share one custody reason.",
+   "evidence": "git grep -l -F docs/contracts/fgos-gateway-api-v1.yaml 56b3c3eb"
+  },
+  {
+   "id": "gateway-g6-ownership",
+   "verdict": "REWORK",
+   "summary": "The packet says the three knowledge docs have no G6 owner and gives them additions; G6 shard-2 at the pin owns all three (f03917 repoint+patch, f04343 preserve-confirmed, f04357 repoint+patch). Additions /2 and /4 duplicate those G6 patches; /3 rewrites the f04343 passage that G6 keeps as historical footprint. herdr spec /6 rewrites line 30, which G6 keeps (f06830/f06831 preserve-confirmed correction-evidence; the same line keeps other old-path locators), and repeats f06837's line-299 retarget. /7 and /8 repeat f07976/f07985. Applying the G6 patch then the G9 addition fails ('Reversed (or previously applied) patch detected') for /2,/4,/7,/8. Fix: for G6-owned rows record the G6 row and its patch, add no patch; drop line 30 and /3; keep only /5 (config/spec.md, no G6 row).",
+   "evidence": "park-judgments/shard-2.json rows 190,191,194 and f03917/f04343/f04357; shard-3.json rows 90,94; scratch dup.py",
+   "severity": "high"
+  },
+  {
+   "id": "patch-replay-22",
+   "verdict": "APPROVE",
+   "summary": "Independent replay: each of the 22 additions applies with GNU patch --fuzz=0 (no offsets) on the step-07 then effective composition chain built from pin bytes, matches expectedAfterSha256, reverses with patch -R and with rollbackDiff to the exact chain bytes. Chain steps used: bin w8 repins (2), file: entries for knowledge/herdr/S03/decisions-corpus test.",
+   "evidence": "scratch replay.py"
+  },
+  {
+   "id": "carries-supersession",
+   "verdict": "REWORK",
+   "summary": "Additions /9,/10,/11,/12,/17,/18 carry the same changed lines as carries/pointer-patches.json /patches/19-22,16,14 (and /19 extends /3); only /13 (bin) is declared stale. Nothing machine-readable says the additions supersede those carries patches, so F sees two prepared patches for the same lines. Add a replaces/supersedes link per addition, as composition uses.",
+   "evidence": "carries/pointer-patches.json status composed-not-applied-pending-shared-file-integration",
+   "severity": "medium"
+  },
+  {
+   "id": "governance-map-reader-census",
+   "verdict": "REWORK",
+   "summary": "The governance and map moves use R26 code readers plus a few exclusions; no rg census was taken as the brief asked. At the pin, live docs still cite docs/doc-governance.md (e.g. documentation-system-design.md:44/165, intent-preservation-ledger, migration-authoring-rules, docs/user/README.md, docs/generated/README.md) and docs/architecture-map.md (cli-io-contract.md:439, retired-decision-history.md:319, state-machine knowledge doc). The sampled ones do have G6 proof rows (f06582-f06587, f08044, f08050, f08446, f03297), so ownership seems to exist, but the packet does not record it and the checker cannot prove completeness.",
+   "evidence": "git grep doc-governance.md / docs/architecture-map.md at pin; preserve-premise/proof.json",
+   "severity": "medium"
+  },
+  {
+   "id": "checker-run-reviewed-commit",
+   "verdict": "APPROVE",
+   "summary": "At ee2ce49c4, python3 -B check_phase9_decisions.py exits 0: 158 entries, 29 records, 473 scan files, 12 readers, 22 patches, 29 chain files, 0 rebases.",
+   "evidence": "run 21 s"
+  },
+  {
+   "id": "checker-current-head-drift",
+   "verdict": "REWORK",
+   "summary": "The branch advanced during review (b005d4eba; 1ff225412 rebased shard-1.json). The checker now exits 1: 'scan input drift: .../park-judgments/shard-1.json'. Every plans/ file that mentions the gateway path must equal its pin bytes on disk, so any later record edit breaks the proof. The ee2ce49c4 fix only covers deleted files. Read all plans/ scan members from the pin (they are wholesale-excluded anyway).",
+   "evidence": "python3 -B check_phase9_decisions.py at b005d4eba -> EXIT=1",
+   "severity": "high"
+  },
+  {
+   "id": "checker-negative-controls",
+   "verdict": "APPROVE",
+   "summary": "All 25 self-test controls fail (scratch run captured each message). Each fails on its intended rule except 'outside move set', which trips 'chain lacks successor' first; the move-set rule itself fires when I remove the destination from the move set.",
+   "evidence": "scratch neg.py, neg2.py",
+   "severity": "low"
+  },
+  {
+   "id": "checker-coverage-gaps",
+   "verdict": "REWORK",
+   "summary": "Controls I added still pass: dropping every G6 row from the gateway readers and relabelling them as F additions; swapping an AGENTS successor anchor to a bogus value or the successor path to docs/reading-map.md. The checker never reads G6 shard or carries patches, so it cannot see duplicates or overridden preserve judgments, and runs the rg census only for the gateway. The 'decision type' rule hardcodes RETAINED instead of deriving it from the quote.",
+   "evidence": "scratch neg3.py (scan read from pin to get past the drift failure)",
+   "severity": "medium"
+  },
+  {
+   "id": "stale-bin-patch",
+   "verdict": "APPROVE",
+   "summary": "carries /patches/13 beforeSha256 4ad9ed0c... differs from pin bin 1c50f564... (verified); entries 56-58 disclose it and addition /0 rebuilds the three exact retargets after the bin chain.",
+   "evidence": "git cat-file blob sha256"
+  }
+ ]
+}
