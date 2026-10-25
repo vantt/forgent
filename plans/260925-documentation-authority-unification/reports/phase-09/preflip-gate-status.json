@@ -7,15 +7,16 @@
     "finalPinF": null,
     "followUpCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
     "followUpRuling": "L13-17 (W18 corrections)",
-    "basis": "Immutable committed turn-start snapshot only (git show 53de2207e1ea8a9417ac131f785704d6ab72ba2c:path), including every reviews/ file, L13-1..L13-16 and the owning receipts. Concurrent carries/** and g0rework/** edits are excluded. Scope-specific APPROVE/FIXED/pass does not turn an overall REWORK into approval of a whole gate. met-local means no unowned local work remains before F; owner/external/F duties remain explicit, not accepted or completed.",
+    "basis": "Immutable original snapshot (git show 53de2207e1ea8a9417ac131f785704d6ab72ba2c:path), including every original reviews/ file and owning receipt; W18/L13-17 and W19 are separate committed follow-up layers. Concurrent carries/** and g0rework/** edits are excluded. Scope-specific APPROVE/FIXED/pass does not turn an overall REWORK into approval of a whole gate. met-local means no unowned local work remains before F; owner/external/F duties remain explicit, not accepted or completed.",
     "evidencePathBase": "plans/260925-documentation-authority-unification/reports/phase-09",
-    "reconciliation": "gate-reconcile/receipt.json"
+    "reconciliation": "gate-reconcile/receipt.json",
+    "reviewFollowUpCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
   },
   "gates": [
     {
       "gateId": "changed-binding-independent-review",
       "g": "G0",
-      "status": "partial",
+      "status": "met-local",
       "evidence": [
         "review-batches.json",
         "reviews/g0-b1-review.json",
@@ -39,15 +40,15 @@
         "carries/current-binding-refresh.json",
         "reviews/w17-parity-rework-review.md",
         "owner-answers.md",
-        "preflip-execution-plan.md"
+        "preflip-execution-plan.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ],
       "commit": "a8ea05c50",
       "pin": null,
-      "note": "W14 exhaustively reviewed 124 distinct content rows, including all three 6f5b9419d rows: 121 APPROVE / 3 REWORK. c25e8cf6a records three supersede decisions; W16 A-pass verifies the pin-scoped decisions, with F2 deferred by L13-15.2. W17 fixes F1/F3/F4/F6/F8; its aggregate PASS on 25 new pending candidate rebinds is not per-row semantic approval (8 change target digest). The frozen changedBindings register and final current-digest verdict join remain F duties, not refreshed by this status reconciliation.",
-      "remaining": "Independently review the 25 pending carries-current-rebindings rows (8 target-digest changes), binding each verdict to the current claim/row and digests; W17-3 is scope/mechanical PASS, not per-row content approval.",
-      "blockers": [
-        "Independently review the 25 pending carries-current-rebindings rows (8 target-digest changes), binding each verdict to the current claim/row and digests; W17-3 is scope/mechanical PASS, not per-row content approval."
-      ],
+      "note": "W14/W16/W17 content review remains historical and scoped. W19 independently approves all 25 pending candidate rebinds row by row, with exact bindingSha256 and targetUnitDigest. No before-F local review item remains; the frozen changedBindings/current-digest join, duplicate successor tracking and claim_2e2bc926 re-decision remain F duties.",
+      "remaining": "",
+      "blockers": [],
       "cleared": [
         {
           "item": "The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F.",
@@ -62,6 +63,17 @@
             "reviews/w17-parity-rework-review.json"
           ],
           "verdict": "pass: Scope in writable list; 3 supersede re-decisions cite existing main commits and spec sections; 127 bindings recompute, all pending; sample 5 parity digests correct; 15 sampled rationales true; d5ba1eda remainder 797c7185; stale pointers resolve to current-binding rows; rebind --check 0; g0rework/verify.py 0."
+        },
+        {
+          "item": "Independent current-digest review of all 25 pending carries-current-rebindings rows (including 8 changed target digests).",
+          "clearedBy": [
+            "a8ea05c50"
+          ],
+          "reviews": [
+            "reviews/w19-live-parity-and-rebinds-review.md",
+            "reviews/w19-live-parity-and-rebinds-review.json"
+          ],
+          "verdict": "B. 25 pending rebinds in `carries-current-rebindings.json`: 25 APPROVE"
         }
       ],
       "atFinalPinUnderLease": [
@@ -74,7 +86,7 @@
     {
       "gateId": "L12-96-uncomposed-duty",
       "g": "G1",
-      "status": "partial",
+      "status": "met-local",
       "evidence": [
         "carries/receipt.md",
         "composition/receipt.md",
@@ -101,16 +113,15 @@
         "reviews/w14-import3-binding-review.md",
         "reviews/w17-parity-rework-review.json",
         "import3/receipt.md",
-        "owner-answers.md"
+        "owner-answers.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ],
       "commit": "a8ea05c50",
       "pin": null,
-      "note": "The W8/W9 member and composition review chain covers all 115 joined members; L13-11 approves GAP-05 and W10 verifies all moved-body joins. Prepared citation glosses replay to zero findings, with subsequent prose/check fixes reviewed through W14. W14-import3 independently APPROVEs all 98 changed/additional rows, including the 24 source rows and 8 adapted subset. W17 nevertheless finds a live-proof regression: four stale heading rows and one uncovered block. The parallel L13-16 fix is not part of this snapshot.",
-      "remaining": "Complete the L13-16 live-proof correction and independent current-row reviews; retain F guard/patch duties separately.",
-      "blockers": [
-        "Fix and independently re-review W17-1: refresh the 4 live distribution.md heading rows, add parity for unheaded-block-17 and restore live heading/direct-block coverage alongside authoring replay (L13-16). No parallel uncommitted fix is counted.",
-        "Obtain current-digest independent review for the 25 pending candidate rebinds introduced by a8ea05c50 (8 target-digest changes), shared with G0; mechanical W17-3 PASS is not semantic approval."
-      ],
+      "note": "W8–W14 member/composition/import-3 approvals retain their exact scope. W19 approves 5a3f7580a live parity and all 25 pending rebinds row by row. Its Low stale-duty and Info duplicate-target cleanup are authored this turn, not independently approved. Recomposition of the two disclosed drifted pointer patches and post-apply guards remain at F.",
+      "remaining": "",
+      "blockers": [],
       "cleared": [
         {
           "item": "No independent composition review / no per-member join over all 115 members.",
@@ -165,6 +176,28 @@
             "reviews/w14-import3-binding-review.md"
           ],
           "verdict": "APPROVE, 98 of 98 rows."
+        },
+        {
+          "item": "Independent current-digest review of all 25 pending carries-current-rebindings rows (including 8 changed target digests).",
+          "clearedBy": [
+            "a8ea05c50"
+          ],
+          "reviews": [
+            "reviews/w19-live-parity-and-rebinds-review.md",
+            "reviews/w19-live-parity-and-rebinds-review.json"
+          ],
+          "verdict": "B. 25 pending rebinds in `carries-current-rebindings.json`: 25 APPROVE"
+        },
+        {
+          "item": "L13-16 live-proof correction: live heading/direct-block coverage restored alongside unchanged witness-pin replay.",
+          "clearedBy": [
+            "5a3f7580a"
+          ],
+          "reviews": [
+            "reviews/w19-live-parity-and-rebinds-review.md",
+            "reviews/w19-live-parity-and-rebinds-review.json"
+          ],
+          "verdict": "A. 5a3f7580a, live parity next to the witness pin: APPROVE"
         }
       ],
       "atFinalPinUnderLease": [
@@ -185,14 +218,15 @@
         "reviews/w6-misc-rework-review.md",
         "preserve-premise/verification.json",
         "owner-answers.md",
-        "preflip-execution-plan.md"
+        "preflip-execution-plan.md",
+        "w19-cleanup-brief.md"
       ],
       "commit": "b25dadae2",
       "pin": "3d0169f39",
-      "note": "Historical reviewed custody at 3d0169f39 was 646 proof joins + 293 REJECT confirmations + 187 owned judgments. The additive settlement at a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6 gives those 187 ids individual dispositions: 134 owning-test joins, 49 re-graded REJECTs and 4 owned navigation-citation parks. Four additional drifted grades are separately re-judged REJECT; current original-census totals are 780 joins + 342 REJECTs + 4 parks = 1,126. No independent settlement approval is claimed. Historical post-pin coverage (143 dynamics and 16 literals, including 8 open judgments), 33 moved Rust locators and combined-verifier F duties are not promoted by this turn (L13-17.1; census-join/receipt.md).",
-      "remaining": "Independently review the pinned settlement in census-join/receipt.md and census-join/settlement.json; settle its 4 explicitly owned citation parks before F. G2 stays partial until settlement and independent review (L13-17.1).",
+      "note": "The 187 original owned judgments retain 134 owning-test joins and 49 REJECT dispositions; the four former navigation parks are now joined-by-citation through 5 explicit ledger holder/unit bindings, with four unapplied comment retargets. Four additional grade drifts remain separate REJECTs. Current original census: 780 owning-test joins + 342 REJECTs + 4 citation joins = 1,126. G2 remains partial pending independent review of this turn and turn 707; no final-pin or execution proof is inferred.",
+      "remaining": "Independently review this turn’s four citation joins/unapplied retargets and turn 707’s pinned census settlement. G2 stays partial until both are reviewed (L13-17.1; w19-cleanup-brief.md).",
       "blockers": [
-        "Independently review the pinned settlement in census-join/receipt.md and census-join/settlement.json; settle its 4 explicitly owned citation parks before F. G2 stays partial until settlement and independent review (L13-17.1)."
+        "Independently review this turn’s four citation joins/unapplied retargets and turn 707’s pinned census settlement. G2 stays partial until both are reviewed (L13-17.1; w19-cleanup-brief.md)."
       ],
       "cleared": [],
       "atFinalPinUnderLease": [
@@ -290,7 +324,7 @@
     {
       "gateId": "step3-step4-preserve-premise-review",
       "g": "G6",
-      "status": "partial",
+      "status": "met-local",
       "evidence": [
         "preserve-premise/receipt.md",
         "preserve-premise/sentence-delta.json",
@@ -306,18 +340,18 @@
         "reviews/w8-g6-parks-review.json",
         "reviews/w8-g6-judgments-review.json",
         "preserve-premise/receipt.json",
-        "owner-answers.md"
+        "owner-answers.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ],
       "commit": "db023f065",
       "pin": "4178dcc6e",
-      "note": "W8 parks covers all 1,260 rows (1,220 APPROVE / 40 REWORK); W8 judgments covers 163 notes plus the overturn (163 APPROVE / 1 REWORK). W9 approved db023f065's reclassification of 319 parks and 20 operand rows by rule, with a 56-row spot check and positive/negative controls, not row by row; this is accepted under L13-17.3. Current pin-scoped totals: 5,413 = 4,320 bounded confirmations + 924 owned parks + 163 dated notes + 6 repoint proposals; 1,093 action rows are not resolved by this reconciliation, but have reviewed custody/prepared work. Scoped proof replays are byte-identical. c5586146c’s verifier pin was independently approved in W8; its misc-fix receipt counts were corrected in 25e8842d3 but still need independent re-review (L13-17.4). That before-F remaining item makes G6 partial under the existing met-local integrity rule; the combined verifier is still an F obligation.",
-      "remaining": "Independently re-review 25e8842d3, the misc-fix receipt counts (W18 F4; L13-17.4); W8 cleared only c5586146c's verifier-pin fix.",
-      "blockers": [
-        "Independently re-review 25e8842d3, the misc-fix receipt counts (W18 F4; L13-17.4); W8 cleared only c5586146c's verifier-pin fix."
-      ],
+      "note": "W8 covers all 1,423 judgment/note rows; W9 approves the 319-park / 20-operand reclassification by rule with a 56-row spot check (L13-17.3), not row by row. W19 independently approves 25e8842d3 receipt counts. Current 5,413-row custody remains 4,320 confirmations + 924 parks + 163 notes + 6 proposals; met-local is not completion of owned actions. F evidence refresh, co-composition and the combined G2/G6 verifier remain open.",
+      "remaining": "",
+      "blockers": [],
       "cleared": [
         {
-          "item": "c5586146c verifier-pin fix only: W8 independently checked it. The separate misc-fix receipt-count correction in 25e8842d3 remains open under L13-17.4.",
+          "item": "c5586146c verifier-pin fix independently checked by W8; the separate receipt-count correction has its own W19 clearance.",
           "clearedBy": [
             "c5586146c"
           ],
@@ -337,6 +371,17 @@
             "reviews/w8-g6-judgments-review.json"
           ],
           "verdict": "APPROVE: Counts are conserved (4320 + 924 + 163 + 6 = 5413) and match an independent diff. All 14 changed files are on the brief's writable list."
+        },
+        {
+          "item": "Independent re-review of 25e8842d3 misc-fix receipt counts (W18 F4; L13-17.4).",
+          "clearedBy": [
+            "25e8842d3"
+          ],
+          "reviews": [
+            "reviews/w19-live-parity-and-rebinds-review.md",
+            "reviews/w19-live-parity-and-rebinds-review.json"
+          ],
+          "verdict": "C. 25e8842d3, misc-fix receipt counts: APPROVE"
         }
       ],
       "atFinalPinUnderLease": [
@@ -620,14 +665,10 @@
     }
   ],
   "cutoverReadiness": {
-    "summary": "Met-local (not met at F): G3, G4, G7, G9. G2 remains partial pending independent settlement review and its 4 before-F citation parks; G6 is partial pending independent re-review of 25e8842d3’s misc-fix receipt counts (L13-17). G0/G1 still need independent review of 25 new pending candidate rebinds; G1 also has the L13-16 live-parity REWORK. G5 lacks the surviving-map clause check and owner acceptance; G8 lacks repository-local archive-ref custody and independent review of its receipt correction. These local gaps still block the cutover approval packet. Owner backlog/carried blockers, HARDEN declarations/section 7 consent, SEAT release/routes and G10 rehearsal remain explicit external dependencies; F joins, post-apply rebinds, guards, census/G6 refresh, full-suite attribution and final status review remain unperformed. No cutover, publication, main import or lease is approved here.",
+    "summary": "Met-local (not met at F): G0, G1, G3, G4, G6, G7, G9. W19 independently approves all 25 pending rebinds, live parity and 25e8842d3 receipt counts. G2 remains partial pending independent review of this turn’s four citation joins and turn 707’s settlement. G5 lacks the surviving-map clause check and owner acceptance; G8 lacks local archive-ref custody and independent receipt-correction review. External dependencies and every F duty remain open; no cutover, publication, main import or lease is approved here.",
     "beforeFinalPin": [
-      "G0: Independently review the 25 pending carries-current-rebindings rows (8 target-digest changes), binding each verdict to the current claim/row and digests; W17-3 is scope/mechanical PASS, not per-row content approval.",
-      "G1: Fix and independently re-review W17-1: refresh the 4 live distribution.md heading rows, add parity for unheaded-block-17 and restore live heading/direct-block coverage alongside authoring replay (L13-16). No parallel uncommitted fix is counted.",
-      "G1: Obtain current-digest independent review for the 25 pending candidate rebinds introduced by a8ea05c50 (8 target-digest changes), shared with G0; mechanical W17-3 PASS is not semantic approval.",
-      "G2: Independently review the pinned settlement in census-join/receipt.md and census-join/settlement.json; settle its 4 explicitly owned citation parks before F. G2 stays partial until settlement and independent review (L13-17.1).",
+      "G2: Independently review this turn’s four citation joins/unapplied retargets and turn 707’s pinned census settlement. G2 stays partial until both are reviewed (L13-17.1; w19-cleanup-brief.md).",
       "G5: Extend g5/check.py with per-span surviving docs/reading-map.md locations and explicit proposed text for the banner restatement and Truth-correction suffix; obtain an independent check of that complete clause. The current 10-span legacy check is insufficient.",
-      "G6: Independently re-review 25e8842d3, the misc-fix receipt counts (W18 F4; L13-17.4); W8 cleared only c5586146c's verifier-pin fix.",
       "G8: Provide the authorized LOCAL archive ref with pinned custody evidence; archive/design.md says it existed only in the disposable rehearsal, whose scratch was removed. No repository-local archive ref was found. No push/main publication is authorized by this task.",
       "G8: Independently re-review f67e0f676’s records-only fix for W14 w8-archive-receipt-json-stale; do not infer independent approval from the Lead’s edit. Keep the separate low documentation note about retained JSON path-string recovery visible."
     ],

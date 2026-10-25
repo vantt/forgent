@@ -4,6 +4,22 @@
 
 The [source-parity rework receipt](../g0rework/receipt.md#current-source-parity-rework) supersedes the current-freshness claims below, not their historical evidence. The same `node …/carries/verify-carries.mjs` command now separates author-pin placement/heading/patch witnesses from current source parity and 1,208 current ledger successor assertions. All 345 rows survive; [current-binding-refresh.json](current-binding-refresh.json) records the extra target-ordinal and candidate-binding repairs. Explicit split/adapted units are checked, never called equal. Final-pin completeness, patch recomposition, native-dependent audit and independent approval remain outside this result.
 
+## Current duty-list cleanup
+
+At `98d9201f1905e433a40b94d8d8b0fb9fefda1452`, W19 independently approved the live-parity correction and all 25 pending current rebinds. This cleanup adds strict rejection of **stale final-pin duties**: each listed path must actually drift from its unapplied patch preimage. The existing failure on unlisted drift remains unchanged. The only two current drift duties remain `bin/fgos.mjs` and `docs/backlog.md`; neither patch is rebased or applied.
+
+The duplicate live target in heading row 55 was removed; its historical `accounting.previousParityRow` remains unchanged. No parity row, case or historical witness was removed.
+
+| Proof (all native addons blocked) | Exit | Evidence |
+|---|---:|---|
+| `node plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs` | 0 | `cleanup-verification.json`: 346 current units, 91 live headings, 321 direct blocks, 1,208 ledger successors |
+| `node plans/260925-documentation-authority-unification/reports/phase-09/carries/controls.mjs` | 0 | `controls.json`: missing duty, stale non-drifting AGENTS.md duty, missing patch, blank reason, missing live heading all rejected |
+| Census join, twice at start HEAD | 0 / 0 | `../census-join/replay.json`, stdout and all three outputs byte-identical |
+| Gate generator, verifier and nine controls | 0 | `../gate-reconcile/reproduction.json`, `verification.json`, `controls.json` |
+| Misc verifier (output-only scratch adapter) | 0 | `../gate-reconcile/misc-replay.json`; only volatile output differences, committed `checks.json` untouched |
+
+Controls reuse the owning checker through read overlays in a tempfile directory under `/tmp/fgos-work/`; the directory is removed. Every Node descendant inherits `--no-addons` plus a scratch `process.dlopen` blocker. Prior art: `5a3f7580a` introduced live drift duties; no earlier carries control runner existed, so the control adapter calls that checker rather than duplicating its assertions. No product/source/test/ledger edits or native loads. Independent review of this cleanup and final-F chain composition remain open.
+
 ## Original authoring receipt
 
 Author: `fgos-run_unit-run-1792750955a733`  

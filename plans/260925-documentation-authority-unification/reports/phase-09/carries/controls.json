@@ -1,0 +1,37 @@
+{
+  "status": "passed",
+  "negativeControls": [
+    {
+      "name": "drop-duty",
+      "result": "rejected",
+      "exit": 1,
+      "expected": "unlisted live pointer-patch drift"
+    },
+    {
+      "name": "stale-duty",
+      "result": "rejected",
+      "exit": 1,
+      "expected": "stale final-pin duty"
+    },
+    {
+      "name": "missing-patch",
+      "result": "rejected",
+      "exit": 1,
+      "expected": "duty must name one unapplied patch"
+    },
+    {
+      "name": "blank-reason",
+      "result": "rejected",
+      "exit": 1,
+      "expected": "d.reason?.trim()"
+    },
+    {
+      "name": "drop-heading",
+      "result": "rejected",
+      "exit": 1,
+      "expected": "live heading census"
+    }
+  ],
+  "count": 5,
+  "method": "The real owning checker reads in-memory overlays through a scratch preload; historical witness-pin reads and checkout files are untouched. All child processes inherit the native-addon block."
+}

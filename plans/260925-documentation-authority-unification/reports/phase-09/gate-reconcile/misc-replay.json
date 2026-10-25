@@ -1,0 +1,50 @@
+{
+  "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py",
+  "exit": 0,
+  "stdout": "{\"byteIdenticalArtifacts\": 4, \"counts\": {\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 137, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 623, \"preserve-operand-reachability-unchanged\": 1394, \"preserve-source-confirmed-history\": 2926, \"repoint-proposal\": 6}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}, \"doctorCheckSplit\": {\"literal\": 136, \"loopIds\": [\"git-worktree-recovery\", \"git-component-compatible\", \"git-repository-config\", \"git-operation-journal\", \"git-native-locks\"], \"loopRegistered\": 5}, \"registrations\": {\"Check\": 141, \"Fix\": 32}, \"status\": \"scoped-replay-passed-not-gate-acceptance\"}\n",
+  "stderr": "",
+  "writeAdapter": "Only Path.write_text for the exact misc-fix/checks.json output was redirected to scratch; every production assertion ran unchanged. Checkout checks.json bytes remained untouched.",
+  "nativeAddonsBlocked": true,
+  "differences": [
+    {
+      "path": "/sourceCommit",
+      "before": "8b4d778d32b5930ab7c80d9d19b2f26b95441ee1",
+      "after": "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
+    },
+    {
+      "path": "/commands/0/stdout",
+      "before": "8b4d778d32b5930ab7c80d9d19b2f26b95441ee1\n",
+      "after": "98d9201f1905e433a40b94d8d8b0fb9fefda1452\n"
+    },
+    {
+      "path": "/commands/2/argv/1",
+      "before": "/tmp/fgos-work/misc-verify-ra28s9lz/registry.mjs",
+      "after": "/tmp/fgos-work/misc-verify-c5vz3jet/registry.mjs"
+    },
+    {
+      "path": "/commands/6/argv/2",
+      "before": "/tmp/fgos-work/misc-verify-ra28s9lz/proof.py",
+      "after": "/tmp/fgos-work/misc-verify-c5vz3jet/proof.py"
+    },
+    {
+      "path": "/commands/6/argv/6",
+      "before": "/tmp/fgos-work/misc-verify-ra28s9lz/double-njettf4c/1",
+      "after": "/tmp/fgos-work/misc-verify-c5vz3jet/double-30hq5wbs/1"
+    },
+    {
+      "path": "/commands/7/argv/2",
+      "before": "/tmp/fgos-work/misc-verify-ra28s9lz/proof.py",
+      "after": "/tmp/fgos-work/misc-verify-c5vz3jet/proof.py"
+    },
+    {
+      "path": "/commands/7/argv/6",
+      "before": "/tmp/fgos-work/misc-verify-ra28s9lz/double-njettf4c/2",
+      "after": "/tmp/fgos-work/misc-verify-c5vz3jet/double-30hq5wbs/2"
+    },
+    {
+      "path": "/commands/8/argv/2",
+      "before": "/tmp/fgos-work/misc-verify-ra28s9lz/g6-owning-assertions.py",
+      "after": "/tmp/fgos-work/misc-verify-c5vz3jet/g6-owning-assertions.py"
+    }
+  ]
+}

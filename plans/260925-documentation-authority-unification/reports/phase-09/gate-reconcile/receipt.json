@@ -28,6 +28,24 @@
     "settlementOutput": "census-join/settlement.json",
     "independentSettlementApproval": false
   },
+  "reviewFollowUp": {
+    "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+    "inputs": [
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w19-live-parity-and-rebinds-review.json",
+        "sha256": "b7dbaf6196b3692c8c71361be13b91f95122dab391bde77744551419ef572cee"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w19-live-parity-and-rebinds-review.md",
+        "sha256": "b72c0245ef95905c799394c7f0a49c31b43b830e31561d74c0c87c31ead7922e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w19-cleanup-brief.md",
+        "sha256": "0b7cf20fe752f4e142b139a7a1b5bfdac74498e919394a861cb1f83197ad5050"
+      }
+    ],
+    "scope": "W19 exact live-parity, 25 current rebinds and receipt-count approvals only; this turn and turn 707 remain unreviewed."
+  },
   "evidencePathBase": "plans/260925-documentation-authority-unification/reports/phase-09",
   "method": "Every required original occurrence is keyed by its JSON pointer and original text. Mixed sentences are decomposed into independently decided parts. Counts below count list entries, not unique defects or underlying claim populations; remaining is one original prose entry per gate and may overlap its blockers.",
   "impactAnalysis": "degraded/unqueried: no fgOS CLI allowed and no impact-analysis MCP exposed; only records and new scoped verifier tooling change.",
@@ -42,17 +60,16 @@
         "cleared": 0
       },
       "after": {
-        "status": "partial",
-        "blockers": 1,
-        "remainingEntries": 1,
-        "cleared": 1,
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 2,
         "atFinalPinUnderLease": 3,
         "external": 0
       },
       "originalDecisions": {
         "cleared": 2,
-        "moved to F": 4,
-        "still open": 1
+        "moved to F": 5
       }
     },
     {
@@ -64,17 +81,16 @@
         "cleared": 0
       },
       "after": {
-        "status": "partial",
-        "blockers": 2,
-        "remainingEntries": 1,
-        "cleared": 4,
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 6,
         "atFinalPinUnderLease": 2,
         "external": 0
       },
       "originalDecisions": {
         "cleared": 4,
-        "moved to F": 1,
-        "still open": 1
+        "moved to F": 2
       }
     },
     {
@@ -168,17 +184,16 @@
         "cleared": 0
       },
       "after": {
-        "status": "partial",
-        "blockers": 1,
-        "remainingEntries": 1,
-        "cleared": 2,
+        "status": "met-local",
+        "blockers": 0,
+        "remainingEntries": 0,
+        "cleared": 3,
         "atFinalPinUnderLease": 3,
         "external": 0
       },
       "originalDecisions": {
-        "still open": 2,
-        "cleared": 1,
-        "moved to F": 2
+        "cleared": 2,
+        "moved to F": 3
       }
     },
     {
@@ -291,7 +306,7 @@
   "readinessCounts": {
     "beforeFinalPin": {
       "before": 6,
-      "after": 8
+      "after": 4
     },
     "atFinalPinUnderLease": {
       "before": 19,
@@ -303,9 +318,9 @@
     }
   },
   "decisionCounts": {
-    "cleared": 21,
-    "moved to F": 41,
-    "still open": 25
+    "cleared": 22,
+    "moved to F": 44,
+    "still open": 21
   },
   "decisions": [
     {
@@ -339,7 +354,9 @@
         "g0rework/receipt.md",
         "g0rework/receipt.json",
         "carries/current-binding-refresh.json",
-        "reviews/w17-parity-rework-review.md"
+        "reviews/w17-parity-rework-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ]
     },
     {
@@ -373,7 +390,9 @@
         "g0rework/receipt.md",
         "g0rework/receipt.json",
         "carries/current-binding-refresh.json",
-        "reviews/w17-parity-rework-review.md"
+        "reviews/w17-parity-rework-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ]
     },
     {
@@ -407,7 +426,9 @@
         "g0rework/receipt.md",
         "g0rework/receipt.json",
         "carries/current-binding-refresh.json",
-        "reviews/w17-parity-rework-review.md"
+        "reviews/w17-parity-rework-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ]
     },
     {
@@ -441,7 +462,9 @@
         "g0rework/receipt.md",
         "g0rework/receipt.json",
         "carries/current-binding-refresh.json",
-        "reviews/w17-parity-rework-review.md"
+        "reviews/w17-parity-rework-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ]
     },
     {
@@ -475,7 +498,9 @@
         "g0rework/receipt.md",
         "g0rework/receipt.json",
         "carries/current-binding-refresh.json",
-        "reviews/w17-parity-rework-review.md"
+        "reviews/w17-parity-rework-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ]
     },
     {
@@ -509,14 +534,16 @@
         "g0rework/receipt.md",
         "g0rework/receipt.json",
         "carries/current-binding-refresh.json",
-        "reviews/w17-parity-rework-review.md"
+        "reviews/w17-parity-rework-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ]
     },
     {
       "sourcePointer": "/gates/0/remaining",
       "item": "Re-review the 124 pending content rebind rows and the 3 rows corrected in 6f5b9419d, then at F re-join every changedBindings row to its ledger row and produce a verdict join with 0 missing, 0 mismatched and 0 open REWORK.",
-      "decision": "still open",
-      "resolution": "Independently review the 25 pending carries-current-rebindings rows (8 target-digest changes), binding each verdict to the current claim/row and digests; W17-3 is scope/mechanical PASS, not per-row content approval.",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
       "gates": [
         "G0"
       ],
@@ -543,7 +570,9 @@
         "carries/current-binding-refresh.json",
         "reviews/w17-parity-rework-review.md",
         "owner-answers.md",
-        "preflip-execution-plan.md"
+        "preflip-execution-plan.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ],
       "parts": [
         {
@@ -560,6 +589,18 @@
             "reviews/w17-parity-rework-review.json"
           ],
           "verdict": "pass: Scope in writable list; 3 supersede re-decisions cite existing main commits and spec sections; 127 bindings recompute, all pending; sample 5 parity digests correct; 15 sampled rationales true; d5ba1eda remainder 797c7185; stale pointers resolve to current-binding rows; rebind --check 0; g0rework/verify.py 0."
+        },
+        {
+          "decision": "cleared",
+          "item": "Independent current-digest review of all 25 pending carries-current-rebindings rows (including 8 changed target digests).",
+          "clearedBy": [
+            "a8ea05c50"
+          ],
+          "reviews": [
+            "reviews/w19-live-parity-and-rebinds-review.md",
+            "reviews/w19-live-parity-and-rebinds-review.json"
+          ],
+          "verdict": "B. 25 pending rebinds in `carries-current-rebindings.json`: 25 APPROVE"
         },
         {
           "decision": "moved to F",
@@ -583,35 +624,6 @@
           "evidence": [
             "preflip-execution-plan.md",
             "owner-answers.md"
-          ]
-        },
-        {
-          "decision": "still open",
-          "item": "Independently review the 25 pending carries-current-rebindings rows (8 target-digest changes), binding each verdict to the current claim/row and digests; W17-3 is scope/mechanical PASS, not per-row content approval.",
-          "evidence": [
-            "review-batches.json",
-            "reviews/g0-b1-review.json",
-            "reviews/g0-b2-review.json",
-            "reviews/g0-b3-review.json",
-            "reviews/g0-b4-review.json",
-            "reviews/g0-b5-review.json",
-            "reviews/w2-g0-delta-review.json",
-            "reviews/w4-ledger-d7b-review.json",
-            "reviews/w7-rebind-review.json",
-            "g0fix/receipt.md",
-            "ledgerfix/receipt.md",
-            "ledgerfix/recipe-migration.json",
-            "rebind/receipt.md",
-            "rebind/rereview-claim-ids.json",
-            "reviews/w16-g0-rework-and-park-rule-review.json",
-            "reviews/w14-g0-content-rereview.json",
-            "reviews/w17-parity-rework-review.json",
-            "g0rework/receipt.md",
-            "g0rework/receipt.json",
-            "carries/current-binding-refresh.json",
-            "reviews/w17-parity-rework-review.md",
-            "owner-answers.md",
-            "preflip-execution-plan.md"
           ]
         }
       ]
@@ -651,7 +663,9 @@
         "reviews/w14-import3-binding-review.json",
         "reviews/w14-import3-binding-review.md",
         "reviews/w17-parity-rework-review.json",
-        "import3/receipt.md"
+        "import3/receipt.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ]
     },
     {
@@ -689,7 +703,9 @@
         "reviews/w14-import3-binding-review.json",
         "reviews/w14-import3-binding-review.md",
         "reviews/w17-parity-rework-review.json",
-        "import3/receipt.md"
+        "import3/receipt.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ]
     },
     {
@@ -727,7 +743,9 @@
         "reviews/w14-import3-binding-review.json",
         "reviews/w14-import3-binding-review.md",
         "reviews/w17-parity-rework-review.json",
-        "import3/receipt.md"
+        "import3/receipt.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ],
       "parts": [
         {
@@ -793,7 +811,9 @@
         "reviews/w14-import3-binding-review.json",
         "reviews/w14-import3-binding-review.md",
         "reviews/w17-parity-rework-review.json",
-        "import3/receipt.md"
+        "import3/receipt.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ]
     },
     {
@@ -831,14 +851,16 @@
         "reviews/w14-import3-binding-review.json",
         "reviews/w14-import3-binding-review.md",
         "reviews/w17-parity-rework-review.json",
-        "import3/receipt.md"
+        "import3/receipt.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ]
     },
     {
       "sourcePointer": "/gates/1/remaining",
       "item": "Independent per-unit review of the 24 import-3 bindings and the 8 adapted rows (s18-import3-resync.json); at F re-run the owning guards (dead-vocabulary, citation drift) on the post-apply tree.",
-      "decision": "still open",
-      "resolution": "Complete the L13-16 live-proof correction and independent current-row reviews; retain F guard/patch duties separately.",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
       "gates": [
         "G1"
       ],
@@ -868,7 +890,9 @@
         "reviews/w14-import3-binding-review.md",
         "reviews/w17-parity-rework-review.json",
         "import3/receipt.md",
-        "owner-answers.md"
+        "owner-answers.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ],
       "parts": [
         {
@@ -930,6 +954,30 @@
           "verdict": "APPROVE, 98 of 98 rows."
         },
         {
+          "decision": "cleared",
+          "item": "Independent current-digest review of all 25 pending carries-current-rebindings rows (including 8 changed target digests).",
+          "clearedBy": [
+            "a8ea05c50"
+          ],
+          "reviews": [
+            "reviews/w19-live-parity-and-rebinds-review.md",
+            "reviews/w19-live-parity-and-rebinds-review.json"
+          ],
+          "verdict": "B. 25 pending rebinds in `carries-current-rebindings.json`: 25 APPROVE"
+        },
+        {
+          "decision": "cleared",
+          "item": "L13-16 live-proof correction: live heading/direct-block coverage restored alongside unchanged witness-pin replay.",
+          "clearedBy": [
+            "5a3f7580a"
+          ],
+          "reviews": [
+            "reviews/w19-live-parity-and-rebinds-review.md",
+            "reviews/w19-live-parity-and-rebinds-review.json"
+          ],
+          "verdict": "A. 5a3f7580a, live parity next to the witness pin: APPROVE"
+        },
+        {
           "decision": "moved to F",
           "item": "Apply the reviewed prepared composition/GAP-05/citation chain under lease, then rerun owning dead-vocabulary and citation guards on the post-apply tree, baseline unchanged (L13-11.2–3).",
           "evidence": [
@@ -942,70 +990,6 @@
           "item": "Recompose the 2 drifted carries pointer patches, bin/fgos.mjs and docs/backlog.md, and recheck all 24 at F (W17-2 ACCEPT-DISCLOSED; L13-16).",
           "evidence": [
             "preflip-execution-plan.md",
-            "owner-answers.md"
-          ]
-        },
-        {
-          "decision": "still open",
-          "item": "Fix and independently re-review W17-1: refresh the 4 live distribution.md heading rows, add parity for unheaded-block-17 and restore live heading/direct-block coverage alongside authoring replay (L13-16). No parallel uncommitted fix is counted.",
-          "evidence": [
-            "carries/receipt.md",
-            "composition/receipt.md",
-            "composition/member-joins.json",
-            "composition/area-holder-table.json",
-            "composition/gap05-placement-proposal.json",
-            "composition/w2-gap05-verification.json",
-            "late-areas/receipt.md",
-            "resync-a/receipt.md",
-            "resync-b/receipt.md",
-            "reviews/w2-g1-carries-review.json",
-            "reviews/w2-late-areas-review.json",
-            "reviews/w3-d1b-resync-review.json",
-            "reviews/w3-d7-resync-review.json",
-            "reviews/w4-ledger-d7b-review.json",
-            "reviews/w5-misc-fix-review.json",
-            "reviews/w6-misc-rework-review.json",
-            "reviews/w8-composition-review.json",
-            "reviews/w9-composition-fix-review.json",
-            "reviews/w10-composition-rework-review.json",
-            "reviews/w14-check-hardening-review.json",
-            "reviews/w13-misc-pin-and-gloss-review.json",
-            "reviews/w14-import3-binding-review.json",
-            "reviews/w14-import3-binding-review.md",
-            "reviews/w17-parity-rework-review.json",
-            "import3/receipt.md",
-            "owner-answers.md"
-          ]
-        },
-        {
-          "decision": "still open",
-          "item": "Obtain current-digest independent review for the 25 pending candidate rebinds introduced by a8ea05c50 (8 target-digest changes), shared with G0; mechanical W17-3 PASS is not semantic approval.",
-          "evidence": [
-            "carries/receipt.md",
-            "composition/receipt.md",
-            "composition/member-joins.json",
-            "composition/area-holder-table.json",
-            "composition/gap05-placement-proposal.json",
-            "composition/w2-gap05-verification.json",
-            "late-areas/receipt.md",
-            "resync-a/receipt.md",
-            "resync-b/receipt.md",
-            "reviews/w2-g1-carries-review.json",
-            "reviews/w2-late-areas-review.json",
-            "reviews/w3-d1b-resync-review.json",
-            "reviews/w3-d7-resync-review.json",
-            "reviews/w4-ledger-d7b-review.json",
-            "reviews/w5-misc-fix-review.json",
-            "reviews/w6-misc-rework-review.json",
-            "reviews/w8-composition-review.json",
-            "reviews/w9-composition-fix-review.json",
-            "reviews/w10-composition-rework-review.json",
-            "reviews/w14-check-hardening-review.json",
-            "reviews/w13-misc-pin-and-gloss-review.json",
-            "reviews/w14-import3-binding-review.json",
-            "reviews/w14-import3-binding-review.md",
-            "reviews/w17-parity-rework-review.json",
-            "import3/receipt.md",
             "owner-answers.md"
           ]
         }
@@ -1027,7 +1011,8 @@
         "reviews/w2-g2-dyn-delta.json",
         "reviews/w3-g2g6-delta-review.json",
         "reviews/w6-misc-rework-review.md",
-        "preserve-premise/verification.json"
+        "preserve-premise/verification.json",
+        "w19-cleanup-brief.md"
       ]
     },
     {
@@ -1046,7 +1031,8 @@
         "reviews/w2-g2-dyn-delta.json",
         "reviews/w3-g2g6-delta-review.json",
         "reviews/w6-misc-rework-review.md",
-        "preserve-premise/verification.json"
+        "preserve-premise/verification.json",
+        "w19-cleanup-brief.md"
       ]
     },
     {
@@ -1065,7 +1051,8 @@
         "reviews/w2-g2-dyn-delta.json",
         "reviews/w3-g2g6-delta-review.json",
         "reviews/w6-misc-rework-review.md",
-        "preserve-premise/verification.json"
+        "preserve-premise/verification.json",
+        "w19-cleanup-brief.md"
       ]
     },
     {
@@ -1084,14 +1071,15 @@
         "reviews/w2-g2-dyn-delta.json",
         "reviews/w3-g2g6-delta-review.json",
         "reviews/w6-misc-rework-review.md",
-        "preserve-premise/verification.json"
+        "preserve-premise/verification.json",
+        "w19-cleanup-brief.md"
       ]
     },
     {
       "sourcePointer": "/gates/2/remaining",
       "item": "At F, re-run join.py with --pin F and --rescan, refresh the 33 moved Rust locators, settle the 8 open literal judgments, get preserve-premise/verify.py to exit 0 and get a delta review.",
       "decision": "still open",
-      "resolution": "Independently review the pinned settlement in census-join/receipt.md and census-join/settlement.json; settle its 4 explicitly owned citation parks before F. G2 stays partial until settlement and independent review (L13-17.1).",
+      "resolution": "Independently review this turn’s four citation joins/unapplied retargets and turn 707’s pinned census settlement. G2 stays partial until both are reviewed (L13-17.1; w19-cleanup-brief.md).",
       "gates": [
         "G2"
       ],
@@ -1103,7 +1091,8 @@
         "reviews/w6-misc-rework-review.md",
         "preserve-premise/verification.json",
         "owner-answers.md",
-        "preflip-execution-plan.md"
+        "preflip-execution-plan.md",
+        "w19-cleanup-brief.md"
       ],
       "parts": [
         {
@@ -1124,7 +1113,7 @@
         },
         {
           "decision": "still open",
-          "item": "Independently review the pinned settlement in census-join/receipt.md and census-join/settlement.json; settle its 4 explicitly owned citation parks before F. G2 stays partial until settlement and independent review (L13-17.1).",
+          "item": "Independently review this turn’s four citation joins/unapplied retargets and turn 707’s pinned census settlement. G2 stays partial until both are reviewed (L13-17.1; w19-cleanup-brief.md).",
           "evidence": [
             "census-join/receipt.md",
             "reviews/w2-g2-census-review.json",
@@ -1133,7 +1122,8 @@
             "reviews/w6-misc-rework-review.md",
             "preserve-premise/verification.json",
             "owner-answers.md",
-            "preflip-execution-plan.md"
+            "preflip-execution-plan.md",
+            "w19-cleanup-brief.md"
           ]
         }
       ]
@@ -1369,8 +1359,8 @@
     {
       "sourcePointer": "/gates/6/blockers/0",
       "item": "c5586146c (w7 REWORK fixes) not independently re-reviewed",
-      "decision": "still open",
-      "resolution": "W8 cleared the verifier-pin fix only; the misc-fix receipt counts in 25e8842d3 still require independent re-review (L13-17.4).",
+      "decision": "cleared",
+      "resolution": "W8 cleared the verifier-pin fix; W19 independently cleared the separate 25e8842d3 receipt-count correction. F refresh/combined-verifier duties remain open.",
       "gates": [
         "G6"
       ],
@@ -1390,12 +1380,14 @@
         "reviews/w9-g6-fix-review.json",
         "reviews/w8-g6-parks-review.json",
         "reviews/w8-g6-judgments-review.json",
-        "preserve-premise/receipt.json"
+        "preserve-premise/receipt.json",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ],
       "parts": [
         {
           "decision": "cleared",
-          "item": "c5586146c verifier-pin fix only: W8 independently checked it. The separate misc-fix receipt-count correction in 25e8842d3 remains open under L13-17.4.",
+          "item": "c5586146c verifier-pin fix independently checked by W8; the separate receipt-count correction has its own W19 clearance.",
           "clearedBy": [
             "c5586146c"
           ],
@@ -1405,25 +1397,16 @@
           "verdict": "APPROVE: Scratch-clone rerun at f2162d9ff exit 0 (95 s); regenerated checks.json differs from committed only in HEAD sha and temp dir names; g6SourceCommit 4178dcc6e. Replay, assertion header pin and source() all at g6pin; owning section still extracted verbatim; proof.py prefix widening is a scratch guard, not an assertion. No weakening."
         },
         {
-          "decision": "still open",
-          "item": "Independently re-review 25e8842d3, the misc-fix receipt counts (W18 F4; L13-17.4); W8 cleared only c5586146c's verifier-pin fix.",
-          "evidence": [
-            "preserve-premise/receipt.md",
-            "preserve-premise/sentence-delta.json",
-            "preserve-premise/sentence-replay.json",
-            "misc-fix/receipt.md",
-            "reviews/w2-g6-preserve-review.json",
-            "reviews/w3-g2g6-delta-review.json",
-            "reviews/w5-misc-fix-review.json",
-            "reviews/w6-misc-rework-review.json",
-            "reviews/w7-header-sentence-review.json",
-            "reviews/w8-lead-fixes-review.json",
-            "reviews/w9-g6-fix-review.json",
-            "reviews/w8-g6-parks-review.json",
-            "reviews/w8-g6-judgments-review.json",
-            "preserve-premise/receipt.json",
-            "owner-answers.md"
-          ]
+          "decision": "cleared",
+          "item": "Independent re-review of 25e8842d3 misc-fix receipt counts (W18 F4; L13-17.4).",
+          "clearedBy": [
+            "25e8842d3"
+          ],
+          "reviews": [
+            "reviews/w19-live-parity-and-rebinds-review.md",
+            "reviews/w19-live-parity-and-rebinds-review.json"
+          ],
+          "verdict": "C. 25e8842d3, misc-fix receipt counts: APPROVE"
         }
       ]
     },
@@ -1451,7 +1434,9 @@
         "reviews/w9-g6-fix-review.json",
         "reviews/w8-g6-parks-review.json",
         "reviews/w8-g6-judgments-review.json",
-        "preserve-premise/receipt.json"
+        "preserve-premise/receipt.json",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ]
     },
     {
@@ -1478,7 +1463,9 @@
         "reviews/w9-g6-fix-review.json",
         "reviews/w8-g6-parks-review.json",
         "reviews/w8-g6-judgments-review.json",
-        "preserve-premise/receipt.json"
+        "preserve-premise/receipt.json",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ]
     },
     {
@@ -1505,14 +1492,16 @@
         "reviews/w9-g6-fix-review.json",
         "reviews/w8-g6-parks-review.json",
         "reviews/w8-g6-judgments-review.json",
-        "preserve-premise/receipt.json"
+        "preserve-premise/receipt.json",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ]
     },
     {
       "sourcePointer": "/gates/6/remaining",
       "item": "Get c5586146c independently checked, get an APPROVE on every overturn/judgment row (the reviews so far were sampled), then refresh the proof at F and replay it twice.",
-      "decision": "still open",
-      "resolution": "Independently re-review 25e8842d3, the misc-fix receipt counts (W18 F4; L13-17.4); W8 cleared only c5586146c's verifier-pin fix.",
+      "decision": "moved to F",
+      "resolution": "No local before-F work; keep the separately recorded F / owner / external duties open.",
       "gates": [
         "G6"
       ],
@@ -1531,12 +1520,14 @@
         "reviews/w8-g6-parks-review.json",
         "reviews/w8-g6-judgments-review.json",
         "preserve-premise/receipt.json",
-        "owner-answers.md"
+        "owner-answers.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ],
       "parts": [
         {
           "decision": "cleared",
-          "item": "c5586146c verifier-pin fix only: W8 independently checked it. The separate misc-fix receipt-count correction in 25e8842d3 remains open under L13-17.4.",
+          "item": "c5586146c verifier-pin fix independently checked by W8; the separate receipt-count correction has its own W19 clearance.",
           "clearedBy": [
             "c5586146c"
           ],
@@ -1559,6 +1550,18 @@
           "verdict": "APPROVE: Counts are conserved (4320 + 924 + 163 + 6 = 5413) and match an independent diff. All 14 changed files are on the brief's writable list."
         },
         {
+          "decision": "cleared",
+          "item": "Independent re-review of 25e8842d3 misc-fix receipt counts (W18 F4; L13-17.4).",
+          "clearedBy": [
+            "25e8842d3"
+          ],
+          "reviews": [
+            "reviews/w19-live-parity-and-rebinds-review.md",
+            "reviews/w19-live-parity-and-rebinds-review.json"
+          ],
+          "verdict": "C. 25e8842d3, misc-fix receipt counts: APPROVE"
+        },
+        {
           "decision": "moved to F",
           "item": "Refresh all preserve-premise evidence at F (the earlier 186 G6 rows / 86 wrapper digests are historical lower bounds, not current totals), replay twice byte-identically and obtain delta review (execution plan §2 G6 / §3 W3, L13-9.4).",
           "evidence": [
@@ -1579,27 +1582,6 @@
           "item": "Pass the combined G2/G6 verifier at the shared F pin (L13-9.4).",
           "evidence": [
             "preflip-execution-plan.md",
-            "owner-answers.md"
-          ]
-        },
-        {
-          "decision": "still open",
-          "item": "Independently re-review 25e8842d3, the misc-fix receipt counts (W18 F4; L13-17.4); W8 cleared only c5586146c's verifier-pin fix.",
-          "evidence": [
-            "preserve-premise/receipt.md",
-            "preserve-premise/sentence-delta.json",
-            "preserve-premise/sentence-replay.json",
-            "misc-fix/receipt.md",
-            "reviews/w2-g6-preserve-review.json",
-            "reviews/w3-g2g6-delta-review.json",
-            "reviews/w5-misc-fix-review.json",
-            "reviews/w6-misc-rework-review.json",
-            "reviews/w7-header-sentence-review.json",
-            "reviews/w8-lead-fixes-review.json",
-            "reviews/w9-g6-fix-review.json",
-            "reviews/w8-g6-parks-review.json",
-            "reviews/w8-g6-judgments-review.json",
-            "preserve-premise/receipt.json",
             "owner-answers.md"
           ]
         }
@@ -2638,6 +2620,8 @@
         "reviews/w17-parity-rework-review.md",
         "owner-answers.md",
         "preflip-execution-plan.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json",
         "reviews/g7-c1-review.json",
         "reviews/g7-c2-review.json",
         "reviews/g7-c3-review.json",
@@ -2718,6 +2702,8 @@
         "reviews/w17-parity-rework-review.md",
         "owner-answers.md",
         "preflip-execution-plan.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json",
         "git-one-door/receipt.md",
         "git-one-door/exemption-proposal.md",
         "git-one-door/declared-exemptions/receipt.md",
@@ -2800,7 +2786,7 @@
         },
         {
           "decision": "cleared",
-          "item": "c5586146c verifier-pin fix only: W8 independently checked it. The separate misc-fix receipt-count correction in 25e8842d3 remains open under L13-17.4.",
+          "item": "c5586146c verifier-pin fix independently checked by W8; the separate receipt-count correction has its own W19 clearance.",
           "clearedBy": [
             "c5586146c"
           ],
@@ -2831,25 +2817,16 @@
           ]
         },
         {
-          "decision": "still open",
-          "item": "Independently re-review 25e8842d3, the misc-fix receipt counts (W18 F4; L13-17.4); W8 cleared only c5586146c's verifier-pin fix.",
-          "evidence": [
-            "preserve-premise/receipt.md",
-            "preserve-premise/sentence-delta.json",
-            "preserve-premise/sentence-replay.json",
-            "misc-fix/receipt.md",
-            "reviews/w2-g6-preserve-review.json",
-            "reviews/w3-g2g6-delta-review.json",
-            "reviews/w5-misc-fix-review.json",
-            "reviews/w6-misc-rework-review.json",
-            "reviews/w7-header-sentence-review.json",
-            "reviews/w8-lead-fixes-review.json",
-            "reviews/w9-g6-fix-review.json",
-            "reviews/w8-g6-parks-review.json",
-            "reviews/w8-g6-judgments-review.json",
-            "preserve-premise/receipt.json",
-            "owner-answers.md"
-          ]
+          "decision": "cleared",
+          "item": "Independent re-review of 25e8842d3 misc-fix receipt counts (W18 F4; L13-17.4).",
+          "clearedBy": [
+            "25e8842d3"
+          ],
+          "reviews": [
+            "reviews/w19-live-parity-and-rebinds-review.md",
+            "reviews/w19-live-parity-and-rebinds-review.json"
+          ],
+          "verdict": "C. 25e8842d3, misc-fix receipt counts: APPROVE"
         }
       ]
     },
@@ -2876,7 +2853,9 @@
         "reviews/w8-g6-parks-review.json",
         "reviews/w8-g6-judgments-review.json",
         "preserve-premise/receipt.json",
-        "owner-answers.md"
+        "owner-answers.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ],
       "parts": [
         {
@@ -3002,6 +2981,8 @@
         "reviews/w17-parity-rework-review.md",
         "owner-answers.md",
         "preflip-execution-plan.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json",
         "carries/receipt.md",
         "composition/receipt.md",
         "composition/member-joins.json",
@@ -3074,6 +3055,8 @@
         "g0rework/receipt.json",
         "carries/current-binding-refresh.json",
         "reviews/w17-parity-rework-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json",
         "late-areas/receipt.md",
         "late-areas/legacy-drift.json",
         "import2/receipt.md",
@@ -3317,7 +3300,9 @@
         "g0rework/receipt.md",
         "g0rework/receipt.json",
         "carries/current-binding-refresh.json",
-        "reviews/w17-parity-rework-review.md"
+        "reviews/w17-parity-rework-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ],
       "parts": [
         {
@@ -3415,7 +3400,8 @@
         "reviews/w2-g2-dyn-delta.json",
         "reviews/w3-g2g6-delta-review.json",
         "reviews/w6-misc-rework-review.md",
-        "preserve-premise/verification.json"
+        "preserve-premise/verification.json",
+        "w19-cleanup-brief.md"
       ],
       "parts": [
         {
@@ -3460,7 +3446,9 @@
         "reviews/w9-g6-fix-review.json",
         "reviews/w8-g6-parks-review.json",
         "reviews/w8-g6-judgments-review.json",
-        "preserve-premise/receipt.json"
+        "preserve-premise/receipt.json",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ],
       "parts": [
         {
@@ -3641,6 +3629,8 @@
         "g0rework/receipt.json",
         "carries/current-binding-refresh.json",
         "reviews/w17-parity-rework-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json",
         "reviews/g7-c1-review.json",
         "reviews/g7-c2-review.json",
         "reviews/g7-c3-review.json",
@@ -3735,6 +3725,8 @@
         "g0rework/receipt.json",
         "carries/current-binding-refresh.json",
         "reviews/w17-parity-rework-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json",
         "reviews/g7-c1-review.json",
         "reviews/g7-c2-review.json",
         "reviews/g7-c3-review.json",
@@ -3930,7 +3922,9 @@
         "g0rework/receipt.md",
         "g0rework/receipt.json",
         "carries/current-binding-refresh.json",
-        "reviews/w17-parity-rework-review.md"
+        "reviews/w17-parity-rework-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.md",
+        "reviews/w19-live-parity-and-rebinds-review.json"
       ],
       "parts": [
         {
@@ -4039,30 +4033,9 @@
   "newlyVisibleOpenItems": [
     {
       "gates": [
-        "G0",
-        "G1"
-      ],
-      "item": "Independently review the 25 pending carries-current-rebindings rows (8 target-digest changes), binding each verdict to the current claim/row and digests; W17-3 is scope/mechanical PASS, not per-row content approval.",
-      "evidence": [
-        "reviews/w17-parity-rework-review.json",
-        "carries/current-binding-refresh.json"
-      ]
-    },
-    {
-      "gates": [
-        "G1"
-      ],
-      "item": "Fix and independently re-review W17-1: refresh the 4 live distribution.md heading rows, add parity for unheaded-block-17 and restore live heading/direct-block coverage alongside authoring replay (L13-16). No parallel uncommitted fix is counted.",
-      "evidence": [
-        "reviews/w17-parity-rework-review.json",
-        "owner-answers.md"
-      ]
-    },
-    {
-      "gates": [
         "G2"
       ],
-      "item": "Independently review the pinned settlement in census-join/receipt.md and census-join/settlement.json; settle its 4 explicitly owned citation parks before F. G2 stays partial until settlement and independent review (L13-17.1).",
+      "item": "Independently review this turn’s four citation joins/unapplied retargets and turn 707’s pinned census settlement. G2 stays partial until both are reviewed (L13-17.1; w19-cleanup-brief.md).",
       "evidence": [
         "census-join/receipt.md",
         "reviews/w2-g2-census-review.json",
@@ -4071,30 +4044,8 @@
         "reviews/w6-misc-rework-review.md",
         "preserve-premise/verification.json",
         "owner-answers.md",
-        "preflip-execution-plan.md"
-      ]
-    },
-    {
-      "gates": [
-        "G6"
-      ],
-      "item": "Independently re-review 25e8842d3, the misc-fix receipt counts (W18 F4; L13-17.4); W8 cleared only c5586146c's verifier-pin fix.",
-      "evidence": [
-        "preserve-premise/receipt.md",
-        "preserve-premise/sentence-delta.json",
-        "preserve-premise/sentence-replay.json",
-        "misc-fix/receipt.md",
-        "reviews/w2-g6-preserve-review.json",
-        "reviews/w3-g2g6-delta-review.json",
-        "reviews/w5-misc-fix-review.json",
-        "reviews/w6-misc-rework-review.json",
-        "reviews/w7-header-sentence-review.json",
-        "reviews/w8-lead-fixes-review.json",
-        "reviews/w9-g6-fix-review.json",
-        "reviews/w8-g6-parks-review.json",
-        "reviews/w8-g6-judgments-review.json",
-        "preserve-premise/receipt.json",
-        "owner-answers.md"
+        "preflip-execution-plan.md",
+        "w19-cleanup-brief.md"
       ]
     },
     {
@@ -4110,7 +4061,7 @@
     }
   ],
   "scopeLimits": [
-    "No parallel uncommitted carries/g0rework content read; all input bytes come from git show at asOf.",
+    "No parallel uncommitted carries/g0rework content read; original inputs come from git show at asOf, W18 and W19 from their separately fingerprinted committed layers.",
     "This is evidence reconciliation, not new independent review of the prior Doers, not proof that F work ran.",
     "No pair accounting, Git writes, fgOS CLI, lifecycle verbs, native addons, audit-report.py, npm test, Cargo suite or preview service.",
     "G0 scoped audit remains partial; missing native-dependent full checks belong to the final owning proof.",
@@ -4123,6 +4074,8 @@
     "controlsCommand": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py",
     "controlsExit": 0,
     "controlsOutput": "gate-reconcile/controls.json",
+    "nativeAddons": "All Node descendants inherited --no-addons and a scratch process.dlopen blocker.",
+    "scopedCleanupProofs": "gate-reconcile/reproduction.json",
     "initialFailure": "The first verification exited 1 because its own not-yet-created verification.json was listed as input evidence. The output is now named as output, not self-referential input; no missing source path or ancestry check was bypassed."
   },
   "planBranchLog": {

@@ -1,6 +1,7 @@
 {
-  "sourceCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+  "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
   "status": "passed",
+  "nativeAddons": "NODE_OPTIONS=--no-addons --require <scratch process.dlopen block>; inherited by every Node child",
   "commands": [
     {
       "argv": [
@@ -8,10 +9,10 @@
         "-B",
         "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
         "--pin",
-        "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
+        "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
       ],
       "exit": 0,
-      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-owning-test\": 780, \"judgment-required\": 4}}\n",
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-by-citation\": 4, \"joined-owning-test\": 780}}\n",
       "stderr": ""
     },
     {
@@ -20,25 +21,10 @@
         "-B",
         "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
         "--pin",
-        "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
+        "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
       ],
       "exit": 0,
-      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-owning-test\": 780, \"judgment-required\": 4}}\n",
-      "stderr": ""
-    },
-    {
-      "argv": [
-        "python3",
-        "-B",
-        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
-        "--pin",
-        "3d0169f390e21c67bc3fc69081fd1bc07186599f",
-        "--rescan",
-        "--out",
-        "/tmp/fgos-work/w2-d4b/judgments-vqsq_kjo/old-pin-wg8k5jqe"
-      ],
-      "exit": 0,
-      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 293, \"joined-owning-test\": 646, \"judgment-required\": 187}}\n",
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-by-citation\": 4, \"joined-owning-test\": 780}}\n",
       "stderr": ""
     }
   ],
@@ -47,20 +33,76 @@
     "stdoutByteIdentical": true,
     "artifactsByteIdentical": true,
     "sha256": {
-      "join.json": "31fa55ad92bd4bc0bc9ee893489370e7f54801f1db5dbd9fc22291d7f09d01eb",
-      "residue.json": "bee6f4ca2fdad9a2b145a1274adfdb73410c5a7b6542a8f2f507409172f3a0c3",
-      "settlement.json": "b1449ca1a6627eb0d481edf6f3bf88babb615c045cbd6f1891bc2b4c41467fe3"
+      "join.json": "999a9f1dfd268e181b5af629f0692bb22c6ceeb2723bc0a1d26beba271a7c539",
+      "residue.json": "85dd5e5598f92fbff1eba7fe3fe13a2e5a104404d798dbf7461ee71f60472386",
+      "settlement.json": "c037e5a76c69bcbcd1d48e135b866624e8aa544f54a64358b84184d53329d056"
     }
   },
-  "historicalReplay": {
-    "pin": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
-    "byteIdenticalToCommittedArtifactsAt": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
-    "sha256": {
-      "join.json": "d9db05e7e785c2147bddcc0f0b4c2fe8accd094bf5496be353f7a9214f572534",
-      "residue.json": "d1cc0974109c7361bd5d766ccdd23b144cfd45e06e9af5be144576d23605c6ad",
-      "post-pin-literals.json": "3e5d0903e448a58999423e60984476968f170acc4796d37fac0b66d7e8861653",
-      "post-pin-dynamics.json": "43046e0a9b276ca1fa10f493c3ad9ab07b651a35d95d9a78095234cdb93aff67"
-    }
+  "previousSettlementReplay": {
+    "sourceCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+    "status": "passed",
+    "commands": [
+      {
+        "argv": [
+          "python3",
+          "-B",
+          "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+          "--pin",
+          "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
+        ],
+        "exit": 0,
+        "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-owning-test\": 780, \"judgment-required\": 4}}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "python3",
+          "-B",
+          "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+          "--pin",
+          "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
+        ],
+        "exit": 0,
+        "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-owning-test\": 780, \"judgment-required\": 4}}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "python3",
+          "-B",
+          "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+          "--pin",
+          "3d0169f390e21c67bc3fc69081fd1bc07186599f",
+          "--rescan",
+          "--out",
+          "/tmp/fgos-work/w2-d4b/judgments-vqsq_kjo/old-pin-wg8k5jqe"
+        ],
+        "exit": 0,
+        "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 293, \"joined-owning-test\": 646, \"judgment-required\": 187}}\n",
+        "stderr": ""
+      }
+    ],
+    "currentPinReplay": {
+      "runs": 2,
+      "stdoutByteIdentical": true,
+      "artifactsByteIdentical": true,
+      "sha256": {
+        "join.json": "31fa55ad92bd4bc0bc9ee893489370e7f54801f1db5dbd9fc22291d7f09d01eb",
+        "residue.json": "bee6f4ca2fdad9a2b145a1274adfdb73410c5a7b6542a8f2f507409172f3a0c3",
+        "settlement.json": "b1449ca1a6627eb0d481edf6f3bf88babb615c045cbd6f1891bc2b4c41467fe3"
+      }
+    },
+    "historicalReplay": {
+      "pin": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
+      "byteIdenticalToCommittedArtifactsAt": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+      "sha256": {
+        "join.json": "d9db05e7e785c2147bddcc0f0b4c2fe8accd094bf5496be353f7a9214f572534",
+        "residue.json": "d1cc0974109c7361bd5d766ccdd23b144cfd45e06e9af5be144576d23605c6ad",
+        "post-pin-literals.json": "3e5d0903e448a58999423e60984476968f170acc4796d37fac0b66d7e8861653",
+        "post-pin-dynamics.json": "43046e0a9b276ca1fa10f493c3ad9ab07b651a35d95d9a78095234cdb93aff67"
+      }
+    },
+    "limits": "Records-only replay; named owning tests were not run; no independent semantic approval or final-pin coverage."
   },
-  "limits": "Records-only replay; named owning tests were not run; no independent semantic approval or final-pin coverage."
+  "limits": "Four navigation joins are not owning-test proofs; patches remain unapplied, independent review and final F coverage remain open."
 }

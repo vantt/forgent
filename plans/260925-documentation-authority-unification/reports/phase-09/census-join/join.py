@@ -237,6 +237,14 @@ def main():
         decisions = {r['id']: r for r in settlement['rows']}
         assert len(decisions) == len(settlement['rows'])
         assert set(decisions) == original_ids | {r['id'] for r in residue}, 'Unlisted or unrelated current judgment'
+        citations = {}
+        if any(d['disposition'] == 'joined-by-citation' for d in decisions.values()):
+            subprocess.run(['python3', '-B', str(HERE / 'citations.py'), '--pin', pin, '--check'],
+                           cwd=ROOT, capture_output=True, text=True, check=True)
+            packet = json.loads((HERE / 'citation-bindings.json').read_text())
+            assert packet['sourceCommit'] == pin and packet['independentApproval'] is False
+            citations = {r['id']: r for r in packet['rows']}
+            assert set(citations) == {d['id'] for d in decisions.values() if d['disposition'] == 'joined-by-citation'}
         settled_rows = []
         for row in rows:
             if row['id'] not in decisions: continue
@@ -265,6 +273,15 @@ def main():
             if disposition == 'joined':
                 assert proofs and row['sourcePresent']
                 row.update(status='joined-owning-test', owningProofs=proofs, custody=group['reason']+' '+decision['detail'])
+            elif disposition == 'joined-by-citation':
+                citation = citations[row['id']]
+                assert not proofs and row['sourcePresent']
+                assert citation['file'] == row['file'] and citation['sourceSha256'] == row['sourceSha256']
+                assert decision['citationBinding'] == 'census-join/citation-bindings.json#' + row['id']
+                assert citation['bindings'] and citation['reviewStatus'] == 'pending'
+                row.update(status='joined-by-citation', citationBinding=citation,
+                           custody=group['reason']+' '+decision['detail'])
+                detail.update(citationBinding=citation, owner=decision['owner'], nextAction=decision['nextAction'])
             elif disposition == 'confirmed REJECT':
                 assert not proofs
                 grade = dict(admission='REJECT', disposition='preserve', nonDocumentUse=True,

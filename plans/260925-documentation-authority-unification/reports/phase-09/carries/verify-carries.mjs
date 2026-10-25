@@ -189,6 +189,7 @@ const livePointerPatchDrift=livePacket.patches.filter(p=>p.applied===false).flat
 });
 if(livePointerPatchDrift.some(d=>!d.finalPinDuty))console.error(JSON.stringify({livePointerPatchDrift}));
 assert.deepEqual(livePointerPatchDrift.filter(d=>!d.finalPinDuty).map(d=>d.path),[],'unlisted live pointer-patch drift; all drift: '+livePointerPatchDrift.map(d=>d.path).join(', '));
+assert.deepEqual([...dutyPaths].filter(p=>!livePointerPatchDrift.some(d=>d.path===p)),[],'stale final-pin duty: listed path does not drift');
 const foundation=read('docs/platform/platform-foundations.md');
 const expectedLaw=read('test/docs/rul104-law.txt').trim();assert.equal(foundation.match(/^- \*\*RUL104 \(tốt hơn, không to hơn\)\.\*\* (.+)$/m)?.[1],expectedLaw);
 for(const id of ['0035','0054','0062'])assert.match(foundation,new RegExp('^### '+id+' —','m'));

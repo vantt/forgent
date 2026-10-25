@@ -1,0 +1,53 @@
+{
+  "status": "pass",
+  "claims": 44,
+  "candidateUnits": 1009,
+  "refreshedDecisions": 121,
+  "droppedClaims": 17,
+  "pointerFiles": 24,
+  "currentSourceUnits": 346,
+  "historicalHeadingWitnesses": 91,
+  "liveHeadingRows": 91,
+  "liveSectionBlocks": 321,
+  "livePointerPatchDrift": [
+    {
+      "path": "bin/fgos.mjs",
+      "beforeSha256": "4ad9ed0cb07518ae19774ddcf058d78484b53de25b850ae641b7b53011010d5f",
+      "liveSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e",
+      "finalPinDuty": {
+        "path": "bin/fgos.mjs",
+        "reason": "main changed after authoring; recompose at the final main import"
+      }
+    },
+    {
+      "path": "docs/backlog.md",
+      "beforeSha256": "344552da9931e8c5ca9f946e49e0a25c40ff42b61dbf6d99c73310d5e14b7c33",
+      "liveSha256": "d0fb356de66a0bdfffac2f9835678bd4001d68779003c381e34a4f2bc9e49306",
+      "finalPinDuty": {
+        "path": "docs/backlog.md",
+        "reason": "main changed after authoring; recompose at the final main import"
+      }
+    }
+  ],
+  "finalPinDuties": {
+    "version": 1,
+    "pointerPatchDrift": [
+      {
+        "path": "bin/fgos.mjs",
+        "reason": "main changed after authoring; recompose at the final main import"
+      },
+      {
+        "path": "docs/backlog.md",
+        "reason": "main changed after authoring; recompose at the final main import"
+      }
+    ]
+  },
+  "witnessPin": "f534aeaea59ebdc39613aab02c109dbd30fd36b8",
+  "currentLedgerSuccessors": {
+    "status": "pass",
+    "origins": 1208,
+    "currentBindings": 1208
+  },
+  "sourceParityQualification": "Current rows require exact source anchor/digest and normalized full-source inclusion at a named current target. Split/adapted rows also check target digests; explicit zero-fuzz adaptations are not false equality. Original heading census, placement and unapplied patch witnesses replay at witnessPin. Live heading census, direct-section block coverage and pointer-patch drift also check working-tree bytes; only explicitly listed final-pin duties permit drift. Patch recomposition and authority/cutover acceptance are not certified.",
+  "reviewStatus": "pending; no gate accepted"
+}

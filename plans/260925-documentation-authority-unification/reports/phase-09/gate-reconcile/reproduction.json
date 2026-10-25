@@ -1,8 +1,75 @@
 {
-  "sourceCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+  "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
   "status": "passed",
-  "supersedesEvidenceAtCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+  "nativeAddons": "--no-addons plus scratch process.dlopen blocker, inherited by every Node descendant",
   "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/citations.py",
+        "--pin",
+        "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
+      ],
+      "exit": 0,
+      "stdout": "{\"bindings\": 5, \"checkOnly\": false, \"citations\": 4, \"sourceCommit\": \"98d9201f1905e433a40b94d8d8b0fb9fefda1452\", \"status\": \"passed\", \"unappliedPatches\": 4, \"zeroFuzzReplays\": 8}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/citations.py",
+        "--pin",
+        "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "{\"bindings\": 5, \"checkOnly\": true, \"citations\": 4, \"sourceCommit\": \"98d9201f1905e433a40b94d8d8b0fb9fefda1452\", \"status\": \"passed\", \"unappliedPatches\": 4, \"zeroFuzzReplays\": 8}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+        "--pin",
+        "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
+      ],
+      "exit": 0,
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-by-citation\": 4, \"joined-owning-test\": 780}}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+        "--pin",
+        "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
+      ],
+      "exit": 0,
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 289, \"confirmed-settlement-REJECT\": 53, \"joined-by-citation\": 4, \"joined-owning-test\": 780}}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"status\": \"pass\",\n  \"claims\": 44,\n  \"candidateUnits\": 1009,\n  \"refreshedDecisions\": 121,\n  \"droppedClaims\": 17,\n  \"pointerFiles\": 24,\n  \"currentSourceUnits\": 346,\n  \"historicalHeadingWitnesses\": 91,\n  \"liveHeadingRows\": 91,\n  \"liveSectionBlocks\": 321,\n  \"livePointerPatchDrift\": [\n    {\n      \"path\": \"bin/fgos.mjs\",\n      \"beforeSha256\": \"4ad9ed0cb07518ae19774ddcf058d78484b53de25b850ae641b7b53011010d5f\",\n      \"liveSha256\": \"1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e\",\n      \"finalPinDuty\": {\n        \"path\": \"bin/fgos.mjs\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    },\n    {\n      \"path\": \"docs/backlog.md\",\n      \"beforeSha256\": \"344552da9931e8c5ca9f946e49e0a25c40ff42b61dbf6d99c73310d5e14b7c33\",\n      \"liveSha256\": \"d0fb356de66a0bdfffac2f9835678bd4001d68779003c381e34a4f2bc9e49306\",\n      \"finalPinDuty\": {\n        \"path\": \"docs/backlog.md\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    }\n  ],\n  \"finalPinDuties\": {\n    \"version\": 1,\n    \"pointerPatchDrift\": [\n      {\n        \"path\": \"bin/fgos.mjs\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      },\n      {\n        \"path\": \"docs/backlog.md\",\n        \"reason\": \"main changed after authoring; recompose at the final main import\"\n      }\n    ]\n  },\n  \"witnessPin\": \"f534aeaea59ebdc39613aab02c109dbd30fd36b8\",\n  \"currentLedgerSuccessors\": {\n    \"status\": \"pass\",\n    \"origins\": 1208,\n    \"currentBindings\": 1208\n  },\n  \"sourceParityQualification\": \"Current rows require exact source anchor/digest and normalized full-source inclusion at a named current target. Split/adapted rows also check target digests; explicit zero-fuzz adaptations are not false equality. Original heading census, placement and unapplied patch witnesses replay at witnessPin. Live heading census, direct-section block coverage and pointer-patch drift also check working-tree bytes; only explicitly listed final-pin duties permit drift. Patch recomposition and authority/cutover acceptance are not certified.\",\n  \"reviewStatus\": \"pending; no gate accepted\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/controls.mjs"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"status\": \"passed\",\n  \"negativeControls\": [\n    {\n      \"name\": \"drop-duty\",\n      \"result\": \"rejected\",\n      \"exit\": 1,\n      \"expected\": \"unlisted live pointer-patch drift\"\n    },\n    {\n      \"name\": \"stale-duty\",\n      \"result\": \"rejected\",\n      \"exit\": 1,\n      \"expected\": \"stale final-pin duty\"\n    },\n    {\n      \"name\": \"missing-patch\",\n      \"result\": \"rejected\",\n      \"exit\": 1,\n      \"expected\": \"duty must name one unapplied patch\"\n    },\n    {\n      \"name\": \"blank-reason\",\n      \"result\": \"rejected\",\n      \"exit\": 1,\n      \"expected\": \"d.reason?.trim()\"\n    },\n    {\n      \"name\": \"drop-heading\",\n      \"result\": \"rejected\",\n      \"exit\": 1,\n      \"expected\": \"live heading census\"\n    }\n  ],\n  \"count\": 5,\n  \"method\": \"The real owning checker reads in-memory overlays through a scratch preload; historical witness-pin reads and checkout files are untouched. All child processes inherit the native-addon block.\"\n}\n",
+      "stderr": ""
+    },
     {
       "argv": [
         "python3",
@@ -30,7 +97,7 @@
         "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py"
       ],
       "exit": 0,
-      "stdout": "{\n  \"status\": \"passed\",\n  \"exit\": 0,\n  \"asOf\": \"53de2207e1ea8a9417ac131f785704d6ab72ba2c\",\n  \"checkedAtHead\": \"a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6\",\n  \"originalOccurrences\": 87,\n  \"gates\": 12,\n  \"reviewFiles\": 110,\n  \"snapshotInputs\": 169,\n  \"followUpPin\": \"a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6\",\n  \"followUpInputs\": 4,\n  \"evidenceAndReviewPaths\": 110,\n  \"clearedEntries\": 16,\n  \"exactVerdictQuotes\": 16,\n  \"clearedByCommits\": [\n    \"0fe6c4381\",\n    \"33cc5539d\",\n    \"4c9e1f31e\",\n    \"4f08d504d\",\n    \"53499dc9d\",\n    \"5c3b57347\",\n    \"5fe778624\",\n    \"63c3db9c6\",\n    \"63c884240\",\n    \"6f5b9419d\",\n    \"928f5cc14\",\n    \"984829939\",\n    \"a8ea05c50\",\n    \"bc2a6a014\",\n    \"c25e8cf6a\",\n    \"c5586146c\",\n    \"d22072da2\",\n    \"d786e305e\",\n    \"daa87810b\",\n    \"db023f065\"\n  ],\n  \"checks\": [\n    \"original occurrence coverage and text\",\n    \"path existence\",\n    \"clearedBy ancestry at snapshot and HEAD\",\n    \"committed exact review quotes\",\n    \"before/after counts\",\n    \"met-local has no local before-F blockers\",\n    \"immutable input fingerprints and all-review coverage\",\n    \"separate immutable follow-up input fingerprints\"\n  ],\n  \"limits\": \"Record integrity only. No independent semantic approval, F gate execution or full product-suite claim.\"\n}\n",
+      "stdout": "{\n  \"status\": \"passed\",\n  \"exit\": 0,\n  \"asOf\": \"53de2207e1ea8a9417ac131f785704d6ab72ba2c\",\n  \"checkedAtHead\": \"98d9201f1905e433a40b94d8d8b0fb9fefda1452\",\n  \"originalOccurrences\": 87,\n  \"gates\": 12,\n  \"reviewFiles\": 110,\n  \"snapshotInputs\": 169,\n  \"followUpPin\": \"a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6\",\n  \"followUpInputs\": 4,\n  \"reviewFollowUpPin\": \"98d9201f1905e433a40b94d8d8b0fb9fefda1452\",\n  \"reviewFollowUpInputs\": 3,\n  \"evidenceAndReviewPaths\": 113,\n  \"clearedEntries\": 20,\n  \"exactVerdictQuotes\": 20,\n  \"clearedByCommits\": [\n    \"0fe6c4381\",\n    \"25e8842d3\",\n    \"33cc5539d\",\n    \"4c9e1f31e\",\n    \"4f08d504d\",\n    \"53499dc9d\",\n    \"5a3f7580a\",\n    \"5c3b57347\",\n    \"5fe778624\",\n    \"63c3db9c6\",\n    \"63c884240\",\n    \"6f5b9419d\",\n    \"928f5cc14\",\n    \"984829939\",\n    \"a8ea05c50\",\n    \"bc2a6a014\",\n    \"c25e8cf6a\",\n    \"c5586146c\",\n    \"d22072da2\",\n    \"d786e305e\",\n    \"daa87810b\",\n    \"db023f065\"\n  ],\n  \"checks\": [\n    \"original occurrence coverage and text\",\n    \"path existence\",\n    \"clearedBy ancestry at snapshot and HEAD\",\n    \"committed exact review quotes\",\n    \"before/after counts\",\n    \"met-local has no local before-F blockers\",\n    \"immutable input fingerprints and all-review coverage\",\n    \"separate immutable follow-up input fingerprints\",\n    \"separate committed W19 review fingerprints and quotes\"\n  ],\n  \"limits\": \"Record integrity only. No independent semantic approval, F gate execution or full product-suite claim.\"\n}\n",
       "stderr": ""
     },
     {
@@ -40,7 +107,7 @@
         "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py"
       ],
       "exit": 0,
-      "stdout": "{\n  \"status\": \"passed\",\n  \"asOf\": \"53de2207e1ea8a9417ac131f785704d6ab72ba2c\",\n  \"positive\": \"passed\",\n  \"negativeControls\": [\n    {\n      \"name\": \"Missing evidence path is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"missing evidence path: gate-reconcile/absent-negative-control.json\"\n    },\n    {\n      \"name\": \"Existing commit outside the snapshot ancestry is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"clearedBy/asOf 42c5a0a55 not ancestor of 53de2207e1ea8a9417ac131f785704d6ab72ba2c\"\n    },\n    {\n      \"name\": \"Invented verdict quotation is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"not an exact review verdict quote: The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F.\"\n    },\n    {\n      \"name\": \"Met-local with local before-F work is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"G3 has before-F local work\"\n    },\n    {\n      \"name\": \"Omitted original occurrence is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"missing/extra/altered original occurrence\"\n    },\n    {\n      \"name\": \"False before/after counts are rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"before/after counts drift\"\n    },\n    {\n      \"name\": \"False snapshot fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"snapshot hash drift: plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md\"\n    },\n    {\n      \"name\": \"False follow-up fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"follow-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md\"\n    }\n  ],\n  \"count\": 8,\n  \"method\": \"In-memory copies at the read_json test seam; real owning check(), path inspection and read-only git; no source file or assertion weakened.\"\n}\n",
+      "stdout": "{\n  \"status\": \"passed\",\n  \"asOf\": \"53de2207e1ea8a9417ac131f785704d6ab72ba2c\",\n  \"positive\": \"passed\",\n  \"negativeControls\": [\n    {\n      \"name\": \"Missing evidence path is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"missing evidence path: gate-reconcile/absent-negative-control.json\"\n    },\n    {\n      \"name\": \"Existing commit outside the snapshot ancestry is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"clearedBy/asOf 42c5a0a55 not ancestor of 53de2207e1ea8a9417ac131f785704d6ab72ba2c\"\n    },\n    {\n      \"name\": \"Invented verdict quotation is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"not an exact review verdict quote: The 124 content rows and three overlapping Lead-corrected rows lacked a content re-review. W14 reviewed 124 distinct rows (not 127): 121 APPROVE / 3 REWORK; the pin-scoped re-decisions pass W16 and parity fixes pass W17. claim_2e2bc926 must still be re-decided at F.\"\n    },\n    {\n      \"name\": \"Met-local with local before-F work is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"G3 has before-F local work\"\n    },\n    {\n      \"name\": \"Omitted original occurrence is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"missing/extra/altered original occurrence\"\n    },\n    {\n      \"name\": \"False before/after counts are rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"before/after counts drift\"\n    },\n    {\n      \"name\": \"False snapshot fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"snapshot hash drift: plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md\"\n    },\n    {\n      \"name\": \"False follow-up fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"follow-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md\"\n    },\n    {\n      \"name\": \"False W19 review fingerprint is rejected\",\n      \"result\": \"rejected\",\n      \"error\": \"review follow-up fingerprint drift: plans/260925-documentation-authority-unification/reports/phase-09/reviews/w19-live-parity-and-rebinds-review.json\"\n    }\n  ],\n  \"count\": 9,\n  \"method\": \"In-memory copies at the read_json test seam; real owning check(), path inspection and read-only git; no source file or assertion weakened.\"\n}\n",
       "stderr": ""
     },
     {
@@ -52,61 +119,21 @@
       "exit": 0,
       "stdout": "",
       "stderr": ""
-    },
-    {
-      "argv": [
-        "git",
-        "diff",
-        "--name-only"
-      ],
-      "exit": 0,
-      "stdout": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.json\nplans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py\nplans/260925-documentation-authority-unification/reports/phase-09/census-join/receipt.json\nplans/260925-documentation-authority-unification/reports/phase-09/census-join/receipt.md\nplans/260925-documentation-authority-unification/reports/phase-09/census-join/residue.json\nplans/260925-documentation-authority-unification/reports/phase-09/census-join/test-locators.mjs\nplans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.json\nplans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py\nplans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.json\nplans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.md\nplans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/reconcile.py\nplans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verification.json\nplans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py\nplans/260925-documentation-authority-unification/reports/phase-09/preflip-gate-status.json\n",
-      "stderr": ""
-    },
-    {
-      "argv": [
-        "git",
-        "ls-files",
-        "--others",
-        "--exclude-standard"
-      ],
-      "exit": 0,
-      "stdout": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/replay.json\nplans/260925-documentation-authority-unification/reports/phase-09/census-join/settlement-decisions.json\nplans/260925-documentation-authority-unification/reports/phase-09/census-join/settlement.json\n",
-      "stderr": ""
     }
   ],
-  "generationByteIdentical": true,
-  "sha256": {
-    "plans/260925-documentation-authority-unification/reports/phase-09/preflip-gate-status.json": "c582f553cea66fdcd7a7c7ab1857bf23c6200f08c341555280d6238c363a4f56",
-    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.json": "d5fff5d6f1b2182d568e5db97f843ba551e0aba96b13014122c7fe5ae6754a14",
-    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.md": "ae9e27cfec2e863bf8daff0bf3737fd047475a45f1503982df8b299316d134ae",
-    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/sources.json": "a01e36251707e446088715cb6a8084cda6a753e7f90d5e336ac329090c239bb4",
-    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/plan-branch-log.txt": "abcd3b28e1d719145cb6081f472a1c82134f3d4f8bed02b4cb060c5d2b30e2b4"
+  "gateGeneratorReplay": {
+    "runs": 2,
+    "stdoutByteIdentical": true,
+    "artifactsByteIdentical": true,
+    "sha256": {
+      "preflip-gate-status.json": "19e2400489c56a8ea71e2003e7fc57e474b61e36122f956410eac8e49cfa64c1",
+      "gate-reconcile/receipt.json": "3e12657fc82998114c3463567ca4bb92b48e550b6834a3f68599dc4157489f21",
+      "gate-reconcile/receipt.md": "81029dc5e1d7d830d29efa1b0b30834c9135f85329b2c61f45bce1fd2722d640",
+      "gate-reconcile/sources.json": "a01e36251707e446088715cb6a8084cda6a753e7f90d5e336ac329090c239bb4",
+      "gate-reconcile/plan-branch-log.txt": "abcd3b28e1d719145cb6081f472a1c82134f3d4f8bed02b4cb060c5d2b30e2b4"
+    }
   },
-  "writeScopeCheck": "passed",
-  "modified": [
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/receipt.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/receipt.md",
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/residue.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/test-locators.mjs",
-    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py",
-    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/receipt.md",
-    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/reconcile.py",
-    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verification.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preflip-gate-status.json"
-  ],
-  "newFiles": [
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/replay.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/settlement-decisions.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/settlement.json"
-  ],
-  "volatileFieldsRestored": {
-    "verification.json.checkedAtHead": "53de2207e1ea8a9417ac131f785704d6ab72ba2c"
-  },
-  "limits": "Only record integrity and replay. No independent semantic review or final-gate acceptance."
+  "censusReplay": "census-join/replay.json",
+  "miscReplay": "gate-reconcile/misc-replay.json",
+  "limits": "Records-only: no independent review of this turn or turn 707; G2 partial. No final F coverage, applied patch, product test, native load, Git write or cutover acceptance."
 }

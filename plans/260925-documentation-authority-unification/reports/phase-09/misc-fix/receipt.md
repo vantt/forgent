@@ -288,9 +288,9 @@ All paths above are under `plans/260925-documentation-authority-unification/`. F
 - No pair accounting or manifest/register write: Lead handles it after merge. Independent G6 review, final-pin replay, all parks and wrapper co-composition remain open.
 - Scratch only `/tmp/fgos-work/w5-misc-rework/`. No Git mutation, fgOS CLI/lifecycle, secrets, product source, full npm/Cargo suite, product test, setup/doctor execution, service or preview. Impact-analysis: **degraded/unqueried** (CLI forbidden, no exposed GitNexus tool). Markdown preview deferred to Lead to avoid extra service state. No user-visible product behavior change or component-boundary change.
 
-## Sentence-scope wave (afb5bb35c, Lead update 2026-10-24 20:35)
+## Historical sentence-scope wave (afb5bb35c, Lead update 2026-10-24 20:35)
 
-The tables above show the line-scope wave and are superseded for counts. At `afb5bb35c`, with `proof.py --pin 4178dcc6e`, the counts are:
+Historical counts only; the newer "Current G6 fixes" table above remains current. At `afb5bb35c`, with `proof.py --pin 4178dcc6e`, the counts were:
 - source-confirmed history: **2,574**
 - stable operand reachability: **1,416**
 - park, unconfirmed premise: **959**
@@ -304,4 +304,4 @@ The jump from 6 to 57 comes from the general illustrative-placeholder rule: a sp
 
 `verify.py` now replays the G6 artifacts and runs the owning G6 assertions at `proof.json`'s `sourceCommit` (recorded as `g6SourceCommit`). The registry, navigation and rebind checks run at HEAD.
 
-Totals at `afb5bb35c`: **3,990 confirmations** (2,574 + 1,416) and **1,423 open rows** (1,260 parks + 163 dated notes). `verify.py` exits 0 (see `checks.json`), and the G6 replay runs `proof.py --pin 4178dcc6e`. This section supersedes the earlier statements that `verify.py` exits 1 and the exit-0 request is unmet (§ at the top), the "3,939 + 1,474" totals and the `--pin HEAD` replay description.
+Totals at `afb5bb35c`: **3,990 confirmations** (2,574 + 1,416) and **1,423 open rows** (1,260 parks + 163 dated notes). `verify.py` exits 0 (see `checks.json`), and the G6 replay runs `proof.py --pin 4178dcc6e`. At that historical wave, this section superseded the earlier exit-1/unmet statements, the "3,939 + 1,474" totals and the `--pin HEAD` replay description; it does not supersede "Current G6 fixes". Cleanup proof at `98d9201f1905e433a40b94d8d8b0fb9fefda1452`: `python3 -B plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py`, native addons blocked, exit 0; the output-only adapter captured `checks.json` in scratch, with only HEAD and temporary-path differences; committed bytes stayed untouched. See `../gate-reconcile/misc-replay.json`.

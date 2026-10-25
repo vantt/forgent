@@ -1,8 +1,8 @@
 {
-  "sourceCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+  "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
   "gateId": "non-behavioral-census-join",
-  "authority": "L13-17; w18-g2-judgments-brief.md",
-  "status": "records-complete-four-owned-parks-independent-review-open",
+  "authority": "L13-17; w19-cleanup-brief.md",
+  "status": "records-complete-four-citation-joins-independent-review-open",
   "independentApproval": false,
   "finalPinCoverage": false,
   "supersedesReceiptAtCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
@@ -13,13 +13,14 @@
     "joinedOwningTest": 780,
     "confirmedOriginalGradeREJECT": 289,
     "confirmedSettlementREJECT": 53,
-    "ownedParks": 4,
+    "ownedParks": 0,
+    "joinedByCitation": 4,
     "originalOwnedJudgments": 187,
-    "originalJudgmentDispositions": {"joined": 134, "confirmed REJECT": 49, "owned park": 4},
+    "originalJudgmentDispositions": {"joined": 134, "confirmed REJECT": 49, "joined-by-citation": 4, "owned park": 0},
     "originalCategories": {
       "fixtures": {"joined": 132, "confirmed REJECT": 27, "owned park": 0, "total": 159},
       "driftedGrades": {"joined": 0, "confirmed REJECT": 21, "owned park": 0, "total": 21},
-      "other": {"joined": 2, "confirmed REJECT": 1, "owned park": 4, "total": 7}
+      "other": {"joined": 2, "confirmed REJECT": 1, "joined-by-citation": 4, "owned park": 0, "total": 7}
     },
     "additionalDriftedGrades": 4,
     "additionalDriftedGradeREJECTs": 4
@@ -30,25 +31,31 @@
     "currentCensus": "join.json",
     "currentParks": "residue.json",
     "replayEvidence": "replay.json",
+    "citationBindings": "citation-bindings.json",
+    "unappliedCommentRetargets": "pointer-patches.json",
     "gateProofEvidence": "../gate-reconcile/reproduction.json"
   },
   "joinGrammar": "Existing JS lexical/same-file helper and Rust test/helper custody, extended only at the settlement pin to name unevaluated JS template titles. Shared setup/loader callers have explicit pinned evidence. Every proof names file, test title expression, test line and source digest; Rust also names functionLine. No test or native addon was executed.",
   "gradePolicy": "Original phase-08 grade records are untouched. New REJECTs name historical spans, old grade-record member/line where present, current evidence and source digests, or an exact deleting commit for retired source. A comment fragment path: in a is rejected as a lexical false positive, not confused with the separate real distribution citation.",
   "remainingOwners": {
-    "fourOriginalCitationParks": {
+    "fourFormerCitationParks": {
       "owner": "Documentation integration Lead (L13-17.1)",
       "ids": ["pc-l-0042", "pc-l-0056", "pc-l-0077", "pc-l-0078"],
-      "nextAction": "Before F, bind each exact citation to its current holder/section, independently review its disposition, then co-compose any required comment retarget. Per-id locators/actions are in settlement.json. G2 remains partial."
+      "nextAction": "Before F, independently review this turn’s four citation joins and turn 707’s settlement, then co-compose the four unapplied comment retargets with the full owning-file chain. Current holder sections and digests are in citation-bindings.json. G2 remains partial."
     },
     "settlementIndependentReview": "Independent census reviewer / Lead",
     "eightHistoricalPostPinLiteralJudgments": "Documentation integration owner / final-pin census reviewer",
     "finalPinRefreshAndAccounting": "Lead"
   },
   "proofs": [
-    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py --pin a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6", "runs": 2, "exits": [0, 0], "stdoutAndThreeOutputsByteIdentical": true, "evidence": "replay.json"},
-    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py --pin 3d0169f390e21c67bc3fc69081fd1bc07186599f --rescan --out <tempfile directory>", "exit": 0, "fourOutputsByteIdenticalToHistoricalCommittedArtifacts": true, "evidence": "replay.json"},
-    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py", "exit": 0, "evidence": "../gate-reconcile/verification.json", "volatileCheckedAtHeadRestored": true},
-    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py", "exit": 0, "negativeControls": 8, "evidence": "../gate-reconcile/controls.json"}
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py --pin 98d9201f1905e433a40b94d8d8b0fb9fefda1452", "runs": 2, "exits": [0, 0], "stdoutAndThreeOutputsByteIdentical": true, "evidence": "replay.json"},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py --pin 3d0169f390e21c67bc3fc69081fd1bc07186599f --rescan --out <tempfile directory>", "exit": 0, "fourOutputsByteIdenticalToHistoricalCommittedArtifacts": true, "historicalProofNotRerunThisTurn": true, "evidence": "replay.json#/previousSettlementReplay"},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py", "exit": 0, "evidence": "../gate-reconcile/verification.json", "checkedAtHead": "98d9201f1905e433a40b94d8d8b0fb9fefda1452"},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py", "exit": 0, "negativeControls": 9, "evidence": "../gate-reconcile/controls.json"},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/citations.py --pin 98d9201f1905e433a40b94d8d8b0fb9fefda1452 --check", "exit": 0, "zeroFuzzPatchReplays": 8, "evidence": "pointer-patches.json"},
+    {"command": "node plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs", "exit": 0, "evidence": "../carries/cleanup-verification.json"},
+    {"command": "node plans/260925-documentation-authority-unification/reports/phase-09/carries/controls.mjs", "exit": 0, "negativeControls": 5, "evidence": "../carries/controls.json"},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py", "exit": 0, "outputOnlyScratchAdapter": true, "evidence": "../gate-reconcile/misc-replay.json"}
   ],
   "historicalReplayRepair": "The first historical comparison detected registerSha256 drift because the old script read the working-tree register. Reading that whole register blob at --pin restores byte-identical old outputs without changing census identities or old grades.",
   "postPinArtifacts": "post-pin-literals.json and post-pin-dynamics.json remain at 3d0169f39; no new-pin or final-pin delta coverage is claimed by this original-judgment settlement.",

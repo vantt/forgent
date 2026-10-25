@@ -1,0 +1,201 @@
+{
+  "independentApproval": false,
+  "rows": [
+    {
+      "bindings": [
+        {
+          "bindingSha256": "f3b0c4bfa240dc20521f696bfb23624b009cdbfcf8e198e766a2ad291268cc78",
+          "content": "### 5.4 Hợp tier (project thắng, `maxTier` là cần gạt ngân sách)",
+          "holderSha256": "44f46d0c42a343d5dad8e2a97ffb4af2881f1d891d0fb87d961d50ee598ced1c",
+          "ledger": {
+            "pointer": "/bindingRefresh/207",
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json"
+          },
+          "locator": {
+            "endLine": 131,
+            "startLine": 131
+          },
+          "originLedger": {
+            "pointer": "/unitCarries/29",
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json"
+          },
+          "sectionAnchor": "54-hợp-tier-project-thắng-maxtier-là-cần-gạt-ngân-sách",
+          "sourceAnchor": "54-hợp-tier-project-thắng-maxtier-là-cần-gạt-ngân-sách",
+          "targetAncestry": [
+            "Spec: Seat Binding (một authority cho câu hỏi \"ghế này chạy bằng gì\")",
+            "5. Tier",
+            "5.4 Hợp tier (project thắng, `maxTier` là cần gạt ngân sách)"
+          ],
+          "targetAnchor": "54-hợp-tier-project-thắng-maxtier-là-cần-gạt-ngân-sách",
+          "targetOwner": "docs/platform/seat-binding/spec.md",
+          "targetUnitDigest": "ed05039981d32e82414320277eeef3068e4d01396339b8273e45e4689ca808f9"
+        },
+        {
+          "bindingSha256": "e3c03a87bc962a863c7b8c0da31a2e6ded58b671a57c4e5583560528ffab0925",
+          "content": "### 6.3 Thứ tự ưu tiên theo từng thuộc tính",
+          "holderSha256": "44f46d0c42a343d5dad8e2a97ffb4af2881f1d891d0fb87d961d50ee598ced1c",
+          "ledger": {
+            "pointer": "/bindingRefresh/220",
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json"
+          },
+          "locator": {
+            "endLine": 188,
+            "startLine": 188
+          },
+          "originLedger": {
+            "pointer": "/unitCarries/42",
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json"
+          },
+          "sectionAnchor": "63-thứ-tự-ưu-tiên-theo-từng-thuộc-tính",
+          "sourceAnchor": "63-thứ-tự-ưu-tiên-theo-từng-thuộc-tính",
+          "targetAncestry": [
+            "Spec: Seat Binding (một authority cho câu hỏi \"ghế này chạy bằng gì\")",
+            "6. Cấu hình",
+            "6.3 Thứ tự ưu tiên theo từng thuộc tính"
+          ],
+          "targetAnchor": "63-thứ-tự-ưu-tiên-theo-từng-thuộc-tính",
+          "targetOwner": "docs/platform/seat-binding/spec.md",
+          "targetUnitDigest": "9090a79249368120ec509138ffabc5bf8c3d86b775f3bdf2cfecd6bbf6749f43"
+        }
+      ],
+      "citation": "// The tier a seat runs at is composed by the crate (docs/specs/seat-binding.md sections 5.4 and 6.3); the golden",
+      "disposition": "joined-by-citation",
+      "file": "test/runner/execution/bind-tier-composition.test.mjs",
+      "id": "pc-l-0042",
+      "independentApproval": false,
+      "line": 1,
+      "patchPath": "census-join/pointer-patches.json",
+      "reason": "Both the tier-composition procedure (5.4) and per-property precedence table (6.3) retain their explicit late-area ledger mappings.",
+      "reviewStatus": "pending",
+      "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+      "sourceSha256": "212d891228b7a4819bf0c58f3f719fe8847d9ae1575466143119cef00df841ba"
+    },
+    {
+      "bindings": [
+        {
+          "bindingSha256": "2f0f6c6b98f78347c8f84a27fee32d4865fa901d1dbfc72735e7ca770bc6b6ed",
+          "carryMapping": "carries/source-heading-parity.json#docs/specs/distribution.md#entry-points-triggers",
+          "content": "#### Entry Points & Triggers",
+          "holderSha256": "b1b20b788fd8b881ef34b076d2ea8eaf89a070dbc7fdd0465beb48704ddefab1",
+          "ledger": {
+            "pointer": "/claims/3",
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json"
+          },
+          "locator": {
+            "endLine": 506,
+            "startLine": 506
+          },
+          "originLedger": {
+            "pointer": "/claims/3",
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json"
+          },
+          "sectionAnchor": "entry-points-triggers",
+          "sourceAnchor": null,
+          "targetAncestry": [
+            "Spec: Packaging-Distribution",
+            "Retained Distribution Source Detail",
+            "Spec: Distribution",
+            "Entry Points & Triggers"
+          ],
+          "targetAnchor": "entry-points-triggers",
+          "targetOwner": "docs/platform/packaging-distribution/spec.md",
+          "targetUnitDigest": "e633ae89d8b3f6aadd36c0fe352566ec1b9835923dafdc33731eda22da2867fa"
+        }
+      ],
+      "citation": "// (docs/specs/distribution.md, Entry Points); the doctor-check state of an onboarded project is",
+      "disposition": "joined-by-citation",
+      "file": "test/setup/doctor-fresh-run.test.mjs",
+      "id": "pc-l-0056",
+      "independentApproval": false,
+      "line": 6,
+      "patchPath": "census-join/pointer-patches.json",
+      "reason": "The original Entry Points & Triggers heading maps through the packaging ledger and carries/source-heading-parity.json, not the separate top-level 2. Entry Points table.",
+      "reviewStatus": "pending",
+      "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+      "sourceSha256": "46e8283ba343663b23fb303f74cdfea9e8bd875de1780b4ea0d218240c2cffee"
+    },
+    {
+      "bindings": [
+        {
+          "bindingSha256": "d9bfa132db10facbd0e732ee08a3608e3b1575ccd6365d58577bc1008407500f",
+          "content": "- **RUL-WF-27 (bản ghi binding worktree).** Binding là bản ghi **theo danh tính gốc worktree** (realpath → thiết bị + inode của gốc, như lease `dispatch-cwd`; không theo thư mục con hay cwd tuỳ ý), mang `{caseId, generation, worktreeRoot, commonDir, ref, state}`; nhánh được ghi như trường kiểm toán, không có bản ghi nhánh độc quyền riêng (git đã từ chối checkout một nhánh hai nơi).\n  - **Một tên file** theo danh tính worktree. Vòng đời dưới `advance` của case: tạo độc quyền với `state: pending` bên trong + fsync → event `binding` trên ledger + fsync → đổi `state` thành `committed` bằng ghi-tạm-rồi-đổi-tên đè **cùng tên**. Chỉ chủ (khớp `caseId` + `generation`) được ghi đè. Cửa đọc đúng một file. Tạo độc quyền là mutex liên-case; không cần hàng khoá mới.\n  - **Thiếu bản ghi = `unbound`** (đường nóng không quét ledger). Bản ghi của case khác đang mở → `worktree-already-bound` (từ chối, không chờ). `pending` khi chưa chắc case còn sống, bản ghi hỏng, hay `generation` lệch → từ chối, không bao giờ `unbound`. Đối chiếu binding với ledger là **đường sửa chữa** (`doctor`/dựng lại view), không ở đường nóng.\n  - Ràng lúc start, ở **mọi reservation ghi file**, và khi harness tạo worktree cho Unit trong lúc chạy. Không còn câu \"binding rộng bằng `writes`\": điều kiện là *không có worktree nào mà activity của case được ghi lại không bị ràng*.\n  - Gỡ ràng chỉ sau khi attempt im lặng và chỉ đúng `generation` khớp, để một lần dọn trễ không xoá chủ mới. `close` khi còn attempt sống giữ nguyên độc quyền.\n  - Binding là **view dựng lại được** từ ledger (L3); chỗ đặt do plan chọn.",
+          "holderSha256": "0ce96d282b026df85d96aa20c42b3e934b3b3f739a13edcf0aee6905465e1d7c",
+          "ledger": {
+            "pointer": "/bindingRefresh/348",
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json"
+          },
+          "locator": {
+            "endLine": 309,
+            "startLine": 304
+          },
+          "originLedger": {
+            "pointer": "/unitCarries/170",
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json"
+          },
+          "sectionAnchor": "6-business-rules",
+          "sourceAnchor": "unheaded-block-62",
+          "targetAncestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "6. Business Rules"
+          ],
+          "targetAnchor": "unheaded-block-64",
+          "targetOwner": "docs/platform/workflow/spec.md",
+          "targetUnitDigest": "76a293a6ec23d331a1d192b54c5451ed25e64200c043354dbb60afd6f9c5fbeb"
+        }
+      ],
+      "citation": "// Workflow case bindings (docs/specs/workflow.md RUL-WF-27): the binding records are a view of each",
+      "disposition": "joined-by-citation",
+      "file": "src/setup/registrations.mjs",
+      "id": "pc-l-0077",
+      "independentApproval": false,
+      "line": 6354,
+      "patchPath": "census-join/pointer-patches.json",
+      "reason": "The complete RUL-WF-27 block remains under 6. Business Rules, including the binding-as-rebuildable-view clause cited by this comment.",
+      "reviewStatus": "pending",
+      "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+      "sourceSha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c"
+    },
+    {
+      "bindings": [
+        {
+          "bindingSha256": "d9bfa132db10facbd0e732ee08a3608e3b1575ccd6365d58577bc1008407500f",
+          "content": "- **RUL-WF-27 (bản ghi binding worktree).** Binding là bản ghi **theo danh tính gốc worktree** (realpath → thiết bị + inode của gốc, như lease `dispatch-cwd`; không theo thư mục con hay cwd tuỳ ý), mang `{caseId, generation, worktreeRoot, commonDir, ref, state}`; nhánh được ghi như trường kiểm toán, không có bản ghi nhánh độc quyền riêng (git đã từ chối checkout một nhánh hai nơi).\n  - **Một tên file** theo danh tính worktree. Vòng đời dưới `advance` của case: tạo độc quyền với `state: pending` bên trong + fsync → event `binding` trên ledger + fsync → đổi `state` thành `committed` bằng ghi-tạm-rồi-đổi-tên đè **cùng tên**. Chỉ chủ (khớp `caseId` + `generation`) được ghi đè. Cửa đọc đúng một file. Tạo độc quyền là mutex liên-case; không cần hàng khoá mới.\n  - **Thiếu bản ghi = `unbound`** (đường nóng không quét ledger). Bản ghi của case khác đang mở → `worktree-already-bound` (từ chối, không chờ). `pending` khi chưa chắc case còn sống, bản ghi hỏng, hay `generation` lệch → từ chối, không bao giờ `unbound`. Đối chiếu binding với ledger là **đường sửa chữa** (`doctor`/dựng lại view), không ở đường nóng.\n  - Ràng lúc start, ở **mọi reservation ghi file**, và khi harness tạo worktree cho Unit trong lúc chạy. Không còn câu \"binding rộng bằng `writes`\": điều kiện là *không có worktree nào mà activity của case được ghi lại không bị ràng*.\n  - Gỡ ràng chỉ sau khi attempt im lặng và chỉ đúng `generation` khớp, để một lần dọn trễ không xoá chủ mới. `close` khi còn attempt sống giữ nguyên độc quyền.\n  - Binding là **view dựng lại được** từ ledger (L3); chỗ đặt do plan chọn.",
+          "holderSha256": "0ce96d282b026df85d96aa20c42b3e934b3b3f739a13edcf0aee6905465e1d7c",
+          "ledger": {
+            "pointer": "/bindingRefresh/348",
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json"
+          },
+          "locator": {
+            "endLine": 309,
+            "startLine": 304
+          },
+          "originLedger": {
+            "pointer": "/unitCarries/170",
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json"
+          },
+          "sectionAnchor": "6-business-rules",
+          "sourceAnchor": "unheaded-block-62",
+          "targetAncestry": [
+            "Spec: Workflow (guide, case, admission)",
+            "6. Business Rules"
+          ],
+          "targetAnchor": "unheaded-block-64",
+          "targetOwner": "docs/platform/workflow/spec.md",
+          "targetUnitDigest": "76a293a6ec23d331a1d192b54c5451ed25e64200c043354dbb60afd6f9c5fbeb"
+        }
+      ],
+      "citation": "// (docs/specs/workflow.md RUL-WF-27). Bodies live here; `registrations.mjs` registers them.",
+      "disposition": "joined-by-citation",
+      "file": "src/setup/workflow-case-checks.mjs",
+      "id": "pc-l-0078",
+      "independentApproval": false,
+      "line": 2,
+      "patchPath": "census-join/pointer-patches.json",
+      "reason": "The complete RUL-WF-27 block remains under 6. Business Rules, including the binding-as-rebuildable-view clause cited by this comment.",
+      "reviewStatus": "pending",
+      "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+      "sourceSha256": "de600986a2325b0a3653835bed153a11ffc447aa31212db8cd4e9d90dd67ed59"
+    }
+  ],
+  "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
+}

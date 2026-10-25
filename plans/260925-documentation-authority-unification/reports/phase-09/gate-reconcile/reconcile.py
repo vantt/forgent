@@ -2,7 +2,8 @@
 """Rebuild this records-only reconciliation from its immutable turn-start snapshot.
 
 No product checker, native addon, fgOS CLI, git mutation or concurrent working-tree
-input is used. Outputs are confined to the two paths granted by the brief.
+input is used. Original and follow-up committed input layers are fingerprinted
+separately. Outputs stay inside the register and gate-reconcile grant.
 """
 import collections
 import hashlib
@@ -17,6 +18,10 @@ OUT = ROOT / BASE / 'gate-reconcile'
 PIN = '53de2207e1ea8a9417ac131f785704d6ab72ba2c'
 FOLLOWUP = 'a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6'
 READ = {}
+REVIEW_PIN = '98d9201f1905e433a40b94d8d8b0fb9fefda1452'
+REVIEW_INPUTS = {}
+REVIEW_PATHS = {str(BASE / ('reviews/w19-live-parity-and-rebinds-review.' + suffix)) for suffix in ['md', 'json']}
+REVIEW_PATHS.add(str(BASE / 'w19-cleanup-brief.md'))
 FOLLOWUP_READ = []
 for rel in ['owner-answers.md', 'w18-g2-judgments-brief.md',
             'reviews/w18-gate-reconcile-review.md', 'reviews/w18-gate-reconcile-review.json']:
@@ -31,8 +36,9 @@ def git(*args):
 
 def source(path):
     path = str(path)
-    data = git('show', f'{PIN}:{path}')
-    READ[path] = {'path': path, 'sha256': hashlib.sha256(data).hexdigest()}
+    layer = REVIEW_INPUTS if path in REVIEW_PATHS else READ
+    data = git('show', f'{REVIEW_PIN if path in REVIEW_PATHS else PIN}:{path}')
+    layer[path] = {'path': path, 'sha256': hashlib.sha256(data).hexdigest()}
     return data.decode()
 
 
@@ -84,7 +90,7 @@ for directory in ['g0rework', 'import3', 'misc-fix', 'preserve-premise', 'compos
 register['asOf'] = {
     'commit': PIN, 'date': '2026-10-25', 'finalPinF': None,
     'followUpCommit': FOLLOWUP, 'followUpRuling': 'L13-17 (W18 corrections)',
-    'basis': 'Immutable committed turn-start snapshot only (git show ' + PIN + ':path), including every reviews/ file, L13-1..L13-16 and the owning receipts. Concurrent carries/** and g0rework/** edits are excluded. Scope-specific APPROVE/FIXED/pass does not turn an overall REWORK into approval of a whole gate. met-local means no unowned local work remains before F; owner/external/F duties remain explicit, not accepted or completed.',
+    'basis': 'Immutable original snapshot (git show ' + PIN + ':path), including every original reviews/ file and owning receipt; W18/L13-17 and W19 are separate committed follow-up layers. Concurrent carries/** and g0rework/** edits are excluded. Scope-specific APPROVE/FIXED/pass does not turn an overall REWORK into approval of a whole gate. met-local means no unowned local work remains before F; owner/external/F duties remain explicit, not accepted or completed.',
     'evidencePathBase': str(BASE),
     'reconciliation': 'gate-reconcile/receipt.json',
 }
@@ -304,9 +310,42 @@ g(11)['external'] = ['SEAT stages release R from F code (manifest sourcePin prov
 g(11)['atFinalPinUnderLease'] = ['Bind staged release R sourcePin to the F code commit and rerun G11/G10 on any relevant subsequent code change (execution plan §3 W4).']
 evidence(11, 'owner-answers.md', 'preflip-execution-plan.md')
 
+# W19 is a separate committed review layer; preserve all original snapshot and
+# W18 fingerprints. APPROVE here closes only the exact named review demands.
+w19 = load('reviews/w19-live-parity-and-rebinds-review.json')
+source(BASE / 'reviews/w19-live-parity-and-rebinds-review.md')
+assert len(w19['items']) == 27 and all(r['verdict'] == 'APPROVE' for r in w19['items'])
+rebinds = [r for r in w19['items'] if r['kind'] == 'rebind']
+assert len(rebinds) == len({r['pointer'] for r in rebinds}) == 25
+w19_paths = ['reviews/w19-live-parity-and-rebinds-review.md', 'reviews/w19-live-parity-and-rebinds-review.json']
+def w19_clear(number, item, commits, verdict):
+    record = dict(item=item, clearedBy=commits, reviews=w19_paths, verdict=verdict)
+    g(number)['cleared'].append(record)
+    evidence(number, *w19_paths)
+    return record
+
+for number in [0, 1]:
+    w19_clear(number, 'Independent current-digest review of all 25 pending carries-current-rebindings rows (including 8 changed target digests).',
+              ['a8ea05c50'], 'B. 25 pending rebinds in `carries-current-rebindings.json`: 25 APPROVE')
+    g(number).update(status='met-local', blockers=[], remaining='')
+g(0)['note'] = 'W14/W16/W17 content review remains historical and scoped. W19 independently approves all 25 pending candidate rebinds row by row, with exact bindingSha256 and targetUnitDigest. No before-F local review item remains; the frozen changedBindings/current-digest join, duplicate successor tracking and claim_2e2bc926 re-decision remain F duties.'
+w19_clear(1, 'L13-16 live-proof correction: live heading/direct-block coverage restored alongside unchanged witness-pin replay.',
+          ['5a3f7580a'], 'A. 5a3f7580a, live parity next to the witness pin: APPROVE')
+g(1)['note'] = 'W8–W14 member/composition/import-3 approvals retain their exact scope. W19 approves 5a3f7580a live parity and all 25 pending rebinds row by row. Its Low stale-duty and Info duplicate-target cleanup are authored this turn, not independently approved. Recomposition of the two disclosed drifted pointer patches and post-apply guards remain at F.'
+g(2)['note'] = 'The 187 original owned judgments retain 134 owning-test joins and 49 REJECT dispositions; the four former navigation parks are now joined-by-citation through 5 explicit ledger holder/unit bindings, with four unapplied comment retargets. Four additional grade drifts remain separate REJECTs. Current original census: 780 owning-test joins + 342 REJECTs + 4 citation joins = 1,126. G2 remains partial pending independent review of this turn and turn 707; no final-pin or execution proof is inferred.'
+g(2)['blockers'] = ['Independently review this turn’s four citation joins/unapplied retargets and turn 707’s pinned census settlement. G2 stays partial until both are reviewed (L13-17.1; w19-cleanup-brief.md).']
+g(2)['remaining'] = g(2)['blockers'][0]
+evidence(2, 'w19-cleanup-brief.md')
+c7['item'] = 'c5586146c verifier-pin fix independently checked by W8; the separate receipt-count correction has its own W19 clearance.'
+c7b = w19_clear(6, 'Independent re-review of 25e8842d3 misc-fix receipt counts (W18 F4; L13-17.4).',
+                ['25e8842d3'], 'C. 25e8842d3, misc-fix receipt counts: APPROVE')
+g(6).update(status='met-local', blockers=[], remaining='')
+g(6)['note'] = 'W8 covers all 1,423 judgment/note rows; W9 approves the 319-park / 20-operand reclassification by rule with a 56-row spot check (L13-17.3), not row by row. W19 independently approves 25e8842d3 receipt counts. Current 5,413-row custody remains 4,320 confirmations + 924 parks + 163 notes + 6 proposals; met-local is not completion of owned actions. F evidence refresh, co-composition and the combined G2/G6 verifier remain open.'
+register['asOf']['reviewFollowUpCommit'] = REVIEW_PIN
+
 # Local, F and external lists are projections of the same per-gate decisions.
 register['cutoverReadiness'] = {
-    'summary': 'Met-local (not met at F): G3, G4, G7, G9. G2 remains partial pending independent settlement review and its 4 before-F citation parks; G6 is partial pending independent re-review of 25e8842d3’s misc-fix receipt counts (L13-17). G0/G1 still need independent review of 25 new pending candidate rebinds; G1 also has the L13-16 live-parity REWORK. G5 lacks the surviving-map clause check and owner acceptance; G8 lacks repository-local archive-ref custody and independent review of its receipt correction. These local gaps still block the cutover approval packet. Owner backlog/carried blockers, HARDEN declarations/section 7 consent, SEAT release/routes and G10 rehearsal remain explicit external dependencies; F joins, post-apply rebinds, guards, census/G6 refresh, full-suite attribution and final status review remain unperformed. No cutover, publication, main import or lease is approved here.',
+    'summary': 'Met-local (not met at F): G0, G1, G3, G4, G6, G7, G9. W19 independently approves all 25 pending rebinds, live parity and 25e8842d3 receipt counts. G2 remains partial pending independent review of this turn’s four citation joins and turn 707’s settlement. G5 lacks the surviving-map clause check and owner acceptance; G8 lacks local archive-ref custody and independent receipt-correction review. External dependencies and every F duty remain open; no cutover, publication, main import or lease is approved here.',
     'beforeFinalPin': [f"{gate['g']}: {item}" for gate in register['gates'] for item in gate['blockers']],
     'atFinalPinUnderLease': [
         'Import main once with merge accounting and record final pin F; any later import reopens changed-path delta work (execution plan §3 W3).',
@@ -352,7 +391,7 @@ blocker_map = {
  3: [('moved to F', None)] * 2,
  4: [('still open', None), ('cleared', c5), ('still open', None)],
  5: [],
- 6: [('still open', c7), ('cleared', c8), ('moved to F', None), ('moved to F', None)],
+ 6: [('cleared', c7), ('cleared', c8), ('moved to F', None), ('moved to F', None)],
  7: [('cleared', c9), ('cleared', c10), ('cleared', c10), ('cleared', c11), ('moved to F', None), ('moved to F', None)],
  8: [('cleared', c12), ('moved to F', None), ('still open', None), ('still open', None)],
  9: [('moved to F', None), ('cleared', c13), ('cleared', c14), ('cleared', c13)],
@@ -374,8 +413,8 @@ for i, old in enumerate(original['gates']):
             parts = [cleared_part(c13)]
             explanation = 'Interim re-judgment/review is cleared; final source-delta review is not cleared and remains in G9 atFinalPinUnderLease/0 and the original final-pin occurrence.'
         if i == 6 and j == 0:
-            parts = [cleared_part(c7), {'decision': 'still open', 'item': g(6)['remaining'], 'evidence': g(6)['evidence']}]
-            explanation = 'W8 cleared the verifier-pin fix only; the misc-fix receipt counts in 25e8842d3 still require independent re-review (L13-17.4).'
+            parts = [cleared_part(c7), cleared_part(c7b)]
+            explanation = 'W8 cleared the verifier-pin fix; W19 independently cleared the separate 25e8842d3 receipt-count correction. F refresh/combined-verifier duties remain open.'
         if i == 1 and j == 2:
             parts = [cleared_part(c3), f_part(g(1)['atFinalPinUnderLease'][0])]
         if i == 7 and j == 0:
@@ -407,7 +446,7 @@ for j, (decision, numbers, records) in enumerate(before_map):
     if j == 3:
         parts.append({'decision': 'still open', 'item': g(5)['remaining'], 'evidence': g(5)['evidence']})
     if j == 1:
-        parts.append({'decision': 'still open', 'item': g(6)['remaining'], 'evidence': g(6)['evidence']})
+        parts.append(cleared_part(c7b))
     # The original G9 before-F demand is review/ownership, not completion of
     # the separate backlog/carried-owner actions retained in external.
     if j == 4:
@@ -472,6 +511,8 @@ receipt = {
                  'inputs': FOLLOWUP_READ, 'settlementReceipt': 'census-join/receipt.md',
                  'settlementOutput': 'census-join/settlement.json',
                  'independentSettlementApproval': False},
+    'reviewFollowUp': {'sourceCommit': REVIEW_PIN, 'inputs': sorted(REVIEW_INPUTS.values(), key=lambda r: r['path']),
+                       'scope': 'W19 exact live-parity, 25 current rebinds and receipt-count approvals only; this turn and turn 707 remain unreviewed.'},
     'evidencePathBase': str(BASE),
     'method': 'Every required original occurrence is keyed by its JSON pointer and original text. Mixed sentences are decomposed into independently decided parts. Counts below count list entries, not unique defects or underlying claim populations; remaining is one original prose entry per gate and may overlap its blockers.',
     'impactAnalysis': 'degraded/unqueried: no fgOS CLI allowed and no impact-analysis MCP exposed; only records and new scoped verifier tooling change.',
@@ -482,14 +523,11 @@ receipt = {
     'decisionCounts': dict(collections.Counter(d['decision'] for d in decisions)),
     'decisions': decisions,
     'newlyVisibleOpenItems': [
-        {'gates': ['G0', 'G1'], 'item': g(0)['blockers'][0], 'evidence': ['reviews/w17-parity-rework-review.json', 'carries/current-binding-refresh.json']},
-        {'gates': ['G1'], 'item': g(1)['blockers'][0], 'evidence': ['reviews/w17-parity-rework-review.json', 'owner-answers.md']},
         {'gates': ['G2'], 'item': g(2)['remaining'], 'evidence': g(2)['evidence']},
-        {'gates': ['G6'], 'item': g(6)['remaining'], 'evidence': g(6)['evidence']},
         {'gates': ['G8'], 'item': g(8)['blockers'][1], 'evidence': ['reviews/w14-g8-retention-timing-review.json', 'archive/receipt.json', 'archive/design.md']},
     ],
     'scopeLimits': [
-        'No parallel uncommitted carries/g0rework content read; all input bytes come from git show at asOf.',
+        'No parallel uncommitted carries/g0rework content read; original inputs come from git show at asOf, W18 and W19 from their separately fingerprinted committed layers.',
         'This is evidence reconciliation, not new independent review of the prior Doers, not proof that F work ran.',
         'No pair accounting, Git writes, fgOS CLI, lifecycle verbs, native addons, audit-report.py, npm test, Cargo suite or preview service.',
         'G0 scoped audit remains partial; missing native-dependent full checks belong to the final owning proof.',
@@ -499,6 +537,8 @@ receipt = {
                'exit': 0, 'output': 'gate-reconcile/verification.json',
                'controlsCommand': 'python3 -B ' + str(BASE / 'gate-reconcile/controls.py'),
                'controlsExit': 0, 'controlsOutput': 'gate-reconcile/controls.json',
+               'nativeAddons': 'All Node descendants inherited --no-addons and a scratch process.dlopen blocker.',
+               'scopedCleanupProofs': 'gate-reconcile/reproduction.json',
                'initialFailure': 'The first verification exited 1 because its own not-yet-created verification.json was listed as input evidence. The output is now named as output, not self-referential input; no missing source path or ancestry check was bypassed.'},
     'planBranchLog': {'command': 'git log --oneline ' + log_range, 'lines': len(log.splitlines()), 'path': 'gate-reconcile/plan-branch-log.txt'},
     'localArchiveRefs': {'command': 'git for-each-ref --format=%(refname) %(objectname) refs/heads/archive/ refs/archive/', 'stdout': local_ref_output},
@@ -510,7 +550,7 @@ dump(OUT / 'sources.json', {'asOf': PIN, 'inputs': sorted(READ.values(), key=lam
                            'reviews': review_inventory, 'reviewFiles': len(review_inventory)})
 lines = [
     '# Gate register reconciliation', '',
-    f'Original reconciliation inputs: `{PIN}`; W18/L13-17 follow-up inputs: `{FOLLOWUP}` (fingerprinted separately in receipt.json). No parallel uncommitted carries/g0rework bytes were read.', '',
+    f'Original reconciliation inputs: `{PIN}`; W18/L13-17 inputs: `{FOLLOWUP}`; W19 review inputs: `{REVIEW_PIN}` (each layer fingerprinted separately in receipt.json). No parallel uncommitted carries/g0rework bytes were read.', '',
     '## Result', '', register['cutoverReadiness']['summary'], '',
     'Met-local is a pre-F scheduling classification, **not** final gate acceptance. Owner/external/F work stays open.', '',
     '## Counts per gate', '',
@@ -522,12 +562,12 @@ for row in counts:
     b, a = row['before'], row['after']
     lines.append(f"| {row['g']} | {b['status']} → {a['status']} | {b['blockers']} → {a['blockers']} | {b['remainingEntries']} → {a['remainingEntries']} | {a['cleared']} | {a['atFinalPinUnderLease']} | {a['external']} |")
 lines += ['', '## Important boundaries', '',
-          '- G2: census-join/receipt.md records 134 joins, 49 REJECTs and 4 parks over the original 187 judgments, plus four newly drifted REJECTs. Independent review and the four citation dispositions remain before-F work (L13-17.1).',
-          '- G6: W8 reviews are exhaustive before db023f065; W9 accepts its 319-park / 20-operand reclassification by rule with a 56-row spot check and controls (L13-17.3). Current totals remain 4,320 / 924 / 163 / 6 = 5,413. Only composition of owned-park actions is at F (L13-17.2); 25e8842d3 receipt-count review is before F, so G6 is partial.',
+          '- G2: 134 owning-test joins, 49 REJECTs and 4 citation joins over the original 187 judgments, plus four separate REJECTs. This turn and turn 707 still need independent review before F.',
+          '- G6: W8 reviews are exhaustive before db023f065; W9 accepts its 319-park / 20-operand reclassification by rule with a 56-row spot check and controls (L13-17.3). Current totals remain 4,320 / 924 / 163 / 6 = 5,413. W19 independently approves 25e8842d3 receipt counts; G6 is met-local, not final-met. Owned actions, F refresh and combined verifier remain open.',
           '- G0 F join duty carries W16 F5: duplicate /bindingRefresh/124..126 follows later rebinds of /6, /20, /21. G3 F placement pre-existed in the old register; W3 is not its authority.',
           '- Import-3: all 98 rows reviewed APPROVE; 8 adapted rows are included in the 24 new source rows, not additional rows.',
-          '- G0: W14 reviewed 124 distinct rows, including the 3 Lead corrections. New 25 pending rebinds (8 changed target digests) still need current-row independent review.',
-          '- G1: W17 live-proof defect remains at this snapshot: 4 stale headings and 1 uncovered block. L13-16 fixes those now; 2 drifted patches stay at F.',
+          '- G0: W14 reviewed 124 distinct rows, including the 3 Lead corrections. W19 independently approves all 25 pending rebinds (8 changed target digests) row by row; G0 is met-local.',
+          '- G1: W19 independently approves the L13-16 live-parity correction and 25 rebinds; G1 is met-local. This turn tightens stale-duty rejection and removes the duplicate heading target. Two disclosed drifted patches stay at F.',
           '- G9: W15 reviewed all 50 parks/superseded/recomposition rows and sampled 60/288 still-valid rows, not all 338 exhaustively; current dispositions are 526 / 15 / 31 / 2. The 2 backlog-owner parks and 15 inherited phase-08 blockers remain owned/open.',
           '- G5 has only the 10-span legacy check; surviving-map clause and owner acceptance are still missing.',
           '- G8 timing/retention is reviewed. Repository-local archive-ref custody and independent review of f67e0f676 are not established. The task performs no Git mutation.',
@@ -547,8 +587,8 @@ for gate in register['gates']:
     lines += [f"### {gate['g']} evidence", '', ', '.join(f'`{p}`' for p in gate['evidence']) + '.', '']
 lines += ['## Reproduce', '',
           '`python3 -B ' + str(BASE / 'gate-reconcile/verify.py') + '`', '',
-          'Checks every cited evidence/review path, cleared commit ancestry at both snapshot and HEAD, exact quoted review verdicts, source fingerprints, original-item coverage and counts. The command exits 0; see `verification.json`. `python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py` also exits 0: eight in-memory negative controls reject missing paths, an existing non-ancestor commit, invented quotes, false met-local status, omitted items, false counts and false original/follow-up fingerprints. See `controls.json`. The first verifier run caught a self-reference to its not-yet-created output; that output is now correctly labeled as output, with every real input check retained.', '',
-          '`sources.json` inventories every reviews/ file plus required owning receipts at the committed snapshot; `plan-branch-log.txt` is the read-only pre-flip branch history from W0 through the snapshot, including imported ancestry. No product suite, native load or old authoring checker was run. Impact-analysis: degraded under the no-CLI/no-MCP boundary. No preview service was started under the exact records-only write grant.', '']
+          'Checks every cited evidence/review path, cleared commit ancestry at its owning snapshot layer and HEAD, exact quoted review verdicts, source fingerprints, original-item coverage and counts. The command exits 0; see `verification.json`. `python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py` also exits 0: nine in-memory negative controls reject missing paths, an existing non-ancestor commit, invented quotes, false met-local status, omitted items, false counts and false original/W18/W19 fingerprints. See `controls.json`. The first verifier run caught a self-reference to its not-yet-created output; that output is now correctly labeled as output, with every real input check retained.', '',
+          'All scoped cleanup proofs exited 0 with native addons blocked: carries checker and five controls; census join twice byte-identically and four citation retargets forward/rollback with actual zero-fuzz patch; this generator twice byte-identically, verifier and nine controls; misc verifier with only its output redirected to scratch (four byte-identical G6 artifacts, committed checks.json untouched). See `reproduction.json`, `misc-replay.json`, `../census-join/replay.json` and `../carries/cleanup-verification.json`. No patch was applied to the checkout.\n\n`sources.json` inventories every original reviews/ file plus required owning receipts at the committed snapshot; the W19 review layer is fingerprinted separately in receipt.json; `plan-branch-log.txt` is the read-only pre-flip branch history from W0 through the snapshot, including imported ancestry. No product suite, native load or old authoring checker was run. Impact-analysis: degraded under the no-CLI/no-MCP boundary. No preview service was started under the exact records-only write grant.', '']
 (OUT / 'receipt.md').write_text('\n'.join(lines))
 print(json.dumps({'gates': len(register['gates']), 'originalOccurrences': len(decisions),
                   'reviewsRead': len(review_inventory), 'inputs': len(READ)}, indent=2))

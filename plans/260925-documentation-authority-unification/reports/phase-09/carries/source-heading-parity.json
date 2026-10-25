@@ -1437,13 +1437,6 @@
         "targetUnitDigest": "e5a1f647f9052ce79f148d74ecc48822debe0894583bee4117ebebcf5a525162",
         "level": 5,
         "directPayloadDigest": "6035e67ac35da5a2bc1c1bc8620ffd7c10455a7575af0a6b21b8b6911317ddca"
-      },
-      {
-        "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-        "anchor": "release-tree-canonicalization",
-        "targetUnitDigest": "e5a1f647f9052ce79f148d74ecc48822debe0894583bee4117ebebcf5a525162",
-        "level": 5,
-        "directPayloadDigest": "6035e67ac35da5a2bc1c1bc8620ffd7c10455a7575af0a6b21b8b6911317ddca"
       }
     ],
     "directSourceBlocks": [

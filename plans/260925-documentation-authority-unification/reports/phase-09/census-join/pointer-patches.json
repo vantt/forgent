@@ -1,0 +1,179 @@
+{
+  "patches": [
+    {
+      "applied": false,
+      "beforeSha256": "212d891228b7a4819bf0c58f3f719fe8847d9ae1575466143119cef00df841ba",
+      "citationId": "pc-l-0042",
+      "composition": "Current-pin citation delta only, not a replacement for shared whole-file composition. Lead must compose the full approved chain at F and recompute hashes; no fuzzy application or cutover acceptance.",
+      "expectedAfterSha256": "3179f9a3eb301f279d881a6f48d4786b5ae5bc2d488667e59dd146c75171d94e",
+      "forwardDiff": "--- a/test/runner/execution/bind-tier-composition.test.mjs\n+++ b/test/runner/execution/bind-tier-composition.test.mjs\n@@ -1,4 +1,4 @@\n-// The tier a seat runs at is composed by the crate (docs/specs/seat-binding.md sections 5.4 and 6.3); the golden\n+// The tier a seat runs at is composed by the crate (docs/platform/seat-binding/spec.md sections 5.4 and 6.3); the golden\n // vectors own those cases, `bind.test` the facade carrying the answer. What stays Node's is the name of a\n // workflow seat's recommendation.\n \n",
+      "forwardSha256": "35975bf950d7afecda8b504eb1b20432f4f9e3be70e47aedfe1d432d0373caab",
+      "generated": false,
+      "path": "test/runner/execution/bind-tier-composition.test.mjs",
+      "rationale": "Both the tier-composition procedure (5.4) and per-property precedence table (6.3) retain their explicit late-area ledger mappings.",
+      "replay": [
+        {
+          "argv": [
+            "patch",
+            "--fuzz=0",
+            "--batch",
+            "-p1"
+          ],
+          "direction": "forward",
+          "exit": 0,
+          "resultSha256": "3179f9a3eb301f279d881a6f48d4786b5ae5bc2d488667e59dd146c75171d94e",
+          "stderr": "",
+          "stdout": "patching file test/runner/execution/bind-tier-composition.test.mjs\n"
+        },
+        {
+          "argv": [
+            "patch",
+            "--fuzz=0",
+            "--batch",
+            "-p1"
+          ],
+          "direction": "rollback",
+          "exit": 0,
+          "resultSha256": "212d891228b7a4819bf0c58f3f719fe8847d9ae1575466143119cef00df841ba",
+          "stderr": "",
+          "stdout": "patching file test/runner/execution/bind-tier-composition.test.mjs\n"
+        }
+      ],
+      "reviewStatus": "pending",
+      "rollbackDiff": "--- a/test/runner/execution/bind-tier-composition.test.mjs\n+++ b/test/runner/execution/bind-tier-composition.test.mjs\n@@ -1,4 +1,4 @@\n-// The tier a seat runs at is composed by the crate (docs/platform/seat-binding/spec.md sections 5.4 and 6.3); the golden\n+// The tier a seat runs at is composed by the crate (docs/specs/seat-binding.md sections 5.4 and 6.3); the golden\n // vectors own those cases, `bind.test` the facade carrying the answer. What stays Node's is the name of a\n // workflow seat's recommendation.\n \n",
+      "rollbackSha256": "03c305424dda3b6f9de203cbd63f134dab0fdff4f6a9a4b446a8832e9f4993e5"
+    },
+    {
+      "applied": false,
+      "beforeSha256": "46e8283ba343663b23fb303f74cdfea9e8bd875de1780b4ea0d218240c2cffee",
+      "citationId": "pc-l-0056",
+      "composition": "Current-pin citation delta only, not a replacement for shared whole-file composition. Lead must compose the full approved chain at F and recompute hashes; no fuzzy application or cutover acceptance.",
+      "expectedAfterSha256": "767294bd7dcba7469dc04b00ed0f1140435bebb3dca49e6dc4786910ddc48bb8",
+      "forwardDiff": "--- a/test/setup/doctor-fresh-run.test.mjs\n+++ b/test/setup/doctor-fresh-run.test.mjs\n@@ -3,7 +3,7 @@\n // Git addon, and Git has one door (the addon), so there is no addon-less Git read path: in a\n // project no `fgctl init` has activated, `fgos init` refuses with a message that names\n // `fgctl init` and changes nothing. New onboarding goes through `fgctl init`\n-// (docs/specs/distribution.md, Entry Points); the doctor-check state of an onboarded project is\n+// (docs/platform/packaging-distribution/spec.md#entry-points-triggers, Entry Points); the doctor-check state of an onboarded project is\n // proven by the fgctl init tests, which run the real runtime tail (init, doctor --fix, doctor).\n // Mirrors test/install-packaging.test.mjs's real-process pattern (spawnSync the actual installed\n // binary, no mocks).\n",
+      "forwardSha256": "7c0d344be3d9046ace4d5701f9e47ace73fdea391d7ecbde9e2128cefe2c440a",
+      "generated": false,
+      "path": "test/setup/doctor-fresh-run.test.mjs",
+      "rationale": "The original Entry Points & Triggers heading maps through the packaging ledger and carries/source-heading-parity.json, not the separate top-level 2. Entry Points table.",
+      "replay": [
+        {
+          "argv": [
+            "patch",
+            "--fuzz=0",
+            "--batch",
+            "-p1"
+          ],
+          "direction": "forward",
+          "exit": 0,
+          "resultSha256": "767294bd7dcba7469dc04b00ed0f1140435bebb3dca49e6dc4786910ddc48bb8",
+          "stderr": "",
+          "stdout": "patching file test/setup/doctor-fresh-run.test.mjs\n"
+        },
+        {
+          "argv": [
+            "patch",
+            "--fuzz=0",
+            "--batch",
+            "-p1"
+          ],
+          "direction": "rollback",
+          "exit": 0,
+          "resultSha256": "46e8283ba343663b23fb303f74cdfea9e8bd875de1780b4ea0d218240c2cffee",
+          "stderr": "",
+          "stdout": "patching file test/setup/doctor-fresh-run.test.mjs\n"
+        }
+      ],
+      "reviewStatus": "pending",
+      "rollbackDiff": "--- a/test/setup/doctor-fresh-run.test.mjs\n+++ b/test/setup/doctor-fresh-run.test.mjs\n@@ -3,7 +3,7 @@\n // Git addon, and Git has one door (the addon), so there is no addon-less Git read path: in a\n // project no `fgctl init` has activated, `fgos init` refuses with a message that names\n // `fgctl init` and changes nothing. New onboarding goes through `fgctl init`\n-// (docs/platform/packaging-distribution/spec.md#entry-points-triggers, Entry Points); the doctor-check state of an onboarded project is\n+// (docs/specs/distribution.md, Entry Points); the doctor-check state of an onboarded project is\n // proven by the fgctl init tests, which run the real runtime tail (init, doctor --fix, doctor).\n // Mirrors test/install-packaging.test.mjs's real-process pattern (spawnSync the actual installed\n // binary, no mocks).\n",
+      "rollbackSha256": "b98ba6ccdc53440a5a5c01ff170b3af391cac345600cc6d9e6ccb6145f0f9413"
+    },
+    {
+      "applied": false,
+      "beforeSha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c",
+      "citationId": "pc-l-0077",
+      "composition": "Current-pin citation delta only, not a replacement for shared whole-file composition. Lead must compose the full approved chain at F and recompute hashes; no fuzzy application or cutover acceptance.",
+      "expectedAfterSha256": "1c57fd561277357d360a2100d9295e41908fc046e6e6a8acc5ce6bd140f221fc",
+      "forwardDiff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -6351,7 +6351,7 @@\n   description: 'The release mutation census lists no Git or hook spawn outside the fgos-git driver and matches the payload it was built from',\n   check: () => checkMutationOneDoor(),\n });\n-// Workflow case bindings (docs/specs/workflow.md RUL-WF-27): the binding records are a view of each\n+// Workflow case bindings (docs/platform/workflow/spec.md#6-business-rules RUL-WF-27): the binding records are a view of each\n // case's ledger. Bodies live in workflow-case-checks.mjs.\n registerCheck({\n   id: 'workflow-case-binding-sentinel',\n",
+      "forwardSha256": "7745923f0d2a46f30a0647eefceabd4f21459e51b105b1733fae6c3c563c4bdc",
+      "generated": false,
+      "path": "src/setup/registrations.mjs",
+      "rationale": "The complete RUL-WF-27 block remains under 6. Business Rules, including the binding-as-rebuildable-view clause cited by this comment.",
+      "replay": [
+        {
+          "argv": [
+            "patch",
+            "--fuzz=0",
+            "--batch",
+            "-p1"
+          ],
+          "direction": "forward",
+          "exit": 0,
+          "resultSha256": "1c57fd561277357d360a2100d9295e41908fc046e6e6a8acc5ce6bd140f221fc",
+          "stderr": "",
+          "stdout": "patching file src/setup/registrations.mjs\n"
+        },
+        {
+          "argv": [
+            "patch",
+            "--fuzz=0",
+            "--batch",
+            "-p1"
+          ],
+          "direction": "rollback",
+          "exit": 0,
+          "resultSha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c",
+          "stderr": "",
+          "stdout": "patching file src/setup/registrations.mjs\n"
+        }
+      ],
+      "reviewStatus": "pending",
+      "rollbackDiff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -6351,7 +6351,7 @@\n   description: 'The release mutation census lists no Git or hook spawn outside the fgos-git driver and matches the payload it was built from',\n   check: () => checkMutationOneDoor(),\n });\n-// Workflow case bindings (docs/platform/workflow/spec.md#6-business-rules RUL-WF-27): the binding records are a view of each\n+// Workflow case bindings (docs/specs/workflow.md RUL-WF-27): the binding records are a view of each\n // case's ledger. Bodies live in workflow-case-checks.mjs.\n registerCheck({\n   id: 'workflow-case-binding-sentinel',\n",
+      "rollbackSha256": "f34c79510de71ea045a7669ebb337f237e6b7da5a541207a91e9d0ac45712997"
+    },
+    {
+      "applied": false,
+      "beforeSha256": "de600986a2325b0a3653835bed153a11ffc447aa31212db8cd4e9d90dd67ed59",
+      "citationId": "pc-l-0078",
+      "composition": "Current-pin citation delta only, not a replacement for shared whole-file composition. Lead must compose the full approved chain at F and recompute hashes; no fuzzy application or cutover acceptance.",
+      "expectedAfterSha256": "9867a3b59832b1b4016c0cd3d532ab0f7a3878781454c1b1824aec14f5e33ce5",
+      "forwardDiff": "--- a/src/setup/workflow-case-checks.mjs\n+++ b/src/setup/workflow-case-checks.mjs\n@@ -1,5 +1,5 @@\n // workflow-case-checks.mjs — doctor checks and the repair of the worktree binding records of Workflow cases\n-// (docs/specs/workflow.md RUL-WF-27). Bodies live here; `registrations.mjs` registers them.\n+// (docs/platform/workflow/spec.md#6-business-rules RUL-WF-27). Bodies live here; `registrations.mjs` registers them.\n //\n // The ledger is the truth (L3); a binding record is a view of it. The check reads every record and every\n // ledger that has a `binding` event and says where they disagree; the fix settles what a crash left\n",
+      "forwardSha256": "d9186f698a8fd340fe87806974e0fe7075a9023f3bafa53e638ac08c48b1daac",
+      "generated": false,
+      "path": "src/setup/workflow-case-checks.mjs",
+      "rationale": "The complete RUL-WF-27 block remains under 6. Business Rules, including the binding-as-rebuildable-view clause cited by this comment.",
+      "replay": [
+        {
+          "argv": [
+            "patch",
+            "--fuzz=0",
+            "--batch",
+            "-p1"
+          ],
+          "direction": "forward",
+          "exit": 0,
+          "resultSha256": "9867a3b59832b1b4016c0cd3d532ab0f7a3878781454c1b1824aec14f5e33ce5",
+          "stderr": "",
+          "stdout": "patching file src/setup/workflow-case-checks.mjs\n"
+        },
+        {
+          "argv": [
+            "patch",
+            "--fuzz=0",
+            "--batch",
+            "-p1"
+          ],
+          "direction": "rollback",
+          "exit": 0,
+          "resultSha256": "de600986a2325b0a3653835bed153a11ffc447aa31212db8cd4e9d90dd67ed59",
+          "stderr": "",
+          "stdout": "patching file src/setup/workflow-case-checks.mjs\n"
+        }
+      ],
+      "reviewStatus": "pending",
+      "rollbackDiff": "--- a/src/setup/workflow-case-checks.mjs\n+++ b/src/setup/workflow-case-checks.mjs\n@@ -1,5 +1,5 @@\n // workflow-case-checks.mjs — doctor checks and the repair of the worktree binding records of Workflow cases\n-// (docs/platform/workflow/spec.md#6-business-rules RUL-WF-27). Bodies live here; `registrations.mjs` registers them.\n+// (docs/specs/workflow.md RUL-WF-27). Bodies live here; `registrations.mjs` registers them.\n //\n // The ledger is the truth (L3); a binding record is a view of it. The check reads every record and every\n // ledger that has a `binding` event and says where they disagree; the fix settles what a crash left\n",
+      "rollbackSha256": "a5ba7f72d3fea8e1b2111f9df7aebcbe11b93e2a6df3cf284a4bd09ba1d63b79"
+    }
+  ],
+  "sourcePin": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
+  "status": "composed-not-applied-pending-shared-file-integration",
+  "version": 1
+}

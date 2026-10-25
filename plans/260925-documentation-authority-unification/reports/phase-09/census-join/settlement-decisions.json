@@ -11,7 +11,7 @@
       "reason": "The exact construction is inside the named test callback. The old extractor accepted only string-literal titles; the pinned layer also records unevaluated template titles, with the exact source title and test call line. No callback was executed here."
     },
     "live-navigation-citations": {
-      "reason": "These are live explanatory documentation citations, not executed fixture literals. A nearby test cannot prove their authority/navigation text. Neither a non-document REJECT nor an owning execution proof is justified; they remain named before-F Lead actions, not deferred automatically to F."
+      "reason": "These are live explanatory documentation citations, not executed fixture literals. Their current holder sections and unit digests are joined through explicit ledger successors in citation-bindings.json, with unapplied forward/rollback comment retargets in pointer-patches.json. This is navigation custody, not an owning-test proof or independent approval; review and shared-file composition remain Lead duties."
     },
     "retired-seat-conversion-fixtures": {
       "reason": "Re-grade REJECT / non-document use: these frozen conversion fixtures and their tests were deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21 when the one-shot seat-binding conversion was removed. Their old paths were scalar config/test inputs, not documentation authority. Historical expression evidence and the exact deletion remain per id; no absent source is recreated and no successor proof is invented."
@@ -290,8 +290,8 @@
       "sourceSha256": null
     },
     {
-      "detail": "Live citation docs/specs/seat-binding.md at test/runner/execution/bind-tier-composition.test.mjs:1 is comment/navigation text, not fixture input; no executing proof owns this citation.",
-      "disposition": "owned park",
+      "detail": "Joined by citation to the explicit seat-binding ledger mappings for sections 5.4 and 6.3; both current unit digests are in citation-bindings.json. The code comment retarget is prepared, not applied.",
+      "disposition": "joined-by-citation",
       "evidence": [
         {
           "file": "test/runner/execution/bind-tier-composition.test.mjs",
@@ -304,7 +304,8 @@
       "file": "test/runner/execution/bind-tier-composition.test.mjs",
       "group": "live-navigation-citations",
       "id": "pc-l-0042",
-      "nextAction": "Before F, have the Documentation integration Lead bind this exact citation to its current holder/section and independently review the citation disposition; then co-compose any required comment retarget with the owning file. Keep G2 partial until that disposition is settled.",
+      "citationBinding": "census-join/citation-bindings.json#pc-l-0042",
+      "nextAction": "Independently review this citation binding before F, then co-compose its unapplied comment retarget with the full owning-file chain. G2 stays partial pending this turn and turn 707 review.",
       "owner": "Documentation integration Lead (L13-17.1)",
       "proofs": [],
       "sourceSha256": "212d891228b7a4819bf0c58f3f719fe8847d9ae1575466143119cef00df841ba"
@@ -398,8 +399,8 @@
       "sourceSha256": "2b6ec57b1c35ab3233031e63dbd7d8e7bad676a2f318f85b0820e57386aae830"
     },
     {
-      "detail": "Live citation docs/specs/distribution.md at test/setup/doctor-fresh-run.test.mjs:6 is comment/navigation text, not fixture input; no executing proof owns this citation.",
-      "disposition": "owned park",
+      "detail": "Joined by citation to the retained Entry Points & Triggers section through the packaging ledger and carries heading mapping, not the distinct top-level Entry Points table. Current digest and unapplied retarget are recorded.",
+      "disposition": "joined-by-citation",
       "evidence": [
         {
           "file": "test/setup/doctor-fresh-run.test.mjs",
@@ -412,14 +413,15 @@
       "file": "test/setup/doctor-fresh-run.test.mjs",
       "group": "live-navigation-citations",
       "id": "pc-l-0056",
-      "nextAction": "Before F, have the Documentation integration Lead bind this exact citation to its current holder/section and independently review the citation disposition; then co-compose any required comment retarget with the owning file. Keep G2 partial until that disposition is settled.",
+      "citationBinding": "census-join/citation-bindings.json#pc-l-0056",
+      "nextAction": "Independently review this citation binding before F, then co-compose its unapplied comment retarget with the full owning-file chain. G2 stays partial pending this turn and turn 707 review.",
       "owner": "Documentation integration Lead (L13-17.1)",
       "proofs": [],
       "sourceSha256": "46e8283ba343663b23fb303f74cdfea9e8bd875de1780b4ea0d218240c2cffee"
     },
     {
-      "detail": "Live citation docs/specs/workflow.md at src/setup/registrations.mjs:6354 is comment/navigation text, not fixture input; no executing proof owns this citation.",
-      "disposition": "owned park",
+      "detail": "Joined by citation to the complete RUL-WF-27 block in workflow/spec.md section 6 through its late-area ledger mapping; digest-bound navigation custody, not execution proof. Comment retarget is prepared only.",
+      "disposition": "joined-by-citation",
       "evidence": [
         {
           "file": "src/setup/registrations.mjs",
@@ -432,14 +434,15 @@
       "file": "src/setup/registrations.mjs",
       "group": "live-navigation-citations",
       "id": "pc-l-0077",
-      "nextAction": "Before F, have the Documentation integration Lead bind this exact citation to its current holder/section and independently review the citation disposition; then co-compose any required comment retarget with the owning file. Keep G2 partial until that disposition is settled.",
+      "citationBinding": "census-join/citation-bindings.json#pc-l-0077",
+      "nextAction": "Independently review this citation binding before F, then co-compose its unapplied comment retarget with the full owning-file chain. G2 stays partial pending this turn and turn 707 review.",
       "owner": "Documentation integration Lead (L13-17.1)",
       "proofs": [],
       "sourceSha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c"
     },
     {
-      "detail": "Live citation docs/specs/workflow.md at src/setup/workflow-case-checks.mjs:2 is comment/navigation text, not fixture input; no executing proof owns this citation.",
-      "disposition": "owned park",
+      "detail": "Joined by citation to the complete RUL-WF-27 block in workflow/spec.md section 6 through its late-area ledger mapping; digest-bound navigation custody, not execution proof. Comment retarget is prepared only.",
+      "disposition": "joined-by-citation",
       "evidence": [
         {
           "file": "src/setup/workflow-case-checks.mjs",
@@ -452,7 +455,8 @@
       "file": "src/setup/workflow-case-checks.mjs",
       "group": "live-navigation-citations",
       "id": "pc-l-0078",
-      "nextAction": "Before F, have the Documentation integration Lead bind this exact citation to its current holder/section and independently review the citation disposition; then co-compose any required comment retarget with the owning file. Keep G2 partial until that disposition is settled.",
+      "citationBinding": "census-join/citation-bindings.json#pc-l-0078",
+      "nextAction": "Independently review this citation binding before F, then co-compose its unapplied comment retarget with the full owning-file chain. G2 stays partial pending this turn and turn 707 review.",
       "owner": "Documentation integration Lead (L13-17.1)",
       "proofs": [],
       "sourceSha256": "de600986a2325b0a3653835bed153a11ffc447aa31212db8cd4e9d90dd67ed59"
@@ -5948,5 +5952,5 @@
       "sourceSha256": null
     }
   ],
-  "sourceCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6"
+  "sourceCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452"
 }
