@@ -202,3 +202,46 @@ fn this_repositorys_project_file_migrates_with_the_same_effective_value() {
     let _ = fs::remove_dir_all(&twin);
     let _ = fs::remove_dir_all(&dir);
 }
+
+#[test]
+fn a_linked_worktree_lists_the_global_command_value_a_dropped_value_stops_hiding() {
+    // The old file holds a command value equal to the standard; the machine's global file sets it
+    // differently. Dropping it lets the global value win, even when the migration runs in a linked
+    // worktree, whose snapshot otherwise takes command values from the main checkout.
+    let (schemas, digest) = Schemas::bundled().unwrap();
+    let standard = Standard::bundled(&schemas).unwrap();
+    let ctx = Context {
+        schemas: &schemas,
+        standard: &standard,
+        digest: &digest,
+        detectors: &NoDetectors,
+    };
+    let confinement = json!({"mode": "required", "policy": "host-write-denied"});
+    let path = "runner.capabilities.advise.confinement.mode";
+    assert_eq!(
+        standard.value_at(
+            &fgos_yaml_doc::path::parse_path("runner.capabilities.advise.confinement").unwrap()
+        ),
+        Some(&confinement),
+        "the case relies on the standard's value"
+    );
+    let dir = common::temp("migrate", "linked-command");
+    for d in ["project/.fgos", "main/.fgos", "home/.fgos"] {
+        fs::create_dir_all(dir.join(d)).unwrap();
+    }
+    let old = json!({"runner": {"capabilities": {"advise": {"confinement": confinement}}}});
+    fs::write(dir.join("project/.fgos/config.json"), old.to_string()).unwrap();
+    fs::write(dir.join("main/.fgos/config.json"), old.to_string()).unwrap();
+    fs::write(
+        dir.join("home/.fgos/config.json"),
+        json!({"runner": {"capabilities": {"advise": {"confinement": {"mode": "unconfined"}}}}})
+            .to_string(),
+    )
+    .unwrap();
+    let roots = common::lay_out(&dir, &json!({}));
+    assert_ne!(roots.trusted_root, roots.project_root, "a linked worktree");
+    let opts = common::migrate_options(&dir, true, false);
+    let writer = common::writer(&json!({"session": "vantt"}));
+    let report = project(&ctx, &roots, &writer, &opts, |_| Ok(())).unwrap();
+    assert_eq!(report.machine_overrides, [path]);
+}

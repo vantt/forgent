@@ -255,8 +255,14 @@ fn differences(
     old: &[u8],
     new: &[u8],
 ) -> Result<Vec<String>, SnapshotError> {
-    // The project layer is exactly the bytes, even while both files of the project exist.
-    let isolated = without_project(roots);
+    // The project layer is exactly the bytes, even while both files of the project exist, and its
+    // command values too: in a linked worktree the snapshot would take them from the main checkout,
+    // so both sides would read the same command values and hide every machine override among them.
+    let absent = without_project(roots);
+    let isolated = SnapshotRequest {
+        trusted_root: absent.project_root.clone(),
+        ..absent
+    };
     let read =
         |bytes| snapshot_with(ctx, &isolated, "project", bytes).map(|snapshot| snapshot.value);
     let mut found = BTreeSet::new();
