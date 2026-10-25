@@ -558,6 +558,8 @@ class JsFile {
     }
     if (/^(fileURLToPath|url\.fileURLToPath)$/.test(callee) || callee === 'new URL') return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     if (callee === 'JSON.parse') return [{ external: 'configuration file data' }];
+    // The config door's result is configured data the scanner cannot see: opaque, never the door's own marshalling code.
+    if (/^read(?:Machine)?Config$/.test(callee)) return [{ unknown: expr }];
     if (/^(fs\.realpathSync|path\.basename|String)$/.test(callee)) return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     if (callee === 'Object.freeze') return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     // `registry.get(key)` on a module-private Map: any value the module stores in it.

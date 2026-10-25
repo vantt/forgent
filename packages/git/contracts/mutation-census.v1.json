@@ -1116,42 +1116,14 @@
       "path": "bin/fgos.mjs",
       "line": 3436,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? -Infinity",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "bin/fgos.mjs",
-      "line": 3436,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? Infinity",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "bin/fgos.mjs",
-      "line": 3436,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? NaN",
+      "binary": "? readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
       "line": 3580,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? -Infinity",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "bin/fgos.mjs",
-      "line": 3580,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? Infinity",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "bin/fgos.mjs",
-      "line": 3580,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? NaN",
+      "binary": "? readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })",
       "family": "unresolved-binary"
     },
     {
@@ -1172,21 +1144,7 @@
       "path": "src/runner/worktree.mjs",
       "line": 147,
       "spawn": "execFileSync",
-      "binary": "? -Infinity",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/worktree.mjs",
-      "line": 147,
-      "spawn": "execFileSync",
-      "binary": "? Infinity",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/worktree.mjs",
-      "line": 147,
-      "spawn": "execFileSync",
-      "binary": "? NaN",
+      "binary": "? readConfig({ projectRoot: repoRoot, sections: ['worktreeSetup'] })",
       "family": "unresolved-binary"
     }
   ],
@@ -1924,20 +1882,6 @@
       "spawn": "Command::new",
       "binary": "? exe of start_with",
       "class": "rust-test"
-    },
-    {
-      "path": "bin/fgos.mjs",
-      "line": 3436,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "(configuration file data)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "bin/fgos.mjs",
-      "line": 3580,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "(configuration file data)",
-      "class": "configured-binary"
     },
     {
       "path": "core/skills/distill/scripts/distill.mjs",
@@ -3236,13 +3180,6 @@
       "line": 165,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (item.verify))",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/runner/worktree.mjs",
-      "line": 147,
-      "spawn": "execFileSync",
-      "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
