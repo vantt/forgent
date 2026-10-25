@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py", line 262, in <module>
+    raise SystemExit(main())
+  File "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py", line 97, in main
+    assert own['targetDigestDrift'] == []
+AssertionError

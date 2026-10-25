@@ -1,0 +1,21 @@
+{
+  "drift": 0,
+  "rows": [],
+  "authenticatedSupersededOrigins": [
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/7",
+      "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "effectivePointer": "/bindingRefresh/117",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "11-business-rules",
+        "targetUnitDigest": "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41",
+        "targetAncestry": [
+          "Work State Specification",
+          "11. Business Rules"
+        ]
+      }
+    }
+  ]
+}

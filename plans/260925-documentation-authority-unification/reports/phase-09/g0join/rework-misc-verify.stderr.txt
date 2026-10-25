@@ -1,0 +1,28 @@
+Traceback (most recent call last):
+  File "/tmp/fgos-work/g0-rework-s49ord2q/misc-verify.py", line 9, in <module>
+    runpy.run_path('/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py',run_name="__main__")
+  File "/usr/lib/python3.10/runpy.py", line 289, in run_path
+    return _run_module_code(code, init_globals, run_name,
+  File "/usr/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py", line 119, in <module>
+    if __name__=='__main__':main()
+  File "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py", line 116, in main
+    verify(pathlib.Path(name))
+  File "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py", line 26, in verify
+    run(['python3','-B',str(P/'reports/phase-09/misc-fix/rebind.py'),'--check'])
+  File "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py", line 23, in run
+    assert proc.returncode==0,proc.stderr
+AssertionError: Traceback (most recent call last):
+  File "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py", line 231, in <module>
+    if __name__=='__main__': main()
+  File "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py", line 222, in main
+    record=check(pin)
+  File "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py", line 214, in check
+    check_live(shard, commit, docs)
+  File "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py", line 187, in check_live
+    assert current == expected, ('unaccounted misc-fix overlays: live row differs', ptr,
+AssertionError: ('unaccounted misc-fix overlays: live row differs', '/bindingRefresh/13', ['changedClauses', 'disposition', 'priorReview', 'reviewNote'])
+

@@ -1,0 +1,1102 @@
+{
+  "status": "scoped-data-checks-passed-not-gate-acceptance",
+  "sourceHead": "ee2ce49c4b610daccb656f79fdb29531bb41d06b",
+  "changedBindingRows": 141,
+  "effectiveChangedBindings": 135,
+  "heldRowsValidated": 27,
+  "runnerMoveMismatchRowsRedecided": 19,
+  "exactClauseRows": 22,
+  "exactChangedClauses": 38,
+  "reworkRows": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/11",
+      "disposition": "supersede",
+      "binding": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "5a6a28507ce8fe1d6df98cd239c61f9d9dbf6e320621f21459fba8174c108939",
+        "targetAncestry": [
+          "Added in candidate: Runner Data Dictionary",
+          "Data Dictionary",
+          "Hợp đồng rigor và tier (cập nhật 2026-10-21)"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/133",
+      "disposition": "supersede",
+      "binding": {
+        "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "83c4ce05b5d6a9b14dccd5a2365bec12ee589a80b555dec26a5a7275106b45ec",
+        "targetAncestry": [
+          "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "Từ vựng dispatch hiện hành",
+          "Bảng đối chiếu từ vựng dispatch"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/14",
+      "disposition": "supersede",
+      "binding": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "targetAnchor": "unheaded-block-7",
+        "targetUnitDigest": "a8bf93ec2567af2434702019c1658d02480d403ef4be9666fb28bb6c81f14746",
+        "targetAncestry": [
+          "Added in candidate: Runner Data Dictionary",
+          "Data Dictionary",
+          "Hợp đồng rigor và tier (cập nhật 2026-10-21)"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/15",
+      "disposition": "supersede",
+      "binding": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "targetAnchor": "unheaded-block-7",
+        "targetUnitDigest": "a8bf93ec2567af2434702019c1658d02480d403ef4be9666fb28bb6c81f14746",
+        "targetAncestry": [
+          "Added in candidate: Runner Data Dictionary",
+          "Data Dictionary",
+          "Hợp đồng rigor và tier (cập nhật 2026-10-21)"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/154",
+      "disposition": "supersede",
+      "binding": {
+        "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+        "targetAnchor": "unheaded-block-10",
+        "targetUnitDigest": "a696f244df3709c995c6a5d8a35ec2083a12d72b54ddba980e58c1d556c623e4",
+        "targetAncestry": [
+          "Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)",
+          "Dispatch operability implementation slice (2026-09-16)"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/claims/250",
+      "disposition": "supersede",
+      "binding": {
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-50",
+        "targetUnitDigest": "f1dec519dfc928f2992606822417a8aa677796a14914454c1794b1900b8021ed",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0022 — Khảo sát choke-point fgOS (quyết định lặp/lệch xuyên CLI/runner/skill)",
+          "Candidates",
+          "Đã kiểm tra, KHÔNG phải choke-point (loại khỏi danh sách, có bằng chứng)"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/37",
+      "disposition": "supersede",
+      "binding": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "targetAnchor": "unheaded-block-36",
+        "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+        "targetAncestry": [
+          "Added in candidate: Runner Business Rules",
+          "Business Rules"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
+      "pointer": "/bindingRefresh/13",
+      "disposition": {
+        "kind": "supersede",
+        "reason": "Truth correction: replace git rev-parse --path-format=absolute --git-common-dir with direct on-disk .git/commondir parsing. Root/linked-worktree behavior and remaining implementation pointers preserved; not merely link adaptation.",
+        "evidence": [
+          "scripts/fgos-shell-integration.sh",
+          "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/binding-refresh.json"
+        ]
+      },
+      "binding": {
+        "targetOwner": "docs/platform/packaging-distribution/spec.md",
+        "targetAnchor": "unheaded-block-109",
+        "targetUnitDigest": "eb95a58af38313457ad6b2291a30070ab9931c046294b2a22b428c3ec126fcaa",
+        "targetAncestry": [
+          "Spec: Packaging-Distribution",
+          "Retained Distribution Source Detail",
+          "Spec: Distribution",
+          "Pointers (implementation)"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "pointer": "/registryGaps/33",
+      "disposition": "supersede",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-93",
+        "targetUnitDigest": "d22dd54866fede529fd68604e083f5f8ec6eb9524d5e3f9bca5bff89227815df",
+        "targetAncestry": [
+          "Work State Specification",
+          "11. Business Rules"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+      "pointer": "/registryGaps/0",
+      "disposition": "supersede",
+      "binding": {
+        "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "83c4ce05b5d6a9b14dccd5a2365bec12ee589a80b555dec26a5a7275106b45ec",
+        "targetAncestry": [
+          "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "Từ vựng dispatch hiện hành",
+          "Bảng đối chiếu từ vựng dispatch"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+      "pointer": "/registryGaps/1",
+      "disposition": "supersede",
+      "binding": {
+        "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "40414b50fe1dc4e6f041fd0fde8ca68afb2519c25ce3de0d798ba58b59bfc491",
+        "targetAncestry": [
+          "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "Từ vựng dispatch hiện hành",
+          "Bảng đối chiếu từ vựng dispatch"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "pointer": "/sourceBindings/453",
+      "disposition": {
+        "kind": "supersede",
+        "reason": "Current truth correction, not only heading/link adaptation: the legacy 24-hour default pane close policy is replaced by indefinite retention until a person closes it. A positive retainFailedPaneMs only makes doctor report the pane; terminal-config check removed from enumeration. Code-span bytes restored from runner.md.",
+        "evidence": [
+          "docs/platform/run-supervisor/spec.md",
+          "docs/platform/terminal-control/spec.md",
+          "docs/specs/runner.md",
+          "7be0cbc52"
+        ]
+      },
+      "binding": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "targetAnchor": "unheaded-block-36",
+        "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+        "targetAncestry": [
+          "Added in candidate: Runner Business Rules",
+          "Business Rules"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "pointer": "/registryGaps/3",
+      "disposition": "partial-carry",
+      "binding": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "targetAnchor": "unheaded-block-36",
+        "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4",
+        "targetAncestry": [
+          "Added in candidate: Runner Business Rules",
+          "Business Rules"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/bindingRefresh/8",
+      "disposition": "supersede",
+      "binding": {
+        "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+        "targetAnchor": "0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption",
+        "targetUnitDigest": "f617f1c06417c2f7984c2c37a8b6d06c85bdc662faa1bb373adac1858eb519d8",
+        "targetAncestry": [
+          "0002 — Mô hình việc phẳng",
+          "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "pointer": "/registryGaps/4",
+      "disposition": "supersede",
+      "binding": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "targetAnchor": "unheaded-block-3",
+        "targetUnitDigest": "a943adf388f96e583638dab0a1b4278a0faf2b869916ed16b2d4c77416dffbf8",
+        "targetAncestry": [
+          "Added in candidate: Runner Data Dictionary",
+          "Data Dictionary"
+        ]
+      }
+    }
+  ],
+  "duplicateChains": [
+    {
+      "older": 6,
+      "newer": 124,
+      "effectivePointer": "/bindingRefresh/124"
+    },
+    {
+      "older": 20,
+      "newer": 125,
+      "effectivePointer": "/bindingRefresh/125"
+    },
+    {
+      "older": 21,
+      "newer": 126,
+      "effectivePointer": "/bindingRefresh/126"
+    }
+  ],
+  "workingTreeObligationJoin": {
+    "note": "Supplement only: reuse resolve() with working-tree rows and frozen baseline. Every touched origin is pending fresh independent review, even where old two-digest verdicts still match. This is not a --pin output, no new approvals.",
+    "beforeEffectiveRows": 1924,
+    "afterEffectiveRows": 1927,
+    "addedEffectiveRows": [
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+        "pointer": "/sourceBindings/152"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+        "pointer": "/sourceBindings/468"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+        "pointer": "/sourceBindings/469"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+        "pointer": "/sourceBindings/470"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
+        "pointer": "/sourceBindings/15"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
+        "pointer": "/sourceBindings/16"
+      }
+    ],
+    "removedEffectiveRows": [
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/20"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/21"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/6"
+      }
+    ],
+    "pendingThisTurn": 130,
+    "otherOpen": [],
+    "pendingBindings": [
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/117",
+        "bindingSha256": "ef29b87a1d635380b165a13b95cda8bebbbd2b342bece6492b4572eab5cd033a",
+        "targetUnitDigest": "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/124",
+        "bindingSha256": "2c48bb9d4d9424ac0a3633701df88efee6794dad4ca0f9d340daeb06f6e79ca0",
+        "targetUnitDigest": "afe8743b9a9643e0b93ed4fed196aa476a500be2ddd7303cf1c963185f51ae96"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/125",
+        "bindingSha256": "4c43c2fb546005229ad28e9b6881ac1737afee4c90a7ca5f4afd51b91ff7adf4",
+        "targetUnitDigest": "539e4336c8f12cd426751dbf3dd0fba533a0767d7f654edc1881aed4a559ea26"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/126",
+        "bindingSha256": "38de637ff86cdcabe8f4c90c65e27557ec6bf5056508758ac961ec9f7d6137aa",
+        "targetUnitDigest": "5f4a17570b16c371d6e0e17c52b6f72acdd363faa4ed92c9c3fc125c446915ba"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+        "pointer": "/registryGaps/4",
+        "bindingSha256": "aa03e06d0e01701e543241265265b1649063d3614607c8a419d73366be648e39",
+        "targetUnitDigest": "a943adf388f96e583638dab0a1b4278a0faf2b869916ed16b2d4c77416dffbf8"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+        "pointer": "/bindingRefresh/474",
+        "bindingSha256": "01c1c7c33c5d66bfed4ecedcb655d87100a6fbae6e791f799448934fc418b01d",
+        "targetUnitDigest": "88c6bc62d859bd8458a097628c7e442a73ec4521d789c8f433bf3e47617414bc"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+        "pointer": "/sourceBindings/152",
+        "bindingSha256": "585c8ced08d8d465f51d753c67a463988c8a935ac2a0ec5afd1e19ed4ed01881",
+        "targetUnitDigest": "d22dd54866fede529fd68604e083f5f8ec6eb9524d5e3f9bca5bff89227815df"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+        "pointer": "/sourceBindings/419",
+        "bindingSha256": "19116044cb8471edc311128a1536b03046fb9cdaab8f04a65c835183ff5e992f",
+        "targetUnitDigest": "e4af416abe40eaf70f1f910b5a777c293eaaa6907bae3c0c18d84d04f7d0bd63"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+        "pointer": "/sourceBindings/453",
+        "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+        "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+        "pointer": "/sourceBindings/468",
+        "bindingSha256": "114c99ce477587056021daf42d7b367187f641ee1c9b45428abd14288e622cf3",
+        "targetUnitDigest": "da06863c06dece6df978e96d9877c1608a30257865d153626d4473b7beca532f"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+        "pointer": "/sourceBindings/469",
+        "bindingSha256": "c1b907e4fe26f6f3deeef5257b5a3be6e3d286de99ac835ddec7961edf16d0ac",
+        "targetUnitDigest": "83c4ce05b5d6a9b14dccd5a2365bec12ee589a80b555dec26a5a7275106b45ec"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+        "pointer": "/sourceBindings/470",
+        "bindingSha256": "17f0d5dccecee97be0c49787102db666c401f15719fdb33fb8cce0ee11c98f73",
+        "targetUnitDigest": "40414b50fe1dc4e6f041fd0fde8ca68afb2519c25ce3de0d798ba58b59bfc491"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+        "pointer": "/sourceBindings/877",
+        "bindingSha256": "5f1efe93f6e6f5dc089fb73d9f97bdb45c5f24aa17f82d45a803aecde7e479de",
+        "targetUnitDigest": "17e86891b31441849e0a2d91751b94f2c01fb3fe13a987609e5f58a30816e212"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+        "pointer": "/bindingRefresh/8",
+        "bindingSha256": "8ef7e89155f83c0a385269c971ebfeef8a702b1310c1eaceacc0a0d487d02afc",
+        "targetUnitDigest": "f617f1c06417c2f7984c2c37a8b6d06c85bdc662faa1bb373adac1858eb519d8"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
+        "pointer": "/sourceBindings/15",
+        "bindingSha256": "19116044cb8471edc311128a1536b03046fb9cdaab8f04a65c835183ff5e992f",
+        "targetUnitDigest": "e4af416abe40eaf70f1f910b5a777c293eaaa6907bae3c0c18d84d04f7d0bd63"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
+        "pointer": "/sourceBindings/16",
+        "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+        "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
+        "pointer": "/bindingRefresh/13",
+        "bindingSha256": "b614859c5d9ec2c4111a94133eef0f8d37d91c16731af31bedbdf2dd1a8a2972",
+        "targetUnitDigest": "eb95a58af38313457ad6b2291a30070ab9931c046294b2a22b428c3ec126fcaa"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+        "pointer": "/claims/126",
+        "bindingSha256": "7df0db9ab204d1b8d872d2185d465f21d318727ba2a7e85896f2efad021a88f3",
+        "targetUnitDigest": "2037530f444b84893e4f4be7fd6c3a9a339a3e26aee0db7f05e6b8e4e5178bdb"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "pointer": "/claims/404",
+        "bindingSha256": "60258c57535838b873ceb9b92395fdcf65ab9e41118c5086e875654b6b02b252",
+        "targetUnitDigest": "b5288b6f94225cb832fcd635d42e51face82e815ebdbb0b6f196bc7d285a7b12"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+        "pointer": "/registryGaps/16",
+        "bindingSha256": "9545236ed63c02f92a5695507d46458fbf6f6436b409e5b6c9f0bc99168afc91",
+        "targetUnitDigest": "ad50d1b4f22683791ffa9f8e122789a54e622c0cd5bc7c44c93f565f1fdaa646"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+        "pointer": "/claims/214",
+        "bindingSha256": "0439a85f72084d980010739335818880edd41b7544c8f7c571434beb4c3aac15",
+        "targetUnitDigest": "18f7037414eaa3e6682d49f5477a6f75321fd6b77ffd90110ab99539dc47298b"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+        "pointer": "/registryGaps/22",
+        "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+        "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+        "pointer": "/registryGaps/3",
+        "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+        "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+        "pointer": "/registryGaps/33",
+        "bindingSha256": "585c8ced08d8d465f51d753c67a463988c8a935ac2a0ec5afd1e19ed4ed01881",
+        "targetUnitDigest": "d22dd54866fede529fd68604e083f5f8ec6eb9524d5e3f9bca5bff89227815df"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+        "pointer": "/registryGaps/35",
+        "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+        "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+        "pointer": "/registryGaps/36",
+        "bindingSha256": "9545236ed63c02f92a5695507d46458fbf6f6436b409e5b6c9f0bc99168afc91",
+        "targetUnitDigest": "ad50d1b4f22683791ffa9f8e122789a54e622c0cd5bc7c44c93f565f1fdaa646"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+        "pointer": "/registryGaps/43",
+        "bindingSha256": "585c8ced08d8d465f51d753c67a463988c8a935ac2a0ec5afd1e19ed4ed01881",
+        "targetUnitDigest": "d22dd54866fede529fd68604e083f5f8ec6eb9524d5e3f9bca5bff89227815df"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-native-successors.json",
+        "pointer": "/registryGaps/3",
+        "bindingSha256": "585c8ced08d8d465f51d753c67a463988c8a935ac2a0ec5afd1e19ed4ed01881",
+        "targetUnitDigest": "d22dd54866fede529fd68604e083f5f8ec6eb9524d5e3f9bca5bff89227815df"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+        "pointer": "/registryGaps/4",
+        "bindingSha256": "585c8ced08d8d465f51d753c67a463988c8a935ac2a0ec5afd1e19ed4ed01881",
+        "targetUnitDigest": "d22dd54866fede529fd68604e083f5f8ec6eb9524d5e3f9bca5bff89227815df"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+        "pointer": "/claims/14",
+        "bindingSha256": "f9022a0baf72cf1f87da4f984a4f12e51859ffb71a6dd269954995e63a67812f",
+        "targetUnitDigest": "ded31e658f6b1c1816df565939e71e41ba27723124035f0cf9c118fed1c5a415"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+        "pointer": "/claims/24",
+        "bindingSha256": "dbb0c2ca79a91d42964a91a8d2a44cf96ddfece2965e2b731e370060c1f5424e",
+        "targetUnitDigest": "8919787289b00624dbb1d0123d1ed8a35e51a18992cfd617a6a40e9cdd9c9747"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+        "pointer": "/claims/25",
+        "bindingSha256": "0767f2742a0c3660a12289ea8a9a32d1249ad9d1cc92730a68f6d7237f46c1a3",
+        "targetUnitDigest": "87e08249fbd99ae0d5c953a0bced0ec3b8e1984a3c7ef94097045e7113828fe6"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+        "pointer": "/registryGaps/0",
+        "bindingSha256": "c1b907e4fe26f6f3deeef5257b5a3be6e3d286de99ac835ddec7961edf16d0ac",
+        "targetUnitDigest": "83c4ce05b5d6a9b14dccd5a2365bec12ee589a80b555dec26a5a7275106b45ec"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+        "pointer": "/registryGaps/1",
+        "bindingSha256": "17f0d5dccecee97be0c49787102db666c401f15719fdb33fb8cce0ee11c98f73",
+        "targetUnitDigest": "40414b50fe1dc4e6f041fd0fde8ca68afb2519c25ce3de0d798ba58b59bfc491"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+        "pointer": "/claims/145",
+        "bindingSha256": "e97c023929b63fd956290c52016b72ded8881cdb0cff269c6001d394b5d98f15",
+        "targetUnitDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+        "pointer": "/claims/147",
+        "bindingSha256": "ae1f3dcc4e11a7f41ed3e153ce1d81b4997cb71b7b4f3ff3b6fea9e392ad5482",
+        "targetUnitDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+        "pointer": "/claims/149",
+        "bindingSha256": "9b3d7df2cad43ccac183fd6ac9b9febfa8d4ab94f7fda4aa8b09845d3107053a",
+        "targetUnitDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+        "pointer": "/claims/150",
+        "bindingSha256": "29ab0072af33d7c4b8465394439b798dbbb9daa805f0fb63375bfd5d90255860",
+        "targetUnitDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+        "pointer": "/claims/151",
+        "bindingSha256": "9486b7940a454bb9490eef062c9b13432d1d9a660c4c6f73a1619c46320e1b54",
+        "targetUnitDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+        "pointer": "/claims/152",
+        "bindingSha256": "98a35a389375ec00e9fae99ed0098f377b5d3dc320641df0fcfad7984e982961",
+        "targetUnitDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+        "pointer": "/claims/154",
+        "bindingSha256": "99b38d16601f26952392d86148928653a07a0816c48a9ab48a5ebb3f290164cf",
+        "targetUnitDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+        "pointer": "/claims/155",
+        "bindingSha256": "3e58abffa135e5d87789c8e0f91b1a8fe677f793fb31753b150af21925e3a033",
+        "targetUnitDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+        "pointer": "/claims/158",
+        "bindingSha256": "a53ff66dd3db1c464d93a5912844315ec80ebf0bd5e18be13a3c9110994d424d",
+        "targetUnitDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+        "pointer": "/claims/159",
+        "bindingSha256": "a2bd310ee49199d40fe4f99ee82903a09720e1dcffb3fc23616d7f268c6ebc06",
+        "targetUnitDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+        "pointer": "/claims/160",
+        "bindingSha256": "ea3f72bb991b365e27b3e5f7cfd57660d1a049ddb62c16d675c6cd6b89e09a41",
+        "targetUnitDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "pointer": "/claims/0",
+        "bindingSha256": "e1e8196fc047eee129ac2d200f62cf22901672e08ac9a4142ae04bfd98fd17d2",
+        "targetUnitDigest": "4d4c1b5f2a290762fd6921a907d31e21e2dce776ea157119f963959606d94de9"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "pointer": "/claims/10",
+        "bindingSha256": "0b633c81fb6df9e6067944c11f0d9d6a7204ff346c46ba14a0c18966bc49dd08",
+        "targetUnitDigest": "48ada5d895788c31e0cfc7f9dc44b26c62ca362a58d42791af1d1faae52c5567"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "pointer": "/claims/13",
+        "bindingSha256": "ead7507e1874e8a8543c27d104d90d28e48c011ea64c473b64f180fe5a6362ff",
+        "targetUnitDigest": "bdac824aa1ded5a576aeca01899a159abcc604b48cfa2e31ad3f660415e78cd3"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "pointer": "/claims/14",
+        "bindingSha256": "e83c60601d726560cd57662be18590ac828182807caae43c243fc2a6fa119d4c",
+        "targetUnitDigest": "2ded62db9d6370e17b2cc65f35e45d117ee7b94c792128d359eb1229e628986f"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "pointer": "/claims/16",
+        "bindingSha256": "3fc8072fd3d07d504e8b317f6e26dcf975d4d2a367925518a42628af4e8da74d",
+        "targetUnitDigest": "beb19f3cb48940ebb818fbbd587c431842314f1d66534d641baa04d9a48396ae"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "pointer": "/claims/18",
+        "bindingSha256": "b4e4e53efac1701be56b9ce50a6a1f000ddcc1c4fae6c304dd242a325d833018",
+        "targetUnitDigest": "2e58e1822dc58b46b60193348bdfef8dcba3ca8621bbd845c2ed61c95c720917"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "pointer": "/claims/2",
+        "bindingSha256": "54da3b096b0c8ce617a331637fa71217cddb90e827a81ea0a30fbd424557a994",
+        "targetUnitDigest": "3c5f074f9b5cfbd5f02d866cbcd9eac50b3c9e5f4ba8ad5d430bf42a0d598c65"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "pointer": "/claims/4",
+        "bindingSha256": "ebfcac2a9dff46497322d64d97dfb66f46efe61f1485e5bd8091cc6a6330a029",
+        "targetUnitDigest": "15cf2d08571be0557c0159bc4ce5e07b282a840ed14172cea109bbe4f4e544c5"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "pointer": "/claims/5",
+        "bindingSha256": "e7e554459652c5f1e519c0d301777cd09297585338b76e0b6ed84164cf66370b",
+        "targetUnitDigest": "24eb30e7b62ea4e840780b81f404e924c679dbc4002866fca5077bccb2b92b6e"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "pointer": "/claims/7",
+        "bindingSha256": "c40d67824b8deb3d2aa102ffdd4ba9417e71519148a7b13258e4d2fc8df7edd8",
+        "targetUnitDigest": "f3c03447025b806dfd933bff337de6626a77b8838d4fff1036b24bcab85a93ff"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "pointer": "/claims/9",
+        "bindingSha256": "4487ecc707e6bc71ae436f5fd676a9a0da4d09044b6e3bddcbc4b857ef06743f",
+        "targetUnitDigest": "a63475b5baf9f8c247d09d757e17fd86c697eb67a12036ce5d1dad24e6407251"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "pointer": "/registryGaps/2",
+        "bindingSha256": "72593be3c85e403df8b73a6a4fb15f54a9fa63a326b293554ed961702bdacb2e",
+        "targetUnitDigest": "516bd5db5c2ca2d7390dc20ddba2b6438a01dcce310bb225d2d2dc9d7d457eea"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/10",
+        "bindingSha256": "f786dc0748d00f4258c3a21479aa14d432d9f16858abf9907b88b3702a684af5",
+        "targetUnitDigest": "ebe762d7e34a8290e4103f5a0ae8adb7cc4efa4c0820b97be07cd42344f1ce8c"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/11",
+        "bindingSha256": "3217bb4542b6d20af2fe1717a9cd912042a8c0a3e26f0082c9c0ccb0a5da58a7",
+        "targetUnitDigest": "5a6a28507ce8fe1d6df98cd239c61f9d9dbf6e320621f21459fba8174c108939"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/12",
+        "bindingSha256": "ce604d7a23e8ad34fe86be6d4d3687dfec7e8e11dd4d8a5c255871ad39f50712",
+        "targetUnitDigest": "11acb9f9f0326bc74fa270823e169722679dcaed64cc6da150f5f2c7912d9400"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/132",
+        "bindingSha256": "114c99ce477587056021daf42d7b367187f641ee1c9b45428abd14288e622cf3",
+        "targetUnitDigest": "da06863c06dece6df978e96d9877c1608a30257865d153626d4473b7beca532f"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/133",
+        "bindingSha256": "c1b907e4fe26f6f3deeef5257b5a3be6e3d286de99ac835ddec7961edf16d0ac",
+        "targetUnitDigest": "83c4ce05b5d6a9b14dccd5a2365bec12ee589a80b555dec26a5a7275106b45ec"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/134",
+        "bindingSha256": "17f0d5dccecee97be0c49787102db666c401f15719fdb33fb8cce0ee11c98f73",
+        "targetUnitDigest": "40414b50fe1dc4e6f041fd0fde8ca68afb2519c25ce3de0d798ba58b59bfc491"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/14",
+        "bindingSha256": "adc69f36a7118cdeb7c8bb5bde0fba74e9602f2ca6708b46de91ca3ba2551974",
+        "targetUnitDigest": "a8bf93ec2567af2434702019c1658d02480d403ef4be9666fb28bb6c81f14746"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/15",
+        "bindingSha256": "adc69f36a7118cdeb7c8bb5bde0fba74e9602f2ca6708b46de91ca3ba2551974",
+        "targetUnitDigest": "a8bf93ec2567af2434702019c1658d02480d403ef4be9666fb28bb6c81f14746"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/154",
+        "bindingSha256": "477661f702e37a9252670a9642ff0b30aa121613dc802f7f0ce6cd2bf947c92e",
+        "targetUnitDigest": "a696f244df3709c995c6a5d8a35ec2083a12d72b54ddba980e58c1d556c623e4"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/155",
+        "bindingSha256": "cd47f51bfb8b4954115e1daefe6556675346690ba636e11f8b88bbe54bda4a40",
+        "targetUnitDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/156",
+        "bindingSha256": "7ef3308fcf2e64fcfb7e3bacd7c3ff92b954fb95ac67b27dd8589a76204be6a6",
+        "targetUnitDigest": "604f27c0c0b41f7c810ab6fbdc753ca0554a9af27dbac7ef93d99156bf4cc7e9"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/157",
+        "bindingSha256": "6a91599526f7f141367d7911d1e8fa4f445d9c992050ed5668f00cc687903ac4",
+        "targetUnitDigest": "b39158ae03ad6358028e813139d4157895186944f4a10ddd3e8756f61cbc8824"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/159",
+        "bindingSha256": "077f026edfdb22ca646e3f9509b77726730085e3840d9d3b775f1e6fa67d53b1",
+        "targetUnitDigest": "1dc2761ded279b2db8a63a37ab46622ee0857ac91ac6bddc70b647b6fd45659f"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/162",
+        "bindingSha256": "f5a5cc3379247dd0d839cd9e916eec3aba133c96bd41cd5b28833ff67b1fc9a9",
+        "targetUnitDigest": "025b8b721ce848ae9047ff219539a44ddcb48627029daad0566fd065a33c2a52"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/163",
+        "bindingSha256": "24965530bf5e047663d58827a75777863561aaec3cbcb1d1afd352c926331d6b",
+        "targetUnitDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/164",
+        "bindingSha256": "c44ab7e94712811da87c49d6566bd5c936764eb0ba0dbe3cea818be0a83e5cba",
+        "targetUnitDigest": "59d0cd5865c681d2535cd1fdfcfa91bb8062f779329ace7673d29537159e2163"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/165",
+        "bindingSha256": "5e902f8963ea53f13c7f5ad63b83089c7e92eef0f90e2b1f32931ad4a486732f",
+        "targetUnitDigest": "04f51a4f5dfccd3bd32411d47268161e9a971db21e975f38699939e78a1f0c55"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/166",
+        "bindingSha256": "16e4aa570d737cc2b559291c2d577c6a0500f75f2ef582bbcc1833e763578dd6",
+        "targetUnitDigest": "124888c61ed54076f79cc849c645c99501bb225b3f323f33af973891f9a5749d"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/167",
+        "bindingSha256": "4e28b65556cc1eb2fe32acbcc44a49cf7c4973438710160426854fe7061697f3",
+        "targetUnitDigest": "c11d67db6566ba3bc0468506dfdcdc3333c4c43943db1813332d60a8e6be3278"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/168",
+        "bindingSha256": "03ceea8e6e2cea767fa1f197511beabc44cfe7a4cef0765b11807b278a4b889b",
+        "targetUnitDigest": "a23e016ecbd901a3f370dd33b3fa87d0f679a24d9be45e178f34b4e24134334c"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/171",
+        "bindingSha256": "e4949fb13c9b759de912a06c748085fef5f27b6595ed6fc528b220ee3c527dc3",
+        "targetUnitDigest": "67ff0ec2d25af01f6dcbc9715018d0d3113542ed4c3d9fd321c10748d2fad180"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/172",
+        "bindingSha256": "7bbb7c7cd47809b0120bb6c75e2defaed6970520154306837596fa15e0332c6f",
+        "targetUnitDigest": "455696e32c5e98ffca93441a2068682b5e085c16763e97e0605fa46948bff67b"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/248",
+        "bindingSha256": "208960e9350d7d3095e673f8fa0e4d68154ef88dcd43bce98f268348ec948192",
+        "targetUnitDigest": "83c14a937143634c17008b10bddbfb2657bc4377adadd84f6886d486aa293bd1"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/250",
+        "bindingSha256": "b9da875bbfaf5e2ec94ba5fac0e5e69bf8afc2f051470f6f3744eae8e7531751",
+        "targetUnitDigest": "f1dec519dfc928f2992606822417a8aa677796a14914454c1794b1900b8021ed"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/439",
+        "bindingSha256": "e7c267d16676e1c5087c07ae09e1222ed8e9d214174c47e987584b443bba6f5e",
+        "targetUnitDigest": "0a6915d3d53788e9d70de92159d89758b13182872f5a7ee48020efc0ffacf620"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/441",
+        "bindingSha256": "c0ec7cd87c7fbb9f62d1ac2cf7c9240eaf24cc104a1255e22988653d323d7380",
+        "targetUnitDigest": "b348235f25df183af98143ce5220b4b9731b2e44dd4578dcd41d9432a5461c48"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/443",
+        "bindingSha256": "84c755cca2031efc8b8335dea71b0791e6e5c7a4a3cdb6e3cb648e1cf8db9569",
+        "targetUnitDigest": "58e740e33a9a769ae192744c810c87b42186d4cdf7bd00141de737534efe7c0c"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/444",
+        "bindingSha256": "a9d191a9f1fc2b3ec50c7b2a4c807e301249c4a115cf84769b48ec2517f0431b",
+        "targetUnitDigest": "28a2888fab360eae6e8483223120b6b767c32cddd3194d81541cc478bdc06af9"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/445",
+        "bindingSha256": "f4e68d4ea2211f96a467485d4958b6a1615901070f06bd700edc73c718bc3bcd",
+        "targetUnitDigest": "44dac5df762c5f87cc45d20804acdd3feb26cc918d6555421c131c555aea4fd4"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/447",
+        "bindingSha256": "e0340fb6e6566ec4fd6e93a373097ed6ef62e7fab646c0f258a07d12ee33ddec",
+        "targetUnitDigest": "b65eccb0bfb36f2ca3b4aea4c026dfaaaa60367e4b4e0ee0b082bf19ad74d5eb"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/449",
+        "bindingSha256": "0b95e6d402886405ed6034a2163467d7fbfbc3e72fda1807d23fe470184b7b23",
+        "targetUnitDigest": "d0b9dc422c288c90827e052e3925c863364d5c1da85bdc9b591861a9fa4b5e82"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/451",
+        "bindingSha256": "fe390a7798f6bcd3f0b7201ee7fc71fbd0b4c599b03581eab94b03bbf700646f",
+        "targetUnitDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/452",
+        "bindingSha256": "51939a41c7810ade8177b04e51ee6c125ab1efca737571a4a06cd18b9f5827d3",
+        "targetUnitDigest": "8eb6fc7fa7239f55dc32f5aff96506fdb14e1dab2dcc19646c88f9c35d022dcc"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/453",
+        "bindingSha256": "24ad159bc32029ce5d209cc40e650040150033612ef3aa8be8f4b8f98d9252f5",
+        "targetUnitDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/454",
+        "bindingSha256": "81c3dbd6e6931d21e6ac5ee3fdbd630c376bbb1f3ea0925d04291186df0ce768",
+        "targetUnitDigest": "a53cd6b5733054d5303010da8b1c661ba5322563d115210eb26ba3a6986cd7f8"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/455",
+        "bindingSha256": "5fa4d89274f84622dc3fc163f44f69fb4f33497fa85e1e422d7e240d20929cda",
+        "targetUnitDigest": "657e5b15bf7f9f37215c2f5ee49bc8e3138f6c678dc74b8d68a051604c85cd71"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/459",
+        "bindingSha256": "63353fe1d72c8c812b88f01717aa11555a2b2cc6e78b509a28898fbb0d5c8305",
+        "targetUnitDigest": "eb2ceb790602f8bd3310614dd469d2ca6038960a4985a5634d5a22a1030c7fe0"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/461",
+        "bindingSha256": "6b51abc9faab7b005fe09ee63b43f9cf4733a2453e3a4f24a9df9b38c8d4e464",
+        "targetUnitDigest": "6597c805f92af65a56d56360287e9afe803302ee3f92f4cb3e4c4171455a2494"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/463",
+        "bindingSha256": "563eae3683c5683cd1ffc117f4daf73d9d094eb50cb994af0928b3e37225f16b",
+        "targetUnitDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/465",
+        "bindingSha256": "67098c528699d0e4d7c39bddb2a8685c5f7648e95c3b663d2c93924e90bbb389",
+        "targetUnitDigest": "0e93cfa2f85e0e2dc551cea9ca8232742dd7c313288eb665c3a2e7e0bd1b84ac"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/467",
+        "bindingSha256": "8036eed0263d0e6d7db0f9b07f324b7532fec7ea56db8d94c6a4f7432ad84992",
+        "targetUnitDigest": "ede7acc66ef8ba5fd9d75af9ee37f824f703af0fe81bd8a982cad99337ffc068"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/469",
+        "bindingSha256": "066a5aa770a4c8597ea7e0b1f193d54d97ee58f32e1f1c1a248eed0799aee390",
+        "targetUnitDigest": "d1f0faef5ca3de2ede25d801bf20fe9505d25e86b186aee4ee1f096bde63fc2e"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/471",
+        "bindingSha256": "5143a17d469805fafde66cbf6320dd93cf06255d7df6dce16c02d8e8f9d22c56",
+        "targetUnitDigest": "a51fdcfe7d7914c5336d3e233a6d0242cae8670f7e656299b43ba0f9e3d5de2d"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/473",
+        "bindingSha256": "d837710aa50fdbfac6991a4d87db5757c830c289cfbc43f40aa3867c99be0170",
+        "targetUnitDigest": "19c9c45fdd93380e44d303b0a25bfb118193bcc69a36c4d91fdfc662055902d1"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/475",
+        "bindingSha256": "07c53f5fe6e065a813614b5bff4a33e3265d28b8f2aebee8e0faaddbb7a9f1f4",
+        "targetUnitDigest": "31edabdb888285eb12462dd50af24bf3f6edc9af3e4afc129909d11ccca3c2ae"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/477",
+        "bindingSha256": "764e91eecbd1093add1f39789e8d4bc605a408bbf017e12eb270ce669e592ba8",
+        "targetUnitDigest": "a1fa418f9e8efd39553b8f30c10b134e1192646b08b68db4225de81de04b5237"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/479",
+        "bindingSha256": "b836af8342d7c51401aacc532252338e66493649df8ac6e5aea2cf505437df9c",
+        "targetUnitDigest": "0b962f5518dcbbfad67bcb4760aaddc4ab2d54aec66968d3eb0812340e318d06"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/481",
+        "bindingSha256": "66b2a285654f39cb9ef34f6e7cd430f4f5e14902390512bae66a946c45f091b8",
+        "targetUnitDigest": "61e128436645d5127c2050899a6e209b13206523fe4a641557c4277ffda23d97"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/484",
+        "bindingSha256": "65dedaf6439f979be1b6791c5de394ff4b9f50649ae663f1fd697565e5ca7ddc",
+        "targetUnitDigest": "1ce68806e971b372fb45ad8f92cc55e0096b7aeca115a614bdd65554d27ac1e0"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/86",
+        "bindingSha256": "19116044cb8471edc311128a1536b03046fb9cdaab8f04a65c835183ff5e992f",
+        "targetUnitDigest": "e4af416abe40eaf70f1f910b5a777c293eaaa6907bae3c0c18d84d04f7d0bd63"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/9",
+        "bindingSha256": "752e30596de569f8b9533b0c4fd3a2fc211ccbe810c741606b3a539b168eed3c",
+        "targetUnitDigest": "de045416214e9431a47210ed32e61ade9efb33289ed7e589859f05736909f5eb"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/claims/97",
+        "bindingSha256": "a073ccc4d33222a19881bc63bd7580c4b4edf455d1a6f672c2f0ce5e43a09514",
+        "targetUnitDigest": "be7eed6375cbeea35577d9d6fc9cfa8c6c24314b3ec71c52d1405e92c5ebb2f6"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/0",
+        "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+        "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/10",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/11",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/12",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/13",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/14",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/15",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/16",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/17",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/18",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/2",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/33",
+        "bindingSha256": "aa03e06d0e01701e543241265265b1649063d3614607c8a419d73366be648e39",
+        "targetUnitDigest": "a943adf388f96e583638dab0a1b4278a0faf2b869916ed16b2d4c77416dffbf8"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/37",
+        "bindingSha256": "e8e5889f2a9ffc8946d6cb5b0cebe0cebd0abe2c87f4995f7977d848a1c521f6",
+        "targetUnitDigest": "e8167a0a73f3c3642511a20aecbcee8b6f8ef8bbb0ab6912d41b8958038642e4"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/38",
+        "bindingSha256": "091e411192d054deaa6a839c8d15fdd16e1f2fbf4c765a042c850a8d8d381127",
+        "targetUnitDigest": "ab5f847e13a581815d3843c93ab1083c090e81c1e517c1fe3354a572ee15b8f9"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/4",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/41",
+        "bindingSha256": "a28e24f2f5711f5895523be3028d0aab24a0078bc9b7385da75512eec550085f",
+        "targetUnitDigest": "7955b70c0fe3dc2879965b9a6a8c6337a14359ce269e0132720511e74e4c4e50"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/5",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/6",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/7",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/8",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/9",
+        "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+      }
+    ]
+  },
+  "noAuthorityTransition": true,
+  "replayRecipe": {
+    "language": "python3 -B",
+    "source": "import sys,json,runpy,subprocess,hashlib,collections,difflib\nfrom pathlib import Path\nP=Path('plans/260925-documentation-authority-unification');R=P/'reports/phase-09';L=P/'ledger/decisions';sys.path.insert(0,str(R/'ledgerfix'))\nfrom bindings import documents,rows,at,payload,digest,effective,supersessions\nrb=runpy.run_path(str(R/'rebind/rebind.py'));D=documents();links=supersessions(D);record=json.loads((R/'rebind/g0-rework-rebindings.json').read_text());head=record['sourceHead'];touched={(x['file'],x['pointer']) for x in record['rows']}\ncurrent={effective(f,p,at(D[f],p),D,links)[:2] for f,p in touched}\npaths=sorted({at(D[f],p)['targetOwner'] for f,p in current});cat=rb['extract'](dict(paths=paths))['catalog']\nfor f,p in touched:\n r=at(D[f],p);assert r['bindingSha256']==digest(r),(f,p,'hash');assert r['reviewStatus']=='pending',(f,p,'pending')\n before=json.loads(subprocess.check_output(['git','show',head+':'+f],text=True));old=at(before,p)\n for key in ['claimId','sourcePath','sourceUnitDigest','sourceContent']:\n  if key in old:assert r[key]==old[key],(f,p,key)\n assert r['priorReview']['g0ReworkBefore']==old,(f,p,'historical snapshot')\nfor f,p in current:\n r=at(D[f],p);us=rb['matches'](r,cat[r['targetOwner']]['units']);assert us,(f,p,'live effective target')\n if r.get('targetAnchor'):\n  assert len(us)==1;u=us[0];assert r['targetAncestry']==u['ancestry']+([u['title']] if u['unitKind']=='heading' else []),(f,p,'ancestry')\nheld=json.loads((R/'g0join/verdict-batches/held.json').read_text())['rows'];assert len(held)==27\nfor h in held:\n r=at(D[h['file']],h['pointer']);assert r['bindingSha256']==digest(r) and r.get('targetUnitDigest');assert (h['file'],h['pointer']) in touched\nrework=[]\nfor batch in range(1,7):\n for v in json.loads((R/f'reviews/w24-g0-verdicts-b{batch}.json').read_text())['verdicts']:\n  if v['verdict']=='REWORK':\n   r=at(D[v['file']],v['pointer']);assert (v['file'],v['pointer']) in touched\n   assert r['reviewStatus']=='pending';rework.append(dict(file=v['file'],pointer=v['pointer'],disposition=r.get('disposition'),binding=payload(r)))\nassert len(rework)==15\ns9=D[str(L/'s9-runner-01.json')];assert not [(c,i) for c in ['claims','registryGaps'] for i,r in enumerate(s9[c]) if r.get('disposition')=='move' and r.get('sourceUnitDigest')!=r.get('targetUnitDigest')]\nassert len(record['runnerMoveMismatchRows'])==19\n# Exact clause proof over authenticated historical source bytes, including\n# heading section payloads, not only their unchanged title text.\nclause_rows=[(str(L/'s9-runner-01.json'),x['pointer']) for x in record['runnerMoveMismatchRows']]+[(str(L/'s10-systemic-native-predecessors.json'),'/registryGaps/4')]\nversions={}\nfor f,p in clause_rows:\n w=at(D[f],p)['legacyWordingWitness'];key=(w['commit'],w['path'])\n if key not in versions:versions[key]=dict(path=f'source-{len(versions)}.md',content=subprocess.check_output(['git','show',w['commit']+':'+w['path']],text=True))\nvc=rb['extract'](dict(virtual=list(versions.values())))['catalog']\nclause_count=0\nfor f,p in clause_rows+[(str(L/'s13-resync-a.json'),'/sourceBindings/453'),(str(L/'s17-misc-review-fixes.json'),'/bindingRefresh/13')]:\n r=at(D[f],p);new=next(u for u in cat[r['targetOwner']]['units'] if u['anchor']==r['targetAnchor'])\n if 'legacyWordingWitness' in r:\n  w=r['legacyWordingWitness'];v=versions[(w['commit'],w['path'])]\n  old=next(u for u in vc[v['path']]['units'] if u['anchor']==w['sourceAnchor'] and u['textDigest']==w['sourceUnitDigest'])\n  oldtext=old.get('sectionText',old['text']);newtext=new.get('sectionText',new['text'])\n else:oldtext=r['sourceContent'];newtext=new['text']\n exact=[('\\n'.join(oldtext.splitlines()[a:b]),'\\n'.join(newtext.splitlines()[c:d])) for tag,a,b,c,d in difflib.SequenceMatcher(None,oldtext.splitlines(),newtext.splitlines(),autojunk=False).get_opcodes() if tag!='equal']\n assert exact==[(c['oldWording'],c['newWording']) for c in r['changedClauses']],(f,p,'exact changed clauses')\n assert all(c['changeSources'] for c in r['changedClauses']);clause_count+=len(exact)\ngf=str(L/'g0-content-redecisions.json');duplicates=[]\nfor n,o in [(124,6),(125,20),(126,21)]:\n r=D[gf]['bindingRefresh'][n];assert r['supersedesBinding']['shard']==gf and r['supersedesBinding']['pointer']==f'/bindingRefresh/{o}'\n assert effective(gf,f'/bindingRefresh/{o}',D[gf]['bindingRefresh'][o],D,links)[:2]==(gf,f'/bindingRefresh/{n}')\n duplicates.append(dict(older=o,newer=n,effectivePointer=f'/bindingRefresh/{n}'))\n# Reuse the real join's obligation traversal against working-tree documents.\n# This is explicitly NOT --pin HEAD proof or a manufactured review verdict.\nj=runpy.run_path(str(R/'g0join/join.py'));register=json.loads((P/'reports/phase-08/step-08-preflip-gates.json').read_text());baseline={}\nfor f in D:\n b=subprocess.run(['git','show',register['sourceCommit']+':'+f],capture_output=True,text=True)\n if b.returncode==0:baseline[f]=json.loads(b.stdout)\ngroups,errors=j['resolve'](register,D,baseline);assert not errors\nbeforejoin=json.loads((R/'g0join/join-ee2ce49c4.json').read_text())\n# Three aliases close, while newly recorded in-place rebindings can add\n# obligations. Never confuse that union with a fixed subtraction census.\nfor n,o in [(124,6),(125,20),(126,21)]:\n assert (gf,f'/bindingRefresh/{o}') not in groups\n assert (gf,f'/bindingRefresh/{n}') in groups\nprior={(r['file'],r['pointer']):r for r in beforejoin['rows']};outside=[];pending=[]\nfor loc,g in groups.items():\n if g['row'].get('bindingSha256')!=digest(g['row']) or not g['row'].get('targetUnitDigest'):outside.append(dict(file=loc[0],pointer=loc[1],reason='invalid-current-binding'))\n if loc in touched or any((o['file'],o['pointer']) in touched for o in g['origins']):\n  pending.append(dict(file=loc[0],pointer=loc[1],bindingSha256=g['row']['bindingSha256'],targetUnitDigest=g['row']['targetUnitDigest']))\n else:\n  assert loc in prior,loc\n  if prior[loc]['errors']:outside.append(dict(file=loc[0],pointer=loc[1],errors=prior[loc]['errors']))\nassert not outside,outside\nout=dict(status='scoped-data-checks-passed-not-gate-acceptance',sourceHead=head,changedBindingRows=len(touched),effectiveChangedBindings=len(current),heldRowsValidated=27,runnerMoveMismatchRowsRedecided=19,exactClauseRows=len(clause_rows)+2,exactChangedClauses=clause_count,reworkRows=rework,duplicateChains=duplicates,workingTreeObligationJoin=dict(note='Supplement only: reuse resolve() with working-tree rows and frozen baseline. Every touched origin is pending fresh independent review, even where old two-digest verdicts still match. This is not a --pin output, no new approvals.',beforeEffectiveRows=beforejoin['counts']['effectiveRows'],afterEffectiveRows=len(groups),addedEffectiveRows=[dict(file=f,pointer=p) for f,p in sorted(set(groups)-set(prior))],removedEffectiveRows=[dict(file=f,pointer=p) for f,p in sorted(set(prior)-set(groups))],pendingThisTurn=len(pending),otherOpen=outside,pendingBindings=pending),noAuthorityTransition=True)\nout['replayRecipe']=dict(language='python3 -B',source=Path(__file__).read_text(),sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),instructions='Materialize this source under your own tempfile directory in /tmp/fgos-work, run from repository root with NODE_OPTIONS=--no-addons, and remove the tempfile on exit. No product suites or native addons.')\n(R/'g0join/rework-data-validation.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\\n');print(json.dumps({k:v for k,v in out.items() if k not in ['reworkRows','workingTreeObligationJoin']},ensure_ascii=False,indent=2));print('pendingThisTurn',len(pending),'otherOpen',len(outside))\n",
+    "sha256": "28a5eb0d2d4edbef4740aa83139bb1c35e04674431fe70faff4cdfebd1e229bb",
+    "instructions": "Materialize this source under your own tempfile directory in /tmp/fgos-work, run from repository root with NODE_OPTIONS=--no-addons, and remove the tempfile on exit. No product suites or native addons."
+  }
+}

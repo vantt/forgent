@@ -14398,17 +14398,43 @@
         "bindingSha256": "0dc5159b21dc53fea55f4ca63c6e5d05c88281573d5523801d7609530d617993"
       },
       "targetAncestry": [
-        "Platform Foundations",
-        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption"
       ],
-      "targetAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
-      "targetOwner": "docs/platform/platform-foundations.md",
-      "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
-      "bindingSha256": "0dc5159b21dc53fea55f4ca63c6e5d05c88281573d5523801d7609530d617993",
+      "targetAnchor": "0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetUnitDigest": "f617f1c06417c2f7984c2c37a8b6d06c85bdc662faa1bb373adac1858eb519d8",
+      "bindingSha256": "8ef7e89155f83c0a385269c971ebfeef8a702b1310c1eaceacc0a0d487d02afc",
       "preimageContentSha256": "6878d16b7457809b91344e2aabc6d97d2cca7f2a51d3ca7f1ef9dde58b07735c",
       "matchScore": 3,
-      "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reason": "Explicit drop of the erroneous platform-foundations retired-history heading: the reference-004047 reader reads only runner and work-state, not foundation. Correct this alias to the Work 0032 Team Harness topic already named by conservedClaims/7/bindings/2; it is not an additional source claim. Runner 0032 Iron Law remains in bindings/3. Both collision topics remain present; no test/path migration or assertion deletion is authorized.",
+      "reviewStatus": "pending",
+      "priorReview": {
+        "g0ReworkBefore": {
+          "supersedesBinding": {
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+            "pointer": "/conservedClaims/7/bindings/0",
+            "targetOwner": "docs/platform/platform-foundations.md",
+            "targetAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+            "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+            "bindingSha256": "0dc5159b21dc53fea55f4ca63c6e5d05c88281573d5523801d7609530d617993"
+          },
+          "targetAncestry": [
+            "Platform Foundations",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+          ],
+          "targetAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+          "targetOwner": "docs/platform/platform-foundations.md",
+          "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+          "bindingSha256": "0dc5159b21dc53fea55f4ca63c6e5d05c88281573d5523801d7609530d617993",
+          "preimageContentSha256": "6878d16b7457809b91344e2aabc6d97d2cca7f2a51d3ca7f1ef9dde58b07735c",
+          "matchScore": 3,
+          "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
+          "reviewStatus": "pending"
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited.",
+      "disposition": "supersede"
     },
     {
       "supersedesBinding": {
@@ -25082,8 +25108,32 @@
       "bindingSha256": "01c1c7c33c5d66bfed4ecedcb655d87100a6fbae6e791f799448934fc418b01d",
       "preimageContentSha256": "1e990ee5a7f7bdd020c0ff2e6d6aa285ea93eaa5b73f2dc6c43f37c3e8d34e4e",
       "matchScore": 0.9719626168224299,
-      "reason": "Changed candidate envelope or relocated/adapted clause; explicit before/after witness is retained for review.",
-      "reviewStatus": "pending"
+      "reason": "Changed candidate envelope or relocated/adapted clause; explicit before/after witness is retained for review. The source line Document type: Contract moved to the same holder metadata fence; it is conserved there, not dropped from the document.",
+      "reviewStatus": "pending",
+      "priorReview": {
+        "g0ReworkBefore": {
+          "supersedesBinding": {
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+            "pointer": "/unitCarries/296",
+            "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+            "targetAnchor": "unheaded-block-2",
+            "targetUnitDigest": "1e990ee5a7f7bdd020c0ff2e6d6aa285ea93eaa5b73f2dc6c43f37c3e8d34e4e",
+            "bindingSha256": "702eb0b4aeb745adbe3d85f88f32bbfc7c1fcee47c8e9d0badd22360495eda5c"
+          },
+          "targetAncestry": [
+            "Knowledge Registry State Contract"
+          ],
+          "targetAnchor": "unheaded-block-2",
+          "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+          "targetUnitDigest": "88c6bc62d859bd8458a097628c7e442a73ec4521d789c8f433bf3e47617414bc",
+          "bindingSha256": "01c1c7c33c5d66bfed4ecedcb655d87100a6fbae6e791f799448934fc418b01d",
+          "preimageContentSha256": "1e990ee5a7f7bdd020c0ff2e6d6aa285ea93eaa5b73f2dc6c43f37c3e8d34e4e",
+          "matchScore": 0.9719626168224299,
+          "reason": "Changed candidate envelope or relocated/adapted clause; explicit before/after witness is retained for review.",
+          "reviewStatus": "pending"
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited."
     },
     {
       "supersedesBinding": {
@@ -27379,10 +27429,9 @@
       "supersedesBinding": {
         "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
         "pointer": "/claims/27",
-        "targetOwner": "docs/platform/component-boundary.md",
         "targetAnchor": "5-high-level-component-authority-register",
-        "targetUnitDigest": "e086f83923aac7dad4e323cdf59fd7be32b2feabcc46802ad41baff5a6a406c2",
-        "bindingSha256": null
+        "targetUnitDigest": "539e4336c8f12cd426751dbf3dd0fba533a0767d7f654edc1881aed4a559ea26",
+        "bindingSha256": "4c43c2fb546005229ad28e9b6881ac1737afee4c90a7ca5f4afd51b91ff7adf4"
       },
       "targetAncestry": [
         "Component Boundary",
@@ -27397,7 +27446,34 @@
       "preimageContentSha256": "05763b3300f415494eba41e464b8c07b439ea627aee196cc47971279e869abb9",
       "matchScore": 2,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "priorReview": {
+        "g0ReworkBefore": {
+          "supersedesBinding": {
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "pointer": "/claims/27",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "5-high-level-component-authority-register",
+            "targetUnitDigest": "e086f83923aac7dad4e323cdf59fd7be32b2feabcc46802ad41baff5a6a406c2",
+            "bindingSha256": null
+          },
+          "targetAncestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "5. High-Level Component Authority Register"
+          ],
+          "targetAnchor": "5-high-level-component-authority-register",
+          "targetOwner": "docs/platform/component-boundary.md",
+          "targetUnitDigest": "c20eee34f9012fa68e41ec39d6a4e3fb2a03e7e0e5c010829ee119609050a6aa",
+          "bindingSha256": "efcbebbafdbf25cc7afee9700520130260894a703fda6039259748a502c83f5c",
+          "preimageContentSha256": "05763b3300f415494eba41e464b8c07b439ea627aee196cc47971279e869abb9",
+          "matchScore": 2,
+          "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
+          "reviewStatus": "pending"
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited."
     },
     {
       "supersedesBinding": {
@@ -27451,10 +27527,9 @@
       "supersedesBinding": {
         "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
         "pointer": "/claims/30",
-        "targetOwner": "docs/platform/component-boundary.md",
         "targetAnchor": "unheaded-block-40",
-        "targetUnitDigest": "57f9ce1415b601e5a7dc77c281d688b5ef47c7c84bf5620294bacf66ed5bde0f",
-        "bindingSha256": null
+        "targetUnitDigest": "5f4a17570b16c371d6e0e17c52b6f72acdd363faa4ed92c9c3fc125c446915ba",
+        "bindingSha256": "38de637ff86cdcabe8f4c90c65e27557ec6bf5056508758ac961ec9f7d6137aa"
       },
       "targetAncestry": [
         "Component Boundary",
@@ -27469,7 +27544,34 @@
       "preimageContentSha256": "57f9ce1415b601e5a7dc77c281d688b5ef47c7c84bf5620294bacf66ed5bde0f",
       "matchScore": 1,
       "reason": "Changed candidate envelope or relocated/adapted clause; explicit before/after witness is retained for review.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "priorReview": {
+        "g0ReworkBefore": {
+          "supersedesBinding": {
+            "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "pointer": "/claims/30",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "unheaded-block-40",
+            "targetUnitDigest": "57f9ce1415b601e5a7dc77c281d688b5ef47c7c84bf5620294bacf66ed5bde0f",
+            "bindingSha256": null
+          },
+          "targetAncestry": [
+            "Component Boundary",
+            "Added in candidate: component-boundary-advisory source carriage",
+            "fgOS Component Boundary Advisory",
+            "5. High-Level Component Authority Register"
+          ],
+          "targetAnchor": "unheaded-block-40",
+          "targetOwner": "docs/platform/component-boundary.md",
+          "targetUnitDigest": "c21b25f287242d61eec950ff2a05b37b8288c2fcf4dcf4648d3c14a4fc9a27e8",
+          "bindingSha256": "2105cad7b31f5705708a4d4600b7f3bdff94ff34820ae317145d92ce214237c4",
+          "preimageContentSha256": "57f9ce1415b601e5a7dc77c281d688b5ef47c7c84bf5620294bacf66ed5bde0f",
+          "matchScore": 1,
+          "reason": "Changed candidate envelope or relocated/adapted clause; explicit before/after witness is retained for review.",
+          "reviewStatus": "pending"
+        }
+      },
+      "reviewNote": "G0 rework: independent review of this exact re-decision is pending; no approval inherited."
     },
     {
       "supersedesBinding": {
