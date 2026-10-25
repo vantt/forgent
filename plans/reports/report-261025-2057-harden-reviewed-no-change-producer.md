@@ -12,7 +12,8 @@ A writing seat that claims done with no changed files settles `confidence.level:
 
 ## Tests (test/runner/execution/patterns/reviewed.test.mjs)
 - Added (red first, own commit): "a producer that changed nothing is still reviewed, and the reviewer's verdict decides the round" (pass and findings).
+- Added: "a checker that settled with no evidence still ends the round" (live and resumed history; a checker never gets the exception).
 - Added: "a producer that crashed stops the round before any reviewer" (failure code, confidence failed). The existing "propagates execution-failure and other hard error outcomes" covers checker-side errors only, so a producer-side case was added.
-- Run: reviewed.test.mjs and run-case-admission.test.mjs (the only two files matching `patterns/reviewed`): 34 tests, 34 pass, 0 fail.
+- Run: reviewed.test.mjs and run-case-admission.test.mjs (the only two files matching `patterns/reviewed`): 35 tests, 35 pass, 0 fail.
 
 Status: DONE
