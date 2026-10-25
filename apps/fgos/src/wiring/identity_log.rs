@@ -51,8 +51,11 @@ impl LogDoor for StoreLogDoor {
             ResolveRepo::NotARepository => return Ok(None),
         };
         let layout = Layout::from_common_dir(Some(repo.common_dir())).map_err(|e| fault(&e))?;
-        // A clone whose store was never migrated has nothing to share into; appending would create it.
-        if std::fs::symlink_metadata(layout.store()).is_err() {
+        // A project whose events were never migrated has nothing to share into. Migration commits the
+        // `.fgos/events` fence; the store itself is minted by the first append, so a clone of a migrated
+        // project that never appended still publishes, and this first append creates its store.
+        let migrated = std::fs::symlink_metadata(repo.trusted_main_root().join(".fgos/events")).is_ok_and(|m| m.is_file());
+        if !migrated && std::fs::symlink_metadata(layout.store()).is_err() {
             return Ok(None);
         }
         let configured = driver.machine_id(&repo).map_err(|e| fault(&e))?;
@@ -82,10 +85,15 @@ impl StoreLog {
         })
     }
 
-    /// The stream as the store orders it, and this store's own origin id.
+    /// The stream as the store orders it, and this store's own origin id: empty while the clone has
+    /// no store yet, as the store's own status reads it, so only other machines' entries are read.
     fn read_stream(&self) -> Result<(fgos_event_store::read::ReadResult, String), Refusal> {
         let fault = |e: &dyn std::fmt::Debug| store_fault("event-store-read-failed", e);
-        let origin = StoreIdentity::open(&self.layout, &self.machine).map_err(|e| fault(&e))?.store_id;
+        let origin = match std::fs::symlink_metadata(self.layout.store()) {
+            Ok(_) => StoreIdentity::open(&self.layout, &self.machine).map_err(|e| fault(&e))?.store_id,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => String::new(),
+            Err(e) => return Err(fault(&e)),
+        };
         let result = read(
             &self.driver,
             &self.repo,

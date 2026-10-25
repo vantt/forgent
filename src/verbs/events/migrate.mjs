@@ -7,6 +7,7 @@ import { isDeepStrictEqual } from 'node:util';
 import { spawnSync } from 'node:child_process';
 import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
 import { resolveHostBin } from '../../util/host-bin.mjs';
+import { nativeError } from '../../native/door.mjs';
 import { selfChain } from '../../runner/dispatch/process-identity.mjs';
 import { fixEventStoreLockDirs, fixEventStoreMachineId, fixEventStoreRefspec } from '../../setup/event-store-fixes.mjs';
 import { foldEvents, serializeView } from '../../state/replay.mjs';
@@ -177,7 +178,7 @@ export async function migrateUseCase(ctx, options = {}) {
   fixEventStoreLockDirs(cwd, base); fixEventStoreMachineId(cwd, base); fixEventStoreRefspec(cwd, base);
   const { store, heldRanks } = eventsContext(ctx, options);
   const snapshot = store.readLegacyFromHead({}, heldRanks);
-  store.readLegacyFromHead({ check: true }, heldRanks);
+  const { emptyLegacy = [] } = store.readLegacyFromHead({ check: true }, heldRanks);
   if (snapshot.inventory.migrated) {
     const check = store.legacyLayout(heldRanks);
     if (!check.passed) refuse('event-store-legacy-mismatch', JSON.stringify(check.problems));
@@ -192,11 +193,17 @@ export async function migrateUseCase(ctx, options = {}) {
   const attributeBytes = files['.gitattributes'] && attributes(files['.gitattributes']);
   const attributesChanged = attributeBytes && !attributeBytes.equals(files['.gitattributes']);
   const writes = [...nonStore, ...(attributesChanged ? ['.gitattributes'] : [])];
-  const plan = { fromCommit: snapshot.inventory.fromCommit, deletions, fence: '.fgos/events', writes, import: importPlan(snapshot), message: 'chore(events): move event truth to refs/fgos (D-ADR0055)' };
+  const plan = { fromCommit: snapshot.inventory.fromCommit, deletions, emptyLegacy, fence: '.fgos/events', writes, import: importPlan(snapshot), message: 'chore(events): move event truth to refs/fgos (D-ADR0055)' };
   if (options.check) return { check: true, plan, parity };
   const git = await import('../../git/index.mjs');
   if (typeof git.createGitScopedCommit !== 'function') refuse('event-store-git-scoped-commit-unavailable', 'Git phase 05 must be merged and its release active before migration');
   if (typeof ctx.writer !== 'string' || !ctx.writer) refuse('event-store-writer-required', 'migration requires the resolved session writer');
+  // Empty untracked legacy files hold no history; they go before the commit's baseline is taken.
+  for (const p of emptyLegacy) {
+    const file = path.join(cwd, p);
+    if (fs.lstatSync(file).size !== 0) refuse('event-store-migration-parity', `${p} gained content after the check; migrate again`);
+    fs.unlinkSync(file);
+  }
   const scoped = git.createGitScopedCommit({ stateRoot: ctx.stateRoot ?? resolveStateRoot().stateRoot, repoPath: cwd, trustedMain: cwd, writer: ctx.writer }, ctx.loaderOptions);
   const baseline = scoped.preflight();
   // Import revalidates HEAD and dirt under event-seal; that lock is dropped
@@ -232,6 +239,8 @@ export async function migrateUseCase(ctx, options = {}) {
       }
     } catch (restoreError) { error.restoreError = restoreError.message; }
     error.operationId = operationId;
+    const stderr = Buffer.from(nativeError(error).stderr ?? []).toString('utf8').trim();
+    if (stderr) error.message = `${failure.cause ?? failure.code}: ${stderr}`;
     if (commitCalled) error.message += `; inspect Git ScopedCommit record ${operationId}`;
     throw error;
   }

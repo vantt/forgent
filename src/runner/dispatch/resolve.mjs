@@ -200,8 +200,8 @@ export function deriveProviderFamily(executorEntry, resolvedCommand = 'claude') 
  * `agentType` support is `tsk-53h`'s separate follow-on, not built here).
  * Reuses `baseExecutor`'s (the already-resolved `cfg.executor`, guaranteed
  * `{command,args}`-shaped by `validateExecutorShape` at config-load time)
- * own args template verbatim — never a hardcoded literal copy of
- * `DEFAULT_RUNNER_CONFIG` — so a project's own `--allowedTools`/
+ * own args template verbatim — never a hardcoded literal copy of the
+ * default executor — so a project's own `--allowedTools`/
  * `--permission-mode` customization carries through to its agentType
  * executors too. Strips the `'--model','{model}'` pair (D2: the named
  * agent definition's own pinned `model:` frontmatter wins, never overridden

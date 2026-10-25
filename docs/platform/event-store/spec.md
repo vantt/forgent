@@ -999,7 +999,12 @@ historical log, and measures parity from the exported restorable bytes.
 writing objects or refs. It reports the computed legacy commit OID and whether
 the observed ref will be created, reused or replaced as an unfenced stale import;
 its three setup repairs can create local identity/lock
-state and Git mapping provenance. Publication validates the expected HEAD,
+state and Git mapping provenance. It refuses `event-store-migration-fence-ignored`
+when the checkout's ignore rules exclude `.fgos/events`, since the cutover commit
+could not track the fence. An untracked legacy file that is empty holds no history:
+it counts as absent, the plan names it under `emptyLegacy`, and the real run
+removes it before the commit. When the cutover commit fails, the error carries
+Git's stderr as text. Publication validates the expected HEAD,
 regular-file paths, event records and clean inputs again under `event-seal`.
 It writes a deterministic parentless legacy commit and CASes an absent ref;
 an identical existing commit is reused. Without a tracked fence, a stale direct

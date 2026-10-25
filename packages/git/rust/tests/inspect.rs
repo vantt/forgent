@@ -721,6 +721,37 @@ fn main_checkout_root_follows_relative_worktree_links_and_refuses_a_submodule_as
 }
 
 #[test]
+fn ignored_paths_names_only_untracked_paths_the_ignore_rules_exclude() {
+    use std::os::unix::fs::PermissionsExt;
+    let root = std::env::temp_dir().join(format!("fgos-inspect-check-ignore-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    fs::create_dir(&root).unwrap();
+    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    git(&root, &["init", "-q", "repo"]);
+    let repo_path = root.join("repo");
+    fs::create_dir(repo_path.join(".fgos")).unwrap();
+    fs::write(repo_path.join(".fgos/tracked"), "t").unwrap();
+    git(&repo_path, &["add", ".fgos/tracked"]);
+    fs::write(repo_path.join(".gitignore"), "/.fgos/*\n").unwrap();
+    git(&repo_path, &["add", ".gitignore"]);
+    git(&repo_path, &["-c", "user.name=F", "-c", "user.email=f@example.invalid", "commit", "-qm", "init"]);
+    let driver = GitDriver::new(&root).unwrap();
+    let repo = match driver.resolve_repo(&repo_path, &repo_path).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    let ask = |paths: &[&str]| driver.ignored_paths(&repo, &paths.iter().map(|p| p.as_bytes().to_vec()).collect::<Vec<_>>()).unwrap();
+    // A path need not exist to be ignored; a tracked path never is.
+    assert_eq!(ask(&[".fgos/events", ".fgos/tracked", "src/main.rs"]), vec![b".fgos/events".to_vec()]);
+    // Nothing ignored is Git's exit 1, read as an empty answer.
+    assert!(ask(&["src/main.rs"]).is_empty());
+    // A leading colon would be pathspec magic, so it is refused, not read.
+    assert!(driver.ignored_paths(&repo, &[b":(glob)*".to_vec()]).is_err());
+    assert!(driver.ignored_paths(&repo, &[]).is_err());
+    let _ = fs::remove_dir_all(&root);
+}
+
+#[test]
 fn listing_one_namespace_returns_exactly_its_refs_and_pages_the_same_way() {
     let root = std::env::temp_dir().join(format!("fgos-list-refs-{}", std::process::id()));
     let _ = fs::remove_dir_all(&root);

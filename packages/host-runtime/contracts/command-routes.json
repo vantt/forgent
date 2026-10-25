@@ -123,6 +123,7 @@
       ],
       "migrate": [
         "accept-machine-overrides",
+        "convert",
         "dir",
         "dry-run",
         "finish",

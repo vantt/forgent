@@ -663,7 +663,21 @@ pub fn import_legacy(
         serde_json::json!({"legacyRefOid":oid.as_str(),"sealDigest":seal.digest()?,"fromCommit":inv.from_commit.as_str(),"operationId":operation_id}),
     )
 }
-pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> Result<(), Error> {
+/// Refuses dirty or untracked migration inputs and a fence the checkout's
+/// ignore rules would keep out of the cutover commit. Returns the untracked
+/// legacy files that are empty: they hold no history, so they count as absent.
+pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> Result<Vec<String>, Error> {
+    if !driver
+        .ignored_paths(repo, &[b".fgos/events".to_vec()])
+        .map_err(git_error)?
+        .is_empty()
+    {
+        return Err(Error::new(
+            ErrorCode::EventStoreMigrationFenceIgnored,
+            "the ignore rules exclude .fgos/events, so the cutover commit cannot track the fence; re-include it (for example `!/.fgos/events` in .gitignore) and migrate again",
+        ));
+    }
+    let mut empty = vec![];
     let mut cursor = None;
     loop {
         let page = driver
@@ -678,6 +692,14 @@ pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> R
             .map_err(git_error)?;
         for e in page.entries {
             let p = std::str::from_utf8(&e.path).map_err(|_| invalid("status path UTF8"))?;
+            if e.untracked
+                && retired_path(p)
+                && std::fs::symlink_metadata(repo.trusted_main_root().join(p))
+                    .is_ok_and(|m| m.is_file() && m.len() == 0)
+            {
+                empty.push(p.to_owned());
+                continue;
+            }
             if retired_path(p)
                 || inv.files.contains_key(p)
                 || p == ".fgos/events"
@@ -687,7 +709,7 @@ pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> R
             }
         }
         if page.complete {
-            return Ok(());
+            return Ok(empty);
         }
         cursor = Some(
             page.next_cursor

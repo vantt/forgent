@@ -134,7 +134,7 @@ pub fn native_operation_id(route_operation: &str, args: &[OsString]) -> Result<S
 /// `fgos config show|standard [--path <p>]`, `explain <path>`, `check`, `set <path> <value>
 /// [--reason <text>] [--global]`, `unset <path> [--reason <text>] [--global]
 /// [--acknowledge-comment-loss]`, `patch <file> [--reason <text>] [--global]`, `migrate [--dry-run]
-/// [--accept-machine-overrides]` or `migrate --global [--finish [--machine-checked]] [--dry-run]`,
+/// [--accept-machine-overrides]` or `migrate --global [--finish [--machine-checked] | --convert [--machine-checked]] [--dry-run]`,
 /// `refresh-docs [--global]`. A path is in the text form of YAML Document. `--dir` and `--json`
 /// are accepted on every verb; the reason is optional here because a write that changes nothing
 /// needs none (the crate refuses a missing one when it is needed).
@@ -155,7 +155,7 @@ fn project_config_request(
         "unset" => (&["--reason"], &["--global", "--acknowledge-comment-loss"], 1),
         "patch" => (&["--reason"], &["--global"], 1),
         "migrate" => {
-            (&[], &["--dry-run", "--global", "--finish", "--machine-checked", "--accept-machine-overrides"], 0)
+            (&[], &["--dry-run", "--global", "--finish", "--convert", "--machine-checked", "--accept-machine-overrides"], 0)
         }
         "refresh-docs" => (&[], &["--global"], 0),
         other => {
@@ -209,8 +209,11 @@ fn project_config_request(
             if has("--finish") && !global {
                 return Err("--finish needs --global".into());
             }
-            if has("--machine-checked") && !has("--finish") {
-                return Err("--machine-checked needs --finish".into());
+            if has("--convert") && (!global || has("--finish")) {
+                return Err("--convert needs --global and goes without --finish".into());
+            }
+            if has("--machine-checked") && !has("--finish") && !has("--convert") {
+                return Err("--machine-checked needs --finish or --convert".into());
             }
             if has("--accept-machine-overrides") && global {
                 return Err("--accept-machine-overrides is for the project migration, not --global".into());
@@ -218,6 +221,7 @@ fn project_config_request(
             Verb::Migrate {
                 global,
                 finish: has("--finish"),
+                convert: has("--convert"),
                 machine_checked: has("--machine-checked"),
                 accept_machine_overrides: has("--accept-machine-overrides"),
                 dry_run: has("--dry-run"),
@@ -899,7 +903,7 @@ mod tests {
         assert_eq!(config(&["config", "refresh-docs", "--global"]).unwrap().verb, Verb::RefreshDocs { global: true });
         assert_eq!(
             config(&["config", "migrate", "--global", "--finish", "--machine-checked"]).unwrap().verb,
-            Verb::Migrate { global: true, finish: true, machine_checked: true, accept_machine_overrides: false, dry_run: false }
+            Verb::Migrate { global: true, finish: true, convert: false, machine_checked: true, accept_machine_overrides: false, dry_run: false }
         );
         // A negative number is a value, not a flag.
         assert!(matches!(config(&["config", "set", "a", "-1"]).unwrap().verb, Verb::Set { value, .. } if value == "-1"));

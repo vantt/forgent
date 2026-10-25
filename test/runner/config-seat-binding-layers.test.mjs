@@ -10,7 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { globalConfigPath, projectConfigPath, writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
-import { DEFAULT_RUNNER_CONFIG, loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 
 const GLOBAL_RUNNER = () => ({
   capabilities: {
@@ -78,9 +78,4 @@ test('a project with no runner section reads the standard with the schema marker
     assert.equal(loaded.patterns.seatBinding.schema, 1);
     assert.equal(fs.existsSync(projectFile), false, 'a read creates no project file');
   });
-});
-
-test('the defaults setup writes into the global file carry neither rigorToTier nor the project file\'s schema marker', () => {
-  assert.equal('rigorToTier' in DEFAULT_RUNNER_CONFIG, false);
-  assert.equal(DEFAULT_RUNNER_CONFIG.patterns.seatBinding, undefined, 'the marker is the project file\'s own: setup writes DEFAULT_RUNNER_CONFIG into the global file too');
 });
