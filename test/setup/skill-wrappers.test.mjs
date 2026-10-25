@@ -8,6 +8,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -150,6 +151,50 @@ test('materializeSkillsIntoProject self-hosting: when packageRoot equals targetR
   assert.equal(copied, false);
   assert.equal(wrappersWritten.length, 1);
   assert.ok(fs.existsSync(path.join(root, '.claude', 'skills', 'skill-a', 'SKILL.md')));
+});
+
+test('materializeSkillsIntoProject keeps a project skill file that is newer than the release copy or edited since HEAD, names it, and still refreshes an older clean one', () => {
+  const skillMd = (version, body) => `---\nname: sample\ndescription: d\nmetadata:\n  version: "${version}"\n---\n${body}\n`;
+  const packageRoot = mkTempDir('skill-wrappers-keep-pkg-');
+  const releaseSkills = path.join(packageRoot, '.agents', 'skills');
+  for (const name of ['held', 'edited', 'stale']) {
+    fs.mkdirSync(path.join(releaseSkills, name), { recursive: true });
+    fs.writeFileSync(path.join(releaseSkills, name, 'SKILL.md'), skillMd('0.1', `release ${name}`));
+  }
+  fs.mkdirSync(path.join(releaseSkills, 'held', 'references'), { recursive: true });
+  fs.writeFileSync(path.join(releaseSkills, 'held', 'references', 'guide.md'), 'release guide\n');
+
+  const targetRoot = mkTempDir('skill-wrappers-keep-target-');
+  const put = (rel, content) => {
+    fs.mkdirSync(path.dirname(path.join(targetRoot, rel)), { recursive: true });
+    fs.writeFileSync(path.join(targetRoot, rel), content);
+  };
+  put('.claude/skills/held/SKILL.md', skillMd('0.2', 'project held'));
+  put('.claude/skills/held/references/guide.md', 'project guide\n');
+  put('.agents/skills/edited/SKILL.md', skillMd('0.1', 'project edited'));
+  put('.agents/skills/stale/SKILL.md', skillMd('0.0.9', 'project stale'));
+  const git = (...args) => execFileSync('git', args, {
+    cwd: targetRoot,
+    env: { ...process.env, GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@t', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@t' },
+    stdio: 'ignore',
+  });
+  git('init', '-q');
+  git('add', '.');
+  git('commit', '-q', '-m', 'project skills');
+  put('.agents/skills/edited/SKILL.md', skillMd('0.1', 'edited after commit'));
+
+  const { skipped } = materializeSkillsIntoProject(packageRoot, targetRoot);
+
+  const read = (rel) => fs.readFileSync(path.join(targetRoot, rel), 'utf8');
+  assert.equal(read('.claude/skills/held/SKILL.md'), skillMd('0.2', 'project held'));
+  assert.equal(read('.claude/skills/held/references/guide.md'), 'project guide\n');
+  assert.equal(read('.agents/skills/edited/SKILL.md'), skillMd('0.1', 'edited after commit'));
+  assert.equal(read('.agents/skills/stale/SKILL.md'), skillMd('0.1', 'release stale'), 'an older clean tracked copy is still refreshed');
+  assert.deepEqual([...skipped].sort(), [
+    '.agents/skills/edited/SKILL.md',
+    '.claude/skills/held/SKILL.md',
+    '.claude/skills/held/references/guide.md',
+  ]);
 });
 
 test('materializeSkillsIntoProject is a no-op when packageRoot has no .agents/skills at all', () => {
