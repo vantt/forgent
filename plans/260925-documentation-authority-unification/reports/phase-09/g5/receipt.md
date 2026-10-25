@@ -272,3 +272,18 @@ span has a self-contained proposal in the owner's cutover packet.
   }
 ]
 ```
+
+## 4. Lead correction: scope of the survival clause
+
+The brief asked for every span in the surviving map, which goes further than G5 itself. The G5 definition in [preflip-execution-plan.md](../preflip-execution-plan.md) has two parts:
+- each `retentionReceipts` span is found at its own file at F;
+- the reading-map entry-union record keeps the L11-25 banner and both compounding→knowledge lines.
+
+The holder-lock span (`docs/platform/holder-lock/spec.md:8`, the L11-23 header) belongs to the first part only, and the legacy check proves it at its own file, which survives under `docs/platform/`. The Lead scoped `check.py` to match: spans whose file is not `docs/specs/reading-map.md` report `surviving.status: not-applicable`, with that reason. The surviving-map file-missing control now counts only the applicable spans.
+
+`python3 -B check.py --pin b57e79625704b2d7a37700fc4d72dbcdd82cdf00` exits 0, and the output is [check-b57e79625.json](check-b57e79625.json):
+- legacy: 10/10 spans;
+- surviving map: 1 verbatim, 8 restated, 1 not applicable;
+- 31 negative controls pass.
+
+[check-a8acd5d27.json](check-a8acd5d27.json) is kept as the record of the over-broad run. The 8 restatements stay pending owner acceptance (L13-10), and `gateApproved` stays false.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check legacy retention and every span's survival in docs/reading-map.md.
+"""Check legacy retention, and the survival of the reading-map entry-union spans in docs/reading-map.md.
 
 Usage: python3 -B check.py [--pin <commit>] (default: working tree).
 Exit 0 means byte checks and negative controls passed, NOT owner acceptance.
@@ -100,6 +100,14 @@ def check(records, files):
             row = {'file': r['file'], 'recordedLine': s['line'],
                    'foundLine': location(files[r['file']], s['text']),
                    'sha256': s['sha256'], 'legacyText': s['text']}
+            # The G5 survival clause covers only the reading-map entry-union spans
+            # (L11-25 banner and the compounding->knowledge lines). Other receipts,
+            # such as the holder-lock header, are proved at their own file above.
+            if r['file'] != LEGACY_MAP:
+                row['surviving'] = {'file': r['file'], 'status': 'not-applicable', 'line': None,
+                                    'reason': 'retention is proved at its own file; the surviving-map clause covers reading-map spans only'}
+                rows.append(row)
+                continue
             line = location(files[SURVIVOR], s['text'])
             surviving = {'file': SURVIVOR, 'status': 'missing', 'line': None}
             if line is not None:
@@ -139,7 +147,7 @@ def negative_controls(records, files, baseline):
     for i, row in enumerate(baseline['rows']):
         survivor = row['surviving']
         cases = [('legacy-byte-changed', row['file'], row['legacyText'])]
-        if survivor['status'] != 'missing':
+        if survivor['status'] not in ('missing', 'not-applicable'):
             cases += [(survivor['status'] + '-byte-changed', SURVIVOR, survivor['text']),
                       ('surviving-span-removed', SURVIVOR, survivor['text'])]
         for name, path, text in cases:
@@ -159,7 +167,8 @@ def negative_controls(records, files, baseline):
         mutated = dict(files)
         mutated[path] = None
         result = check(records, mutated)
-        rejected = (len(result['survivingMissing']) == baseline['spans'] if path == SURVIVOR
+        applicable = sum(1 for r in baseline['rows'] if r['surviving']['status'] != 'not-applicable')
+        rejected = (len(result['survivingMissing']) == applicable if path == SURVIVOR
                     else all(r['foundLine'] is None for r in result['rows'] if r['file'] == path))
         exercised = files[path] is not None
         controls.append({'control': 'file-missing', 'file': path, 'exercised': exercised,
