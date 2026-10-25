@@ -33,7 +33,7 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 import { normalizeContextRefs, WorkflowDefinitionError } from '../../src/workflow/definition.mjs';
 import { withProviderFamilies } from '../helpers/provider-families.mjs';
 import { acquireSync, createLockScope, probe } from '../../src/holder-lock/index.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Worktrees created in the default location outlive the test unless removed here.
 const worktreeDirs = [];
@@ -95,8 +95,8 @@ function setupTestRepo() {
         },
       },
       capabilities: {
-        'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-        'code:implement': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
+        'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard', tier: 'standard' },
+        'code:implement': { prefer: [{ executor: 'test-node' }], rigor: 'standard', tier: 'standard' },
       },
       patterns: { seatBinding: { schema: 1 },
         defaultRule: { mutatingMinRigor: 'standard' },
@@ -800,6 +800,10 @@ test('a foreground advance writes no log file; an explicit onLog receives the pr
 
 test('a unit refused by policy fails its step and the workflow; dependent steps never run', async () => {
   const tmp = setupTestRepo();
+  // The capability is declared, but its pool's only executor has no model at the tier it asks for: policy refuses it.
+  const cfg = readProjectConfig(tmp);
+  cfg.runner.capabilities['unconfigured:capability'] = { prefer: [{ executor: 'test-node' }], tier: 'frontier' };
+  writeProjectConfig(tmp, cfg);
   const workflow = validateWorkflow({
     id: 'refusal-stops-run',
     steps: [
@@ -884,8 +888,7 @@ test('the owner request and earlier step output reach each unit objective', asyn
     }
     `,
   );
-  const cfgPath = path.join(tmp, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(tmp);
   cfg.runner.executors['test-node'].args = [spy, '{prompt}'];
   cfg.runner.executors['test-node'].invocations[0].args = [spy, '{prompt}'];
   writeProjectConfig(tmp, cfg);
@@ -931,8 +934,7 @@ test('the owner request and earlier step output reach each unit objective', asyn
 
 test('a step after a panel step is handed the report of every panelist and of the synthesizer', async () => {
   const tmp = setupTestRepo();
-  const cfgPath = path.join(tmp, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(tmp);
   const script = path.join(tmp, 'echo-worker.mjs');
   // A panel needs one provider family per member plus one for the synthesizer.
   cfg.runner.executors = {};
@@ -979,8 +981,7 @@ test('a step after a panel step is handed the report of every panelist and of th
 
 test('anonymizeInputs hands a later unit neutral copies and a brief that names no step, unit, run or role', async () => {
   const tmp = setupTestRepo();
-  const cfgPath = path.join(tmp, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(tmp);
   const script = path.join(tmp, 'echo-worker.mjs');
   cfg.runner.executors = {};
   for (const name of ['alpha', 'beta', 'gamma', 'delta']) {
@@ -1039,8 +1040,7 @@ test('anonymizeInputs hands a later unit neutral copies and a brief that names n
 
 test('a unit template that declares inputs gets only those steps, and its own seat\'s result of a same-seat step', async () => {
   const tmp = setupTestRepo();
-  const cfgPath = path.join(tmp, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(tmp);
   const script = path.join(tmp, 'echo-worker.mjs');
   cfg.runner.executors = {};
   for (const name of ['alpha', 'beta', 'gamma', 'delta']) {
@@ -1314,8 +1314,7 @@ test('validateWorkflow keeps blind only when true and rejects a non-boolean', ()
 // run within a minute, naming the seat, instead of after the 35-minute default.
 const FIXTURE_SEAT_TIMEOUT_MS = 45_000;
 function useDistinctFamilies(tmp, names) {
-  const cfgPath = path.join(tmp, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(tmp);
   const script = path.join(tmp, 'echo-worker.mjs');
   cfg.runner.executors = {};
   cfg.runner.timeoutMs = FIXTURE_SEAT_TIMEOUT_MS;
@@ -1731,8 +1730,7 @@ test('reviewed findings acceptance proceeds while default and execution failure 
   for (const [accepted, failed] of [[true, false], [false, false], [true, true]]) {
     const tmp = setupTestRepo();
     t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
-    const configPath = path.join(tmp, '.fgos', 'config.json');
-    writeProjectConfig(tmp, withProviderFamilies(JSON.parse(fs.readFileSync(configPath, 'utf8'))));
+    writeProjectConfig(tmp, withProviderFamilies(readProjectConfig(tmp)));
     fs.writeFileSync(path.join(tmp, 'echo-worker.mjs'), `
       import fs from 'node:fs'; import path from 'node:path';
       const target = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '))?.[1];
@@ -1918,10 +1916,9 @@ test('a pool that cannot serve a panel role at all refuses the seated start befo
   const tmp = setupTestRepo();
   t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
   writeSeatBase(tmp);
-  const cfgPath = path.join(tmp, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
-  delete cfg.runner.capabilities['docs:write'];
-  delete cfg.runner.defaultExecutor;
+  const cfg = readProjectConfig(tmp);
+  // The only executor of the pool has no model at the tier the capability asks for, so no seat can be served.
+  cfg.runner.capabilities['docs:write'] = { prefer: [{ executor: 'test-node' }], tier: 'frontier' };
   writeProjectConfig(tmp, cfg);
   await assert.rejects(() => preflightWorkflowSeats({ workflowId: 'seat-base', seats: ['one lens', 'two lens'], repoRoot: tmp, cwd: tmp, worktree: tmp }), /--seats cannot be served/);
   assert.ok(!fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), 'the preflight records nothing');

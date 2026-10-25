@@ -5,8 +5,7 @@
   "gateway",
   "secrets.globalFile",
   "secrets.sources",
-  "secrets.declarations.name.consumers",
-  "bin.globalFgosPath"
+  "secrets.declarations.name.consumers"
  ],
  "cases": [
   {

@@ -18,6 +18,7 @@
     "domains",
     "packages/convention/contracts/convention.rules.v1.json",
     "packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json",
+    "packages/config/contracts/doctor-rows.v1.json",
     "packages/holder-lock/contracts/lock-registry.v1.json",
     ".agents/skills",
     "README.md",
@@ -29,8 +30,7 @@
     "packages/work-state/contracts/event-streams.v1.json",
     "packages/work-state/contracts/porting-event-streams.v1.json",
     "packages/identity/contracts/identity-event-streams.v1.json",
-    "packages/git/contracts/mutation-census.v1.json",
-    "packages/mailbox/contracts/limits.v1.json"
+    "packages/git/contracts/mutation-census.v1.json"
   ],
   "scripts": {
     "test": "node scripts/run-tests.mjs",

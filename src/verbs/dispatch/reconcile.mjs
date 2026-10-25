@@ -1,6 +1,10 @@
 import { planReconciliation, applyReconciliation, RECONCILE_RUN_REQUIRES_ACTION } from '../../runner/dispatch/reconciliation-planner.mjs';
-import { loadGlobalConfig } from '../../config/global-config.mjs';
+import path from 'node:path';
+import { readMachineConfig } from '../../config/facade.mjs';
 import { clearProviderAccountQuarantine, quarantineProviderAccount, providerAccountInventory, ProviderCapacityConfigError } from '../../runner/dispatch/provider-capacity.mjs';
+/** The machine's own runner (global file, accounts layer when unconfined, standard) that provider capacity reads. */
+const machineRunner = (globalConfigPath) => readMachineConfig({ sections: ['runner'], globalDir: globalConfigPath ? path.dirname(globalConfigPath) : undefined }).value.runner;
+
 export class DispatchReconcileError extends Error {
   constructor(message, { category = 'validation' } = {}) {
     super(message);
@@ -30,7 +34,7 @@ export function reconcileProviderCapacityClearUseCase(ctx, payload = {}) {
   if (!provider || typeof provider !== 'string') throw new DispatchReconcileError('provider-capacity clear-quarantine requires --provider');
   if (!account || typeof account !== 'string') throw new DispatchReconcileError('provider-capacity clear-quarantine requires --account');
   if (!reason || typeof reason !== 'string') throw new DispatchReconcileError('provider-capacity clear-quarantine requires --reason');
-  const runnerConfig = loadGlobalConfig(payload.globalConfigPath);
+  const runnerConfig = machineRunner(payload.globalConfigPath);
   try {
     return clearProviderAccountQuarantine({
       runnerConfig,
@@ -69,7 +73,7 @@ export function reconcileProviderCapacityQuarantineUseCase(ctx, payload = {}) {
   const until = new Date(payload.until);
   if (!payload.until || Number.isNaN(until.getTime())) throw new DispatchReconcileError('provider-capacity quarantine requires --until as an ISO date-time');
   if (until.getTime() <= Date.now()) return refuse('until-in-past', `--until ${payload.until} is not in the future`);
-  const runnerConfig = loadGlobalConfig(payload.globalConfigPath);
+  const runnerConfig = machineRunner(payload.globalConfigPath);
   if (!providerAccountInventory(runnerConfig)[provider]?.accounts?.[account]) {
     return refuse('unknown-account', `unknown provider/account ${provider}/${account}`);
   }

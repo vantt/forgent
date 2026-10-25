@@ -151,6 +151,31 @@
   {
    "path": [
     "runner",
+    "executors",
+    "gitnexus"
+   ],
+   "reason": "a tool executor is a project's own choice, not a standard value (a project that declares none reports its tool registry inactive); this repository declares gitnexus for impact analysis"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "herdr"
+   ],
+   "reason": "a tool executor is a project's own choice, not a standard value; this repository declares the herdr pane label writer"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "impact-analysis",
+    "prefer"
+   ],
+   "reason": "names the gitnexus tool executor this repository declares; the standard's impact-analysis capability has no pool, so a project with no tool provider resolves it to none"
+  },
+  {
+   "path": [
+    "runner",
     "capabilities",
     "advise",
     "prefer"

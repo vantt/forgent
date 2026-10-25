@@ -49,10 +49,7 @@ test('dead vocabulary guard: Phase 1-3 retired symbols do not appear in src, bin
 
   const searchDirs = ['src', 'bin', 'core', 'domains', 'scripts'].map((d) => path.join(REPO_ROOT, d));
   const codeFiles = searchDirs.flatMap((d) => collectFiles(d));
-  const configJson = path.join(REPO_ROOT, '.fgos', 'config.json');
-  if (fs.existsSync(configJson)) {
-    codeFiles.push(configJson);
-  }
+  codeFiles.push(...existingProjectConfigPaths(REPO_ROOT));
 
   const docDirs = [
     path.join(REPO_ROOT, 'docs', 'specs'),
@@ -146,14 +143,14 @@ test('dead vocabulary guard: cfg.models and .models are removed from src/runner/
   assert.deepEqual(violations, [], `Legacy models access detected:\n${violations.join('\n')}`);
 });
 
-test('dead vocabulary guard: .fgos/config.json does not contain runner.models or rigorOverrides', () => {
-  const configPath = path.join(REPO_ROOT, '.fgos', 'config.json');
-  if (!fs.existsSync(configPath)) return;
-  const content = fs.readFileSync(configPath, 'utf8');
-  assert.ok(!content.includes('rigorOverrides'), '.fgos/config.json must not mention rigorOverrides');
+test('dead vocabulary guard: the project config does not contain runner.models or rigorOverrides', () => {
+  for (const configPath of existingProjectConfigPaths(REPO_ROOT)) {
+    const content = fs.readFileSync(configPath, 'utf8');
+    assert.ok(!content.includes('rigorOverrides'), `${configPath} must not mention rigorOverrides`);
 
-  const parsed = JSON.parse(content);
-  assert.equal(parsed.runner?.models, undefined, '.fgos/config.json must not declare runner.models');
+    const parsed = parseYaml(content, { filename: configPath });
+    assert.equal(parsed.runner?.models, undefined, `${configPath} must not declare runner.models`);
+  }
 });
 
 import os from 'node:os';
@@ -282,6 +279,8 @@ test('dead vocabulary guard: capabilities.<cap>.rigor is a demand that moves no 
 
 import * as workModule from '../../src/state/work.mjs';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
+import { existingProjectConfigPaths } from '../helpers/config-fixture.mjs';
+import { parseYaml } from '../../src/util/yaml.mjs';
 
 test('dead vocabulary guard: Phase 3 Work tier retired, size and rigor enforced', () => {
   // 1. workModule exports SIZES, not TIERS
@@ -338,10 +337,7 @@ test('dead vocabulary guard: Request-to-Run P1 retired symbols do not appear in 
 
   const searchDirs = ['src', 'bin', 'core', 'domains'].map((d) => path.join(REPO_ROOT, d));
   const codeFiles = searchDirs.flatMap((d) => collectFiles(d, ['.js', '.mjs', '.cjs', '.json', '.yaml', '.yml']));
-  const configJson = path.join(REPO_ROOT, '.fgos', 'config.json');
-  if (fs.existsSync(configJson)) {
-    codeFiles.push(configJson);
-  }
+  codeFiles.push(...existingProjectConfigPaths(REPO_ROOT));
 
   const violations = [];
   const symbolRegexes = p1DeadSymbols.map((sym) => ({ symbol: sym, regex: new RegExp(`\\b${sym}\\b`) }));

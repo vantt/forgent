@@ -7,7 +7,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { initStore, rebuild } from '../../src/state/store.mjs';
-import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 function setupGitRepoWithStore({ enforceRegistry = false } = {}) {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-attest-test-'));
@@ -23,7 +23,7 @@ function setupGitRepoWithStore({ enforceRegistry = false } = {}) {
   const fgosDir = path.join(tmpDir, '.fgos');
   initStore(fgosDir);
   if (enforceRegistry) {
-    writeSharedConfig(tmpDir, { docRegistry: { enforce: true } });
+    writeProjectConfig(tmpDir, { docRegistry: { enforce: true } });
   }
   return { tmpDir, fgosDir };
 }

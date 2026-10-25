@@ -14,7 +14,7 @@ import { resolveConfinementPolicy } from "../../src/runner/dispatch/confinement/
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
 import { executeExecutorCli } from "../../src/runner/dispatch/cli.mjs";
 import { workUnitFor, workDispatchContext } from "../../src/runner/work-dispatch.mjs";
-import { loadRunnerConfigFromDir, RunnerConfigError } from "../../src/runner/dispatch/config.mjs";
+import { loadRunnerConfigForDir, RunnerConfigError } from "../../src/runner/dispatch/config.mjs";
 
 test("buildConfinementRequest builds valid confinement-request.v1 shape at dispatch seam", () => {
   const req = buildConfinementRequest({

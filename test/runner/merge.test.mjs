@@ -20,7 +20,6 @@ import {
   performCatchUp,
   MergeError,
 } from '../../src/runner/merge.mjs';
-import { DEFAULT_INVARIANT_CHECK_COMMANDS, writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 // detectTrunk moved to runner/worktree.mjs (tsk-49i D1) — its cases stay in
 // this file, next to the merge behavior that resolves a target through it.
 import { branchNameFor, detectTrunk } from '../../src/runner/worktree.mjs';
@@ -1295,7 +1294,7 @@ test('detectTrunk resolves the origin/HEAD target branch, not the local main/mas
 // commands that fail).
 
 function configureInvariantChecks(repoRoot, commands) {
-  writeSharedConfig(repoRoot, { invariantChecks: { commands } });
+  writeProjectConfig(repoRoot, { invariantChecks: { commands } });
 }
 
 function tipOf(repoRoot, branch) {
@@ -1334,7 +1333,7 @@ test('no invariant command, absent or the setup default, means no invariant chec
   for (const setupDefault of [false, true]) {
     const repoRoot = initRepo();
     makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-    if (setupDefault) configureInvariantChecks(repoRoot, DEFAULT_INVARIANT_CHECK_COMMANDS);
+    if (setupDefault) configureInvariantChecks(repoRoot, []);
 
     const result = await landItem(repoRoot, makeItem({ verify: 'true' }));
 

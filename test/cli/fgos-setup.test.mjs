@@ -214,7 +214,7 @@ test('setup runs every registered fix and reports them under "fixed", never touc
   const data = envelopeData(result.stdout);
   assert.ok(Array.isArray(data.fixed), 'setup result missing a "fixed" array');
   const byId = Object.fromEntries(data.fixed.map((entry) => [entry.id, entry]));
-  assert.ok('gate-bypass-configured' in byId, 'setup did not run the gate-bypass-configured fix');
+  assert.ok('gateway-token-configured' in byId, 'setup did not run the gateway-token-configured fix');
   assert.ok('claude-plugin-marketplace' in byId, 'setup did not run the claude-plugin-marketplace fix');
   assert.equal(byId['claude-plugin-marketplace'].changed, false);
   assert.match(byId['claude-plugin-marketplace'].message, /not found on PATH/);

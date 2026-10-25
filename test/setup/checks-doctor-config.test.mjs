@@ -5,17 +5,8 @@
 // import/helper đổi cho khớp phần nào file này thật sự dùng.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
-import { EVENT_STORE_DEFAULTS } from '../../src/event-store/index.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
-import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {
-  DEFAULT_CLEANUP_LEAF_TTL_DAYS,
-  DEFAULT_CLEANUP_TTL_DAYS,
-  DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
-  DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
-  DEFAULT_INVARIANT_CHECK_COMMANDS,
-  DEFAULT_LEVEL,
-  DEFAULT_RUNNER_CONFIG,
   DOCTOR_CHECKS,
   FGOS,
   NO_CLAUDE_ENV,
@@ -34,15 +25,14 @@ import {
   withHome,
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
-import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, DEFAULT_DOC_REGISTRY_SETTINGS } from '../../src/setup/registrations.mjs';
-import { writeGlobalConfig, writeProjectConfig, writeRawGlobalConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeLocalStatus } from '../../src/state/tool-registry.mjs';
+import { writeGlobalConfig, writeProjectConfig, writeRawGlobalConfig, writeRawProjectConfig, readProjectConfig, statGatewayToken } from '../helpers/config-fixture.mjs';
 
 // tsk-in1-1 D1: a tool provider is declared directly in
 // `runner.executors.<id>` (`.fgos/config.json`), config-edited like every
 // other executor, never through a `fgos tool register` event.
 function declareExecutor(cwd, id, fields) {
-  const configPath = path.join(cwd, '.fgos', 'config.json');
-  const cfg = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+  const cfg = readProjectConfig(cwd);
   cfg.runner ??= {};
   cfg.runner.executors ??= {};
   cfg.runner.executors[id] = fields;
@@ -62,12 +52,15 @@ function declareExecutor(cwd, id, fields) {
   writeProjectConfig(cwd, cfg);
 }
 
-test('tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure)', () => {
+// Tool executors are a project's own choice, never a standard value: a project that declares none is inactive. What a
+// machine last observed of the declared ones is the local status overlay, which these tests write directly.
+const checkedPresent = (cwd, ...ids) => writeLocalStatus(path.join(cwd, '.fgos'), Object.fromEntries(ids.map((id) => [id, { status: 'present' }])));
+
+test('tool-registry-configured passes as inactive on a fresh project: the standard declares no tool executor', () => {
   const cwd = mkTemp('fgos-tool-registry-inactive-');
   initializeWorkRepository(cwd);
-  spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
-  assert.equal(passed, true);
+  assert.equal(passed, true, message);
   assert.match(message, /^inactive/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
@@ -75,26 +68,22 @@ test('tool-registry-configured passes when no tool-capable executor is declared 
 test('tool-registry-configured passes when every declared tool is checked present (full)', () => {
   const cwd = mkTemp('fgos-tool-registry-full-');
   initializeWorkRepository(cwd);
-  spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   declareExecutor(cwd, 'echo-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
-  const check = spawnSync(process.execPath, [FGOS, 'tool', 'check'], { cwd, encoding: 'utf8' });
-  assert.equal(check.status, 0, check.stderr);
+  checkedPresent(cwd, 'echo-tool');
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
-  assert.equal(passed, true);
-  assert.match(message, /^full/);
+  assert.equal(passed, true, message);
+  assert.match(message, /^full — 1\/1/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 test('tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing or never checked (degraded) -- no longer a silent passed:true', () => {
   const cwd = mkTemp('fgos-tool-registry-degraded-');
   initializeWorkRepository(cwd);
-  spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   declareExecutor(cwd, 'never-checked-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
-  // Deliberately never runs `fgos tool check` -- the tool stays "unknown",
-  // which classifyRegistryPosture reports as degraded (never inactive).
+  // The declared tool was never checked, so it stays "unknown", which classifyRegistryPosture reports as degraded.
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
   assert.equal(passed, false, 'a declared-but-unverified tool must fail the check, not silently pass as before this fix');
-  assert.match(message, /^degraded/);
+  assert.match(message, /^degraded — 0\/1/);
   assert.match(message, /fgos tool check/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
@@ -197,163 +186,22 @@ test('shell-integration-sourced fails when the source line is present but the so
   }
 });
 
-test('config-not-stale reports failed/not-configured when the shared file is absent', () => {
-  const cwd = mkTemp('doctor-config-absent-');
-  const { passed, message } = checkById('config-not-stale').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /not yet configured/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('config-not-stale passes when the existing config already has every default key', () => {
-  const cwd = mkTemp('doctor-config-full-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, {
-      runner: {
-        ...DEFAULT_RUNNER_CONFIG,
-        capabilities: DEFAULT_CAPABILITY_SLOTS,
-        modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, openai: { nano: 'gpt-5.5' } },
-        executors: { openai: PI_EXECUTOR_DEFAULT },
-      },
-      gateBypass: { level: 'off' },
-      cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
-      herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
-      herdrWebDashboard: DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
-      invariantChecks: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
-      worktreeSetup: { commands: [] },
-      workerSlots: { ceiling: null },
-      terminal: DEFAULT_TERMINAL_CONFIG,
-      gateway: { port: 4170, token: null },
-      ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
-      mailbox: {},
-      docRegistry: DEFAULT_DOC_REGISTRY_SETTINGS,
-      eventStore: EVENT_STORE_DEFAULTS,
-    });
-  const { passed } = checkById('config-not-stale').check(cwd);
-  assert.equal(passed, true);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('config-not-stale fails when the shared file is complete except gateBypass', () => {
-  const cwd = mkTemp('doctor-config-no-gatebypass-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { runner: DEFAULT_RUNNER_CONFIG });
-  const { passed, message } = checkById('config-not-stale').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /gateBypass/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('config-not-stale fails when the existing config is missing a default key', () => {
-  const cwd = mkTemp('doctor-config-stale-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { runner: { executor: { command: 'claude', args: [] } } });
-  const { passed, message } = checkById('config-not-stale').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /stale config/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-// ─── gate-bypass-configured (docs/history/doctor-fix-gate-bypass/CONTEXT.md
-// D1/D3, tsk-2qz-2): the registry's first entry to register all three
-// capabilities (check + configDefault + fix). check/fix here are both
-// keyed to "is config.gateBypass.level present and a recognized LEVEL",
-// deliberately distinct from config-not-stale's generic "key present at
-// all" scan above (a malformed-but-present level is never "missing").
-
-// ─── invariant-checks-configured: like worktree-setup-configured below, an
-// absent section or an empty list is a valid choice (no invariant check runs,
-// which is what `fgos setup` writes for a project that names none); only a
-// present-but-malformed section fails, since it reads as zero commands and
-// silently skips the gate. Never executes the configured commands.
-
-test('invariant-checks-configured passes when the section is absent or empty', () => {
-  for (const config of [{}, { invariantChecks: { commands: [] } }]) {
-    const cwd = mkTemp('doctor-invariant-empty-');
-    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    writeProjectConfig(cwd, config);
-    const { passed, message } = checkById('invariant-checks-configured').check(cwd);
-    assert.equal(passed, true, JSON.stringify(config));
-    assert.match(message, /no invariant check runs at return\/merge/);
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test('invariant-checks-configured fails when the section is present but malformed', () => {
-  for (const malformed of [{ commands: 'not-a-list' }, {}, { commands: ['', '  '] }, { commands: ['real --check', 7] }, ['real --check'], null]) {
-    const cwd = mkTemp('doctor-invariant-malformed-');
-    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    writeProjectConfig(cwd, { invariantChecks: malformed });
-    const { passed, message } = checkById('invariant-checks-configured').check(cwd);
-    assert.equal(passed, false, `malformed: ${JSON.stringify(malformed)}`);
-    assert.match(message, /present but malformed/);
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test('invariant-checks-configured passes and names the configured commands', () => {
-  const cwd = mkTemp('doctor-invariant-ok-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { invariantChecks: { commands: ['node --test test/architecture.test.mjs'] } });
-  const { passed, message } = checkById('invariant-checks-configured').check(cwd);
-  assert.equal(passed, true);
-  assert.match(message, /1 command\(s\): node --test test\/architecture\.test\.mjs/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-// ─── worktree-setup-configured: an empty or absent section is a valid
-// choice (worktrees get only their dependency install); only a
-// present-but-malformed one fails, since it reads as zero commands and
-// silently skips setup. Never executes the configured commands.
-
-test('worktree-setup-configured passes when the section is absent or empty', () => {
-  for (const config of [{}, { worktreeSetup: { commands: [] } }]) {
-    const cwd = mkTemp('doctor-wtsetup-empty-');
-    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    writeProjectConfig(cwd, config);
-    const { passed, message } = checkById('worktree-setup-configured').check(cwd);
-    assert.equal(passed, true, JSON.stringify(config));
-    assert.match(message, /only their dependency install/);
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test('worktree-setup-configured fails when the section is present but malformed', () => {
-  for (const malformed of [{ commands: 'cargo build' }, {}, { commands: ['cargo build', ''] }, ['cargo build']]) {
-    const cwd = mkTemp('doctor-wtsetup-malformed-');
-    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    writeProjectConfig(cwd, { worktreeSetup: malformed });
-    const { passed, message } = checkById('worktree-setup-configured').check(cwd);
-    assert.equal(passed, false, `malformed: ${JSON.stringify(malformed)}`);
-    assert.match(message, /present but malformed/);
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test('worktree-setup-configured passes and names the configured commands', () => {
-  const cwd = mkTemp('doctor-wtsetup-ok-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { worktreeSetup: { commands: ['cargo build --release'] } });
-  const { passed, message } = checkById('worktree-setup-configured').check(cwd);
-  assert.equal(passed, true);
-  assert.match(message, /1 command\(s\): cargo build --release/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('worker-slots-ceiling-usable fails when the section is missing entirely', () => {
-  const cwd = mkTemp('doctor-slots-absent-');
+test('worker-slots-ceiling-usable passes on the standard alone (unarmed null), and says so', () => {
+  const cwd = mkTemp('doctor-slots-standard-');
   const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /workerSlots section missing/);
+  assert.equal(passed, true);
+  assert.match(message, /unarmed/);
+  assert.match(message, new RegExp(`recommended: ${DEFAULT_WORKER_SLOT_CEILING}`));
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 // The whole point of the check: each of these silently enforces NOTHING,
 // because hasWorkerSlotRoom treats anything that is not a positive integer
 // as "no ceiling configured" and allows every claim. A project reading its
-// own config would believe it is capped.
+// own config would believe it is capped. The schema already refuses a string,
+// a fraction, a boolean and a list; these two are integers it admits.
 test('worker-slots-ceiling-usable fails on a ceiling that silently enforces nothing', () => {
-  for (const ceiling of ['8', 8.5, 0, -1, true, []]) {
+  for (const ceiling of [0, -1]) {
     const cwd = mkTemp('doctor-slots-malformed-');
     fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
     writeProjectConfig(cwd, { workerSlots: { ceiling } });
@@ -362,20 +210,6 @@ test('worker-slots-ceiling-usable fails on a ceiling that silently enforces noth
     assert.match(message, /enforces NOTHING/);
     fs.rmSync(cwd, { recursive: true, force: true });
   }
-});
-
-// `null` is the one non-number that is not a mistake -- it is exactly what
-// `fgos setup` writes, and it means "deliberately unarmed", so it must pass
-// while still saying plainly that nothing is being enforced.
-test('worker-slots-ceiling-usable passes on the unarmed null fgos setup writes, and says so', () => {
-  const cwd = mkTemp('doctor-slots-unarmed-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { workerSlots: { ceiling: null } });
-  const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
-  assert.equal(passed, true);
-  assert.match(message, /unarmed/);
-  assert.match(message, new RegExp(`recommended: ${DEFAULT_WORKER_SLOT_CEILING}`));
-  fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 test('worker-slots-ceiling-usable passes and names a real armed ceiling', () => {
@@ -388,57 +222,28 @@ test('worker-slots-ceiling-usable passes and names a real armed ceiling', () => 
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-// ─── advise-execute-capabilities-configured (tsk-2uf-3, docs/history/
-// dispatch-activation-and-handoff-redesign/CONTEXT.md D2): same
-// generic-scan/dedicated-check split as gateway/workerSlots/invariantChecks
-// above -- config-not-stale already catches runner.capabilities (or either
-// slot) being wholly ABSENT; this check catches present-but-malformed.
+// A project Workflow naming a capability no entry covers: the shipped Workflows' capabilities are all in the
+// standard, so these tests add a Workflow of the project's own.
+function writeProjectWorkflow(cwd, capabilities) {
+  fs.mkdirSync(path.join(cwd, 'core', 'workflows'), { recursive: true });
+  const units = capabilities.map((capability, i) => `      - id: u${i}\n        template:\n          capability: ${capability}\n`).join('');
+  fs.writeFileSync(path.join(cwd, 'core', 'workflows', 'mine.yaml'), `id: mine\nsteps:\n  - id: s\n    units:\n${units}`);
+}
 
-test('advise-execute-capabilities-configured fails when runner.capabilities is missing entirely', () => {
-  const cwd = mkTemp('doctor-capabilities-absent-');
-  const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /runner\.capabilities section missing/);
+test('workflow-capabilities-configured passes on the standard alone: every shipped Workflow capability has an entry with a prefer pool', () => {
+  const cwd = mkTemp('doctor-workflow-caps-standard-');
+  const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
+  assert.equal(passed, true, message);
+  assert.doesNotMatch(message, /^warning/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('advise-execute-capabilities-configured fails when a slot is missing or malformed', () => {
-  for (const capabilities of [
-    { advise: {} }, // execute missing
-    { execute: {} }, // advise missing
-    { advise: 'not-an-object', execute: {} },
-    { advise: [], execute: {} },
-    { advise: null, execute: {} },
-    {},
-  ]) {
-    const cwd = mkTemp('doctor-capabilities-malformed-');
-    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    writeProjectConfig(cwd, { runner: { capabilities } });
-    const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
-    assert.equal(passed, false, `capabilities: ${JSON.stringify(capabilities)}`);
-    assert.match(message, /missing or has a malformed slot for/);
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test('advise-execute-capabilities-configured passes when both slots are declared', () => {
-  const cwd = mkTemp('doctor-capabilities-ok-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } });
-  const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
-  assert.equal(passed, true);
-  assert.match(message, /declares "advise", "execute", and "code:implement"/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('workflow-capabilities-configured names a capability a Workflow uses that config lacks', () => {
+test('workflow-capabilities-configured names a capability a project Workflow uses that config lacks', () => {
   const cwd = mkTemp('doctor-workflow-caps-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  const { 'architecture:frame': _omitted, ...rest } = DEFAULT_CAPABILITY_SLOTS;
-  writeProjectConfig(cwd, { runner: { capabilities: rest } });
+  writeProjectWorkflow(cwd, ['mine:frame']);
   const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(passed, false);
-  assert.match(message, /architecture:frame \(architecture-advisory\)/);
+  assert.match(message, /mine:frame \(mine\)/);
   assert.doesNotMatch(message, /marketing:write/, 'a registered capability must not be reported');
   fs.rmSync(cwd, { recursive: true, force: true });
 });
@@ -446,139 +251,56 @@ test('workflow-capabilities-configured names a capability a Workflow uses that c
 test('workflow-capabilities-configured accepts a prefix entry, and a bare-verb entry no longer covers a capability', () => {
   const cwd = mkTemp('doctor-workflow-caps-verb-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  const { 'architecture:critique': _omitted, ...rest } = DEFAULT_CAPABILITY_SLOTS;
-  const write = (entries) => writeProjectConfig(cwd, { runner: { capabilities: { ...rest, ...entries } } });
-  write({ 'architecture:*': { description: 'prefix entry', prefer: [{ executor: 'x' }] } });
-  assert.doesNotMatch(checkById('workflow-capabilities-configured').check(cwd).message, /architecture:critique/);
+  writeProjectWorkflow(cwd, ['mine:critique']);
+  const write = (entries) => writeProjectConfig(cwd, { runner: { capabilities: entries } });
+  write({ 'mine:*': { description: 'prefix entry', prefer: [{ executor: 'x' }] } });
+  assert.doesNotMatch(checkById('workflow-capabilities-configured').check(cwd).message, /mine:critique/);
   write({ critique: { description: 'verb entry', prefer: [{ executor: 'x' }] } });
-  assert.match(checkById('workflow-capabilities-configured').check(cwd).message, /no entry for Workflow capabilities: .*architecture:critique/);
+  assert.match(checkById('workflow-capabilities-configured').check(cwd).message, /no entry for Workflow capabilities: .*mine:critique/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 test('workflow-capabilities-configured warns, naming each Workflow capability with no prefer pool', () => {
   const cwd = mkTemp('doctor-workflow-caps-nopool-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } });
+  writeProjectWorkflow(cwd, ['mine:propose']);
+  writeProjectConfig(cwd, { runner: { capabilities: { 'mine:propose': { description: 'taste-free' } } } });
   const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
-  assert.equal(passed, true, 'a taste-free fresh setup is a warning, not a failure');
+  assert.equal(passed, true, 'a taste-free entry is a warning, not a failure');
   assert.match(message, /^warning: .*no "prefer" pool/);
-  assert.doesNotMatch(message, /coding:/, 'the coding workflow declares no runner units, so it names no capability');
-  assert.match(message, /delphi:propose/);
+  assert.match(message, /mine:propose/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 test('workflow-capabilities-configured is clean when each capability resolves to a prefer pool, on its exact entry or its prefix entry', () => {
   const cwd = mkTemp('doctor-workflow-caps-pool-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  const capabilities = {};
-  for (const [name, slot] of Object.entries(DEFAULT_CAPABILITY_SLOTS)) {
-    capabilities[name] = slot;
-  }
-  for (const name of Object.keys(DEFAULT_CAPABILITY_SLOTS)) {
-    if (!name.includes(':')) continue;
-    const [domain] = name.split(':');
-    // half by exact name, half by the prefix entry
-    if (domain.length % 2 === 0) capabilities[name] = { ...capabilities[name], prefer: [{ executor: 'x' }] };
-    else capabilities[`${domain}:*`] = { ...(capabilities[`${domain}:*`] ?? {}), prefer: [{ executor: 'x' }] };
-  }
-  writeProjectConfig(cwd, { runner: { capabilities } });
+  writeProjectWorkflow(cwd, ['mine:exact', 'other:viaprefix']);
+  writeProjectConfig(cwd, { runner: { capabilities: {
+    'mine:exact': { description: 'exact', prefer: [{ executor: 'x' }] },
+    'other:*': { description: 'prefix', prefer: [{ executor: 'x' }] },
+  } } });
   const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
-  assert.equal(passed, true);
+  assert.equal(passed, true, message);
   assert.doesNotMatch(message, /^warning/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('workflow-capabilities-configured also names the runner loop executing capability when it has no prefer pool', () => {
-  const cwd = mkTemp('doctor-workflow-caps-loop-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  const capabilities = {};
-  for (const [name, slot] of Object.entries(DEFAULT_CAPABILITY_SLOTS)) {
-    capabilities[name] = name.includes(':') && name !== 'code:implement' ? { ...slot, prefer: [{ executor: 'x' }] } : slot;
-  }
-  writeProjectConfig(cwd, { runner: { capabilities } });
-  const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
-  assert.equal(passed, true);
-  assert.match(message, /^warning: .*code:implement \(runner loop: coding executing step\)/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('gate-bypass-configured check fails when the shared file has no gateBypass key at all', () => {
-  const cwd = mkTemp('doctor-gatebypass-absent-');
-  const { passed, message } = checkById('gate-bypass-configured').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /missing or not a recognized level/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('gate-bypass-configured check fails when gateBypass.level is present but not a recognized level', () => {
-  const cwd = mkTemp('doctor-gatebypass-bad-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { gateBypass: { level: 'total' } });
-  const { passed, message } = checkById('gate-bypass-configured').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /missing or not a recognized level/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('gate-bypass-configured check passes when gateBypass.level is a recognized level', () => {
-  const cwd = mkTemp('doctor-gatebypass-ok-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { gateBypass: { level: 'standard' } });
-  const { passed, message } = checkById('gate-bypass-configured').check(cwd);
-  assert.equal(passed, true);
-  assert.match(message, /"standard"/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('gate-bypass-configured fix writes a default level when the shared file has no gateBypass key, preserving other keys', () => {
-  const cwd = mkTemp('doctor-gatebypass-fix-absent-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { runner: { timeoutMs: 5000 } });
-  const { changed, message } = fixById('gate-bypass-configured').fix(cwd);
-  assert.equal(changed, true);
-  assert.match(message, new RegExp(`"${DEFAULT_LEVEL}"`));
-  const written = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'config.json'), 'utf8'));
-  assert.deepEqual(written.gateBypass, { level: DEFAULT_LEVEL });
-  assert.deepEqual(written.runner, { timeoutMs: 5000 });
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('gate-bypass-configured fix repairs a malformed level back to the default', () => {
-  const cwd = mkTemp('doctor-gatebypass-fix-bad-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { gateBypass: { level: 'total' } });
-  const { changed } = fixById('gate-bypass-configured').fix(cwd);
-  assert.equal(changed, true);
-  const written = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'config.json'), 'utf8'));
-  assert.equal(written.gateBypass.level, DEFAULT_LEVEL);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('gate-bypass-configured fix is idempotent: reports unchanged and never rewrites when level is already valid', () => {
-  const cwd = mkTemp('doctor-gatebypass-fix-noop-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  const sharedPath = path.join(cwd, '.fgos', 'config.json');
-  writeProjectConfig(cwd, { gateBypass: { level: 'heavy' } });
-  const before = fs.statSync(sharedPath).mtimeMs;
-  const { changed, message } = fixById('gate-bypass-configured').fix(cwd);
-  assert.equal(changed, false);
-  assert.match(message, /already "heavy"/);
-  assert.equal(fs.statSync(sharedPath).mtimeMs, before);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('fgos doctor --fix (CLI e2e) actually bootstraps gateBypass.level via the real fix', () => {
-  const cwd = mkTemp('doctor-cli-fix-gatebypass-');
+test('fgos doctor --fix (CLI e2e) creates the gateway token file through the real fix, then finds nothing left to repair', () => {
+  const cwd = mkTemp('doctor-cli-fix-token-');
+  const homeDir = mkTemp('doctor-cli-fix-token-home-');
+  const env = { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir };
   execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
-  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env: NO_CLAUDE_ENV });
+  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env });
   assert.equal(result.status, 0, `fgos doctor --fix failed: ${result.stderr}`);
   const { data } = JSON.parse(result.stdout);
-  const fixedEntry = data.fixed.find((f) => f.id === 'gate-bypass-configured');
-  assert.ok(fixedEntry, 'doctor --fix did not report the gate-bypass-configured fix');
+  const fixedEntry = data.fixed.find((f) => f.id === 'gateway-token-configured');
+  assert.ok(fixedEntry, 'doctor --fix did not report the gateway-token-configured fix');
   assert.equal(fixedEntry.changed, true);
-  const written = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'config.json'), 'utf8'));
-  assert.equal(written.gateBypass.level, DEFAULT_LEVEL);
+  assert.equal(statGatewayToken(path.join(homeDir, '.fgos')).mode & 0o777, 0o600);
+  assert.equal(data.checks.find((c) => c.id === 'gateway-token-configured').passed, true);
   fs.rmSync(cwd, { recursive: true, force: true });
+  fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
 // docs/history/doctor-fix-pretty-status-line/CONTEXT.md D1: a registered
@@ -589,161 +311,23 @@ test('fgos doctor --fix (CLI e2e) actually bootstraps gateBypass.level via the r
 // `checks` line keys it off `passed`.
 test('fgos doctor --fix --pretty (CLI e2e) renders a fix line green even when the fix found nothing to change', () => {
   const cwd = mkTemp('doctor-cli-fix-pretty-noop-');
+  const homeDir = mkTemp('doctor-cli-fix-pretty-noop-home-');
+  const env = { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir };
   execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
-  const first = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env: NO_CLAUDE_ENV });
+  const first = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env });
   assert.equal(first.status, 0, `fgos doctor --fix failed: ${first.stderr}`);
 
-  const second = spawnSync(process.execPath, [FGOS, 'doctor', '--fix', '--pretty'], { cwd, encoding: 'utf8', env: NO_CLAUDE_ENV });
+  const second = spawnSync(process.execPath, [FGOS, 'doctor', '--fix', '--pretty'], { cwd, encoding: 'utf8', env });
   assert.equal(second.status, 0, `fgos doctor --fix --pretty failed: ${second.stderr}`);
   const lines = second.stdout.split('\n');
-  const fixLine = lines.find((l) => l.includes('fix: gate-bypass-configured'));
-  assert.ok(fixLine, 'expected a "fix: gate-bypass-configured" line in --pretty output');
-  assert.match(fixLine, /already "/, 'expected the second run to be the already-correct no-op case');
+  const fixLine = lines.find((l) => l.includes('fix: gateway-token-configured'));
+  assert.ok(fixLine, 'expected a "fix: gateway-token-configured" line in --pretty output');
+  assert.match(fixLine, /0 repaired/, 'expected the second run to be the already-correct no-op case');
   assert.ok(fixLine.includes('\x1b[32m'), `expected a green mark on an already-correct fix line, got: ${fixLine}`);
   assert.ok(!fixLine.includes('\x1b[31m'), `expected no red mark on an already-correct fix line, got: ${fixLine}`);
   fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-// ─── herdr-launcher-configured (tsk-2m5, docs/history/
-// stage-status-driving-coordination/): the herdr-launcher's own
-// auto-launch toggles. Check-only, no fix (YAGNI -- see registrations.mjs's
-// own comment on this) -- `config-not-stale` already catches the whole
-// section being MISSING; this check adds the one thing that generic
-// staleness scan cannot: a PRESENT but non-boolean toggle value.
-
-test('herdr-launcher-configured check fails when the shared file has no herdrOrchestrator key at all', () => {
-  const cwd = mkTemp('doctor-herdr-launcher-absent-');
-  const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /missing/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('herdr-launcher-configured check fails when a toggle is present but not a boolean', () => {
-  const cwd = mkTemp('doctor-herdr-launcher-bad-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { herdrOrchestrator: { autoDiscover: 'yes', autoMerge: false, autoRetro: false, autoCleanup: false } });
-  const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /autoDiscover/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('herdr-launcher-configured check passes when every toggle is a boolean', () => {
-  const cwd = mkTemp('doctor-herdr-launcher-ok-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { herdrOrchestrator: { autoDiscover: true, autoMerge: false, autoRetro: false, autoCleanup: false } });
-  const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
-  assert.equal(passed, true);
-  assert.match(message, /autoDiscover=true/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-// ─── herdr-web-dashboard-configured (tsk-48w, D14 of docs/history/herdr-
-// web-dashboard-plan-realignment/CONTEXT.md): the web dashboard's static-
-// serving toggle. Same check-only shape as herdr-launcher-configured
-// above -- config-not-stale already catches the whole section missing;
-// this check adds the one thing that generic staleness scan cannot: a
-// PRESENT but non-boolean value.
-
-test('herdr-web-dashboard-configured check fails when the shared file has no herdrWebDashboard key at all', () => {
-  const cwd = mkTemp('doctor-herdr-web-dashboard-absent-');
-  const { passed, message } = checkById('herdr-web-dashboard-configured').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /missing/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('herdr-web-dashboard-configured check fails when staticServing is present but not a boolean', () => {
-  const cwd = mkTemp('doctor-herdr-web-dashboard-bad-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { herdrWebDashboard: { staticServing: 'yes' } });
-  const { passed, message } = checkById('herdr-web-dashboard-configured').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /staticServing/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('herdr-web-dashboard-configured check passes when staticServing is a boolean', () => {
-  const cwd = mkTemp('doctor-herdr-web-dashboard-ok-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { herdrWebDashboard: { staticServing: true } });
-  const { passed, message } = checkById('herdr-web-dashboard-configured').check(cwd);
-  assert.equal(passed, true);
-  assert.match(message, /staticServing=true/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('config-awareness is registered on DOCTOR_CHECKS and always passes', () => {
-  const { passed, message } = checkById('config-awareness').check(process.cwd());
-  assert.equal(passed, true);
-  assert.equal(typeof message, 'string');
-});
-
-test('config-awareness reports "none" when neither project nor global config exists', () => {
-  const homeDir = mkTemp('doctor-awareness-none-home-');
-  const cwd = mkTemp('doctor-awareness-none-cwd-');
-  withHome(homeDir, () => {
-    const { passed, message } = checkById('config-awareness').check(cwd);
-    assert.equal(passed, true);
-    assert.match(message, /no config at either level/);
-  });
   fs.rmSync(homeDir, { recursive: true, force: true });
-  fs.rmSync(cwd, { recursive: true, force: true });
 });
-
-test('config-awareness reports project active with global not present, when only project config exists', () => {
-  const homeDir = mkTemp('doctor-awareness-project-only-home-');
-  const cwd = mkTemp('doctor-awareness-project-only-cwd-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeRawProjectConfig(cwd, '{}');
-  withHome(homeDir, () => {
-    const { passed, message } = checkById('config-awareness').check(cwd);
-    assert.equal(passed, true);
-    assert.match(message, /active: project/);
-    assert.match(message, /global config not present/);
-  });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('config-awareness reports project active with global also present, when both exist', () => {
-  const homeDir = mkTemp('doctor-awareness-both-home-');
-  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-  writeRawGlobalConfig(homeDir, '{}');
-  const cwd = mkTemp('doctor-awareness-both-cwd-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeRawProjectConfig(cwd, '{}');
-  withHome(homeDir, () => {
-    const { passed, message } = checkById('config-awareness').check(cwd);
-    assert.equal(passed, true);
-    assert.match(message, /active: project/);
-    assert.match(message, /global config also present/);
-  });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('config-awareness falls back to global active with project not present, when only global config exists', () => {
-  const homeDir = mkTemp('doctor-awareness-global-only-home-');
-  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-  writeRawGlobalConfig(homeDir, '{}');
-  const cwd = mkTemp('doctor-awareness-global-only-cwd-');
-  withHome(homeDir, () => {
-    const { passed, message } = checkById('config-awareness').check(cwd);
-    assert.equal(passed, true);
-    assert.match(message, /active: global/);
-    assert.match(message, /project config not present/);
-  });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-// ─── main-checkout-hook-wired (tsk-3w8): str65's main-checkout lock only ───
-// guards commits when core.hooksPath actually points at .githooks — str88
-// removed the automatic `prepare`-lifecycle wiring (pnpm 10+ blocks it for a
-// git-hosted dependency), so this doctor check + fgos setup's own wiring
-// (below) are the only paths left that keep it honest.
 
 test('mainCheckoutHookWired is false in a cwd with no .git at all, and never throws', () => {
   const cwd = mkTemp('doctor-hook-no-git-');
@@ -843,14 +427,12 @@ test('fgos doctor --pretty prints colored ANSI text, not JSON', () => {
 test('fgos doctor against a fresh cwd with no runner config never creates the shared config file (read-only proof)', () => {
   const cwd = mkTemp('doctor-cli-readonly-');
   const homeDir = mkTemp('doctor-cli-readonly-home-');
-  const configPath = path.join(cwd, '.fgos', 'config.json');
-  assert.equal(fs.existsSync(configPath), false);
+  const configFiles = ['config.json', 'config.yaml'].map((name) => path.join(cwd, '.fgos', name));
   const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(fs.existsSync(configPath), false, 'fgos doctor must never create .fgos/config.json');
+  for (const file of configFiles) assert.equal(fs.existsSync(file), false, `fgos doctor must never create ${file}`);
   const envelope = JSON.parse(result.stdout);
-  const configCheck = envelope.data.checks.find((c) => c.id === 'config-not-stale');
-  assert.equal(configCheck.passed, false);
+  assert.equal(envelope.data.checks.find((c) => c.id === 'config-parse').passed, true);
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
@@ -1048,7 +630,7 @@ test('tier-vocabulary-dead-keys check fails when retired keys are present', () =
   }
 });
 
-test('tier-vocabulary-dead-keys names a rigorToTier as retired at the level that carries it', () => {
+test('tier-vocabulary-dead-keys names a rigorToTier as retired, whether the global or the project file carries it', () => {
   const dir = mkTemp('checks-tier-dead-rigor-');
   const fakeHome = mkTemp('fake-home-');
   try {
@@ -1060,13 +642,12 @@ test('tier-vocabulary-dead-keys names a rigorToTier as retired at the level that
       writeProjectConfig(dir, { runner: { defaults: { tier: 'standard' } } });
       const global = checkById('tier-vocabulary-dead-keys').check(dir);
       assert.equal(global.passed, false);
-      assert.match(global.message, /global config contains retired key "runner\.rigorToTier".*delete the key/);
+      assert.match(global.message, /effective config contains retired key "runner\.rigorToTier".*delete the key/);
       writeGlobalConfig(fakeHome, { runner: {} });
       writeProjectConfig(dir, { runner: { rigorToTier } });
       const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
       assert.equal(passed, false);
-      assert.match(message, /project config contains retired key "runner\.rigorToTier".*delete the key/);
-      assert.doesNotMatch(message, /global/);
+      assert.match(message, /effective config contains retired key "runner\.rigorToTier".*delete the key/);
     });
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });

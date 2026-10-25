@@ -22,9 +22,9 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
-import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { addWork, listWork } from '../../src/state/store.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-prod-callsite-home-'));
 const originalHome = process.env.HOME;
@@ -139,8 +139,7 @@ test('in-process dispatch with required confinement refuses without trusted harn
     agentType: 'general-assistant',
   }));
   // Add required confinement to the capability in config
-  const cfgPath = path.join(root, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(root);
   cfg.runner.capabilities[IMPLEMENT_CAPABILITY].confinement = {
     mode: 'required',
     policy: 'host-write-denied',
@@ -208,7 +207,7 @@ test('R8: legacy openDispatchRun stamps contract: dispatch-run.legacy in run.jso
   const root = fixtureRepo();
   try {
     const fgosDir = path.join(root, '.fgos');
-    const cfg = loadRunnerConfigFromDir(root);
+    const cfg = loadRunnerConfigForDir(root);
     await executeExecutorCli('mock-non-assignment', { tier: 'standard', model: 'sonnet', sharedCwd: true,
       prompt: 'hello world',
       cwd: root,

@@ -1,0 +1,48 @@
+# Slice C landing C, wave 2: bin readers, setup flow, bin cache, tier-ladder deletion (phase 15) and account readers (Slice D phase 13)
+
+Branch `cfg/slice-c-c-bin` (from `cfg/slice-c-c` at 3e6c5bec3). Commits: `8b8e5f23b` (phase 15), `c0ba99abf` (account readers). Not pushed or merged. Impact analysis inactive; callers checked with `rg`.
+
+## Node lines (`git diff --numstat 3e6c5bec3..HEAD`)
+
+- src + bin + scripts: +114 / -207 (phase 15: +92 / -192, `bin/fgos.mjs` +45 / -81; account readers: +22 / -15).
+- test: +154 / -210. Census file regenerated in both commits (`--write-census`), not counted.
+
+## Phase 15
+
+- `bin/fgos.mjs`: every reader site moved. Runner config through `loadRunnerConfigForDir`; `cleanup` TTLs, `docRegistry.enforce` through `readConfig` sections (the standard supplies 7 / 0 / false, the `DEFAULT_CLEANUP_*` imports are gone); `workerSlots.ceiling` through `readWorkerSlotCeiling` (claim-port); `readInvariantCheckCommands` from `merge.mjs`; the `explain` `projectConfig` argument dropped. `rg readSharedConfig|writeSharedConfig|ensureSharedConfigDefaults|refreshTierLadderComment|ensureRunnerConfigForDir|loadRunnerConfigFromDir|loadRunnerConfig\(` over `bin`: only prose comments naming the old mechanism remain.
+- `--config <path>` removed from `discover`, `plan`, `tool` (coordinator answer 4): no caller outside tests (`rg -e --config` over src, scripts, core, domains, docs: none). Registry entries for it removed (`discover`, `plan`, `tool check|query`); the one test of it retired (`discover --config` missing path); `subcommand-flag-drift` scanner assertion that used `tool`'s shared `config` read now asserts `dispatch`'s shared `for` read (same claim: a flag read outside every sub-verb region is seen).
+- Setup flow: `initConfigFile` for `project` and `global` (create-only, header-only; a legacy `config.json` counts as present and is left). Envelope loses `tierLadderComment`, `configAddedKeys`, `globalConfigAddedKeys`; `configPath` is the existing file (yaml, else legacy json, else the yaml it created); message says `created .fgos/config.yaml` / `config already present`. `runFixes` still runs.
+- Bin cache: `refreshGlobalBinCache({ globalDir })` writes `<globalDir>/runtime/bin-cache.json` (`{"globalFgosPath": ...}`, 0600, `replaceDurably`) only when the value differs, deletes the file when nothing resolves; `cachedGlobalBin` / `resolveFgosBin` take `{ globalDir }`; shell wrapper greps the same key in the new file (no `node` on the hot path); no `config.json` mention left in the script.
+- Deleted: `src/setup/tier-ladder-comment.mjs` + test, `core/config-schema/bin.schema.yaml`, its `bundle.rs` entry, `bin` from `registry-defaults.v1.json` `schema-only`, `bin.globalFgosPath` from `scope.v1.json` `first-slice-global-only` (the scope cases inline their own schemas and stay), manifest line. `cargo test -p fgos-config`: all green.
+- Files outside the ownership row that I had to touch (said here as asked): `src/setup/seat-binding-checks.mjs` (`checkSeatBindingConfig` and its ladder import; it was the deferred item of phase 13), `src/setup/registrations.mjs` (**only** the `seat-binding-config` row and the import name; no other line), `test/setup/checks.test.mjs` (that row id in the expected list), `src/cli/command-registry.mjs` (`--config` flags and account text), `docs/architecture-manifest.json` (deleted module).
+
+## Account readers (Slice D phase 13)
+
+- The assembly point is already the door: `loadRunnerConfigForDir` reads through the facade, which overlays `private/accounts.yaml` when unconfined (wave 1 decision: no `withMachineAccounts` was built, so there is nothing to add or delete). What remained: `explain.mjs` / `model-pool-checks.mjs` lose the `projectConfig` argument of `readLlmAccounts` (the door refuses a project inventory before the reader sees it); `model-pool-checks` and `executor-posture-coverage` use `loadRunnerConfigForDir`; texts naming `~/.fgos/config.json` for accounts (bin x2, registry x3, `llm-accounts.mjs`, `provider-account-probe.mjs`) now say `~/.fgos/private/accounts.yaml`. `src/runner/dispatch/config.mjs` was not touched.
+- Confined refusal: `acquireNamedAccountLease` (the one place that leases) asks `readMachineAccounts().state` and throws code `config-accounts-unavailable-confined` before reading the inventory (a confined worker's inventory is empty, which used to read as "provider not managed"). One test.
+- Fixtures: `writeAccountsFile(globalDir, runner)` added to `test/helpers/config-fixture.mjs`; used by `failover-fixture`, `provider-pool-lease` (local copy deleted), `provider-capacity`, `dispatch-reconcile-operation`, `dispatch-inspect`, `model-pool-checks.test`. The failover fixture writes no accounts file when it has none (an empty `providers` container is refused as wrong-file).
+- Completeness: `rg "llmAccounts|\.accounts\b" src bin` shows no raw read of the global file outside `registrations.mjs` (other lane: `readDoctorProviderInventory` at `registrations.mjs:5411` still reads `loadGlobalConfig`; it belongs to phase 14).
+- Measure of one `readMachineAccounts` per lease: not measured separately (one door call, only on the lease path).
+
+## Tests
+
+Run with an isolated HOME copy (`.gitconfig` only), `node scripts/run-tests.mjs <files>`, cargo target shared with the B lane.
+Green: bin-discovery, shell integration, checks-setup-config/rc-line/envelope/hookspath, dir-resolution, fgos-setup, claude-code-hooks, uninstall-wiring-2/3, seat-binding-dry-bind, architecture, subcommand-flag-drift, fgos-manifest, plan-lint, dispatch-inspect, provider-capacity + provider-pool-lease (49), explain, import-graph guards, executor-posture-coverage, executor-profile-warnings, config facade/door; `cargo test -p fgos-config`.
+Retired: `discover --config` test; `tier-ladder-comment.test.mjs` (behaviour removed); the old "bootstraps the default config" discover test is replaced by one that asserts the refusal naming `fgos config set runner.executor` and no config file written.
+New wiring proofs: setup creates header-only yaml for project and machine; setup leaves a legacy `config.json` alone; setup twice rewrites nothing; bin cache write/delete/0600; confined lease refusal. The non-checkout setup test now gives the copy a `native-addon.json` and the staged addon (setup needs the door).
+
+## Red, and why (none is new; compared with the untouched branch by `git stash`)
+
+- `checks-setup-idempotent` (setup twice): the second run exits 1 with `config-legacy-shadowed .fgos/config.json`, because the old registered fixes in `registrations.mjs` (lines about 2667, 2894, 2965) still write `.fgos/config.json` during `runFixes`. Goes green when the registrations lane removes those writers; re-run it after the merge. Same cause for tests that share one HOME after any setup run: a test file run after a setup/doctor test finds `gateway.token` in the global `config.json` and the door refuses it (seen as `cleanup`/`compound`/`stale` failures only when files run together; each passes alone with a fresh HOME).
+- `fgos-stage` "plan on a standard plan ... READY validation" (`unit-refused-tier-cell-missing`) and `run-provider-failover` walk cases (13): the standard fills the project; same class as the fixture flip, they fail identically without my change.
+- `model-pool-checks.test` 5 cases (family-unique, skills-installed, model-policy-pools, llm-accounts-shape alias case, tier-fallback): the fixtures replace executors while the standard's capabilities still name the standard's invocations (`runner capabilities.advise ... no such invocation`) and the standard now declares tier cells and a tier fallback, so "quiet without a list" cannot hold. Fixture rewrite, same decision as run.test/workflow-runner reds. Their account parts moved to the accounts file and the project-inventory case now asserts the door's `config-key-in-wrong-file`.
+
+## For the merge / coordinator
+
+1. `registrations.mjs`: I removed only the `seat-binding-config` row and the `checkSeatBindingConfig` import name; the registrations lane must not re-add them. It still imports `refreshGlobalBinCache` (signature now `({ globalDir })`, no argument is fine). It should delete the three old `writeSharedConfig` fixes and the `config-awareness` row.
+2. `config.mjs` (fixes lane): the aliases `loadRunnerConfigFromDir` / `ensureRunnerConfigForDir` and the exports in `src/runner/dispatch.mjs` can go once the registrations lane has moved its importers (my files no longer use them); `loadRunnerConfig(path)` has no non-test caller left either (check `src/runner/loop.mjs`, `src/config/global-config.mjs` before deleting).
+3. Docs for phase 23: `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` and `docs/how-to/install-fgos-in-a-project-and-use-doctor.md` still name `seat-binding-config`; `docs/specs/seat-binding.md` lines 453 and 462 name the deleted module; `docs/platform/config/spec.md:230` says the bin cache is "cached in config" (now true to the code, the sentence describes the move).
+4. `globalConfigPath` option (basename ignored) is still used by event-store, terminal, grace, inspect and reconcile readers; moving them to `globalDir` is not in this phase's row.
+5. Census file will conflict across lanes: regenerate with `node scripts/git-one-door-scan.mjs --write-census` after merging (11 undeclared sites reported are not from this lane).
+
+Unresolved: (1) whether `dispatch explain`'s remaining account `problems` should still name a project-file inventory (the door refuses it earlier; I left the reader quiet). (2) Cost of the lease-time `readMachineAccounts` call not measured.

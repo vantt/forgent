@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { writeGlobalConfig, writeRawGlobalConfig } from '../helpers/config-fixture.mjs';
+import { writeAccountsFile, writeGlobalConfig, writeRawGlobalConfig } from '../helpers/config-fixture.mjs';
 import {
   checkTrustStoreWritable,
   checkExecutorConfinement,
@@ -178,9 +178,9 @@ function paneExecutors(providerModel = 'openai') {
       openai: {
         providerModel,
         invocations: [
-          { id: 'codex-herdr', adapter: 'herdr-spawn', command: 'codex', credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
-          { id: 'codex-bwrap', adapter: 'cli-spawn', command: 'codex', resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] },
-          { id: 'codex-cli', adapter: 'cli-spawn' },
+          { id: 'codex-herdr', via: 'cli', adapter: 'herdr-spawn', command: 'codex', credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
+          { id: 'codex-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'codex', resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] },
+          { id: 'codex-cli', via: 'cli', adapter: 'cli-spawn' },
         ],
       },
     },
@@ -265,7 +265,13 @@ function withHome(home, fn) {
 
 function writeConfigContent(home, content) {
   if (typeof content === 'string') writeRawGlobalConfig(home, content);
-  else writeGlobalConfig(home, content);
+  else {
+    // Account pools live in the accounts file; the rest of the runner section stays in the global config.
+    const { providers, llmAccounts, ...rest } = content.runner ?? {};
+    const accounts = { ...(providers ? { providers } : {}), ...(llmAccounts ? { llmAccounts } : {}) };
+    if (Object.keys(accounts).length > 0) writeAccountsFile(path.join(home, '.fgos'), accounts);
+    writeGlobalConfig(home, { ...content, runner: rest });
+  }
 }
 
 test('the registered confined-pane-accounts check reads the global inventory from a directory with no project config', () => {
@@ -281,16 +287,17 @@ test('the registered confined-pane-accounts check reads the global inventory fro
     assert.match(missing.message, /account "acct" has none of auth\.json/);
     fs.writeFileSync(path.join(creds, 'auth.json'), '{}');
     const ok = withHome(home, () => entry.check(home));
-    assert.equal(ok.passed, true, ok.message);
-    assert.match(ok.message, /account "acct" has its 1 credential file/);
+    // The standard's other executors have no inventory in this machine config and keep the check failing; the
+    // verdict on the executor whose accounts the file declares is what this proves: it no longer names a problem.
+    assert.doesNotMatch(ok.message, /executor "openai"|account "acct"/, ok.message);
   } finally { fs.rmSync(home, { recursive: true, force: true }); }
 });
 
 test('the registered confined-pane-accounts check fails with the reason when the global config is unreadable, and never echoes the file', () => {
   const entry = DOCTOR_CHECKS.find((c) => c.id === 'confined-pane-accounts');
   for (const [label, content, wantReason] of [
-    ['not json', '{ "runner": { "x": "LOOKS-LIKE-A-SECRET-VALUE" } oops', /global config unreadable \(not valid JSON or not readable\)/],
-    ['refused by the validator', JSON.stringify({ runner: { providers: { openai: { accounts: { acct: { unknownKey: true } } } } } }), /global config refused by the provider inventory validator/],
+    ['not json', '{ "runner": { "x": "LOOKS-LIKE-A-SECRET-VALUE" } oops', /machine config unreadable \(config-parse /],
+    ['refused by the validator', `# @fgos:v1\n${JSON.stringify({ runner: { providers: { openai: { accounts: { acct: { unknownKey: true } } } } } })}`, /machine config unreadable \(config-key-in-wrong-file /],
   ]) {
     const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-accounts-home-'));
     try {
@@ -298,7 +305,7 @@ test('the registered confined-pane-accounts check fails with the reason when the
       const result = withHome(home, () => entry.check(home));
       assert.equal(result.passed, false, label);
       assert.match(result.message, wantReason, label);
-      assert.ok(result.message.includes(path.join(home, '.fgos', 'config.json')), 'the config path is named');
+      assert.ok(result.message.includes('global:config.yaml'), 'the config file is named');
       assert.equal(result.message.includes('LOOKS-LIKE-A-SECRET-VALUE'), false, label);
       assert.equal(/position|Expected|Unexpected|unknown key/i.test(result.message), false, `no parser or validator text (${label}): ${result.message}`);
     } finally { fs.rmSync(home, { recursive: true, force: true }); }

@@ -611,23 +611,23 @@ test('snapshotFgos captures files in .fgos including observe/, excluding secrets
   fs.writeFileSync(path.join(fgosDir, 'secrets.env'), 'SECRET_KEY=xyz');
 
   const snap = snapshotFgos(base);
-  assert.equal(snap.has('config.json'), true);
+  assert.equal(snap.has('config.yaml'), true);
   assert.equal(snap.has(path.join('observe', 'friction', 'data.json')), true);
   assert.equal(snap.has('secrets.local.env'), false, 'secrets.local.env must be excluded from snapshot');
   assert.equal(snap.has('secrets.env'), false, 'secrets.env must be excluded from snapshot');
-  assert.equal(snap.get('config.json').size, 13);
+  assert.equal(snap.get('config.yaml').size, 13);
 
   fs.rmSync(base, { recursive: true, force: true });
 });
 
 test('diffFgosSnapshots correctly computes added, modified, deleted, and respects allowedMutations', () => {
   const before = new Map([
-    ['config.json', { mtimeMs: 1000, size: 20 }],
+    ['config.yaml', { mtimeMs: 1000, size: 20 }],
     ['state.json', { mtimeMs: 1000, size: 50 }],
     ['to-delete.json', { mtimeMs: 1000, size: 30 }],
   ]);
   const after = new Map([
-    ['config.json', { mtimeMs: 1000, size: 20 }], // unchanged
+    ['config.yaml', { mtimeMs: 1000, size: 20 }], // unchanged
     ['state.json', { mtimeMs: 2000, size: 60 }], // modified
     ['new-run.json', { mtimeMs: 2000, size: 100 }], // added
     ['allowed-new.json', { mtimeMs: 2000, size: 10 }], // allowed added

@@ -9,7 +9,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { EXIT_CODES, OUTCOME_EXIT_CODES, exitCodeForOutcome } from '../../src/state/store.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { capabilityServedBy, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -63,7 +63,9 @@ if (match) {
         },
       },
       capabilities: {
-        'docs:write': { prefer: ['mock-pass'] },
+        'docs:write': capabilityServedBy('mock-pass', 'docs:write'),
+        // Declared, but its executor has no model at the tier it asks for: policy refuses every unit that names it.
+        'unserved-capability-pool': { prefer: [{ executor: 'mock-pass' }], tier: 'frontier' },
       },
     },
   });
@@ -147,7 +149,7 @@ test('fgos run exits with code 4 on policy-refusal while emitting valid json env
     fs.writeFileSync(unitFile, JSON.stringify({
       id: 'u-refused',
       objective: 'Run refusal test',
-      capability: 'missing-capability-pool',
+      capability: 'unserved-capability-pool',
       writes: [],
     }));
 
@@ -192,7 +194,7 @@ test('fgos run exits with code 11 on execution-failure via real CLI', () => {
         },
       },
       capabilities: {
-        'docs:write': { prefer: ['fail-exec'] },
+        'docs:write': capabilityServedBy('fail-exec', 'docs:write'),
       },
     };
     writeProjectConfig(repoDir, { runner });
@@ -226,7 +228,7 @@ test('fgos workflow start detached exits 0 on successful process spawn', () => {
   try {
     const unitsFile = path.join(repoDir, 'units.json');
     fs.writeFileSync(unitsFile, JSON.stringify([
-      { id: 'u-detach', objective: 'Detached unit', capability: 'missing-cap' },
+      { id: 'u-detach', objective: 'Detached unit', capability: 'unserved-capability-pool' },
     ]));
 
     const res = spawnSync(process.execPath, [BIN_FGOS, 'workflow', 'start', '--units', unitsFile, '--dir', repoDir], {
@@ -265,7 +267,7 @@ test('fgos workflow start --foreground exits with non-zero matching the workflow
   try {
     const unitsFile = path.join(repoDir, 'units.json');
     fs.writeFileSync(unitsFile, JSON.stringify([
-      { id: 'u-fail', objective: 'Test fail', capability: 'missing-capability' },
+      { id: 'u-fail', objective: 'Test fail', capability: 'unserved-capability-pool' },
     ]));
 
     const res = spawnSync(process.execPath, [BIN_FGOS, 'workflow', 'start', '--units', unitsFile, '--foreground', '--dir', repoDir], {
@@ -290,7 +292,7 @@ test('fgos workflow status on a failed run always exits 0', () => {
   try {
     const unitsFile = path.join(repoDir, 'units.json');
     fs.writeFileSync(unitsFile, JSON.stringify([
-      { id: 'u-fail-read', objective: 'Test fail read', capability: 'missing-capability' },
+      { id: 'u-fail-read', objective: 'Test fail read', capability: 'unserved-capability-pool' },
     ]));
 
     const resRun = spawnSync(process.execPath, [BIN_FGOS, 'workflow', 'start', '--units', unitsFile, '--foreground', '--dir', repoDir], {

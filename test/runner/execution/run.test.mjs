@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { runUnit as coreRunUnit, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
-import { RunnerConfigError, loadRunnerConfigFromDir } from '../../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError, loadRunnerConfigForDir } from '../../../src/runner/dispatch/config.mjs';
 import { seatConfigDigestOf } from '../../../src/runner/execution/seat-policy.mjs';
 import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -24,7 +24,7 @@ seedFileLocalBwrapRegistry();
 // must reach (command, worker script, worktree) live outside it.
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
-import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
 
 function setupGitRepo() {
   const tmp = makeFixtureDir('fgos-run-test-');
@@ -80,6 +80,11 @@ function setupGitRepo() {
           prefer: [{ executor: 'test-node' }],
           persona: 'code-reviewer',
           rigor: 'standard',
+        },
+        // Declared, but its only executor has no model at the tier it asks for: policy refuses every unit that names it.
+        'unserved:answer': {
+          prefer: [{ executor: 'test-node' }],
+          tier: 'frontier',
         },
       },
       patterns: { seatBinding: { schema: 1 },
@@ -289,7 +294,7 @@ async function mutatingGateFixture({ writeUnitJson = true, corrupt = false, twoC
     // A second executor behind the first, so a fallback walk has somewhere to go. The replay reads the
     // committed config, so the second executor is committed to the project config.
     const file = path.join(repoRoot, '.fgos', 'config.json');
-    const committed = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const committed = readProjectConfig(repoRoot);
     const runner = committed.runner;
     runner.executors['test-node-2'] = { ...runner.executors['test-node'], providerModel: 'node2' };
     runner.capabilities['docs:write'].prefer = [{ executor: 'test-node' }, { executor: 'test-node-2' }];
@@ -304,7 +309,7 @@ async function mutatingGateFixture({ writeUnitJson = true, corrupt = false, twoC
     worktree: fs.realpathSync(worktreeDir),
   };
   // What a bind records: the digest of the seat config it was bound under.
-  const configDigest = seatConfigDigestOf(loadRunnerConfigFromDir(repoRoot)).digest;
+  const configDigest = seatConfigDigestOf(loadRunnerConfigForDir(repoRoot)).digest;
   if (attempts) record.bindings = { 'producer/1': attempts(unitRunId, configDigest) };
   if (bindings) record.bindings = bindings(unitRunId, configDigest);
   if (writeUnitJson) {
@@ -383,16 +388,16 @@ test('mutating gate: a config committed after the bind refuses the write, whatev
   const { baseAssignment, run, record, repoRoot, configDigest } = await mutatingGateFixture({ attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', undefined, digest)] });
   const verified = (await import('../../../src/runner/execution/bind.mjs')).bind(
     { unit: record.unit, role: 'producer', readOnly: false, overrides: [] },
-    { runnerConfig: loadRunnerConfigFromDir(repoRoot), session: {} },
+    { runnerConfig: loadRunnerConfigForDir(repoRoot), session: {} },
   );
   const assignment = { ...baseAssignment, binding: { executor: verified.executor, pool: verified.pool, tier: verified.tier, posture: verified.posture } };
   // The snapshot kept in unit.json still carries the config the seat was bound under; the committed one moved on.
   const file = path.join(repoRoot, '.fgos', 'config.json');
-  const committed = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const committed = readProjectConfig(repoRoot);
   committed.runner.defaults.tier = 'advanced';
   committed.runner.modelPolicies.node.advanced = 'node-adv';
   writeProjectConfig(repoRoot, committed);
-  assert.notEqual(seatConfigDigestOf(loadRunnerConfigFromDir(repoRoot)).digest, configDigest);
+  assert.notEqual(seatConfigDigestOf(loadRunnerConfigForDir(repoRoot)).digest, configDigest);
   await assert.rejects(() => run(assignment), (err) => err.code === 'binding-replay-config-mismatch');
 });
 
@@ -402,7 +407,7 @@ test('mutating gate: a recorded bindingInput that carries a config copy of its o
   });
   const verified = (await import('../../../src/runner/execution/bind.mjs')).bind(
     { unit: record.unit, role: 'producer', readOnly: false, overrides: [] },
-    { runnerConfig: loadRunnerConfigFromDir(repoRoot), session: {} },
+    { runnerConfig: loadRunnerConfigForDir(repoRoot), session: {} },
   );
   const assignment = { ...baseAssignment, binding: { executor: verified.executor, pool: verified.pool, tier: verified.tier, posture: verified.posture } };
   // Reaches the point after the gate: the executable it would spawn is not the point of this test.
@@ -482,8 +487,7 @@ function writeSettlingWorker(dir) {
 }
 
 function reviewedConfig(repoRoot, executorNames) {
-  const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(repoRoot);
   const script = writeSettlingWorker(repoRoot);
   const executors = {};
   for (const name of executorNames) {
@@ -500,10 +504,11 @@ function reviewedConfig(repoRoot, executorNames) {
     };
   }
   cfg.runner.executors = executors;
+  delete cfg.runner.capabilities['unserved:answer']; // its pool named the executor this config replaces
   for (const name of executorNames) cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   const prefer = executorNames.map((executor) => ({ executor }));
-  cfg.runner.capabilities['docs:write'] = { prefer, rigor: 'standard' };
-  cfg.runner.capabilities['docs:review'] = { prefer, persona: 'code-reviewer', rigor: 'standard' };
+  cfg.runner.capabilities['docs:write'] = { prefer, rigor: 'standard', tier: 'standard' };
+  cfg.runner.capabilities['docs:review'] = { prefer, persona: 'code-reviewer', rigor: 'standard', tier: 'standard' };
   cfg.runner.defaultExecutor = executorNames[0];
   writeProjectConfig(repoRoot, cfg);
 }
@@ -1045,7 +1050,7 @@ test('unit summaries cover refusal, thrown execution and resume without duplicat
   const { repoRoot, worktreeDir } = setupGitRepo();
   t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
   t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
-  const unitData = { id: 'summary-doors', capability: 'not-configured:answer', objective: 'Answer question', writes: [] };
+  const unitData = { id: 'summary-doors', capability: 'unserved:answer', objective: 'Answer question', writes: [] };
   const refused = await runUnit({ unitData, repoRoot, cwd: worktreeDir });
   const dir = path.join(repoRoot, '.fgos', 'assignments', refused.unitRunId);
   const readSummary = () => JSON.parse(fs.readFileSync(path.join(dir, 'unit-summary.json'), 'utf8'));
@@ -1078,7 +1083,7 @@ function recordedUnitFixture(t, pattern = 'solo') {
   const unitDir = path.join(repoRoot, '.fgos', 'assignments', unitRunId);
   fs.mkdirSync(unitDir, { recursive: true });
   const record = {
-    unit: { id: 'recorded-question', objective: 'Answer the question', capability: 'not-configured:answer',
+    unit: { id: 'recorded-question', objective: 'Answer the question', capability: 'unserved:answer',
       writes: [], pattern, stanceOptions: ['a', 'b'], ...(pattern === 'panel' ? { seats: panelSeats(3) } : {}) },
     pattern,
     seatSchema: 1,
@@ -1260,8 +1265,7 @@ test('a failed settlement write never replaces the execution error that caused i
 });
 
 function setGeneratedPaths(repoRoot, generatedPaths) {
-  const configPath = path.join(repoRoot, '.fgos', 'config.json');
-  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  const config = readProjectConfig(repoRoot);
   config.runner.generatedPaths = generatedPaths;
   writeProjectConfig(repoRoot, config);
 }
@@ -1291,7 +1295,7 @@ test('a resumed unit keeps its recorded write scope even after generatedPaths ch
   t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
   t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
   setGeneratedPaths(repoRoot, SKILL_RENDERS);
-  const unitData = { id: 'u-resume-scope', objective: 'Edit a skill', capability: 'not-configured:answer', writes: ['core/skills/y.md'] };
+  const unitData = { id: 'u-resume-scope', objective: 'Edit a skill', capability: 'unserved:answer', writes: ['core/skills/y.md'] };
   const first = await runUnit({ unitData, repoRoot, cwd: worktreeDir });
   const unitJson = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId, 'unit.json');
   const expected = ['core/skills/y.md', '.agents/skills/**', 'plugins/fgOS/skills/**'];
@@ -1352,7 +1356,7 @@ test('a resume is refused while a live process holds the dispatch lock of the un
   const { repoRoot, worktreeDir } = setupGitRepo();
   t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
   t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
-  const unitData = { id: 'resume-lock', capability: 'not-configured:answer', objective: 'Answer question', writes: [] };
+  const unitData = { id: 'resume-lock', capability: 'unserved:answer', objective: 'Answer question', writes: [] };
   const refused = await runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir });
   assert.equal(refused.outcome, 'policy-refusal');
   const runDir = path.join(repoRoot, '.fgos', 'assignments', refused.unitRunId, 'producer', '1', 'runs', '01');
@@ -1406,8 +1410,7 @@ function writeScopedWorker(repoRoot, { files, waitFor = null, summary = 'Wrote t
     }
     `,
   );
-  const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(repoRoot);
   for (const executor of Object.values(cfg.runner.executors)) {
     executor.args = [script, '{prompt}'];
     for (const invocation of executor.invocations) invocation.args = [script, '{prompt}'];
@@ -1678,8 +1681,7 @@ test('a committed Unit result survives a failed custody handoff with a warning',
 
 // Gives each named executor family its own model for every tier a rigor may ask for.
 function withModelPolicies(repoRoot, families, patch = {}) {
-  const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(repoRoot);
   for (const family of families) cfg.runner.modelPolicies[family] = { standard: `${family}-std`, flagship: `${family}-flagship`, frontier: `${family}-frontier` };
   Object.assign(cfg.runner, patch);
   writeProjectConfig(repoRoot, cfg);
@@ -1739,8 +1741,7 @@ test('a writing unit\'s verify child borrows the custody lease while it runs', {
   reviewedConfig(repoRoot, ['alpha', 'beta']);
   writeScopedWorker(repoRoot, { files: { 'docs/in.md': 'i\n' } });
   // Only the producer writes; the checker keeps the read-only settling worker.
-  const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(repoRoot);
   const settling = [path.join(repoRoot, 'settling-worker.mjs'), '{prompt}'];
   cfg.runner.executors.beta.args = settling;
   for (const invocation of cfg.runner.executors.beta.invocations) invocation.args = settling;
@@ -1783,8 +1784,7 @@ test('a verify command that outlives runner.timeoutMs fails the verify with the 
 test('a verify declared on the capability is used when the unit names none', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta']);
-  const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(repoRoot);
   cfg.runner.capabilities['docs:write'].verify = 'node -e "process.exit(5)"';
   writeProjectConfig(repoRoot, cfg);
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-verify-cap' });
@@ -1821,7 +1821,7 @@ test('a signal that lands while the unit is set up stops it before any seat star
   const { repoRoot, worktreeDir } = setupGitRepo();
   t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
   t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
-  const unitData = { id: 'cancelled-midway', capability: 'not-configured:answer', objective: 'Answer question', writes: [] };
+  const unitData = { id: 'cancelled-midway', capability: 'unserved:answer', objective: 'Answer question', writes: [] };
   await withCancelHandlers(async () => {
     await assert.rejects(
       runUnit({ unitData, repoRoot, cwd: worktreeDir, onUnitRunCreated: () => { process.emit('SIGINT'); } }),
@@ -1846,7 +1846,7 @@ test('after a signal a new unit is refused before anything is created', async (t
     await new Promise((resolve) => setTimeout(resolve, 100));
     assert.deepEqual(exits, [143]);
     await assert.rejects(
-      runUnit({ unitData: { id: 'late', capability: 'not-configured:answer', objective: 'x', writes: [] }, repoRoot, cwd: worktreeDir }),
+      runUnit({ unitData: { id: 'late', capability: 'unserved:answer', objective: 'x', writes: [] }, repoRoot, cwd: worktreeDir }),
       { code: 'run-cancelled', signal: 'SIGTERM' },
     );
     assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'assignments')), false);
@@ -1861,7 +1861,7 @@ test('an in-process caller keeps its own signal handling: runUnit installs no SI
   const before = counts();
   let during = null;
   const res = await runUnit({
-    unitData: { id: 'own-handlers', capability: 'not-configured:answer', objective: 'x', writes: [] },
+    unitData: { id: 'own-handlers', capability: 'unserved:answer', objective: 'x', writes: [] },
     repoRoot, cwd: worktreeDir, onUnitRunCreated: () => { during = counts(); },
   });
   assert.equal(res.outcome, 'policy-refusal');

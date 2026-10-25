@@ -20,7 +20,8 @@ class StoreError extends Error {
 }
 
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir, loadRunnerConfigFromDir, MODEL_POLICY_TIERS, normalizePreferCandidates, withDefaultExecutor } from './config.mjs';
+import { projectConfigPresent } from '../../config/facade.mjs';
+import { RunnerConfigError, loadRunnerConfigForDir, MODEL_POLICY_TIERS, normalizePreferCandidates, withDefaultExecutor } from './config.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { resolveExecutorAndOverrides, resolveCapabilityDetailsFromHints } from './resolve.mjs';
 import { WORK_ITEM_KEYS, refuseWorkItemInput } from './work-item-input.mjs';
@@ -223,6 +224,25 @@ function selectInvocationForCapability(cfg, executorId, executor, capabilityName
   return unconfined?.id;
 }
 
+/**
+ * The directory whose project config a dispatch reads: the linked worktree `cwd` sits in when that worktree
+ * carries a config of its own (a YAML file or a legacy JSON one), otherwise `root`, the
+ * main checkout. A worktree whose config file the door refuses surfaces the refusal; only not finding a
+ * repository for `cwd` falls back to `root`.
+ */
+function configRootFor(cwd, root) {
+  if (!cwd) return root;
+  let wtRoot;
+  let mainRoot;
+  try {
+    wtRoot = resolveRepoRoot(cwd);
+    mainRoot = resolveMainCheckoutRoot(cwd);
+  } catch {
+    return root;
+  }
+  return mainRoot === root && wtRoot !== root && projectConfigPresent(wtRoot) ? wtRoot : root;
+}
+
 // Confined read-only work goes through runUnit, which binds the posture and leases
 // the account's login for the sandbox.
 function readOnlyDoors(executorId) {
@@ -238,7 +258,7 @@ function readOnlyDoors(executorId) {
 export function runDoorHint({ cwd = process.cwd(), executorId, capability } = {}) {
   let cfg = null;
   try {
-    cfg = loadRunnerConfigFromDir(resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd));
+    cfg = loadRunnerConfigForDir(resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd));
   } catch { /* no readable config: the hint names no executor */ }
   const executor = executorId && cfg?.executors && Object.hasOwn(cfg.executors, executorId) ? cfg.executors[executorId] : null;
   const isAgent = executor !== null && (executor.kind ?? 'agent') === 'agent';
@@ -376,17 +396,8 @@ export async function executeExecutorCli(
   }
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const fgosDir = fgosDirFromRoot(root);
-  let configRoot = root;
-  if (cwd) {
-    try {
-      const wtRoot = resolveRepoRoot(cwd);
-      const mainRoot = resolveMainCheckoutRoot(cwd);
-      if (mainRoot === root && wtRoot !== root && fs.existsSync(path.join(wtRoot, '.fgos', 'config.json'))) {
-        configRoot = wtRoot;
-      }
-    } catch {}
-  }
-  const rawCfg = runnerConfig ?? ensureRunnerConfigForDir(configRoot);
+  const configRoot = configRootFor(cwd, root);
+  const rawCfg = runnerConfig ?? loadRunnerConfigForDir(configRoot);
   const cfg = withDefaultExecutor(rawCfg);
   const resolvedByPurpose = !executorIdArg;
   // Resolve through the shared resolver on the supplied capability or
@@ -833,17 +844,8 @@ export async function decideExecutorCli(
     );
   }
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
-  let configRoot = root;
-  if (cwd) {
-    try {
-      const wtRoot = resolveRepoRoot(cwd);
-      const mainRoot = resolveMainCheckoutRoot(cwd);
-      if (mainRoot === root && wtRoot !== root && fs.existsSync(path.join(wtRoot, '.fgos', 'config.json'))) {
-        configRoot = wtRoot;
-      }
-    } catch {}
-  }
-  const cfg = withDefaultExecutor(ensureRunnerConfigForDir(configRoot));
+  const configRoot = configRootFor(cwd, root);
+  const cfg = withDefaultExecutor(loadRunnerConfigForDir(configRoot));
 
   let workHint;
   if (!executorIdArg && workIdArg) {
@@ -1012,7 +1014,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         const invocationFlag = flagValue('--invocation');
         const herdrBin = resolveHerdrBin();
         const result = await runAccountProbe({
-          cfg: ensureRunnerConfigForDir(repoRoot),
+          cfg: loadRunnerConfigForDir(repoRoot),
           provider,
           accountId,
           executorId: flagValue('--executor') ?? null,

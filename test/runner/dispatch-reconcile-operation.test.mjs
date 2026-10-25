@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { invokeDispatchReconcileOperation, DispatchReconcileError } from '../../src/verbs/dispatch/reconcile.mjs';
+import { writeAccountsFile } from '../helpers/config-fixture.mjs';
 import {
   providerCapacityStatePaths,
   quarantineProviderAccount,
@@ -98,9 +99,9 @@ test('invokeDispatchReconcileOperation ignores a forged now/ttlMs in payload for
   assert.equal(applied.outcome, 'applied');
 });
 
-test('dispatch reconcile provider-capacity clear-quarantine validates global inventory and writes audit', () => {
+test('dispatch reconcile provider-capacity clear-quarantine validates the machine account inventory and writes audit', () => {
   const dir = root();
-  const globalConfigPath = path.join(dir, 'global-config.json');
+  const globalConfigPath = path.join(dir, 'global', 'config.json');
   const runtimeDir = path.join(dir, 'runtime');
   const runnerConfig = {
     runner: {
@@ -116,7 +117,7 @@ test('dispatch reconcile provider-capacity clear-quarantine validates global inv
       },
     },
   };
-  fs.writeFileSync(globalConfigPath, `${JSON.stringify(runnerConfig, null, 2)}\n`);
+  writeAccountsFile(path.join(dir, 'global'), runnerConfig.runner);
 
   const ctx = { repoRoot: dir, actor: 'test-operator' };
   const unknown = invokeDispatchReconcileOperation({

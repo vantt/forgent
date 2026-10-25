@@ -1,5 +1,7 @@
 # Phase 03: declare the catalog and loop tuning in config, retire the old keys, bump the marker
 
+> **CFG answer 2026-10-25 (U1, U6 in plan.md):** Branch A only. Branch B is dropped and must not be built. Start this phase after Slice C is on origin/main; agree the `runner` schema keys with SEAT; CFG reviews the mechanism and fixtures.
+
 Depends on: 01 (the loop modules whose config reads move). Blocks: 04, 05, 09. Effort: 9h. Risk: High (public config contract, a locked behavior, CFG-owned files, about 20 fixtures).
 
 Run as (fgos-cook): three slices (3a data files and Rust golden proofs, 3b loader and retired-key refusal, 3c consumers and fixtures). Activity `implement-item`, capability `code:implement`, pattern `reviewed` (by hand), rigor `high` for 3a and 3b (public contract, hard to reverse), `standard` for 3c. Expect families to be scarce at `high` (producer, reviewer and red-team on distinct families): size `seatLaunchesPerDispatch` for it (see plan.md). Verify per slice below.

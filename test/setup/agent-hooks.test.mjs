@@ -6,7 +6,7 @@ import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { readProjectConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { mailboxHookTimeoutSec } from '../../src/setup/mailbox-limits.mjs';
 
 import {
@@ -34,8 +34,7 @@ function mkTempDir(prefix) {
 
 /** Opts the project in to (or out of) the mailbox hook rows through its own config section. */
 function mailboxOptIn(repoRoot, enabled) {
-  const file = projectConfigPath(repoRoot);
-  const config = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {};
+  const config = readProjectConfig(repoRoot);
   config.mailbox = { ...(config.mailbox ?? {}), enabled };
   writeProjectConfig(repoRoot, config);
 }

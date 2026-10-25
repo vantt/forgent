@@ -52,7 +52,7 @@ import { seatConfigDigestOf } from '../execution/seat-policy.mjs';
 import { walkStateOf } from '../execution/account-rotation.mjs';
 import { bindSeatOf } from '../execution/seat-resolver.mjs';
 import { legacyStateKey } from './llm-accounts.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir, loadRunnerConfigFromDir, withDefaultExecutor } from './config.mjs';
+import { RunnerConfigError, loadRunnerConfigForDir, withDefaultExecutor } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
@@ -441,7 +441,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
         { code: 'binding-replay-snapshot-missing' },
       );
     }
-    const committed = opts.committedRunnerConfig ?? loadRunnerConfigFromDir(root);
+    const committed = opts.committedRunnerConfig ?? loadRunnerConfigForDir(root);
     if (seatConfigDigestOf(committed).digest !== boundDigest) {
       throw new RunnerConfigError(
         `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" was bound under a different seat config than the committed one -- refused`,
@@ -1070,7 +1070,7 @@ export async function executeAssignment(assignment, opts = {}) {
 
   const cwd = opts.cwd ?? process.cwd();
   const root = opts.repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
-  const rawCfg = opts.runnerConfig ?? ensureRunnerConfigForDir(root);
+  const rawCfg = opts.runnerConfig ?? loadRunnerConfigForDir(root);
   const cfg = withDefaultExecutor(rawCfg);
 
   // Storage setup under .fgos/assignments/<assignmentId>/

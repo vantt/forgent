@@ -3,8 +3,7 @@
 // but absent from a user's existing config, without ever touching a value
 // the user already has. Designed for reuse by any config shape (not
 // hardcoded to the runner config's own fields) — today's one caller is
-// `runner/dispatch.mjs`'s `ensureRunnerConfigForDir`, a future caller may be
-// a user-level config file.
+// `agy-permissions.mjs`, which merges into a foreign settings file, never an fgOS config.
 //
 // PURE: no fs import, no I/O of any kind — callers own reading/writing.
 //

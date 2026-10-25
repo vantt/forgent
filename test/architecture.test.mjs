@@ -13,6 +13,7 @@ import './helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import { parseYaml } from '../src/util/yaml.mjs';
 import { lexSource } from '../scripts/lib/js-source-lexer.mjs';
@@ -1285,14 +1286,22 @@ test('YAML bundle signature catches a pasted copy of the parser and ignores code
 });
 
 
-// Config has one test door: a test puts `.fgos/config.json` on disk only through
-// test/helpers/config-fixture.mjs, so a change of the file's format or name is one edit.
-// A write call is any call named write*/append* whose first two arguments name the file
-// (a literal, or a name bound to a path built from it); reads and the helper itself are out.
-// A write inside a script held in a string (run by a child process) is invisible here by design.
+// Config has one door. Production code (src, bin, scripts, core) never opens a config file: `src/config/facade.mjs` is
+// the one module that reaches the config component, and it reads no file itself. Tests put a config file on disk and read
+// one back only through test/helpers/config-fixture.mjs, so a change of the file format or name is one edit.
+// An access is any call named like a file write (write*/append*) or a file read (readFile*, existsSync, stat*, open*, access*,
+// createReadStream) whose first arguments (two for a write, the first for a read) name one of the files (a literal, or a name
+// bound in the same block to a path built from it). `--config <path>` readers pass a variable and are not matched, by design.
+// A string that merely mentions a name is not a call; a write inside a script held in a string (run by a child process) is
+// invisible here by design.
 const CONFIG_FIXTURE = 'test/helpers/config-fixture.mjs';
-// The retired `.bee` tool kept a config.json of its own; writing that one is not an fgOS config write.
-const CONFIG_FILE_NAME = String.raw`(?<![\w.-])(?<!\.bee/)config\.json(?![\w-]|\.\w)`;
+const CONFIG_FACADE = 'src/config/facade.mjs';
+// The retired `.bee` tool kept a config.json of its own; touching that one is not an fgOS config access.
+const CONFIG_FILE_NAME = String.raw`(?<![\w.-])(?<!\.bee/)(?:config\.json|config\.yaml|accounts\.yaml|gateway-token)(?![\w-]|\.\w)`;
+const CONFIG_CALLS = {
+  write: { call: /(?<![\w$])(?:[\w$]+\.)*(?:write|append)[\w$]*\s*\(/gi, leading: 2, skipsReadsInBinding: true },
+  read: { call: /(?<![\w$])(?:[\w$]+\.)*(?:readFile|readFileSync|existsSync|statSync|lstatSync|stat|lstat|openSync|open|accessSync|access|createReadStream)\s*\(/g, leading: 1, skipsReadsInBinding: false },
+};
 
 function balancedEnd(view, open) {
   let depth = 0;
@@ -1321,11 +1330,6 @@ function leadingArguments(argText, count) {
   return args;
 }
 
-/**
- * Calls in `source` that write a file named config.json by hand. Call sites and declarations are
- * located in the `shape` view (comments and literal contents blanked, so text inside a string is
- * never read as code); the file name is read from the `code` view of the same offsets.
- */
 // The index of the `}` closing the innermost block that contains `index` (the end of `view` at top level).
 function enclosingBlockEnd(view, index) {
   let depth = 0;
@@ -1336,63 +1340,160 @@ function enclosingBlockEnd(view, index) {
   return view.length;
 }
 
-export function findConfigFileWrites(source) {
+/**
+ * Calls in `source` that write (`kinds` has 'write') or read (`kinds` has 'read') a file named like a config file.
+ * Call sites and declarations are located in the `shape` view (comments and literal contents blanked, so text inside a
+ * string is never read as code); the file name is read from the `code` view of the same offsets.
+ */
+export function findConfigFileAccesses(source, { kinds }) {
   const { code, shape } = lexSource(source);
   const names = new RegExp(CONFIG_FILE_NAME);
-  // A name bound to a config.json path counts only inside the block that declares it.
-  const bound = [];
-  for (const m of shape.matchAll(/\b(?:const|let|var)\s+(\w+)\s*=\s*/g)) {
-    const from = m.index + m[0].length;
-    const to = shape.indexOf(';', from);
-    const initializer = code.slice(from, to < 0 ? code.length : to);
-    if (names.test(initializer) && !/\b(?:read\w*|parse|exists\w*)\b/.test(initializer)) bound.push({ name: m[1], from, end: enclosingBlockEnd(shape, m.index) });
-  }
   const hits = [];
-  for (const m of shape.matchAll(/(?<![\w$])(?:[\w$]+\.)*(?:write|append)[\w$]*\s*\(/gi)) {
-    const open = m.index + m[0].length - 1;
-    const close = balancedEnd(shape, open);
-    if (close < 0) continue;
-    const [first = '', second = ''] = leadingArguments(code.slice(open + 1, close), 2);
-    const viaName = bound.some((b) => b.name === first && open > b.from && open < b.end);
-    if (names.test(first) || names.test(second) || viaName) hits.push(code.slice(m.index, Math.min(close + 1, open + 61)).replace(/\s+/g, ' '));
+  for (const kind of kinds) {
+    const { call, leading, skipsReadsInBinding } = CONFIG_CALLS[kind];
+    // A name bound to a config file path counts only inside the block that declares it.
+    const bound = [];
+    for (const m of shape.matchAll(/\b(?:const|let|var)\s+(\w+)\s*=\s*/g)) {
+      const from = m.index + m[0].length;
+      const to = shape.indexOf(';', from);
+      const initializer = code.slice(from, to < 0 ? code.length : to);
+      if (names.test(initializer) && !(skipsReadsInBinding && /\b(?:read\w*|parse|exists\w*)\b/.test(initializer))) bound.push({ name: m[1], from, end: enclosingBlockEnd(shape, m.index) });
+    }
+    for (const m of shape.matchAll(call)) {
+      if (/^(?:process\.)?std(?:out|err)\./.test(m[0])) continue; // a stream write carries text, never a file
+      const open = m.index + m[0].length - 1;
+      const close = balancedEnd(shape, open);
+      if (close < 0) continue;
+      const args = leadingArguments(code.slice(open + 1, close), leading);
+      const viaName = bound.some((b) => args.includes(b.name) && open > b.from && open < b.end);
+      if (args.some((arg) => names.test(arg)) || viaName) hits.push(code.slice(m.index, Math.min(close + 1, open + 61)).replace(/\s+/g, ' '));
+    }
   }
   return hits;
 }
 
-test('config has one test door: no test file writes config.json outside the config fixture helper', () => {
-  const violations = scriptFilesUnder('test')
-    .filter((file) => file !== CONFIG_FIXTURE)
-    .flatMap((file) => findConfigFileWrites(fs.readFileSync(path.join(root, file), 'utf8')).map((hit) => `${file}: ${hit}`));
-  assert.deepEqual(violations, [], `Expected every config write in tests to go through ${CONFIG_FIXTURE}, found:\n${violations.join('\n')}`);
+const accessViolations = (files, kinds) => files.flatMap((file) => findConfigFileAccesses(fs.readFileSync(path.join(root, file), 'utf8'), { kinds }).map((hit) => `${file}: ${hit}`));
+
+test('config has one test door: no test file writes or reads a config file outside the config fixture helper', () => {
+  const violations = accessViolations(scriptFilesUnder('test').filter((file) => file !== CONFIG_FIXTURE), ['write', 'read']);
+  assert.deepEqual(violations, [], `Expected every config write and read in tests to go through ${CONFIG_FIXTURE}, found:\n${violations.join('\n')}`);
 });
 
-test('config write guard catches each way to write the file by hand and ignores reads, other file names and the helper calls', () => {
-  const caught = [
+test('config has one production door: no source, bin, script or core file reads or writes a config file outside the facade', () => {
+  const files = ['src', 'bin', 'scripts', 'core'].flatMap(scriptFilesUnder).filter((file) => file !== CONFIG_FACADE);
+  const violations = accessViolations(files, ['write', 'read']);
+  assert.deepEqual(violations, [], `Expected every config read in production code to go through ${CONFIG_FACADE}, found:\n${violations.join('\n')}`);
+});
+
+test('config access guard catches each way to touch the file by hand and ignores other file names, mentions and the helper calls', () => {
+  const writes = [
     "fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify(cfg));",
-    'fs.writeFileSync(path.join(dir, ".fgos/config.json"), "{}");',
-    "fs.writeFileSync(\n  path.join(dir, '.fgos', 'config.json'),\n  JSON.stringify(cfg),\n);",
-    "const configPath = path.join(dir, '.fgos', 'config.json');\nfs.writeFileSync(configPath, text);",
-    "const file = path.join(home, 'config.json'); await fsp.writeFile(file, text);",
+    'fs.writeFileSync(path.join(dir, ".fgos/config.yaml"), "{}");',
+    "fs.writeFileSync(\n  path.join(dir, '.fgos', 'config.yaml'),\n  JSON.stringify(cfg),\n);",
+    "const configPath = path.join(dir, '.fgos', 'config.yaml');\nfs.writeFileSync(configPath, text);",
+    "const file = path.join(home, 'accounts.yaml'); await fsp.writeFile(file, text);",
     "fs.appendFileSync(path.join(dir, '.fgos', 'config.json'), 'x');",
     "writeConfig(path.join(root, '.fgos', 'config.json'), { a: 1 });",
-    "write(dir, '.fgos/config.json', 'modified\\n');",
-    "fs.promises.writeFile(`${dir}/.fgos/config.json`, text);",
+    "write(dir, '.fgos/config.yaml', 'modified\\n');",
+    "fs.promises.writeFile(`${dir}/.fgos/config.yaml`, text);",
+    "fs.writeFileSync(path.join(dir, 'private', 'gateway-token'), token);",
   ];
-  for (const source of caught) assert.ok(findConfigFileWrites(source).length >= 1, source);
+  for (const source of writes) assert.ok(findConfigFileAccesses(source, { kinds: ['write'] }).length >= 1, source);
+  const reads = [
+    "fs.readFileSync(path.join(d, '.fgos', 'config.json'), 'utf8');",
+    'fs.readFileSync(path.join(d, ".fgos/config.yaml"));',
+    "const configPath = path.join(d, '.fgos', 'config.yaml');\nconst text = fs.readFileSync(configPath, 'utf8');",
+    "const text = await fs.promises.readFile(path.join(home, '.fgos', 'accounts.yaml'), 'utf8');",
+    "const text = await fsp.readFile(`${home}/.fgos/config.yaml`, 'utf8');",
+    "if (fs.existsSync(path.join(d, '.fgos', 'config.json'))) go();",
+    "fs.statSync(path.join(d, 'private', 'gateway-token'));",
+    "const fd = fs.openSync(path.join(d, '.fgos', 'config.yaml'), 'r');",
+    "fs.createReadStream(path.join(d, '.fgos', 'config.yaml'));",
+    "fs.accessSync(path.join(d, '.fgos', 'config.yaml'));",
+    "const file = path.join(d, '.fgos', 'config.yaml'); if (fs.existsSync(file)) read(file);",
+  ];
+  for (const source of reads) assert.ok(findConfigFileAccesses(source, { kinds: ['read'] }).length >= 1, source);
   const passed = [
     "writeProjectConfig(dir, { runner: {} });",
+    "readProjectConfig(dir);",
     "writeRawGlobalConfig(home, '{ not json');",
-    "const cfg = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'config.json'), 'utf8'));\nwriteProjectConfig(dir, cfg);",
+    "const cfg = readConfig({ projectRoot: dir });\nwriteProjectConfig(dir, cfg);",
     "fs.writeFileSync(path.join(dir, 'runner-config.json'), text);",
+    "fs.readFileSync(path.join(dir, 'runner-config.json'), 'utf8');",
     "fs.writeFileSync(path.join(dir, 'config.json.pre-seat-binding-1'), text);",
     "// fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), text);",
-    "const t = \"fs.writeFileSync(path.join(dir, 'config.json'), text)\";",
-    "assert.equal(fs.existsSync(path.join(dir, '.fgos', 'config.json')), false);",
-    "execFileSync('git', ['add', '.fgos/config.json']);",
-    "const configPath = path.join(dir, '.fgos', 'config.json');\nassert.ok(fs.readFileSync(configPath, 'utf8'));",
-    "test('a', () => { const file = path.join(dir, '.fgos', 'config.json'); read(file); });\ntest('b', () => { const file = path.join(dir, 'x.json'); fs.writeFileSync(file, text); });",
+    "// fs.readFileSync(path.join(dir, '.fgos', 'config.yaml'));",
+    "const t = \"fs.writeFileSync(path.join(dir, 'config.yaml'), text)\";",
+    "const t = \"fs.readFileSync(path.join(dir, 'config.yaml'))\";",
+    "const message = 'cannot read .fgos/config.yaml';",
+    "execFileSync('git', ['add', '.fgos/config.yaml']);",
+    "fs.readFileSync(path.join(d, '.bee/config.json'), 'utf8');",
+    "process.stderr.write(`ignoring ~/.fgos/config.yaml runner.${name}\\n`);",
+    "test('a', () => { const file = path.join(dir, '.fgos', 'config.yaml'); read(file); });\ntest('b', () => { const file = path.join(dir, 'x.json'); fs.readFileSync(file); });",
   ];
-  for (const source of passed) assert.deepEqual(findConfigFileWrites(source), [], source);
+  for (const source of passed) assert.deepEqual(findConfigFileAccesses(source, { kinds: ['write', 'read'] }), [], source);
+});
+
+// The Rust side: a tracked `.rs` file outside the config crate (and its fixtures, and integration tests that lay out a fixture)
+// never names a config file inside a read call; the config crate is the only reader.
+const RUST_CONFIG_READ = /(?:read_to_string|File::open|fs::read|OpenOptions::new)\s*\([^;]*"(?:[^"]*\/)?(?:config\.json|config\.yaml|accounts\.yaml|gateway-token)"/;
+
+export function findRustConfigReads(source) {
+  const code = source.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, '');
+  return code.split(';').filter((statement) => RUST_CONFIG_READ.test(statement)).map((statement) => statement.trim().replace(/\s+/g, ' ').slice(0, 90));
+}
+
+test('config has one Rust door: no tracked Rust file outside the config crate opens a config file', () => {
+  const tracked = execFileSync('git', ['ls-files', '*.rs'], { cwd: root, encoding: 'utf8' }).split('\n').filter(Boolean)
+    .filter((file) => !file.startsWith('packages/config/') && !file.split('/').includes('tests') && !file.includes('/fixtures/'));
+  const violations = tracked.flatMap((file) => findRustConfigReads(fs.readFileSync(path.join(root, file), 'utf8')).map((hit) => `${file}: ${hit}`));
+  assert.deepEqual(violations, [], `Expected every Rust config read to go through the config crate, found:\n${violations.join('\n')}`);
+});
+
+test('Rust config read guard catches each way to open the file and ignores comments, other names and a bare path', () => {
+  for (const source of [
+    'let text = std::fs::read_to_string(dir.join(".fgos").join("config.json"))?;',
+    'let f = File::open(home.join(".fgos/config.yaml"))?;',
+    'let b = fs::read(root.join("private").join("gateway-token"))?;',
+    'let text = fs::read_to_string(\n    global.join("accounts.yaml"),\n)?;',
+  ]) assert.equal(findRustConfigReads(source).length, 1, source);
+  for (const source of [
+    '// let text = fs::read_to_string(dir.join("config.json"))?;',
+    'let token_file = global.join("private").join("gateway-token");',
+    'let text = fs::read_to_string(dir.join("runner-config.json"))?;',
+    '/* File::open(dir.join("config.yaml")) */ let x = 1;',
+  ]) assert.deepEqual(findRustConfigReads(source), [], source);
+});
+
+// The shell side: a script or git hook never reads a config file with a shell tool.
+const SHELL_CONFIG_READ = /(?:\b(?:grep|egrep|fgrep|cat|sed|awk|jq|yq|head|tail|cut|source|python3?)\b[^\n#]*|<\s*\S*)(?:config\.json|config\.yaml|accounts\.yaml|gateway-token)\b/;
+
+export function findShellConfigReads(source) {
+  return source.split('\n').filter((line) => !/^\s*#/.test(line) && SHELL_CONFIG_READ.test(line)).map((line) => line.trim().slice(0, 90));
+}
+
+test('config has one shell door: no script or git hook reads a config file with a shell tool', () => {
+  const files = [
+    ...fs.readdirSync(path.join(root, 'scripts')).filter((name) => name.endsWith('.sh')).map((name) => `scripts/${name}`),
+    ...fs.readdirSync(path.join(root, '.githooks')).map((name) => `.githooks/${name}`),
+  ];
+  const violations = files.flatMap((file) => findShellConfigReads(fs.readFileSync(path.join(root, file), 'utf8')).map((hit) => `${file}: ${hit}`));
+  assert.deepEqual(violations, [], `Expected no shell read of a config file, found:\n${violations.join('\n')}`);
+});
+
+test('shell config read guard catches each reader and ignores comments and a line that only names the file', () => {
+  for (const line of [
+    'grep -q gateway .fgos/config.yaml',
+    'port=$(jq -r .gateway.port .fgos/config.json)',
+    'cat "$HOME/.fgos/accounts.yaml"',
+    'token=$(< "$HOME/.fgos/private/gateway-token")',
+    'sed -n 1,5p .fgos/config.yaml',
+  ]) assert.equal(findShellConfigReads(line).length, 1, line);
+  for (const line of [
+    '# grep gateway .fgos/config.yaml',
+    'echo "edit .fgos/config.yaml to change it"',
+    'git add .fgos/config.yaml',
+  ]) assert.deepEqual(findShellConfigReads(line), [], line);
 });
 
 

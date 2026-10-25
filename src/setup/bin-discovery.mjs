@@ -5,8 +5,8 @@
 // Tier 1 (dev-checkout self-hosting) and tier 2 (project-local install) are
 // cheap file-checks, re-run on every call -- no caching needed. Tier 3
 // (global install) is the only tier that needs a PATH lookup (a real
-// subprocess spawn), so it is config-cached (D4): `fgos setup`/`doctor
-// --fix` populate the global config's `bin.globalFgosPath` once via
+// subprocess spawn), so it is cached (D4): `fgos setup`/`doctor --fix`
+// populate `~/.fgos/runtime/bin-cache.json` (a cache, never config) once via
 // `refreshGlobalBinCache`; every other caller reads that cached path first
 // and only falls back to a live PATH probe when the cached path no longer
 // exists on disk (self-heal via a cheap `existsSync` check) or the cache
@@ -14,8 +14,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
-import { loadGlobalConfig, writeGlobalConfig } from '../config/global-config.mjs';
+import os from 'node:os';
+import { replaceDurably } from '../native/door.mjs';
 import { hostBinFromActivation } from '../util/host-bin-path.mjs';
 
 /**
@@ -80,45 +80,55 @@ export function probeGlobalBin() {
   return null;
 }
 
+const BIN_CACHE_DIR = 'runtime';
+const BIN_CACHE_NAME = 'bin-cache.json';
+const defaultGlobalDir = () => path.join(os.homedir(), '.fgos');
+const binCachePath = (globalDir) => path.join(globalDir, BIN_CACHE_DIR, BIN_CACHE_NAME);
+
+/** The cached path, or null when the cache is absent, unreadable or not a path string: a cache never fails its reader. */
+function readBinCache(globalDir) {
+  try {
+    const cached = JSON.parse(fs.readFileSync(binCachePath(globalDir), 'utf8'))?.globalFgosPath;
+    return typeof cached === 'string' && cached ? cached : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Tier 3, cache-first (D4): the cached path, only if it still exists on
  * disk. Never spawns a subprocess -- a stale/missing cache resolves to
  * `null` here, letting the caller fall back to `probeGlobalBin`.
  */
-export function cachedGlobalBin(globalConfigPath = undefined) {
-  const cached = loadGlobalConfig(globalConfigPath)?.bin?.globalFgosPath;
-  return typeof cached === 'string' && cached && fs.existsSync(cached) ? cached : null;
+export function cachedGlobalBin({ globalDir = defaultGlobalDir() } = {}) {
+  const cached = readBinCache(globalDir);
+  return cached && fs.existsSync(cached) ? cached : null;
 }
 
 /**
- * Populate (or refresh) the global config's cached tier-3 path. The one
- * write this module performs -- called only from `fgos setup`/`doctor
- * --fix` (D4: "multi-tier probing is a one-time populate/repair step",
- * never run on every call). Clears the cached key when nothing resolves,
- * rather than leaving a stale path behind.
+ * Populate (or refresh) the cached tier-3 path in
+ * `<globalDir>/runtime/bin-cache.json` (`{ "globalFgosPath": "<abs>" }`,
+ * mode 0600). The one write this module performs -- called only from
+ * `fgos setup`/`doctor --fix` (D4: "multi-tier probing is a one-time
+ * populate/repair step", never run on every call). Deletes the file when
+ * nothing resolves, rather than leaving a stale path behind.
  *
  * Only writes when the resolved value actually differs from what is
- * already cached (`fgos setup` calls every registered fix unconditionally
- * on every run, `bin/fgos.mjs`'s own `runFixes(repoRoot)` call -- an
- * unconditional write here would break `fgos setup`'s own idempotency
- * guarantee, "run twice does not rewrite an already-complete config",
- * the same discipline `ensureSharedConfigDefaults`/`insertSourceLine`
- * already apply to their own write paths).
+ * already cached (`fgos setup` runs every registered fix unconditionally,
+ * so an unconditional write would break its idempotency guarantee).
  */
-export function refreshGlobalBinCache(globalConfigPath = undefined) {
+export function refreshGlobalBinCache({ globalDir = defaultGlobalDir() } = {}) {
   const resolved = probeGlobalBin();
-  const existing = loadGlobalConfig(globalConfigPath);
-  const currentCached = existing.bin?.globalFgosPath ?? null;
-  if ((resolved ?? null) === currentCached) {
+  if ((resolved ?? null) === readBinCache(globalDir)) {
     return { resolved, changed: false };
   }
-  const bin = { ...(existing.bin ?? {}) };
   if (resolved) {
-    bin.globalFgosPath = resolved;
+    const dir = path.join(globalDir, BIN_CACHE_DIR);
+    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+    replaceDurably(dir, BIN_CACHE_NAME, `${JSON.stringify({ globalFgosPath: resolved })}\n`, 0o600);
   } else {
-    delete bin.globalFgosPath;
+    fs.rmSync(binCachePath(globalDir), { force: true });
   }
-  writeGlobalConfig({ ...existing, bin }, globalConfigPath);
   return { resolved, changed: true };
 }
 
@@ -130,14 +140,14 @@ export function refreshGlobalBinCache(globalConfigPath = undefined) {
  * fallback so a cold cache never hard-fails). Returns `{ tier, path }` or
  * `null` when nothing resolves at any tier.
  */
-export function resolveFgosBin(cwd, { globalConfigPath = undefined } = {}) {
+export function resolveFgosBin(cwd, { globalDir = defaultGlobalDir() } = {}) {
   const workspaceBin = resolveWorkspaceInstallationBin(cwd);
   if (workspaceBin) return { tier: 0, path: workspaceBin };
   const devBin = resolveDevCheckoutBin(cwd);
   if (devBin) return { tier: 1, path: devBin };
   const projectLocalBin = resolveProjectLocalBin(cwd);
   if (projectLocalBin) return { tier: 2, path: projectLocalBin };
-  const cached = cachedGlobalBin(globalConfigPath);
+  const cached = cachedGlobalBin({ globalDir });
   if (cached) return { tier: 3, path: cached };
   const live = probeGlobalBin();
   if (live) return { tier: 3, path: live };

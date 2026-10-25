@@ -1,29 +1,30 @@
-// mailbox-limits.mjs — the one Node reader of the mailbox's limits contract
-// (packages/mailbox/contracts/limits.v1.json, docs/platform/agent-mailbox/spec.md §12),
-// for setup: the hook rows' timeout, and whether the project opted in to the
-// hook rows. The Rust loader embeds the same file; setup copies none of its
-// values into the project config.
+// mailbox-limits.mjs — the one Node reader of the mailbox's config section
+// (docs/platform/agent-mailbox/spec.md §12), for setup: the hook rows' timeout,
+// and whether the project opted in to the hook rows. Both read through the Config
+// door (src/config/facade.mjs); setup copies no value into the project config.
 
-import { readFileSync } from 'node:fs';
-import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
-
-const LIMITS_CONTRACT = new URL('../../packages/mailbox/contracts/limits.v1.json', import.meta.url);
-
-function contractKeys() {
-  return JSON.parse(readFileSync(LIMITS_CONTRACT, 'utf8')).keys;
-}
+import { isConfigRefusal, readConfig, readStandardValue } from '../config/facade.mjs';
 
 /** Seconds a CLI should allow one mailbox hook call before it cuts it: the
- * hook's own failure ceiling (`mailbox.hook.budgetMs`), rounded up, plus two
- * seconds, so the CLI never kills the hook before its own watchdog does. */
+ * hook's own failure ceiling (`mailbox.hook.budgetMs`, the bundled standard's
+ * value), rounded up, plus two seconds, so the CLI never kills the hook before
+ * its own watchdog does. */
 export function mailboxHookTimeoutSec() {
-  const budget = contractKeys().find((k) => k.key === 'mailbox.hook.budgetMs').default;
-  return Math.ceil(budget / 1000) + 2;
+  const { present, value } = readStandardValue('mailbox.hook.budgetMs');
+  if (!present || !Number.isInteger(value)) throw new Error('mailbox.hook.budgetMs is missing from the bundled config standard');
+  return Math.ceil(value / 1000) + 2;
 }
 
-/** Whether the project opted in to the mailbox hook rows: `mailbox.enabled` in its
- * .fgos/config.json (spec §16 item 23, option (b)). Provisional until the owner answers
- * that item: absent, false or an unreadable config means not enabled. */
+/** Whether the project opted in to the mailbox hook rows: the effective
+ * `mailbox.enabled` (spec §16 item 23, option (b)). Provisional until the owner
+ * answers that item: false, or a project config the Config door refuses, means
+ * not enabled, so a broken file never installs hook rows; a failure of the door
+ * itself is thrown. */
 export function mailboxEnabled(repoRoot) {
-  return readSharedConfigOrEmpty(repoRoot)?.mailbox?.enabled === true;
+  try {
+    return readConfig({ projectRoot: repoRoot, sections: ['mailbox'] }).value.mailbox?.enabled === true;
+  } catch (err) {
+    if (isConfigRefusal(err)) return false;
+    throw err;
+  }
 }

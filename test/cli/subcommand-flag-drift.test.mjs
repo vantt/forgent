@@ -247,7 +247,7 @@ test('the scanner sees what it claims to: known reads in known regions', () => {
   const merge = subRegions('merge', verbCase('merge'), ['list', 'next']);
   const nextReads = regionReads(merge.regions.next, 'probe');
   for (const name of ['acknowledge-iron-law', 'timeout', 'no-timeout', 'wait', 'no-wait']) assert.ok(nextReads.has(name), name);
-  assert.ok(regionReads(subRegions('tool', verbCase('tool'), ['check', 'query']).shared, 'probe').has('config'));
+  assert.ok(regionReads(dispatch.shared, 'probe').has('for'));
 });
 
 // Native verbs (the Rust host runs them; `--help` is answered from this

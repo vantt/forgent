@@ -1,8 +1,8 @@
-// dispatch/config.mjs — runner config load/validate/bootstrap + the frozen
+// dispatch/config.mjs — runner config load/validate + the frozen
 // vocabularies every other dispatch/* module reads (D7, tsk-2uf-1): the
-// `RunnerConfigError` type, `.fgos/config.json`'s `runner` section
-// load/validate/bootstrap (`loadRunnerConfig`/`loadRunnerConfigFromDir`/
-// `ensureRunnerConfigForDir`), every `validate*Shape` gate, and the frozen
+// `RunnerConfigError` type, the read-only loaders of the `runner` section
+// (`loadRunnerConfigForDir` over the config door, `loadRunnerConfig` for a
+// named file), every `validate*Shape` gate, and the frozen
 // enums (`EXECUTOR_KINDS`/`EXECUTOR_CARRIES`/`CLAUDE_CLI_COMMANDS`/
 // `MODEL_POLICY_TIERS`/`INVOCATION_VIA`). Split out of the former
 // `src/runner/dispatch.mjs` (2204 lines, 6 concerns in one file) — pure
@@ -11,7 +11,7 @@
 // handoff-redesign/CONTEXT.md` D7 for the split rationale.
 //
 // TRUSTED-CONFIG NOTE (security panel, unchanged from the pre-split file):
-// the shared config file's `runner` section (`.fgos/config.json`) is an
+// the shared config file's `runner` section (`.fgos/config.yaml`) is an
 // EXECUTABLE config, not passive data — whoever can edit it controls what
 // process `dispatch/transport.mjs` spawns and with what arguments. It is
 // committed (per D2's durability policy) so it is reviewable like any other
@@ -26,14 +26,9 @@ import { RUN_TIMEOUT_MIN_MS, RUN_TIMEOUT_MAX_MS, runTimeoutProblem } from './run
 import { parseTierCell, isExtendedTierCell, REASONING_EFFORT_VALUES } from './tier-cell.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { mergeConfigDefaults } from '../../setup/config-merge.mjs';
-import { sharedConfigFilePath } from '../../config/shared-config-file.mjs';
-import { mergeWithGlobalConfig } from '../../config/global-config.mjs';
-import { findExecutableOnPath } from '../paths.mjs';
-import {
-  rejectProjectProviderAccountInventory,
-  validateProviderAccountInventory,
-} from './provider-capacity.mjs';
+import { ConfigDoorError, readConfig, readStandardValue } from '../../config/facade.mjs';
+import { describeYamlError, parseYaml } from '../../util/yaml.mjs';
+import { validateProviderAccountInventory } from './provider-capacity.mjs';
 // EXECUTOR_ADAPTERS lives in ./adapters.mjs (leaf module) so config loading
 // can validate adapter names without importing transport.mjs (cutting the
 // prior config.mjs <-> transport.mjs import cycle).
@@ -145,6 +140,88 @@ function normalizeConfigConfinement(cfg) {
   return cfg;
 }
 
+/**
+ * `runner.rigorToTier` is retired. Set in the global file it is refused here, naming that file (the shape check
+ * below names the project directory, which is not where the key is).
+ */
+function refuseGlobalRigorToTier(origins) {
+  const at = origins.find((o) => o.layer === 'global' && (o.path === 'runner.rigorToTier' || o.path.startsWith('runner.rigorToTier.')));
+  if (!at) return;
+  // The provenance file of the global layer is `global:<name>`.
+  const file = `~/.fgos/${String(at.file ?? 'config.json').replace(/^global:/, '')}`;
+  throw new RunnerConfigError(
+    `${file}${Number.isInteger(at.line) ? `:${at.line}:${at.column}` : ''} runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key.`,
+  );
+}
+
+const warnedGlobalExtendedCells = new Set();
+
+/**
+ * Every fgOS release on the machine reads the global config; an older one fails on a list or an object cell and
+ * passes `model@pool` to the CLI as a model id, so these forms belong in a project config until every release reads
+ * them. A global cell written that way is dropped from the effective value (in memory, the file is never
+ * rewritten) and named once per process on stderr. The layer that set a cell comes from the snapshot's provenance.
+ */
+function dropGlobalExtendedTierCells(cfg, origins) {
+  const seen = new Set();
+  for (const { path: at, layer } of origins) {
+    const cell = layer === 'global' ? /^runner\.modelPolicies\.([^.[]+)\.([^.[]+)/.exec(at) : null;
+    if (!cell || seen.has(`${cell[1]}.${cell[2]}`)) continue;
+    seen.add(`${cell[1]}.${cell[2]}`);
+    const [, family, tier] = cell;
+    const tierMap = cfg.modelPolicies?.[family];
+    if (!tierMap || !isExtendedTierCell(tierMap[tier])) continue;
+    // The layer below the global one is the standard (the project sits above, accounts and detected hold no cell).
+    const below = readStandardValue(`runner.modelPolicies.${family}.${tier}`);
+    if (below.present) tierMap[tier] = below.value;
+    else delete tierMap[tier];
+    const cellName = `modelPolicies.${family}.${tier}`;
+    if (warnedGlobalExtendedCells.has(cellName)) continue;
+    warnedGlobalExtendedCells.add(cellName);
+    process.stderr.write(
+      `fgos: ignoring ~/.fgos/config.json runner.${cellName}: a list, "model@pool" or {model, pool?, effort?} cell belongs in the project config (older fgOS releases on this machine cannot read it)\n`,
+    );
+  }
+}
+
+/**
+ * Reads the runner config of the project at `dir` through the config door: project over global over the
+ * standard, the detected executor filled in, accounts from the machine's accounts file. Nothing is created
+ * or rewritten by a read. A refusal of the door (a file that does not parse, a key in the wrong scope, a
+ * value that breaks its schema) is raised as a RunnerConfigError carrying the door's failure id as `.code`
+ * and naming every refusal's file and position, never a value. A project with no `runner.executor` set and
+ * no assistant CLI on PATH has none to run: the error names the command that sets one.
+ */
+export function loadRunnerConfigForDir(dir) {
+  let runner;
+  let origins;
+  try {
+    ({ value: { runner }, origins } = readConfig({ projectRoot: dir, sections: ['runner'], origins: ['runner.modelPolicies', 'runner.rigorToTier'] }));
+  } catch (err) {
+    if (err instanceof ConfigDoorError) throw new RunnerConfigError(err.message, { code: err.code });
+    throw err;
+  }
+  if (!runner.executor) {
+    throw new RunnerConfigError(
+      'no runner.executor: none set and no assistant CLI found on PATH; set one with fgos config set runner.executor ... --reason ...',
+      { code: 'runner-executor-missing' },
+    );
+  }
+  // The facade's objects have no prototype; the runner code and its callers take ordinary objects (a JSON round trip
+  // keeps every key an own key, `__proto__` included).
+  const cfg = JSON.parse(JSON.stringify(runner));
+  refuseGlobalRigorToTier(origins);
+  dropGlobalExtendedTierCells(cfg, origins);
+  validateRunnerConfigShape(cfg, `${path.join(dir, '.fgos')} runner`);
+  return normalizeConfigConfinement(cfg);
+}
+
+/**
+ * Reads and validates the runner config file at `configPath` (the `--config <path>` input of discover and
+ * plan): a named input, not project config, so no layer and no standard apply. JSON is YAML. Throws
+ * `RunnerConfigError` for anything short of the minimal shape: `executor.command` (string),
+ * `executor.args` (array of strings), `timeoutMs` (positive number).
+ */
 export function loadRunnerConfig(configPath) {
   let raw;
   try {
@@ -155,9 +232,9 @@ export function loadRunnerConfig(configPath) {
 
   let cfg;
   try {
-    cfg = JSON.parse(raw);
+    cfg = parseYaml(raw, { filename: configPath });
   } catch (err) {
-    throw new RunnerConfigError(`runner config at "${configPath}" is not valid JSON: ${err.message}`);
+    throw new RunnerConfigError(`runner config at "${configPath}" is not valid YAML: ${describeYamlError(err)}`);
   }
 
   validateRunnerConfigShape(cfg, configPath);
@@ -165,35 +242,11 @@ export function loadRunnerConfig(configPath) {
   return cfg;
 }
 
-/**
- * CLI names this module knows how to recognize when auto-detecting an
- * assistant CLI on PATH for a fresh runner config (str82). Order
- * matters: earlier names win when more than one is present on PATH. `codex`
- * is listed here for a clearer "found X, but no verified template" message
- * only — it has no entry in `SUPPORTED_EXECUTOR_TEMPLATES` below (no
- * verified working argv shape for this dispatch path).
- */
-export const KNOWN_ASSISTANT_CLI_NAMES = ['claude', 'codex'];
+/** The capability entry keys that choose tier or taste per seat; they exist in the project config only. */
+const SEAT_BINDING_CAPABILITY_KEYS = Object.freeze(['tier', 'maxTier', 'roles', 'personas', 'seats']);
 
-/**
- * Pure, side-effect-free PATH scan (str82): does an executable file named
- * one of `candidateNames` exist in one of `pathEnv`'s directories? Never
- * spawns or execs the candidate — this is a filesystem check only. Returns
- * the first matching candidate name (in `candidateNames` order, so an
- * earlier name wins over a later one found elsewhere on PATH) or `null`
- * when none is found. `candidateNames`/`pathEnv` are both injectable so
- * callers (and tests) never have to mutate the real environment to control
- * the result.
- *
- * D5 (tsk-62v): this was a second, independent implementation of the exact
- * PATH-scan `tool-registry.mjs`'s `commandExistsOnPath` already did — both
- * now call the one shared `findExecutableOnPath` (accessSync X_OK +
- * platform-aware PATHEXT, tool-registry.mjs owns it since it already
- * exported the kind vocabulary this scan is used alongside).
- */
-export function detectAssistantCli(candidateNames = KNOWN_ASSISTANT_CLI_NAMES, pathEnv = process.env.PATH) {
-  return findExecutableOnPath(candidateNames, pathEnv);
-}
+/** The one value of `runner.patterns.seatBinding.schema` this release reads. */
+const SEAT_BINDING_SCHEMA_VERSION = 1;
 
 /**
  * D1's baked-in default runner payload — mirrors this repo's own tracked
@@ -201,7 +254,7 @@ export function detectAssistantCli(candidateNames = KNOWN_ASSISTANT_CLI_NAMES, p
  * default is provably identical to what already works in this repo's own
  * dogfood loop.
  */
-export const DEFAULT_COORDINATION_ORG_DISCHARGE_ON = Object.freeze(["accepted"]);
+const DEFAULT_COORDINATION_ORG_DISCHARGE_ON = Object.freeze(["accepted"]);
 
 export const DEFAULT_RUNNER_CONFIG = {
   coordination: { orgPolicy: { dischargeOn: [...DEFAULT_COORDINATION_ORG_DISCHARGE_ON] } },
@@ -257,208 +310,6 @@ export const DEFAULT_RUNNER_CONFIG = {
   // [{ from: '<source scope entry>', also: ['<render target entry>', ...] }].
   generatedPaths: [],
 };
-
-/**
- * Executor templates this module has actually verified for the missing-path
- * bootstrap in `ensureRunnerConfigForDir` (str82). Only `claude` has one — it is
- * literally `DEFAULT_RUNNER_CONFIG.executor`, so detecting `claude` on PATH
- * writes a byte-identical config to today's unconditional default. There is
- * deliberately no `codex` (or other) entry: no verified working argv shape
- * exists for this dispatch path yet, and fabricating one would silently
- * break a user's first run instead of loudly asking them to fill it in by
- * hand.
- */
-export const SUPPORTED_EXECUTOR_TEMPLATES = { claude: DEFAULT_RUNNER_CONFIG.executor };
-
-
-
-/**
- * A copy of `value` with every `"$comment"` key removed at every depth. `$comment` is documentation
- * (`fgos setup` writes the tier ladder as one); it never reaches validation, a resolver or the
- * semantic config hash, because the loaders strip it from the merged runner before anything reads it.
- */
-export function stripConfigComments(value) {
-  if (value === undefined) return undefined;
-  // A JSON round trip, so the value stays what the config files hold (data read from disk): the one-door scan
-  // follows it as such, where a recursive rebuild of the object left it unresolved.
-  return JSON.parse(JSON.stringify(value, (key, child) => (key === '$comment' ? undefined : child)));
-}
-
-/** The capability entry keys that choose tier or taste per seat; they exist in the project config only. */
-const SEAT_BINDING_CAPABILITY_KEYS = Object.freeze(['tier', 'maxTier', 'roles', 'personas', 'seats']);
-
-/** The one value of `runner.patterns.seatBinding.schema` this release reads. */
-export const SEAT_BINDING_SCHEMA_VERSION = 1;
-
-/**
- * What a project file with no runner section is given: the defaults plus the seat-binding schema
- * marker. The marker is a project setting only; `DEFAULT_RUNNER_CONFIG` is what `fgos setup` also
- * writes into the global file, which takes no seat-binding key.
- */
-export const FRESH_PROJECT_RUNNER_CONFIG = {
-  ...DEFAULT_RUNNER_CONFIG,
-  patterns: { ...DEFAULT_RUNNER_CONFIG.patterns, seatBinding: { schema: SEAT_BINDING_SCHEMA_VERSION } },
-};
-
-/**
- * `mergeWithGlobalConfig`'s `sanitizeGlobal` hook for this module's own
- * schema (`sanitizeGlobalLayer`, one function for the whole global layer). It drops the retired
- * `runner.rigorToTier` key and any `runner.modelPolicies.<provider>` tier key not in
- * `MODEL_POLICY_TIERS`. A stale key here is not a project-level
- * customization — `validateModelPoliciesShape` already rejects any tier key
- * outside this vocabulary, so leaving a retired one in the global config
- * would silently fill the gap in every project missing that same key, then
- * break config load everywhere once validation runs. This filters the
- * global config in memory on every read; it never rewrites
- * `~/.fgos/config.json` itself, so a stale key already on disk stays there
- * (harmless once filtered) until something else cleans the file.
- *
- * It also drops a cell written as a list, as `model@pool` or as a `{model, pool?, effort?}` object. The global config
- * is read by every fgOS release on the machine, and an older release fails
- * config load on a list and passes `model@pool` to the CLI as a model id, so
- * these forms belong in a project config until every release reads them. The
- * dropped cell is named once per process on stderr.
- */
-const warnedGlobalExtendedCells = new Set();
-
-function sanitizeGlobalLayer(globalConfig) {
-  // Refused here, before the merge, so the error names the global file rather than the project one.
-  if (globalConfig?.runner && Object.hasOwn(globalConfig.runner, 'rigorToTier')) {
-    throw new RunnerConfigError('~/.fgos/config.json runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key.');
-  }
-  const modelPolicies = globalConfig?.runner?.modelPolicies;
-  if (!modelPolicies || typeof modelPolicies !== 'object' || Array.isArray(modelPolicies)) {
-    return globalConfig;
-  }
-  let changed = false;
-  const sanitized = {};
-  for (const [providerModel, tierMap] of Object.entries(modelPolicies)) {
-    if (!tierMap || typeof tierMap !== 'object' || Array.isArray(tierMap)) {
-      sanitized[providerModel] = tierMap;
-      continue;
-    }
-    const sanitizedTierMap = {};
-    for (const [policyTier, model] of Object.entries(tierMap)) {
-      if (!MODEL_POLICY_TIERS.includes(policyTier)) {
-        changed = true;
-      } else if (isExtendedTierCell(model)) {
-        changed = true;
-        const cellName = `modelPolicies.${providerModel}.${policyTier}`;
-        if (!warnedGlobalExtendedCells.has(cellName)) {
-          warnedGlobalExtendedCells.add(cellName);
-          process.stderr.write(
-            `fgos: ignoring ~/.fgos/config.json runner.${cellName}: a list, "model@pool" or {model, pool?, effort?} cell belongs in the project config (older fgOS releases on this machine cannot read it)\n`,
-          );
-        }
-      } else {
-        sanitizedTierMap[policyTier] = model;
-      }
-    }
-    sanitized[providerModel] = sanitizedTierMap;
-  }
-  if (!changed) return globalConfig;
-  return { ...globalConfig, runner: { ...globalConfig.runner, modelPolicies: sanitized } };
-}
-
-/**
- * Resolve+validate the runner section of the shared project config file at
- * `dir` (`.fgos/config.json`'s `runner` key, the sole config source since
- * tsk-5hv D1 retired the legacy fallback). Its content is merged against
- * `~/.fgos/config.json` via `mergeWithGlobalConfig` (project wins any key
- * present in both, tsk-5vf D2's "global config has real runtime effect"
- * half of the gap) before the `runner` section is extracted and validated.
- * Throws `RunnerConfigError` when the shared file itself does not exist —
- * `ensureRunnerConfigForDir` below is the bootstrap-if-missing wrapper
- * around this.
- */
-export function loadRunnerConfigFromDir(dir) {
-  const sharedPath = sharedConfigFilePath(dir);
-  if (!fs.existsSync(sharedPath)) {
-    throw new RunnerConfigError(`cannot read runner config at "${sharedPath}": no such file`);
-  }
-  const raw = fs.readFileSync(sharedPath, 'utf8');
-  let parsed;
-  try {
-    parsed = JSON.parse(raw);
-  } catch (err) {
-    throw new RunnerConfigError(`shared config at "${sharedPath}" is not valid JSON: ${err.message}`);
-  }
-  rejectProjectProviderAccountInventory(parsed, sharedPath);
-  const withGlobal = mergeWithGlobalConfig(parsed, undefined, { sanitizeGlobal: sanitizeGlobalLayer });
-  const runnerCfg = stripConfigComments(withGlobal.runner ?? {});
-  validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
-  normalizeConfigConfinement(runnerCfg);
-  return runnerCfg;
-}
-
-/**
- * Build the default executor block for a fresh runner-config bootstrap
- * (str82's `detectAssistantCli` logic, factored out of `ensureRunnerConfigForDir`
- * below so a future second bootstrap wrapper could reuse the identical
- * shape/messages for the same detected CLI — `pathHint` is the literal
- * string named in the placeholder command / stderr message when no
- * verified template exists).
- */
-function bootstrapDefaultExecutor(pathHint) {
-  const detected = detectAssistantCli();
-  const executor =
-    detected && detected in SUPPORTED_EXECUTOR_TEMPLATES
-      ? SUPPORTED_EXECUTOR_TEMPLATES[detected]
-      : {
-          command: detected
-            ? `NO_VERIFIED_TEMPLATE_FOR_${detected.toUpperCase()}__edit_${pathHint}`
-            : `NO_ASSISTANT_CLI_FOUND__edit_${pathHint}`,
-          args: ['{prompt}'],
-        };
-  return { detected, executor };
-}
-
-/**
- * Bootstrap wrapper (retargeted per tsk-2ta D1 amended / tsk-5vf D1/D2/D4;
- * legacy fallback removed per tsk-5hv D1) around `loadRunnerConfigFromDir`.
- *
- * - Shared file (`.fgos/config.json`) already exists: fills any default
- *   key its `runner` section is missing, rewrites only when a key was
- *   actually added, merges the result against `~/.fgos/config.json` via
- *   `mergeWithGlobalConfig` (project wins), and validates the merged
- *   `runner` section.
- * - Shared file absent (true first run): bootstraps straight into it.
- */
-export function ensureRunnerConfigForDir(dir) {
-  const sharedPath = sharedConfigFilePath(dir);
-
-  if (fs.existsSync(sharedPath)) {
-    const parsed = JSON.parse(fs.readFileSync(sharedPath, 'utf8'));
-    rejectProjectProviderAccountInventory(parsed, sharedPath);
-    const existingRunner = parsed.runner ?? {};
-    const { merged, addedKeys } = mergeConfigDefaults(existingRunner, Object.keys(existingRunner).length === 0 ? FRESH_PROJECT_RUNNER_CONFIG : DEFAULT_RUNNER_CONFIG);
-    let projectShared = parsed;
-    if (addedKeys.length > 0) {
-      projectShared = { ...parsed, runner: merged };
-      fs.writeFileSync(sharedPath, `${JSON.stringify(projectShared, null, 2)}\n`);
-      process.stderr.write(
-        `fgos: added missing default config keys to ${sharedPath}#runner: ${addedKeys.join(', ')}\n`,
-      );
-    }
-    const withGlobal = mergeWithGlobalConfig(projectShared, undefined, { sanitizeGlobal: sanitizeGlobalLayer });
-    const runnerCfg = stripConfigComments(withGlobal.runner ?? {});
-    validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
-    normalizeConfigConfinement(runnerCfg);
-    return runnerCfg;
-  }
-
-  const { detected, executor } = bootstrapDefaultExecutor('.fgos/config.json');
-  const runnerConfig = { ...FRESH_PROJECT_RUNNER_CONFIG, executor };
-  fs.mkdirSync(path.dirname(sharedPath), { recursive: true });
-  fs.writeFileSync(sharedPath, `${JSON.stringify({ runner: runnerConfig }, null, 2)}\n`);
-  process.stderr.write(
-    `fgos: no runner config found — ${
-      detected ? `detected "${detected}" on PATH` : 'no known assistant CLI found on PATH'
-    }; wrote a default (executor: ${executor.command}) at ${sharedPath}#runner; edit .fgos/config.json by hand to change.\n`,
-  );
-  normalizeConfigConfinement(runnerConfig);
-  return runnerConfig;
-}
 
 /**
  * Shape-check one executor block ({command, args[], adapter?}) — shared by
@@ -582,10 +433,9 @@ export function parseRunTimeout(text, label = '--timeout') {
 
 /**
  * CLI commands recognized as staying within the Claude ecosystem for
- * cross-provider governance (D2, tsk-32n). Deliberately NOT
- * `KNOWN_ASSISTANT_CLI_NAMES` (above) — that list is "assistant CLIs this
- * module can auto-bootstrap for a fresh config" and wrongly includes
- * `'codex'` (OpenAI's own CLI, not Claude), so it is the wrong list for a
+ * cross-provider governance (D2, tsk-32n). Deliberately not the list of
+ * assistant CLIs the config door detects on PATH: that one includes `'codex'`
+ * (OpenAI's own CLI, not Claude), so it is the wrong list for a
  * Claude-vs-non-Claude check.
  */
 export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);

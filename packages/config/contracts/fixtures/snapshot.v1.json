@@ -4217,6 +4217,48 @@
      ]
     ]
    }
+  },
+  {
+   "id": "snapshot-legacy-json-comment-keys-are-notes-not-values",
+   "why": "an unmigrated JSON project or global file may hold $comment keys at any depth, as the old loader allowed: they are neither values nor unknown keys nor refusals (migration turns them into doc lines)",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: integer}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties: {type: integer}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"$comment\": \"top note\",",
+      "  \"s\": {\"$comment\": [\"a\", \"b\"], \"a\": 1, \"m\": {\"$comment\": \"n\", \"k\": 2}}",
+      "}"
+     ],
+     "home/.fgos/config.json": [
+      "{",
+      "  \"s\": {\"$comment\": \"g\", \"b\": 3}",
+      "}"
+     ]
+    }
+   },
+   "expect": {
+    "at": {
+     "s.a": 1,
+     "s.b": 3,
+     "s.m.k": 2
+    },
+    "absent": [
+     "$comment",
+     "s.$comment",
+     "s.m.$comment"
+    ]
+   }
   }
  ]
 }

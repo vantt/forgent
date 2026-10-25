@@ -545,42 +545,6 @@ fn run(
     }
 }
 
-/// Fail-closed read of `.fgos/config.json`'s `herdrOrchestrator` section
-/// (tsk-57q) — read directly here rather than through a shared settings
-/// module (`tsk-2m5`'s own settings-source item, not yet landed on this
-/// branch at the time this was written): a missing file, missing
-/// section, any missing/malformed field, or a parse failure all resolve
-/// to every toggle OFF, the same fail-closed convention `gate-bypass.mjs`
-/// already uses for this exact shape of on/off config
-/// (`src/config/shared-config-file.mjs`). Activates for real the moment
-/// `tsk-2m5` lands its actual write-side — no further change needed here.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-struct HerdrOrchestratorToggles {
-    auto_merge: bool,
-    auto_retro: bool,
-    auto_cleanup: bool,
-}
-
-fn read_herdr_orchestrator_toggles(root: &Path) -> HerdrOrchestratorToggles {
-    let Ok(raw) = std::fs::read_to_string(root.join(".fgos/config.json")) else {
-        return HerdrOrchestratorToggles::default();
-    };
-    let Ok(value) = serde_json::from_str::<serde_json::Value>(&raw) else {
-        return HerdrOrchestratorToggles::default();
-    };
-    // `serde_json::Value`'s `Index` impl returns a static `Null` for a
-    // missing key rather than panicking, so an absent `herdrOrchestrator`
-    // section (or an absent field inside it) falls straight through to
-    // `as_bool()`'s own `None` -> `unwrap_or(false)` below — no separate
-    // "section missing" branch needed.
-    let section = &value["herdrOrchestrator"];
-    HerdrOrchestratorToggles {
-        auto_merge: section["autoMerge"].as_bool().unwrap_or(false),
-        auto_retro: section["autoRetro"].as_bool().unwrap_or(false),
-        auto_cleanup: section["autoCleanup"].as_bool().unwrap_or(false),
-    }
-}
-
 /// The auto-merge/retro/cleanup launcher itself (tsk-57q): for each
 /// enabled toggle, guard-checks whether that lane is already in flight,
 /// then launches — never queues, never double-launches. A `None` fixed
@@ -649,7 +613,7 @@ fn cleanup_pool_has_candidate(work_items: &[WorkItem]) -> bool {
 /// launch every tick.
 #[allow(clippy::too_many_arguments)]
 fn decide_auto_operation_tab_launches(
-    toggles: HerdrOrchestratorToggles,
+    toggles: settings::OrchestratorSettings,
     merge_in_flight: bool,
     retro_in_flight: bool,
     cleanup_in_flight: bool,
@@ -688,7 +652,7 @@ fn auto_launch_operation_panes(app: &mut App, root: &Path, pane_orchestrator: &i
     let Some(panes) = app.operation_panes.clone() else {
         return;
     };
-    let toggles = read_herdr_orchestrator_toggles(root);
+    let toggles = settings::read_settings(root);
 
     let launches = decide_auto_operation_tab_launches(
         toggles,
@@ -1535,15 +1499,12 @@ mod tests {
         }
     }
 
-    fn all_off() -> HerdrOrchestratorToggles {
-        HerdrOrchestratorToggles::default()
-    }
-
-    fn all_on() -> HerdrOrchestratorToggles {
-        HerdrOrchestratorToggles {
+    fn all_on() -> settings::OrchestratorSettings {
+        settings::OrchestratorSettings {
             auto_merge: true,
             auto_retro: true,
             auto_cleanup: true,
+            ..Default::default()
         }
     }
 
@@ -1582,7 +1543,7 @@ mod tests {
     #[test]
     fn auto_operation_tab_decision_stays_off_for_every_loop_when_every_toggle_is_off() {
         let (m, r, c) = POOLS_READY;
-        let launches = decide_auto_operation_tab_launches(all_off(), false, false, false, m, r, c);
+        let launches = decide_auto_operation_tab_launches(Default::default(), false, false, false, m, r, c);
         assert_eq!(launches, AutoOperationTabLaunches::default());
     }
 
@@ -1630,10 +1591,9 @@ mod tests {
 
     #[test]
     fn auto_operation_tab_decision_skips_a_loop_whose_own_toggle_is_off() {
-        let toggles = HerdrOrchestratorToggles {
-            auto_merge: false,
-            auto_retro: false,
+        let toggles = settings::OrchestratorSettings {
             auto_cleanup: true,
+            ..Default::default()
         };
         let (m, r, c) = POOLS_READY;
         let launches = decide_auto_operation_tab_launches(toggles, true, false, false, m, r, c);
@@ -1675,72 +1635,21 @@ mod tests {
     // dir (e.g. a retry) — not needed against parallel tests within one
     // run, since no two tests here share a tag.
     fn unique_temp_root(tag: &str) -> std::path::PathBuf {
+        // The settings read also consults `$HOME/.fgos`; point it at an empty directory so a test
+        // never sees the developer's own global config.
+        static HOME: std::sync::Once = std::sync::Once::new();
+        HOME.call_once(|| {
+            let home = std::env::temp_dir()
+                .join(format!("herdr-dashboard-test-home-{}", std::process::id()));
+            std::fs::create_dir_all(&home).expect("create empty home");
+            std::env::set_var("HOME", home);
+        });
         let dir = std::env::temp_dir().join(format!(
             "herdr-dashboard-auto-operation-tab-test-{tag}-{}",
             std::process::id()
         ));
         std::fs::create_dir_all(dir.join(".fgos")).expect("create temp .fgos dir");
         dir
-    }
-
-    #[test]
-    fn auto_operation_tab_toggles_default_off_when_config_file_is_missing() {
-        let root = unique_temp_root("missing-config");
-        // No `.fgos/config.json` written at all.
-        assert_eq!(read_herdr_orchestrator_toggles(&root), all_off());
-        let _ = std::fs::remove_dir_all(&root);
-    }
-
-    #[test]
-    fn auto_operation_tab_toggles_default_off_when_config_json_is_malformed() {
-        let root = unique_temp_root("malformed-config");
-        std::fs::write(root.join(".fgos/config.json"), "{ not valid json")
-            .expect("write malformed config");
-        assert_eq!(read_herdr_orchestrator_toggles(&root), all_off());
-        let _ = std::fs::remove_dir_all(&root);
-    }
-
-    #[test]
-    fn auto_operation_tab_toggles_default_off_when_the_herdr_orchestrator_section_is_absent() {
-        let root = unique_temp_root("no-section");
-        std::fs::write(root.join(".fgos/config.json"), r#"{"gateBypass":{"level":0}}"#)
-            .expect("write config without herdrOrchestrator");
-        assert_eq!(read_herdr_orchestrator_toggles(&root), all_off());
-        let _ = std::fs::remove_dir_all(&root);
-    }
-
-    #[test]
-    fn auto_operation_tab_toggles_default_off_for_a_field_missing_inside_the_section() {
-        let root = unique_temp_root("partial-section");
-        std::fs::write(
-            root.join(".fgos/config.json"),
-            r#"{"herdrOrchestrator":{"autoMerge":true}}"#,
-        )
-        .expect("write partial section");
-        let toggles = read_herdr_orchestrator_toggles(&root);
-        assert!(toggles.auto_merge);
-        assert!(!toggles.auto_retro);
-        assert!(!toggles.auto_cleanup);
-        let _ = std::fs::remove_dir_all(&root);
-    }
-
-    #[test]
-    fn auto_operation_tab_toggles_read_real_values_when_the_section_is_present() {
-        let root = unique_temp_root("full-section");
-        std::fs::write(
-            root.join(".fgos/config.json"),
-            r#"{"herdrOrchestrator":{"autoMerge":true,"autoRetro":false,"autoCleanup":true}}"#,
-        )
-        .expect("write full section");
-        assert_eq!(
-            read_herdr_orchestrator_toggles(&root),
-            HerdrOrchestratorToggles {
-                auto_merge: true,
-                auto_retro: false,
-                auto_cleanup: true,
-            }
-        );
-        let _ = std::fs::remove_dir_all(&root);
     }
 
     #[test]
@@ -1752,8 +1661,8 @@ mod tests {
         // pool-nonempty half, both plain in-memory state.
         let root = unique_temp_root("end-to-end-merge");
         std::fs::write(
-            root.join(".fgos/config.json"),
-            r#"{"herdrOrchestrator":{"autoMerge":true,"autoRetro":false,"autoCleanup":false}}"#,
+            root.join(".fgos/config.yaml"),
+            "herdrOrchestrator:\n  autoMerge: true\n",
         )
         .expect("write config");
 
@@ -1794,8 +1703,8 @@ mod tests {
         // one-shot latch could never have provided.
         let root = unique_temp_root("no-double-launch");
         std::fs::write(
-            root.join(".fgos/config.json"),
-            r#"{"herdrOrchestrator":{"autoMerge":true,"autoRetro":false,"autoCleanup":false}}"#,
+            root.join(".fgos/config.yaml"),
+            "herdrOrchestrator:\n  autoMerge: true\n",
         )
         .expect("write config");
 

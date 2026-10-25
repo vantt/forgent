@@ -132,7 +132,7 @@ test('a doctor run remembers a failed setup context instead of retrying it per r
   const check = eventStoreDoctor(f.repo, f.ctx);
   const first = check('event-store-git-version');
   assert.equal(first.passed, false);
-  assert.match(first.message, /event-store-config: cannot parse shared config/, 'doctor sees the parse failure, never the defaults');
+  assert.match(first.message, /event-store-config: config-parse/, 'doctor sees the parse failure, never the defaults');
   writeProjectConfig(f.repo, {});
   assert.deepEqual(check('event-store-open-root'), { passed: false, message: first.message }, 'every row of the run reports the one remembered failure');
   assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-open-root').passed, true, 'a new run observes the repaired file');
@@ -144,7 +144,7 @@ test('doctor reports a malformed seal coalescing window on every row, and a repa
     writeProjectConfig(f.repo, { eventStore: { seal: { coalesceSec: bad } } });
     const row = eventStoreDoctor(f.repo, f.ctx)('event-store-unsealed');
     assert.equal(row.passed, false, `coalesceSec ${JSON.stringify(bad)}`);
-    assert.match(row.message, /event-store-config: invalid seal\.coalesceSec/);
+    assert.match(row.message, /event-store-config: config-schema .*eventStore\.seal\.coalesceSec/);
   }
   writeProjectConfig(f.repo, { eventStore: { seal: { coalesceSec: 5 } } });
   assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-unsealed').passed, true);

@@ -12,15 +12,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
-import { DEFAULT_CAPABILITY_SLOTS } from '../../src/setup/registrations.mjs';
-import { FRESH_PROJECT_RUNNER_CONFIG } from '../../src/runner/dispatch/config.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
-// `ensureRunnerConfigForDir` always merges in the REAL machine's global
-// `~/.fgos/config.json` (mergeWithGlobalConfig, project wins) -- read-only,
+// The runner loader always merges in the REAL machine's global
+// `~/.fgos/config.json` (project wins) -- read-only,
 // but on a dev machine running other concurrent fgOS work that global file
 // can carry an in-progress, incompatible catalog shape (confirmed live:
 // another worktree's capability-catalog experiment tripped
@@ -36,17 +34,11 @@ function run(cwd, args) {
   });
 }
 
-// `ensureRunnerConfigForDir`'s bare-bootstrap fallback (no prior `fgos
-// setup`) writes the fresh project runner config only -- no `capabilities` catalog at
-// all (that catalog is registered separately, via `fgos setup`'s
-// config-default registry, and running the real `setup` verb per fixture
-// here is too slow -- ~20s each -- for a unit-test suite). Write the same
-// resulting shape directly instead: a real project's `.fgos/config.json`
-// after `fgos setup` always carries `runner.capabilities`, so every fixture
-// here starts from that same state without paying for the real subprocess.
+// A project file as the runner needs it: the executor and the seat-binding marker; the
+// capability catalog and every other default come from the standard.
 function tmpCwd() {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plan-lint-cli-'));
-  const runner = { ...FRESH_PROJECT_RUNNER_CONFIG, executor: { command: 'true', args: [] }, capabilities: DEFAULT_CAPABILITY_SLOTS };
+  const runner = { executor: { command: 'true', args: [] }, patterns: { seatBinding: { schema: 1 } } };
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   writeProjectConfig(cwd, { runner });
   return cwd;
@@ -85,12 +77,11 @@ test('a nonexistent path is a usage error: exit 2', () => {
   assert.match(result.stderr, /is not an existing file/);
 });
 
-test('a project with no .fgos/config.json at all is a usage error: exit 2, and no config gets created', () => {
+test('a read-only lint of a project with no config file creates no config', () => {
   const cwd = bareTmpDir();
   const rel = writePlan(cwd, 'plan.md', `- unit: apply the fix\n  capability: code:implement\n`);
-  const result = run(cwd, ['plan-lint', rel]);
-  assert.equal(result.status, 2, result.stderr);
-  assert.equal(fs.existsSync(path.join(cwd, '.fgos', 'config.json')), false, 'plan-lint must never bootstrap a runner config as a side effect of a read-only lint');
+  run(cwd, ['plan-lint', rel]);
+  assert.equal(fs.existsSync(path.join(cwd, '.fgos')), false, 'plan-lint must never create a config as a side effect of a read-only lint');
 });
 
 test('a bare --cell with no value is a usage error: exit 2', () => {

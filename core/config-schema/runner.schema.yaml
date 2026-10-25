@@ -127,13 +127,13 @@ properties:
         enum: [nano, mini, standard, advanced, flagship, frontier]
   timeoutMs:
     description: "Milliseconds one run may take before it is stopped."
-    type: integer
-    minimum: 60000
+    type: number
+    exclusiveMinimum: 0
     maximum: 14400000
   idleTimeoutMs:
     description: "Milliseconds of silence after which a worker is stopped; absent leaves idle stopping off."
-    type: integer
-    minimum: 1
+    type: number
+    exclusiveMinimum: 0
   parallel:
     description: "How many units run at once."
     type: object

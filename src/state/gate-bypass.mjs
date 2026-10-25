@@ -26,7 +26,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { SIZES } from './work.mjs';
 import { HEAVY_KEYWORDS, matchesKeyword } from '../intake/risk-keywords.mjs';
-import { readSharedConfig } from '../config/shared-config-file.mjs';
+import { isConfigRefusal, readConfig } from '../config/facade.mjs';
 
 /** Level order, weakest to strongest. 'off' auto-approves nothing. */
 export const LEVELS = Object.freeze(['off', ...SIZES]);
@@ -41,31 +41,33 @@ const CONFIG_FILE_NAME = 'gate-bypass.json';
  * `gate-bypass` verb, both skill-embedded gate checks in fgos-coding-exploring/
  * fgos-coding-planning).
  *
- * Tries the shared config file first (`config.gateBypass.level`,
- * docs/history/doctor-fix-gate-bypass/CONTEXT.md D1/D3 — gate-bypass's real
- * registry entry, `registrations.mjs`); `readSharedConfig` takes the repo
- * root (`.fgos`'s parent), not `.fgos` itself, so that's resolved here via
- * `path.dirname(dir)`. Falls back to the legacy standalone
- * `<dir>/gate-bypass.json` (never deleted, a "read the old file until a real
- * migration writes the new one" discipline) when the shared file has no
- * valid `gateBypass` entry yet.
+ * Reads the effective `gateBypass.level` through the config facade
+ * (docs/history/doctor-fix-gate-bypass/CONTEXT.md D1/D3), which takes the repo
+ * root (`.fgos`'s parent), so that is resolved here via `path.dirname(dir)`.
+ * The standard always supplies a level (`off`), so the legacy standalone
+ * `<dir>/gate-bypass.json` is consulted exactly when the level came only from
+ * the standard (a project or the machine set none): a repository holding only
+ * the legacy file keeps the level it names.
  *
- * Fails closed to `DEFAULT_LEVEL` on a missing file, invalid JSON, or a
- * shape/value that isn't a recognized level, at either layer — never
- * throws, per D2/D4's "never fails open" requirement.
+ * Fails closed to `DEFAULT_LEVEL` when a config file is refused, or on a
+ * missing file, invalid JSON, or a value that isn't a recognized level in the
+ * legacy file — never throws on a config problem, per D2/D4's "never fails
+ * open" requirement. A failure of the config door itself is not a config
+ * problem and propagates.
  */
 export function readGateBypassLevel(dir) {
-  let shared;
+  let level;
+  let layer;
   try {
-    shared = readSharedConfig(path.dirname(dir));
-  } catch {
-    shared = undefined;
+    const snapshot = readConfig({ projectRoot: path.dirname(dir), sections: ['gateBypass'], origins: ['gateBypass.level'] });
+    level = snapshot.value.gateBypass?.level;
+    layer = snapshot.origins?.find((origin) => origin.path === 'gateBypass.level')?.layer;
+  } catch (err) {
+    if (isConfigRefusal(err)) return DEFAULT_LEVEL;
+    throw err;
   }
-  const sharedLevel = shared?.gateBypass?.level;
-  if (typeof sharedLevel === 'string' && LEVELS.includes(sharedLevel)) {
-    return sharedLevel;
-  }
-  return readLegacyStandaloneLevel(dir);
+  if (layer === 'standard') return readLegacyStandaloneLevel(dir);
+  return LEVELS.includes(level) ? level : DEFAULT_LEVEL;
 }
 
 /**

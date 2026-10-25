@@ -15,7 +15,7 @@ macro_rules! sections {
 
 /// `(section, YAML text)` in schema-set order.
 pub const SCHEMAS: &[(&str, &str)] = sections!("config-schema", ".schema.yaml";
-    bin, checkpoint, cleanup, docRegistry, eventStore, gateBypass, gateway, herdrOrchestrator,
+    checkpoint, cleanup, docRegistry, eventStore, gateBypass, gateway, herdrOrchestrator,
     herdrWebDashboard, invariantChecks, ironLaw, mailbox, runner, secrets, terminal, workerSlots,
     worktreeSetup);
 /// `(section, YAML text)` in schema-set order.

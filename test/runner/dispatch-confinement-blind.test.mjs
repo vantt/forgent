@@ -397,7 +397,7 @@ test('a blind worker cannot read a peer, a gate answer, a peer home, a mailbox b
   assert.equal(blind.find, '', 'find does not list a peer report');
   assert.ok(!blind.tree.some((entry) => /peer|wf1|d1|mailbox\/record/.test(entry)), `tree shows only its own chain: ${blind.tree.join(' ')}`);
   assert.ok(blind.tree.includes('/assignments/u1/self/1/brief.md'));
-  assert.ok(blind.tree.includes('/config.json'), 'tracked files under .fgos stay visible');
+  assert.ok(blind.tree.includes('/config.yaml'), 'tracked files under .fgos stay visible');
   assert.equal(blind.maskWrite, 'EROFS', 'the mask itself is not writable');
 
   // What it still has.

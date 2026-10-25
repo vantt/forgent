@@ -100,3 +100,35 @@ fn the_bundled_context_is_shared_not_rebuilt() {
     );
     assert!(std::ptr::eq(a.schemas, b.schemas) && std::ptr::eq(a.standard, b.standard));
 }
+
+#[test]
+fn a_project_snapshot_finds_the_global_directory_and_class_from_the_environment_lookup() {
+    let global = lay(
+        "project-snapshot",
+        &[
+            ("home/.fgos/config.yaml", "gateway:\n  port: 5555\n"),
+            ("home/.fgos/private/accounts.yaml", ACCOUNTS),
+            ("project/.fgos/config.yaml", "gateBypass:\n  level: light\n"),
+        ],
+    );
+    let home = global.parent().unwrap().to_string_lossy().into_owned();
+    let root = global.parent().unwrap().parent().unwrap().join("project");
+    let env = |confined: bool| {
+        let home = home.clone();
+        move |name: &str| match name {
+            "HOME" => Some(home.clone()),
+            "FGOS_CONFINED" => confined.then(|| "1".to_string()),
+            _ => None,
+        }
+    };
+    let open = fgos_config::machine::project_snapshot(&root, env(false)).unwrap();
+    assert_eq!(open.value["gateBypass"]["level"], "light");
+    assert_eq!(open.value["gateway"]["port"], 5555);
+    assert_eq!(open.accounts, AccountsState::Present);
+    let confined = fgos_config::machine::project_snapshot(&root, env(true)).unwrap();
+    assert_eq!(confined.accounts, AccountsState::UnavailableConfined);
+    assert!(matches!(
+        fgos_config::machine::project_snapshot(&root, |_| None),
+        Err(SnapshotError::Io(_))
+    ));
+}

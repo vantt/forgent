@@ -6,13 +6,16 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Real, live runs of the actual hook script -- no fixture stands in for
 // `decide`'s own real subprocess call (tsk-60f's own verify field demands
 // this be proven "bằng lần chạy thật, không phải fixture").
 
 const hookPath = fileURLToPath(new URL('../../scripts/dispatch-decide-hook.mjs', import.meta.url));
+// An empty home: the hook reads the machine's global config too, and a developer's own file must not decide a test.
+const emptyHome = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-decide-hook-home-'));
+const env = { ...process.env, HOME: emptyHome };
 
 function mkTempGitRepo() {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-decide-hook-'));
@@ -34,6 +37,7 @@ function runHook(repoRoot, payload) {
   return spawnSync(process.execPath, [hookPath], {
     encoding: 'utf8',
     cwd: repoRoot,
+    env,
     input: JSON.stringify(payload),
   });
 }
@@ -93,16 +97,28 @@ test('ignores a non-Agent/Task tool call entirely -- never even calls decide', (
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
+test('blocks (exit 2) when the project config is refused, naming the refusal ids and `fgos config check`', () => {
+  const repoRoot = mkTempGitRepo();
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  writeRawProjectConfig(repoRoot, 'runner: [unclosed\n');
+  const result = runHook(repoRoot, { tool_name: 'Agent', tool_input: { subagent_type: 'general-purpose' }, cwd: repoRoot });
+  assert.equal(result.status, 2, result.stderr);
+  assert.match(result.stderr, /BLOCKED/);
+  assert.match(result.stderr, /config-[a-z-]+/);
+  assert.match(result.stderr, /fgos config check/);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
 test('fails open (allows) on empty stdin', () => {
   const repoRoot = mkTempGitRepo();
-  const result = spawnSync(process.execPath, [hookPath], { encoding: 'utf8', cwd: repoRoot, input: '' });
+  const result = spawnSync(process.execPath, [hookPath], { encoding: 'utf8', cwd: repoRoot, env, input: '' });
   assert.equal(result.status, 0);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
 test('fails open (allows) on malformed JSON stdin', () => {
   const repoRoot = mkTempGitRepo();
-  const result = spawnSync(process.execPath, [hookPath], { encoding: 'utf8', cwd: repoRoot, input: 'not json{{{' });
+  const result = spawnSync(process.execPath, [hookPath], { encoding: 'utf8', cwd: repoRoot, env, input: 'not json{{{' });
   assert.equal(result.status, 0);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
@@ -112,6 +128,7 @@ test('fails open (allows) when the payload cwd is not inside any git checkout', 
   const result = spawnSync(process.execPath, [hookPath], {
     encoding: 'utf8',
     cwd: notARepo,
+    env,
     input: JSON.stringify({ tool_name: 'Agent', tool_input: { subagent_type: 'general-purpose' }, cwd: notARepo }),
   });
   assert.equal(result.status, 0);

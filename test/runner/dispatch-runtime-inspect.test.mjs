@@ -46,15 +46,13 @@ test('public inspect use-case import graph cannot reach mutation/recovery/proces
   const seen = new Set();
   // run-result.mjs: proven leaf (this test's own header comment on the
   // sibling reconciliation-import-graph test cites this exact carve-out).
-  // global-config.mjs (Provider Capacity Rotator-era global/project config
-  // awareness): `inspect.mjs` imports only its read-only `loadGlobalConfig`
-  // (`fs.existsSync`+`fs.readFileSync`+`JSON.parse`, verified by direct
-  // reading, never `mkdirSync`/`writeFileSync`) to build `runnerConfig` for
-  // read-only inspection context -- but the same file also defines an
-  // UNRELATED `writeGlobalConfig` export (`inspect.mjs` never imports or
-  // calls it) that does call `mkdirSync`/`writeFileSync`. A whole-file text
-  // scan cannot distinguish the two; proven safe by the same
-  // read-the-actual-reachable-code standard every other entry here relies on.
+  // config/facade.mjs: `inspect.mjs` imports only its `readMachineConfig`, one read-only
+  // `snapshot` call of the native config door that builds `runnerConfig` for read-only
+  // inspection context. The same file also exports the `fixConfig` and `initConfigFile`
+  // writers (`inspect.mjs` never imports or calls them), and it reaches the native door
+  // module, whose text names process and file-writing calls. A whole-file text scan cannot
+  // distinguish the exports; proven safe by the same read-the-actual-reachable-code standard
+  // every other entry here relies on.
   //
   // provider-capacity.mjs: `inspect.mjs` also directly imports
   // `inspectProviderCapacity` from it (doctor/inspect reporting) -- verified
@@ -83,7 +81,7 @@ test('public inspect use-case import graph cannot reach mutation/recovery/proces
   // release, the visibility session) are not reachable from `inspect.mjs`.
   const isProvenLeaf = (file) => {
     const f = file.replaceAll('\\', '/');
-    return f.endsWith('/run-result.mjs') || f.endsWith('/global-config.mjs') || f.endsWith('/provider-capacity.mjs') || f.endsWith('/run-supervisor/client.mjs')
+    return f.endsWith('/run-result.mjs') || f.endsWith('/config/facade.mjs') || f.endsWith('/provider-capacity.mjs') || f.endsWith('/run-supervisor/client.mjs')
       || f.endsWith('/runner/paths.mjs') || f.endsWith('/dispatch/run-lock.mjs') || f.endsWith('/dispatch/visibility-session.mjs');
   };
   function walk(file) {
@@ -100,7 +98,7 @@ test('public inspect use-case import graph cannot reach mutation/recovery/proces
   }
   walk(path.join(root, 'src/verbs/dispatch/inspect.mjs'));
   assert.ok(seen.has(path.join(root, 'src/runner/dispatch/runtime-inspection.mjs')));
-  assert.ok(seen.has(path.join(root, 'src/config/global-config.mjs')));
+  assert.ok(seen.has(path.join(root, 'src/config/facade.mjs')));
 });
 
 test('RunObservation vocabulary derives phase, delivery, resourceState and workspace completeness from facts', () => {

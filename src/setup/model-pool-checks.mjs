@@ -4,19 +4,18 @@
 // a model (`model@pool`) or list several; runner.llmAccounts is the machine's account inventory,
 // read beside the provider account inventory the lease still uses. These checks only read.
 
-import { loadRunnerConfigFromDir, MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir, MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
 import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { parseTierCell, isExtendedTierCell } from '../runner/dispatch/tier-cell.mjs';
 import { readLlmAccounts, compareWithLegacyInventory, deriveLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
-import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
-import { loadGlobalConfig } from '../config/global-config.mjs';
+import { isConfigRefusal, readMachineConfig } from '../config/facade.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 
 function loadOrExplain(cwd) {
   try {
-    return { runnerConfig: loadRunnerConfigFromDir(cwd) };
+    return { runnerConfig: loadRunnerConfigForDir(cwd) };
   } catch (err) {
     return { skip: { passed: true, message: `runner config not loadable here, not evaluated: ${err.message}` } };
   }
@@ -138,7 +137,7 @@ export function checkModelPolicyPools(cwd) {
 export function checkLlmAccountsShape(cwd) {
   const { runnerConfig, skip } = loadOrExplain(cwd);
   if (skip) return skip;
-  const { pools, problems } = readLlmAccounts(runnerConfig, { projectConfig: readSharedConfigOrEmpty(cwd) });
+  const { pools, problems } = readLlmAccounts(runnerConfig);
   if (problems.length > 0) {
     return { passed: false, message: problems.map((p) => `${p.at}: ${p.detail}`).join('; ') };
   }
@@ -168,20 +167,27 @@ export function checkLlmAccountsVsLegacy(cwd) {
   return { passed: true, message: 'runner.llmAccounts matches runner.providers' };
 }
 
-/** Every fgOS release on the machine reads the global config; an older one fails on a list cell. */
+/**
+ * Every fgOS release on the machine reads the global config; an older one fails on a list cell. The row judges the
+ * global file's own cells (the standard holds list cells too), so it asks the snapshot which cells the global layer set.
+ */
 export function checkGlobalModelPoliciesPortable() {
-  let globalRunner;
+  let snapshot;
   try {
-    globalRunner = loadGlobalConfig()?.runner;
+    snapshot = readMachineConfig({ sections: ['runner'], origins: ['runner.modelPolicies'] });
   } catch (err) {
+    if (!isConfigRefusal(err)) throw err;
     return { passed: true, message: `global config not readable, not evaluated: ${err.message}` };
   }
-  const extended = [];
-  for (const [family, tiers] of Object.entries(globalRunner?.modelPolicies ?? {})) {
-    for (const [tier, cell] of Object.entries(tiers ?? {})) {
-      if (isExtendedTierCell(cell)) extended.push(`${family}.${tier}`);
-    }
+  const globalCells = new Set();
+  for (const { path: at, layer } of snapshot.origins ?? []) {
+    const cell = layer === 'global' ? /^runner\.modelPolicies\.([^.[]+)\.([^.[]+)/.exec(at) : null;
+    if (cell) globalCells.add(`${cell[1]}.${cell[2]}`);
   }
+  const extended = [...globalCells].filter((name) => {
+    const [family, tier] = name.split('.');
+    return isExtendedTierCell(snapshot.value.runner.modelPolicies?.[family]?.[tier]);
+  });
   if (extended.length > 0) {
     return {
       passed: false,

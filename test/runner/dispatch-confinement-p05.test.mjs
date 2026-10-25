@@ -25,6 +25,8 @@ import { evaluateBypassPairing } from "../../src/runner/dispatch/confinement/byp
 import { checkConfinementHerdrMaturity } from "../../src/setup/registrations.mjs";
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
+import { readStandardValue } from '../../src/config/facade.mjs';
 
 function mkTemp(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -610,12 +612,12 @@ test("R6: herdr-spawn attestation marks host-ipc out-of-scope and controls unver
 
 test("Doctor check: confinement-herdr-maturity reports partial maturity for herdr executors", () => {
   const tmpDir = mkTemp("p05-doctor-");
-  const cfgDir = path.join(tmpDir, ".fgos");
-  fs.mkdirSync(cfgDir, { recursive: true });
+  initFixtureRepo(tmpDir);
   writeProjectConfig(tmpDir, {
       runner: {
         executors: {
           "herdr-agent": {
+            kind: "agent",
             adapter: "herdr-spawn",
             command: "claude",
             interactiveMode: { exitCommand: "/exit", kind: "claude" },
@@ -639,12 +641,12 @@ test("Doctor check: confinement-herdr-maturity reports partial maturity for herd
 
 test("Doctor check: confinement-herdr-maturity fails if bypass is missing full controls", () => {
   const tmpDir = mkTemp("p05-doctor-bypass-bad-");
-  const cfgDir = path.join(tmpDir, ".fgos");
-  fs.mkdirSync(cfgDir, { recursive: true });
+  initFixtureRepo(tmpDir);
   writeProjectConfig(tmpDir, {
       runner: {
         executors: {
           "herdr-agent": {
+            kind: "agent",
             adapter: "herdr-spawn",
             command: "claude",
             permissionMode: "bypass",
@@ -667,12 +669,19 @@ test("Doctor check: confinement-herdr-maturity fails if bypass is missing full c
 
 test("Doctor check: confinement-herdr-maturity reports not-applicable when no herdr executors", () => {
   const tmpDir = mkTemp("p05-doctor-none-");
-  const cfgDir = path.join(tmpDir, ".fgos");
-  fs.mkdirSync(cfgDir, { recursive: true });
+  initFixtureRepo(tmpDir);
+  // The standard ships executors that open a herdr pane first; a project that dispatches nothing through
+  // herdr puts each one's headless invocation ahead of its pane invocation.
+  const standardExecutors = readStandardValue("runner.executors").value;
+  const headlessFirst = Object.fromEntries(Object.entries(standardExecutors).map(([id, executor]) => [id, {
+    invocations: [...executor.invocations.filter((i) => i.adapter !== "herdr-spawn"), ...executor.invocations.filter((i) => i.adapter === "herdr-spawn")],
+  }]));
   writeProjectConfig(tmpDir, {
       runner: {
         executors: {
+          ...headlessFirst,
           "cli-agent": {
+            kind: "agent",
             adapter: "cli-spawn",
             command: "node",
           },
