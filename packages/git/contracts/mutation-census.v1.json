@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c9d0bc208cecd3c1e59ce93df742b9d702c487c5f284cb26a7abffd781447cfb",
+  "payloadDigest": "25f54e31ef7cfc765af3d953e3af9a5cbfe32d68943f1fdba5dda9cceb2ea9d0",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -209,7 +209,7 @@
     "packages/config/rust/src/locks.rs": "cb974624e779e3f9167316d9477b958009dbda760149d9b18de3a87b513bf736",
     "packages/config/rust/src/machine.rs": "beea8290aa664b78472576f6843578c96f76c05dda2d0823740c091d151d5d44",
     "packages/config/rust/src/migrate.rs": "27d988ec4a696008771c9af888706fab44d97c55f5d8b26cf05a8acfc4dc3512",
-    "packages/config/rust/src/provider.rs": "7c1f3f46a67a872dde9a4468b0df9898ab56c69aa4fb8bf409ecf3a40a2a5492",
+    "packages/config/rust/src/provider.rs": "8bcb7338b54eaeae3b885f546da89d39ae238565dfe524d412a4df1cdc3c3b20",
     "packages/config/rust/src/provider/unix_verbs.rs": "d45dd3b7f37e286fe136e8b321ecbf2beeabbbf4b72ec1f9b38494a323b2bcfc",
     "packages/config/rust/src/redact.rs": "189b980926959017d23755edc63b0fc91a5b7d351ada839ebe019dd5d3110677",
     "packages/config/rust/src/relocate.rs": "1e4e4f9835e89c6c4a7f3ae5b4dc0073cf28ec7cc7a8494cf64f1ddda53ffbad",
@@ -272,7 +272,7 @@
     "packages/distribution/rust/src/shim.rs": "079f026604885abc304381ed6fd9df4beb2eeeff718b8994dbe36137df0d6cd8",
     "packages/distribution/rust/src/store.rs": "62713cad4cb6889b2e1333a25d6b6a53cb9195ab8c5e51734eff006d45bb3417",
     "packages/distribution/rust/src/verify.rs": "45abf2dc964ec6fe1687d1cac3bc46654a6b32552ffe8d12d0f1c5753f42b800",
-    "packages/distribution/rust/src/workspace.rs": "a1ed550bb846d8a256048134a8a631afa2801f78163ba6f39b73c4ecb19e1f3f",
+    "packages/distribution/rust/src/workspace.rs": "275a65b4e7346ceb1e3f31f080516d62ad24aec05aac761a5bbe837df2f3afb5",
     "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "13b49506f7c45415429a6f1161577b9d33b3c819067777dfa0708332c1c96236",
     "packages/distribution/rust/tests/fetch_download.rs": "d44e41924790a7bd2cf5829d4948e7046e033fee9fd2e265bdc2b175ff4de858",
     "packages/distribution/rust/tests/install_lock_multiprocess.rs": "4751c03d546107108ed8f23fbceae74cbaa808cb94ee25942dc31c4f24972344",
@@ -375,7 +375,7 @@
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
     "packages/git/node-addon/src/yaml.rs": "cdb0ecd0b330966e5fd3c8e41e2069bf87722f1ac16df8363e514e9441d4432c",
     "packages/git/node-addon/tests/yaml_parts.rs": "835efdf2a4183cd1197385f318bfb370db8804ae9f4e8e500548c75fd6a3462f",
-    "packages/git/rust/src/driver.rs": "6b908c7bbe2fa752e46f29ba97e7e8ab0619c0e8d1e623c5fbb14b7866b2b44f",
+    "packages/git/rust/src/driver.rs": "204de4b9986da0f17ef431a41e296ff2631deb75cbbf9d57e228a3bb16b7e584",
     "packages/git/rust/src/grant.rs": "9702b8f72ada4502857b9ac9d151ea98d9d9a71773a2802278364476851d68d7",
     "packages/git/rust/src/inspect.rs": "6ab5154bc6ead447863198f01de88c16a31703f8839b642bf1d6bf2bb372895a",
     "packages/git/rust/src/land.rs": "9205c084d08ef414a0122b8893b981bf9723d363ff1d4bddc3e293dc09f6ad1e",
@@ -590,7 +590,7 @@
     "packages/observe/rust/src/metrics_cli/outcomes.rs": "f0ab12b98d5a9820d35d48fb06eb88a43356276709e8c8efd4392fc668a2cb97",
     "packages/observe/rust/src/metrics_cli/runs.rs": "5e5f62781e3a7629889da977e0d1bdd8a0be44f08a3870b170aaf017f3dca776",
     "packages/observe/rust/src/metrics_cli/snapshot.rs": "26abd26dad22341484f400be87a6b2ef3aadbfa98b27d56a4ef1c4e719059317",
-    "packages/observe/rust/src/provider.rs": "2675b87d39b643602ce620b4c7e8f049e44a0a295939700b5e926b6f0e00d277",
+    "packages/observe/rust/src/provider.rs": "28396d2c46916bd2d81b878344f5d5c849206a4e41135224b6ef7a6d9f0e9df5",
     "packages/observe/rust/src/scorecard.rs": "e35e798fd51309055b5e42f7e943f561b9f5bc95982f5de64153b567d222b356",
     "packages/observe/rust/src/shard.rs": "87f84323bf2442c65a6d45365e14f3343c16ffc8752f9b39f5f1f1a5750f83e1",
     "packages/observe/rust/src/sources/claude_transcripts.rs": "4af286c2fa0a8f9d1e373ab4fb02196fa182a8cd83223f443de77213e40fdaf2",
@@ -2336,21 +2336,21 @@
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 1183,
+      "line": 1196,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:179",
       "binary": "? path.to_str() .map(str::to_owned) .ok_or_else(|| failure(\"non-utf8-authority-pat",
       "class": "git-driver"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 2816,
+      "line": 2829,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 3003,
+      "line": 3036,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2736,7 +2736,7 @@
     },
     {
       "path": "packages/observe/rust/src/provider.rs",
-      "line": 160,
+      "line": 158,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
