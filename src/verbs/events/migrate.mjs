@@ -2,7 +2,7 @@
 // remain the only Git doors. Q5(a): reviewed code lands before this commit.
 import fs from 'node:fs';
 import path from 'node:path';
-import { decodeLegacyFiles, eventStoreFacts } from '../../event-store/index.mjs';
+import { decodeLegacyFiles, eventStoreFacts, readEventStoreConfig } from '../../event-store/index.mjs';
 import { isDeepStrictEqual } from 'node:util';
 import { spawnSync } from 'node:child_process';
 import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
@@ -177,7 +177,13 @@ export async function migrateUseCase(ctx, options = {}) {
   if (path.resolve(initialFacts.trustedMain) !== cwd) refuse('event-store-migration-main-required', 'run migrate in the main checkout root');
   const stopped = checkStopped({ workspaces: [{ root: cwd, worktrees: workspaceListing(cwd).worktrees }], hostBin: ctx.hostBin });
   if (stopped.status !== 'clean') refuse('event-store-writers-active', JSON.stringify(stopped));
-  fixEventStoreLockDirs(cwd, base); mintMachineId(base.stateRoot ?? resolveStateRoot().stateRoot); fixGitFetchMapping(cwd, ctx.loaderOptions);
+  fixEventStoreLockDirs(cwd, base); mintMachineId(base.stateRoot ?? resolveStateRoot().stateRoot);
+  // Git's setup fix answers a refusal as a `warning: Git setup refused` message instead of throwing; the cut must not go on without mappings.
+  const remote = readEventStoreConfig(initialFacts.trustedMain, ctx.globalConfigPath, { strict: true }).remote;
+  if ((remote === 'origin' ? initialFacts : eventStoreFacts(cwd, { ...base, remote })).remoteFact.configured) {
+    const mapping = fixGitFetchMapping(cwd, ctx.loaderOptions);
+    if (/^warning: Git setup refused/.test(mapping.message)) refuse('event-store-fetch-mapping-refused', mapping.message);
+  }
   const { store, heldRanks } = eventsContext(ctx, options);
   const snapshot = store.readLegacyFromHead({}, heldRanks);
   const { emptyLegacy = [] } = store.readLegacyFromHead({ check: true }, heldRanks);

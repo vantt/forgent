@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8af73305c361f6dcaf7968b96a2d4ea5e3be6e16a1d9285a77e65e65c83e3cf6",
+  "payloadDigest": "eb3afcb30a9826e0ab60a747c887a651b1f4cd85e26a4ff7e2d35d48bce08d58",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1174,7 +1174,7 @@
     "src/verbs/events/context.mjs": "d987940a160671f4495c07b6bd7c93fe19033c6920c2bab558453a5a2a4a70a5",
     "src/verbs/events/export.mjs": "b1af8d42892ffcfccf6521e6cebec5f0507289b18be9c1283f1514f9f00ce3e2",
     "src/verbs/events/import-legacy.mjs": "47e540ea66e0a058a59aa04bfad4280ea60761473f6cf798e4ea4077ed126708",
-    "src/verbs/events/migrate.mjs": "17b16cccbd75596076f6ea5ca4482df67e0e3e5cae49110dc33590155e80fd58",
+    "src/verbs/events/migrate.mjs": "75a2c2f35000ef9e27ad801888ac2d0a7f58b088b0c7bdfd008bc8092cb3290d",
     "src/verbs/events/parity.mjs": "6431bfc150b5876ec83bf6ff63023aeee9fe3c0b33d2e8ed54114b443e088ed7",
     "src/verbs/events/rebuild.mjs": "4e6f58a44c3546b7b30249e430c2bef861bd451dc14c0afe497c48508228d08d",
     "src/verbs/events/seal.mjs": "0651dbaca85800a74027dc30144d0d8e0f45378ea06e81eda25994be2c859474",
