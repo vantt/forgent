@@ -168,16 +168,16 @@ test('the port resolves a binding for a standalone caller: unbound, or whose it 
   assert.equal(port.resolveBinding({ worktree: path.join(wt, 'gone') }).answer, 'worktree-missing');
 });
 
-test('activityUnitOf: returns { pattern, params } from pinned guide snapshot or null per requirement 2', () => {
+test('activityUnitOf: answers the pattern and params a case\'s pinned activity declares, or null when it declares no pattern', () => {
   const workflow = conductorWorkflow({
     activities: [
       { id: 'act-pattern-params', entry: ['request-received'], produces: [], effects: 'none', unit: { pattern: 'reviewed', params: { reviewer: 'human' } } },
       { id: 'act-pattern-bare', entry: ['request-received'], produces: [], effects: 'none', unit: { pattern: 'solo' } },
+      { id: 'act-pattern-whitespace', entry: ['request-received'], produces: [], effects: 'none', unit: { pattern: '   ' } },
       { id: 'act-integrate', entry: ['request-received'], produces: [], effects: 'writes', unit: { kind: 'integrate' } },
       { id: 'act-no-unit', entry: ['request-received'], produces: [], effects: 'none' },
       { id: 'act-playbook', entry: ['request-received'], produces: [], effects: 'none', unit: { step: 'step-a', units: ['unit-1'] } },
     ],
-    decisions: [],
   });
   const run = openCase({ workflow });
 
@@ -191,6 +191,12 @@ test('activityUnitOf: returns { pattern, params } from pinned guide snapshot or 
   assert.deepEqual(
     activityUnitOf({ mainRoot: run.repoRoot, caseId: run.caseId, activity: 'act-pattern-bare' }),
     { pattern: 'solo', params: {} },
+  );
+
+  // with unit: { pattern: '   ' } (whitespace only is not a valid non-empty string)
+  assert.equal(
+    activityUnitOf({ mainRoot: run.repoRoot, caseId: run.caseId, activity: 'act-pattern-whitespace' }),
+    null,
   );
 
   // 2. with unit: { kind: 'integrate' }
