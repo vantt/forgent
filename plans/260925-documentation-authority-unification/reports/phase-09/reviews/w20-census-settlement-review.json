@@ -1,0 +1,1451 @@
+{
+ "items": [
+  {
+   "id": "pc-l-0025",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/event-store/phase08-fixture.mjs:12 is reached by the named test (test/event-store/migrate.test.mjs:17) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0026",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/event-store/phase08-fixture.mjs:13 is reached by the named test (test/event-store/migrate.test.mjs:17) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0030",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/fixtures/seat-binding-config/forgentx-runner.json is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0031",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/fixtures/seat-binding-config/forgentx-runner.json is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0032",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/fixtures/seat-binding-config/forgentx-runner.json is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0033",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/fixtures/seat-binding-config/forgentx-runner.json is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0034",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/fixtures/seat-binding-config/forgentx-runner.json is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0035",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/fixtures/seat-binding-config/global-runner.json is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0036",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/fixtures/seat-binding-config/global-runner.json is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0037",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/fixtures/seat-binding-config/global-runner.json is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0038",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/fixtures/seat-binding-config/global-runner.json is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0039",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/fixtures/seat-binding-config/global-runner.json is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0042",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined by citation (408078b9a): cited text at test/runner/execution/bind-tier-composition.test.mjs:1 maps through the ledger successor to a current holder whose section content is byte-identical to the cited source section; the patch replays forward and back with --fuzz=0.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0043",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/scripts/check-evidence-relocation.test.mjs:16 is reached by the named test (test/scripts/check-evidence-relocation.test.mjs:115) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0044",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/scripts/check-evidence-relocation.test.mjs:17 is reached by the named test (test/scripts/check-evidence-relocation.test.mjs:115) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0056",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined by citation (408078b9a): cited text at test/setup/doctor-fresh-run.test.mjs:6 maps through the ledger successor to a current holder whose section content is byte-identical to the cited source section; the patch replays forward and back with --fuzz=0.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0077",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined by citation (408078b9a): cited text at src/setup/registrations.mjs:6354 maps through the ledger successor to a current holder whose section content is byte-identical to the cited source section; the patch replays forward and back with --fuzz=0.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-l-0078",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined by citation (408078b9a): cited text at src/setup/workflow-case-checks.mjs:2 maps through the ledger successor to a current holder whose section content is byte-identical to the cited source section; the patch replays forward and back with --fuzz=0.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0159",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: apps/fgctl/tests/git_wal_activation_gate.rs:25 sits in a same-file helper that the non-ignored #[test] at apps/fgctl/tests/git_wal_activation_gate.rs:58 calls (checked the helper chain and branch arguments by hand).",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0160",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: apps/fgctl/tests/git_wal_activation_gate.rs:26 sits in a same-file helper that the non-ignored #[test] at apps/fgctl/tests/git_wal_activation_gate.rs:58 calls (checked the helper chain and branch arguments by hand).",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0161",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: packages/event-store/rust/tests/legacy_import.rs:29 sits in a same-file helper that the non-ignored #[test] at packages/event-store/rust/tests/legacy_import.rs:42 calls (checked the helper chain and branch arguments by hand).",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0162",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: packages/event-store/rust/tests/legacy_import.rs:31 sits in a same-file helper that the non-ignored #[test] at packages/event-store/rust/tests/legacy_import.rs:42 calls (checked the helper chain and branch arguments by hand).",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0163",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: packages/event-store/rust/tests/legacy_import.rs:31 sits in a same-file helper that the non-ignored #[test] at packages/event-store/rust/tests/legacy_import.rs:42 calls (checked the helper chain and branch arguments by hand).",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0164",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: packages/event-store/rust/tests/legacy_import.rs:33 sits in a same-file helper that the non-ignored #[test] at packages/event-store/rust/tests/legacy_import.rs:42 calls (checked the helper chain and branch arguments by hand).",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0165",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: packages/event-store/rust/tests/legacy_import.rs:34 sits in a same-file helper that the non-ignored #[test] at packages/event-store/rust/tests/legacy_import.rs:42 calls (checked the helper chain and branch arguments by hand).",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0203",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: packages/git/rust/tests/scoped_commit_sync.rs:470 sits in a same-file helper that the non-ignored #[test] at packages/git/rust/tests/scoped_commit_sync.rs:559 calls (checked the helper chain and branch arguments by hand).",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0204",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: packages/git/rust/tests/scoped_commit_sync.rs:488 sits in a same-file helper that the non-ignored #[test] at packages/git/rust/tests/scoped_commit_sync.rs:559 calls (checked the helper chain and branch arguments by hand).",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0205",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: packages/git/rust/tests/scoped_commit_sync.rs:544 sits in a same-file helper that the non-ignored #[test] at packages/git/rust/tests/scoped_commit_sync.rs:609 calls (checked the helper chain and branch arguments by hand).",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0213",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: packages/git/rust/tests/scoped_commit_sync.rs:1510 sits in a same-file helper that the non-ignored #[test] at packages/git/rust/tests/scoped_commit_sync.rs:1559 calls (checked the helper chain and branch arguments by hand).",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0214",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at packages/identity/rust/tests/golden.rs:8 is reached by the named test (packages/identity/rust/tests/golden.rs:92) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs. Note: The census site is `use std::path::PathBuf;` (an import). The test at golden.rs:92 calls registry_dir, which uses PathBuf, so the join is not wrong, but a REJECT (non-document import) would describe it better.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)",
+   "severity": "low"
+  },
+  {
+   "id": "pc-d-0229",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/convention/definition-files.test.mjs:11 is reached by the named test (test/convention/definition-files.test.mjs:13) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0231",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/convention/seat-id.test.mjs:16 is reached by the named test (test/convention/seat-id.test.mjs:18) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0234",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/e2e/documentation-cutover-lease-hooks.test.mjs:17 is reached by the named test (test/e2e/documentation-cutover-lease-hooks.test.mjs:155) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0235",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/e2e/documentation-cutover-lease-hooks.test.mjs:17 is reached by the named test (test/e2e/documentation-cutover-lease-hooks.test.mjs:155) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0236",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/e2e/documentation-cutover-lease-hooks.test.mjs:18 is reached by the named test (test/e2e/documentation-cutover-lease-hooks.test.mjs:155) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0237",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/e2e/documentation-cutover-lease-hooks.test.mjs:25 is reached by the named test (test/e2e/documentation-cutover-lease-hooks.test.mjs:155) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0238",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/e2e/documentation-cutover-lease-hooks.test.mjs:25 is reached by the named test (test/e2e/documentation-cutover-lease-hooks.test.mjs:155) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0283",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/e2e/documentation-cutover-lease-hooks.test.mjs:792 lies inside the callback of the named template-title test (test/e2e/documentation-cutover-lease-hooks.test.mjs:792); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0330",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/event-store/phase08-fixture.mjs:15 is reached by the named test (test/event-store/migrate.test.mjs:17) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0331",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/event-store/phase08-fixture.mjs:15 is reached by the named test (test/event-store/migrate.test.mjs:17) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0349",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/event-store/topologies.test.mjs:22 is reached by the named test (test/event-store/topologies.test.mjs:151) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0350",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/event-store/topologies.test.mjs:24 is reached by the named test (test/event-store/topologies.test.mjs:151) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0355",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/git/cutover-grant.test.mjs:11 is reached by the named test (test/git/cutover-grant.test.mjs:14) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0356",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:14 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0357",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:15 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0358",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:15 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0359",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:17 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0360",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:20 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0361",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:22 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0362",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:22 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0363",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:22 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0364",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:23 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0365",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:23 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0366",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:23 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0367",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:25 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0368",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:25 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0369",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:26 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0370",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:28 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0371",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:29 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0372",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:30 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0373",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:33 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0374",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:36 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0375",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:36 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0376",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:38 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0377",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:38 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0378",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:38 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0379",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:38 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0380",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:39 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0381",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/cutover-grant.test.mjs:59 lies inside the callback of the named template-title test (test/git/cutover-grant.test.mjs:14); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0396",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/git/legacy-event-adapter.test.mjs:22 is reached by the named test (test/git/legacy-event-adapter.test.mjs:13) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs. Note: Joined to a successor: the original inline config write became writeRawProjectConfig at :23 inside the test at :13. Defensible successor join.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)",
+   "severity": "info"
+  },
+  {
+   "id": "pc-d-0423",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/native-load.test.mjs:221 lies inside the callback of the named template-title test (test/git/native-load.test.mjs:205); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0424",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/git/native-load.test.mjs:221 lies inside the callback of the named template-title test (test/git/native-load.test.mjs:205); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0433",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/githooks/event-layout.test.mjs:10 lies inside the callback of the named template-title test (test/githooks/event-layout.test.mjs:10); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0434",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/githooks/event-layout.test.mjs:11 lies inside the callback of the named template-title test (test/githooks/event-layout.test.mjs:10); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0435",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/githooks/event-layout.test.mjs:18 lies inside the callback of the named template-title test (test/githooks/event-layout.test.mjs:10); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0436",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/githooks/event-layout.test.mjs:19 lies inside the callback of the named template-title test (test/githooks/event-layout.test.mjs:10); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0437",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/githooks/event-layout.test.mjs:20 lies inside the callback of the named template-title test (test/githooks/event-layout.test.mjs:10); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0438",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/githooks/event-layout.test.mjs:21 lies inside the callback of the named template-title test (test/githooks/event-layout.test.mjs:10); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0439",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/githooks/event-layout.test.mjs:25 lies inside the callback of the named template-title test (test/githooks/event-layout.test.mjs:10); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0440",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/githooks/event-layout.test.mjs:28 lies inside the callback of the named template-title test (test/githooks/event-layout.test.mjs:10); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0441",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/githooks/event-layout.test.mjs:29 lies inside the callback of the named template-title test (test/githooks/event-layout.test.mjs:10); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0442",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/helpers/failover-fixture.mjs:135 is reached by the named test (test/runner/execution/run-provider-failover.test.mjs:19) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0443",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/helpers/failover-fixture.mjs:151 is reached by the named test (test/runner/execution/run-provider-failover.test.mjs:19) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0444",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/helpers/failover-fixture.mjs:151 is reached by the named test (test/runner/execution/run-provider-failover.test.mjs:19) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs. Note: Joined to a successor: the original `.fgos/config.json` literal is gone (no exact expression at pin); writeProjectConfig is the successor and setup() is called by the test. Defensible, but it differs from the drifted-grade rule of not rebinding gone expressions.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)",
+   "severity": "low"
+  },
+  {
+   "id": "pc-d-0445",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/helpers/failover-fixture.mjs:155 is reached by the named test (test/runner/execution/run-provider-failover.test.mjs:19) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0446",
+   "kind": "census-row",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Line 157 is the llmAccounts branch of setup() (`const globalPools = llmAccounts && ...`), but it is joined to the test at test/runner/execution/run-provider-failover.test.mjs:19, which calls setup() with only recentlyUsed, so llmAccounts is null and the branch body never runs. The detail text even says the llmAccounts branch is assigned separately. The receipt's claim that this branch joins a test that supplies pool accounts is false for this row.",
+   "evidence": "failover-fixture.mjs:157 at a808bc676; test/runner/execution/run-provider-failover.test.mjs:19-22 passes { recentlyUsed } only. Correct owner: test/runner/execution/run-provider-failover.test.mjs:491 (passes llmAccounts at 494)."
+  },
+  {
+   "id": "pc-d-0447",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/helpers/failover-fixture.mjs:181 is reached by the named test (test/runner/execution/run-provider-failover.test.mjs:491) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs. Note: Outcome correct: the test at test/runner/execution/run-provider-failover.test.mjs:491 calls attemptsOf at :501. But the detail text describes the llmAccounts branch and the evidence binds :493/:499 instead of the :501 call.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)",
+   "severity": "low"
+  },
+  {
+   "id": "pc-d-0448",
+   "kind": "census-row",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Line 182 is summaryOf(); it is joined to test/runner/execution/run-provider-failover.test.mjs:491, which never calls summaryOf (it calls attemptsOf at 501 and selectedAccount at 508). The detail text describes the llmAccounts branch, not this line.",
+   "evidence": "grep summaryOf in test/runner/execution/run-provider-failover.test.mjs at a808bc676: lines 51, 154, 194, 221 only. Correct owner: test/runner/execution/run-provider-failover.test.mjs:19 (summaryOf at 51) or :179."
+  },
+  {
+   "id": "pc-d-0449",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/helpers/failover-fixture.mjs:183 is reached by the named test (test/runner/execution/run-provider-failover.test.mjs:491) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs. Note: Outcome correct: the test at test/runner/execution/run-provider-failover.test.mjs:491 reaches runFile through selectedAccount at :508. Detail text describes the llmAccounts branch, and the evidence does not bind the :508 call.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)",
+   "severity": "low"
+  },
+  {
+   "id": "pc-d-0450",
+   "kind": "census-row",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Line 188 is inside panel() (`member-${n}` seat ids); it is joined to test/runner/execution/run-provider-failover.test.mjs:19, which runs solo('u-rotate') and never calls panel().",
+   "evidence": "panel( appears only at test/runner/execution/run-provider-failover.test.mjs:189 and :213. Correct owner: test/runner/execution/run-provider-failover.test.mjs:179 (panel('u-panel-rotate'))."
+  },
+  {
+   "id": "pc-d-0451",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/helpers/failover-fixture.mjs:191 is reached by the named test (test/runner/execution/run-provider-failover.test.mjs:19) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0452",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/helpers/failover-fixture.mjs:195 is reached by the named test (test/runner/execution/run-provider-failover.test.mjs:19) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0453",
+   "kind": "census-row",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Line 202 is inside unitRuns() (`path.join(fx.repoRoot, '.fgos', 'assignments')`); it is joined to test/runner/execution/run-provider-failover.test.mjs:179, which never calls unitRuns. The detail text describes panel(), not this line.",
+   "evidence": "unitRuns( appears only at test/runner/execution/run-provider-failover.test.mjs:341, :347 (test at :331) and :363 (test at :360)."
+  },
+  {
+   "id": "pc-d-0454",
+   "kind": "census-row",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Same site as pc-d-0453: unitRuns() body at failover-fixture.mjs:202, joined to test/runner/execution/run-provider-failover.test.mjs:179, which never calls unitRuns.",
+   "evidence": "unitRuns( appears only at test/runner/execution/run-provider-failover.test.mjs:341, :347 (test :331) and :363 (test :360)."
+  },
+  {
+   "id": "pc-d-0455",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/helpers/identity-env.mjs:5 is reached by the named test (test/util/session-identity.test.mjs:91) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0462",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/runner/dispatch/worker-env-case-context.test.mjs:22 is reached by the named test (test/runner/dispatch/worker-env-case-context.test.mjs:60) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0463",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/runner/dispatch/worker-env-case-context.test.mjs:23 is reached by the named test (test/runner/dispatch/worker-env-case-context.test.mjs:60) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0467",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/runner/documentation-cutover-lease.test.mjs:20 is reached by the named test (test/runner/documentation-cutover-lease.test.mjs:52) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0468",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/runner/documentation-cutover-lease.test.mjs:20 is reached by the named test (test/runner/documentation-cutover-lease.test.mjs:52) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0469",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/runner/documentation-cutover-lease.test.mjs:21 is reached by the named test (test/runner/documentation-cutover-lease.test.mjs:52) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0470",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/runner/documentation-cutover-lease.test.mjs:24 is reached by the named test (test/runner/documentation-cutover-lease.test.mjs:52) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0471",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/runner/documentation-cutover-lease.test.mjs:24 is reached by the named test (test/runner/documentation-cutover-lease.test.mjs:52) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0479",
+   "kind": "census-row",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Line 37 is the body of the fixture's worktree() closure (`path.join(temp, branch)`, `git worktree add`). It is joined to the test at test/runner/documentation-cutover-lease.test.mjs:52, which calls fixture(t) but never f.worktree(), so the expression never runs there.",
+   "evidence": "documentation-cutover-lease.test.mjs:52-65 at a808bc676 has no worktree( call; f.worktree() first appears at :68 (test :67)."
+  },
+  {
+   "id": "pc-d-0480",
+   "kind": "census-row",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "Same as pc-d-0479: worktree() closure body at documentation-cutover-lease.test.mjs:37 joined to the test at :52, which never calls f.worktree().",
+   "evidence": "First f.worktree() call is at :68 in the test starting at :67."
+  },
+  {
+   "id": "pc-d-0548",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/runner/execution/account-pin.test.mjs:21 is reached by the named test (test/runner/execution/account-pin.test.mjs:53) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0596",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/runner/execution/git-core-adapters.test.mjs:141 lies inside the callback of the named template-title test (test/runner/execution/git-core-adapters.test.mjs:141); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0597",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/runner/execution/git-core-adapters.test.mjs:144 lies inside the callback of the named template-title test (test/runner/execution/git-core-adapters.test.mjs:141); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0598",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/runner/execution/git-core-adapters.test.mjs:144 lies inside the callback of the named template-title test (test/runner/execution/git-core-adapters.test.mjs:141); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0599",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/runner/execution/git-core-adapters.test.mjs:145 lies inside the callback of the named template-title test (test/runner/execution/git-core-adapters.test.mjs:141); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0600",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/runner/execution/git-core-adapters.test.mjs:145 lies inside the callback of the named template-title test (test/runner/execution/git-core-adapters.test.mjs:141); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0601",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/runner/execution/git-core-adapters.test.mjs:146 lies inside the callback of the named template-title test (test/runner/execution/git-core-adapters.test.mjs:141); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0602",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/runner/execution/git-core-adapters.test.mjs:146 lies inside the callback of the named template-title test (test/runner/execution/git-core-adapters.test.mjs:141); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0603",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/runner/execution/git-core-adapters.test.mjs:153 lies inside the callback of the named template-title test (test/runner/execution/git-core-adapters.test.mjs:141); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0618",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/runner/execution/run-case-admission.test.mjs:83 is reached by the named test (test/runner/execution/run-case-admission.test.mjs:235) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs. Note: Joined to a successor: the original config.json literal is gone; writeProjectConfig in setup() is reached by the test at :235. Defensible successor join.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)",
+   "severity": "info"
+  },
+  {
+   "id": "pc-d-0678",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/runner/merge.test.mjs:404 is reached by the named test (test/runner/merge.test.mjs:399) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs. Note: Joined to a successor: the original config.json write became writeProjectConfig at :405 inside the test at :399. Defensible successor join.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)",
+   "severity": "info"
+  },
+  {
+   "id": "pc-d-0683",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/runner/provider-pool-lease.test.mjs:31 is reached by the named test (test/runner/provider-pool-lease.test.mjs:138) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0684",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/runner/provider-pool-lease.test.mjs:31 is reached by the named test (test/runner/provider-pool-lease.test.mjs:138) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0692",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/rust-host/fgctl-upgrade.test.mjs:127 is reached by the named test (test/rust-host/fgctl-upgrade.test.mjs:146) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0693",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/rust-host/help-routes.test.mjs:31 is reached by the named test (test/rust-host/help-routes.test.mjs:98) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0694",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/rust-host/help-routes.test.mjs:32 is reached by the named test (test/rust-host/help-routes.test.mjs:98) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0695",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/rust-host/help-routes.test.mjs:32 is reached by the named test (test/rust-host/help-routes.test.mjs:98) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0696",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/rust-host/release-tree.test.mjs:40 is reached by the named test (test/rust-host/release-tree.test.mjs:97) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0697",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/rust-host/release-tree.test.mjs:42 is reached by the named test (test/rust-host/release-tree.test.mjs:97) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0698",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/rust-host/release-tree.test.mjs:44 is reached by the named test (test/rust-host/release-tree.test.mjs:97) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0701",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/scripts/check-evidence-relocation.test.mjs:15 is reached by the named test (test/scripts/check-evidence-relocation.test.mjs:355) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0702",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/scripts/check-evidence-relocation.test.mjs:15 is reached by the named test (test/scripts/check-evidence-relocation.test.mjs:355) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0703",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/scripts/check-evidence-relocation.test.mjs:16 is reached by the named test (test/scripts/check-evidence-relocation.test.mjs:115) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0704",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/scripts/check-evidence-relocation.test.mjs:17 is reached by the named test (test/scripts/check-evidence-relocation.test.mjs:115) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0754",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/seat-binding/golden-cases.helper.mjs:7 is reached by the named test (test/seat-binding/client.test.mjs:40) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0755",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/seat-binding/golden-cases.helper.mjs:7 is reached by the named test (test/seat-binding/client.test.mjs:40) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0756",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/seat-binding/golden-cases.helper.mjs:10 is reached by the named test (test/seat-binding/client.test.mjs:40) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0757",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/session-identity/attempt-writer-id.test.mjs:15 is reached by the named test (test/session-identity/attempt-writer-id.test.mjs:24) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0758",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: the match is the prose fragment `path: in a` inside the line-3 comment; not code, not a citation. The real citation on line 6 is pc-l-0056.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0775",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-checks.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0776",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-checks.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0777",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-checks.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0778",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-checks.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0779",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-conversion.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0780",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-conversion.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0781",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-conversion.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0782",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-conversion.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0783",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-conversion.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0784",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-conversion.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0785",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-conversion.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0786",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-conversion.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0787",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-conversion.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0788",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-conversion.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0789",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-fence.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0790",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-fence.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0791",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds: source test/setup/seat-binding-fence.test.mjs is absent at the pin and was deleted by 5a33989fa (ancestor of the pin); evidence line text and digest match 244a04354.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0793",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/util/session-identity.test.mjs:22 is reached by the named test (test/util/session-identity.test.mjs:84) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0805",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/workflow/advisory-m-contracts.test.mjs:126 lies inside the callback of the named template-title test (test/workflow/advisory-m-contracts.test.mjs:126); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0818",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/workflow/case-verbs.test.mjs:57 lies inside the callback of the named template-title test (test/workflow/case-verbs.test.mjs:57); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0819",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/workflow/case-verbs.test.mjs:60 lies inside the callback of the named template-title test (test/workflow/case-verbs.test.mjs:57); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0820",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/workflow/case-verbs.test.mjs:68 lies inside the callback of the named template-title test (test/workflow/case-verbs.test.mjs:57); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0821",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/workflow/case-verbs.test.mjs:70 lies inside the callback of the named template-title test (test/workflow/case-verbs.test.mjs:57); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0822",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/workflow/case-verbs.test.mjs:75 lies inside the callback of the named template-title test (test/workflow/case-verbs.test.mjs:57); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0823",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/workflow/case-verbs.test.mjs:80 lies inside the callback of the named template-title test (test/workflow/case-verbs.test.mjs:57); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0824",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/workflow/case-verbs.test.mjs:85 lies inside the callback of the named template-title test (test/workflow/case-verbs.test.mjs:57); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0825",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the site at test/workflow/case-verbs.test.mjs:91 lies inside the callback of the named template-title test (test/workflow/case-verbs.test.mjs:57); confirmed by an independent acorn parse of the pinned blob.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0833",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/workflow/conductor-case.test.mjs:25 is reached by the named test (test/workflow/conductor-case.test.mjs:69) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0834",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/workflow/conductor-case.test.mjs:26 is reached by the named test (test/workflow/conductor-case.test.mjs:69) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0869",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/workflow/playbook-proposer.test.mjs:37 is reached by the named test (test/workflow/playbook-proposer.test.mjs:52) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0870",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/workflow/playbook-proposer.test.mjs:38 is reached by the named test (test/workflow/playbook-proposer.test.mjs:52) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0877",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/workflow/stale-approval-reapproval.test.mjs:30 is reached by the named test (test/workflow/stale-approval-reapproval.test.mjs:56) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0878",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Joined: the declaration at test/workflow/stale-approval-reapproval.test.mjs:31 is reached by the named test (test/workflow/stale-approval-reapproval.test.mjs:56) through the cited loader/caller; caller line lies inside the test callback (independent acorn parse) and the fixture code on the path runs.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0924",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at bin/fgos.mjs:3862 is gone or reshaped into scalar rendering/validation, with no document read or default. Note: REJECT holds (current line 3868 returns a JSON scalar map incl. tokenPath; no document read). Detail text describes line 3867 (the acquire options), not the graded span at 3868.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)",
+   "severity": "low"
+  },
+  {
+   "id": "pc-d-0925",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at bin/fgos.mjs:3863 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0926",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at bin/fgos.mjs:3870 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0927",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at bin/fgos.mjs:3872 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0928",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at bin/fgos.mjs:3873 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0929",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at bin/fgos.mjs:3874 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0931",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at bin/fgos.mjs:3881 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0933",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at bin/fgos.mjs:3891 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0948",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Additional drift. REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at packages/git/rust/src/inspect.rs:131 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0960",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Additional drift. REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at packages/git/rust/src/repository_config.rs:172 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-0961",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Additional drift. REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at packages/git/rust/src/repository_config.rs:172 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-1001",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/runner/dispatch/config.mjs:417 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-1086",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "Additional drift. REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/setup/git-checks.mjs:164 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-1097",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/setup/seat-binding-checks.mjs:69 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-1098",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/setup/seat-binding-checks.mjs:81 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-1099",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/setup/seat-binding-checks.mjs:81 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-1100",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/setup/seat-binding-checks.mjs:85 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-1101",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/setup/seat-binding-checks.mjs:85 is gone or reshaped into scalar rendering/validation, with no document read or default. Note: REJECT holds, but join.json binds the inventory expression to current line 30 (a different, new `path.join(cwd, '.fgos')` for the tier-ladder client) while the detail says the expression was removed; the row's evidence does not grade line 30. Line 30 is also a non-document runtime dir, so the outcome is unchanged.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)",
+   "severity": "low"
+  },
+  {
+   "id": "pc-d-1102",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/setup/seat-binding-checks.mjs:96 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-1103",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/setup/seat-binding-checks.mjs:102 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-1104",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/setup/seat-binding-checks.mjs:106 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-1105",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/setup/seat-binding-checks.mjs:111 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-1106",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/setup/seat-binding-checks.mjs:111 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-1107",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/setup/seat-binding-checks.mjs:114 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "pc-d-1108",
+   "kind": "census-row",
+   "verdict": "APPROVE",
+   "summary": "REJECT holds at current bytes (no source change between a808bc676 and HEAD): the graded span at src/setup/seat-binding-conversion.mjs:139 is gone or reshaped into scalar rendering/validation, with no document read or default.",
+   "evidence": "settlement.json row; all evidence lines and sourceSha256 re-read from git at their pins (445/445 match)"
+  },
+  {
+   "id": "A-join-replay",
+   "kind": "commit-check",
+   "verdict": "APPROVE",
+   "summary": "join.py --pin a808bc676 replayed twice in a git clone --shared scratch at 4e49c3008: exit 0 both, stdout identical, join/residue/settlement.json byte-identical to each other and to the committed files (clone git status clean).",
+   "evidence": "stdout {confirmed-grade-record-REJECT 289, confirmed-settlement-REJECT 53, joined-owning-test 780, judgment-required 4}"
+  },
+  {
+   "id": "A-evidence-integrity",
+   "kind": "commit-check",
+   "verdict": "APPROVE",
+   "summary": "All 445 evidence lines across 191 rows match git show <pin>:<file> text and full-file sha256; all owning-proof titles exist at their lines (two multi-line titles checked by hand).",
+   "evidence": "scratch mech check over settlement.json"
+  },
+  {
+   "id": "A-settlement-correctness",
+   "kind": "commit-check",
+   "verdict": "REWORK",
+   "severity": "medium",
+   "summary": "7 of 134 owning-test joins name a test that does not run the cited expression (pc-d-0446, -0448, -0450, -0453, -0454, -0479, -0480). All are helper/closure bodies joined to a sibling test of the same file. Two more failover rows (-0447, -0449) have the right test but wrong detail text, consistent with detail text attached to the wrong lines. G2 cannot pass review until these rows name their real callers.",
+   "evidence": "run-provider-failover.test.mjs and documentation-cutover-lease.test.mjs at a808bc676; see row items"
+  },
+  {
+   "id": "A-register-corrections",
+   "kind": "commit-check",
+   "verdict": "APPROVE",
+   "summary": "G2 is back to partial with a remaining entry; the G9 note states W15 full review of 50 rows plus a 60/288 sample; the G6 note cites W9 rule-level approval under L13-17.3; the G6 F co-compose item cites L13-17.2; the G0 F duty carries /bindingRefresh/124..126 following /6, /20, /21; the G3 note says W3 does not name G3.",
+   "evidence": "preflip-gate-status.json at HEAD"
+  },
+  {
+   "id": "B-join-replay",
+   "kind": "commit-check",
+   "verdict": "APPROVE",
+   "summary": "join.py --pin 98d9201f1 replayed twice in a scratch clone at 408078b9a: exit 0 both (includes citations.py --check), outputs byte-identical and equal to the committed files.",
+   "evidence": "stdout {..., joined-by-citation 4, joined-owning-test 780}"
+  },
+  {
+   "id": "B-citation-holders",
+   "kind": "commit-check",
+   "verdict": "APPROVE",
+   "summary": "The four citation holders own the cited text: seat-binding 5.4 and 6.3 and the distribution \"Entry Points & Triggers\" section are byte-identical to the 244a04354 source sections. The RUL-WF-27 block is byte-identical and contains the \"binding is a rebuildable view\" clause. Holder sha256s, ledger pointers (s14 /bindingRefresh/207, 220, 348; s12 /unitCarries/29, 42, 170; s4 /claims/3) and anchors (#6-business-rules, #entry-points-triggers) all resolve.",
+   "evidence": "git show 98d9201f1 holders vs 244a04354 docs/specs/*"
+  },
+  {
+   "id": "B-pointer-patches",
+   "kind": "commit-check",
+   "verdict": "APPROVE",
+   "summary": "All 4 unapplied patches replay independently with patch --fuzz=0 --batch -p1: forward reaches expectedAfterSha256, rollback restores beforeSha256, and patch -R of the forward diff also restores it. forwardSha256 matches, applied=false, and the target files at HEAD equal beforeSha256.",
+   "evidence": "scratch replay on git show 98d9201f1 blobs"
+  },
+  {
+   "id": "B-carries-checker",
+   "kind": "commit-check",
+   "verdict": "APPROVE",
+   "summary": "verify-carries.mjs exit 0; controls.mjs exit 0 with 5 rejecting controls. The new stale-duty assert rejects a duty path with an unapplied patch whose live bytes do not drift (AGENTS.md overlay), separately from missing-patch.",
+   "evidence": "scratch clone at 408078b9a, NODE_OPTIONS=--no-addons"
+  },
+  {
+   "id": "B-heading-row-55",
+   "kind": "commit-check",
+   "verdict": "APPROVE",
+   "summary": "source-heading-parity.json row 55 (runtime-identity-and-activation release-tree-canonicalization) had two exactly equal targets; one was removed. The row count stays 91 and the directSourceBlocks are unchanged.",
+   "evidence": "git show 408078b9a^ vs 408078b9a"
+  },
+  {
+   "id": "B-misc-relabel",
+   "kind": "commit-check",
+   "verdict": "APPROVE",
+   "severity": "info",
+   "summary": "The heading is relabelled \"Historical\" and the supersession scope is narrowed so it no longer overrides \"Current G6 fixes\". The commit also adds one cleanup-proof sentence pointing at gate-reconcile/misc-replay.json, so it is not strictly label-only. That proof record (exit 0, only HEAD and temp-path diffs) supports the sentence.",
+   "evidence": "misc-fix/receipt.md:291-307"
+  },
+  {
+   "id": "B-register",
+   "kind": "commit-check",
+   "verdict": "APPROVE",
+   "summary": "G0 and G1 cleared items cite W19 section B (25 APPROVE, clearedBy a8ea05c50). G6 cites W19 section C for 25e8842d3. G1 discloses that the stale-duty and duplicate-target cleanup are not yet reviewed. G2 stays partial with a blocker naming this review. 342 REJECTs = 289 + 53.",
+   "evidence": "preflip-gate-status.json; reviews/w19-live-parity-and-rebinds-review.md headings"
+  },
+  {
+   "id": "B-gate-verify-controls",
+   "kind": "commit-check",
+   "verdict": "APPROVE",
+   "summary": "gate-reconcile/verify.py exit 0; controls.py exit 0 with 9 rejecting controls. verify.py rewrote only verification.json checkedAtHead, and only in the scratch clone.",
+   "evidence": "scratch clone at 408078b9a"
+  },
+  {
+   "id": "C-archive-receipt",
+   "kind": "commit-check",
+   "verdict": "APPROVE",
+   "severity": "info",
+   "summary": "Records-only: all four files are under plans/. The old proofs, coldRunImplementation, blocker and deferred values moved verbatim under historicalSandboxAttempt, and no other key changed. Current values match archive data: verification.json exit 0/verified; rehearsal.json 6 timing runs with cold run 1 at 2.93 s (after-final-pin-without-gates) and 41.70 s (before-final-pin-with-gates). design.md line 3 now states the verified Lead run. Info: postMeasurementEdits lists only this commit's edits; 25e8842d3 had already changed receipt.json after measurement, which postMeasurementNote covers only generically.",
+   "evidence": "json diff f67e0f676^ vs f67e0f676; rehearsal.json variants; measuredMainArtifacts hashes"
+  }
+ ]
+}
