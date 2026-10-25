@@ -1,0 +1,103 @@
+{
+  "inputHead": "39528fa211f9a7e558b1e95467eeae1f66b68a3d",
+  "environment": {"NODE_OPTIONS": "--no-addons", "python": "python3 -B"},
+  "commands": [
+    {
+      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py"],
+      "exit": 0,
+      "stdoutSha256": "eb33d59d1fe21d6a7570d97d1f0b6f831bf5031782e0d9d1d4eaf16b9f68aa70",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "partial",
+      "ok": false,
+      "fullAuditPassed": false,
+      "recordProofsPassed": true,
+      "authoringPin": "5a3f7580a012da011fc09ce88cff89bbea2b9008",
+      "assertions": {
+        "rebindLeavesNoScratch": true,
+        "miscChecksUnchangedSha256": "faa095f14d65005355089b65d4896ba06e96776413a8ec4d33b138d4fb939fe4",
+        "ownershipPassed": true,
+        "clauseSpecificSourceLists": 2,
+        "addVerbFileCountRationale": true,
+        "touchedBindingHashes": 127,
+        "refreshedRationales": 124,
+        "supersedeRedecisions": 3,
+        "retiredStaleOverlayPointers": 3,
+        "parityBase": "568a11f21f442190ef86e25cf5d2303df7fc0f3d",
+        "laterSourceParityRowsAdded": 1,
+        "liveTargetsAndAncestries": 127,
+        "authoringTargetsAndAncestries": 127,
+        "exactChangedLineDiffs": 3,
+        "legacyRewriteDigests": 21,
+        "parityPriorEntriesUnchanged": 248,
+        "parityPriorSourceEntriesRefreshed": 14,
+        "parityPriorTargetOnlyRefreshed": 62,
+        "residualFileHashUnchanged": true
+      },
+      "nestedCommands": [
+        {"label": "rebind/rebind.py --check", "exit": 0},
+        {"label": "carries accounting deterministic replay", "exit": 0},
+        {"label": "carries/verify-carries.mjs", "exit": 0},
+        {"label": "misc-fix/verify.py (only checks.json output sink redirected)", "exit": 0},
+        {"label": "live rebind accounting negative controls", "exit": 0},
+        {"label": "step10-round5/ownership.mjs (authoring pin)", "exit": 0},
+        {"label": "step10-round5/audit-ownership.mjs (authoring pin)", "exit": 0},
+        {"label": "step10-round5/ownership.mjs (live targets)", "exit": 0},
+        {"label": "step10-sync4d/ownership.mjs (authoring pin)", "exit": 0},
+        {"label": "step10-sync4d/audit-ownership.mjs (authoring pin)", "exit": 0},
+        {"label": "step10-sync4d/ownership.mjs (live targets)", "exit": 0},
+        {"label": "legacy docs ratchet", "exit": 0},
+        {"label": "whitespace", "exit": 0}
+      ],
+      "liveOwnershipTargets": {
+        "manifests": ["step10-round5-reproduction.json", "step10-sync4d-reproduction.json"],
+        "perManifest": {"rawDiagnostics": 17, "authenticatedIdenticalUnitGroups": 16, "recordedRebinds": 1, "unaccounted": 0},
+        "record": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-direct-rebindings.json#/rebindings/13"
+      },
+      "changedOverlayTargets": [
+        {
+          "pointer": "/bindingRefresh/117",
+          "before": {"targetOwner": "docs/platform/work-state/spec.md", "targetAnchor": "11-business-rules", "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc"},
+          "after": {"targetOwner": "docs/platform/work-state/spec.md", "targetAnchor": "11-business-rules", "targetUnitDigest": "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41"},
+          "record": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-direct-rebindings.json#/rebindings/13"
+        }
+      ],
+      "negativeControls": {
+        "status": "pass",
+        "positiveControls": ["exact direct-record transition", "exact rework-record transition", "unchanged live targets need no rebind"],
+        "refusals": ["unaccounted drift", "before wrong targetOwner", "before wrong targetAnchor", "before wrong targetUnitDigest", "after wrong targetOwner", "after wrong targetAnchor", "after wrong targetUnitDigest", "before digest prefix", "after digest prefix", "unrecorded new live digest"]
+      },
+      "nativeDependentChecksNotRun": ["step10-round5 checks.mjs", "step10-sync4d checks.mjs"],
+      "notRunReason": "checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment."
+    },
+    {
+      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py", "--check"],
+      "exit": 0,
+      "stdoutSha256": "9de515d28aed5879e94045524394ed36485098ee9afb1141ed04b7197e01af84",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {"status": "pass", "mode": "check", "parityRows": 346, "liveHeadingRows": 91, "refreshedParityRows": 35, "targetOnlyParityRows": 62, "refreshedCandidateBindings": 25}
+    },
+    {
+      "argv": ["node", "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"],
+      "exit": 0,
+      "stdoutSha256": "c8106e77dd2b88201c7ce74970dc0489c933a8cb1470836ff9582bd988449486",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {"status": "pass", "currentSourceUnits": 346, "historicalHeadingWitnesses": 91, "liveHeadingRows": 91, "liveSectionBlocks": 321, "currentLedgerSuccessors": {"status": "pass", "origins": 1208, "currentBindings": 1208}},
+      "existingFinalPinDuties": ["bin/fgos.mjs", "docs/backlog.md"],
+      "qualification": "No patch recomposition, review approval or authority/cutover acceptance certified."
+    },
+    {
+      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py", "--check"],
+      "exit": 0,
+      "stdoutSha256": "781d13299620a58dcd67832f0c33987057a84295cdaf162c5b1d503294a131b6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "drift": 0,
+      "authenticatedSupersededOrigins": 1
+    }
+  ],
+  "protectedTrackedFiles": 4753,
+  "protectedInputFingerprintsSha256": "c1e24e67e0de9ea20ca12d513763734e411e82a682b31b0e7e24644de87fcf1a",
+  "protectedInputScope": "Tracked existing files under docs/, the plan ledger/, carries/, rebind/ and misc-fix/.",
+  "protectedInputsUnchanged": true,
+  "scratchBefore": [],
+  "scratchAfter": []
+}

@@ -1,6 +1,41 @@
 # G0 content rework receipt
 
-**Current live-parity rework: scoped proofs pass; verification remains partial only for the two native-dependent `checks.mjs` recipes. No full-audit or cutover acceptance.**
+## Current verifier accounting and heading deduplication
+
+Input HEAD: `39528fa211f9a7e558b1e95467eeae1f66b68a3d`. **All four required scoped proofs exit 0; the full audit remains partial, `ok: false`.** Evidence: [accounting-proof.json](accounting-proof.json).
+
+### Changes and reused proof owners
+
+- `verify.py` replays the existing frozen ownership recipes and the original 127-row authoring assertions at `5a3f7580a012da011fc09ce88cff89bbea2b9008`, the commit that wrote `receipt.json`. Updating this script or this Markdown receipt does not move that pin. Immutable inputs use the existing misc-fix `source` / `preimages` helpers and a scratch-only Node read adapter; no checkout or historical file is rewritten.
+- Live checking remains separate: the shared `rebind/rebind.py --check` runs unchanged, and all 127 overlay targets still verify their live binding hashes, pending review status, source identity, complete target digests and ancestry. A drifted target is accepted only by an exact recorded old/new path, anchor and full-digest transition from `g0-direct-rebindings.json` or the full witnesses in `g0-rework-rebindings.json`. Rationale-only records cannot waive drift. The original legacy rewrite conservation still checks live legacy bytes.
+- Each frozen live ownership census emits 17 raw diagnostics. Sixteen are identical-unit groups already authenticated by the existing `rebind.matches` group contract, not actual drift. The remaining target is `docs/platform/work-state/spec.md#11-business-rules`: `6780225c…` → `0c7dbff4…`, recorded at `g0-direct-rebindings.json#/rebindings/13`. The same edge accounts for overlay `/bindingRefresh/117`. Raw diagnostics and exact rebind provenance remain in verifier output; none is silently discarded.
+- `refresh-carries.py` deduplicates resolved heading targets by `(path, anchor)`, preserving the first occurrence and order. It refuses conflicting duplicate payloads. Row 55 now emits one live Release Tree Canonicalization target; its complete historical two-target row stays in `accounting.previousParityRow`. No generated carries data was hand-edited or regenerated onto disk.
+- `test-accounting.py` owns the new acceptance predicate's proof. It exercises both real record formats and rejects missing records, wrong old/new paths, anchors or digests, truncated digests, and an unrecorded new live digest. The verifier runs these controls through the same production predicate, not a second implementation.
+
+Prior art: `a8ea05c50` introduced the unqualified live `targetDigestDrift == []` assertion; `5a3f7580a` introduced live heading refresh and exposed the duplicate after both historical locators resolved to one target. `594fe4194` intentionally restored three candidate docs and recorded their rebinds; it did not authorize rewriting historical proof inputs. This change reuses those records, the shared matcher/dual extractors and frozen recipes; the missing pieces were pin separation, exact live transition accounting and stable post-resolution deduplication.
+
+### Required commands and exits
+
+Run from the repository root with `NODE_OPTIONS=--no-addons`; `R=plans/260925-documentation-authority-unification/reports/phase-09`. Every Python command uses `python3 -B`. The verifier also installs a throwing `process.dlopen` guard for its command tree.
+
+| Command | Exit / result |
+| --- | --- |
+| `python3 -B "$R/g0rework/verify.py"` | **0**; `recordProofsPassed: true`, `status: partial`, `ok: false`, `fullAuditPassed: false`; 127 authoring and 127 live targets/ancestries verified |
+| `python3 -B "$R/g0rework/refresh-carries.py" --check` | **0**; all four generated outputs byte-identical to committed files; 346 parity rows, 91 heading rows |
+| `node "$R/carries/verify-carries.mjs"` | **0**; 346 current rows, 91 live headings, 321 live section blocks, 1,208 current bindings; existing two final-pin patch duties remain disclosed |
+| `python3 -B "$R/rebind/rebind.py" --check` | **0**; unresolved drift 0, one authenticated superseded origin |
+| `python3 -B "$R/g0rework/test-accounting.py"` | **0**, also nested in verifier; both record formats accepted, ten negative controls correctly refused |
+| `git diff --check` | **0** |
+
+All 13 nested verifier commands exit 0. Both native-dependent `checks.mjs` recipes remain **not run**, so no full-audit success is claimed. No extra pair accounting, authority promotion, content approval, final-pin acceptance, fgOS CLI, Git write, forbidden audit driver or product/full-suite test ran. The previous receipts below remain historical, not new claims.
+
+Safety: 4,753 tracked protected inputs under `docs/`, the plan ledger, carries, rebind and misc-fix were fingerprinted before/after and stayed unchanged. Scratch was confined to exit-cleaned `tempfile` directories under `/tmp/fgos-work/`; snapshots were `[]` before and after. Only this `g0rework/**` slice changed. `impact-analysis: degraded` (no MCP tool available; fgOS CLI forbidden). Markdown preview was not started because this scoped records task forbids extra state/service writes.
+
+Diagnostics, not final proofs: before edits, both requested checks exited 1 at the reported drift/heading assertions. During implementation, verifier attempts exited 1 on an overbroad extraction of an archived non-direct target, a scratch output-directory/library mismatch, and a local name shadowing the pinned source helper; these plumbing errors were corrected before the final four-command replay. An initial diagnostic harness also exited 1 because `/tmp/fgos-work` did not yet exist; it created no temporary directory.
+
+## Previous live-parity rework (historical)
+
+**Previous live-parity rework: scoped proofs pass; verification remains partial only for the two native-dependent `checks.mjs` recipes. No full-audit or cutover acceptance.**
 
 ## Live heading, section-block and pointer-patch parity
 
