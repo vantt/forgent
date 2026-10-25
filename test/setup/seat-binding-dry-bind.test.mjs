@@ -9,6 +9,7 @@ import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { checkSeatBindingDryBind } from '../../src/setup/seat-binding-checks.mjs';
 import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { simulateUnitBindings } from '../../src/runner/execution/dry-bind.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 
 // Native-agent executors carry no spawned process, so bind() accepts them for any posture without
 // consulting the machine's confinement backend registry: the run depends only on the fixture.
@@ -243,7 +244,10 @@ test('a packaged workflow directory is read like a flat file', async () => {
   }
 });
 
+// The committed config's confined invocations bind only where the machine registry names bwrap; a machine that
+// never ran setup must behave like one that did.
 test('the committed forgentX config binds every seat of every shipped workflow', async () => {
+  seedFileLocalBwrapRegistry();
   const root = path.resolve(import.meta.dirname, '../..');
   const result = await checkSeatBindingDryBind(root, { packageRoot: root, loadRunnerConfig: loadRunnerConfigForDir });
   assert.equal(result.passed, true, result.message);
