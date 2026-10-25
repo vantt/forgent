@@ -1,4 +1,32 @@
-# Census join catch-up receipt
+# Census join locator correction receipt
+
+## Current correction
+
+Pin: `608a4ada5f195b0d0b9d3568a71b8dde4954aacb` (HEAD at this turn's start). Authority: L13-20.3 and `../w23-register-corrections-brief.md`. `join.py` no longer falls back to an arbitrary first evidence span when re-pinned: it uses an explicit, evidence-validated `correctedLocator`, otherwise the newest same-file witness by Git ancestry (author's primary-span order only within one witness pin). No same-file witness, incomparable witnesses, invalid correction or source-digest drift fails loudly. The returned pin remains the actual evidence pin, never falsely relabelled as current.
+
+The three recorded W21 corrections are restored: **pc-d-1101 :30**, **pc-d-0924 :3868**, **pc-d-0449 :184**, all at `5820ca678`. Generic newest-witness selection also refreshes 22 other historical locators to their already-recorded later evidence; all old evidence spans are retained. This changes locator metadata, not dispositions or proof ownership. The three source-bound corrections are explicit in `settlement-decisions.json`, whose sourceCommit is re-pinned; no ledger, review or product file changes.
+
+Replay remains **1,126 ids = 779 proof joins + 289 unchanged grade REJECTs + 54 settlement REJECTs + 4 citations**, zero residue. Both join runs are byte-identical in stdout/stderr and all five generated packets (`join.json`, `residue.json`, `settlement.json`, `citation-bindings.json`, `pointer-patches.json`). The four unapplied comment retargets now have an explicit G2 F-chain duty in the generated gate register; their hashes are not claimed as applied. No final-pin delta rescan or F proof is claimed.
+
+Current commands/exits (`P=plans/260925-documentation-authority-unification/reports/phase-09`):
+
+| Command | Exit | Evidence |
+|---|---:|---|
+| `python3 -B P/census-join/citations.py --pin 608a4ada5f195b0d0b9d3568a71b8dde4954aacb` | 0 | `locator-proof.json`; 4 citations, 5 bindings, 8 zero-fuzz forward/rollback patch replays |
+| `python3 -B P/census-join/join.py --pin 608a4ada5f195b0d0b9d3568a71b8dde4954aacb`, twice | 0 / 0 | `locator-proof.json`, identical output hashes |
+| `python3 -B P/census-join/test_locators.py` | 0 | `../g0join/tests.json`; 3 owning record-only tests |
+| `python3 -B P/g0join/test_join.py` | 0 | `../g0join/tests.json`; 10 owning record-only tests |
+| `python3 -B P/g0join/join.py --pin 608a4ada5f195b0d0b9d3568a71b8dde4954aacb`, twice | 1 / 1 | Expected honest verdict gaps, not a census failure; `../g0join/receipt.md` |
+| `python3 -B P/gate-reconcile/reconcile.py`, twice | 0 / 0 | `../gate-reconcile/corrections-proof.json` |
+| `python3 -B P/gate-reconcile/verify.py` | 0 | Record integrity only; volatile checkedAtHead restored |
+| `python3 -B P/gate-reconcile/controls.py` | 0 | 14 rejecting controls, all original controls retained |
+| `git diff --check` | 0 | Whitespace proof |
+
+Final replay and metadata/disposition assertions are in `../gate-reconcile/corrections-proof.json`. The initial generator attempt exited 1 on a stale G5 external-list consumer after ownerItems separation; that consumer was migrated and the duty preserved (`../gate-reconcile/corrections-attempts.json`). Impact-analysis remains degraded/unqueried under the no-fgOS-CLI/no-MCP boundary. All Node children inherit `--no-addons`; Python uses `-B`; citation scratch is tempfile-only under `/tmp/fgos-work/` and removed. No product tests/suite, native addons, Git writes, pair accounting, lifecycle calls, preview service or out-of-scope writes. `needsWrites: []`.
+
+## Historical catch-up
+
+The following receipt remains historical at cf13e2bd; its old pin references and claims are not this turn's replay.
 
 Pin: `cf13e2bd22ce390344837560b35b41adf7da1238` (HEAD at catch-up start). Authority: `w21-register-catchup-brief.md`, L12-137 / L13-17–19. W20 reviews the settlement and citations; W21 A independently approves the caller/description rework. **G2 is met-local with zero open original-census judgments** after the L13-19.1 REJECT ruling below, not final-met. No product test ran. The detailed caller audit below remains historical at `5820ca6780ff6eec28afe09a128ac95fcd11d06c`; source bytes for its files are unchanged at the current pin.
 

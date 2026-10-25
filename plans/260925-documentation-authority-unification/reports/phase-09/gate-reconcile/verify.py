@@ -86,8 +86,37 @@ def check():
     for path, entry in catchup_inputs.items():
         require(hashlib.sha256(git('show', f'{catchup_pin}:{path}')).hexdigest() == entry['sha256'],
                 'catch-up fingerprint drift: ' + path)
+    corrections = receipt['corrections']
+    correction_pin = corrections['sourceCommit']
+    require(register['asOf']['correctionCommit'] == correction_pin, 'correction pin mismatch')
+    require(subprocess.run(['git', 'merge-base', '--is-ancestor', correction_pin, head], cwd=ROOT,
+                           capture_output=True).returncode == 0, 'correction pin not ancestor of HEAD')
+    correction_inputs = {entry['path']: entry for entry in corrections['inputs']}
+    required_corrections = {str(BASE / rel) for rel in [
+        'owner-answers.md', 'w23-register-corrections-brief.md',
+        'reviews/w22-register-met-local-review.md', 'reviews/w22-register-met-local-review.json',
+        'preserve-premise/proof.json', 'g9/phase9-decisions.json',
+        *[f'preserve-premise/park-judgments/shard-{i}.json' for i in range(1, 4)],
+        'composition/w9-unresolved-bindings.json', 'composition/w8-citation-glosses.json', 'review-batches.json',
+    ]}
+    require(set(correction_inputs) == required_corrections and len(correction_inputs) == len(corrections['inputs']),
+            'correction input coverage')
+    for path, entry in correction_inputs.items():
+        require(hashlib.sha256(git('show', f'{correction_pin}:{path}')).hexdigest() == entry['sha256'],
+                'correction fingerprint drift: ' + path)
+    generated_inputs = {entry['path']: entry for entry in corrections['generatedEvidence']}
+    required_generated = {str(BASE / rel) for rel in [
+        'g0join/join.py', 'g0join/join-608a4ada5.json', 'g0join/receipt.md',
+        'census-join/locator-proof.json', 'census-join/pointer-patches.json', 'archive/design.md',
+    ]}
+    require(set(generated_inputs) == required_generated and len(generated_inputs) == len(corrections['generatedEvidence']),
+            'generated evidence coverage')
+    for path, entry in generated_inputs.items():
+        require(hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == entry['sha256'],
+                'generated evidence fingerprint drift: ' + path)
     evidence_pins = {path: review_pin for path in review_inputs}
     evidence_pins.update({path: catchup_pin for path in catchup_inputs})
+    evidence_pins.update({path: correction_pin for path in correction_inputs})
     original = json.loads(git('show', f'{pin}:{BASE}/preflip-gate-status.json'))
     expected = {}
     for index, gate in enumerate(original['gates']):
@@ -181,6 +210,38 @@ def check():
     require(len(receipt['countsPerGate']) == 12, 'missing gate count')
     require(register['cutoverReadiness']['beforeFinalPin'] == [
         f"{gate['g']}: {item}" for gate in register['gates'] for item in gate['blockers']], 'before-F projection drift')
+    readiness = register['cutoverReadiness']
+    require(readiness['order'] == [
+        'Complete and independently review local work to met-local',
+        'Send owner cutover packet at met-local (L13-6)',
+        'Owner cutover approval within the stated scope and budget',
+        'Acquire documentation write lease; freeze starts',
+        'Final main import with accounting; record F',
+        'Execute F duties and delta reviews; stop if any fails',
+        'Write and independently review the final status ledger',
+        'Land within the separately approved frame'], 'cutover order drift')
+    for field in ['atFinalPinUnderLease', 'external', 'ownerItems']:
+        for gate in register['gates']:
+            require(all(f"{gate['g']}: {item}" in readiness[field] for item in gate[field]),
+                    field + ' gate projection drift')
+    window = readiness['fWindowSize']
+    premise = json.loads(git('show', f'{correction_pin}:{BASE}/preserve-premise/proof.json'))
+    residual = json.loads(git('show', f'{correction_pin}:{BASE}/composition/w9-unresolved-bindings.json'))['assertions']
+    glosses = json.loads(git('show', f'{correction_pin}:{BASE}/composition/w8-citation-glosses.json'))['witnesses']
+    shards = [json.loads(git('show', f'{correction_pin}:{BASE}/preserve-premise/park-judgments/shard-{i}.json')) for i in range(1, 4)]
+    judgments = [r for shard in shards for r in shard['rows']]
+    require(window['sourcePin'] == correction_pin and
+            window['g6UnboundRows']['count'] == sum(r['result'] == 'park-current-passage-unbound' for r in premise['rows']) and
+            window['g6BeforeF']['authoredJudgments'] == window['g6BeforeF']['reviewPending'] == len(judgments) and
+            window['g6BeforeF']['ownedPlacementDecisions'] == sum(r['disposition'] == 'owned-park' for r in judgments) and
+            window['g6BeforeF']['insideFWindow'] is False and
+            window['postApplyBindings']['distinct'] == len({(r['effectiveRecord'], r['effectivePointer']) for r in residual}) and
+            window['postApplyBindings']['assertions'] == len(residual) and
+            window['glosses']['mainOwnedSites'] == sum(len(r['ids']) for r in glosses if r['ownership'] == 'main-at-F'),
+            'F-window source counts drift')
+    require(register['gates'][6]['status'] == 'partial' and register['gates'][6]['blockers'],
+            'G6 cannot be met-local with exhaustive reviews pending')
+    require(set(window['deltaReviewsPerGate']) == {'G0', 'G2', 'G6', 'G7', 'G9'}, 'F-window delta review gate coverage')
     for field in ['beforeFinalPin', 'atFinalPinUnderLease', 'external']:
         require(receipt['readinessCounts'][field] == {'before': len(original['cutoverReadiness'][field]),
                                                       'after': len(register['cutoverReadiness'][field])}, 'readiness counts drift')
@@ -214,13 +275,15 @@ def check():
     require(log['lines'] == len(expected_log.splitlines()), 'plan-branch log count differs')
     for entry in paths:
         if not entry.startswith('gate-reconcile/'):
-            require(str(BASE / entry) in inputs or str(BASE / entry) in evidence_pins, 'cited evidence not fingerprinted: ' + entry)
+            require(str(BASE / entry) in inputs or str(BASE / entry) in evidence_pins or str(BASE / entry) in generated_inputs, 'cited evidence not fingerprinted: ' + entry)
     return {'status': 'passed', 'exit': 0, 'asOf': pin, 'checkedAtHead': head,
             'originalOccurrences': len(decisions), 'gates': len(register['gates']),
             'reviewFiles': len(review_paths), 'snapshotInputs': len(inputs),
             'followUpPin': followup_pin, 'followUpInputs': len(followup['inputs']),
             'reviewFollowUpPin': review_pin, 'reviewFollowUpInputs': len(review_inputs),
             'catchUpPin': catchup_pin, 'catchUpInputs': len(catchup_inputs),
+            'correctionPin': correction_pin, 'correctionInputs': len(correction_inputs),
+            'generatedEvidence': len(generated_inputs),
             'evidenceAndReviewPaths': len(paths), 'clearedEntries': cleared_count,
             'exactVerdictQuotes': quotes, 'clearedByCommits': sorted(commits),
             'checks': ['original occurrence coverage and text', 'path existence',
@@ -228,7 +291,9 @@ def check():
                        'before/after counts', 'met-local has no local before-F blockers',
                        'immutable input fingerprints and all-review coverage',
                        'separate immutable follow-up input fingerprints', 'separate committed W19 review fingerprints and quotes',
-                       'separate W20/W21/ruling fingerprints, quotes and ancestry'],
+                       'separate W20/W21/ruling fingerprints, quotes and ancestry',
+                       'W22/L13-20 correction fingerprints and explicit generated evidence',
+                       'packet-before-lease order, owner/external/F projections and source-derived F-window counts'],
             'limits': 'Record integrity only. No independent semantic approval, F gate execution or full product-suite claim.'}
 
 
