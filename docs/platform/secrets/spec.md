@@ -117,7 +117,7 @@ Rules, checked by `test/architecture.test.mjs` against `docs/architecture-manife
 
 ### 4.1 Layering relative to config loading
 
-Credentials and config loading are two components. `secrets` is lower. Config loading will depend on it to resolve `${VAR}` references and must not carry a copy of the resolver. Today the loaders are scattered (global and project merge in `src/config/global-config.mjs`, per-area readers elsewhere). Consolidating them is a separate item. This spec records only the direction: one config loader above one secrets component, neither knowing the other's internals beyond the expansion function.
+Credentials and config loading are two components. `secrets` is lower. Config loading will depend on it to resolve `${VAR}` references and must not carry a copy of the resolver. The loaders are consolidated in the Config component (`docs/platform/config/spec.md`; Node through `src/config/facade.mjs`). This spec records only the direction: one config loader above one secrets component, neither knowing the other's internals beyond the expansion function.
 
 ## 5. Core model
 
@@ -143,7 +143,7 @@ For a reference `${NAME}` a caller resolves for a named consumer, in order:
 2. the project secrets file, `.fgos/secrets.local.env` of the active project;
 3. the global secrets file under the user's fgOS directory.
 
-First hit wins. This matches "project always overwrites global" in `docs/distribution-vision.md` and `src/config/global-config.mjs`. The order is a decision to confirm (section 15 question 7) because step 1 lets an inherited variable override a file; that is wanted for cron and CI, and is why the interactive shell export of section 7.1 is removed.
+First hit wins. This matches "project always overwrites global" in `docs/distribution-vision.md` and the Config component's precedence (`docs/platform/config/spec.md` section 3). The order is a decision to confirm (section 15 question 7) because step 1 lets an inherited variable override a file; that is wanted for cron and CI, and is why the interactive shell export of section 7.1 is removed.
 
 ### 5.3 Expansion
 

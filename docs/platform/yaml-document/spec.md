@@ -5,12 +5,12 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for reading, editing and merging YAML text while keeping every byte a caller did not change, comments included
 Design status: Signed by the owner on 2026-10-22 as a whole; amendments go through "Lịch sử quyết định"
-Implementation status: Rust crate done (parse, both profiles, limits, edits, comments, merge, fuzzed; parser `saphyr-parser` 0.2.2 vendored, record in packages/yaml-doc/upgrade-record.md); Rust consumers moved off serde_yaml; Node door (section 10) done 2026-10-23 (addon `yaml` namespace, `src/util/yaml.mjs` over it, js-yaml deleted, RUL108 supersedes RUL101)
+Implementation status: Rust crate done (parse, both profiles, limits, edits, comments, merge, fuzzed; parser `saphyr-parser` 0.2.2 vendored, record in packages/yaml-doc/upgrade-record.md); Rust consumers moved off serde_yaml; Node door (section 10) done 2026-10-23 (addon `yaml` namespace, `src/util/yaml.mjs` over it, js-yaml deleted, RUL108 supersedes RUL101); its one config consumer, the Config component, reaches it from Rust, and Node reads config only through `src/config/facade.mjs` (docs/platform/config/spec.md section 12)
 Canonical: Yes
 Owner: YAML Document component (proposed)
 Source: packages/yaml-doc/rust (crate fgos-yaml-doc)
 Contracts: packages/yaml-doc/contracts/
-Last reviewed: 2026-10-22
+Last reviewed: 2026-10-25
 Related:
 - docs/platform/config/spec.md (the one component above this one that applies a schema)
 - docs/platform/component-boundary.md
