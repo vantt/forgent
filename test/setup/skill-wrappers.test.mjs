@@ -183,7 +183,10 @@ test('materializeSkillsIntoProject keeps a project skill file that is newer than
   git('commit', '-q', '-m', 'project skills');
   put('.agents/skills/edited/SKILL.md', skillMd('0.1', 'edited after commit'));
 
-  const { skipped } = materializeSkillsIntoProject(packageRoot, targetRoot);
+  // Reached through a symlinked directory, as a symlinked home or macOS /tmp does.
+  const linkedRoot = path.join(mkTempDir('skill-wrappers-keep-link-'), 'project');
+  fs.symlinkSync(targetRoot, linkedRoot, 'dir');
+  const { skipped } = materializeSkillsIntoProject(packageRoot, linkedRoot);
 
   const read = (rel) => fs.readFileSync(path.join(targetRoot, rel), 'utf8');
   assert.equal(read('.claude/skills/held/SKILL.md'), skillMd('0.2', 'project held'));

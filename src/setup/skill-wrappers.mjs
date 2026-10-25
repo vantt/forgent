@@ -273,7 +273,8 @@ export function createProjectSkillGuard(projectRoot) {
         }
       }
     } catch {
-      // Git unavailable: only the version rule protects a file.
+      // Any Git refusal or absence (not installed, untrusted-worktree, ...)
+      // falls back to the version rule alone.
     }
     return dirty;
   };
@@ -292,7 +293,8 @@ export function createProjectSkillGuard(projectRoot) {
           versionAhead.set(name, Boolean(targetMd && sourceMd
             && isNewerVersion(skillVersion(targetMd.toString('utf8')), skillVersion(sourceMd.toString('utf8')))));
         }
-        if (!versionAhead.get(name) && !dirtyPaths().has(targetPath)) return false;
+        // worktreeRoot is canonical; the project may be reached through a symlink.
+        if (!versionAhead.get(name) && !dirtyPaths().has(fs.realpathSync(targetPath))) return false;
         skipped.push(path.relative(projectRoot, targetPath).split(path.sep).join('/'));
         return true;
       };
