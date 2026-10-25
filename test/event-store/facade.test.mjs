@@ -193,10 +193,11 @@ test('write admission is asked of Git outside the gate and never by a read; a ga
 test('a write refused by a transient Git failure is admitted once the failure clears', { skip: process.platform !== 'linux' }, t => {
   const { store, repo } = fixture(t);
   const refs = path.join(repo, '.git/refs');
+  const original = fs.statSync(refs).mode & 0o7777;
   fs.chmodSync(refs, 0o000);
   try {
     assert.throws(() => store.append('project', [event], {}, 'fixture', []), 'unreadable refs refuse the first write');
-  } finally { fs.chmodSync(refs, 0o755); }
+  } finally { fs.chmodSync(refs, original); }
   assert.equal(store.append('project', [event], {}, 'fixture', []).events.length, 1, 'the refusal outlived the failure that caused it');
 });
 

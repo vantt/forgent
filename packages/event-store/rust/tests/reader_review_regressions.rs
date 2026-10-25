@@ -35,14 +35,20 @@ fn read_project(
 ) -> fgos_event_store::read::ReadResult {
     try_read(f, cursor, folded).unwrap()
 }
-fn plant_ref(f: &Fixture, name: &str, oid: &Oid) {
-    assert!(std::process::Command::new("git")
-        .arg("-C")
-        .arg(f.root.join("repo"))
-        .args(["update-ref", name, oid.as_str()])
-        .status()
-        .unwrap()
-        .success());
+/// Mirror `oid` as a foreign ref of the machine `suffix` by writing the loose
+/// ref file. The publication door cannot plant this: its fetch only maps
+/// `refs/fgos/events/*`, and the remote is this repository, so the source ref
+/// would stay behind as a bad ref of this machine (and the door refuses an
+/// invalid machine name or deleting an events ref). A file write adds no Git
+/// spawn.
+fn plant_foreign_mirror(f: &Fixture, suffix: &str, oid: &Oid) {
+    let path = f
+        .layout
+        .common_dir
+        .join("refs/fgos/remotes/origin/events")
+        .join(suffix);
+    fs::create_dir_all(path.parent().unwrap()).unwrap();
+    fs::write(path, format!("{}\n", oid.as_str())).unwrap();
 }
 #[test]
 fn identical_overlap_recovers_receipt_without_requiring_segment_deletion() {
@@ -736,60 +742,50 @@ fn read_without_a_store_root_is_empty_history() {
 }
 
 /// One foreign mirror that fails its own checks must not take every read down
-/// with it (sync already skips such a mirror with a warning), while the same
-/// content under this machine's own ref stays fatal. Existing tests only
-/// cover a bad own ref (`spliced_ancestor_machine_and_scope_are_refused`).
-fn bad_foreign_mirror_is_skipped_but_the_same_own_ref_is_fatal(
+/// with it (sync already skips such a mirror with a warning). Existing tests
+/// only cover a bad ref of the reader's own machine
+/// (`spliced_ancestor_machine_and_scope_are_refused` owns that it stays fatal).
+fn bad_foreign_mirror_is_skipped(
     bad_name: &str,
     bad_commit: impl Fn(&PublicationPort<'_>, &Fixture) -> Oid,
 ) {
-    {
-        let f = Fixture::new();
-        let mut h = f.handle();
-        let p = f.port(&mut h, "refs/fgos/events/test-aa");
-        let good = seal(&p, &f.repo, vec![], &[event('b', 1, 1)], "test-bb");
-        let bad = bad_commit(&p, &f);
-        plant_ref(&f, "refs/fgos/remotes/origin/events/test-bb", &good);
-        plant_ref(
-            &f,
-            &format!("refs/fgos/remotes/origin/events/{bad_name}"),
-            &bad,
-        );
-        let result = try_read(&f, &Cursor::default(), &[]).unwrap_or_else(|error| {
-            panic!("one bad foreign mirror ({bad_name}) failed the whole read: {error}")
-        });
-        assert_eq!(
-            result.sequence.len(),
-            1,
-            "the other machine's events are still read"
-        );
-    }
     let f = Fixture::new();
     let mut h = f.handle();
-    let p = f.port(&mut h, "refs/fgos/events/test-aa");
-    let bad = bad_commit(&p, &f);
-    plant_ref(&f, &format!("refs/fgos/events/{bad_name}"), &bad);
-    assert!(
-        try_read(&f, &Cursor::default(), &[]).is_err(),
-        "the machine's own ref stays fail-closed"
+    let (good, bad) = {
+        let p = f.port(&mut h, "refs/fgos/events/test-aa");
+        (
+            seal(&p, &f.repo, vec![], &[event('b', 1, 1)], "test-bb"),
+            bad_commit(&p, &f),
+        )
+    };
+    drop(h);
+    plant_foreign_mirror(&f, "test-bb", &good);
+    plant_foreign_mirror(&f, bad_name, &bad);
+    let result = try_read(&f, &Cursor::default(), &[]).unwrap_or_else(|error| {
+        panic!("one bad foreign mirror ({bad_name}) failed the whole read: {error}")
+    });
+    assert_eq!(
+        result.sequence.len(),
+        1,
+        "the other machine's events are still read"
     );
 }
 #[test]
 fn foreign_mirror_with_an_invalid_machine_name_is_skipped_not_fatal() {
-    bad_foreign_mirror_is_skipped_but_the_same_own_ref_is_fatal("EVIL", |p, f| {
+    bad_foreign_mirror_is_skipped("EVIL", |p, f| {
         seal(p, &f.repo, vec![], &[event('c', 1, 1)], "test-cc")
     });
 }
 #[test]
 fn foreign_mirror_whose_header_names_another_machine_is_skipped_not_fatal() {
-    bad_foreign_mirror_is_skipped_but_the_same_own_ref_is_fatal("test-cc", |p, f| {
+    bad_foreign_mirror_is_skipped("test-cc", |p, f| {
         seal(p, &f.repo, vec![], &[event('c', 1, 1)], "test-dd")
     });
 }
 /// 32 MiB is the per-blob cap of the reader; one byte over trips it.
 #[test]
 fn foreign_mirror_with_an_oversized_segment_is_skipped_not_fatal() {
-    bad_foreign_mirror_is_skipped_but_the_same_own_ref_is_fatal("test-cc", |p, f| {
+    bad_foreign_mirror_is_skipped("test-cc", |p, f| {
         let big = vec![b'x'; 32 * 1024 * 1024 + 1];
         let header = fgos_event_store::envelope::Seal::Seal {
             v: 1,
