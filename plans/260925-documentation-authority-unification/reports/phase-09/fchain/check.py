@@ -236,7 +236,10 @@ def compose(pin, manifest=None, additions=None):
                 owner_files[row['id']].add(pointer(load(PHASE / 'g9/f-composition-additions.json'), ref['pointer'])['path'])
     for source in manifest['sources']:
         if source['reader'] == 'link-retargets':
-            for row in load(ROOT / source['path'])['rows']:
+            rows = load(ROOT / source['path'])['rows']
+            if len({row['id'] for row in rows}) != len(rows):
+                raise ValueError('link retarget row ids are not unique')
+            for row in rows:
                 if row['ruling'] not in {'L13-26', 'L13-28'}:
                     raise ValueError('link retarget lacks owning ruling')
                 owner_files.setdefault(row['id'], set()).add(shard.safe_path(row['file']))

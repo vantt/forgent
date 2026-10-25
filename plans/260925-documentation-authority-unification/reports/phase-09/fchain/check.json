@@ -1,6 +1,6 @@
 {
   "contract": "fchain-check.v1",
-  "sourceCommit": "8c79219f4a696a1de1310e75ec24d59f80be8eef",
+  "sourceCommit": "b467e09fe7d60c6aeac3ad6af33a4730060558e3",
   "exit": 0,
   "counts": {},
   "findings": [],
@@ -58,7 +58,7 @@
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/link-retargets.json",
       "reader": "link-retargets",
-      "sha256": "a177f08e4a94d4a5259f6b9890b92d9df49c22b99acb08f33f4e853700630eaa"
+      "sha256": "2b1519d4c0bdcead6513765dced15f6b97b2c3821548f7d93c16b139ded70656"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
