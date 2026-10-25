@@ -37,6 +37,8 @@ function hostScan(t, scan) {
 
 test('migrate --check runs real quiesce/setup/parity without publishing a ref or changing HEAD', async t => {
   const f = fixture(t, { machine: false }); trackedLegacy(f);
+  fs.mkdirSync(path.join(f.repo, '.fgos/events'), { recursive: true });
+  fs.writeFileSync(path.join(f.repo, '.fgos/events/stray-empty.jsonl'), '');
   const head = f.git('rev-parse', 'HEAD');
   const scan = checkStopped({ workspaces: [f.repo], hostBin: scopedHost });
   if (scan.status !== 'clean' && typeof gitPorts.createGitScopedCommit === 'function') { hostScan(t, scan); return; }
@@ -51,6 +53,8 @@ test('migrate --check runs real quiesce/setup/parity without publishing a ref or
   assert.equal(f.git('for-each-ref', 'refs/fgos/legacy'), ''); assert.equal(f.git('rev-parse', 'HEAD'), head);
   assert.ok(result.plan.deletions.includes('docs/distillery/state/porting/state.json'));
   assert.ok(result.plan.deletions.includes('.fgos/events.jsonl.backup-two'));
+  assert.deepEqual(result.plan.emptyLegacy, ['.fgos/events/stray-empty.jsonl']);
+  assert.equal(fs.existsSync(path.join(f.repo, '.fgos/events/stray-empty.jsonl')), true, '--check removes nothing');
 });
 
 test('real Git 05 hook migration and second-run no-op', { skip: typeof gitPorts.createGitScopedCommit !== 'function' ? 'Requires Git 05 merge and activated release; no substitute Git writer' : false }, async t => {
@@ -66,8 +70,11 @@ test('real Git 05 hook migration and second-run no-op', { skip: typeof gitPorts.
     if (oldState === undefined) delete process.env.FGOS_STATE_ROOT; else process.env.FGOS_STATE_ROOT = oldState;
   });
   f.git('config', 'core.hooksPath', path.join(root, '.githooks'));
+  fs.mkdirSync(path.join(f.repo, '.fgos/events'), { recursive: true });
+  fs.writeFileSync(path.join(f.repo, '.fgos/events/stray-empty.jsonl'), '');
   const result = await migrateUseCase({ ...f.ctx, hostBin: scopedHost, writer: 'fixture' });
   assert.equal(result.commit.status, 'committed');
+  assert.deepEqual(result.plan.emptyLegacy, ['.fgos/events/stray-empty.jsonl']);
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(f.repo, '.fgos/events'))), result.pin);
   for (const p of result.plan.deletions) assert.equal(fs.existsSync(path.join(f.repo, p)), false, p);
   assert.equal(fs.readFileSync(path.join(f.repo, '.gitattributes'), 'utf8'), '*.txt text\nother-events/*.jsonl merge=union\n');
@@ -82,10 +89,10 @@ test('real hook rejection restores baseline-only inputs and rerun uses a fresh W
   f.git('add', '.gitattributes'); f.git('commit', '-qm', 'only event attributes');
   const head = f.git('rev-parse', 'HEAD');
   const hooks = path.join(f.temp, 'reject-hooks'); fs.mkdirSync(hooks);
-  fs.writeFileSync(path.join(hooks, 'pre-commit'), '#!/bin/sh\nexit 1\n', { mode: 0o755 });
+  fs.writeFileSync(path.join(hooks, 'pre-commit'), '#!/bin/sh\necho "fixture hook refuses the cutover" >&2\nexit 1\n', { mode: 0o755 });
   f.git('config', 'core.hooksPath', hooks);
   let rejected;
-  await assert.rejects(migrateUseCase({ ...f.ctx, hostBin: scopedHost, writer: 'fixture' }), error => { rejected = error; return error.code === 'commit-rejected'; });
+  await assert.rejects(migrateUseCase({ ...f.ctx, hostBin: scopedHost, writer: 'fixture' }), error => { rejected = error; return error.code === 'commit-rejected' && error.message.includes('fixture hook refuses the cutover'); });
   assert.equal(f.git('rev-parse', 'HEAD'), head);
   for (const [p, bytes] of Object.entries(files).filter(([p]) => p !== '.gitattributes')) assert.equal(fs.readFileSync(path.join(f.repo, p), 'utf8'), bytes);
   assert.equal(f.git('diff', '--cached', '--name-only'), '');

@@ -22,6 +22,7 @@
     "event-store-integrity",
     "event-store-store-moved",
     "event-store-migration-required",
+    "event-store-migration-fence-ignored",
     "event-store-refspec-missing",
     "event-store-ref-tampered",
     "event-store-mirror-rewound",

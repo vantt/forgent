@@ -80,7 +80,7 @@ Rust chỉ sở hữu policy tĩnh của ghế; Execution Core Node giữ placem
 | flagship | phán đoán, thiết kế, phê bình | kết quả là một ý kiến hay một thiết kế? | review, red-team, thiết kế giải pháp, synthesis của panel |
 | frontier | quyết định đắt nhất | khó đảo, đắt nếu sai? | khoá kiến trúc, synthesis cuối của hội đồng quan trọng |
 
-Bảng là một file hợp đồng chung `packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json` (tên tier, độ mạnh, định nghĩa); crate nhúng nó lúc build (`tier.rs`), loader config Node đọc cùng file đó cho `MODEL_POLICY_TIERS`, nên hai bên không thể lệch. `fgos setup` ghi nó thành khoá `"$comment"` cạnh `modelPolicies`, `tierFallback`, `maxTier`; loader bỏ qua `$comment` ở mọi cấp; doctor báo `$comment` khác nguồn; `explain` in định nghĩa tier của ghế. `$comment` bị gỡ trước khi validate và trước hash config ngữ nghĩa.
+Bảng là một file hợp đồng chung `packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json` (tên tier, độ mạnh, định nghĩa); crate nhúng nó lúc build (`tier.rs`), loader config Node đọc cùng file đó cho `MODEL_POLICY_TIERS`, nên hai bên không thể lệch. Cách hiển thị đã đổi (xem mục 15, bản ghi cập nhật Config): thang nằm trong `description` của `modelPolicies`, `tierFallback`, `maxTier` ở `core/config-schema/runner.schema.yaml` và được hiển thị thành dòng `@fgos:doc` trong file config (docs/platform/config/spec.md mục 7); khoá `"$comment"` không còn được ghi hay đọc;  `explain` in định nghĩa tier của ghế. `$comment` bị gỡ trước khi validate và trước hash config ngữ nghĩa.
 
 ### 5.2 Rigor tách khỏi tier
 
@@ -437,6 +437,7 @@ Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker 
 - **Ranh giới:** đã đổi cùng đợt: hàng Execution Core của [component-boundary](../platform/component-boundary.md) không còn quyền chọn ghế; Seat Binding có hàng riêng.
 - **Bằng chứng:** mục 13; bản nháp, báo cáo hội đồng, inventory và nghiên cứu ladder ở mục 16.
 - **Cập nhật 2026-10-22 (SEAT lead):** `--capability`/`--persona` gõ ở cửa `fgos run "<prompt>"` không còn bị coi là nâng tier; cơ chế selector của cửa (crate chỉ giữ persona do override gọi tên) bị xoá. Lý do: mục 5.5 chỉ gọi tên `--tier`/`--override`; tier của `docs:write` = flagship là config đã commit; công thức docs đã duyệt `fgos run "<prompt>" --capability docs:write` bị từ chối `tier-escalation-unauthorized`; phân biệt gõ ở cửa với khai trong file unit không bảo vệ điều gì. Điều kiện đảo: owner muốn giá trị gõ ở cửa bị coi là nâng tier.
+- **Cập nhật 2026-10-25 (Config, Slice C):** the representation clause of D-ADR0072 (Seat Binding: one authority for agent seat choice) for the ladder, a `"$comment"` key written by `fgos setup`, is superseded: Config (owner decision 2026-10-22, docs/platform/config/spec.md section 7) renders the ladder as `@fgos:doc` lines and `$comment` keys are converted by migration; `src/setup/tier-ladder-comment.mjs` and its test are deleted. The tier vocabulary, the single contract file and every other part of D-ADR0072 (Seat Binding: one authority for agent seat choice) stand.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
 ## 16. Pointers
@@ -450,7 +451,7 @@ Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker 
   - Route host `fgos internal seat-binding bind|ladder --protocol 1` (`apps/fgos/src/main.rs`); client Node `src/seat-binding/client.mjs` (fail closed, host kích hoạt trong release đã kích hoạt, từ chối khi đang giữ state lock).
   - Facade `src/runner/execution/bind.mjs` (`bind`, `explainSeat`; chỉ thu `launchView`, `accountView`), resolver ghế `seat-resolver.mjs`, ledger `seat-ledger.mjs`, đường đọc legacy `legacy-seat-read.mjs`, `dry-bind.mjs`.
   - Lease `acquireNamedAccountLease` và `auditLeaseReceipt` trong `src/runner/dispatch/provider-capacity.mjs`; mã lỗi `provider-capacity-lease-conflict` (`run-result.mjs`).
-  - Config: `src/runner/dispatch/config.mjs` (schema, sanitizer của lớp global), `src/setup/tier-ladder-comment.mjs` (làm mới `$comment` trong `fgos setup`), doctor `seat-binding-route|config|dry-bind` (`src/setup/seat-binding-checks.mjs`, `registrations.mjs`).
+  - Config: `src/runner/dispatch/config.mjs` (cross-field validation), `core/config-schema/runner.schema.yaml` (the ladder as `@fgos:doc`), doctor `seat-binding-route|config|dry-bind` (`src/setup/seat-binding-checks.mjs`, `registrations.mjs`).
   - Ngân sách exec: mục 13 (số đo phase 04 và 08).
 
 ## 17. Erratum (điều đợt triển khai chứng minh là sai, kèm bằng chứng)
@@ -459,5 +460,5 @@ Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker 
 - **E2. Ví dụ 10.2, ghế `shape / synthesis`** (đã sửa tại chỗ). Luật spread "family ít peer nhất" chọn xai (còn cell flagship chưa dùng), không phải claude. Bằng chứng: báo cáo crate `plans/reports/phase-lead-261020-2215-seat-binding-phase-01-crate.md` mục 5; `packages/seat-binding/rust/src/rank.rs`.
 - **E3. Predicate drain** (đã gỡ cùng mã chuyển đổi, mục 15 ngày 2026-10-23). Chỉ controller còn sống mới chặn; bản ghi trước hàng rào không controller là thông tin. Bằng chứng: phase 00 (28 `awaiting-resume`, 2 `legacy-run`, 81 không có `execution` trên forgentX) trong `plans/reports/phase-lead-261020-2215-seat-binding-phase-00-facts.md` mục 8.
 - **E4. Receipt và doctor replay** (mục 6.x, đã sửa tại chỗ). Cổng ghi replay; receipt được đối chiếu với record provider lúc settle, không phải doctor, vì doctor bind không có lease và cổng chạy trước lease của chính lượt đó. Row doctor replay bị xoá. Bằng chứng: `auditLeaseReceipt` ở `src/runner/dispatch/provider-capacity.mjs`, `test/runner/provider-pool-lease.test.mjs`.
-- **E5. `$comment`** (mục 5.1). Doctor báo `$comment` khác nguồn nhưng không fail; `$comment` vắng không phải lệch; `fgos setup` làm mới `$comment` lệch. Bằng chứng: `test/setup/tier-ladder-comment.test.mjs`.
+- **E5. Ladder text in config** (mục 5.1). The ladder is shown to a person as `@fgos:doc` lines rendered from the schema; `config-doc-drift` (warning in doctor, failure in `fgos config check`) reports a line that differs from the render and `fgos config refresh-docs` rewrites it. Proof: Config's own tests (`packages/config/rust/tests/authoring_equivalence.rs`), not a Seat Binding test.
 - **E6. Lease conflict có mã lỗi riêng.** Lease từ chối tài khoản mà bind đã chọn settle thành `provider-capacity-lease-conflict`; bản ghi cũ giữ `provider-capacity-refused`. Bằng chứng: `test/runner/assignment-dispatch.test.mjs`, `test/runner/execution/unit-run-outcome.test.mjs`.

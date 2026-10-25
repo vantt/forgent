@@ -134,6 +134,8 @@ pub enum Verb {
     Migrate {
         global: bool,
         finish: bool,
+        /// With `global`: convert the global JSON file to YAML instead of moving the keys.
+        convert: bool,
         machine_checked: bool,
         accept_machine_overrides: bool,
         dry_run: bool,
