@@ -24,6 +24,26 @@ const ERROR_OUTCOMES = Object.freeze([
 ]);
 
 /**
+ * A writing seat that claimed done but changed no files settles no-evidence and inconclusive, which
+ * the history reads as an execution failure. Its work may already be committed, so the round goes on
+ * to its checks; a crash, timeout or provider limit carries a failure and still stops it.
+ *
+ * @param {object} res
+ * @returns {boolean}
+ */
+function changedNothing(res) {
+  const classification = res?.runResult?.classification;
+  return res?.outcome === 'execution-failure'
+    && res.posture?.readOnly !== true
+    && classification?.confidence?.level === 'no-evidence'
+    && classification?.assessment?.verdict === 'inconclusive'
+    && !classification?.failure;
+}
+
+/** An outcome that ends the round: an error outcome, except a producer that changed nothing. */
+const endsRound = (res) => ERROR_OUTCOMES.includes(res?.outcome) && !changedNothing(res);
+
+/**
  * The verify command of a unit: its own `verify`, else its capability's. Nothing else supplies one,
  * so a unit without either is not verified, and says so.
  *
@@ -80,7 +100,7 @@ export function extractFindings(res) {
 function isRoundSettledInHistory(r, priorResults, producerSeat, checkerList, hasVerify) {
   const prod = priorResults.find((h) => h.seat === producerSeat && (h.round ?? 1) === r);
   if (!prod) return false;
-  if (ERROR_OUTCOMES.includes(prod.outcome)) return true;
+  if (endsRound(prod)) return true;
 
   for (const checkerSeat of checkerList) {
     const chk = priorResults.find((h) => h.seat === checkerSeat && (h.round ?? 1) === r);
@@ -97,7 +117,7 @@ function isRoundSettledInHistory(r, priorResults, producerSeat, checkerList, has
 
 /** Shared by live/history execution and the legacy summary projection. */
 function assessRound(results) {
-  const error = results.find((res) => ERROR_OUTCOMES.includes(res.outcome));
+  const error = results.find(endsRound);
   if (error) return { outcome: error.outcome, findings: [] };
   const findings = results.flatMap((res) =>
     res.outcome === 'findings' || (res.seat === VERIFY_SEAT && res.outcome !== 'pass')
@@ -117,7 +137,7 @@ export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}, sea
   for (let round = 1; round <= maxRounds; round++) {
     if (!isRoundSettledInHistory(round, priorResults, producerSeat, checkerList, hasVerify)) return null;
     const producer = priorResults.find((res) => res.seat === producerSeat && (res.round ?? 1) === round);
-    if (ERROR_OUTCOMES.includes(producer.outcome)) return producer.outcome;
+    if (endsRound(producer)) return producer.outcome;
     const results = [producer, ...checkerList.map((seat) =>
       priorResults.find((res) => res.seat === seat && (res.round ?? 1) === round))];
     if (hasVerify) results.push(priorResults.find((res) =>
@@ -161,7 +181,7 @@ export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaun
       const histProducer = priorResults.find((h) => h.seat === producerSeat.seat && (h.round ?? 1) === r);
       allResults.push(histProducer);
 
-      if (ERROR_OUTCOMES.includes(histProducer.outcome)) {
+      if (endsRound(histProducer)) {
         return {
           outcome: histProducer.outcome,
           rounds: r,
@@ -231,7 +251,7 @@ export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaun
     const currentRoundResults = [];
 
     // Step A: Run producer role
-    const existingProducer = priorResults.find((h) => h.seat === producerSeat.seat && (h.round ?? 1) === r && h.outcome === 'pass');
+    const existingProducer = priorResults.find((h) => h.seat === producerSeat.seat && (h.round ?? 1) === r && (h.outcome === 'pass' || changedNothing(h)));
     let producerResult;
     if (existingProducer) {
       producerResult = existingProducer;
@@ -249,7 +269,7 @@ export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaun
     currentRoundResults.push(producerResult);
     allResults.push(producerResult);
 
-    if (ERROR_OUTCOMES.includes(producerResult.outcome)) {
+    if (endsRound(producerResult)) {
       return {
         outcome: producerResult.outcome,
         rounds: r,
