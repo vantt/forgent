@@ -1,0 +1,35 @@
+{
+ "pin": "7c46b8a036fe028e02a1e99be0aa63a25dafb089",
+ "verdicts": [
+  {
+   "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/117",
+   "bindingSha256": "ef29b87a1d635380b165a13b95cda8bebbbd2b342bece6492b4572eab5cd033a",
+   "targetUnitDigest": "0c7dbff49dd8aa0be49b26be6c5419c9bee77617d80dd1b1775a62ba70959d41",
+   "rowFingerprint": "c7ec9641d3367716df8ae8cc0b3ad3618e1e6520ca25a8f0e07ebad18089103f",
+   "verdict": "APPROVE",
+   "reason": "Answers the b10 REWORK. Source 8ea4a467 (legacy docs/specs/work-state.md business-rules at cd8c1cc01) vs target 11-business-rules (0c7dbff4), split by rule id: 54 ids kept in order, heading changed, exactly 13 bullets differ (RUL10, 15, 16, 18, 19, 26, 30, 33, 34, 53, 59, 60, 61) plus the new RUL10 note; the other 41 are byte-equal. The rationale names all 13 and the note and nothing else, matching its \"13 bullets are rewritten\" and \"remaining 41 ... no textual changes\" claims. Every quoted old string occurs in the source bullet and every quoted new string in the target bullet (RUL10 note checked against the added bullet). The required RUL18 (entryStepFor/discovery), RUL19 (fgos-researching + resolveDiscovery), RUL26 (two conditions -> five triggers), RUL53 (compound deprecated, committed path, docRegistry.enforce) and RUL60 (--tier retired and refused, new producer account) rewrites carry old and new wording. Non-blocking: RUL60 old body and RUL59 old intent sentence are paraphrased, not quoted; the dropped RUL60 sentence on fgos edit as a manual write door and the dropped cross-references are covered only implicitly by the verbatim new text. Only rationale changed; digest recomputes."
+  },
+  {
+   "claimId": "claim_bf41e5090dd12c430e3a55206ea11658",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/47",
+   "bindingSha256": "4b567388ccb717451cde08aa5ca968d2af7d3ff040134bbec7e66540d7d9e053",
+   "targetUnitDigest": "9174cce69c473d51d4216e173317d45361ba8d5f9e3b1c7f448150ce21a61a64",
+   "rowFingerprint": "8252aea8fe506d03760a3dc84a291682eacac5b3d7e96a7d6536e8d74ef07753",
+   "verdict": "APPROVE",
+   "reason": "Answers the b10 REWORK. \"every other clause is unchanged\" is gone. Source 8bd05d09 (at cd8c1cc01 and 49ad04648) vs target submit-verb (9174cce6): the section diff is exactly the heading, the runs-when flags, the id clause, the three tier->size swaps, the \"có mặt hay không;\" + --rigor line, and the RUL60 gloss \"ba cờ ghi-đè tier/kind/risk, độc lập từng trường\" -> \"cờ phân loại hiện hành\". Each is named with old and new wording that match the units; the rationale says the other listed clauses have no textual change, which the diff confirms. Only rationale changed; digest recomputes."
+  },
+  {
+   "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+   "pointer": "/bindingRefresh/50",
+   "bindingSha256": "3f88f6d3f3e0c05b6701eebe2307731d04648773ad4f58c50d5a4a7f79cb6119",
+   "targetUnitDigest": "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817",
+   "rowFingerprint": "00260f65a99b38d301bd9294445f500988aaa430240bf5063f8a1a1f459e9788",
+   "verdict": "APPROVE",
+   "reason": "Answers the b10 note. Source 1cedade3 (unheaded-block-4 at 49ad04648 and cd8c1cc01) vs target unheaded-block-4 (697a5d20): the diff is exactly 4 lines (rows 1, 10b, 12, 21), and changedClauses now lists 4 entries. Each oldWording occurs once in the source and not in the target, and each newWording occurs in the target. The prose now says \"four labelled corrections\" and states it does not certify the row-12 default-step wording as code-true. Only rationale and changedClauses changed (entries 0-1 untouched); digest recomputes."
+  }
+ ]
+}
