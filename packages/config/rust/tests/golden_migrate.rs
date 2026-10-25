@@ -220,11 +220,9 @@ fn a_linked_worktree_lists_the_global_command_value_a_dropped_value_stops_hiding
         detectors: &NoDetectors,
     };
     let confinement = json!({"mode": "required", "policy": "host-write-denied"});
-    let path = "runner.capabilities.advise.confinement.mode";
+    let path = "runner.capabilities.advise.confinement";
     assert_eq!(
-        standard.value_at(
-            &fgos_yaml_doc::path::parse_path("runner.capabilities.advise.confinement").unwrap()
-        ),
+        standard.value_at(&fgos_yaml_doc::path::parse_path(path).unwrap()),
         Some(&confinement),
         "the case relies on the standard's value"
     );
