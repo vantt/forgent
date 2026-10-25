@@ -4,11 +4,6 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
 
-function available() {
-  if (process.platform !== 'linux') {
-    throw Object.assign(new Error('event-store-unsupported-platform'), { code: 'event-store-unsupported-platform' });
-  }
-}
 function invalid(detail) {
   return Object.assign(new Error(`event-store-consumer-registry: ${detail}`), { code: 'event-store-consumer-registry' });
 }
@@ -20,7 +15,6 @@ function relativePath(value) {
 let cached;
 /** Read the shipped manifest once; importing a consumer never registers it. */
 export function consumers() {
-  available();
   if (cached) return cached;
   const manifest = JSON.parse(fs.readFileSync(path.join(OWN_PAYLOAD_ROOT, 'packages/event-store/contracts/consumers.v1.json'), 'utf8'));
   if (manifest.v !== 1 || !Array.isArray(manifest.consumers)) throw invalid('unsupported manifest');
@@ -42,13 +36,11 @@ export function consumers() {
 
 /** Absolute contract paths for Registry::load_files; stream/type data stays in those files. */
 export function registryFiles() {
-  available();
   return consumers().map(entry => path.join(OWN_PAYLOAD_ROOT, entry.contractFile));
 }
 
 /** Called by the CLI rebuild route only; normal store loading imports no consumer. */
 export function loadRebuildModule(id) {
-  available();
   const entry = consumers().find(entry => entry.id === id);
   if (!entry) throw invalid(`unknown consumer: ${id}`);
   return import(pathToFileURL(path.join(OWN_PAYLOAD_ROOT, entry.rebuildModule)).href);

@@ -1,0 +1,468 @@
+diff --git a/core/config-schema/runner.schema.yaml b/core/config-schema/runner.schema.yaml
+index d201f11c2..14df7d79c 100644
+--- a/core/config-schema/runner.schema.yaml
++++ b/core/config-schema/runner.schema.yaml
+@@ -1,5 +1,5 @@
+ $schema: "https://json-schema.org/draft/2020-12/schema"
+-$id: "urn:fgos:config-schema:runner:v1"
++$id: "urn:fgos:config-schema:runner:v2"
+ $comment: "owner: runner"
+ description: "The runner: executors, capabilities, model policies, tier fallback, patterns and run limits."
+ type: object
+@@ -176,21 +176,21 @@ properties:
+             items:
+               type: string
+               minLength: 1
+-  patterns:
+-    description: "Settings of the collaboration patterns."
++  loops:
++    description: "Tuning and bounds of the execution loops."
+     type: object
+     properties:
+-      defaultRule:
+-        description: "The rule applied when a pattern names none."
++      solo:
++        description: "Tuning and bounds of the solo loop."
+         type: object
++        additionalProperties: false
+         properties:
+-          mutatingMinRigor:
+-            description: "Lowest rigor a unit that changes files may run at."
+-            type: string
+-            enum: [low, standard, high, critical]
++          bounds:
++            $ref: "#/$defs/loopBounds"
+       reviewed:
+-        description: "The reviewed pattern: rounds and checkers."
++        description: "Tuning and bounds of the reviewed loop."
+         type: object
++        additionalProperties: false
+         properties:
+           maxRounds:
+             description: "Most review rounds before the unit stops."
+@@ -204,34 +204,62 @@ properties:
+                 description: "Checker seats at this rigor."
+                 type: array
+                 items:
++                  description: "Checker seat name."
+                   type: string
+                   enum: [reviewer, red-team, tester]
+               standard:
+                 description: "Checker seats at this rigor."
+                 type: array
+                 items:
++                  description: "Checker seat name."
+                   type: string
+                   enum: [reviewer, red-team, tester]
+               high:
+                 description: "Checker seats at this rigor."
+                 type: array
+                 items:
++                  description: "Checker seat name."
+                   type: string
+                   enum: [reviewer, red-team, tester]
+               critical:
+                 description: "Checker seats at this rigor."
+                 type: array
+                 items:
++                  description: "Checker seat name."
+                   type: string
+                   enum: [reviewer, red-team, tester]
++          bounds:
++            $ref: "#/$defs/loopBounds"
++      panel:
++        description: "Tuning and bounds of the panel loop."
++        type: object
++        additionalProperties: false
++        properties:
++          bounds:
++            $ref: "#/$defs/loopBounds"
++      debate:
++        description: "Tuning and bounds of the debate loop."
++        type: object
++        additionalProperties: false
++        properties:
++          bounds:
++            $ref: "#/$defs/loopBounds"
++    additionalProperties: false
++  patterns:
++    description: "Settings of the collaboration patterns."
++    type: object
++    x-fgos-merge: deep
++    properties:
+       seatBinding:
+         description: "Marker that this project reads the seat binding form of the config."
+         type: object
+         properties:
+           schema:
+-            description: "Version of the seat binding form; the only value this release reads is 1."
++            description: "Version of the seat binding form; this release writes 2 and reads 1 and 2."
+             type: integer
+-            const: 1
++            enum: [1, 2]
++    additionalProperties:
++      $ref: "#/$defs/patternEntry"
+   generatedPaths:
+     description: "Generated trees a unit write scope widens to when it touches their source."
+     type: array
+@@ -819,3 +847,101 @@ $defs:
+         type: array
+         items:
+           type: string
++  loopBounds:
++    description: "Bounds on loop parameters."
++    type: object
++    additionalProperties:
++      description: "Bounds for one parameter: minimum and maximum allowed values."
++      type: object
++      additionalProperties: false
++      properties:
++        min:
++          description: "Minimum allowed value for this parameter."
++          type: integer
++        max:
++          description: "Maximum allowed value for this parameter."
++          type: integer
++  patternEntry:
++    description: "One collaboration pattern: its promise, loop, defaults and invariants."
++    type: object
++    additionalProperties: false
++    properties:
++      promise:
++        description: "One-sentence promise of what this pattern delivers."
++        type: string
++      loop:
++        description: "The execution loop that runs this pattern."
++        type: string
++        enum: [solo, reviewed, panel, debate]
++      defaults:
++        description: "Default parameter values for the loop."
++        type: object
++        properties:
++          maxRounds:
++            description: "Most review rounds before the unit stops."
++            type: integer
++            minimum: 1
++          minCheckers:
++            description: "Minimum checker seats required for a review round."
++            type: array
++            items:
++              description: "A checker seat name."
++              type: string
++              enum: [reviewer, red-team, tester]
++          seats:
++            description: "Default seat declarations for the loop."
++            type: array
++            items:
++              $ref: "#/$defs/declaredSeat"
++          roleTasks:
++            description: "Default task instructions per seat or kind."
++            type: object
++            additionalProperties:
++              description: "Task instruction text."
++              type: string
++          rebuttal:
++            description: "Whether rebuttal is enabled in debate."
++            type: boolean
++      invariants:
++        description: "Invariants that must not be weakened."
++        type: object
++        additionalProperties:
++          $ref: "#/$defs/patternInvariant"
++  declaredSeat:
++    description: "One declared seat in a pattern or unit."
++    type: object
++    additionalProperties: false
++    properties:
++      seat:
++        description: "Unique name of the seat."
++        type: string
++        minLength: 1
++      role:
++        description: "Role the seat performs in the loop."
++        type: string
++        enum: [producer, synthesizer, reviewer, red-team, judge]
++      persona:
++        description: "Persona specialization for the seat."
++        type: string
++        minLength: 1
++      tier:
++        $ref: "#/$defs/tierName"
++    required: [seat, role]
++  patternInvariant:
++    description: "An invariant on one parameter: either atLeast for lists or fixed for exact value."
++    type: object
++    additionalProperties: false
++    properties:
++      atLeast:
++        description: "List elements that must be present in the effective value."
++        type: array
++        items:
++          description: "Required element."
++          type: string
++      fixed:
++        description: "Exact value the parameter must have."
++    oneOf:
++      - description: "Minimum elements that must be present in a list parameter."
++        required: [atLeast]
++      - description: "Exact value the parameter must equal."
++        required: [fixed]
+diff --git a/core/config-standard/runner.yaml b/core/config-standard/runner.yaml
+index 93242fdd8..078d67b46 100644
+--- a/core/config-standard/runner.yaml
++++ b/core/config-standard/runner.yaml
+@@ -804,13 +804,9 @@ runner:
+   confinement:
+     # @fgos:doc When true every capability must declare its own confinement. Default: false.
+     strict: false
+-  # @fgos:doc Settings of the collaboration patterns.
+-  patterns:
+-    # @fgos:doc The rule applied when a pattern names none.
+-    defaultRule:
+-      # @fgos:doc Lowest rigor a unit that changes files may run at. Values: low | standard | high | critical. Default: standard.
+-      mutatingMinRigor: standard
+-    # @fgos:doc The reviewed pattern: rounds and checkers.
++  # @fgos:doc Tuning and bounds of the execution loops.
++  loops:
++    # @fgos:doc Tuning and bounds of the reviewed loop.
+     reviewed:
+       # @fgos:doc Most review rounds before the unit stops. Minimum: 1. Default: 2.
+       maxRounds: 2
+@@ -822,9 +818,73 @@ runner:
+         high: [reviewer, red-team]
+         # @fgos:doc Checker seats at this rigor. Default: ["reviewer","red-team","tester"].
+         critical: [reviewer, red-team, tester]
++  # @fgos:doc Settings of the collaboration patterns.
++  patterns:
+     # @fgos:doc Marker that this project reads the seat binding form of the config.
+     seatBinding:
+-      # @fgos:doc Version of the seat binding form; the only value this release reads is 1. Default: 1.
+-      schema: 1
++      # @fgos:doc Version of the seat binding form; this release writes 2 and reads 1 and 2. Values: 1 | 2. Default: 2.
++      schema: 2
++    solo:
++      promise: "A single worker runs the task to completion."
++      loop: solo
++    reviewed:
++      promise: "A producer executes the task followed by checker review rounds until acceptance or budget exhaustion."
++      loop: reviewed
++    panel:
++      promise: "Multiple independent producers execute the task in parallel and a synthesizer combines their results."
++      loop: panel
++    debate:
++      promise: "Multiple agents debate opposing viewpoints across rounds before reaching a conclusion."
++      loop: debate
++    code-change:
++      promise: "A producer changes code with reviewer and red-team review."
++      loop: reviewed
++      invariants:
++        minCheckers:
++          atLeast: [reviewer, red-team]
++    consult:
++      promise: "An advisor provides specialized guidance without file mutations."
++      loop: solo
++      invariants:
++        seats:
++          fixed:
++            - seat: advisor
++              role: producer
++    rfc:
++      promise: "A document or decision proposal reviewed by a reviewer and red-team against specification."
++      loop: reviewed
++      invariants:
++        minCheckers:
++          atLeast: [reviewer, red-team]
++      defaults:
++        maxRounds: 1
++        roleTasks:
++          reviewer: |-
++            You are the reviewer of a proposal or document another agent just produced. Do not change any file.
++            Read the artifact the task names (a path or text in the task itself) and the producer's own account of it, listed under Context refs. Do not look at git history unless the task names a commit.
++            Check it against the task below and report what is wrong, unsupported, or missing, with quoted evidence, or say plainly that you found nothing.
++
++            The task that was assigned:
++            {objective}
++          red-team: |-
++            You are the red-team for a proposal or document another agent just produced. Do not change any file.
++            Read the artifact the task names (a path or text in the task itself) and the producer's own account of it, listed under Context refs. Do not look at git history unless the task names a commit.
++            Try to break it: wrong claims, hidden assumptions, missed cases, failure modes, and anything the task forbade. Report concrete failures with quoted evidence, or say plainly that you found none.
++
++            The task that was assigned:
++            {objective}
++    research-fan-out:
++      promise: "Multiple researchers investigate a topic independently in parallel and a synthesizer produces the unified finding."
++      loop: panel
++      defaults:
++        seats:
++          - seat: researcher-1
++            role: producer
++          - seat: researcher-2
++            role: producer
++          - seat: researcher-3
++            role: producer
++          - seat: synthesizer
++            role: synthesizer
+   # @fgos:doc Generated trees a unit write scope widens to when it touches their source. Default: [].
+   generatedPaths: []
+diff --git a/packages/config/contracts/fixtures/authoring-source.config.json b/packages/config/contracts/fixtures/authoring-source.config.json
+index 05fd64aa8..010ff65c9 100644
+--- a/packages/config/contracts/fixtures/authoring-source.config.json
++++ b/packages/config/contracts/fixtures/authoring-source.config.json
+@@ -1416,10 +1416,7 @@
+         ]
+       }
+     },
+-    "patterns": {
+-      "defaultRule": {
+-        "mutatingMinRigor": "standard"
+-      },
++    "loops": {
+       "reviewed": {
+         "maxRounds": 2,
+         "checkersByRigor": {
+@@ -1436,9 +1433,96 @@
+             "tester"
+           ]
+         }
+-      },
++      }
++    },
++    "patterns": {
+       "seatBinding": {
+-        "schema": 1
++        "schema": 2
++      },
++      "solo": {
++        "promise": "A single worker runs the task to completion.",
++        "loop": "solo"
++      },
++      "reviewed": {
++        "promise": "A producer executes the task followed by checker review rounds until acceptance or budget exhaustion.",
++        "loop": "reviewed"
++      },
++      "panel": {
++        "promise": "Multiple independent producers execute the task in parallel and a synthesizer combines their results.",
++        "loop": "panel"
++      },
++      "debate": {
++        "promise": "Multiple agents debate opposing viewpoints across rounds before reaching a conclusion.",
++        "loop": "debate"
++      },
++      "code-change": {
++        "promise": "A producer changes code with reviewer and red-team review.",
++        "loop": "reviewed",
++        "invariants": {
++          "minCheckers": {
++            "atLeast": [
++              "reviewer",
++              "red-team"
++            ]
++          }
++        }
++      },
++      "consult": {
++        "promise": "An advisor provides specialized guidance without file mutations.",
++        "loop": "solo",
++        "invariants": {
++          "seats": {
++            "fixed": [
++              {
++                "seat": "advisor",
++                "role": "producer"
++              }
++            ]
++          }
++        }
++      },
++      "rfc": {
++        "promise": "A document or decision proposal reviewed by a reviewer and red-team against specification.",
++        "loop": "reviewed",
++        "invariants": {
++          "minCheckers": {
++            "atLeast": [
++              "reviewer",
++              "red-team"
++            ]
++          }
++        },
++        "defaults": {
++          "maxRounds": 1,
++          "roleTasks": {
++            "reviewer": "You are the reviewer of a proposal or document another agent just produced. Do not change any file.\nRead the artifact the task names (a path or text in the task itself) and the producer's own account of it, listed under Context refs. Do not look at git history unless the task names a commit.\nCheck it against the task below and report what is wrong, unsupported, or missing, with quoted evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\n{objective}",
++            "red-team": "You are the red-team for a proposal or document another agent just produced. Do not change any file.\nRead the artifact the task names (a path or text in the task itself) and the producer's own account of it, listed under Context refs. Do not look at git history unless the task names a commit.\nTry to break it: wrong claims, hidden assumptions, missed cases, failure modes, and anything the task forbade. Report concrete failures with quoted evidence, or say plainly that you found none.\n\nThe task that was assigned:\n{objective}"
++          }
++        }
++      },
++      "research-fan-out": {
++        "promise": "Multiple researchers investigate a topic independently in parallel and a synthesizer produces the unified finding.",
++        "loop": "panel",
++        "defaults": {
++          "seats": [
++            {
++              "seat": "researcher-1",
++              "role": "producer"
++            },
++            {
++              "seat": "researcher-2",
++              "role": "producer"
++            },
++            {
++              "seat": "researcher-3",
++              "role": "producer"
++            },
++            {
++              "seat": "synthesizer",
++              "role": "synthesizer"
++            }
++          ]
++        }
+       }
+     },
+     "generatedPaths": [
+diff --git a/packages/config/contracts/fixtures/repo-differences.v1.json b/packages/config/contracts/fixtures/repo-differences.v1.json
+index 3d31d3c7d..36dcd2da9 100644
+--- a/packages/config/contracts/fixtures/repo-differences.v1.json
++++ b/packages/config/contracts/fixtures/repo-differences.v1.json
+@@ -5,7 +5,7 @@
+   "file": "authoring-source.config.json",
+   "copied-from": ".fgos/config.json",
+   "commit": "ef4a056d7",
+-  "sha256": "7d89f588cfa29c0f1f9d07c2204a02e99cd6aa204d7e4451a56cb1608158ad79"
++  "sha256": "9bf53864fbb6f827768cf03836e9183d0bc2504d328e7d9fb13897bace318d36"
+  },
+  "exclusions": [
+   {
+diff --git a/packages/config/rust/tests/golden_migrate.rs b/packages/config/rust/tests/golden_migrate.rs
+index 4a01fe5a1..6932ba0d3 100644
+--- a/packages/config/rust/tests/golden_migrate.rs
++++ b/packages/config/rust/tests/golden_migrate.rs
+@@ -169,7 +169,7 @@ fn this_repositorys_project_file_migrates_with_the_same_effective_value() {
+     let report = project(&ctx, &roots, &writer, &opts, |_| Ok(())).unwrap();
+     // The one-key sections `gateway` and `lock` go, the tier ladder `$comment` converts, 37 values stay (the two tool executors, the impact-analysis pool and nine pools that never fall back to Codex are this repository's own).
+     assert_eq!(report.kept.len(), 37);
+-    assert_eq!(report.dropped_redundant.len(), 235);
++    assert_eq!(report.dropped_redundant.len(), 257);
+     assert_eq!(report.dropped_retired, ["lock.predecessorKillWaitMs"]);
+     assert_eq!(
+         report.dropped_out_of_scope,
+diff --git a/packages/git/contracts/mutation-census.v1.json b/packages/git/contracts/mutation-census.v1.json
+index 0685f39ba..087c9ef6b 100644
+--- a/packages/git/contracts/mutation-census.v1.json
++++ b/packages/git/contracts/mutation-census.v1.json
+@@ -1,6 +1,6 @@
+ {
+   "schema": "mutation-census.v1",
+-  "payloadDigest": "4af242fe89737882a2b971ec90f59c658ee33fe2825ec08207b95bdc7142dce1",
++  "payloadDigest": "f1a7a838014e202a719e80182df2fab806620d31852ff7bb14202e0cc0dcdff0",
+   "files": {
+     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
+@@ -236,7 +236,7 @@
+     "packages/config/rust/tests/golden_init.rs": "70a052544606bb7ea3b86012ecee4b5cdcf653572953a36d2e2e9ce37fccef98",
+     "packages/config/rust/tests/golden_lint.rs": "998d9f358da34dd171e6b24642b04173be773d95ca689973efb8d15fc69ab02b",
+     "packages/config/rust/tests/golden_meta.rs": "3ba3eb9dcb44bd5a6be43c32545aca479b6757c40bce4222da428e7f3afc91a7",
+-    "packages/config/rust/tests/golden_migrate.rs": "481229e9240879b8226718a2fc9d29f0555536bd1739700948f19ab6202db9e9",
++    "packages/config/rust/tests/golden_migrate.rs": "be018e97bf4aea0599f1f204102aabe4667539c3e7cae48c7baa02fe38f2ff8d",
+     "packages/config/rust/tests/golden_no_echo.rs": "b161c4b4c784d6558346ac927c25f57e395d10ca4237e53bf36a19a5814ca51f",
+     "packages/config/rust/tests/golden_schema.rs": "bfb95ce662b2840b6ec2ee8e0c9edf66040b11cf220f0f7c888b987b18476e61",
+     "packages/config/rust/tests/golden_scope.rs": "ebcf9054e332984689d13529f2cbf7c80600cd2272eebaad99cb0cd639084afb",

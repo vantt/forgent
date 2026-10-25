@@ -1425,7 +1425,6 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
     use fgos_event_store::{
         append::{append, AppendRequest, EventInput},
         layout::{Layout, StreamId},
-        refspec::ensure_refspecs,
         registry::{ConsumerContract, Registry},
         sync::{sync, SyncRequest},
     };
@@ -1477,7 +1476,14 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
         for dir in [layout.common_dir.join("fgos"), layout.root.join("locks")] {
             fs::set_permissions(dir, fs::Permissions::from_mode(0o700)).unwrap();
         }
-        ensure_refspecs(&driver, &repo, "origin").unwrap();
+        fgos_git::RepositoryConfig::ensure_fetch_mapping(
+            &driver,
+            &repo,
+            "origin",
+            &fgos_git::publication_fetch_mappings("origin").unwrap(),
+            "test-mapping-setup",
+        )
+        .unwrap();
         fs::write(root.join(".fgos/events"), "fence\n").unwrap();
         (root, repo, layout)
     };

@@ -296,6 +296,8 @@ test('integration: a real mutant (m-edit-1) is applied and classified inside a r
   t.after(() => fs.rmSync(clone, { recursive: true, force: true }));
   execFileSync('git', ['clone', '-q', '--shared', '--no-checkout', repoRoot, clone]);
   assert.equal(execFileSync('git', ['-C', clone, 'rev-parse', 'HEAD'], { encoding: 'utf8' }), execFileSync('git', ['-C', repoRoot, 'rev-parse', 'HEAD'], { encoding: 'utf8' }));
+  // Removing a verify checkout refuses while its commit is on no local branch; a gate runs on a detached merge.
+  execFileSync('git', ['-C', clone, 'branch', '-f', 'mutate-head', 'HEAD']);
   activateGitFixture(clone);
   const checkouts = headCheckouts(clone);
   let preserved = false;

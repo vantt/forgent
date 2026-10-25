@@ -303,7 +303,7 @@ manual step.
 
 Mostly relevant after the project has real work items.
 
-This table is selective for the Event Store: it lists the two rows a project owner acts on (`event-store-refspec`, `event-store-legacy-layout`). The ten `event-store-*` rows and what each one checks are in `docs/platform/event-store/spec.md` section 21.
+This table is selective for the Event Store: it lists the two rows a project owner acts on (`event-store-refspec`, `event-store-legacy-layout`). The eight `event-store-*` rows and what each one checks are in `docs/platform/event-store/spec.md` section 21.
 
 | Id | Checks | Typical failing message | Who | Fix |
 |---|---|---|---|---|

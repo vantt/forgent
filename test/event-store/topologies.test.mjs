@@ -9,7 +9,7 @@ import { pathToFileURL } from 'node:url';
 import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { eventStoreFacts, openStore, prepareStore } from '../../src/event-store/index.mjs';
-import { checkEventStore } from '../../src/setup/event-store-checks.mjs';
+import { checkGit } from '../../src/setup/git-checks.mjs';
 
 // Owning proof of spec section 8 topologies (section 23.2 item 12), driven
 // through the facade. Layout grammar, linked-worktree common-dir equality on
@@ -154,7 +154,9 @@ test('the Git floor is read from Git: the installed git passes, a git below the 
   const facts = w.facts(plain, plain);
   assert.equal(facts.floor.minimum, floor.minimumVersion);
   assert.deepEqual(facts.floor.probes.map(p => p.name).sort(), [...floor.requiredProbes].sort());
-  assert.equal(checkEventStore(plain, 'event-store-git-version', { stateRoot: w.stateRoot, trustedMain: plain, loaderOptions }).passed, true);
+  const priorState = process.env.FGOS_STATE_ROOT; process.env.FGOS_STATE_ROOT = w.stateRoot;
+  try { assert.equal(checkGit(plain, 'git-component-compatible', loaderOptions).passed, true); }
+  finally { if (priorState === undefined) delete process.env.FGOS_STATE_ROOT; else process.env.FGOS_STATE_ROOT = priorState; }
   // The floor verdict is process-wide, so the old git runs in a fresh process with its own state root.
   const real = execFileSync('sh', ['-c', 'command -v git'], { encoding: 'utf8' }).trim();
   const bin = path.join(w.temp, 'old-git'); fs.mkdirSync(bin);
@@ -162,11 +164,12 @@ test('the Git floor is read from Git: the installed git passes, a git below the 
   const oldState = path.join(w.temp, 'old-state'); fs.mkdirSync(oldState, { mode: 0o700 });
   const probe = `
     const { prepareStore } = await import(${JSON.stringify(pathToFileURL(path.join(root, 'src/event-store/index.mjs')).href)});
-    const { checkEventStore } = await import(${JSON.stringify(pathToFileURL(path.join(root, 'src/setup/event-store-checks.mjs')).href)});
+    const { checkGit } = await import(${JSON.stringify(pathToFileURL(path.join(root, 'src/setup/git-checks.mjs')).href)});
+    process.env.FGOS_STATE_ROOT = ${JSON.stringify(oldState)};
     const options = { stateRoot: ${JSON.stringify(oldState)}, trustedMain: ${JSON.stringify(plain)}, loaderOptions: ${JSON.stringify(loaderOptions)} };
     let refused;
     try { prepareStore(${JSON.stringify(plain)}, options); } catch (error) { refused = error.message; }
-    console.log(JSON.stringify({ refused, doctor: checkEventStore(${JSON.stringify(plain)}, 'event-store-git-version', options) }));`;
+    console.log(JSON.stringify({ refused, doctor: checkGit(${JSON.stringify(plain)}, 'git-component-compatible', options.loaderOptions) }));`;
   const out = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', probe], { encoding: 'utf8', env: { ...process.env, PATH: `${bin}${path.delimiter}${process.env.PATH}` } }));
   assert.match(out.refused, /git-floor-unsupported/);
   assert.equal(out.doctor.passed, false);

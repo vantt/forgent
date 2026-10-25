@@ -5,7 +5,7 @@ use fgos_event_store::{
     envelope::Seal,
     receipt::Receipt,
     seal::{seal, SealRequest},
-    sync::{sync_status, unpublished_summary},
+    sync::sync_status,
 };
 use fgos_git::*;
 use sync_support::*;
@@ -37,8 +37,6 @@ fn v_event_mirrors_divergence_receipts_coverage_and_never_force() {
     .unwrap();
     let own_before = b.tip();
     b.with_port(|p| {
-        let summary = unpublished_summary(p, &b.repo, &b.layout, &b.machine, "origin").unwrap();
-        assert!(!summary[0].sealed_pushed);
         let r = RefName::parse("refs/fgos/events/machine-aa").unwrap();
         let rejected = p.push_refs(&b.repo, "origin", &[(r.clone(), r)]).unwrap();
         assert!(matches!(
@@ -83,12 +81,6 @@ fn v_event_mirrors_divergence_receipts_coverage_and_never_force() {
     .unwrap();
     assert_eq!(receipt.last_seq, 2);
     assert!(receipt.cover.values().all(|n| *n == 2));
-    b.with_port(|p| {
-        assert!(
-            unpublished_summary(p, &b.repo, &b.layout, &b.machine, "origin").unwrap()[0]
-                .sealed_pushed
-        )
-    });
     assert!(sync_status(&b.layout).unwrap().unpublished_since.is_none());
     // Ref namespace on the remote is exactly the own project ref.
     assert_eq!(

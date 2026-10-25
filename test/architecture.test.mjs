@@ -1517,7 +1517,7 @@ test('Event Store keeps consumer boundaries and one native export importer', () 
         if (target.startsWith('src/state/') || target.startsWith('src/runner/')) violations.push(`${file} -> ${target}`);
       }
     }
-    if (file !== 'src/event-store/native.mjs' && /\b(?:new\s+[^;\n]*\.EventStore\b|\w+\.(?:resolveEventStore|openStore|eventStoreFacts|ensureEventStoreRefspecs)\s*\()/.test(lexSource(source).code)) {
+    if (file !== 'src/event-store/native.mjs' && /\b(?:new\s+[^;\n]*\.EventStore\b|\w+\.(?:resolveEventStore|openStore|eventStoreFacts)\s*\()/.test(lexSource(source).code)) {
       violations.push(`${file}: imports native Event Store exports outside native.mjs`);
     }
   }

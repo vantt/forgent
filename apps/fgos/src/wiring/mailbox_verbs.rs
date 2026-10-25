@@ -20,8 +20,8 @@ use super::mailbox_identity::{
     address, handle_conflicts, is_alias, session_of, state_root, Addressed,
 };
 use fgos_host_runtime::{
-    ContractRef, EventSink, HostInvocation, InvocationControl, OperationId, OperationProvider,
-    OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle, ProviderOutcome,
+    EventSink, HostInvocation, InvocationControl, OperationProvider, OperationRequest,
+    ProviderDescriptor, ProviderError, ProviderOutcome,
 };
 use fgos_identity::cli_dirs::claude_config_dir;
 use fgos_mailbox::adapters::version::VersionSources;
@@ -34,69 +34,17 @@ use fgos_mailbox_core::{
     Liveness, MessageId, Recipient, SendRequest, Timestamp, WriterKey,
 };
 use serde_json::{json, Value};
-use std::borrow::Cow;
 use std::ffi::OsString;
 use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-/// The sub-verbs of `fgos mailbox`.
-pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["send", "inbox", "list", "status"];
-
-pub const SEND_OPERATION_ID: &str = "mailbox.send";
-pub const INBOX_OPERATION_ID: &str = "mailbox.inbox";
-pub const INBOX_CLAIM_OPERATION_ID: &str = "mailbox.inbox.claim";
-pub const LIST_OPERATION_ID: &str = "mailbox.list";
-pub const STATUS_OPERATION_ID: &str = "mailbox.status";
-
-const fn descriptor(
-    id: &'static str,
-    request: &'static str,
-    outcome: &'static str,
-) -> ProviderDescriptor {
-    ProviderDescriptor {
-        provider_id: Cow::Borrowed(id),
-        operation_id: OperationId::from_static(id),
-        component_class: Cow::Borrowed("mailbox"),
-        mechanism: Cow::Borrowed("builtin"),
-        lifecycle: ProviderLifecycle::Singleton,
-        request_contract: ContractRef::from_static(request, "1.0.0"),
-        outcome_contract: ContractRef::from_static(outcome, "1.0.0"),
-        allowed_hosts: &["cli"],
-        allowed_modes: &["sync"],
-        capabilities: &[],
-        replacement: None,
-        concurrency: None,
-        health: None,
-    }
-}
-
-pub const SEND_DESCRIPTOR: ProviderDescriptor = descriptor(
-    SEND_OPERATION_ID,
-    "mailbox.send.request",
-    "mailbox.send.outcome",
-);
-pub const INBOX_DESCRIPTOR: ProviderDescriptor = descriptor(
-    INBOX_OPERATION_ID,
-    "mailbox.inbox.request",
-    "mailbox.inbox.outcome",
-);
-pub const INBOX_CLAIM_DESCRIPTOR: ProviderDescriptor = descriptor(
-    INBOX_CLAIM_OPERATION_ID,
-    "mailbox.inbox.claim.request",
-    "mailbox.inbox.claim.outcome",
-);
-pub const LIST_DESCRIPTOR: ProviderDescriptor = descriptor(
-    LIST_OPERATION_ID,
-    "mailbox.list.request",
-    "mailbox.list.outcome",
-);
-pub const STATUS_DESCRIPTOR: ProviderDescriptor = descriptor(
-    STATUS_OPERATION_ID,
-    "mailbox.status.request",
-    "mailbox.status.outcome",
-);
+pub use super::mailbox_surface::{
+    MailboxAnswer, AVAILABLE_SUBCOMMANDS, INBOX_CLAIM_DESCRIPTOR, INBOX_CLAIM_OPERATION_ID,
+    INBOX_DESCRIPTOR, INBOX_OPERATION_ID, LIST_DESCRIPTOR, LIST_OPERATION_ID, SEND_DESCRIPTOR,
+    SEND_OPERATION_ID, STATUS_DESCRIPTOR, STATUS_OPERATION_ID,
+};
 
 /// One `fgos mailbox` invocation, as the projector parsed it.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -212,20 +160,6 @@ pub fn project_mailbox_request(args: &[OsString]) -> MailboxRequest {
         }
         _ => MailboxRequest::Usage("mailbox needs send, inbox, list or status".to_string()),
     }
-}
-
-/// What a mailbox verb answers: the text it prints (unless it was written
-/// already), the envelope data for `--json`, and the exit status.
-#[derive(Debug, Clone, PartialEq)]
-pub struct MailboxAnswer {
-    pub text: String,
-    pub data: Value,
-    pub json: bool,
-    pub exit: i32,
-    /// The frames were written to stdout by the verb itself.
-    pub already_written: bool,
-    /// A line for stderr (an ignored config key, a usage error).
-    pub warning: Option<String>,
 }
 
 /// Exit statuses (plan decision 2).

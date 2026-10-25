@@ -400,6 +400,7 @@ pub fn finish(state: &mut MailboxState, ticket: &FinishTicket, now: Timestamp) -
 }
 
 /// What `inbox --claim` found for one caller.
+#[cfg(unix)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum InboxClaim {
     /// The caller has no binding.
@@ -413,6 +414,7 @@ pub(crate) enum InboxClaim {
 /// Under mutex hold 1 of `inbox --claim`: every pending item of `key`'s
 /// current generation, unbounded (a tool's stdout has no inline limit),
 /// claimed like a step drain. Returns whether the state changed.
+#[cfg(unix)]
 pub(crate) fn claim_inbox(
     state: &mut MailboxState,
     key: &WriterKey,

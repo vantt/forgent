@@ -20,8 +20,8 @@ export function eventStoreConfig(config = {}) {
     }
   }
   result.remote = input.remote === undefined ? EVENT_STORE_DEFAULTS.remote : input.remote;
-  // Same remote-name alphabet as Git's publication_fetch_mappings.
-  if (typeof result.remote !== 'string' || !/^[A-Za-z0-9_-]+$/.test(result.remote)) throw invalid('remote');
+  // The remote's alphabet is Git's rule: the crate refuses a bad name where it first uses it.
+  if (typeof result.remote !== 'string' || result.remote === '') throw invalid('remote');
   return result;
 }
 /**

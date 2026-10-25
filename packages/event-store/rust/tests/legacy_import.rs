@@ -374,7 +374,14 @@ fn a_migrated_write_is_refused_when_a_legacy_mirror_differs_from_the_pin() {
     .unwrap();
     git(&f, &["add", ".fgos/events"]);
     git(&f, &["commit", "-qm", "cutover fence"]);
-    fgos_event_store::refspec::ensure_refspecs(&f.driver, &f.repo, "origin").unwrap();
+    fgos_git::RepositoryConfig::ensure_fetch_mapping(
+        &f.driver,
+        &f.repo,
+        "origin",
+        &fgos_git::publication_fetch_mappings("origin").unwrap(),
+        "test-mapping-setup",
+    )
+    .unwrap();
     write_readiness(&f.driver, &f.repo, "origin").unwrap();
     let legacy_ref = pin["legacyRefOid"].as_str().unwrap();
     git(
