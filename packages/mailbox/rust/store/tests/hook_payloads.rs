@@ -951,35 +951,34 @@ fn pointer_of(begun: Begun) -> fgos_mailbox::hook::PointerOnly {
 fn a_repeating_pointer_stamps_the_last_drain_once_per_new_mail_and_writes_nothing_on_later_calls() {
     // Mail too large for the step: the pointer is all the drain prints.
     let too_large = "x".repeat(step_bound(Adapter::Codex) as usize);
-    for (mut drain, body) in [(Drain::registered(Adapter::Codex), too_large)] {
-        drain.add_peer("peer");
-        drain.send("peer", &body, false);
+    let (mut drain, body) = (Drain::registered(Adapter::Codex), too_large);
+    drain.add_peer("peer");
+    drain.send("peer", &body, false);
 
-        let first = drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
-        assert!(first.state_changed(), "the first pointer stamps the drain");
-        let stamp = drain.state.binding(&drain.writer).unwrap().last_drain_at;
-        assert!(stamp.is_some());
-        for _ in 0..3 {
-            let again = pointer_of(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
-            assert_eq!(again.count, 1);
-            assert!(
-                !Begun::Pointer(again).state_changed(),
-                "a repeated pointer writes nothing"
-            );
-        }
-
-        drain.send("peer", &body, false);
-        let after_new = pointer_of(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
-        assert_eq!(after_new.count, 2);
+    let first = drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
+    assert!(first.state_changed(), "the first pointer stamps the drain");
+    let stamp = drain.state.binding(&drain.writer).unwrap().last_drain_at;
+    assert!(stamp.is_some());
+    for _ in 0..3 {
+        let again = pointer_of(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
+        assert_eq!(again.count, 1);
         assert!(
-            Begun::Pointer(after_new).state_changed(),
-            "new mail is stamped once"
+            !Begun::Pointer(again).state_changed(),
+            "a repeated pointer writes nothing"
         );
-        assert!(drain.state.binding(&drain.writer).unwrap().last_drain_at > stamp);
-        assert!(!drain
-            .hook(HookEvent::PostToolUse, files::POST_TOOL_USE)
-            .state_changed());
     }
+
+    drain.send("peer", &body, false);
+    let after_new = pointer_of(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
+    assert_eq!(after_new.count, 2);
+    assert!(
+        Begun::Pointer(after_new).state_changed(),
+        "new mail is stamped once"
+    );
+    assert!(drain.state.binding(&drain.writer).unwrap().last_drain_at > stamp);
+    assert!(!drain
+        .hook(HookEvent::PostToolUse, files::POST_TOOL_USE)
+        .state_changed());
 }
 
 #[test]
@@ -1016,25 +1015,24 @@ fn a_claim_left_in_flight_beside_too_large_mail_is_offered_again_once_its_deadli
 #[test]
 fn a_pointer_call_past_a_messages_record_ttl_refuses_it_writes_once_and_then_changes_nothing() {
     let too_large = "x".repeat(step_bound(Adapter::Codex) as usize);
-    for (mut drain, body) in [(Drain::registered(Adapter::Codex), too_large)] {
-        drain.add_peer("peer");
-        let id = drain.send("peer", &body, false);
-        let first = pointer_of(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
-        assert!(Begun::Pointer(first).state_changed());
+    let (mut drain, body) = (Drain::registered(Adapter::Codex), too_large);
+    drain.add_peer("peer");
+    let id = drain.send("peer", &body, false);
+    let first = pointer_of(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
+    assert!(Begun::Pointer(first).state_changed());
 
-        // Ignored past the record TTL: the next pointer call runs the sweep.
-        drain.now += limits().record.ttl_sec + 1;
-        let late = drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
-        assert!(late.state_changed(), "the due refusal is written");
-        assert!(matches!(
-            drain.state_of(&id),
-            MessageState::Refused {
-                reason: fgos_mailbox_core::RefusalReason::RecordTtl,
-                ..
-            }
-        ));
-        assert!(!drain
-            .hook(HookEvent::PostToolUse, files::POST_TOOL_USE)
-            .state_changed());
-    }
+    // Ignored past the record TTL: the next pointer call runs the sweep.
+    drain.now += limits().record.ttl_sec + 1;
+    let late = drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
+    assert!(late.state_changed(), "the due refusal is written");
+    assert!(matches!(
+        drain.state_of(&id),
+        MessageState::Refused {
+            reason: fgos_mailbox_core::RefusalReason::RecordTtl,
+            ..
+        }
+    ));
+    assert!(!drain
+        .hook(HookEvent::PostToolUse, files::POST_TOOL_USE)
+        .state_changed());
 }
