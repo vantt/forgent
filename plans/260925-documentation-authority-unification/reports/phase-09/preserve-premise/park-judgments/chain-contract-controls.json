@@ -1,8 +1,8 @@
 {
-  "sourceCommit": "72d516ba54692c7eacb38fde4b3fef9f6d1edc0b",
+  "sourceCommit": "5cb7d0cddabb93f5d5fcd7a0a85468447209fb2b",
   "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/check_shard_controls.py",
   "exit": 0,
-  "passed": 69,
+  "passed": 82,
   "failed": 0,
   "checks": [
     {
@@ -167,6 +167,58 @@
     },
     {
       "case": "gloss cannot remove preserved prose",
+      "passed": true
+    },
+    {
+      "case": "preservation follows the authenticated upstream source correction",
+      "passed": true
+    },
+    {
+      "case": "without an explicit rebind the frozen preservation obligation remains",
+      "passed": true
+    },
+    {
+      "case": "preservation rebind rejects forged corrected text",
+      "passed": true
+    },
+    {
+      "case": "preservation rebind rejects forged corrected unit hash",
+      "passed": true
+    },
+    {
+      "case": "preservation rebind rejects forged corrected file hash",
+      "passed": true
+    },
+    {
+      "case": "preservation rebind rejects different source file",
+      "passed": true
+    },
+    {
+      "case": "preservation rebind rejects different source ordinal",
+      "passed": true
+    },
+    {
+      "case": "preservation rebind rejects different correction owner",
+      "passed": true
+    },
+    {
+      "case": "preservation rebind rejects parallel executable patch",
+      "passed": true
+    },
+    {
+      "case": "preservation rebind rejects non-preserve judgment",
+      "passed": true
+    },
+    {
+      "case": "preservation rebind rejects later commit falsely claiming the correction",
+      "passed": true
+    },
+    {
+      "case": "a later correction cannot certify an earlier replay pin",
+      "passed": true
+    },
+    {
+      "case": "a valid upstream rebind never permits a downstream F rewrite",
       "passed": true
     },
     {

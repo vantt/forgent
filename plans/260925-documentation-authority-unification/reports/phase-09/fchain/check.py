@@ -335,7 +335,7 @@ def compose(pin, manifest=None, additions=None):
                          if any(o['path'] in lines[i - 1] for o in original['normalizedOperands'])]
                 ordinals = bound or ordinals
             for ordinal in ordinals:
-                line = raw.decode().splitlines()[ordinal - 1]
+                line = shard.preservation_line(row, file, ordinal, pin)
                 # L13-21.4 explicitly keeps lineage operands but removes their
                 # clickability. Only this row's declared exact replacements may
                 # alter markup; unrelated changes still fail preservation.

@@ -1,6 +1,6 @@
 {
   "contract": "fchain-check.v1",
-  "sourceCommit": "72d516ba54692c7eacb38fde4b3fef9f6d1edc0b",
+  "sourceCommit": "5cb7d0cddabb93f5d5fcd7a0a85468447209fb2b",
   "exit": 0,
   "counts": {},
   "findings": [],
@@ -13,7 +13,7 @@
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
       "reader": "composition",
-      "sha256": "3e6cbd0cb438426176b55b1eb7f61afb81ae789ca52479398aa2a12a81fc6d2f"
+      "sha256": "d4871ba440aa3510db4f716f5d5d2bf6b656d6a9fa988eac3fae4f3b35254537"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/rebased-patches.json",
@@ -43,7 +43,7 @@
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json",
       "reader": "premise",
-      "sha256": "1a289310f935b6954d856c60b2c68ff339919c0eaa00a307a909a94ec855206d"
+      "sha256": "fc8144ea4ad9c17c2002e18c3253d57f55e0e02b1164e55121252a0af953678e"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/prepared-patches.json",
@@ -58,7 +58,7 @@
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
       "reader": "recomposed",
-      "sha256": "81d60b1d4ca9f64be416bd9d7d5ffa96d0875930885593774d62af4811226e12"
+      "sha256": "fb8bc12273b1d50060b61023dbcdff1841b60e66a850a688be007684b0ea62f9"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-supplemental-specs.json",
@@ -1985,7 +1985,7 @@
         "chainEntryId": "file:docs/platform/component-boundary.md",
         "file": "docs/platform/component-boundary.md",
         "selected": false,
-        "replacedBy": "w8:repin:w2:predecessor:docs/platform/component-boundary.md"
+        "replacedBy": "rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md"
       },
       {
         "chainEntryId": "file:docs/platform/decision-citation-drift/README.md",
@@ -2087,7 +2087,7 @@
         "chainEntryId": "file:docs/platform/runner/architecture/h-7af1f0242611.md",
         "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
         "selected": false,
-        "replacedBy": "recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md"
+        "replacedBy": "rebased:recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md"
       },
       {
         "chainEntryId": "file:docs/platform/runner/architecture/h-e53a3a9829a8.md",
@@ -2147,7 +2147,7 @@
         "chainEntryId": "file:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
         "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
         "selected": false,
-        "replacedBy": "recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md"
+        "replacedBy": "rebased:recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md"
       },
       {
         "chainEntryId": "file:docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
@@ -2645,7 +2645,7 @@
     "executableCompositionIds": [
       "w2:predecessor:apps/fgos-gateway/Cargo.toml",
       "w2:predecessor:apps/fgos-gateway/src/mcp.rs",
-      "w8:repin:w2:predecessor:docs/platform/component-boundary.md",
+      "rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md",
       "w8:repin:w2:predecessor:docs/platform/git/spec.md",
       "w2:predecessor:docs/platform/herdr-web-dashboard/README.md",
       "w8:repin:w2:predecessor:docs/platform/holder-lock/spec.md",
@@ -2702,14 +2702,14 @@
       "w2:description:architecture-intent-self-route",
       "w2:scan:live-successor-specs",
       "w2:guard:retired-schema-qualification",
-      "w8:hunk-park:workflow-holder",
+      "rebased:w8:hunk-park:workflow-holder",
       "w8:convention:area-holder-table",
       "w8:status-units:docs/platform/governance.md",
       "w8:description:system-overview-complete",
       "w8:description:architecture-intent-complete",
       "w8:status-complete:docs/transitional-switchboard.md",
       "w8:status-complete:docs/platform/documentation/switchboard.md",
-      "w8:gap05:relocation",
+      "rebased:w8:gap05:relocation",
       "w8:gap05:history",
       "w8:scan:exclude-successor-history",
       "w8:proof:history-exclusion-negative-control",
@@ -2720,7 +2720,7 @@
       "w8:gloss:docs/platform/runner/decisions/h-36d872fbb0e5.md",
       "w8:gloss:docs/platform/runner/spec.md",
       "w8:gloss:docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
-      "w8:gloss:docs/platform/work-state/spec.md",
+      "rebased:w8:gloss:docs/platform/work-state/spec.md",
       "w8:gloss:researching-source",
       "recomposed-predecessor:.githooks/pre-commit",
       "recomposed-predecessor:docs/io-contract.md",
@@ -2729,8 +2729,8 @@
       "recomposed-predecessor:docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
       "recomposed-predecessor:docs/platform/agent-coordination/decisions/README.md",
       "recomposed-predecessor:docs/platform/runner/architecture/h-69197b459754.md",
-      "recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md",
-      "recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "rebased:recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md",
+      "rebased:recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
       "recomposed-predecessor:docs/reading-map.md",
       "recomposed-predecessor:plugins/fgOS/skills/terminal/SKILL.md",
       "recomposed-predecessor:src/runner/dispatch/assignment-runner.mjs",
@@ -2778,10 +2778,16 @@
       "w2:status-partial:docs/platform/documentation/switchboard.md",
       "w2:proposal:gap05-relocation",
       "w2:proposal:gap05-history",
+      "w8:repin:w2:predecessor:docs/platform/component-boundary.md",
+      "w8:hunk-park:workflow-holder",
+      "w8:gap05:relocation",
+      "w8:gloss:docs/platform/work-state/spec.md",
       "w8:ui:refresh-stale-committed-render",
       "w8:ui:render-composed-sources",
       "w8:render-evidence:.agents/skills/fgos-researching/SKILL.md",
-      "w8:render-evidence:plugins/fgOS/skills/fgos-researching/SKILL.md"
+      "w8:render-evidence:plugins/fgOS/skills/fgos-researching/SKILL.md",
+      "recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md",
+      "recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md"
     ],
     "selectionRule": "Use effectiveSpecIds in order; then finalPinFSpecIds ONLY under the docs lease at final pin F with a current byte guard. Historical entries are not executable alternatives. Generator diffs are evidence, not an apply door.",
     "files": [
@@ -7000,18 +7006,18 @@
       {
         "file": "docs/platform/component-boundary.md",
         "strict": true,
-        "resultSha256": "9b90e37c81498b4f9667d9f96e5e0c8c26241b26eefb8e016af17d9dd4f56d4c",
+        "resultSha256": "6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db",
         "steps": [
           {
-            "chainEntryId": "w8:repin:w2:predecessor:docs/platform/component-boundary.md",
-            "beforeSha256": "ccab81b65e2cd9b92bc2b902caf3446fa95119890088a735dc314b107f7c78ca",
-            "afterSha256": "a3c121a8dfa83416b3d9fea07b22c83be503243a4369be704d288e830a607e31",
+            "chainEntryId": "rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md",
+            "beforeSha256": "dc6481146216ea1dd42fabab7cb5bdcb4c5b0329055c6619d774aef621c329d2",
+            "afterSha256": "53d407ed2e7b626329e334a06b083a964e3bfcc059dfd971d3801beb2ed83904",
             "diagnostic": false
           },
           {
-            "chainEntryId": "w8:gap05:relocation",
-            "beforeSha256": "a3c121a8dfa83416b3d9fea07b22c83be503243a4369be704d288e830a607e31",
-            "afterSha256": "9b90e37c81498b4f9667d9f96e5e0c8c26241b26eefb8e016af17d9dd4f56d4c",
+            "chainEntryId": "rebased:w8:gap05:relocation",
+            "beforeSha256": "53d407ed2e7b626329e334a06b083a964e3bfcc059dfd971d3801beb2ed83904",
+            "afterSha256": "6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db",
             "diagnostic": false
           }
         ]
@@ -7464,12 +7470,12 @@
       {
         "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
         "strict": true,
-        "resultSha256": "06c442990c23e230417099d37bfdab8e94b7306ddcbfe40e7dfabe573480fbd0",
+        "resultSha256": "bf8fd81b43f38bed001d5663155128287f1f59ca1aabc6f498a8ac2a45250395",
         "steps": [
           {
-            "chainEntryId": "recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md",
-            "beforeSha256": "c9087a371a17e3bff3e79e246374b54abfe903c18e3a5ecaa851fa769f634999",
-            "afterSha256": "06c442990c23e230417099d37bfdab8e94b7306ddcbfe40e7dfabe573480fbd0",
+            "chainEntryId": "rebased:recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md",
+            "beforeSha256": "be01e15a9b153167d8203c34acbdf7cb5a98780130b3661153656d2714eb78ba",
+            "afterSha256": "bf8fd81b43f38bed001d5663155128287f1f59ca1aabc6f498a8ac2a45250395",
             "diagnostic": false
           }
         ]
@@ -7619,12 +7625,12 @@
       {
         "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
         "strict": true,
-        "resultSha256": "160c8fd78383bd9e138b73ae7c9b6860a595ea0519c99aa775a7d62ccc9d6a59",
+        "resultSha256": "9d02d02ebcd4e59c0b918ddfaf19238a18a85ce5d769340f3371ea8b81952944",
         "steps": [
           {
-            "chainEntryId": "recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
-            "beforeSha256": "8a974e8880f101b835a5daf35dd261960f8f06b5016d051fb2b77ded21158646",
-            "afterSha256": "160c8fd78383bd9e138b73ae7c9b6860a595ea0519c99aa775a7d62ccc9d6a59",
+            "chainEntryId": "rebased:recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+            "beforeSha256": "85a7a1f8e02393164f47ba50ff163d541eed10a082d8e6707a10d61bab490074",
+            "afterSha256": "9d02d02ebcd4e59c0b918ddfaf19238a18a85ce5d769340f3371ea8b81952944",
             "diagnostic": false
           }
         ]
@@ -8039,12 +8045,12 @@
       {
         "file": "docs/platform/work-state/spec.md",
         "strict": true,
-        "resultSha256": "12e6ceae00eda6b236fb620a5a0b9e97cec04996028d792f884c3f540d29b572",
+        "resultSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597",
         "steps": [
           {
-            "chainEntryId": "w8:gloss:docs/platform/work-state/spec.md",
-            "beforeSha256": "8fad2d269f635ce4a00093500daeb8825e95765d65e133479da4821f7aa5238e",
-            "afterSha256": "12e6ceae00eda6b236fb620a5a0b9e97cec04996028d792f884c3f540d29b572",
+            "chainEntryId": "rebased:w8:gloss:docs/platform/work-state/spec.md",
+            "beforeSha256": "ad87f25480923800f65d16549f7d720519d856b8ee234f5fab20a0b3c5b8e2e8",
+            "afterSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597",
             "diagnostic": false
           }
         ]
@@ -8052,12 +8058,12 @@
       {
         "file": "docs/platform/workflow/spec.md",
         "strict": true,
-        "resultSha256": "6f9b26430c16fa5f489c127d766a3bfc59ad28aef768094af18a355254a940ef",
+        "resultSha256": "2ca4a63b251f13c00da4b68ed49c959ee6b4c435a0494beba2fd3fab8d2d6790",
         "steps": [
           {
-            "chainEntryId": "w8:hunk-park:workflow-holder",
-            "beforeSha256": "0ce96d282b026df85d96aa20c42b3e934b3b3f739a13edcf0aee6905465e1d7c",
-            "afterSha256": "6f9b26430c16fa5f489c127d766a3bfc59ad28aef768094af18a355254a940ef",
+            "chainEntryId": "rebased:w8:hunk-park:workflow-holder",
+            "beforeSha256": "d6e57367a274f65638d4544651230e2605eaa1e42604bd9cfbcd800bcfa83eb8",
+            "afterSha256": "2ca4a63b251f13c00da4b68ed49c959ee6b4c435a0494beba2fd3fab8d2d6790",
             "diagnostic": false
           }
         ]
@@ -12942,15 +12948,15 @@
     "docs/platform/work-state/spec.md": [
       {
         "source": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
-        "pointer": "/patches/115",
-        "id": "w8:gloss:docs/platform/work-state/spec.md"
+        "pointer": "/patches/141",
+        "id": "rebased:w8:gloss:docs/platform/work-state/spec.md"
       }
     ],
     "docs/platform/workflow/spec.md": [
       {
         "source": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
-        "pointer": "/patches/84",
-        "id": "w8:hunk-park:workflow-holder"
+        "pointer": "/patches/142",
+        "id": "rebased:w8:hunk-park:workflow-holder"
       }
     ],
     "docs/platform/yaml-document/spec.md": [
@@ -17020,10 +17026,10 @@
       "file": "docs/platform/component-boundary.md",
       "mode": "composedBy-selected-chain",
       "composedBy": [
-        "w8:repin:w2:predecessor:docs/platform/component-boundary.md",
-        "w8:gap05:relocation"
+        "rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md",
+        "rebased:w8:gap05:relocation"
       ],
-      "afterSha256": "9b90e37c81498b4f9667d9f96e5e0c8c26241b26eefb8e016af17d9dd4f56d4c"
+      "afterSha256": "6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db"
     },
     {
       "id": "g9:docs/platform/config/spec.md",
@@ -17316,9 +17322,9 @@
       "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
       "mode": "composedBy-selected-chain",
       "composedBy": [
-        "recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md"
+        "rebased:recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md"
       ],
-      "afterSha256": "06c442990c23e230417099d37bfdab8e94b7306ddcbfe40e7dfabe573480fbd0"
+      "afterSha256": "bf8fd81b43f38bed001d5663155128287f1f59ca1aabc6f498a8ac2a45250395"
     },
     {
       "id": "g9:docs/platform/runner/architecture/h-e53a3a9829a8.md",
@@ -17417,9 +17423,9 @@
       "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
       "mode": "composedBy-selected-chain",
       "composedBy": [
-        "recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md"
+        "rebased:recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md"
       ],
-      "afterSha256": "160c8fd78383bd9e138b73ae7c9b6860a595ea0519c99aa775a7d62ccc9d6a59"
+      "afterSha256": "9d02d02ebcd4e59c0b918ddfaf19238a18a85ce5d769340f3371ea8b81952944"
     },
     {
       "id": "g9:docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
@@ -17692,18 +17698,18 @@
       "file": "docs/platform/work-state/spec.md",
       "mode": "composedBy-selected-chain",
       "composedBy": [
-        "w8:gloss:docs/platform/work-state/spec.md"
+        "rebased:w8:gloss:docs/platform/work-state/spec.md"
       ],
-      "afterSha256": "12e6ceae00eda6b236fb620a5a0b9e97cec04996028d792f884c3f540d29b572"
+      "afterSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597"
     },
     {
       "id": "g9:docs/platform/workflow/spec.md",
       "file": "docs/platform/workflow/spec.md",
       "mode": "composedBy-selected-chain",
       "composedBy": [
-        "w8:hunk-park:workflow-holder"
+        "rebased:w8:hunk-park:workflow-holder"
       ],
-      "afterSha256": "6f9b26430c16fa5f489c127d766a3bfc59ad28aef768094af18a355254a940ef"
+      "afterSha256": "2ca4a63b251f13c00da4b68ed49c959ee6b4c435a0494beba2fd3fab8d2d6790"
     },
     {
       "id": "g9:docs/platform/yaml-document/spec.md",
@@ -22644,14 +22650,14 @@
     },
     {
       "file": "docs/platform/component-boundary.md",
-      "afterSha256": "9b90e37c81498b4f9667d9f96e5e0c8c26241b26eefb8e016af17d9dd4f56d4c",
+      "afterSha256": "6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db",
       "steps": [
         {
-          "chainEntryId": "w8:repin:w2:predecessor:docs/platform/component-boundary.md",
+          "chainEntryId": "rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md",
           "diagnostic": false
         },
         {
-          "chainEntryId": "w8:gap05:relocation",
+          "chainEntryId": "rebased:w8:gap05:relocation",
           "diagnostic": false
         }
       ]
@@ -23495,10 +23501,10 @@
     },
     {
       "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
-      "afterSha256": "06c442990c23e230417099d37bfdab8e94b7306ddcbfe40e7dfabe573480fbd0",
+      "afterSha256": "bf8fd81b43f38bed001d5663155128287f1f59ca1aabc6f498a8ac2a45250395",
       "steps": [
         {
-          "chainEntryId": "recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md",
+          "chainEntryId": "rebased:recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md",
           "diagnostic": false
         }
       ]
@@ -23623,10 +23629,10 @@
     },
     {
       "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
-      "afterSha256": "160c8fd78383bd9e138b73ae7c9b6860a595ea0519c99aa775a7d62ccc9d6a59",
+      "afterSha256": "9d02d02ebcd4e59c0b918ddfaf19238a18a85ce5d769340f3371ea8b81952944",
       "steps": [
         {
-          "chainEntryId": "recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+          "chainEntryId": "rebased:recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
           "diagnostic": false
         }
       ]
@@ -24197,16 +24203,16 @@
     },
     {
       "file": "docs/platform/work-state/spec.md",
-      "afterSha256": "7428905fc3caaaeb2aa762771af7b9c5539583f7c329e8e63c2e9b9082e860c8",
+      "afterSha256": "30be7cddba2ecfa79f9ba78581fc75b1131cdcdbf17918a5029a073cd7479fe3",
       "steps": [
         {
-          "chainEntryId": "w8:gloss:docs/platform/work-state/spec.md",
+          "chainEntryId": "rebased:w8:gloss:docs/platform/work-state/spec.md",
           "diagnostic": false
         },
         {
           "id": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json#/rows/118/patch",
-          "beforeSha256": "12e6ceae00eda6b236fb620a5a0b9e97cec04996028d792f884c3f540d29b572",
-          "afterSha256": "7428905fc3caaaeb2aa762771af7b9c5539583f7c329e8e63c2e9b9082e860c8",
+          "beforeSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597",
+          "afterSha256": "30be7cddba2ecfa79f9ba78581fc75b1131cdcdbf17918a5029a073cd7479fe3",
           "owners": [
             "f08069",
             "f08076",
@@ -24217,16 +24223,16 @@
     },
     {
       "file": "docs/platform/workflow/spec.md",
-      "afterSha256": "20fff384ef0c1d8bd8af9ff4b927ac75dd9208820151e3b696e3b85527d1174e",
+      "afterSha256": "7e4c3489c797897bd13b9219d71dbf0d48a458b199d8723f20e2e5484c75be27",
       "steps": [
         {
-          "chainEntryId": "w8:hunk-park:workflow-holder",
+          "chainEntryId": "rebased:w8:hunk-park:workflow-holder",
           "diagnostic": false
         },
         {
           "id": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json#/rows/164/patch",
-          "beforeSha256": "6f9b26430c16fa5f489c127d766a3bfc59ad28aef768094af18a355254a940ef",
-          "afterSha256": "20fff384ef0c1d8bd8af9ff4b927ac75dd9208820151e3b696e3b85527d1174e",
+          "beforeSha256": "2ca4a63b251f13c00da4b68ed49c959ee6b4c435a0494beba2fd3fab8d2d6790",
+          "afterSha256": "7e4c3489c797897bd13b9219d71dbf0d48a458b199d8723f20e2e5484c75be27",
           "owners": [
             "f08335"
           ]

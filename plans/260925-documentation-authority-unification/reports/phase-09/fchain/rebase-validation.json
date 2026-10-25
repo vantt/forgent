@@ -1,0 +1,46 @@
+{
+  "exit": 0,
+  "sourceCommit": "5cb7d0cddabb93f5d5fcd7a0a85468447209fb2b",
+  "authority": "L13-21.1; L13-24; w27 brief",
+  "historicalCompositionSpecsUnchanged": 137,
+  "appendedCompositionSpecs": 6,
+  "step7SpecsUnchanged": 423,
+  "judgmentsAndFrozenEvidenceUnchanged": 787,
+  "dependencyDecisionFileUnchanged": true,
+  "dependencyDecisionsUnchanged": 158,
+  "carryAndCensusAuthoringPacketsUnchanged": true,
+  "witnessesRebased": [
+    "docs/platform/component-boundary.md",
+    "docs/platform/runner/architecture/h-7af1f0242611.md",
+    "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "docs/platform/work-state/spec.md",
+    "docs/platform/workflow/spec.md"
+  ],
+  "otherWholeBodyWitnessesUnchanged": 541,
+  "shardChainPatchRowCopiesRebased": [
+    "f08069",
+    "f08076",
+    "f08084",
+    "f08335"
+  ],
+  "preservationRebinds": [
+    "f07671",
+    "f07672",
+    "f07686"
+  ],
+  "upstreamRepairsSurvive": {
+    "workflowFencedSeatBindingLiteral": true,
+    "componentFencedPortLiteral": true,
+    "runnerInlineCallLiteral": true,
+    "priorityTruthCorrection": true,
+    "correctedVocabularyCitations": true
+  },
+  "sharedComposition": {
+    "files": 548,
+    "executed": 141,
+    "links": 20,
+    "findings": {}
+  },
+  "writeScopeVerified": true,
+  "limits": "Records-only; no semantic acceptance, product application, gate closure or cutover authorization."
+}
