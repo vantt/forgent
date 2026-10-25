@@ -43,7 +43,7 @@ Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (
 | MAIL | `lead:MAIL` | `claude-rgvd@fg-server` (đã nhận vai 10-23 11:10) | `fg-server` (xác nhận; dòng MAIL trước đây ghi "máy owner" là sai) |
 | HARDEN | `lead:HARDEN` | `claude-p74h@fg-server2` (IDENT điền từ dòng log 11:28 của HARDEN) | `fg-server2` |
 | TEST | `lead:TEST` | `claude-tt7r@fg-server2` (đã nhận vai 10-23 11:27) | `fg-server2` |
-| WORK | `lead:WORK`, `lead:ES` | **Trống từ 10-25 19:05** (phiên `claude-uygd@fg-server2`/`forgent-4e` đóng theo lệnh owner). Phiên nhận duyệt Event Store tiếp theo chạy `fgos identity session --role lead:ES` rồi điền dòng này | `fg-server2` |
+| WORK | `lead:ES` (lane WORK đóng) | `claude-ursc@fg-server2` (nhận vai 10-25 19:06, thay `claude-uygd@fg-server2` đã đóng) | `fg-server2` |
 | OPC | `lead:OPC` | `claude-muyt@fg-server2` | `fg-server2` |
 | CFG | `lead:CFG` | `claude-hrpe@fg-server` | **Landed:** Slice A, B, D; **Slice C 10-25** (`b6fac0706`: mọi reader qua door `fgos-config`, xoá `src/config/`; repo đã migrate; sửa migrate trong linked worktree `14170bcbd`; xoá default chép `2d587bb9b`; I2 chuyển file global `005282a22`; tài liệu `67524cfe1`). **Máy:** fg-server chạy C, file global là YAML; fg-server2 chạy C, file global còn JSON; design-lap đang bật (SEAT). **Còn lại rồi đóng lane:** C2 design-lap bật C và `config check` xanh; chuyển file global trên fg-server2 và design-lap ở lần nâng release kế tiếp; C3 nâng `config-format-legacy-json` lên fail khi cả ba máy đã chuyển; phép thử identity hai máy (bước 3, cùng OPC). Đang mở ngoài lane: Windows G4. |
 | COOK | `lead:COOK` | `claude-fkpc@fg-server` | `fg-server` |
