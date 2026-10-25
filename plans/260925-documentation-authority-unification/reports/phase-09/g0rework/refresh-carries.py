@@ -172,6 +172,14 @@ def main():
             target = selected[0]
             t.update(anchor=target['anchor'], targetUnitDigest=target['textDigest'],
                      level=target['level'], directPayloadDigest=target['sectionPayloadDigest'])
+        # Distinct historical headings can resolve to the same live target.
+        # Keep its first occurrence, but retain all preimages in accounting.
+        unique = {}
+        for t in h['targets']:
+            key = (t['path'], t['anchor'])
+            assert key not in unique or unique[key] == t, ('conflicting heading target', key)
+            unique.setdefault(key, t)
+        h['targets'] = list(unique.values())
         if h != before:
             h['accounting'] = dict(previousParityRow=before, historicalSourcePin=heading_pin,
                 oldLegacyAnchor=before['sourceAnchor'], oldLegacyDigest=before['sourceUnitDigest'],
