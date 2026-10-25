@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c453f3cd73f96d420263c28190b3d37e49647f4a34e25254e5e45e5292198a59",
+  "payloadDigest": "d01d5a22228f4fa91726068f9f7772ba42bfa06946c882ae81b842c6be0a5237",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -84,7 +84,7 @@
     "apps/fgos/src/wiring/identity_log.rs": "daeee49487d87b3a46914eda54a8b6a40f72b688ede6ce62d64379a89c5d5137",
     "apps/fgos/src/wiring/metrics_sources.rs": "504e2c72b52a5da8d8d23a862403d47986811234809f364ee6006c6957f6c583",
     "apps/fgos/src/wiring/mod.rs": "08deb28466bf1e41ba1508e317fa4f3ef9ec56b782d1ba4478ead92b1eb0a276",
-    "apps/fgos/tests/cli_tests.rs": "5c35aaa7d74c126553e0598d7a594a0b259149869a382c9ad8c2fdc2e0fd7269",
+    "apps/fgos/tests/cli_tests.rs": "cc60e3e856c1372fd429c766d6622655aeeb11d04dbdd09b4c8f456ab2095951",
     "apps/fgos/tests/internal_lock_routes.rs": "c00e9f06cc092ca8892886f25cdabe148fdce3909c933fdf9ec92e9f8ffe298d",
     "apps/fgos/tests/windows_borrow.rs": "59258d09ea0b2420b7cecfe73fd9b67d61f83bb3a4d97feaa770aa6d26a05521",
     "apps/fgos/tests/windows_lock_hold_route.rs": "fe11272fb65d947366300770cd5765c1604c800eeac7f052fad57320db7e8530",
@@ -1782,42 +1782,42 @@
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1437,
+      "line": 1441,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1697,
+      "line": 1701,
       "spawn": "Command::new",
       "binary": "/usr/bin/git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1739,
+      "line": 1743,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1800,
+      "line": 1804,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1841,
+      "line": 1845,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1873,
+      "line": 1877,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"

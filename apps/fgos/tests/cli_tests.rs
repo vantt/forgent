@@ -1198,6 +1198,10 @@ fn identity_command(args: &[&str]) -> Command {
     let mut cmd = Command::new(fgos_bin());
     cmd.arg("identity").args(args);
     cmd.env("FGOS_STATE_ROOT", identity_state_root());
+    // An empty home, so the machine's real global config never decides a case.
+    let home = identity_state_root().with_extension("home");
+    fs::create_dir_all(&home).unwrap();
+    cmd.env("HOME", home).env_remove("XDG_CONFIG_HOME");
     for key in [
         "FGOS_SESSION_ID",
         "CODEX_THREAD_ID",
