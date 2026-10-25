@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos identity session` now publishes from a clone of a migrated project that has never appended an event (for example a second machine's clone). It used to skip publishing silently, so other machines could never resolve its sessions.
 - `fgos config migrate --global --convert --machine-checked` converts `~/.fgos/config.json` to `~/.fgos/config.yaml` the same way as a project file: values equal to the standard dropped, a `[migrate]` reason per kept value, a backup under `~/.fgos/private/config-migrate/`, a tombstone left in the JSON file, and the effective value unchanged. It runs once no release on the machine reads the JSON file and both stages of the account and token move are done; after it, `fgos config set|unset --global` and `doctor --fix` write the global file. `--dry-run` shows the report without the machine check.
 - `fgos config migrate` run in a linked worktree now lists the machine overrides among command values (such as a capability's `confinement` or an executor's `invocations`). It compared both files with the main checkout's command values, so a global value that a dropped project value had hidden went unlisted and won after the cutover.
 - `fgctl stage` on a fresh machine now creates the fgOS state root owner-only (mode 0700) whatever the umask, so a home set up under umask 002 no longer makes the Git door refuse with `untrusted-driver-directory` until `fgos doctor --fix` runs.

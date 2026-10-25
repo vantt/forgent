@@ -1453,8 +1453,9 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
     };
     let project_id = "0123456789abcdef0123456789abcdef";
     let driver = GitDriver::new(&world).unwrap();
-    // A clone of the project with its Event Store opened by one fixture event, like a migrated clone.
-    let clone = |name: &str, machine: &str| {
+    // A clone of a migrated project: the `.fgos/events` fence is there, but this clone never appended,
+    // so it has no store yet; its first identity publish creates it.
+    let clone = |name: &str| {
         let root = world.join(name);
         git(&world, &["clone", "-q", remote.to_str().unwrap(), root.to_str().unwrap()]);
         fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
@@ -1477,16 +1478,7 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
             fs::set_permissions(dir, fs::Permissions::from_mode(0o700)).unwrap();
         }
         ensure_refspecs(&driver, &repo, "origin").unwrap();
-        let mut registry = Registry::default();
-        let fixture = r#"{"v":1,"types":[{"type":"fixture.add","domain":"fixture","scope":"project","schemaVersion":1,"sealOnWrite":false}]}"#;
-        registry.register(serde_json::from_str::<ConsumerContract>(fixture).unwrap()).unwrap();
-        let open = EventInput { event_type: "fixture.add".into(), schema_version: 1, payload: serde_json::json!({}), ts: "2026-10-24T00:00:00.000Z".into() };
-        append(
-            &layout,
-            &registry,
-            AppendRequest { stream: &StreamId::parse("project").unwrap(), events: &[open], cursor: &Default::default(), writer: "fixture", machine, held_ranks: &[] },
-        )
-        .unwrap();
+        fs::write(root.join(".fgos/events"), "fence\n").unwrap();
         (root, repo, layout)
     };
     let sync_clone = |repo: &fgos_git::RepoHandle, layout: &Layout, machine: &str| {
@@ -1498,8 +1490,8 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
         .unwrap();
     };
     let (alpha_state, bravo_state) = (machine_state("alpha", "alpha-aaaaaa"), machine_state("bravo", "bravo-bbbbbb"));
-    let (alpha_root, alpha_repo, alpha_layout) = clone("alpha", "alpha-aaaaaa");
-    let (bravo_root, bravo_repo, bravo_layout) = clone("bravo", "bravo-bbbbbb");
+    let (alpha_root, alpha_repo, alpha_layout) = clone("alpha");
+    let (bravo_root, bravo_repo, bravo_layout) = clone("bravo");
     let _ = bravo_root;
 
     let run = |args: &[&str]| {
@@ -1514,8 +1506,9 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
         let active = alpha_layout.stream(&StreamId::parse("project:identity").unwrap()).active();
         fs::read_to_string(active).map_or(0, |text| text.matches("identity.session-published").count())
     };
+    assert!(!alpha_layout.store().exists(), "the clone has never appended");
     identity_data(&run(&["session", "--register", "--role", "lead:WORK", "--json"]));
-    assert_eq!(published_in_alpha(), 1, "a new registration publishes once");
+    assert_eq!(published_in_alpha(), 1, "a new registration in a migrated clone without a store creates it and publishes once");
     identity_data(&run(&["session", "--register", "--role", "lead:WORK", "--json"]));
     assert_eq!(published_in_alpha(), 1, "an unchanged registration publishes nothing");
 
@@ -1574,7 +1567,7 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
 
     // A clone that still tracks a retired event file is refused by the Event Store's write admission:
     // the local registration succeeds, the refusal is one stderr line, and nothing is appended.
-    let (legacy_root, _, legacy_layout) = clone("legacy", "alpha-aaaaaa");
+    let (legacy_root, _, legacy_layout) = clone("legacy");
     fs::write(legacy_root.join(".fgos/events.jsonl"), "").unwrap();
     git(&legacy_root, &["add", "-f", ".fgos/events.jsonl"]);
     git(&legacy_root, &["-c", "user.name=t", "-c", "user.email=t@example.test", "commit", "-qm", "legacy events"]);
