@@ -3,6 +3,7 @@ use crate::init::{ActivationLockGuard, InitError};
 use crate::manifest::ReleaseManifest;
 use fgos_git::wal::{OsFileSystem, Wal};
 use fgos_git::GitDriver;
+use fgos_holder_lock::origin::{is_script_runtime, FGOS_BINARIES};
 use std::path::{Path, PathBuf};
 
 fn refusal(code: &str, detail: impl std::fmt::Display) -> InitError {
@@ -108,10 +109,10 @@ fn predecessor_scan(workspace: &Path) -> Result<(), InitError> {
     validate_predecessor_scan(&output.stdout, output.status.code())
 }
 
-/// Whether the command line runs fgOS: `argv[0]` is a fgOS binary, or it is an
-/// interpreter (node, bun, deno) whose arguments name a fgOS script. A shell
+/// Whether the process runs fgOS: `argv[0]` is a fgOS binary, or it is a
+/// script runtime (node, bun, deno) whose arguments name a fgOS script. A shell
 /// whose `-c` text merely mentions fgos runs neither.
-fn runs_fgos(cmdline: &str) -> bool {
+fn runs_fgos(argv: &[&str]) -> bool {
     let base = |arg: &str| {
         Path::new(arg)
             .file_name()
@@ -119,24 +120,17 @@ fn runs_fgos(cmdline: &str) -> bool {
             .unwrap_or("")
             .to_string()
     };
-    let mut words = cmdline.split_whitespace();
-    let Some(program) = words.next().map(base) else {
+    let Some((program, args)) = argv.split_first().map(|(p, a)| (base(p), a)) else {
         return false;
     };
-    if matches!(program.as_str(), "fgos" | "fgos-runner" | "fgos-gateway") {
+    if FGOS_BINARIES.contains(&program.as_str()) {
         return true;
     }
-    let interpreter = matches!(program.as_str(), "bun" | "deno")
-        || program.strip_prefix("node").is_some_and(|rest| {
-            matches!(rest, "" | "js")
-                || rest.starts_with(|c: char| c.is_ascii_digit() || c == '.' || c == '-')
-        });
-    interpreter
-        && words.any(|arg| {
-            matches!(
-                base(arg).as_str(),
-                "fgos" | "fgos-runner" | "fgos-gateway" | "fgos.mjs" | "fgos-runner.mjs"
-            )
+    is_script_runtime(&program)
+        && args.iter().any(|arg| {
+            let name = base(arg);
+            FGOS_BINARIES.contains(&name.as_str())
+                || matches!(name.as_str(), "fgos.mjs" | "fgos-runner.mjs")
         })
 }
 
@@ -158,15 +152,26 @@ fn validate_predecessor_scan(bytes: &[u8], exit_code: Option<i32>) -> Result<(),
         .as_array()
         .ok_or_else(|| refusal("git-predecessor-writer-live", "invalid process scan"))?;
     for process in processes {
-        let cmdline = process["cmdline"].as_str().unwrap_or("");
+        let argv: Vec<&str> = process["argv"]
+            .as_array()
+            .ok_or_else(|| {
+                refusal(
+                    "git-predecessor-writer-live",
+                    "process scan lacks the exact argv",
+                )
+            })?
+            .iter()
+            .map(|word| word.as_str().unwrap_or(""))
+            .collect();
+        let cmdline = argv.join(" ");
         // quiesce-scan also reports ordinary shells in the workspace. Only a
         // process that runs fgOS can be a predecessor writer at this capability
         // split, so judge what it executes, never words in its arguments.
-        if !runs_fgos(cmdline) {
+        if !runs_fgos(&argv) {
             continue;
         }
-        let compatible = cmdline
-            .split_whitespace()
+        let compatible = argv
+            .iter()
             .filter(|arg| Path::new(arg).is_absolute())
             .any(|arg| {
                 Path::new(arg)
@@ -262,14 +267,14 @@ mod tests {
         ] {
             assert!(validate_predecessor_scan(&serde_json::to_vec(&body).unwrap(), exit).is_err());
         }
-        let scan = serde_json::json!({"v":1,"protocol":1,"result":"ok","unreadable":0,"processes":[{"pid":424242,"cmdline":"node bin/fgos.mjs"}]});
+        let scan = serde_json::json!({"v":1,"protocol":1,"result":"ok","unreadable":0,"processes":[{"pid":424242,"cmdline":"node bin/fgos.mjs","argv":["node","bin/fgos.mjs"]}]});
         let error = validate_predecessor_scan(&serde_json::to_vec(&scan).unwrap(), Some(10))
             .unwrap_err()
             .to_string();
         assert!(error.contains("424242") && error.contains("node bin/fgos.mjs"));
-        let shell = serde_json::json!({"v":1,"protocol":1,"result":"ok","unreadable":0,"processes":[{"pid":1,"cmdline":"zsh -c fgos run x; fgctl upgrade"}]});
+        let shell = serde_json::json!({"v":1,"protocol":1,"result":"ok","unreadable":0,"processes":[{"pid":1,"argv":["zsh","-c","fgos run x; fgctl upgrade"]}]});
         validate_predecessor_scan(&serde_json::to_vec(&shell).unwrap(), Some(10)).unwrap();
-        let binary = serde_json::json!({"v":1,"protocol":1,"result":"ok","unreadable":0,"processes":[{"pid":2,"cmdline":"/opt/old/bin/fgos run x"}]});
+        let binary = serde_json::json!({"v":1,"protocol":1,"result":"ok","unreadable":0,"processes":[{"pid":2,"argv":["/opt/old/bin/fgos","run","x"]}]});
         assert!(
             validate_predecessor_scan(&serde_json::to_vec(&binary).unwrap(), Some(10)).is_err()
         );
@@ -280,15 +285,55 @@ mod tests {
     #[test]
     fn predecessor_scan_reads_the_program_from_the_exact_argv_not_the_joined_text() {
         let scan = |argv: serde_json::Value| {
-            let cmdline = argv.as_array().unwrap().iter().map(|a| a.as_str().unwrap()).collect::<Vec<_>>().join(" ");
+            let cmdline = argv
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|a| a.as_str().unwrap())
+                .collect::<Vec<_>>()
+                .join(" ");
             serde_json::to_vec(&serde_json::json!({"v":1,"protocol":1,"result":"processes","unreadable":0,"processes":[{"pid":7,"cmdline":cmdline,"argv":argv}]})).unwrap()
         };
         assert!(
-            validate_predecessor_scan(&scan(serde_json::json!(["/opt/my dir/fgos", "run"])), Some(10)).is_err(),
+            validate_predecessor_scan(
+                &scan(serde_json::json!(["/opt/my dir/fgos", "run"])),
+                Some(10)
+            )
+            .is_err(),
             "a fgOS binary under a path with a space is still a writer"
         );
-        validate_predecessor_scan(&scan(serde_json::json!(["/usr/bin/zsh", "-c", "fgos run x; fgctl upgrade"])), Some(10)).unwrap();
-        assert!(validate_predecessor_scan(&scan(serde_json::json!(["node", "/my dir/bin/fgos.mjs"])), Some(10)).is_err());
+        validate_predecessor_scan(
+            &scan(serde_json::json!([
+                "/usr/bin/zsh",
+                "-c",
+                "fgos run x; fgctl upgrade"
+            ])),
+            Some(10),
+        )
+        .unwrap();
+        assert!(validate_predecessor_scan(
+            &scan(serde_json::json!(["node", "/my dir/bin/fgos.mjs"])),
+            Some(10)
+        )
+        .is_err());
+        assert!(
+            validate_predecessor_scan(
+                &scan(serde_json::json!([
+                    "/usr/bin/node20",
+                    "--import",
+                    "x.mjs",
+                    "bin/fgos.mjs"
+                ])),
+                Some(10)
+            )
+            .is_err(),
+            "a versioned node counts"
+        );
+        let no_argv = serde_json::json!({"v":1,"protocol":1,"result":"processes","unreadable":0,"processes":[{"pid":9,"cmdline":"fgos run"}]});
+        assert!(
+            validate_predecessor_scan(&serde_json::to_vec(&no_argv).unwrap(), Some(10)).is_err(),
+            "a scan without the exact argv is refused"
+        );
     }
     #[test]
     fn non_git_non_wal_admission_needs_no_git_or_state_root() {

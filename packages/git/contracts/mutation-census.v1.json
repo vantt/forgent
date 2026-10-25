@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "28b0fb3442b146836855cfdcd07b67526e57cf1eeee2f8df7bc123b9e85a43e1",
+  "payloadDigest": "b53aa151db8355f726d24adeede7bc0b125b7e5a26ac064e082278122e49804d",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -250,7 +250,7 @@
     "packages/distribution/rust/src/canonical.rs": "15ea0f48882aa65ed613554dea8a708618d84e94771deb1af2949fedfe682379",
     "packages/distribution/rust/src/extract.rs": "101e822a4d17774deba3585f7afd3a6718f847e6e2a392c980fa3dfd85b843a6",
     "packages/distribution/rust/src/fetch.rs": "ae1a26554583e297ea2f52bab45be9fe115952203e0413eaec933d71b301fa00",
-    "packages/distribution/rust/src/git_gate.rs": "27ef1e18097d93779a355e44d6cd90876eb5646d6e28edc08b150339789fce27",
+    "packages/distribution/rust/src/git_gate.rs": "7d50addca54b78ca0b5d6b61c9d857b2de82016a1cc53faefc7c1038da163cba",
     "packages/distribution/rust/src/git_grant.rs": "f815308e39bf4eee770bdb47073fba60f05aba2cc1f423e165a98a5f035dd38e",
     "packages/distribution/rust/src/init.rs": "1cfecbbe025a6485495b6e76bf5076d1fa3238ae27a01cf755c83c085a4ebf1c",
     "packages/distribution/rust/src/lib.rs": "f5c75abd8e6178076826eb9baefa6936f97785b5b9f1f50bcb91e354f59f17e0",
@@ -412,10 +412,10 @@
     "packages/holder-lock/rust/src/driver/windows.rs": "d028f7c2117fcf0036a18617b63d612ee5d82e912068218bfc63602625fc4be3",
     "packages/holder-lock/rust/src/helper.rs": "f4f626f0a45b7d99c5bfbe95f4c791b782ee9ba1f9fecbf930f8618ee405ac6d",
     "packages/holder-lock/rust/src/lib.rs": "5fc9363de8f5ea32447fff4b2b2a48f37df5ccd9f3ce92c2c6aacc74ace0c8a3",
-    "packages/holder-lock/rust/src/origin.rs": "a76e1fb306c54035adb2bce7b7cbd01d073e94383b5d307a54f7948c649500dd",
+    "packages/holder-lock/rust/src/origin.rs": "c568569d27880d076dccee86a944f04165a3ac6a5b8f493cb2604038af5fb6da",
     "packages/holder-lock/rust/src/port.rs": "b6a7f37c19f153af486abcd7b0fe50ef46dd583e37eaead2ef06940d75a5def0",
     "packages/holder-lock/rust/src/predecessor.rs": "47a4a310d1a74a567d6c9e0ecc2acdd230628e36119756a2f6a363ef565d672b",
-    "packages/holder-lock/rust/src/route.rs": "7b0d41f15bca85b0c05997562b126e5c1390c870a33c628013840af75f5ec8a2",
+    "packages/holder-lock/rust/src/route.rs": "4957bf5d82e82b6387a0ca2673abf49569604d187c23deeea54949ae896e8a51",
     "packages/holder-lock/rust/src/route/hold.rs": "48336f85b1025d1c289f4a560dcd8d60c32c3680403b745a21521a0ec1bb6e13",
     "packages/holder-lock/rust/src/scope.rs": "9dd5a7e31c4e8d38940ca752700fc9ef8cf80e47624441d6f028033c20dde312",
     "packages/holder-lock/rust/src/semantics.rs": "9218d6264b973ac76481c14c0dcc259b8dff3c3eb283920599a35a39aa5fed65",
@@ -2431,7 +2431,7 @@
     },
     {
       "path": "packages/holder-lock/rust/src/route.rs",
-      "line": 315,
+      "line": 314,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:179",
       "binary": "git",
       "class": "production-sandbox-probe",

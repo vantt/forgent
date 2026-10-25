@@ -11,7 +11,14 @@ use fgos_process::facts::{self, ProcTuple, ProcView, ScanFilter};
 use crate::port::LOCK_FD_ENV;
 
 /// Basenames of the fgOS executables. The quiesce scan's payload rule reads the same set.
-pub(crate) const FGOS_BINARIES: [&str; 3] = ["fgos", "fgos-runner", "fgos-gateway"];
+pub const FGOS_BINARIES: [&str; 3] = ["fgos", "fgos-runner", "fgos-gateway"];
+
+/// Whether a program's basename is a script runtime that can run a fgOS
+/// script: `node`, `nodejs`, a versioned `node20` or `node-22`, `bun` or `deno`.
+pub fn is_script_runtime(base: &str) -> bool {
+    let versioned_node = base.strip_prefix("node").is_some_and(|rest| rest.is_empty() || rest.starts_with(|c: char| c.is_ascii_digit() || c == '.' || c == '-' || c == 'j'));
+    versioned_node || matches!(base, "bun" | "deno")
+}
 
 /// The variable the host pins on every process it starts.
 const STATE_ROOT_ENV: &str = "FGOS_STATE_ROOT";
