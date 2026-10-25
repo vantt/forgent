@@ -1,0 +1,2415 @@
+{
+ "batch": 4,
+ "pin": "cb6fa5fb5fc6fada041376ef437df8378721aed8",
+ "verdicts": [
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/469",
+   "bindingSha256": "b4c24a7d83e139e7900830a8df19a30b549659a9f1f618aa6ac1502aac62889a",
+   "targetUnitDigest": "ed99a9ebdd127680f969ec42a301831071ca2de1e06304b84fcae6c4fb21bdca",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/47",
+   "bindingSha256": "eb719abdb2bdb5d9947514178760eab654e135eb6f975c99287c311dd54ac720",
+   "targetUnitDigest": "df7998d492c2bf1514fddf144e564cb1c546364c13b698fc2fdd9b30b4b3add0",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/470",
+   "bindingSha256": "0b12a6dd38a32a414457f2b2e47abe194d2236fce535a0854c9ecdf65fc0992a",
+   "targetUnitDigest": "95a6132d94fd87374246b3f81a464e2521afc78892a257f0cc25406b6b1239b2",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target text equals source unit modulo heading depth/whitespace; link destinations repointed from docs/specs/{runner,workflow}.md to their docs/platform candidate successors (Phase 6 link pass)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/471",
+   "bindingSha256": "a22a31e90bf5a35905bd3331c1cba374b028abc8cee4a5cdaf39a1c0b214a459",
+   "targetUnitDigest": "a8bc98f44539a2576807650a8f2ccabfe49fd45f03614fc7c8c6b9000c03bc80",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/472",
+   "bindingSha256": "055dc450cb54344ca4c808aaf36001e74a6236d819547704c7282ac93e18173f",
+   "targetUnitDigest": "573a89b3f4334bd5cecbeeeea2231a2280a1e983a1813f93117edd9575174d41",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/473",
+   "bindingSha256": "7fe3f427c412ac24934fd5586a66a70d55853c1db3f46be0b78efd9ef2922f0a",
+   "targetUnitDigest": "0474bf405a78cdd8354e92ed52772ea0b889e09e599b6cb4cc0580c611f54390",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; new candidate heading; the current text equals the witnessed candidate content."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/474",
+   "bindingSha256": "01c1c7c33c5d66bfed4ecedcb655d87100a6fbae6e791f799448934fc418b01d",
+   "targetUnitDigest": "88c6bc62d859bd8458a097628c7e442a73ec4521d789c8f433bf3e47617414bc",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; candidate header block preserved; its \"Document type: Contract\" line moved into the same file's metadata fence (block-1), so nothing is lost."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/476",
+   "bindingSha256": "0dceb357564e11369d8b14334fd8633f7e8ab41dc5453f2b44eeedb99b6a59d0",
+   "targetUnitDigest": "6a5876c503f4de2e6f805e818dae10294be966aa490f78044fc10439eb3f3c2e",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/477",
+   "bindingSha256": "331e72ff686592d58909087c9f62d2c178a050ee922b0f9ac6a1a71a658337cc",
+   "targetUnitDigest": "197b9c0f826c2be367288b2138ce41d3e6c8d274f569be6a866196f84b6a3a3d",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/478",
+   "bindingSha256": "8da98d5dd185cb56037fa1ba9ae637400ea2cca3c574f07cf9cf738e8114afef",
+   "targetUnitDigest": "d08dfbbb6f5ae3ad4059c6865fb90787ad9388427bb4be02d2087fcb3b5b31fe",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/479",
+   "bindingSha256": "335be80ea179551ecd431676a84d59e549c4a0bb142e2350cf3c117c78f9a877",
+   "targetUnitDigest": "472852b8ff6fe7a3649c0added10429c76455197c90943136a698e545345e71f",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/48",
+   "bindingSha256": "4099369886d4bc00b59aaf819dd90ae977e413535004e26d2dfdd2b80c5e0eb3",
+   "targetUnitDigest": "851d7b37056516c9a163b3923c8776d3643c6923dc377f594fc1076b4ef2c5e1",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/480",
+   "bindingSha256": "250c79646c85ce2a51ad50e0460639e7e5229ff75ecd22374a631ed145c96500",
+   "targetUnitDigest": "05c167562b9c07dc4c5a80b2f7bdb915886db9791e4f80bd6c4cf62b1d8d8ca8",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/481",
+   "bindingSha256": "33f79c4398b8e8bb075c1b0c0d015d1b35d6237f791b42fd1e78c6f894d48f6e",
+   "targetUnitDigest": "53f5315268eee7ec07d6eda75fa54d5ea0d376aa886e65d421206871f7e33555",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/482",
+   "bindingSha256": "1271856e23c1219c94201963a7853af44dc1f890d989589ca6474bb7355eea9a",
+   "targetUnitDigest": "7feb99fdd85e59bdd93158068e8ae5e43e235dc3bdac3c084a8e6a9003a35ba1",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/483",
+   "bindingSha256": "b7ab89ef85df5601f0068bbd0096e89d3f1b224dadae7385d1df947afc67ed71",
+   "targetUnitDigest": "3e9d01f9e40c1fe5aa3db29fa7d7af5ceb555d386e7e49628afcfbb70bd2818c",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/484",
+   "bindingSha256": "bac125dbdaf5e0cbadc7d295587d8afbe2640156b03f4db4f8d71a6ea5a007cf",
+   "targetUnitDigest": "26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/485",
+   "bindingSha256": "c72b9605931ad469828f07c424dc5aba690d9f9cb7dab485a2734719c012a827",
+   "targetUnitDigest": "0c252ad79c4b8ab417a4bea6e955b307aa20340ab25da0fe19bf4bcbac79902a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/486",
+   "bindingSha256": "c72b9605931ad469828f07c424dc5aba690d9f9cb7dab485a2734719c012a827",
+   "targetUnitDigest": "0c252ad79c4b8ab417a4bea6e955b307aa20340ab25da0fe19bf4bcbac79902a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; supersede: the V-001..V-012 statement is updated to V-001..V-013 in the Accepted Decisions section bound by the composite heading digest; nothing is contradicted except by the documented vision update."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/487",
+   "bindingSha256": "c72b9605931ad469828f07c424dc5aba690d9f9cb7dab485a2734719c012a827",
+   "targetUnitDigest": "0c252ad79c4b8ab417a4bea6e955b307aa20340ab25da0fe19bf4bcbac79902a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; supersede: ADR-001..007 stay listed in the section; ADR-008..010 are kept as historical links to retired-engine literal snapshots; the ADR-011 addition is current. Nothing is lost."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/488",
+   "bindingSha256": "c72b9605931ad469828f07c424dc5aba690d9f9cb7dab485a2734719c012a827",
+   "targetUnitDigest": "0c252ad79c4b8ab417a4bea6e955b307aa20340ab25da0fe19bf4bcbac79902a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; supersede: the Step 07/08 narrative is kept and reframed as historical after the engine retirement (2180b4e72); the intent ledger is linked as a retired-engine snapshot. This is a documented truth correction, not a loss."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/489",
+   "bindingSha256": "6d136ed02c3e021750988a6b70144ee1a47ef45c0b45207834066583046629cf",
+   "targetUnitDigest": "576ef4b9c089c5932e3ceb6fd85f26befd352ffb1a05e9cf768fb54a4bfe88a9",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/49",
+   "bindingSha256": "f6fbc5f8e98709e2a4e9f4cbfbff96c7080855657ba0d36a859d26ef6fa82791",
+   "targetUnitDigest": "72f207b213009b8eb660d5a867e6704d16bcbd94285c5f258d6fe46f70cb3a4e",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/490",
+   "bindingSha256": "fa3eb2ce7435131a4b8acf7524b93973a0233601125a987d8c398c823f25ec42",
+   "targetUnitDigest": "de888795c53722a1fceec49302307ace1e440cf43aa639e2d32fce78aad12273",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; supersede with an authorized A37 correction: the dead .bee/decisions.jsonl and distill-consult report pointers (both absent at HEAD) are replaced by docs/decisions/index.md and the area history sections. The rest is verbatim."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/491",
+   "bindingSha256": "bf87744501bc8cfa0e3377accaa4ba0f06cbd05ab328d4cc6605d296a74018af",
+   "targetUnitDigest": "04083497fff112b9d6fae286b82e06f3d01cf5979ba1c91b431fd073be2bcea8",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/492",
+   "bindingSha256": "86a6e0f78dd013f84b5d5900d279e9fa462ed505e384b67e5d3b87c1f6cca5e4",
+   "targetUnitDigest": "168dd2e09c1b7d5d85e9ab1c366ad3e2765e68bf3d3991db2335d781272862d7",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/493",
+   "bindingSha256": "bc807ea11bd1010e71a4e69bd13ba61d88b122bed9edfc5537e16f02c922b5aa",
+   "targetUnitDigest": "8964d263ae3ad29e88a1eccd4fb5df020d84e55f2474133eaae113e22f94d25f",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/494",
+   "bindingSha256": "5395b2cca905caceef6eba4e35b8025ebe37392e562a5c449fd24928fa418dc4",
+   "targetUnitDigest": "92472ade03b38c76133d902390be97f629d706f20831347a1435738d597a7afc",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/495",
+   "bindingSha256": "2c0ee544faf3914679b1e2de93225daa3a44873495a758e8dc2d759a11da428b",
+   "targetUnitDigest": "f074d27202dea0e5b6fcd976c22ccfc3836b61a2aec5ba48ea55695d159f72ae",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/496",
+   "bindingSha256": "ee79d3e42c37bf3024680a3cfe9c3fcce40c19aeadd3257579ab5b68031822d9",
+   "targetUnitDigest": "f9ee0c36132cc8ca46dcc88c13ac91d4da3cc4a7613492309fe57d3335ff245b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/497",
+   "bindingSha256": "c46e283232afb3c8a693e88f04055796d006fe7aee6add16199c9094a131ffd3",
+   "targetUnitDigest": "ac87664311c5b2d18345dc46aa1213825d954686d2e16ca42781d195f70b92d7",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/498",
+   "bindingSha256": "ed0c9a3d9b0c01b552288c6c38ebe815556f32450cbca78cdb87c056b46f32dd",
+   "targetUnitDigest": "cb8e14aea4bf8d30ef595a63e5dea5469bfc546948453940d1a152392ec2c353",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/499",
+   "bindingSha256": "560d0df9eb820f670fa153fd02ec8012b868efba2091aeef0c8e68dbf9118320",
+   "targetUnitDigest": "6b9221d7fa3cf226534e6f2d648074316f372917811e47a470f01867cb4cef01",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/5",
+   "bindingSha256": "4ea2e97cc93d0fa304b48552da74dbcdd3dbf199c495617719034bed0e10effb",
+   "targetUnitDigest": "0368179b5fa125296baaaff2714566c9c8a2f8abdb09362ee060b951709a4add",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; conserved test-reader claim: this unit has the RUL104 Business Rules line, and its text equals test/docs/rul104-law.txt word for word."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/50",
+   "bindingSha256": "ef976561f417f40feb6d6797a2a366193aa09370d3e472ce8252e493ca0792c4",
+   "targetUnitDigest": "beff9233f3aa9f7d4ba503faf790747bed8433413648a1e2cad536297f678b47",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/500",
+   "bindingSha256": "1ab47439636a3bc7dee96919695a5375581bb1150a5abd8bbc8f40b1d38c9b48",
+   "targetUnitDigest": "531971f08dd18f63b3add0bb38e9070c4b11d668584f3f7cfb6b08a427c1f675",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/501",
+   "bindingSha256": "0d459f98e01642254eda45ca8e566efefb74af74e845a60f09f77173abd69562",
+   "targetUnitDigest": "6df091c96a3f7425cdf8c220b37c54e0f2bf0734c2e3729cafe6fa4f5adfc036",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/502",
+   "bindingSha256": "2f4801e8531fcbe2ddde6b0cafc092b4cddf0b4d843b114072158c15b5e4d745",
+   "targetUnitDigest": "30f7e9eeb5a17e2b4fe86fa1961296bb91abecfdda08a500133bc382b333c432",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/503",
+   "bindingSha256": "4b52780e3b5f81e8755f32db9cc3b44f84ffefee8b19b0ab809fd685bb7b6114",
+   "targetUnitDigest": "690eb02856c7a16108cb6173bc5beaa6110ab30c1c4c5f439a66c1db93ae3ada",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/504",
+   "bindingSha256": "2cdde1ea7c82e4f697ac87293b0f8bc293817a86faa66788ab1f3a2ec422319f",
+   "targetUnitDigest": "5839776da66814923a7967180bfeb790e725ea19d401943843658433eac1a4ae",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/505",
+   "bindingSha256": "0f8d674cf5eb163e1fecd4daf7b5c315e11049b8807370685fc26f240b66054d",
+   "targetUnitDigest": "11462fd7cf03c90ed5a86a8a544c6ecc76a4bab660cd23c577e6a2637478686b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/506",
+   "bindingSha256": "4db6d3df286ecde47851bc86ddffb8fe1ed31eefb5773e9784ae25461cdba755",
+   "targetUnitDigest": "9c409ff547b04a39d2aa19b74b80df3071c086a6a669d9fcddb1dbb92d4d2baf",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/507",
+   "bindingSha256": "ba16966766449f42c26ecdb70ce4173448c57d214c7a77facdfb91546d17dc2d",
+   "targetUnitDigest": "9c91e304dff732a99d5fa1141233041c634debc06bef4c2a3c77543c181aa9ba",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/508",
+   "bindingSha256": "0caafebf88e5808c13fc4764ab10cd6755c493f0ee2b4a6069e822ef9dedb7d0",
+   "targetUnitDigest": "90e37ae90166ffdff682883f8366a3fe36be59151d980be89b3a4a55414b257f",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/509",
+   "bindingSha256": "f71c3329a0e6015933fadb5d87dba43eadc5f0b4ca2210957dc56cf4c2cf76fb",
+   "targetUnitDigest": "fa0d18bd92ea2f88fec46020b02745a75a410b21eeb7dfcfb43f6851e89a3bea",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/51",
+   "bindingSha256": "a3cdd24dbb167572f89d844df1a0c5dfcbcaa492b9703b5355e99b4d97fba44a",
+   "targetUnitDigest": "cfeda4cd5bd5eff94441b6d1ad847aa3f31f349237eba86dc86f20f161978540",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/510",
+   "bindingSha256": "8fc7c8894d034c09e159426bdee763e8bc7be34a70530dfbc1dc857376e8c2df",
+   "targetUnitDigest": "a6165ca54f6e232f91f3f293552afbc9ba99359966f4ec8c76bbf2fe4566e3af",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/511",
+   "bindingSha256": "b0800ff5f321c8093bd333eb670ff3265220592ca0bd44f64e6b15660beff77b",
+   "targetUnitDigest": "a66a63381d36cbfd9f067080c0df139677a4c83ae2f7132eb47e6d54ff32f768",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/512",
+   "bindingSha256": "b952c3bbc976687b986cdf01f9e36ae53788b9e4371d67947b0cee1e92f67820",
+   "targetUnitDigest": "d345460f92c033e34453a60c7f6a6fa6083e75ab3aa24794279e280464ddcef5",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/513",
+   "bindingSha256": "0bc111b668685685bd8a604988e3cc48a73bccb2376e59f0bdac0bb324cf7e0c",
+   "targetUnitDigest": "2d3a3d99276a46e6495ac8b7b9f5700982cbfbdbfb607c0be05684c3195a81bc",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/514",
+   "bindingSha256": "40b48097152d1fcbca7e0092653c7caea90975305934ed614e04c600143e5f22",
+   "targetUnitDigest": "d4ce58bb34a24c4bae4a9705612947a20539df432b8f187a82966b1cbb730993",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/515",
+   "bindingSha256": "254c6f711bbf09884380b2b6e0fbe151c423d3e5977856c2a17082c69e05e411",
+   "targetUnitDigest": "194feeb55a2c5852ab1a53afe8389d6eecac3acda61bec4b9a2416a86bd6d9ba",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/516",
+   "bindingSha256": "6345cec376b6f54c1f23b51d5ae5b82cdb2b5c5b871efafd49c1aee4cb10013a",
+   "targetUnitDigest": "9b1765b033e354a693b87d6bb03284de03e9eec965bb45aa145216bab1eadf76",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/517",
+   "bindingSha256": "9536c6d82dc2830151cc8384081018ea70c0857c5272343503739d21e2aa038a",
+   "targetUnitDigest": "ac66a5e481b2ccaaae55707f3e75db9db7c9215d05e3c2c776f27b2cdc6722d4",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/518",
+   "bindingSha256": "f6cee5d6239ad85f12b5233aa285fb900401e43d7d8333c467ea77c1f4cc33f0",
+   "targetUnitDigest": "e5655fce38683ccafd23b27b30ba6b2b69da7f872b97e046bf8b20b55eff1f3a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/519",
+   "bindingSha256": "409029de784487a59a2dd0a0d019fded479c7da0700ad63842dc96b9e0a2ea4b",
+   "targetUnitDigest": "9fad9909fecad6671be0b443371b8004fc6fcebb41209c6e482ef7c253b24f4d",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/52",
+   "bindingSha256": "419c4a189e997c7313737d9c84357b947092455438ebaa356408adba0d51c851",
+   "targetUnitDigest": "4b470ff79cf9e9f5e1a2fbf81331d9c07676e323f5e2df2fb3857a7e10538a71",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/520",
+   "bindingSha256": "4ea6c40282eaa3c526ef27b4daf541c471a8fa85bc5e35cd272c3deb2ae06991",
+   "targetUnitDigest": "3581ac1cda8e573a14ba60b273068d1328935dc6d3ef0bb76e5c0dc738e469c4",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/521",
+   "bindingSha256": "80a4d647262c5910894acf44c177da244a5bca5212dd0e75fc989db1cd347485",
+   "targetUnitDigest": "c108c572f3b1aa29e759e131e839893ba4e3325008a2cf90af928e4998dbafa0",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/522",
+   "bindingSha256": "780af8692ac6f6070925fc4aba47f557d6ab09ae507469be977fc75756cbbe78",
+   "targetUnitDigest": "fc29fd5404577c0b040a7e8b7f9e384b1d9f2d945b433af61b23f811e0e41b31",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/523",
+   "bindingSha256": "d263001fea74871b4a61075ffffde117f2aae3e2d3039765ae3995175cdc8084",
+   "targetUnitDigest": "c795a7db139ae8c49aef2c6759d7cac69ed6c21812481c25a1d8e5c02135f665",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/524",
+   "bindingSha256": "b00a6d92907db0067c5344657933388dcb35f73874683483d47516e7b7651a49",
+   "targetUnitDigest": "28907df5eed46756c20083b73c8e9394162079d58dd8bf47abbd107e7ea45e0b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/525",
+   "bindingSha256": "db780a93be8c3217879f397ac3307efed643839f0e78344812fa127c789be018",
+   "targetUnitDigest": "59ad8d3e401e36258a8527c29f47108347fe8192b254faa08ab12c8fc960f212",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/526",
+   "bindingSha256": "7dc9ed31518c9d74caadc36ad38bbf32d6d1c2c9540796d80ec7d15f55f05cf8",
+   "targetUnitDigest": "314a236e6c4731b0624a98aed7b5cee3d2f7393560bd111a1bea083018816ef4",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/527",
+   "bindingSha256": "8af2340c9d809624753296811154176ed33d7dde8b1dad0606c68b0f11579693",
+   "targetUnitDigest": "bc7fee3b89305482daa8230b3e622e12b757ace44e6a8dee938d8d1bcc1a8fce",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/528",
+   "bindingSha256": "6800cfafc3e884a39a0d2e54ba2dc9f55e6d392b56cd5e4974e08b1dcba9da07",
+   "targetUnitDigest": "ea781530a988c571f40a7ce2d00aa12dbb4f57799295621db43d88632f408d11",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/529",
+   "bindingSha256": "c83f48a69ca17100389ba696a1f82d318da71bc853ca70b13117dfd51b5861d8",
+   "targetUnitDigest": "54f8314c197673de54a0ca1fd5f0d223fa3cc77f99da6927b7e688f2f038abc2",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/53",
+   "bindingSha256": "1212a27c3955c0c8dac4f417b8fa5ef6fc826a63ae8dde5d645a357cfa3494fc",
+   "targetUnitDigest": "2f927baef6401e33b1dcb85208ab698e31ff6359378e067624f4b236365a353d",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/530",
+   "bindingSha256": "fe579b780185dfe3df4736fb8f461d5de81d0a4192573e469b1d2d0dd5536836",
+   "targetUnitDigest": "7e3bd2974780c7384b0902da7e62f60eb6eeb6bf2d0ca27868de9bd263779a94",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/531",
+   "bindingSha256": "b693ae93b1ca55c99101ac479052c89929034350837b7d821bafd0042f9c5ec8",
+   "targetUnitDigest": "9cc767290d41105b348e3d3823ed6905197a2843a5dee60c551bcf04cfeb7b60",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/532",
+   "bindingSha256": "9b306b7db4d05ba02c930174972bd32cd75bbfccb2d75c5c9349f363246210d5",
+   "targetUnitDigest": "781d9813175b99ce5352929e313c42be637e23162fc9f4af8c83a45963decba2",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/533",
+   "bindingSha256": "11af7706e749d35ead8115b1411547f5c49132d960b42b6919e05dfc271f6a11",
+   "targetUnitDigest": "b026a410818016db4d0a1dcbe070f3ee609a6d7d1ecf88db636781321abcc803",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/534",
+   "bindingSha256": "a04b05f3989661b1642d83b1579c0f7e5f9efcd735d8e5d147ca1beede00a8df",
+   "targetUnitDigest": "ffef49a44040bab676b2f35e492f2998bdcc37353bc515f1cb7bfe4cf00d15be",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/535",
+   "bindingSha256": "1231f76ffe3fd2a17492922b5be2263b56284c33456006c2ecf2d04eb3030db2",
+   "targetUnitDigest": "6939ee9ec648dfc4a6ced3e213bcbe3b1113cec87bf2dab98574392993b82344",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/536",
+   "bindingSha256": "cf6613d55efdebb8d4734d483b3961462b44ad1815554f9a006aed6d97a453bf",
+   "targetUnitDigest": "4ea8c14d897681838896be70cf1e1752b0c32977fef46f6625862e5867759884",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/537",
+   "bindingSha256": "47b6898ec0db76874bb75a4a22efbccf519832979cc52fff9c28fe1f56284b16",
+   "targetUnitDigest": "2635805de8dc44a68fcc10042a636b1d3eea57b35a04e033f4a6d8cbf71dff13",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/538",
+   "bindingSha256": "f9552887ba1e99b7c5b120d0e507d5f8846578a1b71325a4f91d9296fba5da50",
+   "targetUnitDigest": "2687947208cf7c2aca86618bbbf86b46103d0eb1b25457ad007c73dad85f7fef",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/539",
+   "bindingSha256": "00ce4f090b1c6b2fe7f36319f4130edcc5202cf5b219b86f7aee65e0de7d975a",
+   "targetUnitDigest": "c6cbbafb3359e8cedccd4445b7752500266268d284506b3b6ea2addc5c934aa3",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/54",
+   "bindingSha256": "c1c050df398d7942ab1709d1bf5c76765597210c1ce9557121a7223d09281f4b",
+   "targetUnitDigest": "648a8fc4485b18e4092e2c0b945350436d90b621a5d85a527efef43f740809f1",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/540",
+   "bindingSha256": "544abba6fe4f35c0b771c9c7657bc052a1947000e08cebe2b16d96d4e288e3e6",
+   "targetUnitDigest": "2359f2c0b35193876c094051a0110eacf387819fa76027a6b6b345384fb2d16e",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/541",
+   "bindingSha256": "c0baed779fe4fbccb9b70f0c3af1206d3fe619de227a51b1c9a5b35ceb2a003d",
+   "targetUnitDigest": "0efc4e024672c39cc76a909ac1ee27f6c17c0d09540b7a1fc13ec0ddca65ef3b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/542",
+   "bindingSha256": "3431aa06030afa4ff6601aeeb135282a0d9026be2695e1859f7a9fe8bdc80d14",
+   "targetUnitDigest": "1cc2518bff1d0743f58c76739fb0df05f0f6a9aef55ef94d7c8b4d1d38276435",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/543",
+   "bindingSha256": "73825f754e2fe86dce6a0ce04300fdbf3398e5d688699f213b1f85a1c37fbc0b",
+   "targetUnitDigest": "e11dee98df58f0fd18b2ad85bed581d1ee8733b5a61eb57e5f15b77dfc4ff41f",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/544",
+   "bindingSha256": "d1f3eafc567a6517a692c9fcfe93900ba3679565f91ac495ba6198cdd2820da2",
+   "targetUnitDigest": "275b2faa9870643199ae75c7d893f177befae3b6c147c24a3752a06ac5788f4f",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/545",
+   "bindingSha256": "a3ab863d7c5b84723244edadcaa63b948df16175d3b69dcb3a323a12222a29d8",
+   "targetUnitDigest": "e768e1726afe9a00c736aedb86cce313a8723f0b9e4e8168808767ea578fb883",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; supersede: the candidate header goes from Draft to Candidate and adds the required orientation fields. \"Canonical: Yes, after review\" becomes \"Canonical: No\", with \"None until independent review and atomic cutover\", which keeps the same intent."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/546",
+   "bindingSha256": "fa3eb2ce7435131a4b8acf7524b93973a0233601125a987d8c398c823f25ec42",
+   "targetUnitDigest": "de888795c53722a1fceec49302307ace1e440cf43aa639e2d32fce78aad12273",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; supersede with an authorized A37 correction: the dead .bee/decisions.jsonl and distill-consult report pointers (both absent at HEAD) are replaced by docs/decisions/index.md and the area history sections. The rest is verbatim."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/547",
+   "bindingSha256": "c20746c9f09fc2f58064094c5e2a5a7ea6e745ee8be5a65334b38ec12d4dac33",
+   "targetUnitDigest": "5d693cd0376780c965e59de839cb3db8439d9c27b2810c9c951ca99352e0c3ba",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/548",
+   "bindingSha256": "05158a2350a365183004cc8f901f605dc7e74f6e20b9f5194c8647e392c62f53",
+   "targetUnitDigest": "6e7fac96ac571658cb549018e24770c9973cbeda56203374f2cb1b6582982288",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target text equals source unit modulo heading depth/whitespace; links repointed to docs/platform candidate successors; CoordinationSession/FlowDefinition contracts now point to the retired-engine literal snapshots, consistent with the 2180b4e72 retirement."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/549",
+   "bindingSha256": "98a5ee4888ad09e9761058f26e4c7c07f9b3ed73e8074e75a409c4de43af452f",
+   "targetUnitDigest": "a55c1413a243228ffc24509e1e176d1c921bebdbbbbecffbb04cc36ca4e47b9c",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/55",
+   "bindingSha256": "e9293bb3364bcadac8d27c1d467a0c68626fd1988804ae6ae5b8bad4bd087928",
+   "targetUnitDigest": "01a651288b444be6dfa2a407e46b262d817bad220039d9a2741082808b5ede2a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/550",
+   "bindingSha256": "3273a96c33de83264fd822f7d7f62099398f83424bdf9b0c08cab73c83921c79",
+   "targetUnitDigest": "4ccffa91cb32879adad24bbaa07de27f2045c8f092e9dc3a45da2df6960a6d1f",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/551",
+   "bindingSha256": "73b1876a31f37f93adff5d3e0f6bac77e34e4608ff127232e89b77f493415b81",
+   "targetUnitDigest": "78d58148ed5a88f8afa9f17ea9dfca96f6e3782af983b93558176a1f027b77a9",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/552",
+   "bindingSha256": "08362b74a59d77cd5de60280db410dfd2eca58a598312ff14dcc976f47021874",
+   "targetUnitDigest": "99604b6343fc67389feebfaa90d426013667e994f3aeea1e390c15cea87d1094",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/553",
+   "bindingSha256": "2ec55e40e7ce111f908190e16e153342a28d2a5eb966942527ae8cc4f833316a",
+   "targetUnitDigest": "775e5a1e3ec8f34cedeec90a70b977b73fa12f5cf1af4375d45407efeb8ca150",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/554",
+   "bindingSha256": "4b0dd652ae82b34a9016772e9f5243937e560100628b558a8236f52ae60a7822",
+   "targetUnitDigest": "5d824f3dd0668f48e96dd80da906608cab3e16f627adb31853cf74e08c86442b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/555",
+   "bindingSha256": "75cf5f2de306aef507d95deeff7be89636dc3abe3833bb581dd1b0610764442d",
+   "targetUnitDigest": "c3e3065f86803d9cf1e8ffd2bbe7b66347e7fb1fae1244d3a286f3bb089a4c84",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/556",
+   "bindingSha256": "1fe9cb7908c14fa4d9de3391d7a801879675efbd96f295c5132295675b3086f2",
+   "targetUnitDigest": "2269bc64c0184627a65acff80ad17666348fa26cb74db769fa03d75d40a458bb",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/557",
+   "bindingSha256": "f7f47a9a43e2bd44d31280d56bd9505d270bcfc308e277324c3d5566c3914c9b",
+   "targetUnitDigest": "4816c7877f70615ff18fe93897c011d4d36a279e8a3ed8bffe7f4c0a320c0d8f",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/558",
+   "bindingSha256": "2f52f8218833604f624f94719f3b5a359a85354ed386827b2e57fd8143209b3d",
+   "targetUnitDigest": "414fbebab9b091e01cff844e26ff72df54cb40200d7feffe3e9a1478be20f174",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/559",
+   "bindingSha256": "24da81bde439e5c92443668c1caeabb6f9a37e0388b1493c3e8082619a148d0f",
+   "targetUnitDigest": "1a29398d79ad8a867115fd31673666e42552143a665dff177202e0c0d626050b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/56",
+   "bindingSha256": "fdbf000dac7d9a65aea0a1f7f5b1e0eb785ebae694b3275d7960fceb0addbedb",
+   "targetUnitDigest": "ea4f164ab8dc3705676d7a6fc415db47a54bc6a485f8fdf5090ad0d5656c6324",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/560",
+   "bindingSha256": "708fb688dc638f12def0a6ed3d5ca1ea745a376b87dcbf0958186c1b0f7272f7",
+   "targetUnitDigest": "58a7d0b6b06e40af6787972e6b5ae17c5c91f8a045d4cb4394a46138c132debb",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/561",
+   "bindingSha256": "53d1a3510cb8879a1af37929fd35a60b5f3c454f9442b6fc024c4a320f006635",
+   "targetUnitDigest": "b87cc067c17c90645cd1fcdc200f508f6e8a36b0d03d52ae40f1d3047eb7a4a1",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/562",
+   "bindingSha256": "cd82060b711bdbab9ebbe3d708f3b4613fcbd18158f5af894c01c73be8d47787",
+   "targetUnitDigest": "bc830b9f64a54bfc832f27320ce6317e734dbf49001182bcf514259f253ef1b3",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/563",
+   "bindingSha256": "6ef8db3b185a65ea1b1791b2db885ee621c153600a06995015e502f5d5238684",
+   "targetUnitDigest": "dc114607aada8a58c3fc40c251a33184310b9022f9f6456a6c4f350edecd94c9",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/564",
+   "bindingSha256": "38f0518f800cf67f3e1b67b9a71e16bd7712d4a956f2033f57aa37bcbf0996ba",
+   "targetUnitDigest": "5f39cf944ad6419bd674e7b2261f717adb72e7b3f56508585c9daa0c2add0148",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/565",
+   "bindingSha256": "16c84bc492f45b2cb5e48efc2600a8df56a98b5c08b07426f17f3a296102c760",
+   "targetUnitDigest": "0d2107a21d41d6c32b5d6a8d33671ad6bc26cd901f1522620f59b6f161361054",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/566",
+   "bindingSha256": "c66d44da27d956c9c39fdc8fe0e685e1c05179e0d52ee7c3b11893ac11a211f0",
+   "targetUnitDigest": "428c54989e74ebd6f7c81254573adeee4c4a9ea2010808f553f270bdad1e0cb3",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/567",
+   "bindingSha256": "2a37f4140349c863a2634f14058fff50b6cf022e9b53427c1a54badc2c1f77be",
+   "targetUnitDigest": "34c3658a53018bbad7beb9fbea7100d39476029dc298a822baf472e0ae0e5e64",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/568",
+   "bindingSha256": "dbd606c89bd3e41e91e49111e512e1c60fd7b8e96800ef046094647a072fd955",
+   "targetUnitDigest": "28a0a3648b70b5e53b3a987ba822ea55a92a6c480cae2b39be3c8c8ef0ed3eaa",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/569",
+   "bindingSha256": "497077e78b01217c52330f0e6dd423a592ac2b696d84c43c811547438fcdbd0c",
+   "targetUnitDigest": "9e8af87d9288e484a7a717c9795d5ed040f16b56d5a24b984d9fcc7a26b57577",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/57",
+   "bindingSha256": "6b238b6bface13e25931e92866c1764d553188c13550b7f7a72f4160df7781a2",
+   "targetUnitDigest": "ed370b48a793378919f8c0cab18bbba7abb5da782824a6ec8c9c60a2ea01c1db",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/570",
+   "bindingSha256": "f3606066b3fb06e1d055ae8247e41bc4ebc64c85edd557c1c63aaf5c921f961a",
+   "targetUnitDigest": "2cae11e68b1290299a20e70230fcaed27919fac50d0edbaf580a2791f1cb0b0d",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/571",
+   "bindingSha256": "f2580bf648a131b149bfed24e741520037a914b015362e4670fd91c8feda9a02",
+   "targetUnitDigest": "2946d8be4ed11e89c5b9fc0211a851d0b294aa3a7fd383c538d180fd5634bf32",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/572",
+   "bindingSha256": "c46d7d5e98f8e31ace6d7b27043d70d9b900bee517eb2c779f00a68b851c8250",
+   "targetUnitDigest": "45f67cf4091f5ed96a0ce91a95a3b6836dfbf94c5dbd622e955517017c22c04f",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/573",
+   "bindingSha256": "bd8cfa5f8c25e54c17284e2ddeb3c6de20cbecc8d803d753ac35e54f4ecff9c9",
+   "targetUnitDigest": "5122f358bb31e42999cf63d508fdb35108406dd5a412cfb92c5ce8e78afa735e",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/575",
+   "bindingSha256": "9c07217e0bfff1c6bb6cfb9c9fd1287c62a5279886b90e9b58cadfa0416a3052",
+   "targetUnitDigest": "7cb40f48a17a3f179d8bf58fd03d67ead3d86aa57776986f4130c297fa881056",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/576",
+   "bindingSha256": "13625737d18ae4dbe93004ceb03920760d94062a09c2b389f89340ad087b9290",
+   "targetUnitDigest": "cf6e54194d2c0af4e35d51e88bc596a5ded47f6aed5511d07369e986a047cf6f",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/578",
+   "bindingSha256": "302133ddb002f323a2978ccdc1328794390f550ca6c344527f4d9c092f32230b",
+   "targetUnitDigest": "3ee7c75c68c9e527207fabf58ca9a466ee370f6358c4015ba7951d704b029139",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/579",
+   "bindingSha256": "df18919d090dc95b9e51527f81b87ff24a3d93d4fa2dfa1846c124c60fc6eaca",
+   "targetUnitDigest": "9c60676513c958dea377865ed1f2099acdca34a1234b254527d750af2aef1461",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/58",
+   "bindingSha256": "dc96a2a36abbe1559239d23d44feab34a04ce9190887c45a0c215278dbbb7445",
+   "targetUnitDigest": "82b82b7e414b966ee6cf1a021ba6b074563545dafb0465c4af68ae47dea663b4",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/580",
+   "bindingSha256": "bdf461f1cedd3ba6295caf7ea3aa2b55aaccf75fceb0ca066a027617d3f710d1",
+   "targetUnitDigest": "7fe45de88fbd483e76e550c337d25e8e713295869b1ef0d342e335809f7c706e",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/581",
+   "bindingSha256": "4b74e9374a313b3856fbc28995ae011850a29ab3669cfe1f808b58011ee14c76",
+   "targetUnitDigest": "ddf501baab878da28e004ffac07861746b4975d8f2f6956c30bcbbcb0936f603",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/582",
+   "bindingSha256": "5969304cdf04e4d75b408fbeddb35b1f8ffb0d527d79ba4021b928bd1407ed90",
+   "targetUnitDigest": "f0f5df1caed78140a1faf77c1391de8dfe1d45f411bd11e57f8cbfec8da9ee3a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/583",
+   "bindingSha256": "6cdc303b4c30180f991e3c3a9986a801a5f6cb00a1e3a8ca0eed79de25834888",
+   "targetUnitDigest": "c84467d45b1ab143a666b7d7baa647d6bf8b44b91d67db6a7dff994d9e710e72",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/584",
+   "bindingSha256": "24c43030514c97e6b2133e36e683597b24568fb9e493452accd47b332039033a",
+   "targetUnitDigest": "d52ae8848ecfb9ba6ab60ab5820cf238d032ce57339fd30a18bc56d992d458ae",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/585",
+   "bindingSha256": "de77e7d0932e67307cbcfb13b334b2305fa6af9665f46a91023fadedecaf9750",
+   "targetUnitDigest": "bd851151fbcce9fcff72bbe5777e19ad2cb3513e835f653dedd66dd345a2ff05",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/586",
+   "bindingSha256": "855017d3b35962d284afb37ddc04b62616b458fdb2970238dc7cbb2f69610011",
+   "targetUnitDigest": "ef51053755d718c6c0de59d110635ca0f3d6d4c46ab3391471ef91ed8ac4d687",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/587",
+   "bindingSha256": "1de02913015d1f892fa46bc92dcd4b7552a8cc3f86df682bf6bb5ad0c24c1fdf",
+   "targetUnitDigest": "288dcf20143ebce3b48e0c4370668734d849197fb2800d4e420ac1e6417bb181",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/588",
+   "bindingSha256": "828596cf0957d9deef2a36e86b7109f1079fcc831d89ce524eb847ff5ac1d3bf",
+   "targetUnitDigest": "86d5fbf4fd87da5c0528c02058843a78a373d031a91466384fc2fd3a12bc6bb1",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/589",
+   "bindingSha256": "ba1baa7db18ddcd3ed50eefe4df41c12c2a7af398238290eb6322b547d2a4c52",
+   "targetUnitDigest": "2153a68e7201b407e655d3e81260ec51b4d4b52fce90d0d7fa16aa4555fe7316",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/59",
+   "bindingSha256": "0c104b7b364be1d6c82ec06146f31fc080cc7a6968bba69d1ccd061737a152e4",
+   "targetUnitDigest": "b50ba5afc6c49f2649292519a240b9b6b8760435a5354956f7754cd989bb3756",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/590",
+   "bindingSha256": "a81aa1615320c9d0ed44d6d90459e0b77175226240e741a4aa47eeb30c625858",
+   "targetUnitDigest": "c13537803ff56af1fe9978fc0e6cf5cb24379e51f0722679746693df00939aa9",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/591",
+   "bindingSha256": "e17baad6c38ef487745aa468f6ae336bc1dde2e9daa668dface83acd95850da2",
+   "targetUnitDigest": "d18d9725241f214247cc8a8c68d302f2bda761ce1eb5729eda0811508bfd97ca",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/592",
+   "bindingSha256": "37500d6056fef94be6edfb93641df08810538336ed884c59353a367b1d01498d",
+   "targetUnitDigest": "41a41035bd290ed0ea23e35a11172176f08e771cbd31794bd4c65f9128c3d7c4",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/593",
+   "bindingSha256": "b481f1fa2737d7b3cc7fb16582576e9f865a888e62dece9833139c61fc0467c3",
+   "targetUnitDigest": "1788408993b6607a28c59c3925c30846ec8eaaf79c32672b36ca78c29969d35c",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/594",
+   "bindingSha256": "cf82237d646eee872ac9af0a10f82ef5c74f794aa54fbc57cd2762ae58a21bfa",
+   "targetUnitDigest": "624f0470e956272b4aa288c111d0f175986229add08fe5739a0bf474e4503e8f",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/595",
+   "bindingSha256": "cc5bebf3b5793ce8291329b232ac893d909058b04478a49a434cec5a77d9d810",
+   "targetUnitDigest": "03a1a58ed3626f8b56ac509d8f89f99f17fa5c7041929d9ec4dd46d464b9874a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/596",
+   "bindingSha256": "5cdae9340826a53dd07bf10669a3edca16cbb0eed3411fe84434c563c2f12504",
+   "targetUnitDigest": "71392c90d7e585abc412086957cca9584606daa7415c2afff44c2593060de45e",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target text equals source unit modulo heading depth/whitespace; links repointed to docs/platform candidate successors; CoordinationSession/FlowDefinition to retired-engine literal snapshots."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/597",
+   "bindingSha256": "1c1791b3acb706de9db4caf018bd64b46f8a9336a3c04ea53d02bb00b6071d43",
+   "targetUnitDigest": "027f2e8fb26217eb7e0fd7820c355e06c31c9c42897b4cbf11904518ab14e376",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/598",
+   "bindingSha256": "bd397b06cc687a59db1ba7c88077298554860b9a984326df957ccfb7b4255f9a",
+   "targetUnitDigest": "ce9fedaff71e7f78a97813fd6ea31e52c50d38250d56c929852825ecde7eefcc",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/599",
+   "bindingSha256": "e5360a9458bb18df7f89ad3e65b92ce8eebe3a6d257486503e1855271f722fc4",
+   "targetUnitDigest": "143f6028eea6acd074e646e1e7d0a25e46033f231a37aa5b71110ea2b563b17b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/6",
+   "bindingSha256": "0dc5159b21dc53fea55f4ca63c6e5d05c88281573d5523801d7609530d617993",
+   "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; conserved test-reader claim: the exact \"## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)\" marker occurs exactly once in the holder."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/60",
+   "bindingSha256": "0a99215914c4550dd0b80c222c432e1e184f49c0f65239ca746b2fa7e3e21d95",
+   "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; candidate unit text preserved verbatim. Its 20 sourceOrigins are identical boilerplate lines matched by digest, so they are over-attributed provenance, not a conservation loss."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/600",
+   "bindingSha256": "70cf6b1962115617e8a41810a417b9c50d6840ee4b06f3d76321ddbf8620147e",
+   "targetUnitDigest": "039a6bbc05030558465bd244a7c9cb8d2f6f3db067b716209b51023fddb35127",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/601",
+   "bindingSha256": "687237c88b15566d697d9a3bdb6ca9b745bda85c069e6a6afae302d04e826a5b",
+   "targetUnitDigest": "a9dfd52ce5279d1126f5acff4866e16263c4d65ac6777f2a6a2e692afefce479",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/602",
+   "bindingSha256": "d1ff5d648f3bccac3f4b45dfa0bcab9062dca3390784b49fda1cd5a3cb9f1f87",
+   "targetUnitDigest": "e1e06122c7338e94d1bd360b83b455ea69f6a538127efe50836a045c70bc3d19",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/603",
+   "bindingSha256": "71795eabcdb5ada8f6eaf5535604bcba617aebb1492075f92136c13eea40bd2b",
+   "targetUnitDigest": "0fbb26b5b55ac7b4a59c5822c3a1d8b7d79929464f29ff7217e322b46e2b7d63",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/604",
+   "bindingSha256": "cd973d0c7558f9c44fcf94309b9130b6dd29f7cf4a11826484ca474121fb5bbd",
+   "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/605",
+   "bindingSha256": "367ef4786e6f4317edc5b5e5d8cdecad458879fef9553cb1bd07c81e4580a9b6",
+   "targetUnitDigest": "54e18a3af732fb59e7231c7192c3fe8667a4d705cc22e073d4b68b414e938f60",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_f3d6f2172d4780ee47f3a2f7a44b2ec8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/167",
+   "bindingSha256": "a7a868355850fdb908e6cca984647c371b72bdd29aa6df22b75d6063eaeb67e2",
+   "targetUnitDigest": "54660ce11d518179ea925df6d69831e3c4f990e5e40ed35de69ce4b5c5c672cd",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_a194d0ab7320ba24239af2947b286713",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/172",
+   "bindingSha256": "72804164c0c040cedcb6d740a28257662a8d1834dfbd9f3f42f71e0fde6ca44b",
+   "targetUnitDigest": "09d80c8c5a1f2d0b48a3ba23b932ee64734bb881f132dd2a619920767c7aa7ae",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_dc75ad7e62660d3711910c31e2882533",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/175",
+   "bindingSha256": "b256b84d9cd7144b0c19e8681e97c728071091e9c0333d9399cfed788fdf50f8",
+   "targetUnitDigest": "6cc6e399493acc5297347592b2c25321f3966e749515b140164c6d2afe66963e",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_12d5dbb269ca537c8e1923d57274a43f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/176",
+   "bindingSha256": "099d70d433c8862277a551422377dd3a318906d68b6d7a628f1947a1fb021477",
+   "targetUnitDigest": "b44c3e178244710d1e0d616064bc5ffd82ddb5a6f6c176336a46f877c5f61295",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; supersede: the status cell \"Settled for V1\" becomes \"Selected V1 design conserved above; mechanism unimplemented\", a code-backed status qualification. The row clause is verbatim."
+  },
+  {
+   "claimId": "claim_66b58ad141eda076944d47edf360f2e1",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/177",
+   "bindingSha256": "19fed959121f30b0cb08406bb5750f63242167ae1adebb4d9c2450983220919c",
+   "targetUnitDigest": "d8443cfa2f90ab369871a7afb68ef2e5c9552854977a85ca831db6fa3661f2a5",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_abc2a0de9c412207cb045053290a4e89",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/181",
+   "bindingSha256": "63087ec328106bb84b70fe1e7592114e1e8e3877e1fbd940add7dabce6de91af",
+   "targetUnitDigest": "ea8fc72b458939fea472d94d2c8d3c516dc13a412e087cf565da924b621460a9",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_7f687034c5f8c915c95d7c932ba0cbd6",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/205",
+   "bindingSha256": "9fbf9b214e9c9c54412312c0074cccb189eb0a6f31fb29010e903e053b5bc1f4",
+   "targetUnitDigest": "e802c4d389cea6a3c74d266fabab17ec424c135cc92dd2e63589b010caca2083",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_088af18a5796ed72fe6d33ff2cc5d05c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/208",
+   "bindingSha256": "025e79b6e35b00afd8341831078b5860f3d57000ebc0c9af3ab765a8b77b6775",
+   "targetUnitDigest": "9090616f699faf93b1b7de2b7c7c20c33961ffa832271a2e5b241d74be53d0b7",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_f7b23e10496a2460c655bbcd0c765cfb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/209",
+   "bindingSha256": "3e4ab7743ad655bf4a1b080d48f8d8a0dab81df75834c0eaa8c5a6a87668db64",
+   "targetUnitDigest": "bac0a2990fcb00aa7b8a014d4397ba8c6cf36cfe401bfc85affe20105adaad07",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_34af5eabebda68848f5a4f158e81702f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/210",
+   "bindingSha256": "8a9060ab770411f92e984f1b83b159c2da402ac13072968e65ce60ccc5b6804e",
+   "targetUnitDigest": "d54d128a83d245d152077055d35030f291cd78b240184690839922bd087e8124",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_c809de74f3631def7b3b3098a6290c9a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/211",
+   "bindingSha256": "cd1618705177689fe7e71788f994372fad0982c710d18fba4af1553b20b23274",
+   "targetUnitDigest": "3e69f5309c46f933c74b52c6b3ec9c8b684a0f686fa0ae36e99d609832c8b61a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_4ece2063c9e19d3693005ab4de9f86a1",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/212",
+   "bindingSha256": "acbe93ab02754904a5b574ef6c95b320554abf3fceda56a3f95c45f1ff84054a",
+   "targetUnitDigest": "ead8dd03ae57188ef8d39dbaeb54e973410f426f88701f050dbb675f87ac8829",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_ef427cea4a40a9001dcf5f004d5cda64",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/213",
+   "bindingSha256": "02035e1e0b9ca9497f938d23250a72792e9a2b77b057304fac603799fad61756",
+   "targetUnitDigest": "04f33e62f1f152294e35b2d568d3efcec43f8efd6629e623ead9e34bc9f860f4",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_5b308c0d698cf4b6e679cefd4b72159e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/214",
+   "bindingSha256": "0439a85f72084d980010739335818880edd41b7544c8f7c571434beb4c3aac15",
+   "targetUnitDigest": "18f7037414eaa3e6682d49f5477a6f75321fd6b77ffd90110ab99539dc47298b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target text equals source unit modulo heading depth/whitespace; Legacy CLI Transition link repointed to its docs/platform/host-invocation-routing successor."
+  },
+  {
+   "claimId": "claim_66db7a2760e67bac298e8fa999e03918",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/215",
+   "bindingSha256": "2245d65a44588082f4d902908f09b4832e198e5e1400f80a0cd3e682d2600336",
+   "targetUnitDigest": "e5a1f647f9052ce79f148d74ecc48822debe0894583bee4117ebebcf5a525162",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_e53e994efd41de413243c7feb18609f5",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/216",
+   "bindingSha256": "e9fcf9db76148e2d4eb0a43a831af4b87d5fd1afd337aad05675b70f099af208",
+   "targetUnitDigest": "7f7044001655743cdc702ec27b67e4ab6e1801cb4ea72c8b4ff3cc36fc80416f",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_3153b26f053448afc0c13f85a80b2337",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/217",
+   "bindingSha256": "c5613c60b723e554c802bdbb44ef0ca03e85932d7897a532d51c9d5ea2e2398e",
+   "targetUnitDigest": "b36d585b2b0651d5b9fd0cb39af3fa2430ab9f91154893fe4a4ba25d8fc10069",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_4486d8c871bc7cace22f5877da298119",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/218",
+   "bindingSha256": "ed143141e3c4e67b561f382d56d1f88532e12320694d984d4c8e54ba01e1691f",
+   "targetUnitDigest": "97cd2867dcc936f5efe7950bc065efc46379f62647e62718b515fb4bdde90b03",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_53faf89f35a824288c56245cbe2ad881",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/219",
+   "bindingSha256": "e2c3f45a00d72c39beda4a3978896ceed04c7c8a0998a23df237f67c78d90140",
+   "targetUnitDigest": "738abf5487f9f299c9278c6d13076bcb9385e942dabc5437420d0741ff129b3f",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_4181e74c1b213526e0047eb5d8a3d2ac",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/220",
+   "bindingSha256": "13067b71270f2e6c8a174e4c9d7bb8cc6167116d436a17566a9970d4810464cd",
+   "targetUnitDigest": "089a50e18972a630a340349ad3e33a2917b313ac50cb1a1a344a6b78e6096831",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_2ce83669de6ea1d99233cd5dfee3de09",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/221",
+   "bindingSha256": "ec737cfe5d839f63b805b0b9650c95669f6087dd05f87b8e17d101e6b314ca40",
+   "targetUnitDigest": "55012af631606c03d5fb4a9a0364f518b2e1e6c8144aef25ec3fd46db54cffdb",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_ab15836d7a655b68626a332fa0667efb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/222",
+   "bindingSha256": "780ede5e90119d4459c25241b10c6d68c839d3cd44cafbf6e629a82512c9b7c3",
+   "targetUnitDigest": "3d1ea331b51042a1bdaefa21bcc3b9736a3698b201646581d4c7e2210321b320",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_bb2261debf9bf9f07bb9a0841991d1a2",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/223",
+   "bindingSha256": "e2d91a6eb8d712e39e7ab6d72513db992e2eb95f87f505186820a9682b5a1c0a",
+   "targetUnitDigest": "32122ff0553fd6bc31cd9e5f77b680f47feb87399f7c1e0561c50e46730b49af",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_e4bf9b812f0b787bcf56246677865361",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/224",
+   "bindingSha256": "db4db000a32d07d61d8e3a81e484bb3cd07af4eaed60e7625564e13033d4998b",
+   "targetUnitDigest": "523c6fe2380a7e02bcdd814d7bb4d9129c2afccdc1cbb425204cfb1db2dfd88a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_a0843b462d3bf38fde961cbb25ca58a0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/225",
+   "bindingSha256": "c4f803ee8db6c523e20643ecfff3c5ca860174b9ee8a385df07de7c4610f7e7c",
+   "targetUnitDigest": "885678733f817f280b07d4b33f77ebe14f07d6adac8890f1731eac84a15fe455",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_b1302fab2b069f48ae2cc5e5ae9353f7",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/226",
+   "bindingSha256": "19db06754a2cc2a3919c19ad41549aef41bc4021a14dba4e567f56f7e57f99ae",
+   "targetUnitDigest": "12b89a785769f424521322c24841709e2d53a1fe5a0c7969d85b0e71129abe4b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_4b867492e168a488b4d812642f2aad61",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/227",
+   "bindingSha256": "72a6eecda55d0ec175168ed583c224581d1bc151844d030f06e08d7497b8b71d",
+   "targetUnitDigest": "346ec840057e1f81dffd3b79f9f0c2fa051879aeaa7d1fd1a25b619b02ad9800",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_25d3080e64bc69696f28d89967456930",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/228",
+   "bindingSha256": "c96e01f066213186160a01ab6222224a17d1d339932518a7b52c4c9788cb2664",
+   "targetUnitDigest": "dcbbe772314b4b46c605c86a35c1e5e25c64da8d299ef2ee22ee460360ac611d",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_377f8ce648788d30644f3bc51bfe5381",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/229",
+   "bindingSha256": "162b5ec02458ab5cd21140c320e3a2012a376dd85d76a82e11ac6859bdfaab9a",
+   "targetUnitDigest": "3e990f9e6b22795ca945fd9b59a65b78b12c3b37fbc2ea88d3fa2bf43e15ce4a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_2d797473f60376ca54f9086ff0856496",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/230",
+   "bindingSha256": "e3fc5203fce593bb430bb1069672edbc8493183652bc3e304348a83b47697762",
+   "targetUnitDigest": "a04d969d83b5e49defe710e91650b6705cca0acec720219e49f163c81aff2d13",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_f44d55f008d91c249201a984ce908b79",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/231",
+   "bindingSha256": "7616f0605c601970f37c0192b39af88fdd76862198457d2b1a3d8f1ac3a0e57f",
+   "targetUnitDigest": "88d26cd1a90388f48bc95e9cba6d19643339a3163f45cea76c829a346156247b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_5802544189befbf7e8e93082025a321f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/232",
+   "bindingSha256": "a771413d19a050ae66ff5d26ab405939da3e797a6aed573f49453df3daadfce3",
+   "targetUnitDigest": "c31de9a6af67d0eb1cd6bcfb97cdd527e5def03d15a0e2314dc09a8a48ea4f72",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_627c2ef29f032273927e9dfb2f6590ee",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/233",
+   "bindingSha256": "59d4d8a2e806f42322c7fdae59ee30400310dde9d02c49222f2c149445e82afe",
+   "targetUnitDigest": "dbf8dbfef2ba662c57de06f78ad450a238098cd8069d2f513587dc429ecdddd5",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_d1fbe2ed17042364fd3798e8f1acb938",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/234",
+   "bindingSha256": "6ba8914185dbdd199cc52ce30e0f9a4851010f8061099380fd49b785ded369af",
+   "targetUnitDigest": "4eb7a14280149d74fa9814bb99ec418b4638bd08c6eac32fcbfb4d68b37a5d13",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_655efd23210f4e37ebb981dab1d3572d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/235",
+   "bindingSha256": "fb1ca85b627469971a099596243288c0037be99df1cb968f8323e71d1ec97b2e",
+   "targetUnitDigest": "f85c2d79598886465957f90d305d2fcfb9c2510697bbac8444d542d9ebbe5e9d",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_ba307bc371864f9cec89f991fef61744",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/236",
+   "bindingSha256": "c2a4211a422027909f5b4202f653c71d3071924634b780c5128aaefda9f277dc",
+   "targetUnitDigest": "9d7e46eac50d16bd95ce331d38192f4a87d9797f99b71edf8ceea4205dd93ff5",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_3673677485dd4449067c9e5074623e1a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/237",
+   "bindingSha256": "326b6dff832ed58391ad0ef73d3f1de7d16f34b6b97a39899c9aa27aefb251b3",
+   "targetUnitDigest": "273e89aa19e81dcc743483fe3e51606dcf949278cadecb37a885aa39014cec2b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; move: the source block is fully contained; a labelled dated status note is prepended, backed by code (init.rs static preflight)."
+  },
+  {
+   "claimId": "claim_ba9547c5587487b5a423db3dfbd2a593",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/238",
+   "bindingSha256": "9fe3a0b4d48a8ae9674e263f58883fc0d5d374c75d3156a8067343083c1ba8e1",
+   "targetUnitDigest": "785e4981db56df9627b8591fd383cd6c57cc04d3e8116137b27e1b8aa1bd6849",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_107a23bb29dcf6db15e2471d7e77590b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/239",
+   "bindingSha256": "6741fd82af9e91eca5343d754abe99262464f70a95932fb75b88e58e7f98281e",
+   "targetUnitDigest": "6fbabae72e49d14c8ea861f42ffc8ee4180d3b83c968871b6ea38ace19b92d9a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; move: the source block is fully contained; a labelled status note is appended and keeps the must-not obligation."
+  },
+  {
+   "claimId": "claim_179e4e3efced44d5c47758b3fff895fa",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/240",
+   "bindingSha256": "23f071d50c4ac6420743b09c3a91987ef9ec8fa304df84bf37633960feabeba1",
+   "targetUnitDigest": "9cf64d9a62542a96c82cedc1b87194e9ab1f8b1e6b6b468c23290d7588dc94e8",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_9b88f0158d85f69a82792e4b47f72022",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/241",
+   "bindingSha256": "b11046c1197e49197389c05136959005ed3cfdc4205fadaa5587c016b9f68da7",
+   "targetUnitDigest": "0449999b7a416906c1e39a270e9c21f37d9cc2326d375cf13594e6fe38253d12",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_5d408ebec2a9651d66e1dceb37b133aa",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/242",
+   "bindingSha256": "8d8fa33be3d9293730f664d8606d46de876dfc92b004920da8645858a45d0ddc",
+   "targetUnitDigest": "7db0392a7929f28b94d89e713f924622ad7f686b20f8070c87360ecd964b2b22",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_644be2fa35959c10348a048777c5f1b9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/243",
+   "bindingSha256": "f80baa909689e716796f61eb965b55a9c0e534e956e37639a5fe254f4f313d76",
+   "targetUnitDigest": "e46b094a9d547703457cd1874db926f229c5f840fdc4c04f70ee621f8d25e57a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_6db1dcef195562e8c4244f6ad6d0a032",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/244",
+   "bindingSha256": "dcb59f3b518af1e08dfca2badd4b93492283a4fbf2a8f307fa8f4df5442ed0da",
+   "targetUnitDigest": "dc365e00a42eed9599e3c3364e4fdc6934ded461577fc2edbffbbc164163f43c",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_a56575cde3ab1f361ab6e7079699886f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/245",
+   "bindingSha256": "381b922575fbabc767a75d5628e412f01da26bead464c4cdcf117e52a2329a43",
+   "targetUnitDigest": "7925f88545b7297188e1883a5707b8dbb1dfee8bd4fd4797783de1e0d8b26267",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_14de31f9e2756afe4d30767125f2f302",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/246",
+   "bindingSha256": "b1ceb0c9ba7fe6a9b348f484567f86b182bce8a693e9d367336b66c32b3b4b9b",
+   "targetUnitDigest": "e260a8e1fa942a1f5bf1c99a7ba7abd14dac6ee6231576143a44a28bc0d0a05f",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_3ef278de1f3aec5f3020e1aa0b5ce269",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/247",
+   "bindingSha256": "8bdbd44e1442fb28ef9913f05a6eab6e7549524c70f178d95ce84fe33d977eee",
+   "targetUnitDigest": "2d86b51570e889b3275f8bd88e04ea73bf1b87ef273c55682de94fc09ee5114b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_566ba6b6f52ab7360edd78e376c925ba",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/248",
+   "bindingSha256": "7dc389fa38d73c05c6080154b456751f6e02f216fc396578f709f382df65cec7",
+   "targetUnitDigest": "b8fa01639c54fb4ce334dcb069b23472fbc2478e9bad4df8d67c073289e8e2d8",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_902e921806fa75a30ff3879ae1f85761",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/249",
+   "bindingSha256": "e79110057aa833e5c857902f0e14e1c5cbc31d93186db7f070fcb9240d7bd107",
+   "targetUnitDigest": "dbfa56f1bdbb52a5388df77df070e5146275526c1da44bc23fd9162931e9d761",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_13dd8473351e86bde28b379f9fbeb00f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/250",
+   "bindingSha256": "e2fb33642e5fc72a917ddcab5fa2ded6d364966625c578d3f3d5f07c75f9d503",
+   "targetUnitDigest": "d2e41a70900c9bf7d37465e1a5e7ce95f2dabdc1d8a1a64be8258795da18205b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_9abe48d0f9a2dc345830741d5ab789c8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/251",
+   "bindingSha256": "bd93ef1a8932e2a3e3631077058ab1ad066848f73d262c0efb3f7b98c5aa4aa9",
+   "targetUnitDigest": "a1f9632769f4cbf2465902c1773664342ac276e6a87f3d290cae2d20730110c6",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_9b6a43d8cd95739a1b4b582898073233",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/252",
+   "bindingSha256": "75e2e003ecbf74a80de9f9940ab8705fd1a9778e848cf0d78fcd813790f8254c",
+   "targetUnitDigest": "fd456a8043fdb4255157f59b82696fe42576b90151877b4cb1232a5ea854b82a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_d42eb384f05d935d19cf9891bb5c5df9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/278",
+   "bindingSha256": "3af2b6475acdb174b319729002016832d0526348aa30590e9c6973e3e44a8d09",
+   "targetUnitDigest": "911c580691fc66e1f9485c40795ff51655e76d27689a05f11f7b50899a18f46a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_bee69c9fafc3e15fc38dd82f1b54acc9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/279",
+   "bindingSha256": "54fd0b71cf56ca1a1663e71e3241cc13d01a2d14425676dee854c58f923b420d",
+   "targetUnitDigest": "ac51cf26ef4e4e0468e570f319c083e5225c25835f20c164d4a047cd888458c1",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_4a2a23337b8495f1940fd9e3226e9d31",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/280",
+   "bindingSha256": "a6c458fe4949a6026aff5ca7052bd3368ac12e2e33564fe942f9e0fe70c5116f",
+   "targetUnitDigest": "da01d2fc952c416ba16325b6f4493f5602a85e68e6445890d86a661ddb563d60",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_181a82457153d16a123d8c3378c30c98",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/281",
+   "bindingSha256": "b4baccb0a433dd909e91a40e49e0fc6514af6d2df1d3070ad9cf5caa2e345abe",
+   "targetUnitDigest": "9a365e9b5b43ce380e4ccc724d86d039e5020c11b3875ec94a3e3547cfbbc663",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_c6869299794e7b0b8faebb525521af54",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/282",
+   "bindingSha256": "01f5d7bd2c378778482dc3404b9139e0f1c99e89b9318b40ba61f7111e541f43",
+   "targetUnitDigest": "3608b979a603b21c6131d86953fbe07fd47dceb6f9e477d6dbf66064b3d5f4de",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_bbe6d0ce5f2af5471b4b0f830209f3c6",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/283",
+   "bindingSha256": "ed278a2489cdf34270970e99c06b1ce1c8ec73c42ecced13fce05d6731280a98",
+   "targetUnitDigest": "60ba86001f48ba64132862a134ed1e7ede5c4233b11ea818bda2593400a6ee85",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_573f1ab0c14672c3e3d1893b96f5e6ef",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/284",
+   "bindingSha256": "cb8390ae51516bc1b2f6444a005f40ea52668011de5f8d4446dee59fb483574d",
+   "targetUnitDigest": "1fa15164579b61c19fd19c467f533973c1577e9a1c708158799e0c8994f50419",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_491998778e598a5385e78b541e33bff8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/285",
+   "bindingSha256": "4a8e298865ae139a2c6021fc0302f1ed8cc3c2c59f4c0e3b126ee76156dd5671",
+   "targetUnitDigest": "498ce4bd1a2493ee1261ae7e8632c54b2c6abfcb4fff8fbb7554cd93809c17e8",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_bd90f346258ea0333f0e9b09949a2bae",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/286",
+   "bindingSha256": "a475d7528949b778ceae8f3c09bcce5c12aa0dca4ca3579c01cce8b02503d5d0",
+   "targetUnitDigest": "4a5dcd22823a0b2ccd988467b5c6b7df81536ef3fd5372bfd5ce1d5a1ba2eda5",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_5a5a447d501facb835101fcf15cf5f9d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/287",
+   "bindingSha256": "045e8c856c047ff5afee04d777f52ec5d139575aeb99595f4e6d257c188c3f4c",
+   "targetUnitDigest": "7736cb341115949ee30f3c483b3b4547bd282597586122e1eb7662e64eeb78f0",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_0d7b6c7bb749583718df925f63a8ba7f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/288",
+   "bindingSha256": "e4c17d459b9683f95106f8887231f7ce79937b1ea6065eaece382010fc7bf0b6",
+   "targetUnitDigest": "de9ca65ddfe8a9180b1cfc6b5075e300c8e3c63d27516f5767707a0657fabd05",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_eb0ec8c42d305f6fc227246824a4e360",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/289",
+   "bindingSha256": "e361e22d52f0135aa746ef31c16e4dd496e8ee9e99e092a2b3cb7be0eabc9025",
+   "targetUnitDigest": "70db9bdf36a7ab578e4aced8a540eefcc332495e830b507981eb3605ff53b858",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_30369b94b606096331ba0ac8215dfe6f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/290",
+   "bindingSha256": "6033c8a5d752a0cd45f324bf54de8a712948dc934ce9266c4c809794de5e2caf",
+   "targetUnitDigest": "be3d98e07c3a376719e09158f719c780c45a05d4a808f4665df1392229e81c99",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_3a0164aced10388208f0c748829bf990",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/291",
+   "bindingSha256": "4f0f6c2c90ab3f6e0f8682f3640405a77c1d4ca9b04b955fd5ad41c0ffb90eec",
+   "targetUnitDigest": "17a2c3fcd7e144c9173cd3ad9f462ba8152f488e4ae493b63123be13014b8995",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_ec133e4ac5ee546b775219835450cb9a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/292",
+   "bindingSha256": "184ff927560d48e35cf96fe6c84caac2ec7f18ccd7be6a054c9b805ac40930bb",
+   "targetUnitDigest": "ac7af0538dc243ffd13baf530f76a89686ff9cd2e59016f38c52877e3c3925df",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_093f54d48d2e2a3efc8f0c865ba57b66",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/293",
+   "bindingSha256": "a1705d11f385abf3900a21173712b63ddcc7a781207bbf6eb63fb8fbed170ee8",
+   "targetUnitDigest": "fb1fd721f45cd646c9b1e55e905c9b96ceb0250986e0e1c9bcee142e38c5b1e9",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_6ed197b95e7f9801fa8298694177e5d0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/294",
+   "bindingSha256": "6d6a0b338de29cff64c974f3d93c9ec3d3e2d792f06f25babb21b9d6584f4549",
+   "targetUnitDigest": "6974a311e550994984d962f6e8e1f71e1afc8c14fbe7f8d5282a4cdda7df0cd8",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_a144f2fd3dd53acd12feeb7e72607de9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/295",
+   "bindingSha256": "d6e4e827f5fd4cd04b9aa92e1d0bc18c9be70411e373bcb8d1b0269f363cf714",
+   "targetUnitDigest": "b10f8721b7f1f6d51be6d22b21acb9effa78de473c0b6a2fb2f92dd71e67b158",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_2929202af5d9245fafd9c8fe0055e494",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/296",
+   "bindingSha256": "2cb5f9ed0cac5b1414506ed90cae6e52dc70270f848ef785418df47bc14654a1",
+   "targetUnitDigest": "1f0eae3e1e42a0694560408217a0581fc8920c356521c76f38c931b04a3e21f0",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_ed503fa8fc58ad877bf8c8faa3f7958b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/297",
+   "bindingSha256": "63f75db35e71b4d50cc74bf6431265fd9d2db85d919fb072b68df135dee8cf31",
+   "targetUnitDigest": "1350217488d7df5ff2cd08fc752fef846e75b1b20161c0d22dcde1d9f7388837",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_26bc6a190eda16e49745b6bcc7fbc379",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/298",
+   "bindingSha256": "e904862b482dd754b9e40ece65f1db78fca7daf859fb48667b9f3d11f0716d66",
+   "targetUnitDigest": "0f882749d3e11278fb1a1150c663da4b71885a1d0a9e39574a10225f36a24d65",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_a5d4be2b9bafbb6afe85aa62070351e0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/299",
+   "bindingSha256": "d1ac8812d3b806112b17ad0f0bcf82d683dcdc673cfd2a1b4f16ae5be1846cf5",
+   "targetUnitDigest": "67b295693448086f48b7539c8a2b9b6914b45d721cfe4a7926635054eb41ea81",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_b0de344d5a30b83c57e0ff1b963c4c43",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/300",
+   "bindingSha256": "98e559e95364ed6606941355b279bd5a458d0121a239eb36a9f355982b325a25",
+   "targetUnitDigest": "07f8f1512cab1811efe3279788d3b494c699f31d6e5bf623417c53eb1241ea01",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_89796d37e2377576e2e7202f34b08ea8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/301",
+   "bindingSha256": "584398eb716d634a53d42e4ef68abbf5ea9d2e66fb323fcd039baa6d4d1fc364",
+   "targetUnitDigest": "8ca6f556298555c6b141f6386ec9ea4418f581ecaca73550d2f99de0dda9aa13",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_efd5afeb35b4352c0229ea2f7be2356b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/302",
+   "bindingSha256": "99c2491259347450585dba48b8f0decb8c210e53cf256f7381294c3de681fcd8",
+   "targetUnitDigest": "9d34488da7e7519001ae2092e7014e5f6efd7f4c427c36c592fa098e2012430e",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_c95bf4f07595cb9b849208efc61e76fb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/303",
+   "bindingSha256": "0022232620f7d0bfaf080ac78d3d835507f25a6032b78011d7efeadc36fe3998",
+   "targetUnitDigest": "12a6c926f8c2c640b2a3b32069da45936488d40fc9512a28acc3c71e75632004",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_865a8350c10fa2d9cc73ba3edb8b0520",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/304",
+   "bindingSha256": "82e6262ad954b4b95b65295d37d2ca0fe601855f06c5f45bebd17e2813696ddb",
+   "targetUnitDigest": "5c2bcca41b6bdea7c18a1fb420ab27f7404c32ef2240ab0eb8ef9370b7122872",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_3b0ea2eb26b63bcfe3c447bcce51d96c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/305",
+   "bindingSha256": "592f6387d4e699b9432c8308ed9209dcf09a413e14a1be4700e2b5d5a401d70c",
+   "targetUnitDigest": "fbf2d2af13ec036d421e8ed1fb30ffc5cc600b77e97fbeedcf934348cf3a6291",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_3b558cb40f932564057bd64e5d7e024b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/306",
+   "bindingSha256": "307c9321753445e5b932601dfaef533bc46cd4b3664bc608b89a1e269a86f305",
+   "targetUnitDigest": "c5b60269a59c089f5f65d887f3c94aad46db63cb786f98293fb892cb3ed6ed86",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_b4018a4e982ca86c1f265cfe32a05494",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/307",
+   "bindingSha256": "696a315f457b4163563d5bf1900f8ba8317a4079225be30a57d6fcf463503ced",
+   "targetUnitDigest": "7e3f5e9aeda86c61f68de30e4d5a9b2b817a0dfb720845d3464c86832cf88b93",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_bc6c80a5dbb5b49aa616db0b538022ba",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/308",
+   "bindingSha256": "0055d13aeaa493e3880e97e8862818f6d1109ec1ed941d76220ac5d0466c9fcb",
+   "targetUnitDigest": "c9e7d97572e0bbe68d393d6b5d54f1b9937eaeb8160902cb2b9ed24e5d209884",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_28574a962da3d238b368e94888838811",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/310",
+   "bindingSha256": "5998e3498b70de5dfebcf594794e6a56bf9bd61d6869b2c6b60eb1535d2fdf36",
+   "targetUnitDigest": "a147434c1168e52cbbcb08af34562a30766d1a54e85b2022d9af02bc18e14b50",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; move: the opening clause is kept. The added sentence qualifies the retained pipeline with the current static preflight implementation and links Activation binding."
+  },
+  {
+   "claimId": "claim_d7a9ea523826eba629da2b4c3cdc61b3",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/327",
+   "bindingSha256": "193bef90cfedc0175edb16a490db3e42aeeb7a024c4f9873fb3426e11ceed3f0",
+   "targetUnitDigest": "cc31e38bc3c3353d260dd409d61ffbed70ff357320d45248825aae8117e19cbe",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_c0afc8b40e3422d6dbd55aad9f6388bf",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/328",
+   "bindingSha256": "5c886977a3ec30a2cdc84291bf62eb8131f8273e3d08273445118194314138d8",
+   "targetUnitDigest": "e0e1f0ad2950436a0eb71ae8be89f164c9f710e728b86458c733cdf4aa827c8c",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_a24422208854df7ad9c53b0a7f663e96",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/329",
+   "bindingSha256": "6646be4866c367d565affb23978406988728c9f631a2bf1dca90c433280e615d",
+   "targetUnitDigest": "dc301a37d3747bdf01fa85cab79e39ac9bf39043008ad7893d1eb899d1283a6a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_8c70ec6a92ebfe58cf460e88ce313aa8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/330",
+   "bindingSha256": "a0387d13fcb0c7342f85fa3dc0a74fd13cb1711a3426294e91e44750c70f89a3",
+   "targetUnitDigest": "3ab4151c537f00a4e994ee3e8ddbd727c4160c965eb50c2d03db237286df4976",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_b19d5177a72889440523f68acc63caaa",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/331",
+   "bindingSha256": "e6c77b1cd05ee10a6e168ea9c2e504ef775379b067cadf02cb41b7c5847b14fd",
+   "targetUnitDigest": "f68459234edbfb4349e122e6f226f758838642e285654a94dce11e0230a9f884",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_f293bbd03855e7b0ecb113520bd185b7",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/332",
+   "bindingSha256": "b1257a4d37e9d814dd13585f4938878151412b7e5b3a272e7e60c64992ea7cfa",
+   "targetUnitDigest": "41822b1f6683edd47fc34cd25c33ce061591aeea5f528e07bdc3baa02984ac76",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_0036613efcab070084f6d6a219f0787d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/333",
+   "bindingSha256": "cd396522e9070b3ee663b9ecdbbef9c9f99f76415ae2904ad80747ed79bf657b",
+   "targetUnitDigest": "5ed2f9d1174332ae7c94a4760f7b93b006433d24fe88195bfc8b8642cc393d7d",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_125cef1cef30d1dea90c511b9f6283e0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/334",
+   "bindingSha256": "951117927ab6d9f86461abec0a9b0c70c5d164e1ee390069e3ea1b23f9604241",
+   "targetUnitDigest": "9ae4027c698a260c41546f5626709450f3aae967ca65fc0d58ddff4b11d2bc1d",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_c2e23dcc565a90df0c229c276f49cda6",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/335",
+   "bindingSha256": "9c38803be44c370acbfcb2886b91ba38471ae0aacb005452676088826d95ec0a",
+   "targetUnitDigest": "4c64deca5d4e97eaeb5c2f052964c5763c07cdcf27fd6e09287efa5a3c5fae70",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_1b386ff42da1ea6faffd434fd4600efe",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/336",
+   "bindingSha256": "ccd0d7b68249762a2e60346a148a4be59e4a6f7863bb5640d8915bb7bd95d6ea",
+   "targetUnitDigest": "afa4c17c539557aef31c16b3a5ed32351c0b90839d0e1ccff797fd3ea1e66104",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_6f29738146b71d6c8fe18454fa54170d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/337",
+   "bindingSha256": "a392b68de7791ebc983bc883dddc5c6b59960a2859a24ddfece696a663301d74",
+   "targetUnitDigest": "81b159cc1b99959cb3ac045db0225689aeb8276838282bc59d57bb1513defbd3",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_e6e67bbd91d38440145b2cac743c3983",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/338",
+   "bindingSha256": "24d2610f3407f213ea06f62d7869d04bb56df31e304c8ad100e008a4f534354a",
+   "targetUnitDigest": "e3b0d1af248f4abb69cb8ec6c67d70d375955fc9eaed87c6dd8410d74a47b02b",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_3483ab5f8b28bfbeaca48258d6128c1c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/339",
+   "bindingSha256": "681542e51ccf20edb2c330ddfdeaf8fff236ee3d0ff7a2a5d321445ca3a41633",
+   "targetUnitDigest": "74a93ee0e5cae1031098470874012122913b61d666c545ccb1c79b62eb0205fb",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_9e77c50e995716e7f23813013c466c3d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/340",
+   "bindingSha256": "a40530ba8233833abf08a0025cadc2894cb7bc018b0e75c3f90e615aab3b0b6a",
+   "targetUnitDigest": "f14ef8dfb699884c5004a9c10c4e6a7b2133ad6aa7310ecb57c51bc5a6db2d81",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_0126dcd017d4604b384236e046fadd82",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/341",
+   "bindingSha256": "e4feeea476edb2c5cee152fa6da90b206e965876abe5e72ad788d24e4b3ece2f",
+   "targetUnitDigest": "697dcb0fc77b4574bc4785abc062489f7b8d7ed3fcc636d2f93d67873d5434a7",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_b43688fff7d34b97772efcb6d81018bf",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/342",
+   "bindingSha256": "3ca539d16d611ca0127dae2e7d0d758259fb3c03e023f5c7e9faf6261d689f66",
+   "targetUnitDigest": "1b87605b5ce482ef0e0333ddf175c524f78a4d623b8c66572c4e559afbf420f7",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_73ffcd717dc2650f8713bb90547198d4",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/343",
+   "bindingSha256": "17e0af02d19f23dded3aa742d08598e31027b53be0384e75f5a39571b5bbf26c",
+   "targetUnitDigest": "c658779d98cafcee3b3c0eeb9413b4d7bf827a21660f4c2bdb5892e7a3ce7f6d",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_9881ddf76dc1db230f605f5ea5af6bc3",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/344",
+   "bindingSha256": "212ef7debd97d2dfe2b9512debece00712104dcff3cbc1d8fb488238b98c1f60",
+   "targetUnitDigest": "0963efc29ce84598b9296ee2a2d8cb02b825693121516fb939830568a5b639fc",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_7c93e9a44c1e8eb580ebb1c28fbc9d3f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/345",
+   "bindingSha256": "5a734586767f3a53cdaecf6c8ac249eeca0d96889b48c9205c475e0e907a5362",
+   "targetUnitDigest": "95f27f77881c7880d7a6cdd068afdf0f4ff5e1f3b77fb09685326e0b3bbf384e",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_32e7f978ade53ffcc2e0d133ea0add0b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/346",
+   "bindingSha256": "3d116000fc9009d562d8054cc298c8eb1897bb7c78101ac26b3813f40d840d8f",
+   "targetUnitDigest": "0a60f4e2b6313ac8efb1e1923ff5e4010b74da93e88909aa00aa045b8e0a498d",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_0d5683e5cddc8d54df2796cbb0cffad8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/347",
+   "bindingSha256": "38b1e8bdda157c8d980b910b45988fc3b799b238a7232e2977c8f4cb8e266700",
+   "targetUnitDigest": "45f24c6d010b8e4fc85161342ecf8338d5a0cb71f91007f80badef2718daa6a8",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_04e662788ab02accc67a57eda408fa7c",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/348",
+   "bindingSha256": "9d34ec32ad6990b194a94845031d108d80f49f63bf4f728e8460afcd0a102112",
+   "targetUnitDigest": "707a2f98d8a91c48287589feda663d0cd5c1b11bf1f6dc141e167989b4f815d9",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_85042d69edd2c1710bf4a9a5321cafe8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/349",
+   "bindingSha256": "1eb5e3af8d3535e51014bf35a969eca9c96aa9d0b4bf2dee4a59f79aac6f35f6",
+   "targetUnitDigest": "8e3b4c4a303cab1f6461da7545f2a23adfc7904f3fcec08689a4483c0865eeb5",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_a9679b20b8c65b854853c43ac50534ef",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/350",
+   "bindingSha256": "b32109a7fef5346d5aff33bd57df4e83b628b27f1e67619d5a14eefe84221223",
+   "targetUnitDigest": "985161aeb93aa559790ec6a90663d092cad3660c07a797bd690d693b631a38dd",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_18896f5dc88690abd1dea714b43da23f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/351",
+   "bindingSha256": "24534d0ebc7d0220c53c17a87ff5e54cbffaea97f08c5d5f83d37084070b25fc",
+   "targetUnitDigest": "c5cff96236021d7f8a60a12c4c10acfd1d3940013a858d08887e43952422e10e",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_fd4ef508d9b08945c7592b9cff52303e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/352",
+   "bindingSha256": "0332ca96b115d0f09592c8f46a5d30015c53e0b344baff8f8b92d74f1acbf619",
+   "targetUnitDigest": "00bd2aa432ff7e0b7a314e0190d40f8656d8067825906ca5bd91ed7622fe68fd",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_099829ace5237fb150e7e2112ec87508",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/353",
+   "bindingSha256": "da436726d9db07778505dfa10e636a9ecab67769e6e64e741604682f9d308fbd",
+   "targetUnitDigest": "3e6ff28ccbdb496a38e60ec04e65a4f2f5dced64e85943d31eab6f6f49fb1e53",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_d6c0ad62259e8ebcf4ad364e7e0a0972",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/354",
+   "bindingSha256": "cad2c911b97ca50f4c55fc10aaa26c4a56cea56c5e283e816d7accdeeb95f303",
+   "targetUnitDigest": "88635d84f2c24f8a9f7275e4ebb40f9e0a85aa4dc9df23893415af18f390927a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_8946f48631858996b29154c5a81920ca",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/355",
+   "bindingSha256": "9a827251de68fedcee4a551266ee35e45975dd496a091492df6c66580bbc38e5",
+   "targetUnitDigest": "5343fbfd729fe3fadf948f37abb54f197b5a03f80b3abda7894a9c6bb7934a63",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_dd97ded8ab424ffd24d50cbafc620757",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/356",
+   "bindingSha256": "f51e9dca1fbaa7bb52b1fa103500b2fc77f9f1e86b6c6904bce9dc296006e8af",
+   "targetUnitDigest": "ee2c9e5b5ba499dd52e19900174103c8de441bb92887653e5aaa94fe6883e75a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_6fa26e8fdaaf86bd7e75de5bf28bfea9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/357",
+   "bindingSha256": "f5112d26ddbe4467daebd3e815638a5bc2f4bdf47071dd2d6e09cdbd8f9bf614",
+   "targetUnitDigest": "79e788d6f659642e119268f22b143b493915deedb8c1ab850af730165af51180",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_075bcdb88bc8989bf347f84bcf8b6bb8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/358",
+   "bindingSha256": "41d8ec15d117a23acd20a2b43d994bef109f1aa11847a38509d49482352ea701",
+   "targetUnitDigest": "99029fbd090749e3dd3c7abfb6f4767de2d1542b4d04952b908be8c8979841a0",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_707c20d97af0d6e733b8defcf4d62394",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/359",
+   "bindingSha256": "951073e4a0becf39d696744b012af7d2b86450bb585ffe2d9b27c41825e5ebc4",
+   "targetUnitDigest": "15c51ab594f77c06ab7efbc76008b37c258c66dfbca33297a2357cca853854a8",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_80e603db238925ca6f81c14d52b10436",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/360",
+   "bindingSha256": "bec6b40d2d37a1744805481591ad5c889de6dc528784ae25c6535d83112263eb",
+   "targetUnitDigest": "089f097d4b57980bac6e716054fad8083f991e38a768a387f59aa7c6465b5148",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_163988c8973416bdd64781cc7c667f65",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/361",
+   "bindingSha256": "a218847c0dc267868d87feace3e3c1044ee6e08ed240cb2441bf903867c8b1ce",
+   "targetUnitDigest": "bb51245f797ae2ff9c26ec3eeda2eec25bae525e30543a9a658a47dd84109dd6",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "claimId": "claim_da41a9786ba80d8a51c540a03d4dc2c6",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/362",
+   "bindingSha256": "753c834d4e283318e7dd615b9f0cdeaf3b9595ee19a7cf779e3cd4107c5c11c4",
+   "targetUnitDigest": "25b0152eb0224cc8800a2d0284f2b62c6bab8d4933b1122da4e834e7bd922fdf",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_d6701453661c34a2331f9d9bd12ef843",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/363",
+   "bindingSha256": "0ef67046cab72cea9837f1e75cf659a324d98fb03dea713fed8417c57619167a",
+   "targetUnitDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_d897f2b8b6a0fc956ef2232d1d7b90c3",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/364",
+   "bindingSha256": "8d2c42fad5445d8e92327e74ddff0360153041ae06c8b24ed180f245ff585305",
+   "targetUnitDigest": "4b22d8634e39a4e2aa3c77b4c64890ec5ad33a5702e1297815320411bcc766b6",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_0acb3fce7151b23ecb8e2f00e867edb3",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/365",
+   "bindingSha256": "ef7cb6372c562dd1129a9a74f1ace63845a85232e9a30b4474b34bb97f6d8db9",
+   "targetUnitDigest": "b0517b50aef316291d132b925956dbbc2ed40d6dbc4239d918082e9f88b82653",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_249083eda8db1792917b6bc5239e48dd",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/366",
+   "bindingSha256": "af5dcae2c2cb3bbab50b24beb39e79f3d9d4e0e6f9ee5d362a0fe9b87b476808",
+   "targetUnitDigest": "cd74dfc705f04854cfa17eebf4d9491c6d8006a272e739e8463415183d6a81f5",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "claimId": "claim_ffe2d79ceecc8d5f4c380c2ecbaa86ed",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "pointer": "/claims/367",
+   "bindingSha256": "f34f76a952b0da2d03b0dc86ff0227a9b273f34089626d2fb8c7845fa843b7b2",
+   "targetUnitDigest": "fa062476e5a57e2ecf6e260fcde316a50dce52c3ba7dc17265c9c373bdf51efe",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target unit text equals the source unit (only heading depth, whitespace or same-destination relative-link adaptation)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+   "pointer": "/sourceBindings/419",
+   "bindingSha256": "d30d0d978c320e33cca799ac83bfd9244a7a64ed73b75ea9d88ac30137676937",
+   "targetUnitDigest": "d05bd89bb78b80c804b4be0abc53c217d6c562e42b89e005ca27c94f9ed97481",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+   "pointer": "/sourceBindings/453",
+   "bindingSha256": "8a6b302950e7952db5e607c5aea0a1fc25c8544b763dc6fefc2d7c831f5983d9",
+   "targetUnitDigest": "299c5b49c98df16010e0ac6cfc38a3a77e93bc6b628337f2ee0685a1b7d64269",
+   "verdict": "REWORK",
+   "reason": "Target block-36 corrupts inline code in the RUL95 clause (line 191): `d['executeAssignment'](a)` became `d['executeAssignment'](../../../../specs/a)` through link rewriting. The disposition also says only depth/link/whitespace adaptation, but the bound source still says \"24 hours by default\" while the target says nothing closes the pane."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+   "pointer": "/sourceBindings/859",
+   "bindingSha256": "1d57c8890917395dc13e16522cf3046288138a2282e866fba5c1d23b2336f13e",
+   "targetUnitDigest": "170ce67e010e1bc0f007c97c410db3aeb3f4af54ba6788c9a04f30b194614d34",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+   "pointer": "/sourceBindings/860",
+   "bindingSha256": "16e40f7d66cc4a6deeeb32e52f387c24fa6d05f202ace822a9a49bc0614a88fa",
+   "targetUnitDigest": "56a9269a6139c7decbb50dc5a46edf077a2d6d68c328b1620443082cc61e7aa7",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; adapted legacy clause: the scenario is kept, and the terminal-dir sentence is corrected to match the documented 2026-10-23 removal of the terminal-dir fix (src/setup has no terminal-dir fix)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+   "pointer": "/sourceBindings/871",
+   "bindingSha256": "9f110e93a66d7af4f9e94376009c50d05fc92af706936c276e70749a78e474ea",
+   "targetUnitDigest": "f9c90772c897f5be41cd3554d3810ef2641ec4dd7c3d3a415840d0b4eb06a4f6",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; heading title carried verbatim (level/placement adapted only)."
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+   "pointer": "/sourceBindings/877",
+   "bindingSha256": "5f1efe93f6e6f5dc089fb73d9f97bdb45c5f24aa17f82d45a803aecde7e479de",
+   "targetUnitDigest": "17e86891b31441849e0a2d91751b94f2c01fb3fe13a987609e5f58a30816e212",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; current source content fully present; a labelled RUL108 supersession note was inserted. Note: the disposition reason understates this, because it says only depth/link/whitespace adaptation."
+  },
+  {
+   "claimId": "claim_04703f011b22383992b94545055b9e56",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+   "pointer": "/registryGaps/1",
+   "bindingSha256": "03765f0b0cb5de3faefaba3cf20b4e75d15acf8d89855cc9b4d7580bdabe738f",
+   "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; supersede: same bullet; \"5 bản mỗi account\" now reads per login store (per account / per stores/<cli>), matching the per-CLI store layout. Nothing is lost."
+  },
+  {
+   "claimId": "claim_f033905b059f073c62ec27f0ee6da620",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+   "pointer": "/registryGaps/3",
+   "bindingSha256": "8a6b302950e7952db5e607c5aea0a1fc25c8544b763dc6fefc2d7c831f5983d9",
+   "targetUnitDigest": "299c5b49c98df16010e0ac6cfc38a3a77e93bc6b628337f2ee0685a1b7d64269",
+   "verdict": "REWORK",
+   "reason": "Target block-36 corrupts inline code in the RUL95 clause (line 191): `d['executeAssignment'](a)` became `d['executeAssignment'](../../../../specs/a)` through link rewriting, so the bound unit misstates the code example."
+  },
+  {
+   "claimId": "claim_a4ed6ca5cfd26790037b35d1c99373b2",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json",
+   "pointer": "/registryGaps/1",
+   "bindingSha256": "0ef67046cab72cea9837f1e75cf659a324d98fb03dea713fed8417c57619167a",
+   "targetUnitDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; target text equals source unit modulo heading depth/whitespace; the Workspace Topology link now resolves to docs/architect/workspace-topology.md, which is the fix that g0-b1 asked for and matches sibling block-76."
+  },
+  {
+   "claimId": "claim_7cfb055e3f10b99944ffec46ce877653",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-holder-lock-predecessor.json",
+   "pointer": "/registryGaps/0",
+   "bindingSha256": "11502b4e351cf4d11c1dd080b52afdf31c77a72fff28b4da59e90f56e49900fc",
+   "targetUnitDigest": "6bcdd232b69054da2ac3b64457ac4a777cfefa37bd8a90facb7567e64be1e50e",
+   "verdict": "APPROVE",
+   "reason": "Digests and four-key binding hash recompute at HEAD with the dual extractor; supersede: the header implementation status goes from In progress to Implemented (signed N1 correction), and the session-identity link moves to the existing docs/platform/identity/spec.md. The other header fields are kept."
+  }
+ ]
+}
