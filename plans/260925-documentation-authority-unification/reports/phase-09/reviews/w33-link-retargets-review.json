@@ -1,0 +1,74 @@
+{
+  "pin": "1513cf049b2cf052dc5fd8bf7b9d55f106bc8186",
+  "reviewedCommit": "a319902ab",
+  "checksRunAt": "a91edadbe (HEAD advanced during review only by reviews/w33-ownership-audit-review.*)",
+  "items": [
+    {
+      "id": "link-retargets-record",
+      "verdict": "REWORK",
+      "severity": "medium",
+      "summary": "All 162 rows and 41 patches are mechanically correct except row L13-26:link:125, which should retarget to docs/reading-map.md instead of becoming a code span. Independently verified: every oldTarget resolves to its oldPath; every oldPath is in the phase-08 move set at its moveSetPointer; every newPath is one of that path's move-set destinations, chosen by the exact alias (159/159 aliasIds match fromPath=oldPath[#fragment] and toOwner=newPath, unique per fromPath); every newTarget resolves from its file to newPath; fragments are kept; all 49 destinations exist after F; no destination is itself in the move set. A separate scanner, written for this review, finds the same 160 links in 40 files with zero difference in population. Code spans, backtick and tilde fences, and comments stay literal. The only no-successor row is 125. All 41 patches replay byte-exact: preimage from a compose() run with the record emptied equals beforeSha256, forwardDiff gives the final composed bytes (= expectedAfterSha256), and rollbackDiff restores the preimage. Row 125 fix: the move set records docs/specs/reading-map.md with to:null, but the phase-09 plan (\"merge of docs/specs/reading-map.md into retained docs/reading-map.md\") and G5 (g5/check-b57e79625.json rows: surviving file docs/reading-map.md, status restated) name docs/reading-map.md as the successor. Every other docs/platform reader already links ../reading-map.md (README, governance, component-boundary, switchboard, docs-portal). The sentence is a live \"Read ... first\" instruction, so a code span leaves the reader with no route to follow.",
+      "evidence": "Exact fix for row L13-26:link:125: action \"retarget\"; start 2184, end 2210, column 20 (destination span, like the other retarget rows); before \"../../specs/reading-map.md\"; after/newTarget \"../../reading-map.md\"; newPath \"docs/reading-map.md\"; aliasId null; add a selector naming phase-09-atomic-platform-authority-cutover.md (reading-map merge obligation) and g5/check-b57e79625.json (surviving docs/reading-map.md), and amend selectionRule and counts.codeSpans to 0. Patch /patches/24 (docs/platform/proposals/coordination-capability-envelope.md): beforeSha256 is unchanged, and the second hunk's + line becomes \"Read [Reading Map](../../reading-map.md), [Runner spec](../runner/spec.md),\". New expectedAfterSha256 8ce81ee7f54c1f655e6e814b6f76e8448bb29efff04c83b64de3d75427c9b884 (was 9ae33a28...). Regenerate rollbackDiff, then refresh fchain/check.json, link-validation.json and the receipt counts. The manifest resolutions key by /patches/N, and N does not change. Verification scripts were scratch under /tmp/fgos-work (deleted): compose() final and pre-retarget states, independent census, alias join, apply_diff roundtrip."
+    },
+    {
+      "id": "linkIntoMoveSet-door-check",
+      "verdict": "APPROVE",
+      "severity": "low",
+      "summary": "check.py runs links.scan on the same composed states that compose() built, plus pin bytes for untouched docs/platform/**/*.md, against the move set it already uses (phase-08/step-05-cutover-move-set.json). It does not keep a second copy of either. The owning control injects a real patch through compose() and fails with linkIntoMoveSet, exit 1. Running compose() with the record emptied gives exactly 160 linkIntoMoveSet findings, so the check fails on the real population as well. Review mutation probes on final states: an inline link in an untouched pin file, a used reference definition, an HTML href, a repo-absolute /docs/ path and a link in a composed file each give 1 finding; links inside a code span or a fence give 0. Low notes: (a) the angle-bracket destination [x](<../specs/runner.md>) is reported twice, because the autolink regex matches inside the inline link (no real occurrence today); (b) the scan reads only .md, so a regression of the YAML x-specs would go unseen; (c) Related-header paths inside the ```txt metadata fence are not read (see related-header-paths).",
+      "evidence": "check.py diff hunks @@-233 and @@-349 at a319902ab; controls.py injected-link control; mutation probe counts inline 1, ref-def 1, href 1, angle 2, absolute 1, composed 1, code-span 0, fence 0, yaml 0, Related 0."
+    },
+    {
+      "id": "work-state-rebase",
+      "verdict": "APPROVE",
+      "severity": "none",
+      "summary": "No decision changed. A recursive field diff from a319902ab^ to a319902ab shows: shard-3 changed only patch.sourceSha256, proposedSha256, chainResultSha256, chainEntryIds and two reworkNotes; patch text, disposition and every other row field are identical. g9/recomposed.json changed only hashes, sourceCommit, the predecessor specId and composedBy id, and one appended rebaseHistory entry. composition/patch-specs.json appends one spec and swaps one effectiveSpecIds entry, and all historical spec objects are unchanged. The appended rebased-current spec's diff and rollbackDiff are byte-identical to its predecessor's, so only the base hashes moved after e88d4e283 edited work-state/spec.md. fchain/rebased-patches.json is untouched by this commit.",
+      "evidence": "Scratch field-walk over git show a319902ab^ / a319902ab for the four records; old.diff==new.diff True, old.rollbackDiff==new.rollbackDiff True."
+    },
+    {
+      "id": "w28-low-notes",
+      "verdict": "APPROVE",
+      "severity": "low",
+      "summary": "All four notes are addressed. (1) f07871's reworkNotes[1] now says that row.patch is the executable basis, and f07667's note says the selected chain is strict. Residual: f07667 still has staleChainDependencies [file:docs/platform/runner/architecture/h-69197b459754.md], which contradicts its new note. No code reads the field. (2) The zero-fuzz control now uses exactBase False, asserts exactly one new patch command with --fuzz=0 and a nonzero exit, and separately proves that a pure line offset applies. (3) When the record and the manifest both carry composedBy and they disagree, the check now adds a conflict finding and skips the entry; the control asserts that reason through a real compose(). (4) g0rework/final-pin-duties.json names rebased:w8:gap05:relocation at composition/patch-specs.json#/patches/138, with before 53d407ed... and after 6b457550..., both verified against the packet. It also gives the final file hash 61cd146d..., which equals check.json for component-boundary.md (chain: predecessor -> relocation -> link-retargets /patches/4). The register's gate-0 atFinalPinUnderLease has since named it too.",
+      "evidence": "shard-3.json rows f07667/f07871; controls.py @@-30 hunk; check.py @@-262 hunk; final-pin-duties.json; check.json files[] for docs/platform/component-boundary.md; preflip-gate-status.json gates[0].atFinalPinUnderLease[3]."
+    },
+    {
+      "id": "gateway-x-specs",
+      "verdict": "APPROVE",
+      "severity": "low",
+      "summary": "In the composed fgos-gateway-api-v1.yaml, x-specs line 54 changes docs/specs/work-state.md to docs/platform/work-state/README.md (alias root-authorities-draft-0073), and line 55 changes docs/specs/runner.md to docs/platform/runner/README.md (alias step10-runner-0001). Both are the whole-file aliases in the move set, and the patch replays exactly. Low notes, outside L13-26.3: the operation descriptions at lines 456, 607, 710 and 739 still name docs/specs/work-state.md and docs/specs/runner.md as the authoritative shape. x-docs lines 50-51 name docs/decisions/0011-*.md and 0014-*.md, which are already absent at pin. For an x-specs entry, docs/platform/work-state/spec.md (also a move-set destination) is arguably a better fit than the README portal.",
+      "evidence": "link-retargets rows L13-26:x-specs:1/2; final composed YAML lines 49-55, 456, 607, 710, 739; git ls-tree HEAD shows no docs/decisions/0011 or 0014."
+    },
+    {
+      "id": "related-header-paths",
+      "verdict": "NOTE",
+      "severity": "high",
+      "summary": "Needs a Lead ruling. After F, 67 Related-header entries in 59 docs/platform files still name move-set source paths (pre-L13-26 there were also 67, so this commit neither causes nor fixes them). The product doc checker (scripts/check-doc-candidate-status.mjs relatedPaths -> unresolved-related; check-doc-retirement.mjs counts it as a link) reads Related values inside the ```txt header fence. L13-21.4 treated 9 Related-header entries as link rows. L13-26 and linkIntoMoveSet cover only clickable links, so the ruling's premise that F passes a strict link guard is not met for Related headers. Some of these are deliberate custody spellings in history wrappers (shard-2 reasons), so the decision belongs to the Lead, not this Doer: either extend L13-26 rows and linkIntoMoveSet to header Related values, or rule that the cutover guard 3 does not read Related in history wrappers.",
+      "evidence": "Scratch simulation of the product guard (relativeLinkTargets + headerBlock/relatedPaths) on the post-F tree (pin tree minus move-set sources plus composed states): related-into-moveset 67, e.g. docs/platform/agent-confinement/spec.md -> docs/specs/confinement-authority.md, docs/platform/agent-mailbox/spec.md -> docs/routing-handoff-contract.md."
+    },
+    {
+      "id": "self-links-and-stale-labels",
+      "verdict": "NOTE",
+      "severity": "low",
+      "summary": "The retargets are mechanically correct under the alias rule, but some read poorly. 24 rows now link a file to itself, mostly 'Source relationship: [original source](<self>)' in carriage wrappers. 11 link labels still show the old path, e.g. [../platform-foundations.md](platform-foundations.md) and [../architect/component-boundary/README.md](component-boundary.md). L13-21.4 made lineage links into removed files code spans. A lineage link whose source merged into the containing file is arguably the same case. Lead may rule; this is not blocking.",
+      "evidence": "Scratch scan: newPath==file without fragment for 24 rows (e.g. L13-26:link:6, 22, 23, 124); label contains old target for 11 rows (L13-26:link:3, 22-26, 47, 53, 54, 155, 159)."
+    },
+    {
+      "id": "other-unresolved-links-after-F",
+      "verdict": "NOTE",
+      "severity": "medium",
+      "summary": "Outside L13-26 scope. Under the product checker's semantics, 435 relative links in 45 docs/platform files still fail to resolve after F. 411 of them are in pin files and point at paths absent at pin, already broken today, mainly agent-coordination/history/retired-engine snapshots and component-boundary-source-carriage.md. The other 24 are in files that F creates. They do not resolve into the move set, so linkIntoMoveSet correctly ignores them, but the cutover guard 3 (link and anchor check inside docs/platform/**) will still fail unless that guard or the snapshots treat them as literal. The 5 roadmap.md anchors (L13-26:link:75/79/91/93/99) keep the source's single-hyphen spelling for an em-dash heading. The repository's own anchorExists accepts them, so this is not a defect of this commit.",
+      "evidence": "Scratch post-F guard simulation: link-other 435 (pinfile/absentAtPin 411, newfile 24); related-other 2."
+    }
+  ],
+  "counts": {
+    "APPROVE": 4,
+    "REWORK": 1,
+    "NOTE": 3,
+    "checks": {
+      "fchain/check.py --pin HEAD": "exit 0; 572 files, 182 executed, 20 links, zero findings (check.json restored; only sourceCommit differed)",
+      "fchain/controls.py": "exit 0; 19 controls; controls.json unchanged",
+      "check_shard.py --all": "exit 0; unresolved 0, duplicateOfChain 24 (transient chain-check-a91edadbe.json deleted)",
+      "g9/check_phase9_decisions.py": "exit 0; 158 entries, 572 chain files"
+    }
+  }
+}
