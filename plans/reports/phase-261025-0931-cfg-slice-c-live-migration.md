@@ -44,9 +44,35 @@ So the effective value of this repository on fg-server is the same before and af
 - **Tombstone against an older reader.** The plan's `tombstone-older-reader.test.mjs` does not exist in the repository. The evidence is preflight line 8 instead: `fgctl status` and `fgctl verify` pass on a workspace holding the tombstone.
 - **Independent review** (sonnet, read-only): every non-redundant value is kept, the dropped classes and counts match, the tombstone text is exact, the backup is byte-identical to `HEAD:.fgos/config.json` and git-ignored, and the YAML holds no secret. Each kept value carries a `@fgos:why` line naming the migrating session. That is the migration's reason format, which the spec sets.
 
-## Still to do in this phase
+## Step 6: final gates
 
-- Step 6: final gates (cargo workspace, npm, gateway, `herdr-dashboard`, clippy, fmt, deny) and budget counts.
+The gates ran sequentially on `cfg/slice-c-c` after the migration commit.
+
+| Gate | Result |
+|---|---|
+| `cargo test --workspace --no-fail-fast -j 4` | 1615 passed, 0 failed |
+| `npm test` | 8491 passed, 20 failed (see below) |
+| `cargo test --manifest-path apps/fgos-gateway/Cargo.toml` | 88 passed, 0 failed |
+| `cargo test --manifest-path herdr-dashboard/Cargo.toml` | 125 passed, 0 failed |
+| `cargo clippy --locked --workspace --all-targets -- -D warnings` | exit 0 |
+| `cargo fmt --all --check` | red; equally red on a clean `origin/main` (4,180 hunks repo-wide) |
+| `cargo deny ... check advisories bans sources` | advisories red on `RUSTSEC-2026-0386` (tokio `AsyncFd`); equally red on a clean `origin/main`; bans and sources pass; the branch adds no external crate |
+
+The first `npm test` after the migration had 42 failures; the 22 extra came from the migration itself and are fixed in `e95f4814b`:
+
+- `test/helpers/committed-config.mjs` parsed `HEAD:.fgos/config.json`, now the tombstone. It now copies `HEAD:.fgos/config.yaml` and reads the effective `runner` section through the facade with no machine global. Nine test files use it.
+- `seat-binding-dry-bind` "the committed forgentX config binds every seat" used to pass vacuously: the old file was refused, and the check answers `passed: true` when the config is not loadable. Now the config loads, and the confined invocations bind only where the machine registry names bwrap. The test seeds that registry, like the other confinement tests. On this machine's real global file all 62 seats of 27 units bind.
+
+The 20 that remain are known:
+
+- 17 `fgctl-upgrade` and `fgctl-init-download-sources` cases, red on main too.
+- 2 inline-lead cases in `run.test.mjs`, waiting on SEAT.
+- `node-version-and-git`, which reads the main checkout's unmigrated file from a linked worktree.
+
+## Still to do
+
+- Budget counts in the phase 23 closeout.
+- The landing waits on SEAT's two items.
 
 ## Unresolved
 
