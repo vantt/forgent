@@ -70,7 +70,7 @@ mailbox:
   hook:
     # @fgos:doc Longest wait for the mailbox lock before a hook skips its drain. In milliseconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Default: 100.
     lockWaitMs: 100
-    # @fgos:doc Whole-hook failure ceiling, not a target: a hook call still running when it passes exits 0 without printing, unless its stdout write has started. In milliseconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Default: 8000.
+    # @fgos:doc Whole-hook failure ceiling, not a target: a hook call still running when it passes exits 0 without printing, unless its stdout write has started. In milliseconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. It cannot be raised: setup gives each CLI a hook timeout of this standard value plus two seconds, and a larger value would let the CLI cut the hook before its own watchdog does. Minimum: 0. Maximum: 8000. Default: 8000.
     budgetMs: 8000
     # @fgos:doc Largest foreign JSON document the hook reads: its stdin payload and the CLI's own session file; a larger one is refused (stdin: the drain is skipped with the quiet reason OverReadCap, which the entry records in runtime/mailbox/hook-outcome.json, and the mail stays pending; session file: no head). In bytes. Borrowed from the repository's two bounds on a foreign input read, both 1 MiB (terminal control's stdin and observe's file reads), not yet measured. Minimum: 0. Default: 1048576.
     maxReadBytes: 1048576

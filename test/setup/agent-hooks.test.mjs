@@ -7,7 +7,8 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readProjectConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
-import { mailboxHookTimeoutSec } from '../../src/setup/mailbox-limits.mjs';
+import { mailboxHookTimeoutSec, mailboxOptIn } from '../../src/setup/mailbox-limits.mjs';
+import { parseYaml } from '../../src/util/yaml.mjs';
 
 import {
   installClaudeHook,
@@ -560,6 +561,14 @@ test('mailbox rows install Stop and PostToolUse for Claude Code and Codex and no
   assert.deepEqual(codex.hooks.Stop, [{ hooks: [{ type: 'command', command: `'${shim}' hook mailbox --cli codex --event stop`, timeout: 10 }] }]);
   assert.deepEqual(codex.hooks.PostToolUse, [{ hooks: [{ type: 'command', command: `'${shim}' hook mailbox --cli codex --event post-tool-use`, timeout: 10 }] }]);
   assert.ok(!JSON.stringify(readFile(repoRoot, 'agy')).includes('hook mailbox'));
+  // The rows' timeout comes from the standard's hook budget, so no config may raise the budget past it:
+  // the schema caps mailbox.hook.budgetMs, and a larger value is refused instead of outliving the CLI's cut.
+  const budgetMs = parseYaml(fs.readFileSync(fileURLToPath(new URL('../../core/config-schema/mailbox.schema.yaml', import.meta.url)), 'utf8')).properties.hook.properties.budgetMs;
+  assert.ok(mailboxHookTimeoutSec() * 1000 >= budgetMs.maximum + 2000, `a ${mailboxHookTimeoutSec()} s timeout covers a ${budgetMs.maximum} ms budget`);
+  writeProjectConfig(repoRoot, { mailbox: { enabled: true, hook: { budgetMs: budgetMs.maximum + 1 } } });
+  const over = mailboxOptIn(repoRoot);
+  assert.deepEqual([over.state, over.reason], ['refused', 'config:config-schema']);
+  writeMailboxOptIn(repoRoot, true);
   for (const ext of ['.omp/extensions/fgos-hooks.ts', '.pi/extensions/fgos-hooks.ts']) {
     assert.ok(fs.readFileSync(path.join(repoRoot, ext), 'utf8').includes("'mailbox'"), ext);
   }

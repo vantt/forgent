@@ -222,9 +222,10 @@ properties:
         x-fgos-scope: both
         x-fgos-file: config
       budgetMs:
-        description: "Whole-hook failure ceiling, not a target: a hook call still running when it passes exits 0 without printing, unless its stdout write has started. In milliseconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        description: "Whole-hook failure ceiling, not a target: a hook call still running when it passes exits 0 without printing, unless its stdout write has started. In milliseconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. It cannot be raised: setup gives each CLI a hook timeout of this standard value plus two seconds, and a larger value would let the CLI cut the hook before its own watchdog does."
         type: integer
         minimum: 0
+        maximum: 8000
         x-fgos-scope: both
         x-fgos-file: config
       maxReadBytes:
