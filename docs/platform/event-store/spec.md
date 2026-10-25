@@ -642,7 +642,7 @@ Clarification, 2026-10-22: only the automatic triggers are gated by the dispatch
 
 ## 22. Support matrix and known limits
 
-- Linux first. macOS follows holder-lock's `flock` driver once the seal crash matrix runs there. Windows has a holder-lock driver now, but the seal crash matrix has not run there, so Windows stays out of this store. Network filesystems are refused.
+- Linux only. Every other platform, macOS and Windows included, is refused with `event-store-unsupported-platform`: holder-lock has drivers there, but the seal crash matrix has not run there and macOS needs its own fsync and lock semantics (backlog `p-zsy3fmbcpd`). Network filesystems are refused.
 - One user; lock directories are mode 0700; multi-user permissions are out of scope.
 - Unsealed events are lost with the disk or the clone; the window is the seal cadence while fgOS runs, unbounded while nothing runs.
 - Cross-machine success is provisional against concurrent events of other stores (section 12); the owner accepted this, and there is no online coordinator.
@@ -746,7 +746,7 @@ The two pre-signature proofs (section 23.1) are evidence about a finite Python m
 
 ## 25. Out of scope
 
-SQLite WAL and multi-process SQLite semantics: the view is a consumer cache, so whichever engine a consumer picks is that consumer's concern. Red-team round 2 proposed adding this expertise, and it does not apply to the store. This stays a dissent (see "Unresolved dissent"). It becomes required when a consumer folds into SQLite inside the Work gate. Also out: a dedicated scheduler or daemon, Windows, network filesystems, multi-user permissions, hard deletion, ref-chain compaction, removing the `.fgos` strip, and an online cross-machine coordinator.
+SQLite WAL and multi-process SQLite semantics: the view is a consumer cache, so whichever engine a consumer picks is that consumer's concern. Red-team round 2 proposed adding this expertise, and it does not apply to the store. This stays a dissent (see "Unresolved dissent"). It becomes required when a consumer folds into SQLite inside the Work gate. Also out: a dedicated scheduler or daemon, platforms other than Linux, network filesystems, multi-user permissions, hard deletion, ref-chain compaction, removing the `.fgos` strip, and an online cross-machine coordinator.
 
 Outside expertise: the owner engages none (decision of 2026-10-17 15:13). The six gaps the councils named are covered as follows:
 
@@ -1208,5 +1208,5 @@ Dated clarification with no protocol change: a process that reads the same store
 
 Dated clarification with no protocol change, made with the Work part of the section 23.2 gate ([report](../../../plans/reports/verification-261023-1630-work-cutover-parity-and-docs.md)):
 
-- Section 23.2 item 9 asks for the addon "in both the npm package and the legacy-node payload". The npm install channel is retired (owner decision, plan refresh Q-W1 superseded 2026-10-22) and ships no addon: on it Work verbs and `fgos events` refuse with `git-addon-unavailable`, naming the missing addon. Item 9 is therefore met by the legacy-node payload alone: the addon loads from the staged release, activation refuses a linux-x64 payload without `components.nativeAddon`, and `event-store-native-addon` has setup and doctor vectors. Work verbs also refuse on Windows (`event-store-unsupported-platform`).
+- Section 23.2 item 9 asks for the addon "in both the npm package and the legacy-node payload". The npm install channel is retired (owner decision, plan refresh Q-W1 superseded 2026-10-22) and ships no addon: on it Work verbs and `fgos events` refuse with `git-addon-unavailable`, naming the missing addon. Item 9 is therefore met by the legacy-node payload alone: the addon loads from the staged release, activation refuses a linux-x64 payload without `components.nativeAddon`, and `event-store-native-addon` has setup and doctor vectors. Work verbs also refuse on every platform other than Linux, macOS included (`event-store-unsupported-platform`).
 - Section 19 describes the code the cutover deletes. On the Work cutover branch every row is gone from the tree; the cited lines belong to the pre-cutover tree. The standing proof is the reader census in `test/event-store/door.test.mjs`: no product file reads the retired event files or imports a reader of them. The tracked event files and the `.gitattributes` `merge=union` line of a repository leave in that repository's own `fgos events migrate` commit.
