@@ -1,6 +1,6 @@
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { resolveHolderLiveness } from '../runner/dispatch/process-identity.mjs';
-import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixLandRecovery } from './git-checks.mjs';
+import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixGitOperationRecovery } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / fix registry (CONTEXT.md D1/D2,
 // docs/history/setup-doctor-config-registry/): the one place a module declares
@@ -5403,5 +5403,5 @@ registerCheck({
 registerFix({ id: 'workflow-case-bindings', fix: (cwd) => fixWorkflowCaseBindings(cwd) });
 registerFix({ id: 'git-driver-directories', fix: fixGitDriverDirectories });
 registerFix({ id: 'git-wal-dir', fix: fixGitWal });
-registerFix({ id: 'git-land-recovery', fix: (cwd) => fixLandRecovery(cwd) });
+registerFix({ id: 'git-land-recovery', fix: (cwd) => fixGitOperationRecovery(cwd) });
 registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping });

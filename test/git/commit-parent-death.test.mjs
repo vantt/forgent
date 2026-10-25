@@ -10,7 +10,7 @@ import { once } from 'node:events';
 import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { createGitScopedCommit, createGitSync } from '../../src/git/index.mjs';
-import { fixLandRecovery } from '../../src/setup/git-checks.mjs';
+import { fixGitOperationRecovery } from '../../src/setup/git-checks.mjs';
 const built = ensureGitAddon();
 const loader = { descriptor: { manifest: JSON.parse(fs.readFileSync(built.manifest)), releaseRoot: root } };
 const pause = () => new Promise(resolve => setTimeout(resolve, 10));
@@ -69,12 +69,12 @@ for (const mode of ['commit', 'sync']) for (const rejected of [false,true]) {
         assert.throws(() => port.commit({ operationId: 'death', baseline, request }, [holder]), /commit-attempt-recovery-required/);
         // doctor --fix takes the checkout's custody per pending ScopedCommit: busy while a holder has it, kept for a
         // writer that is not the operation's, and closed (custody free afterwards) for the writer that started it
-        assert.match(fixLandRecovery(linked, loader, { ...config, writer: 'doctor' }).message, /death \(checkout busy: /);
+        assert.match(fixGitOperationRecovery(linked, loader, { ...config, writer: 'doctor' }).message, /death \(checkout busy: /);
         holder.release();
-        const kept = fixLandRecovery(linked, loader, { ...config, writer: 'doctor' });
+        const kept = fixGitOperationRecovery(linked, loader, { ...config, writer: 'doctor' });
         assert.equal(kept.changed, false);
         assert.match(kept.message, /death \(commit-authority-mismatch; only its writer .* can recover it\)/);
-        const closed = fixLandRecovery(linked, loader, config);
+        const closed = fixGitOperationRecovery(linked, loader, config);
         assert.equal(closed.changed, true, closed.message);
         assert.match(closed.message, /recovered interrupted Git operations: death/);
         const free = acquireSync(createLockScope(), 'dispatch-cwd', params);

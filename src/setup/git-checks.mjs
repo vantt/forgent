@@ -137,7 +137,7 @@ const AUTHORITY_MISMATCH_CAUSES = ['land-authority-mismatch', 'commit-authority-
  * A chain without a TargetAttempt closes `abandonedBeforeAttempt` whoever runs it; an attempted chain is recovered
  * only by the writer that started it. Nothing is merged, re-published or deleted: candidates stay until Work acknowledges them.
  */
-export function fixLandRecovery(cwd, loaderOptions, portOptions) {
+export function fixGitOperationRecovery(cwd, loaderOptions, portOptions) {
   return attemptFix(cwd, () => {
     const recovery = recoveryPort(cwd, loaderOptions, portOptions);
     const recovered = [];
