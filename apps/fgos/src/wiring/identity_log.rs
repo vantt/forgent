@@ -90,6 +90,7 @@ impl StoreLog {
             &self.driver,
             &self.repo,
             ReadRequest {
+                machine: &self.machine,
                 layout: &self.layout,
                 origin: &origin,
                 streams: std::slice::from_ref(&self.stream),
