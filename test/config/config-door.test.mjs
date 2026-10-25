@@ -70,7 +70,7 @@ test('check lists the findings of a project and the machine with the doctor seve
   assert.equal(row('config-parse').severity, 'fail');
   assert.equal(row('config-parse').file.endsWith('config.yaml'), true);
   assert.equal(Number.isInteger(row('config-parse').line), true);
-  assert.equal(row('config-format-legacy-json').severity, 'warn');
+  assert.equal(row('config-format-legacy-json').severity, 'fail');
   assert.equal(JSON.stringify(findings).includes(SECRET), false);
   assert.equal(Object.getPrototypeOf(findings[0]), null);
   const only = call('check', { projectRoot: d.project, globalDir: d.global, class: 'unconfined', rows: ['config-format-legacy-json'] });

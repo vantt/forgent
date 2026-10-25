@@ -416,13 +416,13 @@ test('a commit staging an .fgos jsonl log with equal-or-more lines succeeds, and
   assert.equal(result.status, 0, result.stderr);
 });
 
-test('a deliberate shrink of a non-log .fgos file such as config.json is not refused', () => {
+test('a deliberate shrink of a non-log .fgos json file is not refused', () => {
   const { mainRoot } = initSharedAbsoluteHooksPathFixture();
-  commitEventLog(mainRoot, 'config.json', '{\n  "a": 1,\n  "b": 2,\n  "c": 3\n}\n');
-  assert.equal(commitStaged(mainRoot, 'add config').status, 0);
+  commitEventLog(mainRoot, 'notes.json', '{\n  "a": 1,\n  "b": 2,\n  "c": 3\n}\n');
+  assert.equal(commitStaged(mainRoot, 'add notes').status, 0);
 
-  commitEventLog(mainRoot, 'config.json', '{\n  "a": 1\n}\n');
-  const result = commitStaged(mainRoot, 'remove config entries');
+  commitEventLog(mainRoot, 'notes.json', '{\n  "a": 1\n}\n');
+  const result = commitStaged(mainRoot, 'remove note entries');
 
   assert.equal(result.status, 0, result.stderr);
 });
