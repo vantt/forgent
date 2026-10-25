@@ -48,7 +48,7 @@ results = [
              lambda d: d['gates'][0]['cleared'][0].update(verdict='APPROVE: invented control verdict'),
              'not an exact review verdict quote'),
     exercise('Met-local with local before-F work is rejected', register_path,
-             lambda d: d['gates'][2]['blockers'].append('unowned local control task'),
+             lambda d: d['gates'][3]['blockers'].append('unowned local control task'),
              'has before-F local work'),
     exercise('Omitted original occurrence is rejected', receipt_path,
              lambda d: d['decisions'].pop(), 'missing/extra/altered original occurrence'),
@@ -56,6 +56,8 @@ results = [
              lambda d: d['countsPerGate'][0]['after'].update(blockers=99), 'before/after counts drift'),
     exercise('False snapshot fingerprint is rejected', sources_path,
              lambda d: d['inputs'][0].update(sha256='0' * 64), 'snapshot hash drift'),
+    exercise('False follow-up fingerprint is rejected', receipt_path,
+             lambda d: d['followUp']['inputs'][0].update(sha256='0' * 64), 'follow-up fingerprint drift'),
 ]
 result = {'status': 'passed', 'asOf': positive['asOf'], 'positive': positive['status'],
           'negativeControls': results, 'count': len(results),

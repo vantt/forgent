@@ -1,10 +1,10 @@
 # Gate register reconciliation
 
-Committed inputs: `53de2207e1ea8a9417ac131f785704d6ab72ba2c`. No parallel uncommitted carries/g0rework bytes were read.
+Original reconciliation inputs: `53de2207e1ea8a9417ac131f785704d6ab72ba2c`; W18/L13-17 follow-up inputs: `a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6` (fingerprinted separately in receipt.json). No parallel uncommitted carries/g0rework bytes were read.
 
 ## Result
 
-Met-local (not met at F): G2, G3, G4, G6, G7, G9. G0/G1 still need independent review of 25 new pending candidate rebinds; G1 also has the L13-16 live-parity REWORK. G5 lacks the surviving-map clause check and owner acceptance; G8 lacks repository-local archive-ref custody and independent review of its receipt correction. These local gaps still block the cutover approval packet. Owner backlog/carried blockers, HARDEN declarations/section 7 consent, SEAT release/routes and G10 rehearsal remain explicit external dependencies; F joins, post-apply rebinds, guards, census/G6 refresh, full-suite attribution and final status review remain unperformed. No cutover, publication, main import or lease is approved here.
+Met-local (not met at F): G3, G4, G7, G9. G2 remains partial pending independent settlement review and its 4 before-F citation parks; G6 is partial pending independent re-review of 25e8842d3’s misc-fix receipt counts (L13-17). G0/G1 still need independent review of 25 new pending candidate rebinds; G1 also has the L13-16 live-parity REWORK. G5 lacks the surviving-map clause check and owner acceptance; G8 lacks repository-local archive-ref custody and independent review of its receipt correction. These local gaps still block the cutover approval packet. Owner backlog/carried blockers, HARDEN declarations/section 7 consent, SEAT release/routes and G10 rehearsal remain explicit external dependencies; F joins, post-apply rebinds, guards, census/G6 refresh, full-suite attribution and final status review remain unperformed. No cutover, publication, main import or lease is approved here.
 
 Met-local is a pre-F scheduling classification, **not** final gate acceptance. Owner/external/F work stays open.
 
@@ -16,11 +16,11 @@ Counts are register entries, not distinct underlying defects. The prose remainin
 |---|---|---:|---:|---:|---:|---:|
 | G0 | partial → partial | 6 → 1 | 1 → 1 | 1 | 3 | 0 |
 | G1 | partial → partial | 5 → 2 | 1 → 1 | 4 | 2 | 0 |
-| G2 | final-pin → met-local | 4 → 0 | 1 → 0 | 0 | 2 | 0 |
+| G2 | final-pin → partial | 4 → 1 | 1 → 1 | 0 | 2 | 0 |
 | G3 | final-pin → met-local | 2 → 0 | 1 → 0 | 0 | 1 | 0 |
 | G4 | external → met-local | 3 → 0 | 1 → 0 | 1 | 0 | 1 |
 | G5 | partial → partial | 0 → 1 | 1 → 1 | 0 | 1 | 1 |
-| G6 | partial → met-local | 4 → 0 | 1 → 0 | 2 | 3 | 0 |
+| G6 | partial → partial | 4 → 1 | 1 → 1 | 2 | 3 | 0 |
 | G7 | partial → met-local | 6 → 0 | 1 → 0 | 4 | 2 | 0 |
 | G8 | partial → partial | 4 → 2 | 1 → 1 | 1 | 1 | 1 |
 | G9 | partial → met-local | 4 → 0 | 1 → 0 | 3 | 3 | 2 |
@@ -29,11 +29,13 @@ Counts are register entries, not distinct underlying defects. The prose remainin
 
 ## Important boundaries
 
-- G6: exhaustive W8 reviews plus W9 fix review exist; current totals are 4,320 confirmations, 924 owned parks, 163 notes, 6 repoints (5,413). Action ownership is not action execution.
+- G2: census-join/receipt.md records 134 joins, 49 REJECTs and 4 parks over the original 187 judgments, plus four newly drifted REJECTs. Independent review and the four citation dispositions remain before-F work (L13-17.1).
+- G6: W8 reviews are exhaustive before db023f065; W9 accepts its 319-park / 20-operand reclassification by rule with a 56-row spot check and controls (L13-17.3). Current totals remain 4,320 / 924 / 163 / 6 = 5,413. Only composition of owned-park actions is at F (L13-17.2); 25e8842d3 receipt-count review is before F, so G6 is partial.
+- G0 F join duty carries W16 F5: duplicate /bindingRefresh/124..126 follows later rebinds of /6, /20, /21. G3 F placement pre-existed in the old register; W3 is not its authority.
 - Import-3: all 98 rows reviewed APPROVE; 8 adapted rows are included in the 24 new source rows, not additional rows.
 - G0: W14 reviewed 124 distinct rows, including the 3 Lead corrections. New 25 pending rebinds (8 changed target digests) still need current-row independent review.
 - G1: W17 live-proof defect remains at this snapshot: 4 stale headings and 1 uncovered block. L13-16 fixes those now; 2 drifted patches stay at F.
-- G9: 338 mechanical parks were judged; current dispositions are 526 / 15 / 31 / 2. The 2 backlog-owner parks and 15 inherited phase-08 blockers remain owned/open.
+- G9: W15 reviewed all 50 parks/superseded/recomposition rows and sampled 60/288 still-valid rows, not all 338 exhaustively; current dispositions are 526 / 15 / 31 / 2. The 2 backlog-owner parks and 15 inherited phase-08 blockers remain owned/open.
 - G5 has only the 10-span legacy check; surviving-map clause and owner acceptance are still missing.
 - G8 timing/retention is reviewed. Repository-local archive-ref custody and independent review of f67e0f676 are not established. The task performs no Git mutation.
 - Historical residual sizing is 407 distinct = 361 chain-caused + 46 pre-existing, 556 assertions at W10. Earlier 661 is not an additional population; F must re-enumerate.
@@ -62,7 +64,7 @@ The machine receipt preserves each original pointer/text, explanation, exact evi
 | `/gates/2/blockers/1` | 33 G2 Rust test locators moved since the pin | moved to F | [G2](#g2-evidence) |
 | `/gates/2/blockers/2` | 8 post-pin literal judgments open | moved to F | [G2](#g2-evidence) |
 | `/gates/2/blockers/3` | preserve-premise/verify.py exits 1 on the G2 census pin | moved to F | [G2](#g2-evidence) |
-| `/gates/2/remaining` | At F, re-run join.py with --pin F and --rescan, refresh the 33 moved Rust locators, settle the 8 open literal judgments, get preserve-premise/verify.py to exit 0 and get a delta review. | moved to F | [G2](#g2-evidence) |
+| `/gates/2/remaining` | At F, re-run join.py with --pin F and --rescan, refresh the 33 moved Rust locators, settle the 8 open literal judgments, get preserve-premise/verify.py to exit 0 and get a delta review. | still open | [G2](#g2-evidence) |
 | `/gates/3/blockers/0` | Per-id approvals are bound to cffe725b9; targets edited afterwards | moved to F | [G3](#g3-evidence) |
 | `/gates/3/blockers/1` | Register statuses still restored-pending-review / superseded-pending-review | moved to F | [G3](#g3-evidence) |
 | `/gates/3/remaining` | At F, re-check the 17 register targets at their current anchor and unit digest, get a delta review for any changed target, and move the register statuses off *-pending-review. | moved to F | [G3](#g3-evidence) |
@@ -71,11 +73,11 @@ The machine receipt preserves each original pointer/text, explanation, exact evi
 | `/gates/4/blockers/2` | Aliased-export scan gap is an open Git-owner item (git-one-door/git-owner-review-request.md) | still open | [G4](#g4-evidence) |
 | `/gates/4/remaining` | Git owner (HARDEN) must review the declarations on the review branch, and 53499dc9d needs an independent check. | still open | [G4](#g4-evidence) |
 | `/gates/5/remaining` | Extend g5/check.py to the surviving docs/reading-map.md: banner lines 3-9 are restated in English in §3, line 34 survives only with a Truth correction suffix (line 156), line 37 is exact (line 159); the restatement and suffix need owner acceptance (cutover packet), then rerun at F. | still open | [G5](#g5-evidence) |
-| `/gates/6/blockers/0` | c5586146c (w7 REWORK fixes) not independently re-reviewed | cleared | [G6](#g6-evidence) |
+| `/gates/6/blockers/0` | c5586146c (w7 REWORK fixes) not independently re-reviewed | still open | [G6](#g6-evidence) |
 | `/gates/6/blockers/1` | No exhaustive APPROVE over the 1,423 open judgment/note rows and every overturn (w2-g6 was a stratified sample) | cleared | [G6](#g6-evidence) |
 | `/gates/6/blockers/2` | 186 G6 rows and 86 wrapper successor digests to refresh at F | moved to F | [G6](#g6-evidence) |
 | `/gates/6/blockers/3` | Combined verifier blocked on the G2 census pin | moved to F | [G6](#g6-evidence) |
-| `/gates/6/remaining` | Get c5586146c independently checked, get an APPROVE on every overturn/judgment row (the reviews so far were sampled), then refresh the proof at F and replay it twice. | moved to F | [G6](#g6-evidence) |
+| `/gates/6/remaining` | Get c5586146c independently checked, get an APPROVE on every overturn/judgment row (the reviews so far were sampled), then refresh the proof at F and replay it twice. | still open | [G6](#g6-evidence) |
 | `/gates/7/blockers/0` | 2 REWORK specs recomposed but not re-reviewed | cleared | [G7](#g7-evidence) |
 | `/gates/7/blockers/1` | 101 park actions without independent review | cleared | [G7](#g7-evidence) |
 | `/gates/7/blockers/2` | 4 park actions blocked: system-overview f07928/f07929, architecture-intent 8 Related/evidence rows, transitional-switchboard f08382-f08384, documentation/switchboard f06749-f06751 | cleared | [G7](#g7-evidence) |
@@ -89,7 +91,7 @@ The machine receipt preserves each original pointer/text, explanation, exact evi
 | `/gates/8/blockers/3` | Publication (S2) needs owner cutover approval | still open | [G8](#g8-evidence) |
 | `/gates/8/remaining` | At F: rebuild the partition keeping register evidence (L13-13.4), re-enumerate readers to 0 unresolved and retime from a cold cache. | still open | [G8](#g8-evidence) |
 | `/gates/9/blockers/0` | Final pin F not recorded | moved to F | [G9](#g9-evidence) |
-| `/gates/9/blockers/1` | Interim and final re-judgment of 518 + 144 records not done | moved to F | [G9](#g9-evidence) |
+| `/gates/9/blockers/1` | Interim and final re-judgment of 518 + 144 records not done | cleared | [G9](#g9-evidence) |
 | `/gates/9/blockers/2` | Doer-SHA record pins not re-pinned to plan-branch SHAs (w4-import2 REWORK) | cleared | [G9](#g9-evidence) |
 | `/gates/9/blockers/3` | No G9 review | cleared | [G9](#g9-evidence) |
 | `/gates/9/remaining` | At F: rerun sweep.py --check --pin F and judge every row whose evidence changed since d786e305e; recompose drifted specs; the 338 owned parks are mechanical (5 fixed rules, generic next action) and need the Lead re-judgment or an owner before F; source review of the F delta. | moved to F | [G9](#g9-evidence) |
@@ -102,10 +104,10 @@ The machine receipt preserves each original pointer/text, explanation, exact evi
 | `/gates/11/blockers/2` | WORK cutover stop: DOC launches no fgos run, pull or push until "cutover xong" (L13-9) | still open | [G11](#g11-evidence) |
 | `/gates/11/remaining` | SEAT stages release R with sourcePin equal to the F code commit; the Lead then proves docs-lease acquire/status/release/abandon in a disposable clone. | still open | [G11](#g11-evidence) |
 | `/cutoverReadiness/beforeFinalPin/0` | Re-review the 124 pending content rebind rows in rebind/rereview-claim-ids.json and the 3 rows corrected in 6f5b9419d (G0, G7) | cleared | [G0](#g0-evidence), [G7](#g7-evidence) |
-| `/cutoverReadiness/beforeFinalPin/1` | Get independent re-reviews of the Lead REWORK fixes: c5586146c (G6), 6f5b9419d (G0/G7), 53499dc9d (G4 spec sentence), 984829939 and 5c3b57347 (G8) | cleared | [G0](#g0-evidence), [G4](#g4-evidence), [G6](#g6-evidence), [G7](#g7-evidence), [G8](#g8-evidence) |
+| `/cutoverReadiness/beforeFinalPin/1` | Get independent re-reviews of the Lead REWORK fixes: c5586146c (G6), 6f5b9419d (G0/G7), 53499dc9d (G4 spec sentence), 984829939 and 5c3b57347 (G8) | still open | [G0](#g0-evidence), [G4](#g4-evidence), [G6](#g6-evidence), [G7](#g7-evidence), [G8](#g8-evidence) |
 | `/cutoverReadiness/beforeFinalPin/2` | Get an exhaustive APPROVE of every G6 overturn/judgment row, including the 1,423 open judgment/note rows (G6) | cleared | [G6](#g6-evidence) |
 | `/cutoverReadiness/beforeFinalPin/3` | Run and commit the G5 retention hash check (G5) | still open | [G5](#g5-evidence) |
-| `/cutoverReadiness/beforeFinalPin/4` | Re-judge or assign owners for the 338 mechanical G9 parks (G9) | still open | [G9](#g9-evidence) |
+| `/cutoverReadiness/beforeFinalPin/4` | Re-judge or assign owners for the 338 mechanical G9 parks (G9) | cleared | [G9](#g9-evidence) |
 | `/cutoverReadiness/beforeFinalPin/5` | Independent per-unit review of the 24 import-3 bindings and 8 adapted rows in s18-import3-resync.json (G0, G1) | cleared | [G0](#g0-evidence), [G1](#g1-evidence) |
 | `/cutoverReadiness/atFinalPinUnderLease/0` | Import main (M2) with merge accounting and record F; no further main import after it | moved to F | [G0](#g0-evidence), [G9](#g9-evidence) |
 | `/cutoverReadiness/atFinalPinUnderLease/1` | Re-pin Doer-SHA record pins to plan-branch SHAs, keeping plan/260925-w1-d* branches until then (w4-import2 REWORK) | cleared | [G9](#g9-evidence) |
@@ -179,7 +181,7 @@ All paths below are phase-09-relative and read from the committed snapshot, not 
 
 ### G9 evidence
 
-`late-areas/receipt.md`, `late-areas/legacy-drift.json`, `import2/receipt.md`, `resync-a/receipt.md`, `resync-b/receipt.md`, `w0-deferred-rebinds.json`, `w0-prior-overlap-replay.json`, `composition/w2-predecessor-recomposition.json`, `reviews/w4-import2-review.json`, `reviews/w16-g0-rework-and-park-rule-review.json`, `reviews/w10-g9-interim-review.json`, `reviews/w11-g9-rework-review.json`, `reviews/w12-g9-followup-review.json`, `reviews/w15-g9-parks-review.json`, `g9/receipt.md`, `reviews/w11-import3-review.json`, `owner-answers.md`, `preflip-execution-plan.md`.
+`late-areas/receipt.md`, `late-areas/legacy-drift.json`, `import2/receipt.md`, `resync-a/receipt.md`, `resync-b/receipt.md`, `w0-deferred-rebinds.json`, `w0-prior-overlap-replay.json`, `composition/w2-predecessor-recomposition.json`, `reviews/w4-import2-review.json`, `reviews/w16-g0-rework-and-park-rule-review.json`, `reviews/w10-g9-interim-review.json`, `reviews/w11-g9-rework-review.json`, `reviews/w12-g9-followup-review.json`, `reviews/w15-g9-parks-review.json`, `reviews/w13-misc-pin-and-gloss-review.json`, `reviews/w14-check-hardening-review.json`, `g9/receipt.md`, `reviews/w11-import3-review.json`, `owner-answers.md`, `preflip-execution-plan.md`.
 
 ### G10 evidence
 
@@ -193,6 +195,6 @@ All paths below are phase-09-relative and read from the committed snapshot, not 
 
 `python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py`
 
-Checks every cited evidence/review path, cleared commit ancestry at both snapshot and HEAD, exact quoted review verdicts, source fingerprints, original-item coverage and counts. The command exits 0; see `verification.json`. `python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py` also exits 0: seven in-memory negative controls reject missing paths, an existing non-ancestor commit, invented quotes, false met-local status, omitted items, false counts and false fingerprints. See `controls.json`. The first verifier run caught a self-reference to its not-yet-created output; that output is now correctly labeled as output, with every real input check retained.
+Checks every cited evidence/review path, cleared commit ancestry at both snapshot and HEAD, exact quoted review verdicts, source fingerprints, original-item coverage and counts. The command exits 0; see `verification.json`. `python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py` also exits 0: eight in-memory negative controls reject missing paths, an existing non-ancestor commit, invented quotes, false met-local status, omitted items, false counts and false original/follow-up fingerprints. See `controls.json`. The first verifier run caught a self-reference to its not-yet-created output; that output is now correctly labeled as output, with every real input check retained.
 
 `sources.json` inventories every reviews/ file plus required owning receipts at the committed snapshot; `plan-branch-log.txt` is the read-only pre-flip branch history from W0 through the snapshot, including imported ancestry. No product suite, native load or old authoring checker was run. Impact-analysis: degraded under the no-CLI/no-MCP boundary. No preview service was started under the exact records-only write grant.

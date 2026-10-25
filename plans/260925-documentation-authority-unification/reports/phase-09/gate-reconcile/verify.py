@@ -150,6 +150,16 @@ def check():
         require((ROOT / path).is_file(), 'input/review path missing: ' + path)
         data = git('show', f'{pin}:{path}')
         require(hashlib.sha256(data).hexdigest() == entry['sha256'], 'snapshot hash drift: ' + path)
+    # Preserve the original snapshot/fingerprints; later rulings are a separate
+    # immutable input layer, not a rewrite of what the first reconciliation read.
+    followup = receipt['followUp']
+    followup_pin = followup['sourceCommit']
+    require(subprocess.run(['git', 'merge-base', '--is-ancestor', followup_pin, head], cwd=ROOT,
+                           capture_output=True).returncode == 0, 'follow-up pin not ancestor of HEAD')
+    require(followup['independentSettlementApproval'] is False, 'follow-up is not independent approval')
+    for entry in followup['inputs']:
+        data = git('show', f"{followup_pin}:{entry['path']}")
+        require(hashlib.sha256(data).hexdigest() == entry['sha256'], 'follow-up fingerprint drift: ' + entry['path'])
     review_paths = set(git('ls-tree', '-r', '--name-only', pin, str(BASE / 'reviews')).decode().splitlines())
     require({row['path'] for row in sources['reviews']} == review_paths, 'not every review file inventoried')
     require(sources['reviewFiles'] == len(sources['reviews']) == len(review_paths), 'review count drift')
@@ -168,12 +178,14 @@ def check():
     return {'status': 'passed', 'exit': 0, 'asOf': pin, 'checkedAtHead': head,
             'originalOccurrences': len(decisions), 'gates': len(register['gates']),
             'reviewFiles': len(review_paths), 'snapshotInputs': len(inputs),
+            'followUpPin': followup_pin, 'followUpInputs': len(followup['inputs']),
             'evidenceAndReviewPaths': len(paths), 'clearedEntries': cleared_count,
             'exactVerdictQuotes': quotes, 'clearedByCommits': sorted(commits),
             'checks': ['original occurrence coverage and text', 'path existence',
                        'clearedBy ancestry at snapshot and HEAD', 'committed exact review quotes',
                        'before/after counts', 'met-local has no local before-F blockers',
-                       'immutable input fingerprints and all-review coverage'],
+                       'immutable input fingerprints and all-review coverage',
+                       'separate immutable follow-up input fingerprints'],
             'limits': 'Record integrity only. No independent semantic approval, F gate execution or full product-suite claim.'}
 
 

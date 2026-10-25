@@ -1,79 +1,59 @@
 {
-  "sourceCommit": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
-  "supersedesReceiptAtCommit": "bade6b6b3",
+  "sourceCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
   "gateId": "non-behavioral-census-join",
-  "status": "followup-records-complete-judgments-open",
+  "authority": "L13-17; w18-g2-judgments-brief.md",
+  "status": "records-complete-four-owned-parks-independent-review-open",
   "independentApproval": false,
-  "noReadinessClaim": true,
+  "finalPinCoverage": false,
+  "supersedesReceiptAtCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
+  "historicalReceiptSourceCommit": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
   "counts": {
     "sites": 1126,
     "files": 140,
-    "joinedOwningTest": 646,
-    "confirmedGradeRecordREJECT": 293,
-    "gradedTotal": 314,
-    "judgmentRequired": 187,
-    "judgmentFixtureSites": 159,
-    "judgmentGradeSites": 21,
-    "judgmentOtherSites": 7,
-    "deletedFixtureSites": 27,
-    "deletedReaderSites": 1,
-    "emptyProofHelperCustodyClaimsCorrected": 116,
-    "reviewedDynamicSitesBound": 132,
-    "reviewedDynamicSitesUnbound": 0,
-    "reviewedDynamicOwningTestJoins": 77,
-    "reviewedDynamicNonDocumentJudgments": 55,
-    "individuallyJudgedReaderHints": 13,
-    "additionalDynamicSites": 11,
-    "allDynamicDeltaSites": 143,
-    "allDynamicOwningTestJoins": 87,
-    "allDynamicNonDocumentJudgments": 56,
-    "currentNewLiteralSites": 84,
-    "postPinDeltaLiteralSites": 16,
-    "deltaJoinedYamlFixtureSlots": 3,
-    "deltaJoinedConfigFixtureSlots": 5,
-    "deltaLiteralJudgmentsOpen": 8,
-    "originalLiteralJudgmentsWithIndividualReasons": 13
-  },
-  "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
-  "recoveryOwningProof": "packages/git/rust/tests/recovery_matrix.rs:recovery_matrix_all_payload_kinds",
-  "touchedIds": {
-    "owningArtifact": "join.json",
-    "selector": "rows[*].id",
-    "count": 1126,
-    "uniqueAndExhaustiveAgainstRegister": true,
-    "residueSelector": "residue.json#rows[*].id",
-    "postPinLiteralSelector": "post-pin-literals.json#rows[*]",
-    "postPinDynamicSelector": "post-pin-dynamics.json#rows[*]",
-    "reviewedDynamicIdentitySelector": "post-pin-dynamics.json#rows[*].reviewSite",
-    "meaning": "All original and reviewed delta identities retained; exact current source custody, test locators or digest-bound proposed non-document grades. No independent acceptance or test execution claim."
-  },
-  "commands": [
-    {
-      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py", "--pin", "3d0169f390e21c67bc3fc69081fd1bc07186599f", "--rescan"],
-      "exit": 0
+    "joinedOwningTest": 780,
+    "confirmedOriginalGradeREJECT": 289,
+    "confirmedSettlementREJECT": 53,
+    "ownedParks": 4,
+    "originalOwnedJudgments": 187,
+    "originalJudgmentDispositions": {"joined": 134, "confirmed REJECT": 49, "owned park": 4},
+    "originalCategories": {
+      "fixtures": {"joined": 132, "confirmed REJECT": 27, "owned park": 0, "total": 159},
+      "driftedGrades": {"joined": 0, "confirmed REJECT": 21, "owned park": 0, "total": 21},
+      "other": {"joined": 2, "confirmed REJECT": 1, "owned park": 4, "total": 7}
     },
-    {
-      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py", "--pin", "3d0169f390e21c67bc3fc69081fd1bc07186599f"],
-      "exit": 0,
-      "evidence": "../preserve-premise/verification.json",
-      "proof": "Two isolated runs per generator, all eight artifacts and stdout byte-identical; original/delta identities, reader reasons and Rust/YAML locators checked."
-    },
-    {"argv": ["git", "diff", "--check"], "exit": 0}
-  ],
-  "developmentFailures": [
-    {"command": "read-only Python review-shape inspection", "exit": 1, "reason": "The review delta is an array, not an object; corrected inspection, no data or generator failure."}
-  ],
-  "priorArt": {
-    "reused": ["W1 join and Node bundled Acorn", "unchanged step-02l-inventory.py build and grammar", "frozen register/grade records", "exact diff-line occurrence rebinding"],
-    "history": ["bade6b6b3 introduced this records join", "5e512a829 introduced the recovery matrix parent/subprocess proof", "5a33989fa removed seat-binding conversion sources"],
-    "missingBeforeFollowup": ["explicit pin", "dynamic delta custody", "per-reader source judgments", "deleted-source attribution", "accurate ignored-parent and Rust/YAML locators"]
+    "additionalDriftedGrades": 4,
+    "additionalDriftedGradeREJECTs": 4
   },
-  "impactAnalysis": "degraded/unqueried: fgOS CLI forbidden by brief; only scoped records scripts edited",
-  "notRun": ["product owning tests (no product behavior changed)", "npm test", "scripts/run-tests.mjs", "cargo test --workspace", "fgos CLI", "pair accounting", "final-pin F census", "independent census review", "markdown preview (Lead custody; no out-of-scope service state)"],
+  "artifacts": {
+    "pinnedInput": "settlement-decisions.json",
+    "perIdDispositions": "settlement.json",
+    "currentCensus": "join.json",
+    "currentParks": "residue.json",
+    "replayEvidence": "replay.json",
+    "gateProofEvidence": "../gate-reconcile/reproduction.json"
+  },
+  "joinGrammar": "Existing JS lexical/same-file helper and Rust test/helper custody, extended only at the settlement pin to name unevaluated JS template titles. Shared setup/loader callers have explicit pinned evidence. Every proof names file, test title expression, test line and source digest; Rust also names functionLine. No test or native addon was executed.",
+  "gradePolicy": "Original phase-08 grade records are untouched. New REJECTs name historical spans, old grade-record member/line where present, current evidence and source digests, or an exact deleting commit for retired source. A comment fragment path: in a is rejected as a lexical false positive, not confused with the separate real distribution citation.",
   "remainingOwners": {
-    "187OriginalJudgmentsAnd8LiteralJudgments": "Documentation integration owner / independent census reviewer",
-    "proposedDynamicGradeApproval": "independent census reviewer",
+    "fourOriginalCitationParks": {
+      "owner": "Documentation integration Lead (L13-17.1)",
+      "ids": ["pc-l-0042", "pc-l-0056", "pc-l-0077", "pc-l-0078"],
+      "nextAction": "Before F, bind each exact citation to its current holder/section, independently review its disposition, then co-compose any required comment retarget. Per-id locators/actions are in settlement.json. G2 remains partial."
+    },
+    "settlementIndependentReview": "Independent census reviewer / Lead",
+    "eightHistoricalPostPinLiteralJudgments": "Documentation integration owner / final-pin census reviewer",
     "finalPinRefreshAndAccounting": "Lead"
   },
+  "proofs": [
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py --pin a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6", "runs": 2, "exits": [0, 0], "stdoutAndThreeOutputsByteIdentical": true, "evidence": "replay.json"},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py --pin 3d0169f390e21c67bc3fc69081fd1bc07186599f --rescan --out <tempfile directory>", "exit": 0, "fourOutputsByteIdenticalToHistoricalCommittedArtifacts": true, "evidence": "replay.json"},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/verify.py", "exit": 0, "evidence": "../gate-reconcile/verification.json", "volatileCheckedAtHeadRestored": true},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/gate-reconcile/controls.py", "exit": 0, "negativeControls": 8, "evidence": "../gate-reconcile/controls.json"}
+  ],
+  "historicalReplayRepair": "The first historical comparison detected registerSha256 drift because the old script read the working-tree register. Reading that whole register blob at --pin restores byte-identical old outputs without changing census identities or old grades.",
+  "postPinArtifacts": "post-pin-literals.json and post-pin-dynamics.json remain at 3d0169f39; no new-pin or final-pin delta coverage is claimed by this original-judgment settlement.",
+  "priorArt": ["bade6b6b3 introduced the join", "b25dadae2 added pin/delta custody", "5a33989fa removed one-shot seat conversion and its fixtures", "Existing Acorn locator, Rust helper grammar and gate reconciliation generator reused"],
+  "impactAnalysis": "degraded/unqueried: fgOS CLI forbidden by brief and no impact-analysis MCP exposed",
+  "notRun": ["product tests", "npm test", "scripts/run-tests.mjs", "cargo test --workspace", "phase-08/audit-report.py", "native addons", "fgos CLI", "lifecycle verbs", "pair accounting", "final-pin F census", "independent semantic review", "markdown preview service"],
   "needsWrites": []
 }
