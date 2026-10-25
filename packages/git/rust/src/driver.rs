@@ -344,6 +344,19 @@ impl GitDriver {
             ResolveRepo::NotARepository => None,
         })
     }
+    /// The trusted main checkout holding `path`, through a driver on this
+    /// process's fgOS state root; `None` outside a repository. It runs the same
+    /// disk-only topology check as every resolve and no Git: a caller that only
+    /// needs the root never pays the config and format probes an operation needs.
+    pub fn trusted_root_at(path: &Path) -> Result<Option<PathBuf>> {
+        Self::new(&fgos_holder_lock::state_root::state_root().0)?.trusted_root(path)
+    }
+    pub(crate) fn trusted_root(&self, path: &Path) -> Result<Option<PathBuf>> {
+        Ok(match self.resolve_topology(path, path)? {
+            ResolveRepo::Repository(repo) => Some(repo.trusted_main_root),
+            ResolveRepo::NotARepository => None,
+        })
+    }
     pub fn resolve_repo(&self, path: &Path, trusted_main: &Path) -> Result<ResolveRepo> {
         self.require_floor()?;
         let mut repo = match self.resolve_topology(path, trusted_main)? {
@@ -2851,6 +2864,26 @@ mod tests {
         let text = fs::read_to_string(log).unwrap_or_default();
         (text.lines().filter(|l| l.contains("--show-origin")).count(),
          text.lines().filter(|l| l.contains("--show-object-format")).count())
+    }
+
+    #[test]
+    fn the_trusted_root_of_a_linked_worktree_is_its_main_checkout_and_spawns_no_git() {
+        let state = Temp::new();
+        let dir = Temp::new();
+        let logs = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        git(&dir.0, &["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "root"]);
+        let linked = dir.0.join("linked");
+        git(&dir.0, &["worktree", "add", "-q", linked.to_str().unwrap()]);
+        // Config a resolve refuses: the root never reads it.
+        git(&dir.0, &["config", "filter.external.clean", "touch /unreachable"]);
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        let log = log_git_children(&mut driver, &logs.0);
+        let main = fs::canonicalize(&dir.0).unwrap();
+        assert_eq!(driver.trusted_root(&linked).unwrap(), Some(main.clone()));
+        assert_eq!(driver.trusted_root(&main).unwrap(), Some(main));
+        assert_eq!(driver.trusted_root(&logs.0).unwrap(), None);
+        assert_eq!(fs::read_to_string(&log).unwrap_or_default(), "", "no Git child ran");
     }
 
     #[test]

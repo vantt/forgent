@@ -114,6 +114,13 @@ runner:
           # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
           prefer:
             - xai
+        # @fgos:doc The tier and executors one role, persona or seat prefers.
+        reviewer:
+          # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider.
+          # @fgos:why [e0397c00-5319-463e-8e23-86031fbc824b] Owner 2026-10-25 21:44 chose (a): deepseek reviewer seats stalled or hit 402 in 4 of 5 rounds of the Part A case (evidence-261025-2126-cook-reviewer-seat-stalls.md); claude read-only seats write no outbox; xai finished every round. Unset when HARDEN lands the pi stall detection.
+          prefer:
+            - xai
+            - openai
     # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
     marketing:*:
       # @fgos:doc Per-role tier and executor taste; a role is producer, synthesizer, reviewer, red-team or judge.

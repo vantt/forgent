@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "fc8d46aaec62cad74e6731a5d5b86928a000f65cfdcf6d4c829e3ae8210141b8",
+  "payloadDigest": "4af242fe89737882a2b971ec90f59c658ee33fe2825ec08207b95bdc7142dce1",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -64,6 +64,10 @@
     ".agents/skills/fgos-researching/SKILL.md": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
     ".agents/skills/fgos-routing/SKILL.md": "8a215975394d282772c768e69a0767aabbf1a2ca30e0fe7959252f7fcdba3a8e",
     ".agents/skills/fgos-run/SKILL.md": "03546387e1980b232ef90159c93aa8b7e6f7da787f71980d284fceea855bdc11",
+    ".agents/skills/instruction-audit/SKILL.md": "0269219bf0ecffddabc89246be5e5a9e9376512bf43a42c1a38535457395dcc5",
+    ".agents/skills/instruction-audit/references/lane-prompts.md": "adac8362adbb7eb04c163fbcf3cdb16aa566e61a6f4a6a9351c07d4fc4d08d52",
+    ".agents/skills/instruction-audit/references/report-template.md": "9d3b7abfd876d88e8a6a7e1820ea6a2aaf02472a75a69603921344fa0db699d6",
+    ".agents/skills/instruction-audit/scripts/instruction-audit.mjs": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490",
     ".githooks/pre-commit": "9657e4a358f316763bba471a178dcbfdf6abaeecb50696efe23f119775c7e6c1",
     "apps/fgctl/src/main.rs": "3f59cfc17cfd6c8268d15dcbeb0649b8cead1d18c387c7b20e14ce55ab26b9ff",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "59d08ca94acbd2af2e283734930e007a7ad28161608c10933e62d0a7268205a1",
@@ -72,7 +76,7 @@
     "apps/fgos-gateway/src/cf_access.rs": "3c9fd890e36eabbf4f9bbb9971c0acb32f5689bec2adefa414d6361b88c93040",
     "apps/fgos-gateway/src/gateway.rs": "037b6108a3a6af81e24d9cdb7d324419ea5ee5b2d7d3758677959ce9f4b11887",
     "apps/fgos-gateway/src/lib.rs": "32d594b18ae0c15f09c3b06c69d82bb142f1370e6fffb6b95d104378b0ffa3fd",
-    "apps/fgos-gateway/src/main.rs": "41e1922dd426ca7d9c26aa17ef72ba70f03e3a627d8fa9599666582cc475c928",
+    "apps/fgos-gateway/src/main.rs": "8184c8e2edfb686747243fbb2916582781687195d602fd63e5837b4383edc47e",
     "apps/fgos-gateway/src/mcp.rs": "d1c162643e93c2547656b1e034b84967efab2adb20090a1c058859593f36e6f8",
     "apps/fgos-gateway/src/ports.rs": "f639e87f4a9119eedf765fa10de38dc0a68315a9482b041543a5f294ca0d1999",
     "apps/fgos-gateway/src/remote_invocation.rs": "b0f0ad004ce73d737c7e09b22e5e1d445db64abbca77425b4d282f4859b1388a",
@@ -205,7 +209,7 @@
     "packages/config/rust/src/locks.rs": "cb974624e779e3f9167316d9477b958009dbda760149d9b18de3a87b513bf736",
     "packages/config/rust/src/machine.rs": "beea8290aa664b78472576f6843578c96f76c05dda2d0823740c091d151d5d44",
     "packages/config/rust/src/migrate.rs": "27d988ec4a696008771c9af888706fab44d97c55f5d8b26cf05a8acfc4dc3512",
-    "packages/config/rust/src/provider.rs": "7c1f3f46a67a872dde9a4468b0df9898ab56c69aa4fb8bf409ecf3a40a2a5492",
+    "packages/config/rust/src/provider.rs": "8bcb7338b54eaeae3b885f546da89d39ae238565dfe524d412a4df1cdc3c3b20",
     "packages/config/rust/src/provider/unix_verbs.rs": "d45dd3b7f37e286fe136e8b321ecbf2beeabbbf4b72ec1f9b38494a323b2bcfc",
     "packages/config/rust/src/redact.rs": "189b980926959017d23755edc63b0fc91a5b7d351ada839ebe019dd5d3110677",
     "packages/config/rust/src/relocate.rs": "1e4e4f9835e89c6c4a7f3ae5b4dc0073cf28ec7cc7a8494cf64f1ddda53ffbad",
@@ -268,7 +272,7 @@
     "packages/distribution/rust/src/shim.rs": "079f026604885abc304381ed6fd9df4beb2eeeff718b8994dbe36137df0d6cd8",
     "packages/distribution/rust/src/store.rs": "62713cad4cb6889b2e1333a25d6b6a53cb9195ab8c5e51734eff006d45bb3417",
     "packages/distribution/rust/src/verify.rs": "45abf2dc964ec6fe1687d1cac3bc46654a6b32552ffe8d12d0f1c5753f42b800",
-    "packages/distribution/rust/src/workspace.rs": "a1ed550bb846d8a256048134a8a631afa2801f78163ba6f39b73c4ecb19e1f3f",
+    "packages/distribution/rust/src/workspace.rs": "275a65b4e7346ceb1e3f31f080516d62ad24aec05aac761a5bbe837df2f3afb5",
     "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "13b49506f7c45415429a6f1161577b9d33b3c819067777dfa0708332c1c96236",
     "packages/distribution/rust/tests/fetch_download.rs": "d44e41924790a7bd2cf5829d4948e7046e033fee9fd2e265bdc2b175ff4de858",
     "packages/distribution/rust/tests/install_lock_multiprocess.rs": "4751c03d546107108ed8f23fbceae74cbaa808cb94ee25942dc31c4f24972344",
@@ -371,7 +375,7 @@
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
     "packages/git/node-addon/src/yaml.rs": "cdb0ecd0b330966e5fd3c8e41e2069bf87722f1ac16df8363e514e9441d4432c",
     "packages/git/node-addon/tests/yaml_parts.rs": "835efdf2a4183cd1197385f318bfb370db8804ae9f4e8e500548c75fd6a3462f",
-    "packages/git/rust/src/driver.rs": "6b908c7bbe2fa752e46f29ba97e7e8ab0619c0e8d1e623c5fbb14b7866b2b44f",
+    "packages/git/rust/src/driver.rs": "204de4b9986da0f17ef431a41e296ff2631deb75cbbf9d57e228a3bb16b7e584",
     "packages/git/rust/src/grant.rs": "9702b8f72ada4502857b9ac9d151ea98d9d9a71773a2802278364476851d68d7",
     "packages/git/rust/src/inspect.rs": "6ab5154bc6ead447863198f01de88c16a31703f8839b642bf1d6bf2bb372895a",
     "packages/git/rust/src/land.rs": "9205c084d08ef414a0122b8893b981bf9723d363ff1d4bddc3e293dc09f6ad1e",
@@ -557,7 +561,7 @@
     "packages/mailbox/rust/store/tests/fixtures_contract.rs": "f8a6b1f13b97cc0fdebaf91fe09807a7e1141ef1696179b76ee42de390a04154",
     "packages/mailbox/rust/store/tests/head.rs": "6e333a6c50fe02bc1d86cb8a278bd2578eaef149b8eb64b2d821c4a7886ff1b2",
     "packages/mailbox/rust/store/tests/head_finder.rs": "28e2a972e3156ca2833845bfcc42494ad5aa91b5697df700bd9553304c9dbc05",
-    "packages/mailbox/rust/store/tests/hook_payloads.rs": "192c71ef29bc95b710b6751e927fd6f732d5ec93ff28a0aa3bbaea5abb27f21d",
+    "packages/mailbox/rust/store/tests/hook_payloads.rs": "4bf564821972df4f116050096e0bcd19a65c9b9387f662076b2fa7e6601e4d98",
     "packages/mailbox/rust/store/tests/hook_shell.rs": "3975730a0f8d8a542c23193a3fecda621bddde249b9fadd063163be406f9c9b4",
     "packages/mailbox/rust/store/tests/limits_contract.rs": "f325afd89b20852e7396e15d5634a0b44095f21f9d7d80162fd00c6924f67ffc",
     "packages/mailbox/rust/store/tests/limits_loader.rs": "e406a2233fa64fbe62aafa2dd1e3514ceae352ff5f2c562194225a29cc93ca0a",
@@ -586,7 +590,7 @@
     "packages/observe/rust/src/metrics_cli/outcomes.rs": "f0ab12b98d5a9820d35d48fb06eb88a43356276709e8c8efd4392fc668a2cb97",
     "packages/observe/rust/src/metrics_cli/runs.rs": "5e5f62781e3a7629889da977e0d1bdd8a0be44f08a3870b170aaf017f3dca776",
     "packages/observe/rust/src/metrics_cli/snapshot.rs": "26abd26dad22341484f400be87a6b2ef3aadbfa98b27d56a4ef1c4e719059317",
-    "packages/observe/rust/src/provider.rs": "2675b87d39b643602ce620b4c7e8f049e44a0a295939700b5e926b6f0e00d277",
+    "packages/observe/rust/src/provider.rs": "28396d2c46916bd2d81b878344f5d5c849206a4e41135224b6ef7a6d9f0e9df5",
     "packages/observe/rust/src/scorecard.rs": "e35e798fd51309055b5e42f7e943f561b9f5bc95982f5de64153b567d222b356",
     "packages/observe/rust/src/shard.rs": "87f84323bf2442c65a6d45365e14f3343c16ffc8752f9b39f5f1f1a5750f83e1",
     "packages/observe/rust/src/sources/claude_transcripts.rs": "4af286c2fa0a8f9d1e373ab4fb02196fa182a8cd83223f443de77213e40fdaf2",
@@ -1032,7 +1036,7 @@
     "src/runner/execution/loops/history-outcome.mjs": "596e7a2b6344ce9955b9c813c2811b79a16b8825aee51fe1cb3e40839cdcd048",
     "src/runner/execution/loops/index.mjs": "f874295891f2cb8e5065c36ddc3778002bbf18090be23b50c479dbc3cf74552c",
     "src/runner/execution/loops/panel.mjs": "8e9e803b647ebf1c819e2eb217609ae19bea4dc7b2caa16129bca340f7c77797",
-    "src/runner/execution/loops/reviewed.mjs": "4d89cb1825bca71a291cefe82cbeb82c606f3e6b65877f722573592e82c37998",
+    "src/runner/execution/loops/reviewed.mjs": "8e4a020e172d1dbb7195b66f0d4572fc8881d463a32405e556e9e52954e37a06",
     "src/runner/execution/loops/role-tasks.mjs": "6df89972192146084a969ed83d56acdd25969f9eff8fa4f1a71c1a4f103bf3e9",
     "src/runner/execution/loops/solo.mjs": "709db6262995af3a6dde9f6c6be4180ea99d01f0a8a9b2b84690382118495694",
     "src/runner/execution/partial-writes.mjs": "9c7ab4a2f57852b93283b819ed8c4adcac2b71c9241cdd4c760e73960bc1c027",
@@ -1215,43 +1219,7 @@
     "src/workflow/unit-handoff.mjs": "af84e939515499624ded2e37a628f6486e7cb425249eacf7f7d93cfcf0e2494b",
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3"
   },
-  "sites": [
-    {
-      "path": "bin/fgos.mjs",
-      "line": 3436,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "bin/fgos.mjs",
-      "line": 3580,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/merge.mjs",
-      "line": 943,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? elements of readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/merge.mjs",
-      "line": 973,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? elements of readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/worktree.mjs",
-      "line": 147,
-      "spawn": "execFileSync",
-      "binary": "? readConfig({ projectRoot: repoRoot, sections: ['worktreeSetup'] })",
-      "family": "unresolved-binary"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
@@ -1274,6 +1242,18 @@
       ],
       "class": "standalone-skill-script",
       "skill": "distill"
+    },
+    {
+      "path": ".agents/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 74,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".agents/skills/instruction-audit/scripts/instruction-audit.mjs:335"
+      ],
+      "class": "standalone-skill-script",
+      "skill": "instruction-audit"
     },
     {
       "path": ".githooks/pre-commit",
@@ -2065,6 +2045,20 @@
       "class": "rust-test"
     },
     {
+      "path": "bin/fgos.mjs",
+      "line": 3436,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "line": 3580,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
+      "class": "configured-binary"
+    },
+    {
       "path": "core/skills/distill/scripts/distill.mjs",
       "line": 49,
       "spawn": "execFileSync",
@@ -2342,21 +2336,21 @@
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 1183,
+      "line": 1196,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:179",
       "binary": "? path.to_str() .map(str::to_owned) .ok_or_else(|| failure(\"non-utf8-authority-pat",
       "class": "git-driver"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 2816,
+      "line": 2829,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 3003,
+      "line": 3036,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2742,7 +2736,7 @@
     },
     {
       "path": "packages/observe/rust/src/provider.rs",
-      "line": 160,
+      "line": 158,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -3447,6 +3441,27 @@
       "line": 165,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (item.verify))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "line": 943,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "line": 973,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/worktree.mjs",
+      "line": 147,
+      "spawn": "execFileSync",
+      "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['worktreeSetup'] })))",
       "class": "configured-binary"
     },
     {

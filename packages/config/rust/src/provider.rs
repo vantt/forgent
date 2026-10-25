@@ -13,7 +13,7 @@ use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
 
-use fgos_git::{GitDriver, OperationError, ResolveRepo};
+use fgos_git::{GitDriver, OperationError};
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
     OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
@@ -250,13 +250,9 @@ fn roots(root: &Path) -> Result<SnapshotRequest, Refusal> {
     };
     let git = |e: OperationError| refuse("git-read-failed", e.cause);
     let project_root = canonical(root)?;
-    let driver = GitDriver::new(&fgos_holder_lock::state_root::state_root().0).map_err(git)?;
-    let trusted_root = match driver
-        .resolve_repo(&project_root, &project_root)
-        .map_err(git)?
-    {
-        ResolveRepo::Repository(repo) => canonical(repo.trusted_main_root())?,
-        _ => project_root.clone(),
+    let trusted_root = match GitDriver::trusted_root_at(&project_root).map_err(git)? {
+        Some(root) => canonical(&root)?,
+        None => project_root.clone(),
     };
     let class = session_class(|key| std::env::var(key).ok());
     Ok(SnapshotRequest {

@@ -16,14 +16,12 @@ use std::sync::Arc;
 /// The root a writing Observe verb works on, resolved once per invocation before
 /// the store lock: the Git component's trusted main root of the requested root
 /// (so a linked worktree writes its main checkout's stores), the requested root
-/// itself outside a repository, and a named error when Git cannot answer (an
-/// untrusted worktree, an unsupported Git, an unreadable config), never a silent
-/// fall back to a different store. Reads keep the requested root: the resolve
-/// spawns Git three times (about +20 ms a call, measured), which only a write
+/// itself outside a repository, and a named error when the topology cannot be
+/// trusted (an untrusted worktree), never a silent fall back to a different store. Reads keep the requested root: only a write
 /// needs to be sure of its destination.
 fn trusted_root(requested: &Path) -> Result<PathBuf, String> {
-    match fgos_git::GitDriver::open_at(requested) {
-        Ok(Some((_, repo))) => Ok(repo.trusted_main_root().to_path_buf()),
+    match fgos_git::GitDriver::trusted_root_at(requested) {
+        Ok(Some(root)) => Ok(root),
         Ok(None) => Ok(requested.to_path_buf()),
         Err(e) => Err(format!("observe-root-unresolved: {}", e.cause)),
     }

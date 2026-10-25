@@ -7,8 +7,8 @@ use fgos_git::GitDriver;
 /// topology.
 fn main() -> io::Result<()> {
     let cwd = std::env::current_dir()?;
-    let (_, repo) = GitDriver::open_at(&cwd)
+    let root = GitDriver::trusted_root_at(&cwd)
         .map_err(|e| io::Error::other(format!("git repository read refused: {}", e.cause)))?
         .ok_or_else(|| io::Error::other(format!("not a git repository: {}", cwd.display())))?;
-    fgos_gateway::gateway::run(repo.trusted_main_root().to_path_buf())
+    fgos_gateway::gateway::run(root)
 }

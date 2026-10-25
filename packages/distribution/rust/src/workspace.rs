@@ -26,10 +26,10 @@ pub enum WorkspaceError {
 /// state root when absent (`fgos init` may run before one exists).
 /// Refuses outside a git repository with `WorkspaceError::NotGitRepository`.
 pub fn resolve_workspace_root(start_dir: &Path) -> Result<PathBuf, WorkspaceError> {
-    let (_, repo) = fgos_git::GitDriver::open_at(start_dir)
+    let root = fgos_git::GitDriver::trusted_root_at(start_dir)
         .map_err(|e| WorkspaceError::GitCommand(e.cause))?
         .ok_or(WorkspaceError::NotGitRepository)?;
-    let canonical = std::fs::canonicalize(repo.trusted_main_root())?;
+    let canonical = std::fs::canonicalize(root)?;
     let clean = {
         let s = canonical.to_string_lossy();
         if let Some(stripped) = s.strip_prefix(r"\\?\") {

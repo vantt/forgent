@@ -3,14 +3,17 @@ import '../helpers/process-tmp-root.mjs';
 // runs where a business project lives. No other test runs a registered Workflow on a detached HEAD
 // without origin/HEAD or outside a repository: test/workflow/business-discussion-workflow.test.mjs
 // owns the preset's step order and gate on an ordinary branch checkout, and
-// test/git/inspect.test.mjs owns Inspect's typed `notARepository` answer.
+// test/git/inspect.test.mjs owns Inspect's typed `notARepository` answer. The labelled writing
+// fixture below is the one noncoding Unit that writes and lands; it is never a production caller.
 // The fake worker is confined by bwrap, so this file needs a host that allows user namespaces.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { startWorkflow, answerWorkflow } from '../../src/workflow/index.mjs';
+import { execFileSync } from 'node:child_process';
+
+import { startWorkflow, answerWorkflow, validateWorkflow } from '../../src/workflow/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 
@@ -63,4 +66,36 @@ test('business-discussion completes in a directory that is not a repository', as
   await runToCompletion(dir);
 
   assert.equal(fs.existsSync(path.join(dir, '.git')), false);
+});
+
+test('a labelled noncoding writing fixture lands its one declared file on main', async () => {
+  // Fixture, not a production route: a business capability whose Unit declares writes is committed
+  // by the runner and landed by an integrate step exactly as a coding Unit is.
+  const dir = setupWorkflowFixtureRepo({
+    prefix: 'fgos-consumer-writing-',
+    readme: '# Business project',
+    gitName: 'Consumer Test',
+    capabilities: ['business:plan'],
+    workerBody: `
+      if (match[1].includes('/producer/')) fs.writeFileSync('business-plan.md', '# Business plan\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Business plan\\nThe plan was written to its declared file and checked against the brief in full.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
+    `,
+  });
+  const git = (args) => execFileSync('git', args, { cwd: dir, encoding: 'utf8' }).trim();
+  const before = git(['rev-parse', 'main']);
+  const workflow = validateWorkflow({
+    id: 'noncoding-writing-fixture',
+    steps: [
+      { id: 'plan', units: [{ id: 'plan', template: { capability: 'business:plan', pattern: 'reviewed', objective: 'Write the business plan.', writes: ['business-plan.md'] } }] },
+      { id: 'land', kind: 'integrate', dependsOn: ['plan'] },
+    ],
+  });
+
+  const state = await startWorkflow({ workflow, repoRoot: dir, cwd: dir, worktree: dir });
+
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  assert.equal(git(['show', 'main:business-plan.md']), '# Business plan');
+  assert.equal(git(['merge-base', '--is-ancestor', before, 'main']), '');
+  assert.notEqual(git(['rev-parse', 'main']), before);
 });

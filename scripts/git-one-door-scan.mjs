@@ -461,6 +461,7 @@ class JsFile {
     const narrowed = /^([\s\S]+?)\s*\.\s*(?:filter|slice|concat|reverse|sort)\s*\(/.exec(shape);
     if (narrowed && splitArgs(shape, narrowed[0].length - 1).close === shape.trimEnd().length - 1) return this.elements(expr.slice(0, narrowed[1].length), index, depth + 1);
     if (/^process\.argv\b/.test(expr)) return [{ external: 'command-line arguments' }];
+    if (/^readConfig\s*\(/.test(shape)) return [{ external: `config door value (${expr})` }];
     // `table[key]` and `table[key].list`: the elements of what any element holds there.
     const indexed = /^([A-Za-z_$][\w$]*(?:\??\.[A-Za-z_$][\w$]*)*)\s*(?:\?\.)?\[[^\[\]]+\]((?:\??\.[A-Za-z_$][\w$]*)*)$/.exec(shape);
     if (indexed) return this.property(expr.slice(0, indexed[1].length), ['*', ...indexed[2].split(/\??\./).filter(Boolean), '*'], index, depth + 1);
@@ -558,8 +559,8 @@ class JsFile {
     }
     if (/^(fileURLToPath|url\.fileURLToPath)$/.test(callee) || callee === 'new URL') return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     if (callee === 'JSON.parse') return [{ external: 'configuration file data' }];
-    // The config door's result is configured data the scanner cannot see: opaque, never the door's own marshalling code.
-    if (callee === 'readConfig') return [{ unknown: expr }];
+    // The config door's result is configured data, like a parsed config file: never the door's own marshalling code.
+    if (callee === 'readConfig') return [{ external: `config door value (${expr})` }];
     if (/^(fs\.realpathSync|path\.basename|String)$/.test(callee)) return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     if (callee === 'Object.freeze') return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     // `registry.get(key)` on a module-private Map: any value the module stores in it.
