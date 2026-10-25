@@ -191,6 +191,29 @@ fn identity_is_stable_and_copies_moves_and_machine_changes_refuse() {
     .is_err());
     assert_eq!(fs::read(layout.store()).unwrap(), b"broken");
 }
+/// Moving the clone moves `store.json` with it, so the store keeps its id (the
+/// copy case above is the one that must refuse: a copy has a new inode). The
+/// refusal test above never renames a clone, so nothing else proves a moved
+/// path opens.
+#[test]
+fn a_clone_moved_to_another_path_keeps_its_store_id() {
+    let repo = Repo::new();
+    let id = StoreIdentity::initialize_under_append_lock(
+        &repo.layout(),
+        "machine-1",
+        "2026-10-18T00:00:00.000Z",
+    )
+    .unwrap();
+    let moved = Repo(repo.0.with_file_name(format!(
+        "{}-moved",
+        repo.0.file_name().unwrap().to_str().unwrap()
+    )));
+    fs::rename(&repo.0, &moved.0).unwrap();
+    let opened = StoreIdentity::open(&moved.layout(), "machine-1").unwrap_or_else(|error| {
+        panic!("a moved clone (same directory, new path) must keep its store: {error}")
+    });
+    assert_eq!(opened.store_id, id.store_id);
+}
 #[test]
 fn layouts_and_linked_worktrees_share_common_root() {
     let repo = Repo::new();

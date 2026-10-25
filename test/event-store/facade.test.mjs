@@ -188,6 +188,18 @@ test('write admission is asked of Git outside the gate and never by a read; a ga
   assert.equal(fresh.store.append('project', [event], {}, 'fixture', []).events.length, 1);
 });
 
+// No other test makes the first admission fail and then lets the failure clear: the migration and
+// gate tests only see answers that stay true for the life of the repository.
+test('a write refused by a transient Git failure is admitted once the failure clears', { skip: process.platform !== 'linux' }, t => {
+  const { store, repo } = fixture(t);
+  const refs = path.join(repo, '.git/refs');
+  fs.chmodSync(refs, 0o000);
+  try {
+    assert.throws(() => store.append('project', [event], {}, 'fixture', []), 'unreadable refs refuse the first write');
+  } finally { fs.chmodSync(refs, 0o755); }
+  assert.equal(store.append('project', [event], {}, 'fixture', []).events.length, 1, 'the refusal outlived the failure that caused it');
+});
+
 test('a repeat read is not sent the legacy history it already holds, and each read still gets its own events', { skip: process.platform !== 'linux' }, t => {
   const { store, repo, git } = fixture(t);
   const line = (seq) => JSON.stringify({ ts: '2026-01-01T00:00:00.000Z', seq, type: 'work.add', payload: { id: `item-${seq}`, title: 'legacy' }, v: 4 }) + '\n';

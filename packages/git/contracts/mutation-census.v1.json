@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7a1574748f60aae1fe945894722929b00442bd6b8c242ee1a3fd245513b9ba5a",
+  "payloadDigest": "ee0eebda19139f07a151bc5e527146cabc9d9273b05c1303da154984d9f53997",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -304,7 +304,7 @@
     "packages/event-store/rust/src/walk.rs": "429928b27ac16e6bc1cb14dbbd56e30e02aafda1b140a479c78502c913b2e392",
     "packages/event-store/rust/tests/append_recovery.rs": "c9cdfd1dff2ad7d9aaf38eb84bb90cbb99069f280cde64c846b5eee38bd231fa",
     "packages/event-store/rust/tests/branch_local_refs.rs": "51dad4f4f7f228c363cf5f7076f61fd5a8528adb31419fed8cb202fce712e862",
-    "packages/event-store/rust/tests/checkpoint.rs": "082d41b7dbeb3bf2000e36a4456def251e98967795da86b9564337b6a937ab5b",
+    "packages/event-store/rust/tests/checkpoint.rs": "06f155b8784fc8b20f1e97305cd97caa8b012b5c65b48cffda50132a09c50808",
     "packages/event-store/rust/tests/common/mod.rs": "e624f9a261ae17eb1fbcba629523ad971c7124891525e7040e2aedca8efdf9ab",
     "packages/event-store/rust/tests/cursor_incremental.rs": "9429430246c625debce0c8e221cbe84fdd7d1d0088159ce2d62a80292f158744",
     "packages/event-store/rust/tests/distribution_compatibility.rs": "27a73fa86d90395fb62b98bc7dbc5779538cccae607023ee9e1675235d8b6ac9",
@@ -317,10 +317,10 @@
     "packages/event-store/rust/tests/p02_review.rs": "5a560dd163330beb32cac8881bc37b3cd558471d1aa7ffead138b7b686e23fe3",
     "packages/event-store/rust/tests/read_head_children.rs": "ee7a7ca38ff6c062dc49a27fbda88a784eb409943dd8bbea9223301518be93e0",
     "packages/event-store/rust/tests/read_memo.rs": "d0134060cbc0ad3d6de4b4f4dfe65e70e6ce6235bdb1dcd84595a4459273507f",
-    "packages/event-store/rust/tests/reader_review_regressions.rs": "efbd1fd2f7fb6b5456979b81544b1c7b6aa73ac2a22356a638fccc649587a5ea",
+    "packages/event-store/rust/tests/reader_review_regressions.rs": "a7c6805bf3c43ac53c6b2cb487aab271503594f5b3df85d36870766b4d9a084e",
     "packages/event-store/rust/tests/reader_seal_stress.rs": "f721a995073a7d466a35914f58aa06448433e2bce6383809f6abee93bf9fc34e",
     "packages/event-store/rust/tests/reader_support/mod.rs": "a3d8d2960c4931a09398dbc727e6394e47e1bcd5bedfe5f7e4f9d12d1ab95029",
-    "packages/event-store/rust/tests/registry_identity_layout.rs": "d480d79d17137c8239299d5e93916d12569dc9845124c63fca7d4fc90a56e140",
+    "packages/event-store/rust/tests/registry_identity_layout.rs": "4493eb6c483f027528bf3ffadae5318db43589c2ef1115fe92ea4c06f20d3cb3",
     "packages/event-store/rust/tests/registry_rows.rs": "4afd0326e26d038e1a2b7962cacc19bc140cd5afbb3416088b2e4798572519bb",
     "packages/event-store/rust/tests/review_fixes.rs": "d3aa5b3493b5f55d8fe3cd8809d63e9abe69598a5d26166addabd63bd1b617bb",
     "packages/event-store/rust/tests/seal_cas_race.rs": "ec575e833a1a35a026d46fbb26e46d3088d56ff9a2857cc2f309016c849d814d",
@@ -1998,14 +1998,21 @@
     },
     {
       "path": "packages/event-store/rust/tests/reader_review_regressions.rs",
-      "line": 355,
+      "line": 39,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/event-store/rust/tests/reader_review_regressions.rs",
-      "line": 700,
+      "line": 370,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/reader_review_regressions.rs",
+      "line": 715,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
