@@ -1,0 +1,3511 @@
+{
+ "pin": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
+ "source": "g0join/join-608a4ada5.json",
+ "batch": 6,
+ "rows": [
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/834",
+   "ids": [],
+   "bindingSha256": "75683dfbf715898a3b058448540c06c2826243e80baa0728692ec0e6f41ca9c4",
+   "targetUnitDigest": "01990f162b647f9106bf2b23d20b6236c1bbdc2d92d25b1f7f2c41abbdf4e604",
+   "targetAnchor": "open-gaps",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/835",
+   "ids": [],
+   "bindingSha256": "a550cdd7b4aec2b69e391384dff50f8db6118173325e16a0d9c1e00a71a346cb",
+   "targetUnitDigest": "781246c6887cde3fb56a4e600cf48696b21126b5b7d322dc1f548a66099a5fec",
+   "targetAnchor": "unheaded-block-17",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/836",
+   "ids": [],
+   "bindingSha256": "713283a49c9e1f1ed8255feafdb94232c4b0492b55006012c6b91db2aa9ae2a2",
+   "targetUnitDigest": "9f3ce69e3eed5edfea59ac8e4d7bdbdeb861fd8f2f9aa73ba6289cfc347204c4",
+   "targetAnchor": "pointers-implementation",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/837",
+   "ids": [],
+   "bindingSha256": "91bad054bc995276ca3db87a6f0f615f7d4b5be32863e9bf4378f4027d8f48c4",
+   "targetUnitDigest": "97e5d9c3323668e0b451c079ce2555edba376d0c095da5b6567713d00e64a229",
+   "targetAnchor": "unheaded-block-18",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/838",
+   "ids": [],
+   "bindingSha256": "738eafeec8733a6c35e114ff9c7e97a250773f96f4045d6e63020edde798488d",
+   "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+   "targetAnchor": "l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh-retired-t\u1eeb-docsdecisions-tsk-1lv-4",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/839",
+   "ids": [],
+   "bindingSha256": "e88f94c1e8d1b092b181710e7308998c5255c647c50d437f6090ef20039b510d",
+   "targetUnitDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+   "targetAnchor": "unheaded-block-19",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/84",
+   "ids": [],
+   "bindingSha256": "2d09961b5468825af00d39edb23e9096c4a64739319a8e216975ac2416c76952",
+   "targetUnitDigest": "d78d7dbcdc6b9638cbaceec445eb2637a80ed44797b1c9738e6ce1d8f6cb11c3",
+   "targetAnchor": "unheaded-block-113",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/840",
+   "ids": [],
+   "bindingSha256": "fbbea6233a16a14c079c0775f0e58bcf802e3f7a1a7ac3218729dbcbe5081a79",
+   "targetUnitDigest": "f977c7a5cb812938ec71e42548c6358a719589327f3ff618a792b15e56f85811",
+   "targetAnchor": "0016-m\u1ed1c-mvp-c\u1ee7a-fgos",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/841",
+   "ids": [],
+   "bindingSha256": "69a007bca87b87845587ff06c0b06f0d4fdb8a34da390b8c6923406c6c18fbaa",
+   "targetUnitDigest": "180af535ab0ff1f36452842ec46cea3a86bc6d19500e8663f0e54b4fad2a0bb4",
+   "targetAnchor": "b\u1ed1i-c\u1ea3nh",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/842",
+   "ids": [],
+   "bindingSha256": "c1619a75cf7d29af404596157efcecd26e2fbfef312336f0b30a9032427f23a0",
+   "targetUnitDigest": "035f26d192b740ad51442be5915a92eba9b9f63a5440cf86b20bc8806fb2f457",
+   "targetAnchor": "unheaded-block-20",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/843",
+   "ids": [],
+   "bindingSha256": "1d84bcbbeacfced346b7963d3dbc63811faf0bde8449b524c985b42a2c0df500",
+   "targetUnitDigest": "7a2a6fe7aacb92898bf7860528039bf35a7ca76fb22b0ea540ccc820d3c073fb",
+   "targetAnchor": "unheaded-block-21",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/844",
+   "ids": [],
+   "bindingSha256": "803b2eee0b46c83321d63fca28deb99b94be08ebdfca3ae7252e5f5e18a0402c",
+   "targetUnitDigest": "ecce4cc8c0219563f30d06a59a921ca306d123cb3c63d9448cc58a92d7598bae",
+   "targetAnchor": "quy\u1ebft-\u0111\u1ecbnh",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/845",
+   "ids": [],
+   "bindingSha256": "4d09233959e0b56a24679ddea8f72f778fb0691176e983bba84576b12cc73955",
+   "targetUnitDigest": "86470363f8975826cef49be51ee068b76dfd3e1709fa1a009d308aaf648d0e9f",
+   "targetAnchor": "unheaded-block-22",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/846",
+   "ids": [],
+   "bindingSha256": "66bdb5b9c7d9688dd8642f43647712dbd4eb318d878c11797a555524c79bd727",
+   "targetUnitDigest": "a956941f710ace090d5a068b66bda1656e6315d916cff6fd853e74e6fe8499b8",
+   "targetAnchor": "unheaded-block-23",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/847",
+   "ids": [],
+   "bindingSha256": "a2a947e05977683148b22c529506d3d25d6898730c2740358a74547f09c65f35",
+   "targetUnitDigest": "af929a9783b1b814da80d6e90013059ccc535aefa9001480f4b4fd7d5b8fae0c",
+   "targetAnchor": "unheaded-block-24",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/848",
+   "ids": [],
+   "bindingSha256": "abffc90eec7563ea82138c5de90fd155c1e7552c33624b3bf3bcbccaa5e19ae9",
+   "targetUnitDigest": "640e74dd79d88c3be8fab531f6354a62a51d2f1bce7646d753ccbe7db46fea23",
+   "targetAnchor": "unheaded-block-25",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/849",
+   "ids": [],
+   "bindingSha256": "2da36b9ee09181c77dc2e26a5d91a13bf786d21ad73ecf24180c0f84f3395109",
+   "targetUnitDigest": "ca1e25e3422164d7a0c32774fd017bf4b37338681688fb71e843053c0e582a96",
+   "targetAnchor": "unheaded-block-26",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/85",
+   "ids": [],
+   "bindingSha256": "845ca064fb01294c80354e613b60b75893c776328e9774c81f4be96846180a8f",
+   "targetUnitDigest": "f511812c1eebc54ba4a1a0ae1cc94a7288f6163c7a3a7955d0823fa2e63310cf",
+   "targetAnchor": "unheaded-block-114",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/850",
+   "ids": [],
+   "bindingSha256": "579def9980c4ea36df06eb0f9aca1f1426a105f9b0ec7ed3ab7cbcea49d7529b",
+   "targetUnitDigest": "a98b8477e2daa3ef863b480bf2f9845a1e0ad34217de4189adde5f8ece5ffd27",
+   "targetAnchor": "h\u1ec7-qu\u1ea3",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/851",
+   "ids": [],
+   "bindingSha256": "a09cafa6d329fee3148d628bd6163f7395a906a1cb6bcafc0527415afbd008bf",
+   "targetUnitDigest": "37be99be5616526202bcb7092e29f3bb49d0605fb0a34d883dee60932671667d",
+   "targetAnchor": "unheaded-block-27",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/852",
+   "ids": [],
+   "bindingSha256": "4799520aeda977015b51a998e3b6fe5c6790b8844a77d533bd97511642bc5aa5",
+   "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+   "targetAnchor": "unheaded-block-28",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/853",
+   "ids": [],
+   "bindingSha256": "52f1f18fe0b2acee90f065be76aa0f0f96edb78218540ae1c56ec4e44cde0262",
+   "targetUnitDigest": "e77b84b8020b24b4201a75f807f8aa001a904378d02b6b601bba14c0ee0a3097",
+   "targetAnchor": "0018-m\u1ed1c-mvp2-c\u1ee7a-fgos",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/854",
+   "ids": [],
+   "bindingSha256": "95a9f5bd1747c5d806299757220e85b76a0f53824946a517392ccfca17fe2b8c",
+   "targetUnitDigest": "96a78de23befc0537f1e29d65e9fc09bdc559b0a335bb077ab5d950a3d644516",
+   "targetAnchor": "b\u1ed1i-c\u1ea3nh-1",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/855",
+   "ids": [],
+   "bindingSha256": "62581a7bb631a3144d7df2946ac5226b8a183e5eb9b34c7f7121bd0cce5c3137",
+   "targetUnitDigest": "5bedc043fd0f5b9beb02a149c7bc137bd310993dcf3b072e315e435fae4aa238",
+   "targetAnchor": "unheaded-block-29",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/856",
+   "ids": [],
+   "bindingSha256": "d2b5202cd10789c5793ed5b5df5fd96cb9bf3d02b164bbcc553e115d24955ce0",
+   "targetUnitDigest": "cfcaec056453d9890a1714412a4cac491c6fe59d09b63e4240e2f0f6e08a1cf9",
+   "targetAnchor": "unheaded-block-30",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/857",
+   "ids": [],
+   "bindingSha256": "960ec847af94df0b6bdeb3584eb13b9dca9e87dbdbf36fb10d7de965e64df6f4",
+   "targetUnitDigest": "b5d0c86a66366ee6826b4a9f730c2737c63171c35c58cedc93362e6da10a5d8e",
+   "targetAnchor": "quy\u1ebft-\u0111\u1ecbnh-1",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/858",
+   "ids": [],
+   "bindingSha256": "fe36e6e4f14bcadd7973e01f4aacecd385f7569267301cb1f006630ec7fe3c1e",
+   "targetUnitDigest": "0de3ef01e06f1fcfd6962045ce23135b4eef52be58a18bdd696bcdde2e9814d1",
+   "targetAnchor": "unheaded-block-31",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/859",
+   "ids": [],
+   "bindingSha256": "9ba0c4c056c94aecd19e5a64cf10e78b3dead76d833c0d0de3579475723ff719",
+   "targetUnitDigest": "1c22583dfa5df8b579c1f83189ceb473287395f5d401014c5d6a8a830b7249a5",
+   "targetAnchor": "unheaded-block-32",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/86",
+   "ids": [],
+   "bindingSha256": "599520747947e8409c336172fd5db077585f14dff95d5178c734339b4e1db69d",
+   "targetUnitDigest": "ec10012beebec8e651aff0caf8acad4955f5b55cb6f043691257516fa5f99bda",
+   "targetAnchor": "unheaded-block-115",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/860",
+   "ids": [],
+   "bindingSha256": "e5990c8075e98bec3fd5fd65af71b041d69bb2e1eef670dcaf58e40bdb6a8914",
+   "targetUnitDigest": "7d17b81b13d11a426667a81a8428ada6727d6f3f405882a5e5a6f9c8b7cc6a21",
+   "targetAnchor": "unheaded-block-33",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/861",
+   "ids": [],
+   "bindingSha256": "1f8c882a232fa7606ab70efceea22606901386f0310a1c7502dec0197276ef60",
+   "targetUnitDigest": "2a59fb70a1d29878ac4c71a1f8494d4da8f504726c35e727c1feae01b8e7e78a",
+   "targetAnchor": "unheaded-block-34",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/862",
+   "ids": [],
+   "bindingSha256": "cc7d0166edbb345e4bcf8b92a64bafb914312473db8d117bd9acf977ec39b6ad",
+   "targetUnitDigest": "9189c0c2e0e5bf383bbbb1f2c878a571f412fc1469b8bfcb4cdfafe034b585b9",
+   "targetAnchor": "unheaded-block-35",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/863",
+   "ids": [],
+   "bindingSha256": "82caf3a3d6c71c0fe8971fe317a6f923621e795c6e5a6d8f997e03c18128c96f",
+   "targetUnitDigest": "2cf00510b9d558c06aff7ab045f246c2d24ceef764d7afe2a190d00933be0433",
+   "targetAnchor": "h\u1ec7-qu\u1ea3-1",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/864",
+   "ids": [],
+   "bindingSha256": "8c5622483c82ed72a2a77f454a610160fb71cd4f733bd224cf958a2bbade14e1",
+   "targetUnitDigest": "07774fa3f663a59a126b7b877d4754a38131a7a323bdf1949f143fc6765c57d9",
+   "targetAnchor": "unheaded-block-36",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/865",
+   "ids": [],
+   "bindingSha256": "5e9d98a5d3b0d7e79f7de3c572c81c54872a866dcfde9703d650315dde049b00",
+   "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+   "targetAnchor": "unheaded-block-37",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/866",
+   "ids": [],
+   "bindingSha256": "5e3a2e52bb642332d08a4d8209366df68048bab1a899443af68e70fa71e37f9e",
+   "targetUnitDigest": "d9fd8ccb31e5d5e9d27261a84305ee26e372fcfa22336346f63f348de89b602e",
+   "targetAnchor": "unheaded-block-6",
+   "targetOwner": "docs/platform/system-overview/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/867",
+   "ids": [],
+   "bindingSha256": "53dedaaf9629167d3ee0d80b02fdbf8f0413cc4c0548bd4475557b156b203f88",
+   "targetUnitDigest": "ef970220b2a0deaa9fe9d0aabe96a61d29451f0955f547b511aaa46b7f5df403",
+   "targetAnchor": "unheaded-block-5",
+   "targetOwner": "docs/platform/component-boundary.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/87",
+   "ids": [],
+   "bindingSha256": "474b37b94e1251aff53162ca4063b5c5d9dc2e61e65f51ad88d502b489b8cd2f",
+   "targetUnitDigest": "2bc6e8304bbd830f71cfd07ac39a126a1492c801151e35ba9ace0728a48dea6d",
+   "targetAnchor": "unheaded-block-116",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/871",
+   "ids": [],
+   "bindingSha256": "0e649c82824d4853a1e0d9a4dfc5bc7615f2fdce6dac49ea8c1aa6b4a4c50286",
+   "targetUnitDigest": "c119ae3b82e1912e427be4ae6078517a2a5e6b3658d78b2f2f5718bc9eb84b70",
+   "targetAnchor": "1-quy\u1ebft-\u0111\u1ecbnh-ki\u1ebfn-tr\u00fac",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/872",
+   "ids": [],
+   "bindingSha256": "fc8eb9c6b7c32bdd4e51ad7c4ec6ac8e1434d4b95e41df1b6d0aa661cb512414",
+   "targetUnitDigest": "9d4d164e372af43991d3261be4b79b667ccf22f6638a95d779a39b5d8a2c507e",
+   "targetAnchor": "unheaded-block-5",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/873",
+   "ids": [],
+   "bindingSha256": "cec50dcac31e304def274fe2015ae432130ab099a64eda23aeffcfb9a45faaea",
+   "targetUnitDigest": "e384c0c10fe8fd6b869a7be0d2de9f930130ad7a1414087ffb543d0357fd4108",
+   "targetAnchor": "unheaded-block-6",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/874",
+   "ids": [],
+   "bindingSha256": "3beafa281b11f5025fab3ec4d0f7a0ea7f1d297ef99fe47560bb6f6b6bf4f061",
+   "targetUnitDigest": "1bd83bcb38f40d1a4ed245ba1b513ab5a174bd6bc1b4d2f3a931766b5b0bd96d",
+   "targetAnchor": "unheaded-block-7",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/875",
+   "ids": [],
+   "bindingSha256": "04eeee4655a53ab0a00af78b1b4f3a9b63c35db776135ae2df1c4f78340ca57e",
+   "targetUnitDigest": "ea53abaf5e95cecd30240f63cad49962f5acca16df85c4a32c65dba40a621dac",
+   "targetAnchor": "unheaded-block-8",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/876",
+   "ids": [],
+   "bindingSha256": "3096ef0d30daa18426954515245231c1495d04c891692f6f888e7ca4a428cab8",
+   "targetUnitDigest": "c925e836abc1dfa057f90f82e9c2307792e1fce53c77e881c1359cd136acb642",
+   "targetAnchor": "unheaded-block-9",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/877",
+   "ids": [],
+   "bindingSha256": "dde80b0c8f8805d852a5f31e772fd56906b0543458e69ea904638b73d29c6999",
+   "targetUnitDigest": "01917de3660e3d39505f58b3957a70b7bab65168b52a8d36442f945802b419f3",
+   "targetAnchor": "11-v\u00ec-sao-m\u1ed9t-c\u1eeda-quan-tr\u1ecdng",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/878",
+   "ids": [],
+   "bindingSha256": "66531e0906930223aa0423bf753b530b0201ea3209555ea424d3546d7e7215c2",
+   "targetUnitDigest": "85615858f7582bd250778a1f45ac6b437662679bf2ef85ee4e21bc4020380a96",
+   "targetAnchor": "unheaded-block-10",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/879",
+   "ids": [],
+   "bindingSha256": "c8f8d61662cc65b4d91749a712edaf50b5527b63935c57cac5f214a2e671db58",
+   "targetUnitDigest": "cdc2076b281a4cc71b1c038a08fa902599137f915486ba487deede97672be124",
+   "targetAnchor": "2-v\u1ea5n-\u0111\u1ec1-l\u1ecbch-s\u1eed-v\u00e0-gi\u1ea3i-ph\u00e1p-\u0111\u00e3-ch\u1ed1t",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/88",
+   "ids": [],
+   "bindingSha256": "2c334d7cf9a1385ad930b3bbc9be07e3a7f48d2c97493d0d1856d1a5263ea555",
+   "targetUnitDigest": "138af5e6ba7d18ee0fc080f7eb898f2f07302e2e866ff8f7cc7bfdc617db098d",
+   "targetAnchor": "unheaded-block-117",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/880",
+   "ids": [],
+   "bindingSha256": "216bad613419127fb832d4fd07eaa1a5a5a334c10ee5886d8e77558d93dce5c1",
+   "targetUnitDigest": "f5322e1b6b0a6cc2889ea9c713ab098d0caf9520f7aa856f5c72e0bf63f9e4b4",
+   "targetAnchor": "unheaded-block-11",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/881",
+   "ids": [],
+   "bindingSha256": "551283f2290ea56fac63740cbd427e8be8337645d0d4082840ab0b781b9f3324",
+   "targetUnitDigest": "df9207a3ace166343d8025978e5409c42dfd1ce28e4de1e88ca5499e66703881",
+   "targetAnchor": "unheaded-block-12",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/882",
+   "ids": [],
+   "bindingSha256": "5fa7769e8001ebddc3962211fc31678d34751d67437da6ccd8735fb95e862e05",
+   "targetUnitDigest": "3cf2768b10b9304382d4ba662dcef7f1a45677693e3747976d99c21b9b80188c",
+   "targetAnchor": "unheaded-block-13",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/883",
+   "ids": [],
+   "bindingSha256": "4cf15dcaaced6019f6ed293955b30f39c76c8db6e04386a1c081852047e81c75",
+   "targetUnitDigest": "26140143831da0f2e8c9e325debb900f01b964c4da8e833176574e14292d86fb",
+   "targetAnchor": "unheaded-block-14",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/884",
+   "ids": [],
+   "bindingSha256": "dd9e386ca281102388403f6e64b1708a58cd51f5a94ba642ba5651325a6872cd",
+   "targetUnitDigest": "e611e532ff4cc0f1c9168081419271fc8db68b61d56867614551f7b660d21400",
+   "targetAnchor": "3-m\u1ee5c-ti\u00eau-v\u00e0-phi-m\u1ee5c-ti\u00eau",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/885",
+   "ids": [],
+   "bindingSha256": "6cbc2fad09365a188dd605b756f4be4b61d2d460ee9b2f619d08b6e5784e7314",
+   "targetUnitDigest": "95910a9adb38ca27d11f8417e6bc455e771873351ec383f854dea2a11a4014c9",
+   "targetAnchor": "31-m\u1ee5c-ti\u00eau",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/886",
+   "ids": [],
+   "bindingSha256": "f7f99eec283ac0f4ce380a4fbfcc0965a491f6e044dbe3a49d9f499d5d0c240b",
+   "targetUnitDigest": "5988e9107c5e1f93a6a203244071b7020b294ab5b855fea771691a4504177421",
+   "targetAnchor": "unheaded-block-15",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/887",
+   "ids": [],
+   "bindingSha256": "e7ca4bc82875ebd9095c3f4a91513c14760785fc021c27bc968fbd8f04e1ed0b",
+   "targetUnitDigest": "cdfde5146a65a6fec68998b706feccb15e1f785cee0b79a6338a97bc437a1e18",
+   "targetAnchor": "32-phi-m\u1ee5c-ti\u00eau",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/888",
+   "ids": [],
+   "bindingSha256": "50c724e4c18f3361ca9127eb9e02d5ef46cd321a66a2e69b617cfe42354ab7da",
+   "targetUnitDigest": "9c04558a540d0fc1dbaaa1b4873972a1a77bc6d49d8fdf13af722161dfa97d72",
+   "targetAnchor": "unheaded-block-16",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/889",
+   "ids": [],
+   "bindingSha256": "0860648229b7334127eda594fdccb0a3e71394ff7d452540d8c43d4d37871e5b",
+   "targetUnitDigest": "7dc76c05398590e943ab78d13d574f0f66841e659505f94999893ac40caaebe7",
+   "targetAnchor": "33-use-case-\u0111\u00edch-v\u00e0-c\u00e1ch-d\u00f9ng-m\u1eb7c-\u0111\u1ecbnh",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/89",
+   "ids": [],
+   "bindingSha256": "9be32ffcf0a4ff949dac4a62b895c0b663cb6a403e9972d1c5553c358cf15f8c",
+   "targetUnitDigest": "aa5979e3e072470985007f023ac28d4cd2232782a797715da16579082394f87d",
+   "targetAnchor": "h\u1ec7-qu\u1ea3-3",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/890",
+   "ids": [],
+   "bindingSha256": "120ac9b723501662b15c59a14940d580b7571d941adc1dc486bf71e2e0da82b2",
+   "targetUnitDigest": "0034e87f9be5666d0e95dfc3c4a8f54454f40fe51f7b8891d3ea7fd4f241ed11",
+   "targetAnchor": "unheaded-block-17",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/891",
+   "ids": [],
+   "bindingSha256": "331f4025beec1d7d661f89a7b10977e1a2bb79db9ad218c46d4c1a1b6390c84a",
+   "targetUnitDigest": "779d0248a0709725dc0bd8d0ffdbd4b5257325e259c824143b8c8b79d5d0903d",
+   "targetAnchor": "unheaded-block-18",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/892",
+   "ids": [],
+   "bindingSha256": "dbfef29bcce89f6a35614f2bde96f52f3bc20dd560fe2735a962e723aba0791c",
+   "targetUnitDigest": "03005174fec0d1410da6c08443f52a2de9eb5b0a6b6f3e7c8015749bf627491a",
+   "targetAnchor": "4-threat-model",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/893",
+   "ids": [],
+   "bindingSha256": "f415aa9d3fa364fef3cdb2b4a6b6b0ce1718677da769daf51a74c468728eec6e",
+   "targetUnitDigest": "fbe04ecca29a8fc82519684dcfead7d2c94adcdb68ceaa637dbd5845b5e83033",
+   "targetAnchor": "unheaded-block-19",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/894",
+   "ids": [],
+   "bindingSha256": "dbe6b8966a681836eeb12e854735b910672e30d466df7df7637c6577bdf8cda7",
+   "targetUnitDigest": "b1dd0ead1405bd4a8e01cf9358cba6b084ef835b43f78f550012d05cdf3ff002",
+   "targetAnchor": "unheaded-block-20",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/895",
+   "ids": [],
+   "bindingSha256": "eff6a86017a114216546843c1d019665c2df229ad8d3c7209ebefe2817c6cf56",
+   "targetUnitDigest": "50350bcfe22e57e77360aad5d1e994053801f7d59e47c1d83ed9c602253b3ecd",
+   "targetAnchor": "unheaded-block-21",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/896",
+   "ids": [],
+   "bindingSha256": "25e39520497f0160497a761e412ff6fb30907984a1b0be4555b045d154279b54",
+   "targetUnitDigest": "82a9fc630b06efc1ff9160ddf99d1ef14782fc3bc60922926371aff69b9ca768",
+   "targetAnchor": "unheaded-block-22",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/897",
+   "ids": [],
+   "bindingSha256": "33f59747dd9d635e2cc75c58af45e1426146ef8b8fb4d67777ed7337397a50d1",
+   "targetUnitDigest": "58de682e70a5457522892e8231fb6d7cf5c71ba825b60d0b16e3386248a8156b",
+   "targetAnchor": "unheaded-block-23",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/898",
+   "ids": [],
+   "bindingSha256": "846948ad916afacac1b5ccf40aec9ff286960dcb7706434935a273a4f816920b",
+   "targetUnitDigest": "be716ac2e12a5034e40af648c86c875e85a8959bbc8b36fdb5767121bd29460b",
+   "targetAnchor": "unheaded-block-24",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/899",
+   "ids": [],
+   "bindingSha256": "d4343a2db738e0af6877f58f9b64c06919ba91b5fff6c8bfbe7fdf553fdca12b",
+   "targetUnitDigest": "bd8e4286da3b9be7ecca63ef6997d223b301f60c28afc8a6a5917091e7e46241",
+   "targetAnchor": "5-component-boundary",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/9",
+   "ids": [],
+   "bindingSha256": "0dc5159b21dc53fea55f4ca63c6e5d05c88281573d5523801d7609530d617993",
+   "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+   "targetAnchor": "l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh-retired-t\u1eeb-docsdecisions-tsk-1lv-4",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/90",
+   "ids": [],
+   "bindingSha256": "b3414ad925979eaf251d48ddf90df77871eb36ad8b2156622d896ae6ce786ee7",
+   "targetUnitDigest": "b4ccb53277f276d2cab4ca3db5f8351e513a21e78221e889b89b622e96cf035d",
+   "targetAnchor": "unheaded-block-118",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/900",
+   "ids": [],
+   "bindingSha256": "6477eb1a518697a1981562623deff737fbc6f397ab4d1b210f75b25d3cd4db4f",
+   "targetUnitDigest": "1f7803f54ad8e97373ec11ddaf6f2c0c4e4b1217eacd9059e9008ca69bdaed10",
+   "targetAnchor": "51-v\u1ecb-tr\u00ed-v\u00e0-parent",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/901",
+   "ids": [],
+   "bindingSha256": "9d857348ad131e13662bcac92730c55d4048d11ed5e75eaff07a0629f68f1196",
+   "targetUnitDigest": "75fcceade6aa085b470fe340ea5938c62fb80e1f413bf4a9833fe96eb305dc0b",
+   "targetAnchor": "unheaded-block-25",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/902",
+   "ids": [],
+   "bindingSha256": "bc605d380fba4a13f2b40e71d4c3f771f23203f87742a13f32a57d2f784b9737",
+   "targetUnitDigest": "c197e2049c5a07656d02143a56b987482fd5eb433e461694a1c11ad171d736ff",
+   "targetAnchor": "unheaded-block-26",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/903",
+   "ids": [],
+   "bindingSha256": "d418dc203af4f4f8d6ba77ebb6f6def7826d5ba6d26de04045462633f081ca59",
+   "targetUnitDigest": "ae3e82541e20bbf22e7804f3cb3fcdc42582b93303a71e221acf99a6fec61522",
+   "targetAnchor": "unheaded-block-27",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/904",
+   "ids": [],
+   "bindingSha256": "e9c8771ded5a0792993fe980766ca3ed807e8568a7c7214f814abe88b1ed440e",
+   "targetUnitDigest": "696474a359edf32d98a7cc86a8e42e841414dc3c40437ceeb67fe94a80f21163",
+   "targetAnchor": "unheaded-block-28",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/905",
+   "ids": [],
+   "bindingSha256": "5ebd814d1019e2cd4dcdbfc0d9e874101ec584e3b2e0d2b9ca20deaac671f3e3",
+   "targetUnitDigest": "12b7882b372d729494e050cc316c0dfc77f753c58d110032331e9d26b9aaff97",
+   "targetAnchor": "unheaded-block-29",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/906",
+   "ids": [],
+   "bindingSha256": "0a3e70a0950df1483d969bfc6ecdb9e157946f7e24adf4c3de80a5293f4765bc",
+   "targetUnitDigest": "e8c7eee6176e190b96b95b1e3b176acd116578dd43dd17332d7d3924d54c81c0",
+   "targetAnchor": "52-quy-t\u1eafc-dependency",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/907",
+   "ids": [],
+   "bindingSha256": "aa28eec09ed65171757bd8b067c2077c7c18cb8dedd5aef1392593cd58fc6131",
+   "targetUnitDigest": "9e8799eecd7d7c8646a012459732c22b9ab75b0b66923b1de2c4e72edfcf65e6",
+   "targetAnchor": "unheaded-block-30",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/908",
+   "ids": [],
+   "bindingSha256": "0d530728b3e3a4f3898f20b4ef776de9a6ed37a0aecbaf0492deeada678c9a12",
+   "targetUnitDigest": "20d9856cf018fb4ea9d199a3f2d18b6256ac6e69242dee66192a5722319c5f1f",
+   "targetAnchor": "unheaded-block-31",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/909",
+   "ids": [],
+   "bindingSha256": "86997f20b52ab0d7de24e7a54562995a88d834311b46cbd3fe2804c60e59bb03",
+   "targetUnitDigest": "872e36adb904d7de53366a46ce523413a6460409a990194cefc392bc5edd90d7",
+   "targetAnchor": "unheaded-block-32",
+   "targetOwner": "docs/platform/agent-confinement/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/91",
+   "ids": [],
+   "bindingSha256": "c6a72ad99f341df82e9c8a06f12711f2746faeb076929aacf1957abad2d90506",
+   "targetUnitDigest": "ddc3502e29bc7492ee8f2807118f946bb770b2d769474d8e06487cd04edf4072",
+   "targetAnchor": "tham-chi\u1ebfu",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/910",
+   "ids": [],
+   "bindingSha256": "3e69dfd901fc7d25dd9c8af09b0f3dca0483598ada9a77ce5b1d2ba44e8cf869",
+   "targetUnitDigest": "d254eef730f5414dcdf6f6c748ad5579f3557e842c7234930d5b503e195fff16",
+   "targetAnchor": "6-canonical-contracts",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/911",
+   "ids": [],
+   "bindingSha256": "77a33c1bfc07758f460616602df9fe9f7108f1b9c2c63e6fa33ec7a750fae04e",
+   "targetUnitDigest": "9a4c1352f50e0f212ffcd376be7eb6daf6aaa184187043e0aa977c91c04ddbd0",
+   "targetAnchor": "unheaded-block-3",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/912",
+   "ids": [],
+   "bindingSha256": "913110f8c751d869b6a0cd5689cc1b36100a5ee49afa08d547add436fc5f0618",
+   "targetUnitDigest": "cf864e273a4652744a19ede737cb847431f5dbb4092c029a5e65089030ee147c",
+   "targetAnchor": "61-confinementpolicy",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/913",
+   "ids": [],
+   "bindingSha256": "69113035a5437431a1cf6994ce1c69355e70e0509c9c70e67e4a14851465f249",
+   "targetUnitDigest": "144306fc23422ced2d9f4ce6ea50de58d300c00160f2d1a952e8794165f41364",
+   "targetAnchor": "unheaded-block-4",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/914",
+   "ids": [],
+   "bindingSha256": "10dbcac8273a8bd61a84ac163c6f35050b1bdec7fa859341751ffd23a64bb54c",
+   "targetUnitDigest": "82974998a4d9a5d1cd113cf5bc697a1493802a4d5b42fc4a29efe62f682794dd",
+   "targetAnchor": "unheaded-block-5",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/915",
+   "ids": [],
+   "bindingSha256": "27ffeea31685fd18c4d45efc1c9e65c78d39dc2818f955cb13de5cc49c52f0e2",
+   "targetUnitDigest": "c5fed59ea82e4179183d322c4994aa0dd9fe6fec922ac6c75c739b0cb993f482",
+   "targetAnchor": "unheaded-block-6",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/916",
+   "ids": [],
+   "bindingSha256": "afe59e511ffac2dba6054c672b8de7e21adec4695e47b41cde4966542cb04758",
+   "targetUnitDigest": "174065be7731e065d49df8831765e8b1621624e5e9c4147b65fc3f3d59bef97e",
+   "targetAnchor": "unheaded-block-7",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/917",
+   "ids": [],
+   "bindingSha256": "0a975cb2eb2ca5be66c4b719dfcd7056f45b83d26f4ecf8fa5603e96a0b1721b",
+   "targetUnitDigest": "77d2d471883052250200ab7600172e75a4629ddcc35862fd36dad5c808926384",
+   "targetAnchor": "unheaded-block-8",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/918",
+   "ids": [],
+   "bindingSha256": "f49a592279d4296eda6aae151702e60c9a526eff352c3c53d2eb7fc2b422a4aa",
+   "targetUnitDigest": "34e25b534cf851fdcca5ee576a24508f5e64e3ce2202bb48088a3827822cce87",
+   "targetAnchor": "unheaded-block-9",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/919",
+   "ids": [],
+   "bindingSha256": "1d4e61df7562ca451d08d83fc15f242ac880e042a2aad9113757688e4526dfeb",
+   "targetUnitDigest": "e8c7201602b1661b1d1c2d0bcd200de348fa9f5ca2db3942a9cdedd5138b47e0",
+   "targetAnchor": "62-n\u01a1i-\u0111\u1eb7t-policy",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/92",
+   "ids": [],
+   "bindingSha256": "47f5bc18559ac930ff3c92e716373bfde9ccdb390b1b149861fdf045f17a0457",
+   "targetUnitDigest": "a39c51ed905b2929f86840c22c96d380d31ab86920b051ca02025821dd85600a",
+   "targetAnchor": "unheaded-block-119",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/920",
+   "ids": [],
+   "bindingSha256": "8b95c8bbb96ed5fa04c9bb77e57768b55b257363a2dbf393a7d949eb735abe35",
+   "targetUnitDigest": "ac0a0c84105227bcfd944b8130d6b3d17154e9c4e22729a3fd5d1ac6a6eeb211",
+   "targetAnchor": "unheaded-block-10",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/921",
+   "ids": [],
+   "bindingSha256": "19105d10b5abe7b6056ad375fecbef65fc1dd21548866f685512ba03df33b8aa",
+   "targetUnitDigest": "7b98849030627dd574a65bdc66dcae626816913bf146d7d0563ffe208e741bba",
+   "targetAnchor": "unheaded-block-11",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/922",
+   "ids": [],
+   "bindingSha256": "0b4d81c2bba581c00d4f36069f62ccde911465ddf2705d25b50e9cde4f947d11",
+   "targetUnitDigest": "6d3a53fec3b2db3ccb67a44456cfa49581dc393b660909021f2ce70797bbb15e",
+   "targetAnchor": "unheaded-block-12",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/923",
+   "ids": [],
+   "bindingSha256": "77aaea238c3ff5a04c23306994da590500f2cfa1f8547a2ec1b9b9592d92d4d0",
+   "targetUnitDigest": "6d04aec7233a3abca178f1faeb3165af28667ce83052b987786fbbe4f382119c",
+   "targetAnchor": "unheaded-block-13",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/924",
+   "ids": [],
+   "bindingSha256": "0f398a94e73db21b357ee7a1fec6a0bbdf08650e7ed3c6d1b296a20a896cb868",
+   "targetUnitDigest": "aef1e73b22aa08d3ade14ec51cac96b5f2b8011355459ddc3fa512d0550748cc",
+   "targetAnchor": "unheaded-block-14",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/925",
+   "ids": [],
+   "bindingSha256": "8547e31ee9a1870be651642493322edae27b5b043d598750656329be026809d3",
+   "targetUnitDigest": "36e771f87aee65315d67207605e953c9e01114e3a44901731a7da9a5a6f7d97c",
+   "targetAnchor": "unheaded-block-15",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/926",
+   "ids": [],
+   "bindingSha256": "7284795bfa584d44bc8f8f6be953f913749ee21443beb6eb62bdc9b44acd109f",
+   "targetUnitDigest": "46511410e541ae7f3d505f24b96474a308661046620525bdc78b0132632503ac",
+   "targetAnchor": "unheaded-block-16",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/927",
+   "ids": [],
+   "bindingSha256": "656e223365ab42da9c191dd71fd71d99fdf1d09eaf584e6d172cc02791bcbdc1",
+   "targetUnitDigest": "b4384b488cab8d5b506feb676b0806a3a4359417a76025ae33e510f669118d5b",
+   "targetAnchor": "unheaded-block-17",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/928",
+   "ids": [],
+   "bindingSha256": "a1b0179cda84ed075e46a95f17c05abb7ac88797828a2d096718056b26759726",
+   "targetUnitDigest": "a8993901e0112ac1a6abc97ad6af873a631e01d29de08abe7603f4857dea40bc",
+   "targetAnchor": "unheaded-block-18",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/929",
+   "ids": [],
+   "bindingSha256": "da079897d287ebaa8f7e2777eee9d5c802f443eb94808862865cb98468aec6fa",
+   "targetUnitDigest": "b3e564641ff23cbde2e94d06283e58ae0ddefcbcc0928d31b2aa18c1b6c4d4b8",
+   "targetAnchor": "unheaded-block-19",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/93",
+   "ids": [],
+   "bindingSha256": "8995b09d8dfc26564aa81be12af5f9ee21d19f4f37c7206b5c5eeeaf942e9667",
+   "targetUnitDigest": "651b88b459a07df17476ee6f4a56a8b0b315965bf2213132851503b7461a8a22",
+   "targetAnchor": "0036-kho\u00e1-rul11-t\u00f9m-lum-kh\u00f4ng-ph\u1ea3i-n\u1eb7ng-t\u00f9m-lum-kh\u00f4ng-ph\u1ea3i-n\u1eb7ng",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/930",
+   "ids": [],
+   "bindingSha256": "b428b5907a89ab7bafbcacc975de2c40ce62be3530b47a0c2f4039d7314f9e3b",
+   "targetUnitDigest": "5f56c09a0921d072e749320c929cf1ee3801280e3288ce0f388accb47e6f399c",
+   "targetAnchor": "unheaded-block-20",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/931",
+   "ids": [],
+   "bindingSha256": "3f3b9582b5e375d28ea8cf96bc4c96945bcbc13b39c92780cc37e78d6fe4b383",
+   "targetUnitDigest": "d8a9fb19101ac0e03201ba2cc768c704b2aa263798aef9c98f10712f587e67f6",
+   "targetAnchor": "unheaded-block-21",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/932",
+   "ids": [],
+   "bindingSha256": "fd3cb098e2b9fd59f48745d5e4c5a1585ef72bc512bf911c035ec4d3396e4ae4",
+   "targetUnitDigest": "066ac1063e1440ff187b3549a9a0767e3a73e0d8ed51d563746d3674f1b75adf",
+   "targetAnchor": "unheaded-block-22",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/933",
+   "ids": [],
+   "bindingSha256": "3f8f4354d2b56e001d7f9c2cd60d096075dc39298e136ea19c441f00907fea03",
+   "targetUnitDigest": "3cef3c7a3f285561a7ddffb1c2c51186af1674c44611658a12b638f5337dcaf1",
+   "targetAnchor": "unheaded-block-23",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/934",
+   "ids": [],
+   "bindingSha256": "de31f5ff619725fc688c709ae71b730e4726a1a7219336adc09f2bdaa9c81d6d",
+   "targetUnitDigest": "1c88074cc7336dc83b3ad38729360fe21f7dd439060af7a287bc4fd0bb7f5e47",
+   "targetAnchor": "unheaded-block-24",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/935",
+   "ids": [],
+   "bindingSha256": "61638f47d0a12c4be963460ff3ffde89ef99e26c85c13676eaf9327a0409b62d",
+   "targetUnitDigest": "c979fe19764ba16590b0f9f551bc05298d26b38d39ef9ecd18c354b7aa5311c6",
+   "targetAnchor": "unheaded-block-25",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/936",
+   "ids": [],
+   "bindingSha256": "903cff3602a5fc9763c8a274b1257ba705c76c1525038d060408c69933e36c6e",
+   "targetUnitDigest": "31662baa9e369dcb6cf5055ca1889e2036714c0505a740d883b0ccd1cd13abd6",
+   "targetAnchor": "unheaded-block-26",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/937",
+   "ids": [],
+   "bindingSha256": "8edad86e81f765890638fa1d0dd559a6b898e3ee26b08d3ca50b32d0fa360087",
+   "targetUnitDigest": "6e03ccb65264e6643bf7207bc062fa8805c7576c3ee873d95818f0e06730f263",
+   "targetAnchor": "unheaded-block-27",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/938",
+   "ids": [],
+   "bindingSha256": "34199982fce4d39aaa795eeecbd92acebc9e98c4381e949440722ee5a69ed4ee",
+   "targetUnitDigest": "41e420ab27f84a409a736afe94d48d53b7189944b2e8eab354d5808f1928d87e",
+   "targetAnchor": "unheaded-block-28",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/939",
+   "ids": [],
+   "bindingSha256": "a5aad84ac2be02c34763641e893101dc882537748a2a90c4a89e25d900e686bf",
+   "targetUnitDigest": "05c490af337290c284cdda8846ae5ae6c55ba87783b627d5565966fbb32ff22c",
+   "targetAnchor": "unheaded-block-29",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/94",
+   "ids": [],
+   "bindingSha256": "109b75b07b36b5a53bd91e99542deb3f0e0e6fc87023d1208e34995fec216b42",
+   "targetUnitDigest": "4b4d5cf6bb2e5e1f7564aa2318a23d9d22d03ca834bacfd98d06a66247487396",
+   "targetAnchor": "unheaded-block-120",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/940",
+   "ids": [],
+   "bindingSha256": "713d839715659d34014e5baeb29436334c1474a9a319e5c145096abf8078e915",
+   "targetUnitDigest": "6881955b6321c52b6c9feb850cdd00c7205c99aa02bdd18025a771e908b91003",
+   "targetAnchor": "621-trust-boundary-c\u1ee7a-backend-registry",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/941",
+   "ids": [],
+   "bindingSha256": "ed4e112c948fc4b1a6ca457f0b156d022d4af93a2fbe45a289968499289c61af",
+   "targetUnitDigest": "8d1d0290f08fff8a37ca8c4df31c7e374a99a8a734dfed30635740417f6b2449",
+   "targetAnchor": "unheaded-block-30",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/942",
+   "ids": [],
+   "bindingSha256": "e1f43fb2ad591aad47a8665a8ae96d4e34f32f3dde8ee54c5ff6b2e868805ea2",
+   "targetUnitDigest": "b23088a2e289401fe24b97ed2e1a116c59e6fbf44c5a2a23addf2a1e61ff87c3",
+   "targetAnchor": "unheaded-block-31",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/943",
+   "ids": [],
+   "bindingSha256": "4e6f49d008faadbeae9b1aa6683a700f0b1b11c0c4916e1e8159ac21ecbd9deb",
+   "targetUnitDigest": "56dd7eb62d06c283727cf88865d888ad8e0cb8d4d4b073794be71e2af4fc85bd",
+   "targetAnchor": "unheaded-block-32",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/944",
+   "ids": [],
+   "bindingSha256": "700796820d174493439cd97ec5622fe2eb6cdc2f14bb3db3bc702cf1b0995ccb",
+   "targetUnitDigest": "5e9e62faae2fce40894b8d475702c842c54249bb1f25f3183a8584c4fb549ba4",
+   "targetAnchor": "unheaded-block-33",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/945",
+   "ids": [],
+   "bindingSha256": "ad7a954ae63084b66b1032485c8160ba5cd7ecf2a03d1e24d01deae1cd64059f",
+   "targetUnitDigest": "f74a150d52beabb3e5c3a6f2ebfbb7566a43287c85ae6d944b76c692925466cb",
+   "targetAnchor": "unheaded-block-34",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/946",
+   "ids": [],
+   "bindingSha256": "8fc92386b44ca903dda53e11879b8918a86cc378bb12b92e63da8f260eb2ce32",
+   "targetUnitDigest": "88261031ef650f143ae4ba47fd8c1a7453082b83e92ceb8f25dd1174ccf52acf",
+   "targetAnchor": "unheaded-block-35",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/947",
+   "ids": [],
+   "bindingSha256": "abe99b8747a8b498dd0c0261b2aae16ab2fc4215b809dc8de89aab82a309ff8e",
+   "targetUnitDigest": "c8b981d3fe9349795218066abe6fc97123368dc6b73b184748f04af9c504c574",
+   "targetAnchor": "unheaded-block-36",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/948",
+   "ids": [],
+   "bindingSha256": "eaa908303ff6798385c4d3fb0c9ecc451c3f17fc1b3c55bc8193da2d6bc5b916",
+   "targetUnitDigest": "0c228c628bd3d18adc97e83532fb52d588c5cee0d5835e6211155c37de3568fd",
+   "targetAnchor": "unheaded-block-37",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/949",
+   "ids": [],
+   "bindingSha256": "17d40cfdd371572bff92976e7c9643ef35159e6aad86d485dcc9dc4c0c703003",
+   "targetUnitDigest": "08f5437a2edf680768899a27c79fe45abcb69a0fb79d53529243f812b1f788d5",
+   "targetAnchor": "unheaded-block-38",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/95",
+   "ids": [],
+   "bindingSha256": "2d61c6a7dd2ce2b0016b148d1739a343bfa9defe613b3f2688bd17488dcdea85",
+   "targetUnitDigest": "5c6c70a7edaf5e34ba4a41fffb5a66abc94d09708bb844e3191d67b24a7cade6",
+   "targetAnchor": "b\u1ed1i-c\u1ea3nh-4",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/950",
+   "ids": [],
+   "bindingSha256": "5d3468b98fa105374ccadccd65304a3a4a8923cdb48849f059d9a65fb221bbdc",
+   "targetUnitDigest": "72f093595d525174c341571c7c6b2ba780f6865fbf4b897c68f446e3152cc330",
+   "targetAnchor": "63-confinementrequest",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/951",
+   "ids": [],
+   "bindingSha256": "92be6afff91aeef50aab803106667c8dbc6b086fce9ddb5c2b989d78082e4dde",
+   "targetUnitDigest": "243f9c7a472a472994fb186884a60bba0663fa2a88ca22ec227b73d82a8a8379",
+   "targetAnchor": "unheaded-block-39",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/952",
+   "ids": [],
+   "bindingSha256": "25bb81b6c1bc64701373a0f9fabeb8df676e7f17bf589e4c3cd728d5c6344150",
+   "targetUnitDigest": "b9cd3c2a8b12d39371ea0530bcee8ebfe91b503ed4eba9a7b163277746524c5c",
+   "targetAnchor": "unheaded-block-40",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/953",
+   "ids": [],
+   "bindingSha256": "7c327cbef5b95ca8b55307b922e2277154622c71febd570170606471b4d9a68d",
+   "targetUnitDigest": "93e2804980576701a4a72931a954008cf6bdd673e36939d85ef2414581623855",
+   "targetAnchor": "unheaded-block-41",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/954",
+   "ids": [],
+   "bindingSha256": "cde120e81b58de1f2b8170cb6f5ccbb1112eeb10cc66371a37f56aaf7ce95836",
+   "targetUnitDigest": "d25458887a8603d248604aaf1ef55ca94fc14a5dbea5d5631db83950840ec492",
+   "targetAnchor": "unheaded-block-42",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/955",
+   "ids": [],
+   "bindingSha256": "b0adab4493827e44761c695b89a3da9ae2db3faacfee645ac73468ad90a5fafe",
+   "targetUnitDigest": "bc442418deabb38062109ee413f6cdbce852c513665fb09388458180787834e0",
+   "targetAnchor": "unheaded-block-43",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/956",
+   "ids": [],
+   "bindingSha256": "8600c5019b8e5d725f289020b71f9711cd00eae1b9eb7ab7ac0b52ed540691b8",
+   "targetUnitDigest": "0b3fe05e83b37073480e24dad16055a7cf52ca7997ad4d1d2a4a8aec05587a1f",
+   "targetAnchor": "unheaded-block-44",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/957",
+   "ids": [],
+   "bindingSha256": "4df93d58b8b7530d9bb6979fa14affec5f16cd3c19384006a9c4bec9d793871b",
+   "targetUnitDigest": "781ad161936829706a9cb0681013fd165c5c218f7e4b509f617c3035147d06e6",
+   "targetAnchor": "unheaded-block-45",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/958",
+   "ids": [],
+   "bindingSha256": "1602a32e513025831cb75927e192a3b61bba40b804fc98dd493a493f152f581b",
+   "targetUnitDigest": "21f17ef9f28dce5a128ccff3b509f4f1ef314f516665c113fc072cd78ea5c343",
+   "targetAnchor": "unheaded-block-46",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/959",
+   "ids": [],
+   "bindingSha256": "b2f1e2ddb0aa43850a794bfaef2463a8a69368467af39ad12e0ac972550c563e",
+   "targetUnitDigest": "8928a0f81055cbe7077d99e75a47b1514fea1b6461e357cbbd48b056a2b9a864",
+   "targetAnchor": "64-confinementplan",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/96",
+   "ids": [],
+   "bindingSha256": "aed67af322be223d67510a8b054be78922855f2a92492046e1c90fe1a4fe34ec",
+   "targetUnitDigest": "389021fce1197e6e5b4a365aa70e700df61f10bed7fc52abc2805f124b85b268",
+   "targetAnchor": "unheaded-block-121",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/960",
+   "ids": [],
+   "bindingSha256": "45082e97fb63f9d87a22770c96201529293de81ecba6e251afe87d023421e52a",
+   "targetUnitDigest": "5eafc3ef3beffaecc2bacf329d0b69051d295685302d9410ef256ccef5f2392b",
+   "targetAnchor": "unheaded-block-47",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/961",
+   "ids": [],
+   "bindingSha256": "ccbf802bce7c11c057464486254ce0baaaff3ec178122a097cab6cb97beedc3a",
+   "targetUnitDigest": "69dceaac752e861a29e869a905561a77730ad654a1447daf35ae69028dcf12c3",
+   "targetAnchor": "unheaded-block-48",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/962",
+   "ids": [],
+   "bindingSha256": "19708b3c138728ff44317e90a3986c87680970a4653449538b6fd3a818c6fa59",
+   "targetUnitDigest": "55919a3c62b46ee8432b975ae44c4fcd01074f7403f6e627f72500559d1a1128",
+   "targetAnchor": "unheaded-block-49",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/963",
+   "ids": [],
+   "bindingSha256": "8290f432f4e114c83e1be1de9e66861ef4acec9f37e6e299ea624889514afa66",
+   "targetUnitDigest": "b166dfcc0268ae16b1c802d447fae76e3fcf211d53db89d771658ac6f06fe381",
+   "targetAnchor": "unheaded-block-50",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/964",
+   "ids": [],
+   "bindingSha256": "6a5f6889e28b4b15ef8bccf208414d2d067f6a01f67f2676462c3f61fad576e1",
+   "targetUnitDigest": "c55f6ec48cf55337094638acaca6e109f0d37c78715262afa2f18b9f24040c46",
+   "targetAnchor": "unheaded-block-51",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/965",
+   "ids": [],
+   "bindingSha256": "06b5761bcc8a1fe3c84f60415f54f1cf6d04b4ccfbb29e7da05a3268808ac0d3",
+   "targetUnitDigest": "e677af6cabda5ca88740aa698ea1f1c5742bcddab52c9c83946cd08a1de590a7",
+   "targetAnchor": "65-backend-port",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/966",
+   "ids": [],
+   "bindingSha256": "543cc3e1763f91209c1fe84384ddd7e0502c112af90883ddaa860bc7004b470c",
+   "targetUnitDigest": "7718d52080bcbfd8bb8f3fa0973b4049dd6b2a03ea35c45f7074b8b6367792c5",
+   "targetAnchor": "unheaded-block-52",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/967",
+   "ids": [],
+   "bindingSha256": "3098272e70582432c038a252039084d8841c379fb4a8fb83a220244d0c940202",
+   "targetUnitDigest": "e81a571e9b40f865f5f99d9059280046325b34ab251552aab97756381f5df132",
+   "targetAnchor": "unheaded-block-53",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/968",
+   "ids": [],
+   "bindingSha256": "927f9253c763b3ac41aa3b5c7ba45a396daf82c715d8d9a2124b4ff95b1e5953",
+   "targetUnitDigest": "046c553717b3b1b9f594a9befbd04ef2b033b5a4d266293ac583a2e2ff9d9140",
+   "targetAnchor": "unheaded-block-54",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/969",
+   "ids": [],
+   "bindingSha256": "de06e3fbb59a103bf4c7ddbdf52e0aaad15b15af85f6f27eb02f2c0cdc2cf5a0",
+   "targetUnitDigest": "7fe89045e3c2deaea6858de1a820ee4aa20aa4316e55cc36627a10e507f0d105",
+   "targetAnchor": "unheaded-block-55",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/97",
+   "ids": [],
+   "bindingSha256": "dd431d450feaf6cc105945d09ac289fbb7077d68fa86fee4bcb214671fca1899",
+   "targetUnitDigest": "74e9dde6d61646ac25bd0c13bc27bd59d6bd77ad24c52d6a20f486c95fdc180f",
+   "targetAnchor": "unheaded-block-122",
+   "targetOwner": "docs/platform/platform-foundations.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/970",
+   "ids": [],
+   "bindingSha256": "181d93ee305fece8a033e1f6095f2a8dc8a2ad1c4fca55eb21ebfbb55eff36e7",
+   "targetUnitDigest": "4b4b9501f14522ae5b83efb77c99bcf71e3005b6ae4e013aa1d4eb7509d21cd8",
+   "targetAnchor": "unheaded-block-56",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+   "pointer": "/bindingRefresh/971",
+   "ids": [],
+   "bindingSha256": "b2b4c6ff61d10172e9cf60c79748e3cd93122e1e0aeaee6fa4ed3f3b39e907cc",
+   "targetUnitDigest": "c314eefe918518a0ee39527d6f6eded3afd69107670c4461e71454e9dc6bce8e",
+   "targetAnchor": "unheaded-block-57",
+   "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/297",
+   "ids": [],
+   "bindingSha256": "f15f463490daa838ebb646314c96ececda01ceff5ef3109d5d0ed14b2a4e5e7c",
+   "targetUnitDigest": "034d4915c666e4babf5f93a783f969c247988df188e421fdbfbfd196729563ad",
+   "targetAnchor": "unheaded-block-3",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/298",
+   "ids": [],
+   "bindingSha256": "ac2f6e1c932097570178de5d07d3b39052cf767ce11e189b91283d94efacdeae",
+   "targetUnitDigest": "aff979f68c2e1db1cb8a0145902307cd523258005a2b720f3e867d94162b63ca",
+   "targetAnchor": "unheaded-block-4",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/299",
+   "ids": [],
+   "bindingSha256": "672b02b95829b216230b48c5a9150a89b2cf5cdb2009c6d19744104778ab92be",
+   "targetUnitDigest": "ea7e0c840ef8177842c0fd9a04cd7ee14c5f2125517d4db4d036ec9aab48013e",
+   "targetAnchor": "unheaded-block-5",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/300",
+   "ids": [],
+   "bindingSha256": "4ba1d7453745521ada6518ecfd0fca7be7a216f59efa221da0f9e578d473b7ad",
+   "targetUnitDigest": "55a0937658dd873ac813d042f9b4d69c2d6a23086e391be790080b3d8d7829b1",
+   "targetAnchor": "unheaded-block-6",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/301",
+   "ids": [],
+   "bindingSha256": "65e4bc09e3c8aadf3a5797c6dd401917e4c1691fe01f3758f6ebe91243fa5117",
+   "targetUnitDigest": "34babbf16cf5df45b6bc92288626eaede7ace6e806a1073c888031d12b1b4990",
+   "targetAnchor": "unheaded-block-7",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/302",
+   "ids": [],
+   "bindingSha256": "87be4b37f7011fcd5e8ff5c18beddffefcac90fcb014bb6decd2f6ce3de40b9e",
+   "targetUnitDigest": "7fb1a3e42058e0bbb5562c114f237128fa9b4ed108e307465a0bae1af522ee2a",
+   "targetAnchor": "unheaded-block-8",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/303",
+   "ids": [],
+   "bindingSha256": "90d14633a927a76dc25acd224acc17dd8d70516a6f427586bf9080a6b228c044",
+   "targetUnitDigest": "79c2372e010ec5e457627b44575dfe8d1b19ee00e03efdd5ba30c31d9952da7f",
+   "targetAnchor": "unheaded-block-9",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/304",
+   "ids": [],
+   "bindingSha256": "2dd7af3820c05e7ab086e08b0fabeedf38dcf31151415c54ae9991c03d080ce3",
+   "targetUnitDigest": "99a541bc6f36182ac4a91cdcac764594c365dc469fd8d8bbde4db9e9c2674bb8",
+   "targetAnchor": "unheaded-block-10",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/305",
+   "ids": [],
+   "bindingSha256": "00c37fb15dbf90f48ac708b9812af1838709003749472eb5d61453e406d7f4e7",
+   "targetUnitDigest": "f463b6fbd2e614e0aa64f22eced774f6b683b3a1e2a314157d6fe1a5a12666cf",
+   "targetAnchor": "unheaded-block-11",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/306",
+   "ids": [],
+   "bindingSha256": "0850deca9bba99a8da838b9d0eda1ca4cc0e1f6f2d04e442fc76069b62d47a86",
+   "targetUnitDigest": "1280ba5ea25d36262e0349ea7ff0ca46bba2371cbebb3e40f2faca98da4ba9dd",
+   "targetAnchor": "unheaded-block-12",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/307",
+   "ids": [],
+   "bindingSha256": "33138d826fdc8dfded93d805375efe4a358f02a591a9236145eecfa539d6aa59",
+   "targetUnitDigest": "1d332459407c2e65a2c3e0364f0cb6414303f3e7e7bf6ee4b95cbed6b0acdf22",
+   "targetAnchor": "unheaded-block-13",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/308",
+   "ids": [],
+   "bindingSha256": "c5ff15e4c248afb32eab55a504581fc628841a638058f90384c449e6ed055fc4",
+   "targetUnitDigest": "48553ccc173f80cfb16cc54dd22483435bdba0a592f69d2afe0f177eb9c983ae",
+   "targetAnchor": "unheaded-block-14",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/309",
+   "ids": [],
+   "bindingSha256": "a786d2a044ff6ef64dc1d835c356795acb88360e3965ce8eb55396f83dec08a0",
+   "targetUnitDigest": "0f048b9698aa61548e372ead489d136b83fdc63e258e7d4e7524d220ee9b32b8",
+   "targetAnchor": "unheaded-block-15",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/310",
+   "ids": [],
+   "bindingSha256": "6fec6fca481547aa1298544fffd394eb2c414d2b5d5847299f04a5f14974692b",
+   "targetUnitDigest": "29fe8f4f3fe14b42e70b1c6a7949ae17d870b7cbc7be6e70af100c6afd4b0ca5",
+   "targetAnchor": "unheaded-block-16",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/311",
+   "ids": [],
+   "bindingSha256": "33e3f0d8f70c4cdd236a0aea6c744e8fca831df7a9f89944c0045117fa940b55",
+   "targetUnitDigest": "12f1aae66370fa048c2a63eecfcd2587179c6b182ab5e4a0cd1f316f6d9af3c7",
+   "targetAnchor": "unheaded-block-17",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/312",
+   "ids": [],
+   "bindingSha256": "33179596649f987ba113b8f0be68734f1ddb6020c0213ff0dd58078b055e9d2a",
+   "targetUnitDigest": "825db07080cc9922bb6f025ab15ef9d6faf796d2c468a4339424330c03d029ec",
+   "targetAnchor": "unheaded-block-18",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/313",
+   "ids": [],
+   "bindingSha256": "ab15b3e38b3243a35593d567b223a6d9ed66eab04a713908016e42ab152e1ad7",
+   "targetUnitDigest": "1bd394a71e80e1c33910db0c0c662f3cf0c9fd4c246f1b334aa02a93293cbb55",
+   "targetAnchor": "unheaded-block-19",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/314",
+   "ids": [],
+   "bindingSha256": "4c969cc2c88ed6de346c5f708833b6ebeaf9949596eb5a99aae7e7755bf4eed4",
+   "targetUnitDigest": "76e4802e53492552a4187c1aaad3086e3ae4cab2ec78c8c2a22f8c135747ca57",
+   "targetAnchor": "unheaded-block-20",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/315",
+   "ids": [],
+   "bindingSha256": "3c3d22cfc9ec7e99055bd776c62752567d261a8e6cd600bf89e544a104b579ba",
+   "targetUnitDigest": "a125c5c5d352bc96f9bffabe5e353d4f2bd8d13d7e45757c9418deb3be995fe1",
+   "targetAnchor": "unheaded-block-21",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/316",
+   "ids": [],
+   "bindingSha256": "a00cfc26ddd640ed9b0cafce827a0f5e7a542cbc1c32e2b012c4bbe5fa16f173",
+   "targetUnitDigest": "a6b27f4ebff7faacac68bf9cffa06caba948d51adee7a60414278166c189e253",
+   "targetAnchor": "unheaded-block-22",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/317",
+   "ids": [],
+   "bindingSha256": "2397ea8141ed9b2daf3468b44fd4bd7260071711db9131600aecb58885f052d3",
+   "targetUnitDigest": "da53402e3440c28a0650f5f6eb20f3ee43d465252d264782421e7d1edc16c181",
+   "targetAnchor": "unheaded-block-23",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/318",
+   "ids": [],
+   "bindingSha256": "3851772f74d38f959c4a6eaeb6c73ca53337b5f970259ca63ff681e7da79fec3",
+   "targetUnitDigest": "2d2be1df1e31b6859766c694473a2c3c3ed08df09655fafa72a635ebfb42bfbd",
+   "targetAnchor": "unheaded-block-24",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/319",
+   "ids": [],
+   "bindingSha256": "9629fad0da1b55ffc9872251166db8f75d77483a4157232afb615af6bd69f311",
+   "targetUnitDigest": "376cde44da7727d4ee3129c3cb7a4e5829b901522af2454e74595cb1c32f5df6",
+   "targetAnchor": "unheaded-block-25",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/320",
+   "ids": [],
+   "bindingSha256": "85bbdae89696ddf959f519509518cd9a7f97adc12cb779136dd78c06d8bb923b",
+   "targetUnitDigest": "ad10f4098a41a2e85339dcf98198c6d727b2fceab48ed4f6b44106b251f6824b",
+   "targetAnchor": "unheaded-block-26",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/321",
+   "ids": [],
+   "bindingSha256": "6ef7ef5068ad6cb736f084eb409e90007d3380f93a9ad2bea9d22dd585e62093",
+   "targetUnitDigest": "f9847f06343232d434e2efe0375e05c80c79d2520463320415a1024ba2aaa920",
+   "targetAnchor": "unheaded-block-27",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/322",
+   "ids": [],
+   "bindingSha256": "b6f35affa2a9caef74f090f0c9adab2ec730cebe31d947c9d52c35f33637b1da",
+   "targetUnitDigest": "b8b18dfe2891469cc46b5280a93288e3c04b71f45f0874dfd8f9f4634020524c",
+   "targetAnchor": "unheaded-block-28",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/323",
+   "ids": [],
+   "bindingSha256": "165f74b44ea1cf09ae774b62d145ca108507bce3163d83c66c857db6942278bf",
+   "targetUnitDigest": "99a541bc6f36182ac4a91cdcac764594c365dc469fd8d8bbde4db9e9c2674bb8",
+   "targetAnchor": "unheaded-block-29",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/324",
+   "ids": [],
+   "bindingSha256": "373cd15566df88590abd3c20c13709301c1e5891d874c5f8f827d85b29d55da7",
+   "targetUnitDigest": "b27809361339cbedc3ce0d9567b0af38ff2851809238980057582f5869c8f64b",
+   "targetAnchor": "unheaded-block-30",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/325",
+   "ids": [],
+   "bindingSha256": "d8657213376c9cfcebea47e06817497bebad135aa798c5703f3cff55026dd47d",
+   "targetUnitDigest": "ecef573ffe837822c7a2958fbb75b439a33f0b94bd33dfe0b5a1d4065ec9725f",
+   "targetAnchor": "unheaded-block-31",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/326",
+   "ids": [],
+   "bindingSha256": "75356e2a5cf8d4b7302b4863036f95cd6823e830f83067066b7c6bedd5258238",
+   "targetUnitDigest": "e7069eb8ad9dfff5cf0aae968211aae17965c002f8813973024b5f9a45180236",
+   "targetAnchor": "unheaded-block-32",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/327",
+   "ids": [],
+   "bindingSha256": "7ed63257301bea0080acbd80fe1e4af872478a57defa772c832d7ddfbb72d331",
+   "targetUnitDigest": "9099a6dc90c33b213bd015ebadffdebacfe6eb18875cd8d9ddc910f5eecbb8de",
+   "targetAnchor": "unheaded-block-33",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/328",
+   "ids": [],
+   "bindingSha256": "05936830f4038e7bb7f9b517f4562345971568b53e7d1fcb2208049979cd802d",
+   "targetUnitDigest": "5310f3c9e54d4d1ec3789d2c8712fc6ecb4c3a3d4caf5fb7c82015f3f2a344ea",
+   "targetAnchor": "unheaded-block-34",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/329",
+   "ids": [],
+   "bindingSha256": "f969ecd4a4529c2abfbe1892391e85689446338186a6b4db4ecc621d7c6f55ee",
+   "targetUnitDigest": "a77d286957b1682e939926a51be1194fe1e3458bf50d6334d3f0eea70868c429",
+   "targetAnchor": "unheaded-block-35",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/330",
+   "ids": [],
+   "bindingSha256": "0e9cd5105bace2d6a089ebb8c6acd9536857562378847273f55bf54eded75fdf",
+   "targetUnitDigest": "6017d0306a7a0617f2795470b68274460bbc959495b87210deabc98f99404298",
+   "targetAnchor": "unheaded-block-36",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/331",
+   "ids": [],
+   "bindingSha256": "a65bb1060ae114204ea1992cedb01b323d5ccc150753dcb08614b2bf7712ad7a",
+   "targetUnitDigest": "69b862faaabb62fd106dbbbf88f2b55a6edee7c3e6e1ebe05fd804822d6c6c38",
+   "targetAnchor": "unheaded-block-37",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/332",
+   "ids": [],
+   "bindingSha256": "fd47aa1eef575143d3a8cfc6b0a4444dc55847d011d5b5a8ec8ca31269fa220b",
+   "targetUnitDigest": "077537453f3503ec51c73f973badac53cedf764675d960d79d1ef1219fd69feb",
+   "targetAnchor": "unheaded-block-38",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/333",
+   "ids": [],
+   "bindingSha256": "6457332fe9bed8b60f226df4c859d2401c762b340f9cf3876df6c3024d3c2bbb",
+   "targetUnitDigest": "c48b59a9ff758d6149492773f7e2c9fc55e18f4561c14b1b4141f1b5a198de58",
+   "targetAnchor": "unheaded-block-39",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/334",
+   "ids": [],
+   "bindingSha256": "71900f2473f8618540845ccb8c3f69fc28d1dcf68ee00bc8c59169f2349863a7",
+   "targetUnitDigest": "756d562b9efb511d9fa3e4e945d3f8016c022e4d442073b1bc1b585bf167bd1b",
+   "targetAnchor": "unheaded-block-40",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/335",
+   "ids": [],
+   "bindingSha256": "b8c764f05e01956ac78cd9b90c14e38715b5996cebc66fc742a05a5b9d57a677",
+   "targetUnitDigest": "98280a0b6df3e11154c4b5cd4b7f82eb6efab64095abf845b25fa0392d043e6a",
+   "targetAnchor": "unheaded-block-41",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/336",
+   "ids": [],
+   "bindingSha256": "6a63e383bccbbd291b012198e699ab4386e5926b7cf01de059b1bad7de96f7c4",
+   "targetUnitDigest": "7b00c05ddfb683e94cb7218b60d7afdf37437fcb3ba4d5957e3f0fe84b4fc5ba",
+   "targetAnchor": "unheaded-block-42",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/337",
+   "ids": [],
+   "bindingSha256": "007c8d8ba4ddf8bf4d2604b5a304c4d339fdeae9691b4b988a5dae0716d2ad73",
+   "targetUnitDigest": "921faa33d4f5438516e9d3ffdf998cbba421be8d79f2a7f139d2d8db421d66bd",
+   "targetAnchor": "unheaded-block-43",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/338",
+   "ids": [],
+   "bindingSha256": "ba047415af1b3caa5e6bcfa4427c3b06f2c4b14979f389cb472458efe1262d4d",
+   "targetUnitDigest": "a33ee8c80cd83fa71e670ca60f33bcde7896c470a9d35fb0b17f10b3ad43e565",
+   "targetAnchor": "unheaded-block-44",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/339",
+   "ids": [],
+   "bindingSha256": "d2a3542dc136a5545ac06a51bf5bcaca08a1392f62cff1bcd790e7b31b3732d2",
+   "targetUnitDigest": "f1afb964edc2695673d22888b2f12de5b4218c7bbb68207836fd301e39e0fe08",
+   "targetAnchor": "unheaded-block-45",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/340",
+   "ids": [],
+   "bindingSha256": "bb1cfbc6af1c8eeac996d2dcaa99f8f1dc476c51b60c2a2d23801dca8027d0d3",
+   "targetUnitDigest": "80954ce9b25c6eb754982d0041218c0c1c985cdf50e64f119cd2d04ad2109067",
+   "targetAnchor": "unheaded-block-46",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/341",
+   "ids": [],
+   "bindingSha256": "50a9d75ac2a87e29853f4a5f2b62352f26d58b46c3c9928d21346edbdc79a980",
+   "targetUnitDigest": "c438f01c2fb0c6da306591d7136e11554781dfe2ca34afa7e735f9e43b3cc98e",
+   "targetAnchor": "unheaded-block-47",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/342",
+   "ids": [],
+   "bindingSha256": "17432c5ecc1813312c02c969ff3829941c0dbec28a39d80361dad0f5ad85745d",
+   "targetUnitDigest": "b55701918250f18e1c6dcc23698178cdf520da3128a7b3478f2b05a84db66261",
+   "targetAnchor": "unheaded-block-48",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/343",
+   "ids": [],
+   "bindingSha256": "de4b9061d36b7bb49184189f9d46d8158265a122fa9a9a612ecd8087cf470e2a",
+   "targetUnitDigest": "b55d20b13ec03d7ddcbf10ca247a66916610a8c429fee5873a0225aac01b2aa2",
+   "targetAnchor": "unheaded-block-49",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/344",
+   "ids": [],
+   "bindingSha256": "a2bcc6e91f6dafb46d64bb8ace75fbdc688d550bdc4a9288e9eda978f55845fe",
+   "targetUnitDigest": "6d045254010697e0e481a67dd6538ab7cb61cf5e4f465ac634e46c4f3e4bbbb0",
+   "targetAnchor": "unheaded-block-50",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/345",
+   "ids": [],
+   "bindingSha256": "1ad864e1507b7b9261900c33347c789a678b573e4f958ff7d46c75aa5258dc60",
+   "targetUnitDigest": "f31638737c60a3bbbf4aeb001089093b4718887963206c1c9ee23dd06c8b1554",
+   "targetAnchor": "unheaded-block-51",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/346",
+   "ids": [],
+   "bindingSha256": "c3919287a472c449c112bc55928677a52f739b2b655416102a9deb77b2be3369",
+   "targetUnitDigest": "0674097e44c4206ecb3eca922cefe57970b3716621510c5b94e91dbe7064bbaf",
+   "targetAnchor": "unheaded-block-52",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/347",
+   "ids": [],
+   "bindingSha256": "a65487b9c6aacd51cf3a43dfebf3e97f88b40cde8239db2ce1e3de00ffe2bb49",
+   "targetUnitDigest": "4bb739e6e32c58b24146606553425779c821fdb566aabfd97ff35fb6910dbe63",
+   "targetAnchor": "unheaded-block-53",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/348",
+   "ids": [],
+   "bindingSha256": "85545d7276105f504b361fa2aa6cff5119848e547b24ff073712b1bda9a224dd",
+   "targetUnitDigest": "c7ff2c6a52cbb5cf67f0752b801d20afac23947b8c753245bb6b1f001e06b1a5",
+   "targetAnchor": "unheaded-block-54",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/349",
+   "ids": [],
+   "bindingSha256": "478f34281971d0e77ec3c82debe55027a37f44604d436fe5a80bf033c03a0764",
+   "targetUnitDigest": "04c8ba200f9e5090de4f21bdcf0aad8ad9c2f38243bb047c606dbb9f82dd527b",
+   "targetAnchor": "unheaded-block-55",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/350",
+   "ids": [],
+   "bindingSha256": "36b3c8d490f73e2f0f0a8fad05688b85e7fe9ead6b856185842471b2369166e8",
+   "targetUnitDigest": "0c4b5ddcde02b724f5bbc32982fa03b14eafdc78a6bc3a247a82379ea6ef7b61",
+   "targetAnchor": "unheaded-block-56",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/351",
+   "ids": [],
+   "bindingSha256": "cd3c0c7055ee17d37ce99463d1d84906dc80843b672e3119938f72d03b267f49",
+   "targetUnitDigest": "5f85fc9702eae2d68c051c7e6c59dedcfc48ef5feeccc9137b6e3ee7b42ef5c9",
+   "targetAnchor": "unheaded-block-57",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/352",
+   "ids": [],
+   "bindingSha256": "f145ba136a1241bbdf9535e1ca9dd18ee7d894555d10c8cb6b945c391a51a4a0",
+   "targetUnitDigest": "da2912b239898abbf136030386f6fdd052db5437552ab4bcc5c888633d5c4241",
+   "targetAnchor": "unheaded-block-58",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/353",
+   "ids": [],
+   "bindingSha256": "9c706420cb8731cdc70c79320eda2e04c0cc22b6c45aede7bba6b00d802bb7c6",
+   "targetUnitDigest": "8575adc4f01fe5f14ae5440a47806f126bcf15b22e538df31e3d179c9f368c9e",
+   "targetAnchor": "unheaded-block-59",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/354",
+   "ids": [],
+   "bindingSha256": "866c32af5b66226f587366f9bb14079bca9a32e3b46653cd60d39249c6323f4e",
+   "targetUnitDigest": "faad692cb74eddb36df0a0b0c7fae8be1e1860a0813afaf985f146b00b943dbd",
+   "targetAnchor": "unheaded-block-60",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/355",
+   "ids": [],
+   "bindingSha256": "412ff12f6db142f00b4d650874c1063ee28a01f8d8116bfa75b8f3affe3d2551",
+   "targetUnitDigest": "ecf4c5edb1fbf70ebb931033de4526a643b76c0298d2c00478e245d582d8466b",
+   "targetAnchor": "unheaded-block-61",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/356",
+   "ids": [],
+   "bindingSha256": "e4cce93fdff838584533dac065941f659e41ebebe2629447284554171f977de4",
+   "targetUnitDigest": "eccd52b5ebaf56a67a69e541d13d002917b71d4486aa7a5ab824514f7831ab9f",
+   "targetAnchor": "unheaded-block-62",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/357",
+   "ids": [],
+   "bindingSha256": "2cc9078ffec1eaee5ef37bf3276ed462049db1e220b2ca5850c6d8004d8e2d8b",
+   "targetUnitDigest": "c654446c29273640daaee1c4d8ac7d659ae45a868135bd7f3e91af07c6cd4b10",
+   "targetAnchor": "unheaded-block-63",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/358",
+   "ids": [],
+   "bindingSha256": "1015aeae9be257cfda5650f5ea5ee42a1b4e67b9b7c963353ab698de5997aa06",
+   "targetUnitDigest": "a18d67904c5ac0d260cd63ebf8a6704131650f3f3a7da82ba920c0a59b445d14",
+   "targetAnchor": "unheaded-block-64",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/359",
+   "ids": [],
+   "bindingSha256": "46a9dc1cfafac44dceb36f71f953008047d1eca60c94db3c69a02b1d3d554054",
+   "targetUnitDigest": "d105b260a61023e18fdf8bf13324960820dcbccf389acf5e79739b7a5f5db6d0",
+   "targetAnchor": "unheaded-block-65",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/360",
+   "ids": [],
+   "bindingSha256": "e15714c4b55615c3086e5ec6cd54818d730c455d4fd618e815580f87ab3d29ec",
+   "targetUnitDigest": "6ad5f05ee8350b77bbaf6778188e60e26cbfaab535c2893c0b06452239a2295a",
+   "targetAnchor": "unheaded-block-66",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/361",
+   "ids": [],
+   "bindingSha256": "b9b5296b533a2b31067358e44b78fe3e467fd147ba569cb4d1ad0392b5b925b5",
+   "targetUnitDigest": "b930b7ebf7e846e9c95c2df7ff4c6b474cddbad2e532b6a70d56ad540ba9ad15",
+   "targetAnchor": "unheaded-block-67",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/362",
+   "ids": [],
+   "bindingSha256": "10c3fdfb72cb154f03d5918d6a1ad933f4f24db73317a3791868c55813250566",
+   "targetUnitDigest": "aac8873662375624bdde9a7ec2f1ab5424fafec81cf632380b17c1184bcb5105",
+   "targetAnchor": "unheaded-block-68",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+   "pointer": "/unitCarries/363",
+   "ids": [],
+   "bindingSha256": "dee8fe11cd448e0cc138456b31b6a05a8b2611e9e85dd7cd8210d7752ce0030d",
+   "targetUnitDigest": "b8b9e08c1bafe5d0746c6bae3c20a08c18a59f1a5febddc9f0cdcf07c0339864",
+   "targetAnchor": "unheaded-block-69",
+   "targetOwner": "docs/platform/work-state/contracts/knowledge-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/0",
+   "ids": [
+    "claim_e7f7734953cc2e9478d81719b046f0cc"
+   ],
+   "bindingSha256": "94ca1c088c3dd29a8d262512056ee360b19e4c1b7215c112f94690d5d75cdeda",
+   "targetUnitDigest": "03a0da5fd22a7227b1f996d39b3a6f7ae43a1a49bfaf061e1edb11774c09eee2",
+   "targetAnchor": "unheaded-block-87",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/1",
+   "ids": [
+    "claim_9138d3d0488e16d2eb4a0150ddd3b60f"
+   ],
+   "bindingSha256": "3569a730a8e576ad1ed5dd26acdaf862ce033bc8478b21f3acdb2d50e0134e9f",
+   "targetUnitDigest": "86f1d1773ee8d8e8784f7912f29ba493e083a2764d888ffc06e84715864e91f9",
+   "targetAnchor": "spec-distribution",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/10",
+   "ids": [
+    "claim_ac8cc5d1152e7a057ffbef1e804079aa"
+   ],
+   "bindingSha256": "6a42486f718084d2f9d872f349139880016db1f922873f42a01c4e20696d8a30",
+   "targetUnitDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+   "targetAnchor": "contributor-hooks-setup",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/11",
+   "ids": [
+    "claim_5c58459a3d4fb3c94d3d177ae5ff71ad"
+   ],
+   "bindingSha256": "9b2220421d80a589df3f4ff7ae7d9ed100f4221359d193658d04e0fab315edfb",
+   "targetUnitDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+   "targetAnchor": "unheaded-block-29",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/12",
+   "ids": [
+    "claim_2cca265eea57df2daf94c3b3876393f3"
+   ],
+   "bindingSha256": "1d57c8890917395dc13e16522cf3046288138a2282e866fba5c1d23b2336f13e",
+   "targetUnitDigest": "170ce67e010e1bc0f007c97c410db3aeb3f4af54ba6788c9a04f30b194614d34",
+   "targetAnchor": "setup",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/13",
+   "ids": [
+    "claim_40d8d8f06aaedbc16cdcc4f8603e6d09"
+   ],
+   "bindingSha256": "be36e2b1b4cf95730aebcd91b5734d6c4a9caa23bfc9414d0af574797714f057",
+   "targetUnitDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+   "targetAnchor": "doctor",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/14",
+   "ids": [
+    "claim_1b418e3e2ee62a83adc1420a4967de62"
+   ],
+   "bindingSha256": "91cb0a7ee757c66cb62710008b59337e2421e38641add8edb7a57baba6ffc48a",
+   "targetUnitDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+   "targetAnchor": "unheaded-block-31",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/15",
+   "ids": [
+    "claim_7120b40ec04026fbdb538c6454614709"
+   ],
+   "bindingSha256": "1c472dd56076e0d97b15d9808c92350ed6e70be5958d0b4e5ac0799db8e089b7",
+   "targetUnitDigest": "a6d34c55620f48713afb89fa7b97344e4b2041cf0cf93165cf6c3bbe657bc3ea",
+   "targetAnchor": "actors-access",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/16",
+   "ids": [
+    "claim_bc11bca870313f227b78bebe0f81d49a"
+   ],
+   "bindingSha256": "a3676e26ceb573a70cf19d86c2c36eea8bd02e442b150330bd5f5df0fb071b7f",
+   "targetUnitDigest": "8a7f8b1ec294e660bb2f226cadfbb2ce6fd85e6d65417ba4122b18bb2fc81825",
+   "targetAnchor": "unheaded-block-93",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/17",
+   "ids": [
+    "claim_7b2641076e23f0d2528c250d4e59cba2"
+   ],
+   "bindingSha256": "c3642c0d5da95013a627cb9231c717e57f86a365f7676d6428bc2722e5ccff35",
+   "targetUnitDigest": "66ec4b8568f3c061110d78146cf13062280b7eb8655d5d1bcb669cb47b07460d",
+   "targetAnchor": "business-rules",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/18",
+   "ids": [
+    "claim_8930ab9733374cfbb11470da79f610cf"
+   ],
+   "bindingSha256": "923e1ad5f8060cb6a7c7980d97aa0fd1ad0795ffccd8fdf3a1d6eca11a401c04",
+   "targetUnitDigest": "914e48925f5e42f4270598fcf5322dbfb5b2777fe26e0349a30c6c290ba2f08a",
+   "targetAnchor": "unheaded-block-94",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/19",
+   "ids": [
+    "claim_7932ee258c8d561f60718b34edc2d44a"
+   ],
+   "bindingSha256": "6b95a9c7e69d432ad12ad0e15764ea628e6638bdc5807a867be05d1ea8b259ac",
+   "targetUnitDigest": "cd11cb8c94cd0a27e819aa61df4a4f4fb2e32a83c7e0fd4066e27bc7cd22bb89",
+   "targetAnchor": "unheaded-block-95",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/2",
+   "ids": [
+    "claim_67a64ed4e0700ecab3cb28af6962195c"
+   ],
+   "bindingSha256": "2d363b43170e8708854b45a0e0ab8bc62ef1e5219854bb7c11af9716d3a50729",
+   "targetUnitDigest": "38e7467e63d434cad969f415699ed7a67abeaa8becb100975d091f9ad55a7074",
+   "targetAnchor": "unheaded-block-88",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/20",
+   "ids": [
+    "claim_797fb0be5db3c260c97745cd0894bec8"
+   ],
+   "bindingSha256": "44f3c488c83f035e01c5a35f4d14d741448a072d6f54e2a605a509a675e9eb34",
+   "targetUnitDigest": "70b3e24c7665deb086b89512653742923101d6225f10fe0b71857316abd91708",
+   "targetAnchor": "edge-cases-settled",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/21",
+   "ids": [
+    "claim_18420261f445f01acf39c262a9ce170c"
+   ],
+   "bindingSha256": "e38b74c6267c649eefcbb31392a5e684103f074a846783f3c8f9d9678c5ae783",
+   "targetUnitDigest": "3c9b4fc33a1e34edca18ff8772fa5723ac85887b6ed36b987245a612c5f6e06e",
+   "targetAnchor": "open-gaps",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/22",
+   "ids": [
+    "claim_4ef3a246eb6f72de0409c2cc711b6f7a"
+   ],
+   "bindingSha256": "0285ef4a91019fc908c5f37549ac8ecbbbddb1c5c8e32dec99560e22fae60a87",
+   "targetUnitDigest": "f2aa140aabef20a5a98af537527987721e90af6779c22a7a854dc6b9f0979b31",
+   "targetAnchor": "unheaded-block-106",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/23",
+   "ids": [
+    "claim_e7c9f593b4b15dfa15ae91707e9a64ec"
+   ],
+   "bindingSha256": "e752ed061a1cb7adb41a68d697d655c94510c13c890e608bce25ca78d710f6a3",
+   "targetUnitDigest": "291f58705fa5b9342b82921aa8ab5eb129462c0bb6c7320a817a6a70fbac6e74",
+   "targetAnchor": "unheaded-block-107",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/24",
+   "ids": [
+    "claim_d992e79d0cffb916c68bf73be5dd33d1"
+   ],
+   "bindingSha256": "8c5f099540f49b512b7e12a69050a438df2d80540dd0aa07b8a5e5f9bf694ac8",
+   "targetUnitDigest": "89ef28e9d464cbb1c6c1edb1b7fd5eaf494a10dc6b24f8af7d5be75ff6bd916d",
+   "targetAnchor": "visuals",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/25",
+   "ids": [
+    "claim_a84463023d9ac4e9ff86edae6ccd1bd4"
+   ],
+   "bindingSha256": "47e707f626bc0cd473bf16c787da0bebb76d318849a144fc9604f29297ee371a",
+   "targetUnitDigest": "84ea69d22b8a2aa754f14016550c25df1336715f9701bbfe4f0108195a852bb7",
+   "targetAnchor": "unheaded-block-108",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/29",
+   "ids": [
+    "claim_a1a323052194c5140b628b5f3861fa05"
+   ],
+   "bindingSha256": "9f110e93a66d7af4f9e94376009c50d05fc92af706936c276e70749a78e474ea",
+   "targetUnitDigest": "f9c90772c897f5be41cd3554d3810ef2641ec4dd7c3d3a415840d0b4eb06a4f6",
+   "targetAnchor": "l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/3",
+   "ids": [
+    "claim_906908e36bec4cc1428b304dee46bf65"
+   ],
+   "bindingSha256": "2f0f6c6b98f78347c8f84a27fee32d4865fa901d1dbfc72735e7ca770bc6b6ed",
+   "targetUnitDigest": "e633ae89d8b3f6aadd36c0fe352566ec1b9835923dafdc33731eda22da2867fa",
+   "targetAnchor": "entry-points-triggers",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/4",
+   "ids": [
+    "claim_8a26867c2037ac3caf4e9eaf2f4c9ec1"
+   ],
+   "bindingSha256": "8c2078de517fa7c1c09756503c205871d8f0fad6606e618369fc2ba3f574f2e2",
+   "targetUnitDigest": "2bceb305d29a7f8e789401b4cc799de05d744748eed33b9ba12c4dacaaf5b0fa",
+   "targetAnchor": "unheaded-block-89",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/5",
+   "ids": [
+    "claim_35e55882f79d7ab6b9435f03982beba3"
+   ],
+   "bindingSha256": "3e49d47ef604d65e7765ddaba8789ad16408a60390662546a3b29a1b44467b80",
+   "targetUnitDigest": "230097c6afa64e84d3eece3ece7407471e6a1bb0576fa4cd4dc5afe77750e6e1",
+   "targetAnchor": "behaviors-operations",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/6",
+   "ids": [
+    "claim_2a9767fa3d005bdcd288d3432e88700d"
+   ],
+   "bindingSha256": "92c937ab9c5ef66c3db06c2858c19a6cdde22bfb78876857f01de198c0af19e7",
+   "targetUnitDigest": "b7d85aac05e3f18b60cac3e1be0688b3d4aa516ab673a004c43f09d42acf2f77",
+   "targetAnchor": "install",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/7",
+   "ids": [
+    "claim_391af7258478be2a89286128fcd86063"
+   ],
+   "bindingSha256": "65bf54dd598146378b824fc99839b9771101ddf697ffea50127a3df6e0c18535",
+   "targetUnitDigest": "ddee3916eeb71a2e1df124e5b3b2737128f48fa21494c2720fd4284db23a9941",
+   "targetAnchor": "unheaded-block-91",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/8",
+   "ids": [
+    "claim_5b1bf67352e3b6cadd74ac1cfdab901d"
+   ],
+   "bindingSha256": "e7dfe2e9a57009b6f7c7b73b810441bae36b9f27007d0c883c5e2338a7ff55c8",
+   "targetUnitDigest": "098dc1daf6dc0682b944b0dcd6b41799b44c5a46ff036b93e1bb19e374a0f565",
+   "targetAnchor": "dev-checkout-shell-helpers",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/claims/9",
+   "ids": [
+    "claim_e36dc6d7c4cffd08e74b89407c1de2d1"
+   ],
+   "bindingSha256": "907547e761dfb2895ea821d36c95f330c1dce42be77817d037960e0fe6a0af06",
+   "targetUnitDigest": "29db1d0b391ac93fe635489740b466a4285c3c06d6afcc67e40e7a76d841c91c",
+   "targetAnchor": "unheaded-block-92",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/registryGaps/1",
+   "ids": [
+    "claim_bdeaa6f1cce78532047ba6bf959cc43a"
+   ],
+   "bindingSha256": "a691faaf66fa1f8a065b0e7b0cf23471e90203d0f88acb2c257f24825c7fef0b",
+   "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+   "targetAnchor": "unheaded-block-96",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/registryGaps/2",
+   "ids": [
+    "claim_45e83e644c43384e188c16e20172a52c"
+   ],
+   "bindingSha256": "5f1efe93f6e6f5dc089fb73d9f97bdb45c5f24aa17f82d45a803aecde7e479de",
+   "targetUnitDigest": "17e86891b31441849e0a2d91751b94f2c01fb3fe13a987609e5f58a30816e212",
+   "targetAnchor": "unheaded-block-104",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/registryGaps/3",
+   "ids": [
+    "claim_8d6b06dae659395981e196d4f7d33c15"
+   ],
+   "bindingSha256": "6882705e72f2e63e2111efb2d61f5d4de9ba20f20869dfcb7ff973dc5bb3adc0",
+   "targetUnitDigest": "b712c1644b8475d3e1625be217fc446174718933cddf4092f1da35b3125f59e7",
+   "targetAnchor": "unheaded-block-105",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/registryGaps/4",
+   "ids": [
+    "claim_c87924f5a8b4ef3683e8133768ec69b9"
+   ],
+   "bindingSha256": "df801227b8f6cbd24fc85a31eb96825e3001b15f2b3a589946c5254d409dde6f",
+   "targetUnitDigest": "b2c9c497e49a577b5d5d415d67fb1d8791380e262f3a349c4b7e3350525f7d8b",
+   "targetAnchor": "unheaded-block-86",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "pointer": "/registryGaps/5",
+   "ids": [
+    "claim_891db485a75cdb558cf725c3315f3857"
+   ],
+   "bindingSha256": "16e40f7d66cc4a6deeeb32e52f387c24fa6d05f202ace822a9a49bc0614a88fa",
+   "targetUnitDigest": "56a9269a6139c7decbb50dc5a46edf077a2d6d68c328b1620443082cc61e7aa7",
+   "targetAnchor": "unheaded-block-30",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/conservedClaims/38/bindings/0",
+   "ids": [],
+   "bindingSha256": "ce3e70ec50c79246086d5120fed5c9740f9dc63e4fdb272754859d5c30ffbeb5",
+   "targetUnitDigest": "a7a749093db6a108f6abb494fb53b492e6a2c77c1729ce915f3f287964b3c6c8",
+   "targetAnchor": "upgrade-and-advisory-procedure",
+   "targetOwner": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/252",
+   "ids": [],
+   "bindingSha256": "9796fe432a8346dea5fa93f4e00e01d1f3f098ad7679fad4520b1d6dcd278028",
+   "targetUnitDigest": "512f3b8855ddb8f956130c154a8f24c7b2df06ea21fbe11f6bf013aa19f57e55",
+   "targetAnchor": "2-registry-types",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/254",
+   "ids": [],
+   "bindingSha256": "553ddd0f1ec554a1d38c7551c8e5651992dc262a035b928d5fe6e740aa7064cf",
+   "targetUnitDigest": "03024c345457b1dd391e1db4abb02b4ac98212f6a14ed4f25250b38a10e08861",
+   "targetAnchor": "unheaded-block-6",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/256",
+   "ids": [],
+   "bindingSha256": "4cfda04d748ba0cfbd1208bf13bda0a919e91c096601364edf8324a4e25b91a0",
+   "targetUnitDigest": "b8b7131fe2deb8eb26c659f21e4c06f6d1a3bd56398356d550a89de6cf0ff67b",
+   "targetAnchor": "3-doctor-contract",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/257",
+   "ids": [],
+   "bindingSha256": "140fd6c13b6a0c8a4a78240cae8067deedd2ab106c50da82c3268fa631a1c30a",
+   "targetUnitDigest": "1054adf2ffc0c9bd235e0f376f683364ebf733be8cec969ecccf85900777b599",
+   "targetAnchor": "unheaded-block-8",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/277",
+   "ids": [],
+   "bindingSha256": "7d736529e05ecdf816e135e9779387cd1b0c7be2e16280793b9675228100db36",
+   "targetUnitDigest": "a9a56f607a54c5ea31e3ad7a1da41e7172f20953cede3180a4819ffc5f1edd42",
+   "targetAnchor": "registered-inventory",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/279",
+   "ids": [],
+   "bindingSha256": "2017ebbec5212f38c831058de1d9159aa06cfadaa93a57b1b5ac5a7f1ef7dd1a",
+   "targetUnitDigest": "f8c71a377dca7744cc6e7cab4c7cc371ce14d9343200d75badb42a59e9477bbf",
+   "targetAnchor": "unheaded-block-24",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/280",
+   "ids": [],
+   "bindingSha256": "fd798f6d8e0fd53b6db77762028a745e6ee0fc894af92ae6a88b529077a19391",
+   "targetUnitDigest": "61935a25b2fd8148d6a00ec3e6a764f8f4b0a547d744fed46364fa58be6a6cac",
+   "targetAnchor": "unheaded-block-25",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/281",
+   "ids": [],
+   "bindingSha256": "f8402779995bda7c74fb0ee566be1324b182d539b4c1789df6e6a97b59f1074c",
+   "targetUnitDigest": "f0daa55efc27d11e7d0a943a0c0453c151117e1319731444a19aa6900c2c8f88",
+   "targetAnchor": "unheaded-block-26",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/282",
+   "ids": [],
+   "bindingSha256": "696ef8eb7f5b2dfab7c349e69e616660a3fef5a096dcd97b028d4d038a89d527",
+   "targetUnitDigest": "e97f05e5ec4bbe570cbff86a5103332090925a47df59d372d882eed71fec2178",
+   "targetAnchor": "unheaded-block-27",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/287",
+   "ids": [],
+   "bindingSha256": "1d57c8890917395dc13e16522cf3046288138a2282e866fba5c1d23b2336f13e",
+   "targetUnitDigest": "170ce67e010e1bc0f007c97c410db3aeb3f4af54ba6788c9a04f30b194614d34",
+   "targetAnchor": "setup",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/288",
+   "ids": [],
+   "bindingSha256": "16e40f7d66cc4a6deeeb32e52f387c24fa6d05f202ace822a9a49bc0614a88fa",
+   "targetUnitDigest": "56a9269a6139c7decbb50dc5a46edf077a2d6d68c328b1620443082cc61e7aa7",
+   "targetAnchor": "unheaded-block-30",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/353",
+   "ids": [],
+   "bindingSha256": "16e40f7d66cc4a6deeeb32e52f387c24fa6d05f202ace822a9a49bc0614a88fa",
+   "targetUnitDigest": "56a9269a6139c7decbb50dc5a46edf077a2d6d68c328b1620443082cc61e7aa7",
+   "targetAnchor": "unheaded-block-30",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/354",
+   "ids": [],
+   "bindingSha256": "72fea73206dd2d0cfafd34de1499f950b74bede25e18316f54b57a0d8a8e68b5",
+   "targetUnitDigest": "2e7287da1e929106b26cb77ce2a4792b67fa5138aa28d97550d5bb6d919ff2a5",
+   "targetAnchor": "dependency-upgrade-discipline",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/356",
+   "ids": [],
+   "bindingSha256": "791aa2f5779a3702273df95a58b846013cd6b9419390f39846bf915a11a35c9f",
+   "targetUnitDigest": "cf691131abe06956ee54388e6d248921c39ee6711a27da3d81e6af5342e7a0b0",
+   "targetAnchor": "unheaded-block-51",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/423",
+   "ids": [],
+   "bindingSha256": "9f110e93a66d7af4f9e94376009c50d05fc92af706936c276e70749a78e474ea",
+   "targetUnitDigest": "f9c90772c897f5be41cd3554d3810ef2641ec4dd7c3d3a415840d0b4eb06a4f6",
+   "targetAnchor": "l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/429",
+   "ids": [],
+   "bindingSha256": "5f1efe93f6e6f5dc089fb73d9f97bdb45c5f24aa17f82d45a803aecde7e479de",
+   "targetUnitDigest": "17e86891b31441849e0a2d91751b94f2c01fb3fe13a987609e5f58a30816e212",
+   "targetAnchor": "unheaded-block-104",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/879",
+   "ids": [],
+   "bindingSha256": "ce3e70ec50c79246086d5120fed5c9740f9dc63e4fdb272754859d5c30ffbeb5",
+   "targetUnitDigest": "a7a749093db6a108f6abb494fb53b492e6a2c77c1729ce915f3f287964b3c6c8",
+   "targetAnchor": "upgrade-and-advisory-procedure",
+   "targetOwner": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+   "pointer": "/unitCarries/880",
+   "ids": [],
+   "bindingSha256": "5f1efe93f6e6f5dc089fb73d9f97bdb45c5f24aa17f82d45a803aecde7e479de",
+   "targetUnitDigest": "17e86891b31441849e0a2d91751b94f2c01fb3fe13a987609e5f58a30816e212",
+   "targetAnchor": "unheaded-block-104",
+   "targetOwner": "docs/platform/packaging-distribution/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "pointer": "/registryGaps/10",
+   "ids": [
+    "claim_211f0b98400863f2a0e9b9cdaa2259fe"
+   ],
+   "bindingSha256": "7eda30ce1ca9d2439469d7be220822f27a5f56e62a89de98dd6d4500032eb427",
+   "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+   "targetAnchor": "unheaded-block-178",
+   "targetOwner": "docs/specs/runner.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "pointer": "/registryGaps/11",
+   "ids": [
+    "claim_1d8baa1def0cea7595b62de99846b489"
+   ],
+   "bindingSha256": "5fd6de45ac642457d581c36d952434b3d2072f9bbc299a63f4f32b5ded702164",
+   "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+   "targetAnchor": "unheaded-block-243",
+   "targetOwner": "docs/specs/runner.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "pointer": "/registryGaps/12",
+   "ids": [
+    "claim_012bfa2639fb107eeb3baee4fb502f54"
+   ],
+   "bindingSha256": "d3625801696e520b75a70281a4d4e39aeaeab0ee6425c9ea595d56768e53e2a7",
+   "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+   "targetAnchor": "unheaded-block-252",
+   "targetOwner": "docs/specs/runner.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "pointer": "/registryGaps/13",
+   "ids": [
+    "claim_99806d8b21d05eb7a8e8744d765bea00"
+   ],
+   "bindingSha256": "729f938eda66a492108099482864ee75ec278376894901f649c7f780dfaedf98",
+   "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+   "targetAnchor": "unheaded-block-276",
+   "targetOwner": "docs/specs/runner.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "pointer": "/registryGaps/14",
+   "ids": [
+    "claim_a6f43d98b3eebe97802fd01a4ac7863b"
+   ],
+   "bindingSha256": "94144df70ec8667e4068964a86b546456a526981fc415e4bf3756442ded082d0",
+   "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+   "targetAnchor": "unheaded-block-288",
+   "targetOwner": "docs/specs/runner.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "pointer": "/registryGaps/15",
+   "ids": [
+    "claim_b91c86788522c3516bef2c7bab859093"
+   ],
+   "bindingSha256": "124e08e454127b74d29d2b6baaa52b6d08cbf4520a18616e69ebb8eb0a33c197",
+   "targetUnitDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
+   "targetAnchor": "unheaded-block-80",
+   "targetOwner": "docs/specs/runner.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "pointer": "/registryGaps/16",
+   "ids": [
+    "claim_76d404ea624a10455d7a14debe2b2a95"
+   ],
+   "bindingSha256": "9545236ed63c02f92a5695507d46458fbf6f6436b409e5b6c9f0bc99168afc91",
+   "targetUnitDigest": "ad50d1b4f22683791ffa9f8e122789a54e622c0cd5bc7c44c93f565f1fdaa646",
+   "targetAnchor": "unheaded-block-9",
+   "targetOwner": "docs/specs/runner.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "pointer": "/registryGaps/7",
+   "ids": [
+    "claim_97479b13a60800e856813bfd4f0cbb78"
+   ],
+   "bindingSha256": "f15cca45e76010dd04ad42c94b0d955f1259ff835611995139c75fbc08533b28",
+   "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+   "targetAnchor": "unheaded-block-152",
+   "targetOwner": "docs/specs/runner.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "pointer": "/registryGaps/8",
+   "ids": [
+    "claim_50dca4885019ac5125d941ea5a86f448"
+   ],
+   "bindingSha256": "7c280f9f06268b578a9d8e6ff41fbd28a46dded6bf53901381e9f4fa2f065e43",
+   "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+   "targetAnchor": "unheaded-block-157",
+   "targetOwner": "docs/specs/runner.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "pointer": "/registryGaps/9",
+   "ids": [
+    "claim_07ae72c4d2c93884a120cf2ca12250a8"
+   ],
+   "bindingSha256": "7ce4fedbc4b81fd17c995f62b857d71d16747c61a74d182222e7b8f4eec00b40",
+   "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+   "targetAnchor": "unheaded-block-169",
+   "targetOwner": "docs/specs/runner.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+   "pointer": "/registryGaps/1",
+   "ids": [
+    "claim_1a6a7460ede876ae7fa1de7c2e168cfe"
+   ],
+   "bindingSha256": "13d847e34e6877cadb3066d5aeb17b6358224970d8245edd2f4b0c19b2bed432",
+   "targetUnitDigest": "d6004980f8bdb50003e28eaa386059d97c51d1b635823d8af58aee6acc0caa2f",
+   "targetAnchor": "unheaded-block-65",
+   "targetOwner": "docs/platform/work-state/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+   "pointer": "/registryGaps/10",
+   "ids": [
+    "claim_7c4295aa058b6a7fa5c6b945a0441a35"
+   ],
+   "bindingSha256": "a0a2ee9846a5bae3683586bca9c4d24f29c70b10342adae2d82d498941105eed",
+   "targetUnitDigest": "f8282cd8a7e103ee85953aeec2c8f24ab69c3d7c7581de2ab86357d599b32a03",
+   "targetAnchor": "unheaded-block-67",
+   "targetOwner": "docs/platform/work-state/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+   "pointer": "/registryGaps/4",
+   "ids": [
+    "claim_8d273e8328dac53565eb0286c6a91d65"
+   ],
+   "bindingSha256": "77d168421ed431b714f619fa1e328ab31095b21a57cffd58f5f945424c4d3328",
+   "targetUnitDigest": "9e9bbdf83b5d57c643d48b609ad491d17126e382dffcf075caff62d4262ff770",
+   "targetAnchor": "unheaded-block-93",
+   "targetOwner": "docs/platform/work-state/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+   "pointer": "/registryGaps/6",
+   "ids": [
+    "claim_eb0bf7783bb1b1027c012f050c782203"
+   ],
+   "bindingSha256": "354ac8ae048aadeef0ca07f002e5c1c8dbd59c533c252c01bd9091af919c7dbb",
+   "targetUnitDigest": "eb57f42ea9bddbdb72969c05a14d8f43b6a305874975de8990fddfb34b0f3644",
+   "targetAnchor": "unheaded-block-3",
+   "targetOwner": "docs/platform/work-state/spec.md",
+   "errors": [
+    "missing"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+   "pointer": "/claims/35",
+   "ids": [
+    "claim_57f11d837272b3f9781b376ef1665c81"
+   ],
+   "bindingSha256": "34d1e9c56a94dc1318b715e3bf44c17f5f2ce8af1ffa0261d534a8bcdfb62ac0",
+   "targetUnitDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
+   "targetAnchor": "unheaded-block-10",
+   "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+   "errors": [
+    "mismatched"
+   ]
+  },
+  {
+   "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+   "pointer": "/registryGaps/4",
+   "ids": [
+    "claim_f5365b8e40fb58c75adc56a574263242"
+   ],
+   "bindingSha256": "34d1e9c56a94dc1318b715e3bf44c17f5f2ce8af1ffa0261d534a8bcdfb62ac0",
+   "targetUnitDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
+   "targetAnchor": "unheaded-block-10",
+   "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+   "errors": [
+    "mismatched"
+   ]
+  }
+ ]
+}

@@ -214,3 +214,9 @@ Decided by the Lead under A42. Results of the w23 reviews: shard 1 got 229/34, s
    The `packages/yaml-doc` mentions are recorded as excluded, with a reason.
 6. **All Phase-9 dependencies that phase 08 left are decided before F, not just the 33.** That means the other 53 as well, including the 18 retention-or-move rows for `docs/doc-governance.md` and `docs/architecture-map.md`. The Lead owns them.
 7. The row-level REWORKs in the three shard reviews are fixed as the reviews say, unless the Doer shows evidence otherwise.
+
+## L13-22 — G0 per-row verdict file is built before F (Lead, 2026-10-25 13:25)
+
+Decided by the Lead under A42. The strict join `g0join/join.py` at 608a4ada5 found 1,924 effective binding rows. Only 174 of them have a per-row APPROVE that matches both digests. 1,473 rows have no per-row verdict, 247 have related verdicts whose digests do not match, 3 have open REWORK, and 27 have a missing digest or an invalid stored hash. The earlier reviews were mostly aggregate: they approved the work, but did not write the `{id, pointer, bindingSha256, targetUnitDigest, verdict}` records that the G0 definition joins on.
+
+Ruling: build the verdict file now, through six independent review batches (`g0join/verdict-batches/batch-1..6.json`, 1,723 rows). At F, only the rows that F rebinds then need delta verdicts. The 27 rows in `held.json` first get a data fix (a Doer turn that recomputes the canonical hashes and restores the missing target digests), and are reviewed after that. Each reviewer judges the row's claim against the current target unit, not only the digests. An aggregate review cited as context does not replace the per-row judgment.
