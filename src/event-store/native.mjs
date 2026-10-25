@@ -158,10 +158,6 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
       const ranks = outsideGate(heldRanks);
       return call(() => native.legacyLayout(ranks, hotLockDepth()));
     },
-    unpublishedSummary(remote, heldRanks) {
-      const ranks = outsideGate(heldRanks);
-      return call(() => native.unpublishedSummary(remote, ranks, hotLockDepth()));
-    },
   };
   return Object.freeze(facade);
 }

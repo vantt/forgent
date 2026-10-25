@@ -882,9 +882,7 @@ paths and ids must each be unique.
 The shared exec guard and `hotLockDepth` now live in
 `src/holder-lock/hot-guard.mjs`; `src/state/hot-lock.mjs` re-exports the depth and
 error for existing consumers. Entering a hot section returns a one-shot release
-that cannot decrement the depth twice. Unpublished summary validates repository
-and layout before taking `event-seal`; this read-only operation waits behind an
-active seal or sync. The strace gate proof covers ordinary append/readInGate and recovery of a lost
+that cannot decrement the depth twice. The strace gate proof covers ordinary append/readInGate and recovery of a lost
 high-water mark plus a torn active tail. Holder reclaim additionally relies on
 the Rust structural no-port boundary and existing crate regression tests.
 

@@ -449,30 +449,6 @@ impl EventStore {
         fgos_event_store::diagnostics::maintenance(&self.layout).map_err(error)
     }
     #[napi]
-    pub fn unpublished_summary(
-        &self,
-        remote: String,
-        held_ranks: Vec<u32>,
-        hot_lock_depth: u32,
-    ) -> Result<Value> {
-        let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
-        let result = fgos_event_store::sync::guarded_unpublished_summary(
-            driver,
-            repo,
-            fgos_event_store::sync::SyncRequest {
-                layout: &self.layout,
-                machine,
-                remote: &remote,
-                no_push: true,
-                opportunistic: false,
-                held_ranks: &held_ranks,
-                hot_lock_depth,
-            },
-        )
-        .map_err(error)?;
-        Ok(Value::Array(result.into_iter().map(|v| json!({"stream":v.stream.as_str(),"sealedPushed":v.sealed_pushed,"oldestUnsealedAgeSec":v.oldest_unsealed_age_sec})).collect()))
-    }
-    #[napi]
     pub fn read(
         &self,
         request: EventStoreReadRequest,
