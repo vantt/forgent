@@ -952,12 +952,12 @@ Export stream discovery uses the configured remote and skips status entirely
 when `--stream` is explicit. Only warning-capable checks emit
 `warning:`; sync passes when no unpublished events and no push error exist.
 
-The machine-id setup fix uses the crate's atomic durable-file install-once door;
+The machine id is minted by Identity's mint, which uses the atomic durable-file install-once door;
 concurrent mints expose exactly one complete identity. The state root is
 canonicalized so symlinked ancestors are supported; the machine-id leaf remains
-protected by the atomic installer. Refspec setup calls the
-crate's existing `ensure_refspecs`, hence Git's journaled `ensure_fetch_mapping`.
-It never writes push mappings. Doctor additionally refuses fetch wildcards that
+protected by the atomic installer. Git's `fixGitFetchMapping` owns the fetch
+mappings, through Git's journaled `ensure_fetch_mapping`, and never writes push
+mappings. Doctor additionally refuses fetch wildcards that
 could include local/branch event namespaces. Lock-directory setup refuses symlink
 ancestors and ensures mode 0700.
 
