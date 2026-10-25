@@ -1,0 +1,82 @@
+[
+  {
+    "id": "w35-1",
+    "severity": "high",
+    "verdict": "REWORK",
+    "area": "linkGuard post-F tree model (questions 1 and 8)",
+    "evidence": "links.py tree() computes paths = (paths - set(moving)) | set(states). 21 move-set source paths have a composed F state (docs/README.md, docs/doc-governance.md, docs/transitional-switchboard.md, docs/coexistence.md, docs/routing-handoff-contract.md, docs/io-contract.md, docs/operator-runbook-herdr-cockpit.md, docs/contracts/fgos-gateway-api-v1.yaml, docs/architecture-manifest.json and 12 docs/ui-spec files). They are added back as existing files, so any link into them passes. After F, 11 Related entries in docs/platform still resolve into the move set. 5 are self-sources: coexistence/spec.md:17, documentation/operations/portals/docs-portal.md:17, documentation/switchboard.md:17, governance.md:17 and herdr-web-dashboard/operations/operator-runbook.md:17. 6 point at a successor in another file: README.md:17 and migration-authoring-rules.md:16 name docs/transitional-switchboard.md; agent-mailbox/spec.md:22 names docs/routing-handoff-contract.md; documentation/history/templates/{architecture,area-readme,contract}.md:18 name docs/doc-governance.md. Probe: on the real compose() states, appending '[gov](../doc-governance.md)' to docs/platform/README.md gives no linkGuard finding, while into_move_set (the old linkIntoMoveSet semantics) flags it. That is a weakening of the L13-26.2 invariant, which L13-28.4 extended and did not supersede. The record is inconsistent with itself: it retargets clickable links into docs/routing-handoff-contract.md (1 row) and docs/io-contract.md (5 rows) as moved under L13-26, yet leaves the Related entry into docs/routing-handoff-contract.md alone. The receipt line 'Related entries pointing into the move set 67 -> 0' is false; 11 remain. If cutover removes these root files, guard 3 fails on all 11. No control covers this case (a mutation that keeps every moved path still fails the controls only through the docs/specs/runner.md probe).",
+    "fix": "In tree(), never let a composed state resurrect a move-set source: paths = (paths | set(states)) - set(moving), unless the Lead rules that specific root files survive cutover, in which case name them explicitly. Add the 11 rows to link-retargets.json in L13-28.2 order. The 6 cross-file rows retarget to docs/platform/documentation/switchboard.md, docs/platform/runner/contracts/routing-handoff.md and docs/platform/governance.md. The 5 self rows follow 2.3: a matching title anchor, or 'Historical source: `...`'. Where a line is already owned by a park-judgment patch, extend that owner as was done for f06461. Add a control that injects a link into a composed move-set source (for example ../doc-governance.md) and expects linkGuard moved-target. Correct the receipt counts."
+  },
+  {
+    "id": "w35-2",
+    "severity": "medium",
+    "verdict": "REWORK",
+    "area": "Rule order L13-28.2: successor before literal (question 3)",
+    "evidence": "Row L13-28:related:36 (docs/platform/config/spec.md:18) turns Related 'docs/specs/seat-binding.md' into 'Historical source: `docs/specs/seat-binding.md`' under rule 2.2. Its only evidence is the move-set entry /paths/1452 with to:null ('retiring-root-or-retired-decision'). L13-4.1 rules that docs/platform/seat-binding/spec.md is the verbatim-carry successor of docs/specs/seat-binding.md. That file exists at pin 0557f175b and in the composed tree. This is the same trap as row 125 in w33: a move-set to:null entry is not proof that no successor exists. Lesser issue: L13-28:related:64 (platform-foundations.md -> docs/specs/platform-foundations.md) is labelled 2.2 ('noSuccessor'), but the file's own header says 'Promoted anchor from docs/platform-foundations.md and docs/specs/platform-foundations.md'. That makes it a self-source under 2.3. The outcome is the same (a literal, since no matching title anchor exists); only the rule label and evidence are wrong.",
+    "fix": "Retarget related:36 to docs/platform/seat-binding/spec.md (add the anchor of section 5.1 if the extractor lists one) with rule 2.1 and the L13-4.1 selector. Alternatively, get a Lead ruling that a provenance-only citation of a superseded clause stays literal. Relabel related:64 as L13-28.2.3, with matchingSourceTitle and matchingAnchor null. Before keeping any rule 2.2 row whose only evidence is a move-set to:null, check the L13 rulings and G5 for a successor."
+  },
+  {
+    "id": "w35-3",
+    "severity": "medium",
+    "verdict": "REWORK",
+    "area": "Rule L13-28.2.4: labels show the new path (question 3)",
+    "evidence": "The receipt says rule 2.4 fixed 10 labels, only the 11 exact old-path labels that w33 named. After F, 49 links that this record retargets still carry the old file name as their label. Examples: docs/platform/documentation/operations/portals/docs-portal.md '[doc-governance.md](../../../governance.md)' (2 links); component-boundary.md '[workflow.md](workflow/spec.md)' (4); host-invocation-routing/intent-preservation-ledger.md '[host-invocation-provider-routing.md](spec.md#...)', '[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#...)' and '[rust-cli-and-proof-components-plan.md](roadmap.md#...)' (about 38); host-invocation-routing/history/source-inventory.md '[external-provider-protocol.md](../README.md)' and 4 more. Across all of docs/platform, 75 links have a path-like label that names a different file from their target.",
+    "fix": "Apply 2.4 to every row whose label names the old file, not only to w33's 11. If the Lead holds that a bare legacy file name in a source or inventory column is a provenance label, then that link is a lineage citation and follows the literal rule; it must not become a live link that a stale name labels. Record the count for each class in the receipt."
+  },
+  {
+    "id": "w35-4",
+    "severity": "low",
+    "verdict": "APPROVE",
+    "area": "Population completeness of linkGuard (question 1)",
+    "evidence": "An independent CommonMark oracle (markdown-it-py 4.2.0 in a scratch venv) ran over the composed post-F tree from compose(0557f175b): link_open, image, html href/src, every reference definition, plus the product relatedPaths() for Related headers and listAnchors for anchors. It covered 628 docs/platform Markdown files and found 2,701 destinations (1,968 links, 1 image, 732 Related). This is the same multiset as links.population() after percent-decoding, and both report 0 file or anchor failures under strict GitHub-relative resolution. Latent gaps, 0 occurrences today: a link label with nested brackets or an image inside it ('[![i](a.png)](x.md)', where the outer x.md is never scanned); parenthesised titles; an unclosed fence inside a blockquote masks the rest of the file; HTML src is not read; 'docs/...' and 'repo/docs/...' relative destinations resolve from the repository root, unlike GitHub.",
+    "fix": "Optional: add these cases to the clickable control, or have the cutover guard 3 use a CommonMark parser and assert agreement with this witness (L13-28.4)."
+  },
+  {
+    "id": "w35-5",
+    "severity": "low",
+    "verdict": "APPROVE",
+    "area": "398 literal occurrences (question 2)",
+    "evidence": "All 398 were checked against markdown-it block tokens on the composed text, not a sample. 394 sit inside CommonMark fenced blocks, almost all inside the '~~~~' verbatim wrappers of retired-engine snapshots across 38 files. A sample of 30 across files shows fence ranges such as L27-1651 and L26-348. The other 4 (verification/step-08-standalone-coordination/P00.1.md lines 80, 81, 337, 338, target '...') are multi-line inline code spans, not fences. None of the 398 is produced as a link by the parser. The 37 live ones match (8 were retargeted and no longer occur). Excluding them agrees with L13-25.1 and L13-28: code is not a link, and any CommonMark checker agrees. However, the current product check-doc-candidate-status stripCode() strips only ``` fences that start in column 0, and only single-line spans, so it would still count them. The duty that guard 3 must agree with this witness lives only in receipt prose.",
+    "fix": "Change the receipt wording to '394 in fences and 4 in multi-line code spans'. Record the guard-3 fence-semantics agreement as a machine F duty, for example in the final-pin duties."
+  },
+  {
+    "id": "w35-6",
+    "severity": "low",
+    "verdict": "APPROVE",
+    "area": "Mechanical record integrity (question 3)",
+    "evidence": "All 285 rows and 82 patches were checked, not a sample. For each file: the rollback applied to the composed post-F bytes reproduces beforeSha256; the forward patch reproduces the post-F bytes; each coordinate stage's basisSha256 matches; text[start:end]==before for every row; and applying the rows in stage order gives the composed bytes exactly. Every retarget, self-anchor and x-specs newPath exists after F, and every fragment is a listAnchors anchor. Every move-set retarget's newPath is one of that oldPath's move destinations, except row 125 (G5). For all 64 rule 2.3 rows, matchingSourceTitle equals the old source's H1 at the pin, and the anchor exists in the file. The rule 2.2 code spans for absent src/ test/ plans/ and machine-absolute targets are absent at the pin and on disk.",
+    "fix": "None."
+  },
+  {
+    "id": "w35-7",
+    "severity": "low",
+    "verdict": "APPROVE",
+    "area": "Row L13-26:link:125 (question 4)",
+    "evidence": "Row 125: start 2184, end 2210, before '../../specs/reading-map.md', after '../../reading-map.md', newPath docs/reading-map.md, aliasId null, with the plan-obligation and G5 selector. Applying link:124 (as authored in w33) plus the w33 row-125 fix to the patch-24 preimage cb550ddf gives 8ce81ee7f54c1f655e6e814b6f76e8448bb29efff04c83b64de3d75427c9b884, which the row125ReviewCheckpoint records. The final 15feba80 adds the L13-28 self-anchor for link:124 and related:68, and replays exactly. The explanation holds.",
+    "fix": "None."
+  },
+  {
+    "id": "w35-8",
+    "severity": "low",
+    "verdict": "APPROVE",
+    "area": "Gateway YAML, L13-28.5 (question 5)",
+    "evidence": "Composed fgos-gateway-api-v1.yaml: x-decisions now name retired-decision-history.md#0011-... and platform-foundations.md#0014-..., the same decisions, and both anchors exist. x-specs and the descriptions at lines 44, 53, 456, 607, 681, 710, 739 and 863 name docs/platform successors. The key is x-decisions, not x-docs. No code or test reads x-decisions or x-specs. One remaining comment at line 205 cites docs/history/tsk-4id-task-detail-screen/RESEARCH.md, which is absent at the pin and is not a cutover path. Lines 256 and 729 describe the runtime docs/history contract and correctly stay.",
+    "fix": "None required. Optionally give the line-205 comment a historical marker."
+  },
+  {
+    "id": "w35-9",
+    "severity": "low",
+    "verdict": "APPROVE",
+    "area": "Controls and F door (question 6)",
+    "evidence": "'python3 -B P/fchain/check.py --pin HEAD' exits 0: 594 files, 223 executed, 20 links, no findings. HEAD is d0d0e1aab, which differs from 8ea185bfd only in plan.md. check.json differed only in sourceCommit and was restored. No chain-check file was written by check.py. 'python3 -B P/fchain/controls.py' exits 0 with 21 controls, and controls.json is unchanged. Mutation runs, with links.py redirected to scratch copies, all make controls.py exit 1: anchor check disabled; scan() returning []; moved paths kept as existing. The case in w35-1 (a composed move-set source) has no control.",
+    "fix": "Add the control described in w35-1."
+  },
+  {
+    "id": "w35-10",
+    "severity": "low",
+    "verdict": "APPROVE",
+    "area": "Park-judgment shard edits (question 7)",
+    "evidence": "Shard-2 f06461, f06591 and f07205 change only the 'after' of one Related replacement, from '`x`' to 'Historical source: `x`', with proposedSha256 and patch refreshed. This is justified: the product relatedPaths() strips backticks from '- `path`', so the earlier L13-21.4 literal was still resolved as a path, while 'Historical source:' is skipped (no '/' in its first token). The judgments, dispositions and frozen evidence are unchanged, and no other record binds the old proposed hashes. The shard-3 f07667 staleChainDependencies removal matches the w33 residual. 'python3 -B P/preserve-premise/park-judgments/check_shard.py --all' exits 0 (787 rows, unresolved 0, duplicateOfChain 24); the transient chain-check-d0d0e1aab.json was deleted. These rows' reviewed patch bytes changed after review.",
+    "fix": "Mark the three changed proposals for the final-F delta review."
+  }
+]
