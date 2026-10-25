@@ -196,3 +196,21 @@ Decided by the Lead under A42, from the w22 review (10 APPROVE / 4 REWORK). The 
    - Remove the stale "design-lap must not pull main" text.
    - `cutoverReadiness` states one order, consistent with L13-6: packet at met-local, then owner approval, lease, F, F duties, final ledger review, Land. It also sizes the F window the approval opens.
 4. **The cutover approval packet waits** until items 1 to 3 are done and reviewed.
+
+## L13-21 — Premise shard and phase-9 decision reviews (Lead, 2026-10-25 13:10)
+
+Decided by the Lead under A42. Results of the w23 reviews: shard 1 got 229/34, shard 2 256/7, shard 3 217/44, and the G9 decisions 31/3.
+
+1. **Every prepared patch is checked against the F chain, not the bare pin.** The F chain is `phase-08/step-07-composed-patches.json` followed by `composition/patch-specs.json`. A row whose retarget the chain already makes is recorded as `alreadyComposed` with the id of that chain entry, and carries no new patch. A patch that conflicts with the chain is rebased onto the chain's result. A chain entry whose bytes no longer match the current file is rebased in the same turn. One consolidated `park-judgments/check_shard.py` replaces the three per-shard copies. It applies the chain entries first, flags duplicates, and checks that every repointed path is actually removed or moved by the cutover.
+2. **The "Removed door (2026-10-14)" banners are current guidance, not history.** That covers 16 rows in shard 1 and 2 in shard 2. Each banner's citation "decision 0062 in `docs/specs/runner.md`" is repointed to `docs/platform/runner/decisions/h-36d872fbb0e5.md`, the same way the chain repoints the AGENTS.md citation.
+3. **The 36 `docs/history/` convention parks are decided under L12-10.** The answer is keep-unchanged: history is not a legacy authority root, and the cutover moves no `docs/history` path.
+4. **Lineage links in `docs/platform/**` that point at removed files become code spans.** That is 36 rows, 27 clickable source links and 9 Related-header entries. The cutover's platform link guard stays strict, with no exemption list. A lineage reference keeps its path text, but a reader can no longer click into a deleted file. Each one is a prepared patch on the F chain.
+5. **Uncovered live pointers are owned by this rework.** Each gets a prepared patch on the F chain:
+   - the gateway yaml citations in 4 candidate docs (`config/spec.md:83`, `herdr-web-dashboard/spec.md:299`, `ui-spec/.../S03-task-detail.md:121`, `ui-spec/contracts/15-system-events.md:38`);
+   - the component-boundary advisory link (f06920, f06933);
+   - `identity/spec.md:22` and `:159`;
+   - `workflow/spec.md:694`.
+
+   The `packages/yaml-doc` mentions are recorded as excluded, with a reason.
+6. **All Phase-9 dependencies that phase 08 left are decided before F, not just the 33.** That means the other 53 as well, including the 18 retention-or-move rows for `docs/doc-governance.md` and `docs/architecture-map.md`. The Lead owns them.
+7. The row-level REWORKs in the three shard reviews are fixed as the reviews say, unless the Doer shows evidence otherwise.
