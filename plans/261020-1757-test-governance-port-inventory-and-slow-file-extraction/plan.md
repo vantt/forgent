@@ -70,6 +70,21 @@ Every item this lane took on is listed here until it closes; a row closes only w
 
 Order now: W1 and D3 → phase 3 (with D4) → the 59 `test/setup` clones (with S1). H2 and H3 wait for their triggers.
 
+## Owner decision 2026-10-25 23:10: speed first, and find why the suite keeps growing and slowing
+
+The owner reopened the suite-speed work instead of closing the lane. **TEST's main priority is a faster, more effective suite.** New goal: find, with evidence, **why the suite keeps getting slower and larger** despite the "one proof" rule. The answer must name the mechanisms and commits that carry the growth, not a guess. Every item below is to be resolved, not parked as backlog:
+
+| ID | Item | State |
+|---|---|---|
+| F14b | Re-profile the full suite on current main (quiet machine, `test-timing profile`), diff it against the two 10-24 junits (`4688c735e`, `d884f1fbc`), and record `wallSeconds` in `test/suite-baseline.json`, which has been `null` since phase 0 | running 10-25 23:1x |
+| F14c | Batch-plant fixture events and share one initialized repo per file (the 10-24 finding: per-write native-store cost spread across every Work-writing test; outliers `intake/plan` 1.6→63.7 s, `intake/discovery` 1.1→28.1 s, `direct/fgos-step` 0.4→24.5 s) | open |
+| G1 | Root cause of growth and slowdown over time: tests, files and wall per week; which lanes and mechanisms add tests and cost; why new tests still land as new files or CLI spawns; what the guards (`suite:` line, clone ratchet, H1 lines) miss | open |
+| F1/H21 | Timing asserts that fail under load | open |
+| F16 | `test/config/config-door.test.mjs` copies of crate cases; CFG closed, so TEST takes it back | open |
+| HOME | `runFgctl`/`runFgos` fixtures pass the parent env and are safe only through `isolateHome()`; set HOME explicitly (CFG 10-25 16:24) | open |
+| PIOMP | 3 pi/omp tests in `test/scripts/mailbox-live-confined.test.mjs` always skip: `piOmpInstall()` reads `os.homedir()` under `isolateHome()` | routed to MAIL 10-25 |
+| WAM | `worktree-admin-multiprocess` rounds 20 → 5 (open owner question from phase 3) | open |
+
 ## Rules for every batch
 
 - `npm test` and `cargo test --workspace` green before and after; quote the `suite:` line both times.
