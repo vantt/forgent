@@ -25,7 +25,8 @@ function hostScan(t, scan) {
 
 test('migrate refuses by name before any cut when the fetch mappings cannot be installed', async t => {
   const f = fixture(t, { remote: true }); trackedLegacy(f);
-  f.git('config', 'credential.helper', 'untrusted-helper');
+  // Every journaled Git write refuses without the activation fence, so the mapping fix is refused while the facts still read.
+  fs.rmSync(path.join(f.repo, '.fgos/locks/activation.lock'), { recursive: true });
   const head = f.git('rev-parse', 'HEAD');
   const scan = checkStopped({ workspaces: [f.repo], hostBin });
   if (scan.status !== 'clean') { hostScan(t, scan); return; }
