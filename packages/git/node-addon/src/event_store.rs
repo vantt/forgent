@@ -250,8 +250,9 @@ fn is_settled_refusal(code: fgos_event_store::errors::ErrorCode) -> bool {
     matches!(code, fgos_event_store::errors::ErrorCode::EventStoreMigrationRequired)
 }
 impl EventStore {
-    /// The reason writes are refused, or `None`. The answer is asked of Git
-    /// once per store, and Git is never asked inside the Work gate (rank 60):
+    /// The reason writes are refused, or `None`. A settled answer is kept per
+    /// store; a failure that may clear is asked again by the next write. Git is
+    /// never asked inside the Work gate (rank 60):
     /// a write that arrives there before `admit_writes` ran is refused, not
     /// answered with a process spawn.
     fn write_admission(&self, held_ranks: &[u32]) -> Result<Option<&str>> {
