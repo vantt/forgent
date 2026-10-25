@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos doctor` has two fewer Event Store rows. `event-store-git-version` is judged by `git-component-compatible` (the same Git floor verdict), and `event-store-orphan-branches` is part of `event-store-unsealed`, which now also warns per orphan branch stream.
 - `fgos doctor --fix` no longer has the Event Store fixes `event-store-machine-id` and `event-store-refspec`. The machine id is minted by `identity-machine-id` and the fetch mappings are installed by `git-publication-refspecs`, which already did the same work; `event-store-lock-dirs` stays. The `event-store-*` rows are unchanged.
 - A `reviewed` run whose producer had nothing left to change (it claimed done, but its work was already committed) now reaches its reviewer and checks, whose verdict decides the round, instead of ending as an execution failure. A producer crash, timeout or provider limit still stops the round.
 - Reading a config value (`fgos config show`, every host reader of one setting) no longer spawns Git: the project's trusted main checkout comes from the Git component's disk-only topology check, without the Git config and repository-format probes an operation needs. `fgos observe` writes and the workspace root resolve take the same path.

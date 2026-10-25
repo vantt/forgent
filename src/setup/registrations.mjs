@@ -5365,10 +5365,10 @@ registerCheck({
   check: (cwd) => checkObserveRunCoverage(cwd),
 });
 
-// Event Store: one setup fix and ten doctor rows. A doctor run builds one `eventStoreDoctor`
+// Event Store: one setup fix and eight doctor rows. A doctor run builds one `eventStoreDoctor`
 // (its lazy store snapshot is read at most once) and every row asks it; a row called without a run gets a private one.
 registerFix({ id: 'event-store-lock-dirs', fix: cwd => fixEventStoreLockDirs(cwd) });
-for (const name of ['git-version', 'open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout', 'orphan-branches']) {
+for (const name of ['open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout']) {
   const id = `event-store-${name}`;
   registerCheck({ id, description: `Event Store ${name}`, check: (cwd, run = createDoctorRun()) => run.once(`event-store-doctor:${cwd}`, () => eventStoreDoctor(cwd))(id) });
 }

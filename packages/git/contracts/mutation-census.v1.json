@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "73d231585e5b428f474a09ec307a015eb8042a04d8c14db7ec133010570e575a",
+  "payloadDigest": "6b95510920d29ab7cf59d192c832f18a87c6f3abbeb4dd6748db1338a90ba9aa",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1091,7 +1091,7 @@
     "src/setup/claude-code-hooks.mjs": "d9f4cdbe8c4cec4cb3ea7c67798d24b49e3c86a0d97a041b202dec8def2332fe",
     "src/setup/config-checks.mjs": "719e03ec310567d1f5c84604ad779c23fe577b28ec78254e37e05de7a3b00b1f",
     "src/setup/config-merge.mjs": "3fce8c44841690e5e07a2c909329cc1add3a9111bb4a65803edf4aa842656e59",
-    "src/setup/event-store-checks.mjs": "2ef84479355f46cb0fe9efd60a81bffe34d08a30b1460254fa7522a75df80448",
+    "src/setup/event-store-checks.mjs": "31ec48218f82a5677b40ff895778ca1f5732a893db2b8123bed571ea414e7475",
     "src/setup/event-store-fixes.mjs": "6075174c2a02253e34dda0b021cf46bd33b61f75917fe07d70967fd94e6e3052",
     "src/setup/executor-posture-coverage.mjs": "cab23a4fa399353344a74cd88230b0c72ed267dc02edbbdde725c435e21b89af",
     "src/setup/executor-profile-warnings.mjs": "159ece46c6c50e80b3ba5aae80a14c11387f1a4b3384a0d80e0ad4b969ea7b48",
@@ -1106,7 +1106,7 @@
     "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
     "src/setup/model-pool-checks.mjs": "a770f17808c6a02cd2d5e50e145711635587f78eddf0639eb5525a7d442a9246",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "5ee78b8b2765ffb395a918dba1df774170b47fd6d415d93097d3873659040999",
+    "src/setup/registrations.mjs": "c7784ea0408fec013d018d4ad8b9d0ffd081a7f13fc722e101d4d316f8fa58bc",
     "src/setup/run-supervisor-checks.mjs": "b5919215aaa5f3910306a6f6edb53aa2eb9d60382c6505d46975776d44c369e9",
     "src/setup/seat-binding-checks.mjs": "8eb709c6ef91ea0c4e24d1ad15adb3231f5d1441ebb260a42f0934e994b136f6",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",

@@ -626,16 +626,14 @@ Doctor checks, registered in `src/setup/registrations.mjs`:
 
 | Check | Fails when |
 |---|---|
-| `event-store-git-version` | Git's floor verdict is unsupported or a required probe failed. The floor is Git's (`packages/git/contracts/git-floor.v1.json`, Git phase 01 req 3), read through `gitFloorVerdict`; this spec keeps no version number of its own |
 | `event-store-open-root` | root does not resolve, not a git repository, or guarantee `none`; prints the guarantee level |
 | `event-store-machine-id` | missing or malformed; warns `event-store-machine-ref-shared` (section 14) |
 | `event-store-refspec` | remote configured but fetch refspec missing; a positive push refspec whose source can match `refs/fgos/`; a positive fetch refspec matching `refs/fgos/local-events` or `refs/fgos/branch-events` (negative exclusions are safe) |
-| `event-store-unsealed` | section 16 thresholds |
+| `event-store-unsealed` | section 16 thresholds; warns per orphan branch stream (a branch stream whose worktree is gone), listing them in the same message |
 | `event-store-integrity` | a seal blob whose hash differs from `seal.json`, an event `h` that does not verify, a batch commit marker that does not verify inside a closed segment or a sealed blob, a sequence gap in an own stream, `event-store-seq-conflict`, `event-store-seq-recovery-conflict` that a seal did not resolve, `event-store-order-cycle`, `event-store-ref-moved` or `seal-mismatch` recorded |
 | `event-store-sync` | warns when the last push failed or is older than 24 h with unpublished events and a remote configured; reports ahead/behind |
-| `event-store-native-addon` | the combined N-API addon of section 17 (linking `fgos-event-store` and `fgos-git`) is missing from the active payload, fails to load, or was built for another Node ABI or platform. Git spec section 4 requires one ABI row for the combined addon, so the Git plan merges this check's ABI evidence with Git's `git-component-compatible` rather than adding a second ABI row |
+| `event-store-native-addon` | (kept as its own row: the Event Store facade exports are checked here and the contract version only in `git-component-compatible`, so merging would lose the export check) the combined N-API addon of section 17 (linking `fgos-event-store` and `fgos-git`) is missing from the active payload, fails to load, or was built for another Node ABI or platform. Git spec section 4 requires one ABI row for the combined addon, so the Git plan merges this check's ABI evidence with Git's `git-component-compatible` rather than adding a second ABI row |
 | `event-store-legacy-layout` | after cutover: tracked event files, `.fgos/events/`, tracked `state.json` or backups, or a `merge=union` line for events exist; `refs/fgos/legacy` missing or its tree differs from `seal.json.treeOfFgosEvents` |
-| `event-store-orphan-branches` | warns per orphan branch stream |
 
 Clarification, 2026-10-22: only the automatic triggers are gated by the dispatched-worker rule. A dispatched worker may run `fgos events sync` explicitly, because that is a request; the end-of-command push and the Land candidate release never run in one. A shared config file that exists but does not parse never lends its defaults to a publish decision: the `events` verbs and doctor refuse with `event-store-config`, and the write path and the triggers use a config that never pushes (`sync.intervalSec` 0), so a trigger still seals.
 
@@ -1168,7 +1166,7 @@ Dated clarifications with no protocol change, made with the store part of the se
 
 - Section 5 names `project:<name>` consumer streams (plan D9: porting uses `project:porting`, Work keeps `project`). The crate already accepted them and seals them onto the machine's `events` ref with their own `seq` (`seal_publication.rs`, `project_consumer_streams_share_one_ref_without_false_move_or_sequence_reuse`).
 - Section 10 step 2.3 now names Git's Publication port instead of `gix` or `git -c core.fsync=...`: Git fsyncs directories itself and treats `core.fsync` only as a backend input (Git spec section 10). The store's own barriers (step 1, step 2.4 and 2.5) are unchanged.
-- Section 21 `event-store-git-version` points to Git's floor (`git-floor.v1.json` through `gitFloorVerdict`, 2.53.0 with four required probes today) instead of 2.31 and 2.36; section 8's "git 2.31 or newer" likewise. The check body already read Git's verdict.
+- Section 21: the Git floor is judged by Git's own row `git-component-compatible` (the old `event-store-git-version` row is gone; Git guarantees a supported verdict only when every required probe passed), and it points to Git's floor (`git-floor.v1.json` through `gitFloorVerdict`, 2.53.0 with four required probes today) instead of 2.31 and 2.36; section 8's "git 2.31 or newer" likewise. The check body already read Git's verdict.
 - Section 8 records the measured topology result: `--separate-git-dir` and absorbed submodules are refused by Git's resolver (`trusted-main-gitfile-unsupported`), not resolved as experiment 1 suggested.
 - Sections 15 and 19 cite current source lines; the `events.lock` row says its read-check-append role already moved to the `state` hot mutex.
 

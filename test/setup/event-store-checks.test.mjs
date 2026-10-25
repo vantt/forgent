@@ -11,7 +11,7 @@ import { DOCTOR_CHECKS, FIX_REGISTRATIONS, createDoctorRun } from '../../src/set
 
 test('doctor pass bodies are read-only in a real repo; no implicit repair of corrupt logs', t => {
   const f = fixture(t); append(f.store, [{}]);
-  for (const name of ['git-version', 'open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'native-addon', 'orphan-branches', 'sync']) assert.equal(checkEventStore(f.repo, `event-store-${name}`, f.ctx).passed, true, name);
+  for (const name of ['open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'native-addon', 'sync']) assert.equal(checkEventStore(f.repo, `event-store-${name}`, f.ctx).passed, true, name);
   const active = path.join(f.repo, '.git/fgos/events/project/active.jsonl');
   const bytes = fs.readFileSync(active); fs.writeFileSync(active, Buffer.from(bytes.toString().replace('"title":"one"', '"title":"bad"')));
   const before = fs.readFileSync(active);
@@ -47,7 +47,7 @@ test('sync without unpublished events passes; missing addon fails rather than si
 test('orphan branches warn, persisted integrity fails, and nonrepositories fail closed', t => {
   const f = fixture(t);
   fs.mkdirSync(path.join(f.repo, '.git/fgos/events/branch:gone'));
-  assert.match(checkEventStore(f.repo, 'event-store-orphan-branches', f.ctx).message, /^warning:.*branch:gone/);
+  assert.match(checkEventStore(f.repo, 'event-store-unsealed', f.ctx).message, /^warning:.*orphan branch streams: branch:gone/);
   append(f.store, [{}]);
   fs.writeFileSync(path.join(f.repo, '.git/fgos/events/project/integrity.json'), JSON.stringify({ code: 'event-store-ref-moved', ranges: [] }));
   assert.equal(checkEventStore(f.repo, 'event-store-integrity', f.ctx).passed, false);
@@ -109,9 +109,9 @@ test('live worktree branch keys are not orphaned; removal makes the same stream 
   const linked = path.join(f.temp, 'linked');
   f.git('worktree', 'add', '-qb', 'Feature/Live_One', linked);
   fs.mkdirSync(path.join(f.repo, '.git/fgos/events/branch:feature-live-one'));
-  assert.equal(checkEventStore(f.repo, 'event-store-orphan-branches', f.ctx).message, 'no orphan branch streams');
+  assert.doesNotMatch(checkEventStore(f.repo, 'event-store-unsealed', f.ctx).message, /orphan/);
   f.git('worktree', 'remove', linked);
-  assert.match(checkEventStore(f.repo, 'event-store-orphan-branches', f.ctx).message, /^warning:.*branch:feature-live-one/);
+  assert.match(checkEventStore(f.repo, 'event-store-unsealed', f.ctx).message, /^warning:.*branch:feature-live-one/);
 });
 test('one doctor invocation reuses its status snapshot; a new invocation observes new data', t => {
   const f = fixture(t);
@@ -129,7 +129,7 @@ test('a doctor run remembers a failed setup context instead of retrying it per r
   const f = fixture(t);
   writeRawProjectConfig(f.repo, '{ eventStore: half-written');
   const check = eventStoreDoctor(f.repo, f.ctx);
-  const first = check('event-store-git-version');
+  const first = check('event-store-open-root');
   assert.equal(first.passed, false);
   assert.match(first.message, /event-store-config: config-parse/, 'doctor sees the parse failure, never the defaults');
   writeProjectConfig(f.repo, {});
@@ -152,9 +152,9 @@ test('doctor reports a malformed seal coalescing window on every row, and a repa
   assert.equal(eventStoreSetupContext(f.repo, f.ctx).config.seal.coalesceSec, 30, 'the default is 30 seconds');
 });
 
-test('the ten Event Store rows and one fix are registered and every row of a run shares one doctor', t => {
+test('the eight Event Store rows and one fix are registered and every row of a run shares one doctor', t => {
   const rows = DOCTOR_CHECKS.filter(({ id }) => id.startsWith('event-store-'));
-  assert.deepEqual(rows.map(({ id }) => id).sort(), ['git-version', 'open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout', 'orphan-branches'].map(name => `event-store-${name}`).sort());
+  assert.deepEqual(rows.map(({ id }) => id).sort(), ['open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout'].map(name => `event-store-${name}`).sort());
   assert.deepEqual(FIX_REGISTRATIONS.filter(({ id }) => id.startsWith('event-store-')).map(({ id }) => id).sort(), ['event-store-lock-dirs']);
   const f = fixture(t);
   const run = createDoctorRun();
