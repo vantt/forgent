@@ -4,7 +4,7 @@
  *
  * Generates golden fixtures for Observe and owner crates under test/fixtures/observe/.
  * - friction/ and cases/ shards are generated using the native Rust CLI.
- * - owner stores (Event Store, assignments/, coordination/) are generated
+ * - owner stores (Event Store, assignments/) are generated
  *   using Node CLI / standard deterministic store structure in a temporary directory.
  * - All timestamps, IDs, PIDs, and git hashes are pinned so that running this script
  *   multiple times produces ZERO git diff.
@@ -149,64 +149,6 @@ function main() {
       'utf8'
     );
 
-    // 4. Setup deterministic Coordination store (.fgos/coordination/sessions/)
-    const sessionDir = path.join(fgosDir, 'coordination', 'sessions', 'coord-golden-01');
-    fs.mkdirSync(sessionDir, { recursive: true });
-
-    fs.writeFileSync(
-      path.join(sessionDir, 'session.json'),
-      JSON.stringify(
-        {
-          id: 'coord-golden-01',
-          status: 'completed',
-          completedAt: '2026-09-29T09:30:00.000Z',
-        },
-        null,
-        2
-      ) + '\n',
-      'utf8'
-    );
-
-    const sessionEvents = [
-      {
-        type: 'session-opened',
-        ts: '2026-09-29T09:00:00.000Z',
-        payload: {
-          protocolRef: 'rfc-deliberation@v1',
-          driver: 'interactive',
-        },
-      },
-      {
-        type: 'assignment-created',
-        ts: '2026-09-29T09:05:00.000Z',
-        payload: {
-          actorId: 'agent-1',
-          assignmentId: 'asgn-golden-01',
-        },
-      },
-      {
-        type: 'result-linked',
-        ts: '2026-09-29T09:20:00.000Z',
-        payload: {
-          assignmentId: 'asgn-golden-01',
-          runId: 'run-golden-01',
-        },
-      },
-      {
-        type: 'session-completed',
-        ts: '2026-09-29T09:30:00.000Z',
-        payload: {
-          verdict: 'approved',
-        },
-      },
-    ];
-
-    fs.writeFileSync(
-      path.join(sessionDir, 'events.jsonl'),
-      sessionEvents.map((e) => JSON.stringify(e)).join('\n') + '\n',
-      'utf8'
-    );
-
     // Retain the frozen Observe migration snapshot. Its retired work.friction type cannot be appended to a
     // current Work registry, so the legacy journal comes from a committed fixture; new records below still use
     // the native writer on top of these real existing journal bytes.
@@ -282,7 +224,6 @@ function main() {
         'open',
         '--dir',
         tmpDir,
-        '--name',
         'golden-case-1',
         '--harness',
         'fgos',
@@ -303,7 +244,6 @@ function main() {
         'close',
         '--dir',
         tmpDir,
-        '--name',
         'golden-case-1',
         '--interventions',
         '0',
@@ -365,7 +305,7 @@ function main() {
     fs.mkdirSync(FIXTURES_DIR, { recursive: true });
 
     // Copy only owner snapshots: native identity, cursors and locks are runtime state.
-    for (const name of ['assignments', 'coordination', 'observe']) {
+    for (const name of ['assignments', 'observe']) {
       fs.cpSync(path.join(fgosDir, name), path.join(FIXTURES_DIR, '.fgos', name), { recursive: true });
     }
     const history = workStore.read({ streams: ['project'] }, []).sequence;
