@@ -105,6 +105,12 @@
       "meaning": "Dropping values equal to the standard changes the effective value on this machine, where the global file holds a different one; the paths are listed and the run needs --accept-machine-overrides."
     },
     {
+      "id": "config-migrate-moves-pending",
+      "origin": "chosen",
+      "section": "13",
+      "meaning": "The global file still holds account or token keys that have not moved to their files under ~/.fgos/private; the paths are listed and the conversion runs after both stages of the key move."
+    },
+    {
       "id": "config-migrate-source-invalid",
       "origin": "chosen",
       "section": "13",

@@ -262,6 +262,23 @@ fn write(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<Value,
         }
         Verb::Migrate {
             global: true,
+            convert: true,
+            machine_checked,
+            dry_run,
+            ..
+        } => {
+            let opts = MigrateOptions {
+                accept_machine_overrides: false,
+                dry_run: *dry_run,
+                lock_root: fgos_holder_lock::state_root::lock_root(),
+                lock_wait_ms: LOCK_WAIT_MS,
+            };
+            let report = migrate::global(&ctx, roots, &writer, &opts, *machine_checked, |_| Ok(()))
+                .map_err(refused)?;
+            Ok(migration(&report))
+        }
+        Verb::Migrate {
+            global: true,
             dry_run: true,
             ..
         } => {

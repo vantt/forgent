@@ -34,7 +34,7 @@
     },
     {
       "id": "config-format-legacy-json",
-      "description": "A project or global file is still legacy JSON; run fgos config migrate. Warns until every reader moved to Config.",
+      "description": "A project or global file is still legacy JSON; run fgos config migrate (the global file: fgos config migrate --global --convert --machine-checked, after both key stages). Warns until every reader moved to Config.",
       "doctor": "warn",
       "check": "warn",
       "fix": null

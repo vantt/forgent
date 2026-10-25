@@ -1998,11 +1998,11 @@ fn config_migrate_converts_a_legacy_project_file_and_leaves_the_tombstone() {
 }
 
 #[test]
-fn config_migrate_global_copies_first_and_refuses_the_removal_without_the_machine_check() {
+fn config_migrate_global_copies_first_refuses_the_removal_without_the_machine_check_then_converts() {
     let sandbox = config_sandbox("global");
     fs::create_dir_all(sandbox.join("home/.fgos")).unwrap();
     let global = sandbox.join("home/.fgos/config.json");
-    let legacy = "{\"runner\":{\"llmAccounts\":{\"claude\":{\"work\":{\"login\":\"~/.claude-work\"}}}}}\n";
+    let legacy = "{\"gateBypass\":{\"level\":\"light\"},\"runner\":{\"llmAccounts\":{\"claude\":{\"work\":{\"login\":\"~/.claude-work\"}}}}}\n";
     fs::write(&global, legacy).unwrap();
     let copied = config_data(&config_run(&sandbox, &["migrate", "--global"], false));
     assert_eq!(copied["stage"], "copy");
@@ -2012,6 +2012,10 @@ fn config_migrate_global_copies_first_and_refuses_the_removal_without_the_machin
     assert!(config_refusal(&refused).contains("config-machine-check-required"));
     let finished = config_data(&config_run(&sandbox, &["migrate", "--global", "--finish", "--machine-checked"], false));
     assert_eq!(finished["stage"], "finish");
+    let converted = config_data(&config_run(&sandbox, &["migrate", "--global", "--convert", "--machine-checked"], false));
+    assert_eq!(converted["kept"][0], "gateBypass.level");
+    assert!(sandbox.join("home/.fgos/config.yaml").exists());
+    assert!(fs::read_to_string(&global).unwrap().starts_with("moved to .fgos/config.yaml"));
     let _ = fs::remove_dir_all(&sandbox);
 }
 

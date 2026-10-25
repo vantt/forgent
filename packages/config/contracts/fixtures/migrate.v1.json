@@ -1035,6 +1035,153 @@
    "expect": {
     "code": "config-legacy-shadowed"
    }
+  },
+  {
+   "id": "migrate-global-converts-keeping-only-what-differs",
+   "why": "spec 13: the global file migrates like a project file once no release on the machine reads the JSON; its value stays exactly the same",
+   "input": {
+    "scope": "global",
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"gateBypass\": {",
+      "    \"level\": \"light\"",
+      "  },",
+      "  \"limits\": {",
+      "    \"count\": 4",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "kept": [
+      "gateBypass.level"
+     ],
+     "dropped_redundant": [
+      "limits.count"
+     ],
+     "machine_overrides": []
+    },
+    "files": {
+     "home/.fgos/config.json": [
+      "moved to .fgos/config.yaml; upgrade fgOS"
+     ],
+     "home/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-global-needs-the-machine-check",
+   "why": "spec 13: converting the global file needs the owner's statement that no release on the machine reads ~/.fgos/config.json",
+   "input": {
+    "scope": "global",
+    "machine_checked": false,
+    "files": {
+     "home/.fgos/config.json": [
+      "{\"gateBypass\": {\"level\": \"light\"}}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-machine-check-required"
+   }
+  },
+  {
+   "id": "migrate-global-dry-run-needs-no-machine-check-and-writes-nothing",
+   "why": "D17: a dry run runs everything except the writes",
+   "input": {
+    "scope": "global",
+    "machine_checked": false,
+    "dry_run": true,
+    "files": {
+     "home/.fgos/config.json": [
+      "{\"gateBypass\": {\"level\": \"light\"}}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "kept": [
+      "gateBypass.level"
+     ],
+     "dry_run": true
+    }
+   }
+  },
+  {
+   "id": "migrate-global-waits-for-the-key-moves",
+   "why": "spec 13: the account and token keys move to their files first (both stages of migrate --global)",
+   "input": {
+    "scope": "global",
+    "files": {
+     "home/.fgos/config.json": [
+      "{\"gateway\": {\"token\": \"tok-secret\"}}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-migrate-moves-pending",
+    "paths": [
+     "gateway.token"
+    ],
+    "absent": [
+     "tok-secret"
+    ]
+   }
+  },
+  {
+   "id": "migrate-global-of-a-converted-file-does-nothing",
+   "why": "spec 13: the tombstone and the YAML file mean it is done; the tombstone holds no key to move",
+   "input": {
+    "scope": "global",
+    "files": {
+     "home/.fgos/config.json": [
+      "moved to .fgos/config.yaml; upgrade fgOS"
+     ],
+     "home/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "already_migrated": true,
+     "kept": []
+    }
+   }
   }
  ]
 }
