@@ -2032,7 +2032,21 @@
       ],
       "reworkNotes": [
         "Depends on stale F-chain input(s): file:docs/platform/runner/architecture/h-7af1f0242611.md. Rebase belongs to the separate chain turn; no diagnostic bytes are certified here."
-      ]
+      ],
+      "preservationRebind": {
+        "pin": "594fe4194693d1a6026ed7801168002f89e6c85e",
+        "sourceLine": 23,
+        "composedBy": "594fe4194693d1a6026ed7801168002f89e6c85e",
+        "source": {
+          "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
+          "startLine": 23,
+          "endLine": 23,
+          "text": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-1: link-only rebase; label and repository referent preserved (docs/architect/agent-coordination/architecture/dispatch-control-plane.md); R9-5: remove decisions-placement boilerplate from non-decision carrier. G0 rework: vocabulary citations below are re-cited to the current legacy source at `ee2ce49c4`; this is a labelled citation correction, not a verbatim move.",
+          "fileSha256": "be01e15a9b153167d8203c34acbdf7cb5a98780130b3661153656d2714eb78ba",
+          "unitSha256": "60dd4883d9e2edd9ad3f7cf4930c5e70c426bbcb1a810a68f86133017000a885"
+        },
+        "reason": "The same provenance note was corrected by upstream G0 rework (turn 722), which re-cited vocabulary against ee2ce49c4. Preserve that current corrected note; frozen evidence, disposition and original judgment remain unchanged. The upstream commit is the sole owner, not a new executable patch."
+      }
     },
     {
       "rowId": "f07672",
@@ -2081,7 +2095,21 @@
       ],
       "reworkNotes": [
         "Depends on stale F-chain input(s): file:docs/platform/runner/architecture/h-7af1f0242611.md. Rebase belongs to the separate chain turn; no diagnostic bytes are certified here."
-      ]
+      ],
+      "preservationRebind": {
+        "pin": "594fe4194693d1a6026ed7801168002f89e6c85e",
+        "sourceLine": 23,
+        "composedBy": "594fe4194693d1a6026ed7801168002f89e6c85e",
+        "source": {
+          "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
+          "startLine": 23,
+          "endLine": 23,
+          "text": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-1: link-only rebase; label and repository referent preserved (docs/architect/agent-coordination/architecture/dispatch-control-plane.md); R9-5: remove decisions-placement boilerplate from non-decision carrier. G0 rework: vocabulary citations below are re-cited to the current legacy source at `ee2ce49c4`; this is a labelled citation correction, not a verbatim move.",
+          "fileSha256": "be01e15a9b153167d8203c34acbdf7cb5a98780130b3661153656d2714eb78ba",
+          "unitSha256": "60dd4883d9e2edd9ad3f7cf4930c5e70c426bbcb1a810a68f86133017000a885"
+        },
+        "reason": "The same provenance note was corrected by upstream G0 rework (turn 722), which re-cited vocabulary against ee2ce49c4. Preserve that current corrected note; frozen evidence, disposition and original judgment remain unchanged. The upstream commit is the sole owner, not a new executable patch."
+      }
     },
     {
       "rowId": "f07686",
@@ -2130,7 +2158,21 @@
       ],
       "reworkNotes": [
         "Depends on stale F-chain input(s): file:docs/platform/runner/architecture/h-7af1f0242611.md. Rebase belongs to the separate chain turn; no diagnostic bytes are certified here."
-      ]
+      ],
+      "preservationRebind": {
+        "pin": "594fe4194693d1a6026ed7801168002f89e6c85e",
+        "sourceLine": 23,
+        "composedBy": "594fe4194693d1a6026ed7801168002f89e6c85e",
+        "source": {
+          "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
+          "startLine": 23,
+          "endLine": 23,
+          "text": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-1: link-only rebase; label and repository referent preserved (docs/architect/agent-coordination/architecture/dispatch-control-plane.md); R9-5: remove decisions-placement boilerplate from non-decision carrier. G0 rework: vocabulary citations below are re-cited to the current legacy source at `ee2ce49c4`; this is a labelled citation correction, not a verbatim move.",
+          "fileSha256": "be01e15a9b153167d8203c34acbdf7cb5a98780130b3661153656d2714eb78ba",
+          "unitSha256": "60dd4883d9e2edd9ad3f7cf4930c5e70c426bbcb1a810a68f86133017000a885"
+        },
+        "reason": "The same provenance note was corrected by upstream G0 rework (turn 722), which re-cited vocabulary against ee2ce49c4. Preserve that current corrected note; frozen evidence, disposition and original judgment remain unchanged. The upstream commit is the sole owner, not a new executable patch."
+      }
     },
     {
       "rowId": "f07690",
@@ -9448,8 +9490,8 @@
           "f08076",
           "f08084"
         ],
-        "sourceSha256": "12e6ceae00eda6b236fb620a5a0b9e97cec04996028d792f884c3f540d29b572",
-        "proposedSha256": "7428905fc3caaaeb2aa762771af7b9c5539583f7c329e8e63c2e9b9082e860c8",
+        "sourceSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597",
+        "proposedSha256": "30be7cddba2ecfa79f9ba78581fc75b1131cdcdbf17918a5029a073cd7479fe3",
         "replacements": [
           {
             "line": 16,
@@ -9481,9 +9523,9 @@
         ],
         "patch": "--- a/docs/platform/work-state/spec.md\n+++ b/docs/platform/work-state/spec.md\n@@ -13,7 +13,7 @@\n - docs/platform/work-state/decisions/retired-decision-history.md\n - docs/platform/work-state/history/multi-role-harness-distill-record.md\n - docs/specs/work-state.md\n-- docs/io-contract.md\n+- docs/platform/work-state/contracts/cli-io-contract.md\n Implementation: Carried source material; current implementation truth unverified\n Provenance: Retained work-state candidate carriage from docs/specs/work-state.md; existing Related references retained\n Writer type: Original writer attribution not recorded; retained source provenance\n@@ -708,7 +708,7 @@\n   lỗi vào manifest, `init` vẫn thành công (fail-safe).\n - **Afterwards:** re-init trên cùng project ghi lại manifest nhất quán\n   (idempotent — không tích lũy/trùng lặp entry qua nhiều lần chạy). Doctrine\n-  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/coexistence.md`.\n+  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/platform/coexistence/spec.md`.\n \n ### Add Verb\n \n@@ -1200,4 +1200,4 @@\n - [decisions/retired-decision-history.md](decisions/retired-decision-history.md)\n - [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md)\n - [docs/specs/work-state.md](../../specs/work-state.md)\n-- [docs/io-contract.md](../../io-contract.md)\n+- [docs/platform/work-state/contracts/cli-io-contract.md](contracts/cli-io-contract.md)\n",
         "chainEntryIds": [
-          "w8:gloss:docs/platform/work-state/spec.md"
+          "rebased:w8:gloss:docs/platform/work-state/spec.md"
         ],
-        "chainResultSha256": "12e6ceae00eda6b236fb620a5a0b9e97cec04996028d792f884c3f540d29b572"
+        "chainResultSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597"
       }
     },
     {
@@ -9597,8 +9639,8 @@
           "f08076",
           "f08084"
         ],
-        "sourceSha256": "12e6ceae00eda6b236fb620a5a0b9e97cec04996028d792f884c3f540d29b572",
-        "proposedSha256": "7428905fc3caaaeb2aa762771af7b9c5539583f7c329e8e63c2e9b9082e860c8",
+        "sourceSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597",
+        "proposedSha256": "30be7cddba2ecfa79f9ba78581fc75b1131cdcdbf17918a5029a073cd7479fe3",
         "replacements": [
           {
             "line": 16,
@@ -9630,9 +9672,9 @@
         ],
         "patch": "--- a/docs/platform/work-state/spec.md\n+++ b/docs/platform/work-state/spec.md\n@@ -13,7 +13,7 @@\n - docs/platform/work-state/decisions/retired-decision-history.md\n - docs/platform/work-state/history/multi-role-harness-distill-record.md\n - docs/specs/work-state.md\n-- docs/io-contract.md\n+- docs/platform/work-state/contracts/cli-io-contract.md\n Implementation: Carried source material; current implementation truth unverified\n Provenance: Retained work-state candidate carriage from docs/specs/work-state.md; existing Related references retained\n Writer type: Original writer attribution not recorded; retained source provenance\n@@ -708,7 +708,7 @@\n   lỗi vào manifest, `init` vẫn thành công (fail-safe).\n - **Afterwards:** re-init trên cùng project ghi lại manifest nhất quán\n   (idempotent — không tích lũy/trùng lặp entry qua nhiều lần chạy). Doctrine\n-  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/coexistence.md`.\n+  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/platform/coexistence/spec.md`.\n \n ### Add Verb\n \n@@ -1200,4 +1200,4 @@\n - [decisions/retired-decision-history.md](decisions/retired-decision-history.md)\n - [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md)\n - [docs/specs/work-state.md](../../specs/work-state.md)\n-- [docs/io-contract.md](../../io-contract.md)\n+- [docs/platform/work-state/contracts/cli-io-contract.md](contracts/cli-io-contract.md)\n",
         "chainEntryIds": [
-          "w8:gloss:docs/platform/work-state/spec.md"
+          "rebased:w8:gloss:docs/platform/work-state/spec.md"
         ],
-        "chainResultSha256": "12e6ceae00eda6b236fb620a5a0b9e97cec04996028d792f884c3f540d29b572"
+        "chainResultSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597"
       }
     },
     {
@@ -9746,8 +9788,8 @@
           "f08076",
           "f08084"
         ],
-        "sourceSha256": "12e6ceae00eda6b236fb620a5a0b9e97cec04996028d792f884c3f540d29b572",
-        "proposedSha256": "7428905fc3caaaeb2aa762771af7b9c5539583f7c329e8e63c2e9b9082e860c8",
+        "sourceSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597",
+        "proposedSha256": "30be7cddba2ecfa79f9ba78581fc75b1131cdcdbf17918a5029a073cd7479fe3",
         "replacements": [
           {
             "line": 16,
@@ -9779,9 +9821,9 @@
         ],
         "patch": "--- a/docs/platform/work-state/spec.md\n+++ b/docs/platform/work-state/spec.md\n@@ -13,7 +13,7 @@\n - docs/platform/work-state/decisions/retired-decision-history.md\n - docs/platform/work-state/history/multi-role-harness-distill-record.md\n - docs/specs/work-state.md\n-- docs/io-contract.md\n+- docs/platform/work-state/contracts/cli-io-contract.md\n Implementation: Carried source material; current implementation truth unverified\n Provenance: Retained work-state candidate carriage from docs/specs/work-state.md; existing Related references retained\n Writer type: Original writer attribution not recorded; retained source provenance\n@@ -708,7 +708,7 @@\n   lỗi vào manifest, `init` vẫn thành công (fail-safe).\n - **Afterwards:** re-init trên cùng project ghi lại manifest nhất quán\n   (idempotent — không tích lũy/trùng lặp entry qua nhiều lần chạy). Doctrine\n-  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/coexistence.md`.\n+  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/platform/coexistence/spec.md`.\n \n ### Add Verb\n \n@@ -1200,4 +1200,4 @@\n - [decisions/retired-decision-history.md](decisions/retired-decision-history.md)\n - [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md)\n - [docs/specs/work-state.md](../../specs/work-state.md)\n-- [docs/io-contract.md](../../io-contract.md)\n+- [docs/platform/work-state/contracts/cli-io-contract.md](contracts/cli-io-contract.md)\n",
         "chainEntryIds": [
-          "w8:gloss:docs/platform/work-state/spec.md"
+          "rebased:w8:gloss:docs/platform/work-state/spec.md"
         ],
-        "chainResultSha256": "12e6ceae00eda6b236fb620a5a0b9e97cec04996028d792f884c3f540d29b572"
+        "chainResultSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597"
       }
     },
     {
@@ -13866,14 +13908,14 @@
         "status": "prepared-not-applied",
         "basis": "chain",
         "chainEntryIds": [
-          "w8:hunk-park:workflow-holder"
+          "rebased:w8:hunk-park:workflow-holder"
         ],
-        "chainResultSha256": "6f9b26430c16fa5f489c127d766a3bfc59ad28aef768094af18a355254a940ef",
+        "chainResultSha256": "2ca4a63b251f13c00da4b68ed49c959ee6b4c435a0494beba2fd3fab8d2d6790",
         "rowIds": [
           "f08335"
         ],
-        "sourceSha256": "6f9b26430c16fa5f489c127d766a3bfc59ad28aef768094af18a355254a940ef",
-        "proposedSha256": "20fff384ef0c1d8bd8af9ff4b927ac75dd9208820151e3b696e3b85527d1174e",
+        "sourceSha256": "2ca4a63b251f13c00da4b68ed49c959ee6b4c435a0494beba2fd3fab8d2d6790",
+        "proposedSha256": "7e4c3489c797897bd13b9219d71dbf0d48a458b199d8723f20e2e5484c75be27",
         "patch": "--- a/docs/platform/workflow/spec.md\n+++ b/docs/platform/workflow/spec.md\n@@ -690,7 +690,7 @@\n - Ranh giới component: [../platform/component-boundary.md](../component-boundary.md) (hàng Workflow, Work Lifecycle, Execution Core, Holder-lock — bản sửa nháp đi cùng spec này).\n - Spec chủ hiện hành của Workflow và Execution Core: [runner decisions](../runner/decisions/h-36d872fbb0e5.md) (0047, 0048, 0049, RUL84 (one write-scope matcher), RUL89 (workflow start --units), RUL94 (a Work driver step runs as a Unit), RUL95 (dispatch takes generic inputs only)).\n - Lifecycle Work và tail phổ quát: [work-state.md](../work-state/spec.md) (0027).\n-- Luật nền: [../platform-foundations.md](../../platform-foundations.md) (L1, L3, L5, L9, L10).\n+- Luật nền: [../platform-foundations.md](../platform-foundations.md) (L1, L3, L5, L9, L10).\n - Holder-lock: [../platform/holder-lock/spec.md](../holder-lock/spec.md); Event Store: [../platform/event-store/spec.md](../event-store/spec.md); Run Supervisor: [../platform/run-supervisor/spec.md](../run-supervisor/spec.md); Session Identity: [../platform/identity/spec.md](../identity/spec.md).\n - Test phải giữ xanh: `test/architecture.test.mjs` (khối cấm import `workflow/` từ execution/dispatch), `test/state/domain-registry-compiled.test.mjs` (cô lập kernel).\n - Code hiện tại (tham khảo, không khoá): `src/workflow/` (`definition.mjs`, `steps.mjs`, `loader.mjs`, `store.mjs`, `ref-digests.mjs`, `runner.mjs`, `integrate.mjs`, `units-source.mjs`, `plan-source.mjs`), `src/runner/execution/` (`run.mjs`, `unit.mjs`, `bind.mjs`, `patterns/`), `src/runner/dispatch/` (`adapters.mjs`, `cwd-lock.mjs`, `assignment-runner.mjs`, `confinement/`), `core/workflows/*.yaml`, `domains/coding/workflows/feature.yaml`, `domains/marketing/workflows/content-publish.yaml`, `core/skills/_shared/coordination-driver.md`.\n",
         "replacements": [
           {

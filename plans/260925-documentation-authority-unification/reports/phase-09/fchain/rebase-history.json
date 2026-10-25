@@ -1,0 +1,264 @@
+{
+  "sourceCommit": "5cb7d0cddabb93f5d5fcd7a0a85468447209fb2b",
+  "authority": "L13-21.1; L13-24; w27-fchain-rebase-brief",
+  "initialFindings": [
+    {
+      "kind": "conflict",
+      "file": "docs/platform/component-boundary.md",
+      "patch": "file:docs/platform/component-boundary.md",
+      "reason": {
+        "kind": "staleChainEntry",
+        "file": "docs/platform/component-boundary.md",
+        "resolved": false,
+        "chainEntryId": "file:docs/platform/component-boundary.md",
+        "expectedBeforeSha256": "a8b612b6100f37b0d8301b4eaa39d1cc31c1a1df6605a66e2918b235ca68d15b",
+        "actualBeforeSha256": "dc6481146216ea1dd42fabab7cb5bdcb4c5b0329055c6619d774aef621c329d2",
+        "replayError": "absent-or-ambiguous-current-hunk:e1e7b85663d20f12"
+      }
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/component-boundary.md",
+      "patch": "w8:repin:w2:predecessor:docs/platform/component-boundary.md",
+      "reason": {
+        "kind": "staleChainEntry",
+        "file": "docs/platform/component-boundary.md",
+        "resolved": false,
+        "chainEntryId": "w8:repin:w2:predecessor:docs/platform/component-boundary.md",
+        "expectedBeforeSha256": "ccab81b65e2cd9b92bc2b902caf3446fa95119890088a735dc314b107f7c78ca",
+        "actualBeforeSha256": "dc6481146216ea1dd42fabab7cb5bdcb4c5b0329055c6619d774aef621c329d2",
+        "replayError": "no exact chain input; cannot certify replay"
+      }
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/component-boundary.md",
+      "patch": "w8:gap05:relocation",
+      "reason": {
+        "kind": "staleChainEntry",
+        "file": "docs/platform/component-boundary.md",
+        "resolved": false,
+        "chainEntryId": "w8:gap05:relocation",
+        "expectedBeforeSha256": "a3c121a8dfa83416b3d9fea07b22c83be503243a4369be704d288e830a607e31",
+        "actualBeforeSha256": "dc6481146216ea1dd42fabab7cb5bdcb4c5b0329055c6619d774aef621c329d2",
+        "replayError": "no exact chain input; cannot certify replay"
+      }
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "patch": "file:docs/platform/runner/architecture/h-7af1f0242611.md",
+      "reason": {
+        "kind": "staleChainEntry",
+        "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "resolved": false,
+        "chainEntryId": "file:docs/platform/runner/architecture/h-7af1f0242611.md",
+        "expectedBeforeSha256": "c3fd068f991f656ac7856ccaee0435693f4efd86a626ffe0a89f1cf5cf8d1654",
+        "actualBeforeSha256": "be01e15a9b153167d8203c34acbdf7cb5a98780130b3661153656d2714eb78ba",
+        "diagnosticRebase": true
+      }
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "patch": "recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md",
+      "reason": {
+        "kind": "staleChainEntry",
+        "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "resolved": false,
+        "chainEntryId": "recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md",
+        "expectedBeforeSha256": "c9087a371a17e3bff3e79e246374b54abfe903c18e3a5ecaa851fa769f634999",
+        "actualBeforeSha256": "bf8fd81b43f38bed001d5663155128287f1f59ca1aabc6f498a8ac2a45250395",
+        "replayError": "no exact chain input; cannot certify replay"
+      }
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "patch": "file:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "reason": {
+        "kind": "staleChainEntry",
+        "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "resolved": false,
+        "chainEntryId": "file:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "expectedBeforeSha256": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+        "actualBeforeSha256": "85a7a1f8e02393164f47ba50ff163d541eed10a082d8e6707a10d61bab490074",
+        "diagnosticRebase": true
+      }
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "patch": "recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "reason": {
+        "kind": "staleChainEntry",
+        "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "resolved": false,
+        "chainEntryId": "recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "expectedBeforeSha256": "8a974e8880f101b835a5daf35dd261960f8f06b5016d051fb2b77ded21158646",
+        "actualBeforeSha256": "9d02d02ebcd4e59c0b918ddfaf19238a18a85ce5d769340f3371ea8b81952944",
+        "replayError": "no exact chain input; cannot certify replay"
+      }
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/work-state/spec.md",
+      "patch": "w8:gloss:docs/platform/work-state/spec.md",
+      "reason": {
+        "kind": "staleChainEntry",
+        "file": "docs/platform/work-state/spec.md",
+        "resolved": false,
+        "chainEntryId": "w8:gloss:docs/platform/work-state/spec.md",
+        "expectedBeforeSha256": "8fad2d269f635ce4a00093500daeb8825e95765d65e133479da4821f7aa5238e",
+        "actualBeforeSha256": "ad87f25480923800f65d16549f7d720519d856b8ee234f5fab20a0b3c5b8e2e8",
+        "replayError": "no exact chain input; cannot certify replay"
+      }
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/workflow/spec.md",
+      "patch": "w8:hunk-park:workflow-holder",
+      "reason": {
+        "kind": "staleChainEntry",
+        "file": "docs/platform/workflow/spec.md",
+        "resolved": false,
+        "chainEntryId": "w8:hunk-park:workflow-holder",
+        "expectedBeforeSha256": "0ce96d282b026df85d96aa20c42b3e934b3b3f739a13edcf0aee6905465e1d7c",
+        "actualBeforeSha256": "d6e57367a274f65638d4544651230e2605eaa1e42604bd9cfbcd800bcfa83eb8",
+        "replayError": "no exact chain input; cannot certify replay"
+      }
+    },
+    {
+      "kind": "conflict",
+      "file": "shard-3",
+      "patch": "shard-contract",
+      "reason": "non-strict chain basis: docs/platform/work-state/spec.md"
+    },
+    {
+      "kind": "ownerless",
+      "file": "docs/platform/work-state/spec.md",
+      "patch": "chain:docs/platform/work-state/spec.md"
+    },
+    {
+      "kind": "ownerless",
+      "file": "docs/platform/workflow/spec.md",
+      "patch": "chain:docs/platform/workflow/spec.md"
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/component-boundary.md",
+      "patch": "g9:docs/platform/component-boundary.md",
+      "reason": "whole-body witness preimage drift"
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "patch": "g9:docs/platform/runner/architecture/h-7af1f0242611.md",
+      "reason": "whole-body witness preimage drift"
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "patch": "g9:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "reason": "whole-body witness preimage drift"
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/work-state/spec.md",
+      "patch": "g9:docs/platform/work-state/spec.md",
+      "reason": "whole-body witness preimage drift"
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/workflow/spec.md",
+      "patch": "g9:docs/platform/workflow/spec.md",
+      "reason": "whole-body witness preimage drift"
+    },
+    {
+      "kind": "conflict",
+      "file": "docs/platform/workflow/spec.md",
+      "patch": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/park-judgments/shard-3.json#/rows/164/patch",
+      "reason": "patching file docs/platform/workflow/spec.md\nHunk #1 FAILED at 690.\n1 out of 1 hunk FAILED -- saving rejects to file docs/platform/workflow/spec.md.rej\n"
+    },
+    {
+      "kind": "sameLinesTwice",
+      "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "patch": "preserve:f07671",
+      "reason": "preserved occurrence changed"
+    },
+    {
+      "kind": "sameLinesTwice",
+      "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "patch": "preserve:f07672",
+      "reason": "preserved occurrence changed"
+    },
+    {
+      "kind": "sameLinesTwice",
+      "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "patch": "preserve:f07686",
+      "reason": "preserved occurrence changed"
+    }
+  ],
+  "entries": [
+    {
+      "file": "docs/platform/component-boundary.md",
+      "oldId": "w8:repin:w2:predecessor:docs/platform/component-boundary.md",
+      "id": "rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md",
+      "oldBeforeSha256": "ccab81b65e2cd9b92bc2b902caf3446fa95119890088a735dc314b107f7c78ca",
+      "oldAfterSha256": "a3c121a8dfa83416b3d9fea07b22c83be503243a4369be704d288e830a607e31",
+      "beforeSha256": "dc6481146216ea1dd42fabab7cb5bdcb4c5b0329055c6619d774aef621c329d2",
+      "afterSha256": "53d407ed2e7b626329e334a06b083a964e3bfcc059dfd971d3801beb2ed83904",
+      "oldRecord": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#/patches/69"
+    },
+    {
+      "file": "docs/platform/component-boundary.md",
+      "oldId": "w8:gap05:relocation",
+      "id": "rebased:w8:gap05:relocation",
+      "oldBeforeSha256": "a3c121a8dfa83416b3d9fea07b22c83be503243a4369be704d288e830a607e31",
+      "oldAfterSha256": "9b90e37c81498b4f9667d9f96e5e0c8c26241b26eefb8e016af17d9dd4f56d4c",
+      "beforeSha256": "53d407ed2e7b626329e334a06b083a964e3bfcc059dfd971d3801beb2ed83904",
+      "afterSha256": "6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db",
+      "oldRecord": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#/patches/91"
+    },
+    {
+      "file": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "oldId": "recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md",
+      "id": "rebased:recomposed-predecessor:docs/platform/runner/architecture/h-7af1f0242611.md",
+      "oldBeforeSha256": "c9087a371a17e3bff3e79e246374b54abfe903c18e3a5ecaa851fa769f634999",
+      "oldAfterSha256": "06c442990c23e230417099d37bfdab8e94b7306ddcbfe40e7dfabe573480fbd0",
+      "beforeSha256": "be01e15a9b153167d8203c34acbdf7cb5a98780130b3661153656d2714eb78ba",
+      "afterSha256": "bf8fd81b43f38bed001d5663155128287f1f59ca1aabc6f498a8ac2a45250395",
+      "oldRecord": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#/patches/129"
+    },
+    {
+      "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "oldId": "recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "id": "rebased:recomposed-predecessor:docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "oldBeforeSha256": "8a974e8880f101b835a5daf35dd261960f8f06b5016d051fb2b77ded21158646",
+      "oldAfterSha256": "160c8fd78383bd9e138b73ae7c9b6860a595ea0519c99aa775a7d62ccc9d6a59",
+      "beforeSha256": "85a7a1f8e02393164f47ba50ff163d541eed10a082d8e6707a10d61bab490074",
+      "afterSha256": "9d02d02ebcd4e59c0b918ddfaf19238a18a85ce5d769340f3371ea8b81952944",
+      "oldRecord": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#/patches/130"
+    },
+    {
+      "file": "docs/platform/work-state/spec.md",
+      "oldId": "w8:gloss:docs/platform/work-state/spec.md",
+      "id": "rebased:w8:gloss:docs/platform/work-state/spec.md",
+      "oldBeforeSha256": "8fad2d269f635ce4a00093500daeb8825e95765d65e133479da4821f7aa5238e",
+      "oldAfterSha256": "12e6ceae00eda6b236fb620a5a0b9e97cec04996028d792f884c3f540d29b572",
+      "beforeSha256": "ad87f25480923800f65d16549f7d720519d856b8ee234f5fab20a0b3c5b8e2e8",
+      "afterSha256": "237f0ef0084ec452d6a70e1401498e7ed5edbd12d566a9b43faecc34cec6a597",
+      "oldRecord": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#/patches/115"
+    },
+    {
+      "file": "docs/platform/workflow/spec.md",
+      "oldId": "w8:hunk-park:workflow-holder",
+      "id": "rebased:w8:hunk-park:workflow-holder",
+      "oldBeforeSha256": "0ce96d282b026df85d96aa20c42b3e934b3b3f739a13edcf0aee6905465e1d7c",
+      "oldAfterSha256": "6f9b26430c16fa5f489c127d766a3bfc59ad28aef768094af18a355254a940ef",
+      "beforeSha256": "d6e57367a274f65638d4544651230e2605eaa1e42604bd9cfbcd800bcfa83eb8",
+      "afterSha256": "2ca4a63b251f13c00da4b68ed49c959ee6b4c435a0494beba2fd3fab8d2d6790",
+      "oldRecord": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#/patches/84"
+    }
+  ]
+}

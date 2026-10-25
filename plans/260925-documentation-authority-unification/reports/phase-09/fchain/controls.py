@@ -68,6 +68,29 @@ def main():
                 scan = g9.scan_gateway('frozen')
                 assert scan[path]['sha256'] == g9.digest(frozen) and scan[path]['lines'] == [1]
             results.append(dict(case='plans evidence ' + label + ' after pin still scans frozen bytes', passed=True))
+
+        path = 'docs/example.md'; target = root / path
+        target.parent.mkdir(parents=True); target.write_text('unrelated current correction\n')
+        def drift_git(*args):
+            if args[0] == 'ls-tree':
+                return b'100644 blob ' + b'0' * 40 + b'\tdocs/example.md\0'
+            if args[0] == 'diff':
+                return (path + '\n').encode()
+            raise AssertionError(args)
+        for label, old, current, accepted in [
+            ('non-reader repair', b'old non-reader\n', 'new non-reader\n', True),
+            ('new gateway occurrence', b'old non-reader\n', g9.GATEWAY + '\n', False),
+            ('removed gateway occurrence', frozen, 'new non-reader\n', False),
+            ('changed gateway reader body', frozen, g9.GATEWAY + '\nextra\n', False),
+        ]:
+            target.write_text(current); g9.scan_gateway.cache_clear()
+            with patch.object(g9, 'ROOT', root), patch.object(g9, 'git', side_effect=drift_git), patch.object(g9, 'blob', return_value=old):
+                try:
+                    scan = g9.scan_gateway('frozen')
+                    assert accepted and scan == {}, label
+                except ValueError:
+                    assert not accepted, label
+            results.append(dict(case='gateway scan authenticates ' + label, passed=True))
     output = dict(exit=0, controls=results, count=len(results), reuse='Real apply_one with compose.apply_diff; real G9 scan_gateway with immutable Git fixture replies.')
     (c.HERE / 'controls.json').write_text(json.dumps(output, ensure_ascii=False, indent=2) + '\n')
     print(json.dumps(dict(exit=0, controls=len(results))))

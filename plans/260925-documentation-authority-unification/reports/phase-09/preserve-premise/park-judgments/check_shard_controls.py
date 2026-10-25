@@ -127,6 +127,37 @@ def main():
     check('a preserved path cannot become a longer different path', not c.preserved_line_survives('docs/old.md', 'docs/old.md-other'))
     check('gloss cannot remove preserved prose', not c.preserved_line_survives('See `docs/old.md` important.', 'See `docs/old.md` (gloss).'))
 
+    # Upstream citation corrections are not F patches. This helper owns exact
+    # rebind authentication; the shared F door has only the wiring to it.
+    rebound = next(r for r in validated[3][0]['rows'] if r.get('preservationRebind'))
+    rebound_file = rebound['preservationRebind']['source']['file']
+    corrected = c.preservation_line(rebound, rebound_file, 23, pin)
+    check('preservation follows the authenticated upstream source correction',
+          corrected == rebound['preservationRebind']['source']['text'] and
+          c.preserved_line_survives(corrected, states[rebound_file]['text']))
+    frozen = copy.deepcopy(rebound); frozen.pop('preservationRebind')
+    check('without an explicit rebind the frozen preservation obligation remains',
+          c.preservation_line(frozen, rebound_file, 23, pin) == frozen['source']['text'] and
+          not c.preserved_line_survives(frozen['source']['text'], states[rebound_file]['text']))
+    for label, mutate in [
+        ('forged corrected text', lambda r: r['preservationRebind']['source'].__setitem__('text', 'forged')),
+        ('forged corrected unit hash', lambda r: r['preservationRebind']['source'].__setitem__('unitSha256', '0' * 64)),
+        ('forged corrected file hash', lambda r: r['preservationRebind']['source'].__setitem__('fileSha256', '0' * 64)),
+        ('different source file', lambda r: r['preservationRebind']['source'].__setitem__('file', 'docs/wrong.md')),
+        ('different source ordinal', lambda r: r['preservationRebind'].__setitem__('sourceLine', 22)),
+        ('different correction owner', lambda r: r['preservationRebind'].__setitem__('composedBy', r['pin'])),
+        ('parallel executable patch', lambda r: r.__setitem__('patch', {'file': rebound_file})),
+        ('non-preserve judgment', lambda r: r.__setitem__('disposition', 'repoint')),
+        ('later commit falsely claiming the correction', lambda r: r['preservationRebind'].update(pin=pin, composedBy=pin)),
+    ]:
+        changed = copy.deepcopy(rebound); mutate(changed)
+        rejects('preservation rebind rejects ' + label,
+                lambda: c.preservation_line(changed, rebound_file, 23, pin))
+    rejects('a later correction cannot certify an earlier replay pin',
+            lambda: c.preservation_line(rebound, rebound_file, 23, rebound['pin']))
+    check('a valid upstream rebind never permits a downstream F rewrite',
+          not c.preserved_line_survives(corrected, corrected.replace('ee2ce49c4', 'forged')))
+
     # Current fixed rows replace the old expected-red CLI runs. Deliberately bad
     # documents still exercise the real main error/report boundary without a
     # second expensive replay or a persistent report write during each probe.

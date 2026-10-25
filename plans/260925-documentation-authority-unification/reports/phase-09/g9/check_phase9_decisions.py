@@ -122,10 +122,15 @@ def scan_gateway(pin):
                 not path.startswith(('.fgos/', '.gitnexus/'))):
             files.append(path)
     drift = set(git('diff', '--name-only', pin, '--', *[p for p in files if not p.startswith('plans/')]).decode().splitlines())
-    require(not drift, 'non-record scan inputs differ from sourcePin')
+    for path in drift:
+        # An unrelated document repair is not gateway-reader drift. Prove both
+        # byte domains contain no operand; actual readers still need exact bytes.
+        require((ROOT / path).is_file() and GATEWAY.encode() not in blob(pin, path) and
+                GATEWAY.encode() not in (ROOT / path).read_bytes(),
+                'gateway scan input differs from sourcePin: ' + path)
     hits = set()
     # Every record is evidence from the pin, whether later edited or deleted.
-    # Non-record inputs still require exact checkout agreement.
+    # Non-record readers still require exact checkout agreement.
     records = [p for p in files if p.startswith('plans/')]
     files = [p for p in files if not p.startswith('plans/')]
     for path in records:

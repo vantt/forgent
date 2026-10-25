@@ -1,5 +1,27 @@
 # Premise patches: one guarded chain contract
 
+## Current-doc rebase
+
+Current replay pin: `5cb7d0cddabb93f5d5fcd7a0a85468447209fb2b`.
+`check_shard.py --all` exits **0** with zero unresolved findings and 24 resolved
+chain markers; [current report](chain-check-5cb7d0cdd.json). The owning controls
+now total **82**, all passing. Full commands, initial failures, source/history
+checks and boundaries are in [the F receipt](../../fchain/receipt.md).
+
+Existing chain-basis patches for work-state and workflow are rebased without
+changing replacements or judgments. All original frozen evidence remains intact.
+For f07671/f07672/f07686, the optional `preservationRebind` links the single
+upstream correction of their shared provenance note, not a new patch. Its
+`composedBy` is the full introducing Git commit; `pin`, `sourceLine` and a hashed
+single-line `source` span authenticate the corrected preservation operand.
+The checker proves source/correction/replay ancestry, exact span hashes and
+one-to-one line correspondence, and rejects a commit that did not introduce
+that line. No rebind leaves the original obligation unchanged; a valid rebind
+never permits the F chain to overwrite its corrected line. The shared F door
+uses this same helper. Earlier evidence and receipts below remain historical.
+
+## Historical contract receipt
+
 Checked checkout: `b005d4eba8d89a28f4b7cbd66f75354708aeb23c`.
 Frozen judgment/evidence pin: `c94545de5b45873cb2eb419f10124283fd730a2e`.
 Authority: [L13-21](../../owner-answers.md), [chain-contract brief](../../w26-chain-contract-brief.md).

@@ -1,149 +1,136 @@
-# One F composition door — records receipt
+# One F composition door — current-doc rebase receipt
 
-Status: **mechanical records proof passes; no product application, semantic approval, gate closure or cutover authorization.**
+Status: **mechanical records proof passes; no product application, semantic approval,
+gate closure or cutover authorization.** Authority: L13-21.1 and L13-24, under the
+[w27 records brief](../w27-fchain-rebase-brief.md).
 
-Replay pin: `72d516ba54692c7eacb38fde4b3fef9f6d1edc0b` (`HEAD` when checked).
-G9 immutable evidence pin: `56b3c3ebffddca273154e482e581591113c394da`.
-Premise evidence remains at each unchanged shard's own pin. Census authoring/replay
-pin: `608a4ada5f195b0d0b9d3568a71b8dde4954aacb`.
+Replay pin: `5cb7d0cddabb93f5d5fcd7a0a85468447209fb2b` (`HEAD` during this turn).
+G9 immutable decision/evidence pin: `56b3c3ebffddca273154e482e581591113c394da`.
+Original premise evidence pin: `c94545de5b45873cb2eb419f10124283fd730a2e`.
+Census authoring/replay pin: `608a4ada5f195b0d0b9d3568a71b8dde4954aacb`.
 
 ## Read and reproduce
 
-The sole prepared-byte replay door is [check.py](check.py), driven by
-[manifest.json](manifest.json). [check.json](check.json) contains every composed
-file after-hash, ordered trace, concrete base owner, source-input hash and link.
-[commands.json](commands.json) retains exact argv/stdout/stderr/exit results.
+The only prepared-byte replay door remains [check.py](check.py), using the
+unchanged [manifest.json](manifest.json). [check.json](check.json) records all
+548 composed after-hashes, selected predecessors, concrete owners and source hashes.
+[rebase-commands.json](rebase-commands.json) retains exact final argv, stdout,
+stderr and exits, plus initial failed diagnostic results.
+[rebase-validation.json](rebase-validation.json) records decision/history/scope
+conservation checks. [rebase-history.json](rebase-history.json) retains all 21
+initial findings and the six old/new spec references and pre/post hashes.
 
-With `P=plans/260925-documentation-authority-unification/reports/phase-09`, run
-`python3 -B "$P/fchain/prove.py" --all` to reproduce the records proofs. This
-invokes original proof functions/scripts; it does not execute product tests.
+With `P=plans/260925-documentation-authority-unification/reports/phase-09`, use
+the commands below. No source document is applied or edited by these proofs.
 
-## Reused prior art, not another patch engine
+## Resolutions: 16 conflict, 3 sameLinesTwice, 2 ownerless → zero
 
-- `composition/compose.py::apply_diff` remains the actual GNU
-  `patch --batch --fuzz=0 -p1` application door, using its existing disposable
-  scratch workspaces. `step-07-assemble.py::hunk_edits` supplies parsed changes.
-- `check_shard.py::replay_chain` still selects the Step-7 roots, replacement
-  roots and named composition predecessors. Its default checkout-drift guard
-  remains; the F door explicitly requests immutable pin-byte replay. All shard
-  contract validation and preservation helpers are reused, not reimplemented.
-- `fchain/check.py` adds cross-source ownership, changed-line provenance,
-  duplicate/link checks and composed hashes around that replay. It rejects
-  GNU patch's otherwise silent auto-reversal of an already-applied forward diff.
-- G9's independent `chain_sources`/`replay` path was removed. G9 now calls this
-  shared door; `check_shard.py --all` also has one shared-door wiring check.
-  The premise validator itself does not recurse through that CLI wiring.
-- Historical carry and census checks remain their owning authoring/semantic
-  proofs. Their immutable authoring pre/post hashes are checked separately
-  from replaying their deltas over the complete current state.
-- Independent composition proof reuses the recorded W13 GNU-patch recipe and
-  Step-7's existing `patch_roundtrip`, rather than writing a new replay algorithm.
+1. **Nine stale chain findings across five files:** append six replacement steps
+   in `composition/patch-specs.json`, preserving all 137 historical spec objects
+   and all 423 Step-7 specs byte-for-byte. Select the replacements through the
+   existing effective-id lists, `replaces`, `supersedes` and exact predecessor
+   fields, as the earlier chain rebase did. The files are component-boundary,
+   runner dispatch-vocabulary architecture, runner business rules, work-state
+   and workflow. Component-boundary retains its two distinct steps: the evaluator
+   pointer correction and the approved source-carriage relocation. No decision
+   or approved placement is redesigned.
+2. **Five whole-body witness conflicts:** rebase exactly those five G9 witnesses
+   onto current pin bytes and link them to the selected steps. Their old full
+   records remain retrievable through each `rebaseHistory` Git commit/selector;
+   the other 541 witnesses are unchanged. Witnesses remain non-executable readers.
+3. **Shard contract and workflow proposal conflicts:** refresh the existing
+   `basis: chain` contract in four row copies: f08069/f08076/f08084 (one work-state
+   patch) and f08335 (one workflow patch). The exact replacements, owners, frozen
+   evidence, successor bindings, judgments and pin/chain basis choices do not change.
+4. **Two ownerless roots:** the successfully replayed work-state and workflow
+   replacement steps now bind to their concrete composition-record selectors in
+   `check.json.baseOwners`. They are not independent extra patches or invented owners.
+5. **Three sameLinesTwice preservation findings:** f07671/f07672/f07686 all
+   observe the same dispatch-vocabulary provenance note, already corrected by
+   upstream commit `594fe4194` (turn 722). Each links that single upstream owner
+   through `preservationRebind.composedBy`, with full pin/file/unit hashes and
+   source ordinals; none carries an executable patch. Original judgments and
+   frozen evidence remain unchanged. The note is preserved in its corrected form,
+   not reverted to obsolete citation wording.
 
-Prior history, packet inventory and existing receipts were inspected before
-choosing the mechanism. What was missing was one composition across all prepared
-sources: earlier G9 relevant-file replay could independently accept conflicting
-or already-owned deltas.
+The premise checker owns rebind authentication through the existing Git/span
+proof primitives: both ancestry edges, exact source identity, one-to-one line
+correspondence and the commit that actually introduced the corrected line.
+Without a rebind, the original preservation obligation stays strict. The F door
+calls this same owning helper rather than maintaining a second interpretation.
+A valid rebind still cannot authorize a later F patch to rewrite the corrected note.
 
-## Inventory and result
+## Reused mechanisms and bounded checker correction
 
-| Item | Result |
-|---|---:|
-| Manifest sources, including witness/history readers | 19 |
-| Diff-bearing Phase-9 JSON files exhaustively inventoried | 18 |
-| Selected base-chain files | 465 |
-| Additional executable per-file proposals | 141 |
-| Explicit cross-source links, including one linked residual | 20 |
-| Composed files with after-hashes | 548 |
-| `sameLinesTwice` / `conflict` / `ownerless` / `duplicateWithoutLink` | **0 / 0 / 0 / 0** |
-| Existing whole-body witnesses authenticated | 546 |
-| Immutable G9 decisions retained | 158 |
-| Premise judgments retained without alteration | 787 |
+`check_shard.replay_chain`, `composition/compose.py::apply_diff`,
+`step-07-assemble.py::hunk_edits`/`locate_edit`, exact forward/inverse diffs and
+`replacement_result` remain the replay and rebase primitives. Prior history,
+including the earlier appended-root rebase, was inspected before choosing this
+representation. No alternative patch engine or permanent rebase script was added.
 
-The 141 proposals comprise 103 distinct shard-file proposals, 19 direct carries,
-5 selected carry replacement roots, 4 census pointers, 1 confirmed non-shard G6
-prepared patch and 9 G9 residual/new patches. Base composition predecessors are
-already ordered single-owner compositions, not independent owners of each line.
+The first G9 run also exposed an unrelated global-byte-drift guard: all five
+changed documents have **zero gateway operand occurrences at both pins**. Its
+scanner now authenticates that absence in both domains for changed non-readers.
+Actual gateway readers still require exact pin/checkout bytes; adding, removing
+or editing a gateway reader remains an error. This does not re-pin decisions,
+exclude any file, or change the 473-file / 12-active-reader census.
 
-The manifest also inventories `preserve-premise/prepared-patches.json`, G9's
-whole-body/supplemental witnesses, old gap05 candidates, generator observations,
-park-review evidence and carry source-parity extraction-unit witnesses. Historical
-alternatives, generated previews and extracted-unit adaptations are not second
-apply doors. Whole-body witnesses split into 465 selected-chain links, 79 generator
-previews, one linked workspace residual and one no-byte-change witness.
-[audit.json](audit.json) records the exhaustive diff-source census and scope checks.
+The complete result retains the upstream inline/fenced-code literal repairs,
+work-state priority error-reporting correction and corrected vocabulary citations.
+These are explicitly checked in `rebase-validation.json`, not inferred from green
+patch application alone.
 
-## Ownership resolutions
+## Commands and exits
 
-1. **Gateway:** G9 `/2`, `/3`, `/4`, `/6`, `/7`, `/8` retain their stable indices
-   but no executable payload. Their `composedBy` references name f03917, f04343,
-   f04357, f06830/f06831/f06837, f07976 and f07985. In particular, preserved
-   f04343 and f06830/f06831 are not retargeted. `/5` remains G9-owned and is
-   rebased only after the distinct existing premise Identity correction.
-2. **Map:** G9 `/1` links f00527 instead of restating its patch.
-3. **Carries:** `/9`–`/12`, `/17`, `/18` and the additional `/0` bin duplicate
-   are link-only. `/19` explicitly links carry 3 with a named exact predecessor;
-   its diff contains only the independent map pointer/heading-depth residual.
-4. **Other carry collisions:** selected replacements in `rebased-patches.json`
-   cover AGENTS, the retired-corpus test, the conserved network readiness clause,
-   the live backlog STR70a pointer and the richer workspace residual. Original
-   carry witnesses are unchanged except for five `composedBy` links. Completed
-   backlog advisory history is not revived. Two exact base-chain co-composition
-   edges cover the network clause and event-store line; arbitrary overlap remains
-   an error. Canonical skill carries are bound through their generated headers.
-5. **Governance/map readers:** G9 records 136 pinned occurrences, including 42
-   surviving occurrences, with exact shard, selected-chain or new-patch owners.
-   Historical/completed/projection/retiring cases retain individual evidence.
-   New `/22` owns the live mailbox map citation. No surviving reader is unowned.
-6. **G9 validation:** all `plans/` scan members and evidence/G6 judgment rows
-   come from pinned Git bytes, including files edited or deleted after that pin.
-   Gateway G6 ownership is independently rederived; relabeling it as G9 fails.
-   AGENTS must name the exact composed governance path and scope-table anchor.
+All final commands below exited **0**. Each Python invocation uses `-B`.
 
-No shard judgment, evidence span or patch was edited. The existing 24
-`duplicateOfChain` shard observations remain resolved by their owning proof;
-they are not unexplained F findings. The two classifier provenance flags remain
-unchanged; L13-23.1 already accepted those proposals, so this work asks no new
-policy decision.
-
-## Commands and owning evidence
-
-All commands below exited **0**. `$P` is the Phase-9 path defined above.
-
-| Command | Evidence / result |
+| Command | Result / owning evidence |
 |---|---|
-| `python3 -B $P/fchain/prepare.py` | Reproducible manifest, link records and exact replacement proposals |
-| `python3 -B $P/fchain/readers.py` | 12 gateway readers; 136 root-document occurrences; 42 surviving; 0 unowned |
-| `python3 -B $P/fchain/check.py --pin HEAD` | `check.json`: 548 files; no findings |
-| `python3 -B $P/fchain/controls.py` | `controls.json`: 9 probes pass, including every finding kind, forged hash, path escape, auto-reversal, edited/deleted pinned plans |
-| `python3 -B $P/preserve-premise/park-judgments/check_shard_controls.py` | 69 owning contract controls pass |
-| `python3 -B $P/preserve-premise/park-judgments/check_shard.py --all` | 0 unresolved; shared F exit 0; `chain-check-72d516ba5.json` |
-| `python3 -B $P/g9/check_phase9_decisions.py` | 158 decisions; 12 gateway readers; complete shared replay |
-| `python3 -B $P/g9/check_phase9_decisions.py --self-test` | 30 negative controls pass, including ownership relabeling, forged AGENTS path/anchor and missing root-reader coverage |
-| `node $P/carries/verify-carries.mjs` | 44 claims; 24 pointer files; existing final-pin duties retained |
-| `python3 -B $P/fchain/prove.py --census` | Original `census-join/join.py --pin 608a4ada5f195b0d0b9d3568a71b8dde4954aacb` twice; byte-identical outputs; 140 files / 1,126 sites; `census-replay.json` |
-| `python3 -B $P/fchain/prove.py --roots` | 423 selected roots; original Step-7 forward/rollback exact-byte proof; `root-replay.json` |
-| `python3 -B $P/fchain/prove.py --composition` | 94 effective + 14 deferred specs; 89 files; 251 GNU-patch invocations; `composition-replay.json` |
-| `python3 -B $P/fchain/audit.py` | Exact write scope, unchanged decisions/bodies and exhaustive diff-source census |
-| `python3 -B $P/fchain/prove.py --all` | Full reproducible command receipt in `commands.json` |
-| `git diff --check` | No whitespace errors |
+| `python3 -B $P/fchain/check.py --pin HEAD` | 548 files; 141 executable proposals; 20 existing links; zero findings (`check.json`) |
+| `python3 -B $P/preserve-premise/park-judgments/check_shard.py --all` | 787 rows; zero unresolved; 24 existing resolved markers; shared F exit 0 (`chain-check-5cb7d0cdd.json`) |
+| `python3 -B $P/g9/check_phase9_decisions.py` | All 158 decisions; 136 root-document occurrences; 12 gateway readers; pass |
+| `node $P/carries/verify-carries.mjs` | 44 claims; 24 pointer files; 1,208 live successor bindings; existing final-pin duties unchanged |
+| `python3 -B $P/fchain/prove.py --census` | Original `census-join/join.py --pin 608a4ada5f195b0d0b9d3568a71b8dde4954aacb` twice; both exit 0; all JSON outputs byte-identical; 140 files / 1,126 sites |
+| `python3 -B $P/fchain/controls.py` | 13 controls pass, including non-reader drift and rejection of added/removed/edited gateway readers |
+| `python3 -B $P/preserve-premise/park-judgments/check_shard_controls.py` | 82 controls pass, including forged source/owner/hash/ordinal, wrong ancestry, parallel patch and downstream rewrite rejection |
+| `python3 -B $P/g9/check_phase9_decisions.py --self-test` | All 30 existing negative controls pass |
+| `git diff --check` | Exit 0; no whitespace errors |
 
-The census script hardcodes its writable output directory. The proof runner calls
-its original `main` with original inputs and assertions and relocates **only** its
-`dump(path,data)` output sink into an auto-cleaned tempfile. Both normal citation
-`--check` calls still execute. Its exact adapter and output hashes are recorded.
-The independent W13 recipe similarly changes **only** its obsolete hardcoded
-scratch directory to an auto-cleaned tempfile; all replay assertions are intact.
-Neither adaptation disables a check or writes outside the granted record scope.
+Initial diagnostics were not successes: the original F check exited **1** with
+16 conflict / 3 sameLinesTwice / 2 ownerless; after the six-step rebase it exited
+**1** with only the three preservation findings. The first G9 run exited **1**
+with `non-record scan inputs differ from sourcePin`; the bounded scanner correction
+above resolves that separately. A first disposable rebase-script attempt failed
+before persisting records and was corrected; the successful run and all final
+proofs are reflected above. One aggregate verification shell hit its 300-second
+harness timeout during the optional G9 self-test; its complete rerun finished
+successfully with a longer command budget. No test was disabled or skipped.
 
-## Boundaries
+The census proof reuses the existing output-only `dump` relocation into
+auto-cleaned tempfiles; original inputs, assertions and both citation `--check`
+calls still execute. Its existing `census-replay.json` was restored because only
+checkout/tempfile argv paths changed; source hash, stdout, exits and every output
+hash were identical. Final invocation evidence is in `rebase-commands.json`.
 
-No `docs/`, ledger, register, original composition/Step-7 chain bytes, generated
-product surface or runtime state was changed. No git writes, fgOS commands,
-native-addon loads, npm/cargo suites, product tests, pair accounting or cutover
-commands were used. Scratch consists only of auto-cleaned tempfile directories
-under `/tmp/fgos-work/`. Impact analysis is unavailable under this brief's CLI/tool
-constraints; no blast-radius completeness claim is made.
+`commands.json`, `root-replay.json`, `composition-replay.json` and `audit.json`
+remain historical receipts of the previous turn, not proofs at this pin.
+`prove.py --all` includes that turn's deliberately frozen-body audit; it is not
+this brief's reproduction command. No old audit was weakened to accept new bytes.
 
-Remaining final-F conservation, current-truth, guard implementation and authorized
-application duties are unchanged. A green mechanical replay is **not** those
-acceptances and does not transfer old approvals to a future pin.
+## Boundaries and remaining duties
+
+All 787 original judgments/evidence, the entire 158-decision G9 file, historical
+spec objects, Step-7 packet and carry/census authoring packets are unchanged.
+Only permitted records/checkers were changed; no `docs/`, ledger, register,
+review, product/runtime file or private state was written. No git writes, fgOS
+CLI, native addons, npm/cargo/product tests, pair accounting or cutover commands
+were used. Scratch was confined to disposable `/tmp/fgos-work/` directories.
+
+Impact analysis is degraded under the brief's CLI/tool constraints: no provider
+query or impact tools are available here. Static callers of the changed checker
+paths are the premise CLI, shared F checker, G9 checker and their owning controls;
+no blast-radius completeness claim is made.
+
+Conservation/current-truth acceptance, independent review, final-F rebind duties,
+lease and authorized product application remain unchanged. Green mechanical
+replay does not transfer old approvals to new hashes or authorize the cutover.

@@ -384,6 +384,44 @@ def cutover_removes(path, moving, tracked):
     return bool(members) and all(p in moving for p in members)
 
 
+def preservation_line(row, file, ordinal, replay_pin):
+    """Bind preservation to an explicit upstream correction, never proposal bytes.
+
+    Frozen evidence and judgments stay intact. A rebind names the single Git
+    commit owning the correction, authenticates its span, and proves one-to-one
+    source-line correspondence; without it the original obligation is unchanged.
+    """
+    original = blob(row['pin'], file).decode().splitlines()[ordinal - 1]
+    rebind = row.get('preservationRebind')
+    if not rebind:
+        return original
+    require(row['disposition'] == 'preserve-confirmed' and not row.get('patch') and
+            not row.get('alreadyComposed'), 'preservation rebind cannot own a patch')
+    correction = rebind['pin']; span = rebind['source']
+    require(re.fullmatch('[0-9a-f]{40}', correction) and
+            rebind['composedBy'] == correction and rebind.get('reason'),
+            'preservation rebind needs an exact upstream owner and reason')
+    require(span['file'] == file and rebind['sourceLine'] == ordinal and
+            span['startLine'] == span['endLine'], 'preservation rebind source identity')
+    for earlier, later in [(row['pin'], correction), (correction, replay_pin)]:
+        require(subprocess.run(['git', '--no-optional-locks', 'merge-base',
+                '--is-ancestor', earlier, later], cwd=ROOT, capture_output=True).returncode == 0,
+                'preservation rebind is outside replay ancestry')
+    check_span(correction, span)
+    parent = blob(correction + '^', file)
+    require(parent is not None and span['text'] not in parent.decode().splitlines(),
+            'preservation rebind owner did not introduce the corrected line')
+    old = blob(row['pin'], file).decode().splitlines()
+    new = blob(correction, file).decode().splitlines()
+    mapping = {}
+    for tag, a, z, b, y in difflib.SequenceMatcher(None, old, new, autojunk=False).get_opcodes():
+        if tag in {'equal', 'replace'} and z - a == y - b:
+            mapping.update((i + 1, b + i - a + 1) for i in range(a, z))
+    require(mapping.get(ordinal) == span['startLine'] and original != span['text'],
+            'preservation rebind lacks an exact corrected source line')
+    return span['text']
+
+
 def preserved_line_survives(line, text):
     """Accept an exact line or insertion-only gloss, never a lost path operand."""
     if line in text.splitlines():
@@ -438,9 +476,8 @@ def inspect_rows(number, document, proof, patches, states, replayer, moving, tra
         elif row['disposition'] == 'preserve-confirmed' and state:
             # A preserved occurrence already rewritten by the chain is not a
             # context-only conflict: inspect its actual occurrence lines only.
-            lines = blob(document['pin'], file).decode().splitlines()
             for n in occurrence_lines:
-                line = lines[n - 1]
+                line = preservation_line(row, file, n, replayer.PIN)
                 if line and not preserved_line_survives(line, state['text']):
                     owners = [t['chainEntryId'] for t in state['trace'] if line in t['before'] and line not in t['after']]
                     if owners:

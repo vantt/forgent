@@ -93,8 +93,24 @@
     {
       "case": "plans evidence deleted after pin still scans frozen bytes",
       "passed": true
+    },
+    {
+      "case": "gateway scan authenticates non-reader repair",
+      "passed": true
+    },
+    {
+      "case": "gateway scan authenticates new gateway occurrence",
+      "passed": true
+    },
+    {
+      "case": "gateway scan authenticates removed gateway occurrence",
+      "passed": true
+    },
+    {
+      "case": "gateway scan authenticates changed gateway reader body",
+      "passed": true
     }
   ],
-  "count": 9,
+  "count": 13,
   "reuse": "Real apply_one with compose.apply_diff; real G9 scan_gateway with immutable Git fixture replies."
 }
