@@ -136,3 +136,24 @@ test('a resumed attempt that has a binding but no recorded outcome is adopted, n
   assert.equal(reviewer[0].outcome, 'provider-limit', 'its settled result is adopted');
   assert.deepEqual(runDirs(fx, resumed, 'reviewer', '1'), ['01'], 'no second run started for that attempt');
 });
+
+test('a resumed run does not run a seat again whose last attempt settled with findings; it keeps its binding and its single attempt', { skip: SKIP }, async () => {
+  const fx = setup({ alpha: { family: 'alpha' }, beta: { family: 'spentquota' } });
+  const first = await run(fx, { ...writer('u-resume-findings'), pattern: 'reviewed' }, { pattern: 'reviewed' });
+  const unitDir = unitDirOf(fx.repoRoot, first);
+  // The reviewer finished its judgment: its settled result is a verdict of findings, not a failure.
+  const resultFile = path.join(unitDir, 'reviewer', '1', 'runs', '01', 'result.json');
+  const result = readJson(resultFile);
+  result.classification = { ...result.classification, outcome: { category: 'verdict' }, assessment: { verdict: 'findings' }, failure: undefined };
+  fs.writeFileSync(resultFile, JSON.stringify(result));
+  const file = path.join(unitDir, 'unit.json');
+  const record = readJson(file);
+  record.bindings['reviewer/1'][0].outcome = 'findings';
+  fs.writeFileSync(file, JSON.stringify(record, null, 2));
+  const before = attemptsOf(fx.repoRoot, first, 'reviewer/1');
+
+  replaceFailingExecutor(fx);
+  const resumed = await resume(fx, first.unitRunId);
+  assert.deepEqual(attemptsOf(fx.repoRoot, resumed, 'reviewer/1'), before, JSON.stringify(resumed.results.map((r) => [r.role, r.outcome])));
+  assert.deepEqual(runDirs(fx, resumed, 'reviewer', '1'), ['01'], 'the finished judgment is not run again');
+});
