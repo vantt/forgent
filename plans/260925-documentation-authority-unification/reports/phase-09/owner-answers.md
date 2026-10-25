@@ -167,3 +167,9 @@ Decided by the Lead under A42, from the w18 review (5 APPROVE / 1 REWORK).
 2. **Owned-park actions are co-composed at F.** The 163 dated wrapper notes, the owned-park actions and the 6 repoint proposals all need the actual flip date and placement, and those exist only at F. Their judgments were reviewed before F (w8, w9). Only their composition is an F duty.
 3. **Rule-level approval of a mechanical reclassification is accepted.** W9 approved db023f065's reclassification of 319 parks and 20 operand rows by rule, with a 56-row spot check. That is enough, because `proof.py` replays the rule byte-identically and the review checked positive and negative controls for each rule. The G6 note must say so instead of implying a row-by-row review.
 4. The remaining w18 Low and Info findings are register corrections. They go in the same turn. 25e8842d3 (misc-fix receipt counts) gets an independent re-review.
+
+## L13-18 — The local archive ref is created at F (Lead, 2026-10-25 09:55)
+
+Decided by the Lead under A42. The G8 row asks for a repository-local archive ref before F. The partition is bound to d3efc70c5 and gets rebuilt at F (W3/W4), and `archive/design.md` makes the archive ref create-only: it refuses an existing ref that points at a different target. So a local ref created now would point at a commit the F rebuild replaces, and it would then block the correct ref at F.
+
+Ruling: create the local archive ref at F, from the F rebuild, with its custody evidence (commit, partition hash, path, blob, size and SHA256 agreement), before the G10 rehearsal. Before F, G8 needs only the independent re-review of f67e0f676. Publishing the ref stays in the owner's cutover approval (S2).
