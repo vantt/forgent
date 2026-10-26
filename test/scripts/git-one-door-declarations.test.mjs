@@ -258,6 +258,44 @@ test('declared wrappers refuse aliased and default exports with undeclared reset
   }
 });
 
+// Local export-alias cases above do not observe a barrel that never names the wrapper itself.
+// This proof owns refusal of star exports and exported namespace holders, including fixed argv.
+test('declared wrappers refuse star and namespace re-exports with undeclared reset callers', async (t) => {
+  for (const [barrel, caller] of [
+    ["export * from './read.mjs';", "import { g } from './barrel.mjs'; g(['reset', '--hard']);"],
+    ["export * as ns from './read.mjs';", "import { ns } from './barrel.mjs'; ns.g(['reset', '--hard']);"],
+    ["import * as r from './read.mjs'; export const ns = r;", "import { ns } from './barrel.mjs'; ns.g(['reset', '--hard']);"],
+  ]) {
+    for (const argv of ['args', "['ls-tree', 'HEAD']"]) {
+      for (const forwarded of [false, true]) {
+        await t.test(`${forwarded ? 'via named re-export: ' : ''}${barrel} with ${argv}`, (t) => {
+          const source = `import { execFileSync } from 'node:child_process';\nexport function g(args) { return execFileSync('git', ${argv}, {}); }\ng(['ls-tree', 'HEAD']);\n`;
+          const f = fixture(t, 'scripts/read.mjs', source);
+          f.declare([f.entry]);
+          assert.deepEqual(scan({ root: f.root }).sites, [], 'baseline declaration matches');
+          if (forwarded) f.write('scripts/forward.mjs', "export { g } from './read.mjs';\n");
+          f.write('scripts/barrel.mjs', (forwarded ? barrel.replace('./read.mjs', './forward.mjs') : barrel) + '\n');
+          f.write('scripts/caller.mjs', caller + '\n');
+          assert.throws(() => scan({ root: f.root }), /invalid Git declaration: wrapper escapes/);
+        });
+      }
+    }
+  }
+});
+
+// Refusing exported holders must not turn an ordinary, fully observed namespace call into an escape.
+test('a namespace import without a re-export remains declarable', async (t) => {
+  for (const binding of ["import * as ns from './read.mjs';", "const ns = await import('./read.mjs');"]) {
+    await t.test(binding, (t) => {
+      const f = fixture(t, 'scripts/read.mjs', "import { execFileSync } from 'node:child_process';\nexport function g(args) { return execFileSync('git', args, {}); }\ng(['ls-tree', 'HEAD']);\n");
+      f.write('scripts/caller.mjs', binding + "\nns.g(['ls-tree', 'HEAD']);\n");
+      const [site] = scan({ root: f.root }).sites;
+      f.declare([{ ...f.entry, siteId: site.siteId }]);
+      assert.deepEqual(scan({ root: f.root }).sites, []);
+    });
+  }
+});
+
 test('wrapper caller identities survive line shifts but an added read caller needs a new declaration', (t) => {
   for (const shape of WRAPPERS) {
     const f = wrapperFixture(t, shape);

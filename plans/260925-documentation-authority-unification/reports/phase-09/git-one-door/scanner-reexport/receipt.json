@@ -1,0 +1,43 @@
+{
+  "schema": "git-one-door-scanner-reexport-receipt.v1",
+  "status": "done",
+  "inputHead": "4c81209f968a3d4c1c4324dd0c858d8fe47688e9",
+  "historicalScannerRevision": "129cbb127349909fe171da418215e383d8ea06c7",
+  "approach": "Refuse unsupported re-exports through the existing value-flow escape machinery; retain namespace property paths and follow named forwarding bindings in the same bounded queue.",
+  "owningProof": "test/scripts/git-one-door-declarations.test.mjs",
+  "newNegativeCases": 12,
+  "newPositiveCases": 2,
+  "negativeControl": { "tests": 61, "pass": 48, "fail": 13, "parentFailures": 1, "missingExpectedExceptions": 12 },
+  "acceptance": { "tests": 61, "pass": 61, "fail": 0, "skipped": 0 },
+  "commands": [
+    { "command": "Required acknowledgement via Node fs.writeFileSync(.tmp) then fs.renameSync", "exitCode": 0 },
+    { "command": "git status --short && fgos tool query --capability impact-analysis --status present", "exitCode": 127, "note": "Attempted concurrently with reading brief; no installation found. No subsequent fgOS CLI invocation." },
+    { "command": "git log -8 --oneline -- scripts/git-one-door-scan.mjs", "exitCode": 0 },
+    { "command": "git log --oneline -G 'exportAll|ExportAll|re-export|findCallers|valueEscapes' -- scripts/git-one-door-scan.mjs", "exitCode": 0 },
+    { "command": "git show --stat 129cbb127", "exitCode": 0 },
+    { "command": "git log -4 -p -G 'aliasedExport|moduleImports' -- scripts/git-one-door-scan.mjs", "exitCode": 0 },
+    { "command": "mkdir -p /tmp/fgos-work && mktemp -d /tmp/fgos-work/scanner-reexport.XXXXXX", "exitCode": 0 },
+    { "command": "Initial inline no-addons Node historical-source import relocation and final-test copy", "exitCode": 0, "note": "Equivalent operation persisted as negative-control.mjs." },
+    { "command": "TMPDIR=/tmp/fgos-work/scanner-reexport.BYfEzv env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --test /tmp/fgos-work/scanner-reexport.BYfEzv/original-scanner.test.mjs", "exitCode": 1, "expectedExitCode": 1, "note": "Initial direct-only cases: 48 pass, 7 fail including parent; superseded by final red.log." },
+    { "command": "TMPDIR=/tmp/fgos-work/scanner-reexport.BYfEzv env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --test test/scripts/git-one-door-declarations.test.mjs", "exitCode": 0, "note": "Initial repair: 55/55; final repair with named forwarding: 61/61." },
+    { "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --check scripts/git-one-door-scan.mjs", "exitCode": 0, "runs": 3 },
+    { "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --check test/scripts/git-one-door-declarations.test.mjs", "exitCode": 0, "runs": 2 },
+    { "command": "git diff --check && git diff --stat && git diff -- scripts/git-one-door-scan.mjs test/scripts/git-one-door-declarations.test.mjs", "exitCode": 0 },
+    { "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-reexport/negative-control.mjs", "exitCode": 1, "expectedExitCode": 1, "evidence": "red.log" },
+    { "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --check plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-reexport/negative-control.mjs", "exitCode": 0 },
+    { "command": "git diff --check", "exitCode": 0 },
+    { "command": "git status --short && git diff --numstat && git rev-parse HEAD", "exitCode": 0 },
+    { "command": "Inline no-addons Node evidence audit, historical source hashing and invocation scratch cleanup", "exitCode": 0, "evidence": "audit.json" },
+    { "command": "Final no-addons scanner syntax, receipt/audit JSON and source-hash validation, tracked/untracked write-scope audit, git diff --check", "exitCode": 0 }
+  ],
+  "evidence": ["receipt.md", "red.log", "declarations.log", "negative-control.mjs", "audit.json"],
+  "optionalLows": {
+    "trailingSpread": "Unchanged: fixed read verb cannot become a ref write, but --output may write a file. This residual risk is acknowledged.",
+    "unresolvedConfiguredBinary": "Unchanged: explicitly covered existing no-escape behavior; no configured-binary declarations remain in real inputs."
+  },
+  "impactAnalysis": { "posture": "degraded", "reason": "Initial query failed; no graph tool available; no further fgOS CLI permitted by brief.", "reviewSeverity": "medium", "blastRadius": "Value-flow callers and escapes, automatic wrapper classification, declaration validation, census output; no runtime Git mutation." },
+  "scratch": { "root": "/tmp/fgos-work", "invocationDirectoryRemoved": true, "negativeControlUsesFinallyCleanup": true },
+  "deviations": ["One initial fgOS capability query was launched in parallel with reading the brief and failed with exit 127 before any further CLI use."],
+  "leadHandoff": ["Regenerate real census", "Run native-backed checks", "Update spec as delegated by brief"],
+  "needsWrites": []
+}
