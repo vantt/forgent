@@ -347,3 +347,23 @@ Scope, as the packet set it:
 - The Lead imports F only after HARDEN answers.
 
 **Not covered by this choice:** DOC committing to main, activating release R, holding the real lease before G10 and G11 pass, and Land.
+
+## L13-32 — Owner go for the cutover with review conditions (owner decision)
+
+**Owner text:** 2026-10-26 11:42, relayed into this session after lead:COMMUNICATION collected DOC-READY from the lanes on fg-server2.
+1. The owner approves DOC to run the documentation cutover. All six lanes on fg-server2 have confirmed they write nothing under docs/ from DOC's F import until Land.
+2. The machine is quiet, and the new release is up.
+3. Before the lease, DOC fixes the scanner and the hook and pushes `review/doc-git-one-door`. OPC must give the hook a MERGE before DOC takes the lease. HARDEN must re-review the scanner before DOC lands.
+4. OPC's High item stays the gate on the lease. The `reference-transaction` hook currently blocks `git pull` on other machines while the lease is held, so taking the lease before it is fixed would block the other machines.
+5. When DOC changes `docs/specs/*`, DOC writes a board line for COOK. Every exchange between DOC and the lanes goes through the board.
+
+**Lead plan under this go.**
+1. Merge and verify the scanner fix (turn 741) and the hook fix (turn 742), with an independent review.
+2. Import F with accounting.
+3. Push `review/doc-git-one-door` (L13-12 A'), and ask on the board for OPC's hook re-review and HARDEN's scanner re-review.
+4. lead:LAND stages release R from the F code, staging only.
+5. Run G11, then G10.
+6. Take the lease only after OPC MERGE.
+7. Land only after HARDEN's re-review and a separate owner Land approval.
+
+Board lines go through lead:LAND unless the owner allows DOC to push them itself.
