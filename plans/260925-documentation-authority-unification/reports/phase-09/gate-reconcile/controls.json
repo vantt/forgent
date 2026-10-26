@@ -1,6 +1,6 @@
 {
   "status": "passed",
-  "asOf": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
+  "asOf": "6ba3a13e18018fdfc7c79f08cd7f290865537bde",
   "positive": "passed",
   "negativeControls": [
     {
@@ -144,12 +144,27 @@
       "error": "ownership audit provenance drift"
     },
     {
-      "name": "Conditional approval cannot omit LAND confirmation",
+      "name": "Confirmed LAND condition cannot be reset to pending",
       "result": "rejected",
       "error": "conditional owner approval drift"
     },
     {
       "name": "Approved permission cannot imply an executed lease",
+      "result": "rejected",
+      "error": "cutover order drift"
+    },
+    {
+      "name": "F import before the HARDEN answer is rejected",
+      "result": "rejected",
+      "error": "cutover order drift"
+    },
+    {
+      "name": "Real lease before G11 is rejected",
+      "result": "rejected",
+      "error": "cutover order drift"
+    },
+    {
+      "name": "Real lease after G11 but before G10 is rejected",
       "result": "rejected",
       "error": "cutover order drift"
     },
@@ -174,7 +189,7 @@
       "error": "outside-plan follow-up provenance drift"
     },
     {
-      "name": "Packet moved after the lease is rejected",
+      "name": "Reversed approval-to-Land order is rejected",
       "result": "rejected",
       "error": "cutover order drift"
     },
@@ -184,6 +199,6 @@
       "error": "F-window source counts drift"
     }
   ],
-  "count": 36,
+  "count": 39,
   "method": "In-memory copies at the read_json test seam; real owning check(), path inspection and read-only git; no source file or assertion weakened."
 }

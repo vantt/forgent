@@ -181,6 +181,7 @@ def check():
         'reviews/w33-ownership-audit-review.json': ['73e89962e', '98d71bef2', 'ca3179b3c', 'c3882df26'],
         'reviews/w32-register-review.json': ['c50b78db9'],
         'reviews/w38-register-update-review.json': ['e7e6c129c'],
+        'reviews/w39-register-refresh-review.json': ['45da92781'],
     }
     require(isinstance(corrections_now, list) and len(corrections_now) == len(required_coverage) and
             {r['review']: r['commits'] for r in corrections_now} == required_coverage,
@@ -205,6 +206,10 @@ def check():
     require('edf816838' in corrections_now[2]['reworkResolutions']['w37-6'] and
             'mechanical' in corrections_now[2]['reworkResolutions']['w37-6'] and
             'independent' in corrections_now[4]['note'].lower(), 'mechanical fix or register review boundary drift')
+    require(corrections_now[-1]['verdictCounts'] == {'APPROVE': 11} and
+            corrections_now[-1]['affectedGates'] == ['cutoverReadiness'] and
+            all(term in corrections_now[-1]['note'] for term in ['0 REWORK', 'w39-10', 'w39-11', 'resolved', 'L13-31']),
+            'register order review resolution drift')
     rebind_path = ROOT / BASE / 'rebind/g0-rework-rebindings.json'
     old_rebind = git('show', f'{current_pin}:{BASE}/rebind/g0-rework-rebindings.json')
     new_rebind = rebind_path.read_bytes()
@@ -349,16 +354,30 @@ def check():
             all(term in register['gates'][9]['note'] for term in ['138', '136', '2 history-only', '60', '288']),
             'current gate note disclosure drift')
     require([row['step'] for row in readiness['order']] == [
-        'Complete and independently review local work to met-local',
-        'Send owner cutover packet at met-local (L13-6)',
         'Owner cutover approval within the stated scope and budget',
-        'Acquire documentation write lease; freeze starts',
+        'lead:LAND confirms and posts the DOC freeze notice and HARDEN request on the board',
+        'HARDEN/Git owner answers: G4 review of the 25 declarations and git spec §7 consent',
         'Final main import with accounting; record F',
+        'SEAT/LAND stages release R from the F code commit; staged only, not activated',
+        'G11: Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone',
+        'G10: holder Land rehearsal on the G8 shrunk clone with release R',
+        'Acquire the real documentation write lease',
         'Execute F duties and delta reviews; stop if any fails',
         'Write and independently review the final status ledger',
         'Land within the separately approved frame'] and
-            [row['status'] for row in readiness['order']] == ['done'] * 3 + ['pending'] * 5,
+            [row['status'] for row in readiness['order']] == ['done'] * 2 + ['pending'] * 9,
             'cutover order drift')
+    board = readiness['order'][1]
+    board_bytes = git('show', '--format=', '--unified=0', board['boardCommit'], '--', board['boardPath'])
+    require(board['boardCommit'] == git('rev-parse', 'e99966b37').decode().strip() and
+            board['boardPath'] == 'plans/261017-1313-fgos-platform-program-board/log.md' and
+            board['boardDiffSha256'] == hashlib.sha256(board_bytes).hexdigest() and
+            all(term in board_bytes.decode() for term in ['lead:LAND', 'DOC', 'HARDEN', '25 declaration', '§7']) and
+            board['date'] == '2026-10-26' and board['ruling'] == 'L13-31' and
+            board['evidence'] == ['owner-answers.md', 'w40-register-order-brief.md'] and
+            all('Freeze docs/ from F until Land; convention only until the real lease.' in row['note']
+                for row in [board, readiness['order'][3]]),
+            'board notice or convention-only freeze provenance drift')
     decision = readiness['ownerDecision']
     require(decision['source'] == 'owner-answers.md' and decision['ruling'] == 'L13-30' and
             decision['date'] == '2026-10-26' and decision['time'] == '09:57' and
@@ -367,15 +386,16 @@ def check():
             decision['packetCommit'] == git('rev-parse', '6586bbc46').decode().strip() and
             decision['ownerText'] == 'đồng ý A, khi nào lead LAND báo ổn thì em làm.' and
             decision['ownerText'] in git('show', f'{current_pin}:{BASE}/owner-answers.md').decode() and
-            decision['condition'] == dict(owner='lead:LAND', requiredBefore=readiness['order'][3]['step'], status='pending',
-                action='Confirm lease/freeze, F import and F-window heavy IO are OK before starting.') and
+            decision['condition'] == dict(owner='lead:LAND', requiredBefore=readiness['order'][1]['step'], status='done',
+                action='lead:LAND confirms before any option-A step, starting with the board notice',
+                date='2026-10-26', evidence=['owner-answers.md', 'w40-register-order-brief.md']) and
             decision['allowed'] == ['Documentation lease', 'One main import as F with accounting',
                 'F duties on plan branch and clones', 'Archive ref publication', 'Write and independently review final ledger'] and
             decision['notAllowed'] == ['Land on main without separate approval after final ledger review',
                 'Delete files on main', 'Push .fgos/events*', 'Widen the frame when F exceeds counts; stop and ask again'] and
             all(row['evidence'] == ['cutover-approval-packet.md', 'owner-answers.md'] and
                 row['packetCommit'] == decision['packetCommit'] and row['ruling'] == 'L13-30'
-                for row in readiness['order'][1:3]) and
+                for row in readiness['order'][:1]) and
             git('show', f"{decision['packetCommit']}:{BASE}/cutover-approval-packet.md") ==
             git('show', f'{current_pin}:{BASE}/cutover-approval-packet.md'),
             'conditional owner approval drift')
@@ -490,7 +510,7 @@ def check():
                        'separate immutable follow-up input fingerprints', 'separate committed W19 review fingerprints and quotes',
                        'separate W20/W21/ruling fingerprints, quotes and ancestry',
                        'W22/L13-20 correction fingerprints and explicit generated evidence',
-                       'packet-before-lease order, owner/external/F projections and source-derived F-window counts',
+                       'L13-31 board/HARDEN/F/staged-R/G11/G10/lease order, owner/external/F projections and source-derived F-window counts',
                        'current committed catch-up inputs, exhaustive review inventory, owning proofs, conditional overlays and outside-plan follow-ups'],
             'limits': 'Record integrity only. No independent semantic approval, F gate execution or full product-suite claim.'}
 

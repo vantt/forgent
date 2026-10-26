@@ -1,9 +1,9 @@
 {
   "status": "passed",
   "exit": 0,
-  "asOf": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
+  "asOf": "6ba3a13e18018fdfc7c79f08cd7f290865537bde",
   "originalSnapshotCommit": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
-  "checkedAtHead": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
+  "checkedAtHead": "6ba3a13e18018fdfc7c79f08cd7f290865537bde",
   "originalOccurrences": 87,
   "gates": 12,
   "reviewFiles": 110,
@@ -17,10 +17,10 @@
   "correctionPin": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
   "correctionInputs": 12,
   "generatedEvidence": 6,
-  "currentPin": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
-  "currentInputs": 311,
-  "currentReviews": 48,
-  "evidenceAndReviewPaths": 165,
+  "currentPin": "6ba3a13e18018fdfc7c79f08cd7f290865537bde",
+  "currentInputs": 315,
+  "currentReviews": 50,
+  "evidenceAndReviewPaths": 166,
   "clearedEntries": 24,
   "exactVerdictQuotes": 24,
   "clearedByCommits": [
@@ -64,7 +64,7 @@
     "separate committed W19 review fingerprints and quotes",
     "separate W20/W21/ruling fingerprints, quotes and ancestry",
     "W22/L13-20 correction fingerprints and explicit generated evidence",
-    "packet-before-lease order, owner/external/F projections and source-derived F-window counts",
+    "L13-31 board/HARDEN/F/staged-R/G11/G10/lease order, owner/external/F projections and source-derived F-window counts",
     "current committed catch-up inputs, exhaustive review inventory, owning proofs, conditional overlays and outside-plan follow-ups"
   ],
   "limits": "Record integrity only. No independent semantic approval, F gate execution or full product-suite claim."
