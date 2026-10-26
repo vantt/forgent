@@ -1,0 +1,52 @@
+{
+  "review": "w47-g4-final-review",
+  "scope": ["c5750a967", "6aa8e5af0"],
+  "head": "6aa8e5af0",
+  "items": [
+    {
+      "id": "W45-1",
+      "severity": "high",
+      "verdict": "APPROVE",
+      "area": "src/runner/documentation-cutover-lease-hook.mjs guardReferenceTransaction (zero old value)",
+      "evidence": "Scratch repo with this worktree's .githooks, held sidecar committed on main, origin/main at the pre-acquire commit: `git update-ref refs/heads/main <pre>`, `git branch -f main <pre>`, `update-ref --stdin` (update without old), `reset --hard <pre>`, `update-ref HEAD <pre>` with HEAD->main, and a symref alias -> main all exit 128 with 'reference-transaction refused' and main stays at the acquire commit; same with origin/main deleted. Negative control: the same probe with .githooks+src from c5750a967^ admits update-ref/branch -f/--stdin (main rewound, sidecar gone). Creating an absent main with hooks wired succeeds (rc 0). Injected rev-parse failures with status 128, 129, 2 and undefined, and an empty stdout with status 0, all return 'failing closed'. Hook runs only in the prepared phase, so rev-parse refs/heads/main reads the pre-update value.",
+      "fix": "none"
+    },
+    {
+      "id": "W45-2",
+      "severity": "high",
+      "verdict": "APPROVE",
+      "area": "scripts/git-one-door-scan.mjs re-export follower (identifier `default` alias)",
+      "evidence": "`export { g as default } from` refuses with 'exported as default', also multi-line, with a comment inside the specifier, via `./../scripts/read.mjs`, `export { g, g as default } from` behind a forwarding barrel, and `export { default as g } from` over a default barrel; `import { default as h }` from a named barrel stays stale (refuses). HEAD tests: declarations 66/0. The same test file run against the f4324b27d scanner fails 6 (4 default re-export subtests + parent + configured-adapter default case). Full-tree `--root .`: 0 undeclared, class counts byte-identical to the c5750a967 scanner (configured-binary 95, declared-tooling-exemption 19, rust-test 139, hook-read-context 26, ...).",
+      "fix": "none"
+    },
+    {
+      "id": "W47-1",
+      "severity": "medium",
+      "verdict": "REWORK",
+      "area": "scripts/git-one-door-scan.mjs re-export follower (string-name export aliases)",
+      "evidence": "ES2022 string export names bypass the W45-2 fix: barrel `export { g as \"default\" } from './read.mjs';` + caller `import h from './barrel.mjs'; h(['reset','--hard']);` scans with 0 sites and no escape, so the declared-tooling-exemption on read.mjs still passes. Same for `export { g as 'x-y' } from` + `import { 'x-y' as h } from`. Node 24.18 runs both (prints g:reset). Pre-existing at f4324b27d; not used anywhere in the repo today. The follower compares the raw alias token (`\"default\"` !== 'default') and pushes the quoted token as a name that no caller can match.",
+      "fix": "In the named re-export loop, strip matching quotes from `alias` (and `original`) before comparing; treat an unquoted value of `default` as the existing 'exported as default' escape and any alias that was quoted and is not a plain identifier as an escape ('exported under a string name'). Add both spellings to the re-export matrix in test/scripts/git-one-door-declarations.test.mjs."
+    },
+    {
+      "id": "W45-3",
+      "severity": "medium",
+      "verdict": "APPROVE",
+      "area": "docs/platform/git/spec.md section 7 line 351, section 17 line 653, CHANGELOG.md:27",
+      "evidence": "Section 7 now says only a main proven absent is a creation and a zero old value from update-ref/branch -f is replaced by the real main, matching the code; CHANGELOG 'a rewind stays refused' is now true (probe above). Section 17 now says 'a namespace import that is exported again', matching the exported-holder refusal. Section 17 claim 'default export ... refuses' holds for identifier spellings; string-name spelling is W47-1.",
+      "fix": "none (extend section 17 wording when W47-1 lands)"
+    },
+    {
+      "id": "W47-CENSUS",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "packages/git/contracts/mutation-census.v1.json",
+      "evidence": "`node scripts/git-one-door-scan.mjs --root . --write-census` exits 0 and git status is byte-identical before and after. Lease unit tests 18/0.",
+      "fix": "none"
+    }
+  ],
+  "counts": { "APPROVE": 4, "REWORK": 1, "high": 2, "medium": 2, "low": 1 },
+  "notInScope": [
+    "Extension-less relative specifiers (`from './read'`) are not followed but Node ESM refuses to resolve them, so no runtime bypass.",
+    "W45-7 dynamic import `.then(m => m.g())` callers remain a separate item."
+  ]
+}
