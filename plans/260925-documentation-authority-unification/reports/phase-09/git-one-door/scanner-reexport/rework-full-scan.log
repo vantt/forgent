@@ -1,0 +1,20 @@
+Full declared-product scan through explicit-files API; no addon staged; no census written.
+file:///home/vantt/projects/forgentX-p9-w1-d2/src/native/door.mjs:14
+const unavailable = (cause) => Object.assign(new Error(`git-addon-unavailable: ${cause}`), { code: 'git-addon-unavailable' });
+                                             ^
+
+Error: git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`
+    at unavailable (file:///home/vantt/projects/forgentX-p9-w1-d2/src/native/door.mjs:14:46)
+    at loadNativeAddon (file:///home/vantt/projects/forgentX-p9-w1-d2/src/native/door.mjs:39:117)
+    at nativeDoor (file:///home/vantt/projects/forgentX-p9-w1-d2/src/native/door.mjs:75:58)
+    at parseYaml (file:///home/vantt/projects/forgentX-p9-w1-d2/src/util/yaml.mjs:33:13)
+    at readStandaloneDeclaration (file:///home/vantt/projects/forgentX-p9-w1-d2/scripts/lib/git-spawn-match.mjs:43:45)
+    at standaloneSkillOf (file:///home/vantt/projects/forgentX-p9-w1-d2/scripts/lib/git-spawn-match.mjs:30:75)
+    at scan (file:///home/vantt/projects/forgentX-p9-w1-d2/scripts/git-one-door-scan.mjs:2667:19)
+    at file:///home/vantt/projects/forgentX-p9-w1-d2/[eval1]:9:14
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  code: 'git-addon-not-shipped'
+}
+
+Node.js v24.18.0

@@ -1,0 +1,77 @@
+✔ a declaration classifies exactly one call, retains its rationale, and survives line shifts (15.279334ms)
+✔ deleted, edited, renamed, or ambiguous declared calls fail closed instead of reusing a line number (4.845546ms)
+✔ declarations reject duplicate keys, path patterns, unknown classes, empty reasons and invalid hook verbs (9.289325ms)
+✔ the hook read set adds only show-ref and diff-tree and still rejects their mutating neighbours (1.733243ms)
+✔ an explicitly declared unresolved consumer command uses the existing configured-binary class (6.744246ms)
+✔ new or changed write callers cannot inherit any declared pass-through wrapper (21.640944ms)
+▶ call, Reflect.apply and array-slot callers refuse declared pass-through wrappers
+  ✔ tooling wrapper: git.call(null, '.', ['reset', '--hard', 'HEAD']); (1.6606ms)
+  ✔ tooling wrapper: Reflect.apply(git, null, ['.', ['reset', '--hard', 'HEAD']]); (1.725261ms)
+  ✔ tooling wrapper: const tbl = [git]; tbl[0]('.', ['reset', '--hard', 'HEAD']); (1.600887ms)
+  ✔ callback wrapper: run.call(null, 'git', ['push', '--force', 'origin', 'HEAD']); (2.308686ms)
+  ✔ callback wrapper: Reflect.apply(run, null, ['git', ['push', '--force', 'origin', 'HEAD']]); (2.587542ms)
+  ✔ callback wrapper: const tbl = [run]; tbl[0]('git', ['push', '--force', 'origin', 'HEAD']); (2.213983ms)
+  ✔ cold-hook callback: git.call(null, ['update-ref', 'refs/heads/main', 'HEAD']); (2.265059ms)
+  ✔ cold-hook callback: Reflect.apply(git, null, [['update-ref', 'refs/heads/main', 'HEAD']]); (2.515767ms)
+  ✔ cold-hook callback: const tbl = [git]; tbl[0](['update-ref', 'refs/heads/main', 'HEAD']); (2.174227ms)
+✔ call, Reflect.apply and array-slot callers refuse declared pass-through wrappers (19.868691ms)
+▶ configured declarations refuse fixed Git callback programs, including escaping write callers
+  ✔ resolved literal git caller (2.464794ms)
+  ✔ run.call(null, 'git', ['push', '--force', 'origin', 'HEAD']); (2.087965ms)
+  ✔ Reflect.apply(run, null, ['git', ['push', '--force', 'origin', 'HEAD']]); (2.084261ms)
+  ✔ const tbl = [run]; tbl[0]('git', ['push', '--force', 'origin', 'HEAD']); (2.437342ms)
+✔ configured declarations refuse fixed Git callback programs, including escaping write callers (9.464899ms)
+▶ configured declarations refuse escaping program parameters even with a known config caller
+  ✔ unresolvedConfig() (1.276634ms)
+  ✔ JSON.parse(process.env.COMMANDS).command (1.438351ms)
+✔ configured declarations refuse escaping program parameters even with a known config caller (2.94818ms)
+✔ indexed returned configuration proves the program without trusting an escaping outer caller (3.168811ms)
+▶ tooling declarations reject literal writes and non-literal caller verbs
+  ✔ literal site: ['update-ref', 'refs/heads/x', 'HEAD'] (2.05195ms)
+  ✔ wrapper: ['update-ref', 'refs/heads/x', 'HEAD'] (0.893278ms)
+  ✔ literal site: unresolvedArgs() (1.230321ms)
+  ✔ wrapper: unresolvedArgs() (0.848679ms)
+  ✔ literal site: [verb, 'HEAD'] (1.07471ms)
+  ✔ wrapper: [verb, 'HEAD'] (0.846548ms)
+  ✔ literal site: [...prefix, 'diff', 'HEAD'] (1.120357ms)
+  ✔ wrapper: [...prefix, 'diff', 'HEAD'] (1.144953ms)
+  ✔ literal site: ['symbolic-ref', ...operands] (1.11818ms)
+  ✔ wrapper: ['symbolic-ref', ...operands] (0.815893ms)
+✔ tooling declarations reject literal writes and non-literal caller verbs (11.800984ms)
+▶ declared wrappers refuse aliased and default exports with undeclared reset callers
+  ✔ export { g as alias }; with args (2.034494ms)
+  ✔ export { g as alias }; with ['ls-tree', 'HEAD'] (1.381015ms)
+  ✔ export { g as default }; with args (1.472087ms)
+  ✔ export { g as default }; with ['ls-tree', 'HEAD'] (1.137967ms)
+✔ declared wrappers refuse aliased and default exports with undeclared reset callers (6.3502ms)
+▶ declared wrappers refuse star and namespace re-exports with undeclared reset callers
+  ✔ export * from './read.mjs'; with args (1.553749ms)
+  ✔ via named re-export: export * from './read.mjs'; with args (1.416795ms)
+  ✔ export * from './read.mjs'; with ['ls-tree', 'HEAD'] (1.521359ms)
+  ✔ via named re-export: export * from './read.mjs'; with ['ls-tree', 'HEAD'] (1.228453ms)
+  ✔ export * as ns from './read.mjs'; with args (1.231415ms)
+  ✔ via named re-export: export * as ns from './read.mjs'; with args (1.264211ms)
+  ✔ export * as ns from './read.mjs'; with ['ls-tree', 'HEAD'] (1.123215ms)
+  ✔ via named re-export: export * as ns from './read.mjs'; with ['ls-tree', 'HEAD'] (1.617683ms)
+  ✔ import * as r from './read.mjs'; export const ns = r; with args (1.6355ms)
+  ✔ via named re-export: import * as r from './read.mjs'; export const ns = r; with args (1.551385ms)
+  ✔ import * as r from './read.mjs'; export const ns = r; with ['ls-tree', 'HEAD'] (1.146598ms)
+  ✔ via named re-export: import * as r from './read.mjs'; export const ns = r; with ['ls-tree', 'HEAD'] (1.270244ms)
+✔ declared wrappers refuse star and namespace re-exports with undeclared reset callers (17.361698ms)
+✔ a configured function adapter stays classified beside an unrelated named re-export (5.536567ms)
+▶ a namespace import without a re-export remains declarable
+  ✔ import * as ns from './read.mjs'; (1.468117ms)
+  ✔ const ns = await import('./read.mjs'); (1.570859ms)
+✔ a namespace import without a re-export remains declarable (3.232174ms)
+✔ wrapper caller identities survive line shifts but an added read caller needs a new declaration (8.106929ms)
+✔ caller fingerprints bind computed callees and duplicates but not caller ordering (2.943474ms)
+✔ declared hook verbs must equal observed literal caller verbs even after re-declaration (4.705526ms)
+✔ the census binds declaration bytes so doctor rejects missing or changed declarations (1.238089ms)
+ℹ tests 62
+ℹ suites 0
+ℹ pass 62
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 212.959747

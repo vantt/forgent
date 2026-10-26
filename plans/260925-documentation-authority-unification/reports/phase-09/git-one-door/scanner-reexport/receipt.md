@@ -1,10 +1,52 @@
 # Git one-door re-export refusal receipt
 
-## Result
+## Rework: configured adapter caller regression
 
-The requested code slice is complete. `computeValueFlow` now refuses declarations whose exported wrapper reaches `export * from`, `export * as ns from`, or an exported namespace holder such as `import * as r ...; export const ns = r`. It reuses the existing importer cache, bounded value-flow queue, property paths, escape list and `aliasedExport` guard; no parallel walker or declaration exception was added. Named re-exports feed that same queue so an intermediate forwarding module cannot conceal these forms. Static and awaited dynamic namespace imports retain the wrapper's property path. Import/export syntax is blanked before scanning value uses.
+**Code and owning proofs repaired; full-tree acceptance is blocked by the brief's no-addon constraint.** The earlier assertion that the re-export repair leaves the real census unchanged is withdrawn. It was not established by the declaration-only tests. The regression reported at `9fd202707` is real: `2fa7fe921` incorrectly treats *every* exported value with a nonempty property path as a namespace holder. That includes `cliSpawnAdapter.execute` and the registries receiving the adapter by value, so `computeValueFlow` records false export escapes and stops following the registered caller. A named barrel need not export `cliSpawnAdapter` to be present in this path.
 
-Ordinary namespace imports remain declarable when their observed callers are reads. Export escapes also set the existing alias flag, so configured-program provenance cannot override their refusal. No census, declaration input, runtime Git code, docs, records or fixture file changed.
+The repair keeps namespace-import provenance in the **existing** bounded value-flow queue, forwards it through the existing aliases/parameters/holders, and clears it when the held function is selected. Only a path introduced by an actual namespace import triggers the namespace-holder refusal. Ordinary function properties and registry slots continue through imports and named re-exports. Namespace imports prepend the exported name to the existing property path rather than discarding that path. No parallel resolver, special executor name, declaration exception, configuration switch or native bypass was added.
+
+The new owning test, **a configured function adapter stays classified beside an unrelated named re-export**, registers a function by value, gives it an `.execute` self-assignment, calls it with parsed configuration through the registry, and adds a named re-export list that excludes the function. It requires no undeclared sites and the same configured class count before/after adding the barrel. No existing proof was retired or weakened.
+
+### Rework proofs
+
+Working directory `/home/vantt/projects/forgentX-p9-w1-d2`, input HEAD `7bd705065`. All Node commands used `env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons`; fixture/snapshot scratch lived in invocation-owned `mkdtemp` directories under `/tmp/fgos-work/` and was removed.
+
+| Proof | Exit | Result |
+|---|---:|---|
+| `TMPDIR=<invocation scratch> env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --test test/scripts/git-one-door-declarations.test.mjs` | 0 | **62 pass, 0 fail, 0 skipped**; [rework-declarations.log](rework-declarations.log). |
+| `env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-reexport/rework-controls.mjs` | 0 | [rework-controls.log](rework-controls.log): all **12** re-export negatives fail against `129cbb127` with missing expected exceptions; the adapter regression fails against `2fa7fe921` with the false namespace-holder escape and passes against `fbcb8e016`. The harness checks the expected child exits/counts; it changes only snapshot imports, not scanner logic. |
+| Full declared-product scan via unmodified `scan({root, files})`, with read-only `git ls-files` supplying tracked/untracked non-ignored paths | 1 | **Blocked**, [rework-full-scan.log](rework-full-scan.log): `standaloneSkillOf` → `readStandaloneDeclaration` → `parseYaml` → native door throws `git-addon-not-shipped`. No classes or empty-census result are claimed from this attempt. |
+| `node --check` for scanner, owning test and rework control; `git diff --check`; tracked/untracked write-scope audit | 0 | Syntax/whitespace valid; every changed/new file is inside the exact writable list. |
+
+**Why the exact CLI scan was not run:** contrary to the rework brief's statement that it needs no addon, `main()` imports `scripts/lib/git-ports.mjs`, whose `inspectRepo()` calls `ensureScriptAddon()` and may stage/build an addon before opening Inspect. Separately, even supplying the exact product files to the public scan API reaches native YAML while checking standalone skill declarations. Running that staging route or loading an addon would violate this assignment. No fallback parser, omitted source set, mock, production skip or census write was used to hide the gap. The Lead must authorize/run native-backed full-tree acceptance, or supply a revised contract; this is a permission/dependency blocker, not a request to edit another file.
+
+### Census correction and class comparison limit
+
+Fresh per-class comparison against `fbcb8e016` **has not completed** under the no-addon contract. The rework brief reports **89 configured-binary** and one undeclared site after the regression. Reading the *stored* census at `fbcb8e016` and HEAD gives the identical table below; this is historical artifact data, **not** a fresh scan, and cannot certify the rework:
+
+| Class | Stored at `fbcb8e016` | Stored at input HEAD | Fresh rework scan |
+|---|---:|---:|---|
+| configured-binary | 92 | 92 | blocked |
+| standalone-skill-script | 3 | 3 | blocked |
+| hook-read-context | 23 | 23 | blocked |
+| rust-test | 112 | 112 | blocked |
+| argv-runner | 13 | 13 | blocked |
+| production-sandbox-probe | 4 | 4 | blocked |
+| uncalled-wrapper | 20 | 20 | blocked |
+| git-driver | 1 | 1 | blocked |
+| declared-tooling-exemption | 19 | 19 | blocked |
+| sandbox-door | 2 | 2 | blocked |
+
+Both stored artifacts list zero sites, illustrating why the unchanged artifact was not proof of unchanged behavior. A logging-only scratch diagnostic of wrapper resolution (the full classifier still ran and failed at native YAML) found no `transport.mjs` raw site before the regression or after this repair, and exactly the reported `cliSpawnAdapter` raw site at `2fa7fe921`. Its pre-final configured records were 189/183/189 respectively, before deduplication and final classification: diagnostic evidence only, **not class census counts**. Product source at input HEAD differs from `fbcb8e016` only in the scanner; read-only Git comparison confirmed that fact.
+
+**Rework limitations/deviations:** impact-analysis remains degraded (no live graph tool). An initial capability CLI query was mistakenly launched alongside reading the brief and failed with exit 127 because the worktree has no installation; no further fgOS CLI call was made. An initial full-tree comparison helper hit the default child stdout buffer limit, then the native YAML blocker after increasing the buffer; the scratch helper was removed, not shipped as a purported proof. No Git writes, lifecycle calls, native addon loads/builds, `npm test`, suite-launcher edits, docs/record edits, pair accounting or census writes were performed. No extra writable paths or install/config defaults are needed. Required outbox files are the execution-contract exception. Preview was not launched because its external writes are outside the grant.
+
+## Historical receipt (prior round; result claims superseded above)
+
+The earlier round reported the requested code slice complete. `computeValueFlow` now refuses declarations whose exported wrapper reaches `export * from`, `export * as ns from`, or an exported namespace holder such as `import * as r ...; export const ns = r`. It reuses the existing importer cache, bounded value-flow queue, property paths, escape list and `aliasedExport` guard; no parallel walker or declaration exception was added. Named re-exports feed that same queue so an intermediate forwarding module cannot conceal these forms. Static and awaited dynamic namespace imports retain the wrapper's property path. Import/export syntax is blanked before scanning value uses.
+
+Ordinary namespace imports remain declarable when their observed callers are reads. Export escapes also set the existing alias flag, so configured-program provenance cannot override their refusal. No census file, declaration input, runtime Git code, docs, records or fixture file changed in that round; this did not establish that fresh scan results were unchanged.
 
 Authority read: `w43-scanner-reexport-brief.md`, `reviews/w42-g4-fixes-review.{md,json}` (S4), `git-one-door/scanner-fixes/receipt.md`, `docs/specs/reading-map.md`, and Git spec §§12/17 plus its decision history. Prior-art inspection identifies `d0dcc24ec` as introducing export-alias refusal; this change extends it rather than repairing `findCallers` with another traversal.
 
