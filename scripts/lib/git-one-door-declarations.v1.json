@@ -3,25 +3,11 @@
   "declarations": [
     {
       "path": ".githooks/pre-commit",
-      "siteId": "leaseGitRead:90abf7f3892c18964a007d28726432916f3a7e606601ccbe23b87c8623e62463",
+      "siteId": "leaseGitRead:d9a1f33e2e9afb746b3e5f13fce0e821d3549d382ead649df4aeed7e9f2655c8",
       "class": "hook-read-context",
       "reason": "Owner L13-6 approves S1: the cold hook's leaseGitRead callback authenticates committed/staged lease authority for guardCommit and guardReferenceTransaction without loading the checkout addon; its callers only read Git facts.",
       "retireWhen": "The lease reader retires, or the Git owner supplies an approved cold-client door preserving hook authentication.",
-      "verbs": ["cat-file", "ls-tree", "show-ref", "diff", "show", "symbolic-ref read", "rev-parse", "diff-tree", "rev-list"]
-    },
-    {
-      "path": "bin/fgos.mjs",
-      "siteId": "runVerb:5015bae31309f661fda9ed9e2e7c69052e479737c20a6d248620eaf23f8a9377",
-      "class": "configured-binary",
-      "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
-      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
-    },
-    {
-      "path": "bin/fgos.mjs",
-      "siteId": "runVerb:7c4188212f1a46f409d6c6c8c060ac228b3e2bec876a988791dd2ed25b3ef2e7",
-      "class": "configured-binary",
-      "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
-      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+      "verbs": ["cat-file", "ls-tree", "show-ref", "diff", "show", "symbolic-ref read", "rev-parse", "diff-tree", "rev-list", "merge-base"]
     },
     {
       "path": "scripts/check-doc-inventory-gates.mjs",
@@ -155,27 +141,6 @@
       "class": "declared-tooling-exemption",
       "reason": "Owner L13-6 / L13-2: receipt needs the exact commit tree OID from rev-parse <commit>^{tree}; Inspect has no typed commit-tree identity fact. Parsing commit headers here would duplicate Git parsing.",
       "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git exposes commit-tree identity."
-    },
-    {
-      "path": "src/runner/merge.mjs",
-      "siteId": "landRunnerItem:cc9889cc48b52606b9bc90ec69d9c7e3216188c53719a6b06f5243f78ef87115",
-      "class": "configured-binary",
-      "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
-      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
-    },
-    {
-      "path": "src/runner/merge.mjs",
-      "siteId": "landRunnerItem:a7d2645a7b32b2cbd3ccc8248ee7b4e5b369da5845a9e8f02bf176709ac52b51",
-      "class": "configured-binary",
-      "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
-      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
-    },
-    {
-      "path": "src/runner/worktree.mjs",
-      "siteId": "runWorktreeSetupCommands:248e44e1134e762a1a88f3d776215e3515492e402a14b26abdb11f281e78d2a1",
-      "class": "configured-binary",
-      "reason": "Owner L13-6: worktreeSetup.commands is JSON project configuration, not product-selected Git; the existing consumer-command marker agrees with runtime classification but indexed configuration loses static provenance.",
-      "retireWhen": "The scanner proves parsed-config provenance, or this setup-command consumer retires."
     }
   ]
 }

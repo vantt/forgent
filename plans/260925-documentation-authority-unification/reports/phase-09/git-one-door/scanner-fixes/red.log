@@ -1,0 +1,486 @@
+✔ a declaration classifies exactly one call, retains its rationale, and survives line shifts (13.155591ms)
+✔ deleted, edited, renamed, or ambiguous declared calls fail closed instead of reusing a line number (4.248244ms)
+✔ declarations reject duplicate keys, path patterns, unknown classes, empty reasons and invalid hook verbs (8.679601ms)
+✔ the hook read set adds only show-ref and diff-tree and still rejects their mutating neighbours (1.498626ms)
+✔ an explicitly declared unresolved consumer command uses the existing configured-binary class (2.983146ms)
+✔ new or changed write callers cannot inherit any declared pass-through wrapper (18.327847ms)
+▶ call, Reflect.apply and array-slot callers refuse declared pass-through wrappers
+  ✔ tooling wrapper: git.call(null, '.', ['reset', '--hard', 'HEAD']); (1.361316ms)
+  ✔ tooling wrapper: Reflect.apply(git, null, ['.', ['reset', '--hard', 'HEAD']]); (1.202225ms)
+  ✔ tooling wrapper: const tbl = [git]; tbl[0]('.', ['reset', '--hard', 'HEAD']); (1.486114ms)
+  ✔ callback wrapper: run.call(null, 'git', ['push', '--force', 'origin', 'HEAD']); (1.783535ms)
+  ✔ callback wrapper: Reflect.apply(run, null, ['git', ['push', '--force', 'origin', 'HEAD']]); (1.779669ms)
+  ✔ callback wrapper: const tbl = [run]; tbl[0]('git', ['push', '--force', 'origin', 'HEAD']); (1.930363ms)
+  ✔ cold-hook callback: git.call(null, ['update-ref', 'refs/heads/main', 'HEAD']); (1.676396ms)
+  ✔ cold-hook callback: Reflect.apply(git, null, [['update-ref', 'refs/heads/main', 'HEAD']]); (1.980895ms)
+  ✔ cold-hook callback: const tbl = [git]; tbl[0](['update-ref', 'refs/heads/main', 'HEAD']); (1.644598ms)
+✔ call, Reflect.apply and array-slot callers refuse declared pass-through wrappers (15.553239ms)
+▶ configured declarations refuse fixed Git callback programs, including escaping write callers
+  ✖ resolved literal git caller (1.924116ms)
+  ✖ run.call(null, 'git', ['push', '--force', 'origin', 'HEAD']); (1.864904ms)
+  ✖ Reflect.apply(run, null, ['git', ['push', '--force', 'origin', 'HEAD']]); (1.643852ms)
+  ✖ const tbl = [run]; tbl[0]('git', ['push', '--force', 'origin', 'HEAD']); (1.82634ms)
+✖ configured declarations refuse fixed Git callback programs, including escaping write callers (7.600129ms)
+▶ configured declarations refuse escaping program parameters even with a known config caller
+  ✖ unresolvedConfig() (1.206819ms)
+  ✖ JSON.parse(process.env.COMMANDS).command (1.150687ms)
+✖ configured declarations refuse escaping program parameters even with a known config caller (2.526183ms)
+✖ indexed returned configuration proves the program without trusting an escaping outer caller (2.045994ms)
+▶ tooling declarations reject literal writes and non-literal caller verbs
+  ✖ literal site: ['update-ref', 'refs/heads/x', 'HEAD'] (1.157195ms)
+  ✖ wrapper: ['update-ref', 'refs/heads/x', 'HEAD'] (0.994672ms)
+  ✖ literal site: unresolvedArgs() (1.000814ms)
+  ✖ wrapper: unresolvedArgs() (0.949227ms)
+  ✖ literal site: [verb, 'HEAD'] (0.895124ms)
+  ✖ wrapper: [verb, 'HEAD'] (0.726555ms)
+  ✖ literal site: [...prefix, 'diff', 'HEAD'] (0.937367ms)
+  ✖ wrapper: [...prefix, 'diff', 'HEAD'] (0.755767ms)
+  ✖ literal site: ['symbolic-ref', ...operands] (0.980734ms)
+  ✖ wrapper: ['symbolic-ref', ...operands] (0.652323ms)
+✖ tooling declarations reject literal writes and non-literal caller verbs (9.574975ms)
+▶ declared wrappers refuse aliased and default exports with undeclared reset callers
+  ✖ export { g as alias }; with args (1.960917ms)
+  ✖ export { g as alias }; with ['ls-tree', 'HEAD'] (1.049945ms)
+  ✖ export { g as default }; with args (0.993233ms)
+  ✖ export { g as default }; with ['ls-tree', 'HEAD'] (0.904545ms)
+✖ declared wrappers refuse aliased and default exports with undeclared reset callers (5.171952ms)
+✔ wrapper caller identities survive line shifts but an added read caller needs a new declaration (7.034797ms)
+✔ caller fingerprints bind computed callees and duplicates but not caller ordering (2.020997ms)
+✔ declared hook verbs must equal observed literal caller verbs even after re-declaration (4.486967ms)
+✔ the census binds declaration bytes so doctor rejects missing or changed declarations (1.023673ms)
+ℹ tests 45
+ℹ suites 0
+ℹ pass 20
+ℹ fail 25
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 161.824573
+
+✖ failing tests:
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:182:13
+✖ resolved literal git caller (1.924116ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:188:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:182:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*(?:fixed program|wrapper escapes)/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:182:13
+✖ run.call(null, 'git', ['push', '--force', 'origin', 'HEAD']); (1.864904ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:188:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:182:13)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*(?:fixed program|wrapper escapes)/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:182:13
+✖ Reflect.apply(run, null, ['git', ['push', '--force', 'origin', 'HEAD']]); (1.643852ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:188:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:182:13)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*(?:fixed program|wrapper escapes)/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:182:13
+✖ const tbl = [run]; tbl[0]('git', ['push', '--force', 'origin', 'HEAD']); (1.82634ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:188:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:182:13)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*(?:fixed program|wrapper escapes)/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:196:13
+✖ unresolvedConfig() (1.206819ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:200:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:196:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:196:13
+✖ JSON.parse(process.env.COMMANDS).command (1.150687ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:200:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:196:13)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:207:1
+✖ indexed returned configuration proves the program without trusting an escaping outer caller (2.045994ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + [
+  +   {
+  +     binary: '? elements of section.commands',
+  +     callerDigests: [
+  +       '0bda06198856e4e54820df4bdcc93574e8b749f2a1ead291844873887eb5a7be'
+  +     ],
+  +     escapes: [
+  +       'called through .call/.apply (scripts/read.mjs:6)'
+  +     ],
+  +     family: 'unresolved-binary',
+  +     line: 4,
+  +     path: 'scripts/read.mjs',
+  +     siteId: 'verify:1b9306684a42150eab273461bfa99e64d45a0ef341c49abd19df949ccd930e38',
+  +     spawn: 'execFileSync'
+  +   }
+  + ]
+  - []
+  
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:219:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ { path: 'scripts/read.mjs', line: 4, spawn: 'execFileSync', binary: '? elements of section.commands', family: 'unresolved-binary', siteId: 'verify:1b9306684a42150eab273461bfa99e64d45a0ef341c49abd19df949ccd930e38', callerDigests: [Array], escapes: [Array] } ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15
+✖ literal site: ['update-ref', 'refs/heads/x', 'HEAD'] (1.157195ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:235:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*tooling read verbs/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15
+✖ wrapper: ['update-ref', 'refs/heads/x', 'HEAD'] (0.994672ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:235:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*tooling read verbs/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15
+✖ literal site: unresolvedArgs() (1.000814ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:235:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*tooling read verbs/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15
+✖ wrapper: unresolvedArgs() (0.949227ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:235:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*tooling read verbs/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15
+✖ literal site: [verb, 'HEAD'] (0.895124ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:235:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*tooling read verbs/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15
+✖ wrapper: [verb, 'HEAD'] (0.726555ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:235:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*tooling read verbs/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15
+✖ literal site: [...prefix, 'diff', 'HEAD'] (0.937367ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:235:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*tooling read verbs/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15
+✖ wrapper: [...prefix, 'diff', 'HEAD'] (0.755767ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:235:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*tooling read verbs/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15
+✖ literal site: ['symbolic-ref', ...operands] (0.980734ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:235:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*tooling read verbs/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15
+✖ wrapper: ['symbolic-ref', ...operands] (0.652323ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:235:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:229:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*tooling read verbs/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:248:15
+✖ export { g as alias }; with args (1.960917ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:255:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:248:15)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:248:15
+✖ export { g as alias }; with ['ls-tree', 'HEAD'] (1.049945ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:255:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:248:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:248:15
+✖ export { g as default }; with args (0.993233ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:255:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:248:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:248:15
+✖ export { g as default }; with ['ls-tree', 'HEAD'] (0.904545ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:255:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs:248:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }

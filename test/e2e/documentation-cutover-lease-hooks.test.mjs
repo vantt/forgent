@@ -13,6 +13,7 @@ import {
 
 import { acquireSync, createLockScope, runBorrowed } from '../../src/holder-lock/index.mjs';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
+import { landRunnerItem } from '../../src/runner/merge.mjs';
 
 const stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-hooks-state-'));
 process.env.FGOS_STATE_ROOT = stateRoot;
@@ -29,7 +30,7 @@ delete env.CLAUDE_CODE_SESSION_ID;
 delete env.FGOS_SESSION_ID;
 delete env.FGOS_DOCS_LEASE_TOKEN;
 
-function fixture(t) {
+function fixture(t, { cloned = false } = {}) {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-hooks-'));
   t.after(() => fs.rmSync(temp, { recursive: true, force: true }));
 
@@ -57,6 +58,14 @@ function fixture(t) {
   put('docs/guide.md', '# Guide\n');
   git(['add', '.']);
   git(['commit', '-q', '-m', 'fixture baseline']);
+  if (cloned) {
+    const seed = path.join(temp, 'seed');
+    fs.renameSync(repo, seed);
+    git(['clone', '-q', '--bare', seed, path.join(temp, 'origin.git')], temp);
+    git(['clone', '-q', path.join(temp, 'origin.git'), repo], temp);
+    git(['config', 'user.name', 'Lease Hook Fixture']);
+    git(['config', 'user.email', 'lease-hooks@example.invalid']);
+  }
 
   const fence = path.join(repo, '.fgos/locks/activation.lock');
   fs.mkdirSync(fence, { recursive: true });
@@ -786,6 +795,50 @@ test('failed CLI transitions restore main sidecar bytes and remove only freshly 
   assert.notEqual(f.rawCli(['abandon', '--owner-confirmed', '--reason', 'repair']).status, 0);
   assert.equal(fs.readFileSync(path.join(f.repo, DEFAULT_SIDECAR_PATH), 'utf8'), 'corrupt bytes without newline');
   assert.equal(f.git(['status', '--porcelain']), '');
+});
+
+// Local-branch pull rejection below cannot observe a fetched origin/main.
+// This boundary proof uses the existing lease CLI and holder Land doors in A,
+// then the real hook in independent clone B (no shared token or borrower).
+test('a second clone pulls published acquire, holder docs and release but refuses unpublished main', async t => {
+  const f = fixture(t, { cloned: true });
+  const clone = path.join(f.temp, 'clone-b');
+  f.git(['clone', '-q', path.join(f.temp, 'origin.git'), clone]);
+  f.git(['config', 'core.hooksPath', path.join(f.host, '.githooks')], clone);
+  const holder = f.addWorktree('published-holder');
+  const pull = state => {
+    f.git(['push', '-q', 'origin', 'main']);
+    const result = spawnSync('git', ['pull', '--ff-only', 'origin', 'main'], { cwd: clone, env, encoding: 'utf8', timeout: 30_000 });
+    assert.equal(result.status, 0, result.stderr + result.stdout);
+    assert.equal(f.git(['rev-parse', 'main'], clone), f.git(['rev-parse', 'main']));
+    assert.equal(JSON.parse(f.git(['show', `main:${DEFAULT_SIDECAR_PATH}`], clone)).state, state);
+    assert.equal(fs.existsSync(path.join(clone, DEFAULT_TOKEN_FILE)), false);
+  };
+  f.setupLease(holder);
+  pull('held');
+  f.put('docs/published.md', '# Published holder docs\n', holder);
+  f.git(['add', 'docs/published.md'], holder);
+  const committed = f.commit(['-m', 'holder docs for publication'], holder);
+  assert.equal(committed.status, 0, committed.stderr);
+  const landed = await landRunnerItem(f.repo, { id: 'published-holder', verify: 'true' }, {
+    branch: 'published-holder', callerCheckout: holder,
+  });
+  assert.equal(landed.outcome, 'merged', JSON.stringify(landed));
+  pull('held');
+  assert.equal(fs.readFileSync(path.join(clone, 'docs/published.md'), 'utf8'), '# Published holder docs\n');
+
+  const before = f.git(['rev-parse', 'main'], clone);
+  f.put('docs/guide.md', '# Unpublished local edit\n', clone);
+  f.git(['add', 'docs/guide.md'], clone);
+  const candidate = f.git(['commit-tree', f.git(['write-tree'], clone), '-p', before, '-m', 'unpublished main'], clone);
+  f.git(['reset', '--hard', '-q'], clone);
+  const refused = spawnSync('git', ['update-ref', 'refs/heads/main', candidate, before], { cwd: clone, env, encoding: 'utf8', timeout: 30_000 });
+  assert.notEqual(refused.status, 0);
+  assert.match(refused.stderr, /reference-transaction refused/);
+  assert.equal(f.git(['rev-parse', 'main'], clone), before);
+
+  assert.equal(f.cli(['release'], holder).result, 'released');
+  pull('released');
 });
 
 for (const operation of ['cherry-pick', 'rebase', 'am', 'pull']) {

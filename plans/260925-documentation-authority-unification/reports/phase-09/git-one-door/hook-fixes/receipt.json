@@ -1,0 +1,59 @@
+{
+  "sourceHead": "6215e614f97d520b6caa43060a6a72e1bb5c381f",
+  "status": "implemented; native verification delegated to Lead",
+  "fixes": [
+    {
+      "file": "src/runner/documentation-cutover-lease-hook.mjs",
+      "change": "Admit non-deletion main updates whose next OID is ancestor-or-equal to the resolved origin/main OID. Missing origin/main retains local policy; only ancestry exit 0 admits; unexpected ref/ancestry failures fail closed. Deletion and unpublished-update rules remain.",
+      "proof": "published main admission distinguishes ancestry from absence and read errors",
+      "wiringProof": "a second clone pulls published acquire, holder docs and release but refuses unpublished main"
+    },
+    {
+      "file": "docs/platform/git/spec.md",
+      "change": "Section 7 now limits linked-worktree coverage to commits that run pre-commit, explicitly names merge/cherry-pick/rebase/am/--no-verify plus direct HEAD:main push gaps, and describes convention plus typed doors, not complete enforcement. Documents published-history admission."
+    },
+    {
+      "file": "src/runner/documentation-cutover-lease-hook.mjs",
+      "change": "For zero old OID, hash the object-format empty tree without -w and use it as the diff baseline instead of resolving absent main.",
+      "proof": "creating absent main compares its candidate with the empty tree"
+    },
+    {
+      "file": "docs/platform/git/spec.md",
+      "change": "Moved the 2026-10-22 hardening checkpoint from owner decisions section 18 into section 7 dated history, retaining its wording."
+    }
+  ],
+  "reuse": {
+    "priorArt": ["8b20f5185 introduced guardReferenceTransaction", "83a331410 tightened transitions and corruption handling"],
+    "mechanism": "Extended the existing shared guard and owning test files; reused the read-only git adapter, fixture, docs-lease CLI transitions and landRunnerItem holder door. No new production helper or alternate gate. Shell front end unchanged.",
+    "impactAnalysis": "degraded: no impact-analysis MCP tools available; brief forbids the fgos CLI capability query. Read-only git history and caller grep show guardReferenceTransaction is wired through .githooks/pre-commit; e2e fixture extension defaults to existing behavior."
+  },
+  "commands": [
+    {"command": "git status --short; git show origin/main:plans/261017-1313-fgos-platform-program-board/log.md | grep -A 45 -B 2 '2026-10-26 11:01 OPC'", "exit": 0},
+    {"command": "git log -6 --oneline -- src/runner/documentation-cutover-lease-hook.mjs; git log --oneline -S'guardReferenceTransaction' -- src/runner/documentation-cutover-lease-hook.mjs; git log --oneline -S'refs/remotes/origin/main' -- src/runner/documentation-cutover-lease-hook.mjs", "exit": 0},
+    {"command": "git show 83a331410 -- src/runner/documentation-cutover-lease-hook.mjs", "exit": 0},
+    {"command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --test test/runner/documentation-cutover-lease.test.mjs", "exit": 1, "tests": 17, "passed": 4, "failed": 13, "note": "Both new unit proofs passed. Native-dependent existing cases could not be verified with addons forbidden: git-addon-unavailable (including derivative assertion failures). No all-green claim."},
+    {"command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --test test/e2e/documentation-cutover-lease-hooks.test.mjs", "exit": 1, "tests": 36, "passed": 2, "failed": 34, "note": "Native-dependent cases not successfully run. Existing docs-lease bootstrap requires the addon; Lead must run with the supported host/addon. This attempt preceded the explicit clone-A fixture refinement."},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g0join/join.py --pin HEAD", "exit": 0, "note": "1929/1929 effective rows approved; zero missing/mismatched/stale/open REWORK. HEAD-pinned, not live-byte approval."},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/fchain/check.py --pin HEAD (runpy invocation; output sink redirected only)", "exit": 0, "note": "595 files, 229 executed patches, 20 links, no findings. Redirected fchain/check.json into the writable hook-fixes directory before writing, rather than touching/restoring an out-of-scope file. Tracked check.json SHA-256 unchanged: f80416b15bcd711a5d035014c3d6b7e35b436989a5ca78356e14104643a3279b. No untracked chain-check report was produced."},
+    {"command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py --check", "exit": 0, "note": "Run twice after spec edits; drift 0. Seven authenticated superseded origins. No rebind file changes required."},
+    {"command": "env NODE_OPTIONS=--no-addons python3 -B (rebind.extract dual-extractor comparison of HEAD and live Git spec, then ledgerfix.bindings recursive target scan)", "exit": 0, "note": "150 documents / 13930 binding rows; zero target bindings name docs/platform/git/spec.md. No new target-digest edges; g0-rework-rebindings.json unchanged. No ownership-audit or pair-accounting recipe run."},
+    {"command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=<owned /tmp/fgos-work tempfile directory> NODE_OPTIONS=--no-addons node --test --test-name-pattern='creating absent main|published main admission' test/runner/documentation-cutover-lease.test.mjs", "exit": 0, "passed": 2, "failed": 0, "evidence": "focused-tests.log", "note": "Owned scratch removed after command; no native loading enabled."},
+    {"command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=<owned /tmp/fgos-work tempfile directory> NODE_OPTIONS=--no-addons node --test --test-name-pattern='a second clone pulls published' test/e2e/documentation-cutover-lease-hooks.test.mjs", "exit": 1, "evidence": "two-clone-blocked.log", "note": "Final fixture successfully creates clone A and clone B from a bare origin; blocked at setupLease's native CLI bootstrap before acquire/Land/pull. Lead verification required."},
+    {"command": "env NODE_OPTIONS=--no-addons node --check src/runner/documentation-cutover-lease-hook.mjs", "exit": 0},
+    {"command": "env NODE_OPTIONS=--no-addons node --check test/runner/documentation-cutover-lease.test.mjs", "exit": 0},
+    {"command": "env NODE_OPTIONS=--no-addons node --check test/e2e/documentation-cutover-lease-hooks.test.mjs", "exit": 0},
+    {"command": "sh -n .githooks/reference-transaction", "exit": 0},
+    {"command": "git diff --check", "exit": 0},
+    {"command": "python3 -B final JSON/scope/digest audit (git diff --name-only + git ls-files --others --exclude-standard)", "exit": 0, "note": "All changed/untracked repository paths inside exact assignment scope; receipt and check JSON parse; live spec matches recorded SHA-256; tracked fchain/check.json unchanged."},
+    {"command": "mdview open /home/vantt/projects/forgentX-p9-w1-d3/plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/hook-fixes/receipt.md", "exit": 1, "note": "Preview unavailable: MDView database is read-only; no URL returned."},
+    {"command": "initial G0/rebind stdout redirects before hook-fixes directory existed", "exit": 1, "note": "Shell redirection failed; neither checker executed in those two initial attempts. Directory then created and both real checks passed as recorded above."}
+  ],
+  "fchainReproduction": "Run via runpy with sys.argv=[<absolute phase-09/fchain/check.py>, '--pin', 'HEAD']; temporarily wrap pathlib.Path.write_text so only <absolute phase-09/fchain/check.json> writes to a report under the writable hook-fixes directory, rejecting other repository writes. Preserve all checker logic and reads. Compare original check.json bytes before/after. Set NODE_OPTIONS=--no-addons. This is output plumbing, not a proof bypass.",
+  "artifacts": ["plan-checks.json", "focused-tests.log", "two-clone-blocked.log", "receipt.md"],
+  "pending": [
+    "Lead runs the native-capable unit and e2e suites, especially the acquire/holder Land/release two-clone wiring proof. No native-capable success is claimed.",
+    "Repository-wide Unreleased changelog note requires CHANGELOG.md, outside this assignment's exact writable list; not written."
+  ],
+  "needsWrites": ["CHANGELOG.md"],
+  "limits": ["No git add/commit or repository Git mutation performed by the worker; test Git writes confined to fixtures.", "No fgos CLI invoked outside the existing tests; no native loading enabled.", "No pair accounting, phase-08/audit-report.py, npm test, scripts/run-tests.mjs, authority promotion or lifecycle changes.", "No new config default, env var, tool or infrastructure dependency.", "No independent approval is claimed; if a later review needs target-digest edges they must remain authored-pending-independent-review."]
+}

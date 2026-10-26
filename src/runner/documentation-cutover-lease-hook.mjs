@@ -8,6 +8,12 @@ import {
   hashHolderToken, readTokenFromWorktree,
 } from './documentation-cutover-lease.mjs';
 
+// The empty tree object id for each Git object format.
+const EMPTY_TREE = {
+  sha1: '4b825dc642cb6eb9a060e54bf8d69288fbee4904',
+  sha256: '6ef19b41225c5369f1c104d45d8d85efa9b057b53b14b4b9b939dd74decc5321',
+};
+
 function readBlob(git, revision) {
   try { return git(['cat-file', '-p', `${revision}:${DEFAULT_SIDECAR_PATH}`]).toString('utf8'); }
   catch {
@@ -83,9 +89,22 @@ export function guardReferenceTransaction({ git, root, input, env = process.env 
         if (old.status === 'held') throw new Error('cannot delete main while lease held');
         continue;
       }
+      // Another checkout may pull across acquire, holder Land and release.
+      // Published history was admitted at its typed doors, not by this clone's
+      // local sidecar/borrower. Missing origin/main keeps the local policy.
+      let published;
+      try { published = git(['rev-parse', '--verify', '--quiet', 'refs/remotes/origin/main']).toString('utf8').trim(); }
+      catch (error) { if (error.status !== 1) throw error; }
+      if (published) {
+        try { git(['merge-base', '--is-ancestor', nextOid, published]); continue; }
+        catch (error) { if (error.status !== 1) throw error; }
+      }
       const nextRaw = readBlob(git, nextOid);
       if (old.status !== 'held' && old.status !== 'corrupt' && raw === nextRaw) continue;
-      const before = /^0+$/.test(oldOid) ? git(['rev-parse', 'refs/heads/main']).toString('utf8').trim() : oldOid;
+      // Creating main: compare against the empty tree of this object format,
+      // since the main ref it would otherwise resolve does not exist yet.
+      const before = /^0+$/.test(oldOid) ? EMPTY_TREE[git(['rev-parse', '--show-object-format']).toString('utf8').trim()] : oldOid;
+      if (!before) throw new Error('unknown Git object format');
       const changed = paths(git(['diff-tree', '-r', '--name-only', '-z', '--no-renames', before, nextOid]));
       if (old.status !== 'corrupt' && !intersectsScope(changed)) continue;
       const parents = git(['rev-list', '--parents', '-n', '1', nextOid]).toString('utf8').trim().split(/\s+/);
