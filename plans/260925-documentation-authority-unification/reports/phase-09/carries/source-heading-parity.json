@@ -510,9 +510,9 @@
       {
         "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
         "anchor": "1-purpose",
-        "targetUnitDigest": "dd7d5b40f1d9981d48b9d683db6be68aa8993e6b876d56fb279c52af47d7ccdf",
+        "targetUnitDigest": "0ec0a540632ce6036fdd7bb80a9c035166853783677b5bd2a326560bdaed53ba",
         "level": 2,
-        "directPayloadDigest": "d8a9ddcaaef66bf045879c2099f8e7460998bd53c89d76c1fc4016a740d94a18"
+        "directPayloadDigest": "7d1acef5ceca0adf447fc058ea5694e81ef84bd79a11f771acfacfd5e5b4a485"
       },
       {
         "path": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
@@ -576,7 +576,149 @@
       "unheaded-block-3",
       "unheaded-block-4"
     ],
-    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit.",
+    "accounting": {
+      "previousParityRow": {
+        "sourcePath": "docs/architect/packaging-distribution/migration-map.md",
+        "sourceAnchor": "1-purpose",
+        "sourceUnitDigest": "9c5f771a64b54710e26063a46dc0e481aef023244329ee208ea5cb4d3d730177",
+        "sourceLevel": 1,
+        "title": "1. Purpose",
+        "sourceDirectPayloadDigest": "257b59cf981cbde49b685791dd54e555594b587191ad3b595a4e53c728e767d0",
+        "targets": [
+          {
+            "path": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "6ba5c7a895d85cfd4d3930b5ca0e0b6b2be5613e4134861ec9f71e6fde5702da",
+            "level": 2,
+            "directPayloadDigest": "3c76670d64b958df50e5d2f779735ad03650b38afa2c078137d39f45cd1dd8e3"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "aa90bf0b7a51a8cac91cd9cc621a351801b16909367a9aee76bb6c859501b7f2",
+            "level": 2,
+            "directPayloadDigest": "f1d7b10b6811bb9cf94ca43d4f68fb52dd99267819bc31adf9fcecff99733099"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "cc3975ebb6672b00fde69cd397d4ea235f21eb81c2435537a3be3b6d60d1371b",
+            "level": 2,
+            "directPayloadDigest": "6c89f18756f1f71dd38157733357d4b284ee7baa0e9100f4fe8e341d6c6d4e85"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "0a2ea80f9441566a9c567056d1e2cd637837b67983b6b51be8d592c318df4566",
+            "level": 2,
+            "directPayloadDigest": "47edad57f62b31944fd26a46db3a910297ce7b97a7fd8961e6235e17d136cf00"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "6e64e86f75591170c686251d2e25bc0abc0d0e50ca683f05a851a9d616879790",
+            "level": 2,
+            "directPayloadDigest": "57227574462f9e7202dc09bf603ddfb898e7694a976d15e21a5290eeee5131eb"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "7fd77bc7c17a3ef8a1f81f3fe35b3ecc315b4dee2faef0f5d2f463e8926d0ef9",
+            "level": 2,
+            "directPayloadDigest": "0069bcb18ac4d94f0c68eb163b92fdd79247be9a3604410e4b47e5d1166dafd3"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "405890737d6d1ab3b62d5e422fae5ab739717051180d7f381493bde5e0885dc9",
+            "level": 2,
+            "directPayloadDigest": "526dfb3161f1a342dc606b251fa7dcf5499fb38963a788f76d693df2cdff7ad2"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "ddb1f2d748ee389a0d0687251368ad9a7daf89b2fd5c941bf4be6547537d5af9",
+            "level": 2,
+            "directPayloadDigest": "1c98b0d3baf429ee9b473287f777fb5b8903ecb4f07afa3c5675de305a0d6dae"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "dd7d5b40f1d9981d48b9d683db6be68aa8993e6b876d56fb279c52af47d7ccdf",
+            "level": 2,
+            "directPayloadDigest": "d8a9ddcaaef66bf045879c2099f8e7460998bd53c89d76c1fc4016a740d94a18"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "a6ae5859d58abeb45fe4a6f047f3bd2b24d0efe8dce2744672e5a3ad9ea8651e",
+            "level": 2,
+            "directPayloadDigest": "a0ddbb32ad6ded5522a7113da5110dda1143109fa71e640c7fa97bc7437f7272"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "1fe2f28adc528c09558e1c57248236012f4e5123f8b37b9b8aa8936ab84c2c7f",
+            "level": 2,
+            "directPayloadDigest": "a1a615b6bdcf91b9afe66e5967fdfa7c99e8b014041c1dae875ecf6d2e2ffeb2"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "ad45e659a6444e6939d39eedb3126e760aaac325cbacc6ddad9157157bae2ec4",
+            "level": 3,
+            "directPayloadDigest": "257b59cf981cbde49b685791dd54e555594b587191ad3b595a4e53c728e767d0"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/spec.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "4fea3f1c943cf21ac7cecd558b406fcb61f6a481e668347adfdebc7079a7b8ba",
+            "level": 2,
+            "directPayloadDigest": "c47cfa4a6bbdeaec57a6154d37ab9e4b9af1c1806dec0fbdde8b3ae8ff58e16e"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/verification/implementation-alignment.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "b6be14e65e9ff78bea247a36bc70f33e4fbff0aefed29448db602b4b9d84ffde",
+            "level": 2,
+            "directPayloadDigest": "9f5656f9b64599d6f0b8d1587cc540675c99951e3c559a86d37c9ddfc506fd10"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "3495fb28bd2769a7d2020511167b124af881ea89256231c3d1f4c3cb165fbd9f",
+            "level": 2,
+            "directPayloadDigest": "1996100141dc9de2d0048c191dd0e56b04e116358b617b558709c55ea200a204"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/verification/source-preservation-audit.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "af53692ca91c1ae5896ad776233cc2cd0307b2a09f5fffc2515250b73ddd6ce7",
+            "level": 2,
+            "directPayloadDigest": "d6fc5e26bdb2c1f8019dbc71d3e2d8b0dd98225d894fc0ceddaabd3af95d200e"
+          },
+          {
+            "path": "docs/platform/packaging-distribution/vision.md",
+            "anchor": "1-purpose",
+            "targetUnitDigest": "80d64a114571aba5776a54699630f3db8f9273706c15e96eb0eb811e4e9a9619",
+            "level": 2,
+            "directPayloadDigest": "713470262c18eb92c00ac9ff70a1ae17739c6d4f5f39077de188c88e9a25c06b"
+          }
+        ],
+        "directSourceBlocks": [
+          "unheaded-block-2",
+          "unheaded-block-3",
+          "unheaded-block-4"
+        ],
+        "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+      },
+      "historicalSourcePin": "5a3f7580a",
+      "oldLegacyAnchor": "1-purpose",
+      "oldLegacyDigest": "9c5f771a64b54710e26063a46dc0e481aef023244329ee208ea5cb4d3d730177",
+      "rationale": "F refresh of live heading and complete direct-block census; no approval carried.",
+      "reviewStatus": "pending"
+    }
   },
   {
     "sourcePath": "docs/architect/packaging-distribution/migration-map.md",
@@ -2117,10 +2259,10 @@
   {
     "sourcePath": "docs/specs/distribution.md",
     "sourceAnchor": "data-dictionary",
-    "sourceUnitDigest": "ea2e6b86ff3cfb046074dd1da3defe6ff5f212c8528f6124837782848f91eddc",
+    "sourceUnitDigest": "b1d8afdee180a44a76bd9a7a33ceb75369152eb6856e49447bf09f5492937ba1",
     "sourceLevel": 2,
     "title": "Data Dictionary",
-    "sourceDirectPayloadDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+    "sourceDirectPayloadDigest": "b99e9a01b2eb55a7cbe9899c2477e57010b509c93af1603748d22b93d75eb1f7",
     "targets": [
       {
         "path": "docs/platform/packaging-distribution/spec.md",
@@ -2138,28 +2280,56 @@
       "previousParityRow": {
         "sourcePath": "docs/specs/distribution.md",
         "sourceAnchor": "data-dictionary",
-        "sourceUnitDigest": "5778eb04067fe3263755aa2183a8fa30e77ee1a86b25330171ae084cb8f53828",
+        "sourceUnitDigest": "ea2e6b86ff3cfb046074dd1da3defe6ff5f212c8528f6124837782848f91eddc",
         "sourceLevel": 2,
         "title": "Data Dictionary",
-        "sourceDirectPayloadDigest": "7df410607f6d4460de1cbd6bb5b9b82969aacd91fb327a21642cfc5e44384261",
+        "sourceDirectPayloadDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
         "targets": [
           {
             "path": "docs/platform/packaging-distribution/spec.md",
             "anchor": "data-dictionary",
-            "targetUnitDigest": "8614119392e90a5380a4a517637f837d0b55045239e9dbcee00c3d3c6579f1b2",
+            "targetUnitDigest": "2dc0a292149077bef0543e606ba23bb513348daa7b676f3abc27a99035b995a9",
             "level": 4,
-            "directPayloadDigest": "7df410607f6d4460de1cbd6bb5b9b82969aacd91fb327a21642cfc5e44384261"
+            "directPayloadDigest": "9beb13029f354e3841ec8984af7be4fdd63a04ac96dec86607fa268a5284739b"
           }
         ],
         "directSourceBlocks": [
           "unheaded-block-5"
         ],
-        "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+        "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit.",
+        "accounting": {
+          "previousParityRow": {
+            "sourcePath": "docs/specs/distribution.md",
+            "sourceAnchor": "data-dictionary",
+            "sourceUnitDigest": "5778eb04067fe3263755aa2183a8fa30e77ee1a86b25330171ae084cb8f53828",
+            "sourceLevel": 2,
+            "title": "Data Dictionary",
+            "sourceDirectPayloadDigest": "7df410607f6d4460de1cbd6bb5b9b82969aacd91fb327a21642cfc5e44384261",
+            "targets": [
+              {
+                "path": "docs/platform/packaging-distribution/spec.md",
+                "anchor": "data-dictionary",
+                "targetUnitDigest": "8614119392e90a5380a4a517637f837d0b55045239e9dbcee00c3d3c6579f1b2",
+                "level": 4,
+                "directPayloadDigest": "7df410607f6d4460de1cbd6bb5b9b82969aacd91fb327a21642cfc5e44384261"
+              }
+            ],
+            "directSourceBlocks": [
+              "unheaded-block-5"
+            ],
+            "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+          },
+          "historicalSourcePin": "f534aeaea",
+          "oldLegacyAnchor": "data-dictionary",
+          "oldLegacyDigest": "5778eb04067fe3263755aa2183a8fa30e77ee1a86b25330171ae084cb8f53828",
+          "rationale": "Refresh live source/target heading digests and ordered direct-block locators from current bytes. The complete authoring row remains historical; no review approval carried.",
+          "reviewStatus": "pending"
+        }
       },
-      "historicalSourcePin": "f534aeaea",
+      "historicalSourcePin": "5a3f7580a",
       "oldLegacyAnchor": "data-dictionary",
-      "oldLegacyDigest": "5778eb04067fe3263755aa2183a8fa30e77ee1a86b25330171ae084cb8f53828",
-      "rationale": "Refresh live source/target heading digests and ordered direct-block locators from current bytes. The complete authoring row remains historical; no review approval carried.",
+      "oldLegacyDigest": "ea2e6b86ff3cfb046074dd1da3defe6ff5f212c8528f6124837782848f91eddc",
+      "rationale": "F refresh of live heading and complete direct-block census; no approval carried.",
       "reviewStatus": "pending"
     }
   },
@@ -2227,10 +2397,10 @@
   {
     "sourcePath": "docs/specs/distribution.md",
     "sourceAnchor": "contributor-hooks-setup",
-    "sourceUnitDigest": "bc2cf68b62efb7443a726062ce1b1aa5e98f7eb197f4a5c97eb296a87aa17982",
+    "sourceUnitDigest": "ec6c5dc6828f05ce19e82ac83707c7147a9c3d7fae4a779c9bc2bdbea8965175",
     "sourceLevel": 3,
     "title": "Contributor hooks setup",
-    "sourceDirectPayloadDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+    "sourceDirectPayloadDigest": "469b9e1045e16083e8ae08ddca0bdc858c971911b19337ee3c79a1b2039d5b09",
     "targets": [
       {
         "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
@@ -2243,15 +2413,43 @@
     "directSourceBlocks": [
       "unheaded-block-8"
     ],
-    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit.",
+    "accounting": {
+      "previousParityRow": {
+        "sourcePath": "docs/specs/distribution.md",
+        "sourceAnchor": "contributor-hooks-setup",
+        "sourceUnitDigest": "bc2cf68b62efb7443a726062ce1b1aa5e98f7eb197f4a5c97eb296a87aa17982",
+        "sourceLevel": 3,
+        "title": "Contributor hooks setup",
+        "sourceDirectPayloadDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "targets": [
+          {
+            "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+            "anchor": "contributor-hooks-setup",
+            "targetUnitDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+            "level": 5,
+            "directPayloadDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d"
+          }
+        ],
+        "directSourceBlocks": [
+          "unheaded-block-8"
+        ],
+        "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+      },
+      "historicalSourcePin": "5a3f7580a",
+      "oldLegacyAnchor": "contributor-hooks-setup",
+      "oldLegacyDigest": "bc2cf68b62efb7443a726062ce1b1aa5e98f7eb197f4a5c97eb296a87aa17982",
+      "rationale": "F refresh of live heading and complete direct-block census; no approval carried.",
+      "reviewStatus": "pending"
+    }
   },
   {
     "sourcePath": "docs/specs/distribution.md",
     "sourceAnchor": "setup",
-    "sourceUnitDigest": "3ddc0439eab8352041049e0935f8d5c4b51b519b2bc13d2db2c2503f0971d8af",
+    "sourceUnitDigest": "614f018f009b7bed08766551eb84093f6a21479eac914f2bb6ef3b871b08b3dc",
     "sourceLevel": 3,
     "title": "Setup",
-    "sourceDirectPayloadDigest": "56a9269a6139c7decbb50dc5a46edf077a2d6d68c328b1620443082cc61e7aa7",
+    "sourceDirectPayloadDigest": "a4e5c02eb076c14e18b1e83c08cb6f70b432e042dc074d60ce9076babaa44d80",
     "targets": [
       {
         "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
@@ -2269,28 +2467,56 @@
       "previousParityRow": {
         "sourcePath": "docs/specs/distribution.md",
         "sourceAnchor": "setup",
-        "sourceUnitDigest": "3100ba971aa49e17d071b3ba3eefb5f0d2e6749b9df553c0baba5ed0dabeee32",
+        "sourceUnitDigest": "3ddc0439eab8352041049e0935f8d5c4b51b519b2bc13d2db2c2503f0971d8af",
         "sourceLevel": 3,
         "title": "Setup",
-        "sourceDirectPayloadDigest": "4d0599aeabec3d9f17d933e855897f53a6ffb0479400426111b48cdc07ff6a66",
+        "sourceDirectPayloadDigest": "56a9269a6139c7decbb50dc5a46edf077a2d6d68c328b1620443082cc61e7aa7",
         "targets": [
           {
             "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
             "anchor": "setup",
-            "targetUnitDigest": "67db6969421f5b23163946c68822bc23b2272a1e04afae0da23b7f7bf5d09d9e",
+            "targetUnitDigest": "170ce67e010e1bc0f007c97c410db3aeb3f4af54ba6788c9a04f30b194614d34",
             "level": 5,
-            "directPayloadDigest": "4d0599aeabec3d9f17d933e855897f53a6ffb0479400426111b48cdc07ff6a66"
+            "directPayloadDigest": "56a9269a6139c7decbb50dc5a46edf077a2d6d68c328b1620443082cc61e7aa7"
           }
         ],
         "directSourceBlocks": [
           "unheaded-block-9"
         ],
-        "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+        "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit.",
+        "accounting": {
+          "previousParityRow": {
+            "sourcePath": "docs/specs/distribution.md",
+            "sourceAnchor": "setup",
+            "sourceUnitDigest": "3100ba971aa49e17d071b3ba3eefb5f0d2e6749b9df553c0baba5ed0dabeee32",
+            "sourceLevel": 3,
+            "title": "Setup",
+            "sourceDirectPayloadDigest": "4d0599aeabec3d9f17d933e855897f53a6ffb0479400426111b48cdc07ff6a66",
+            "targets": [
+              {
+                "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+                "anchor": "setup",
+                "targetUnitDigest": "67db6969421f5b23163946c68822bc23b2272a1e04afae0da23b7f7bf5d09d9e",
+                "level": 5,
+                "directPayloadDigest": "4d0599aeabec3d9f17d933e855897f53a6ffb0479400426111b48cdc07ff6a66"
+              }
+            ],
+            "directSourceBlocks": [
+              "unheaded-block-9"
+            ],
+            "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+          },
+          "historicalSourcePin": "f534aeaea",
+          "oldLegacyAnchor": "setup",
+          "oldLegacyDigest": "3100ba971aa49e17d071b3ba3eefb5f0d2e6749b9df553c0baba5ed0dabeee32",
+          "rationale": "Refresh live source/target heading digests and ordered direct-block locators from current bytes. The complete authoring row remains historical; no review approval carried.",
+          "reviewStatus": "pending"
+        }
       },
-      "historicalSourcePin": "f534aeaea",
+      "historicalSourcePin": "5a3f7580a",
       "oldLegacyAnchor": "setup",
-      "oldLegacyDigest": "3100ba971aa49e17d071b3ba3eefb5f0d2e6749b9df553c0baba5ed0dabeee32",
-      "rationale": "Refresh live source/target heading digests and ordered direct-block locators from current bytes. The complete authoring row remains historical; no review approval carried.",
+      "oldLegacyDigest": "3ddc0439eab8352041049e0935f8d5c4b51b519b2bc13d2db2c2503f0971d8af",
+      "rationale": "F refresh of live heading and complete direct-block census; no approval carried.",
       "reviewStatus": "pending"
     }
   },
@@ -2339,10 +2565,10 @@
   {
     "sourcePath": "docs/specs/distribution.md",
     "sourceAnchor": "business-rules",
-    "sourceUnitDigest": "2bf8f761d6f896e77001be77524779fbeb2d871183170be2112ff5aa6403de19",
+    "sourceUnitDigest": "229f81f905dd014d54517afc7d630d78a8c62545bf54573369b3e0188989069b",
     "sourceLevel": 2,
     "title": "Business Rules",
-    "sourceDirectPayloadDigest": "9aa97de48018b934e6eb6f7ad9cfb25b5002e8295663fb2974132e7508103dee",
+    "sourceDirectPayloadDigest": "98e60d6aa2a87d909042c3c1909c1993418480176e72eb094c7d74ac8500a7d1",
     "targets": [
       {
         "path": "docs/platform/packaging-distribution/spec.md",
@@ -2364,10 +2590,10 @@
       "previousParityRow": {
         "sourcePath": "docs/specs/distribution.md",
         "sourceAnchor": "business-rules",
-        "sourceUnitDigest": "f15d85de438adbc466873ed6d47a3dd9801c6f90f4a83b9eecaa6bf2c3661db9",
+        "sourceUnitDigest": "2bf8f761d6f896e77001be77524779fbeb2d871183170be2112ff5aa6403de19",
         "sourceLevel": 2,
         "title": "Business Rules",
-        "sourceDirectPayloadDigest": "233c7995e671dd467bcea75efcb0d0ca360441e23e274722b97c1f54354b78ce",
+        "sourceDirectPayloadDigest": "9aa97de48018b934e6eb6f7ad9cfb25b5002e8295663fb2974132e7508103dee",
         "targets": [
           {
             "path": "docs/platform/packaging-distribution/spec.md",
@@ -2384,12 +2610,44 @@
           "unheaded-block-15",
           "unheaded-block-16"
         ],
-        "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+        "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit.",
+        "accounting": {
+          "previousParityRow": {
+            "sourcePath": "docs/specs/distribution.md",
+            "sourceAnchor": "business-rules",
+            "sourceUnitDigest": "f15d85de438adbc466873ed6d47a3dd9801c6f90f4a83b9eecaa6bf2c3661db9",
+            "sourceLevel": 2,
+            "title": "Business Rules",
+            "sourceDirectPayloadDigest": "233c7995e671dd467bcea75efcb0d0ca360441e23e274722b97c1f54354b78ce",
+            "targets": [
+              {
+                "path": "docs/platform/packaging-distribution/spec.md",
+                "anchor": "business-rules",
+                "targetUnitDigest": "66ec4b8568f3c061110d78146cf13062280b7eb8655d5d1bcb669cb47b07460d",
+                "level": 4,
+                "directPayloadDigest": "647e6a167d1504a959c35b9cba7f7e1d5ca5a9e5a581da5bb4c074b1e8902ec2"
+              }
+            ],
+            "directSourceBlocks": [
+              "unheaded-block-12",
+              "unheaded-block-13",
+              "unheaded-block-14",
+              "unheaded-block-15",
+              "unheaded-block-16"
+            ],
+            "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+          },
+          "historicalSourcePin": "f534aeaea",
+          "oldLegacyAnchor": "business-rules",
+          "oldLegacyDigest": "f15d85de438adbc466873ed6d47a3dd9801c6f90f4a83b9eecaa6bf2c3661db9",
+          "rationale": "Refresh live source/target heading digests and ordered direct-block locators from current bytes. The complete authoring row remains historical; no review approval carried.",
+          "reviewStatus": "pending"
+        }
       },
-      "historicalSourcePin": "f534aeaea",
+      "historicalSourcePin": "5a3f7580a",
       "oldLegacyAnchor": "business-rules",
-      "oldLegacyDigest": "f15d85de438adbc466873ed6d47a3dd9801c6f90f4a83b9eecaa6bf2c3661db9",
-      "rationale": "Refresh live source/target heading digests and ordered direct-block locators from current bytes. The complete authoring row remains historical; no review approval carried.",
+      "oldLegacyDigest": "2bf8f761d6f896e77001be77524779fbeb2d871183170be2112ff5aa6403de19",
+      "rationale": "F refresh of live heading and complete direct-block census; no approval carried.",
       "reviewStatus": "pending"
     }
   },
@@ -2605,10 +2863,10 @@
   {
     "sourcePath": "docs/specs/distribution.md",
     "sourceAnchor": "pointers-implementation",
-    "sourceUnitDigest": "f45aeba53fa3144eaec9bf04c50a58c55356471c3dc0e3e0af31be4a6e027db9",
+    "sourceUnitDigest": "8487d88a1d13cf333ea10897286835f52c2bea3e0cdebf0a13b40f034638ac26",
     "sourceLevel": 2,
     "title": "Pointers (implementation)",
-    "sourceDirectPayloadDigest": "dafeb397fad0ae82979e931d86c897ed92c0d4769a5e303569c6c82f36da4bb9",
+    "sourceDirectPayloadDigest": "682e4935fb3e0f1d2389f22edf31b6ebf8330bfd147704d1af33c0a01e62e097",
     "targets": [
       {
         "path": "docs/platform/packaging-distribution/spec.md",
@@ -2634,20 +2892,48 @@
           {
             "path": "docs/platform/packaging-distribution/spec.md",
             "anchor": "pointers-implementation",
-            "targetUnitDigest": "851884c939509226f78c3caadf8509ec1afffbe99c5067cf97630ae6887b01ab",
+            "targetUnitDigest": "69a415f020853dcf82a0db0e5d6f93a3223436771bc39d27c1d9b24d8741d906",
             "level": 4,
-            "directPayloadDigest": "dafeb397fad0ae82979e931d86c897ed92c0d4769a5e303569c6c82f36da4bb9"
+            "directPayloadDigest": "eb95a58af38313457ad6b2291a30070ab9931c046294b2a22b428c3ec126fcaa"
           }
         ],
         "directSourceBlocks": [
-          "unheaded-block-27"
+          "unheaded-block-28"
         ],
-        "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+        "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit.",
+        "accounting": {
+          "previousParityRow": {
+            "sourcePath": "docs/specs/distribution.md",
+            "sourceAnchor": "pointers-implementation",
+            "sourceUnitDigest": "f45aeba53fa3144eaec9bf04c50a58c55356471c3dc0e3e0af31be4a6e027db9",
+            "sourceLevel": 2,
+            "title": "Pointers (implementation)",
+            "sourceDirectPayloadDigest": "dafeb397fad0ae82979e931d86c897ed92c0d4769a5e303569c6c82f36da4bb9",
+            "targets": [
+              {
+                "path": "docs/platform/packaging-distribution/spec.md",
+                "anchor": "pointers-implementation",
+                "targetUnitDigest": "851884c939509226f78c3caadf8509ec1afffbe99c5067cf97630ae6887b01ab",
+                "level": 4,
+                "directPayloadDigest": "dafeb397fad0ae82979e931d86c897ed92c0d4769a5e303569c6c82f36da4bb9"
+              }
+            ],
+            "directSourceBlocks": [
+              "unheaded-block-27"
+            ],
+            "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+          },
+          "historicalSourcePin": "f534aeaea",
+          "oldLegacyAnchor": "pointers-implementation",
+          "oldLegacyDigest": "f45aeba53fa3144eaec9bf04c50a58c55356471c3dc0e3e0af31be4a6e027db9",
+          "rationale": "Refresh live source/target heading digests and ordered direct-block locators from current bytes. The complete authoring row remains historical; no review approval carried.",
+          "reviewStatus": "pending"
+        }
       },
-      "historicalSourcePin": "f534aeaea",
+      "historicalSourcePin": "5a3f7580a",
       "oldLegacyAnchor": "pointers-implementation",
       "oldLegacyDigest": "f45aeba53fa3144eaec9bf04c50a58c55356471c3dc0e3e0af31be4a6e027db9",
-      "rationale": "Refresh live source/target heading digests and ordered direct-block locators from current bytes. The complete authoring row remains historical; no review approval carried.",
+      "rationale": "F refresh of live heading and complete direct-block census; no approval carried.",
       "reviewStatus": "pending"
     }
   }

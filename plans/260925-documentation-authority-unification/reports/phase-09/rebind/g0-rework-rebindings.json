@@ -1,6 +1,6 @@
 {
   "sourceHead": "ee2ce49c4b610daccb656f79fdb29531bb41d06b",
-  "status": "reviewed; records 0–148 (594fe4194): reviews/w26-g0-rework-verdicts.md; records 149–154: reviews/w33-ownership-audit-review.json (5 APPROVE / 0 REWORK)",
+  "status": "reviewed; records 0–148 (594fe4194): reviews/w26-g0-rework-verdicts.md; records 149–154: reviews/w33-ownership-audit-review.json (5 APPROVE / 0 REWORK); records 155–173: authored-pending-independent-review (F refresh; three rows need delta decisions, not authored)",
   "records": [
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
@@ -1580,7 +1580,9 @@
         "unitKind": "heading",
         "anchor": "3-work-item-data-dictionary",
         "textDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
-        "ancestry": ["Work State Specification"],
+        "ancestry": [
+          "Work State Specification"
+        ],
         "startLine": 58,
         "endLine": 58
       },
@@ -1588,7 +1590,9 @@
         "unitKind": "heading",
         "anchor": "3-work-item-data-dictionary",
         "textDigest": "38928382469a2a60b56f2ff61809ddaa4867bb56befe003f6b6de3e59bc5980b",
-        "ancestry": ["Work State Specification"],
+        "ancestry": [
+          "Work State Specification"
+        ],
         "startLine": 58,
         "endLine": 58
       },
@@ -1608,7 +1612,10 @@
         "unitKind": "unheaded-block",
         "anchor": "unheaded-block-4",
         "textDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
-        "ancestry": ["Work State Specification", "3. Work Item Data Dictionary"],
+        "ancestry": [
+          "Work State Specification",
+          "3. Work Item Data Dictionary"
+        ],
         "startLine": 60,
         "endLine": 93
       },
@@ -1616,7 +1623,10 @@
         "unitKind": "unheaded-block",
         "anchor": "unheaded-block-4",
         "textDigest": "697a5d20130ddf3da55b15a4c83de8547350169cad06716db63e84920b77f817",
-        "ancestry": ["Work State Specification", "3. Work Item Data Dictionary"],
+        "ancestry": [
+          "Work State Specification",
+          "3. Work Item Data Dictionary"
+        ],
         "startLine": 60,
         "endLine": 93
       },
@@ -1637,7 +1647,9 @@
         "unitKind": "heading",
         "anchor": "6-domain-model",
         "textDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
-        "ancestry": ["Work State Specification"],
+        "ancestry": [
+          "Work State Specification"
+        ],
         "startLine": 428,
         "endLine": 428
       },
@@ -1645,7 +1657,9 @@
         "unitKind": "heading",
         "anchor": "6-domain-model",
         "textDigest": "6409f8626a70ed88b74540a41004923b33139c286f3000e7d2ad0dccd7827603",
-        "ancestry": ["Work State Specification"],
+        "ancestry": [
+          "Work State Specification"
+        ],
         "startLine": 428,
         "endLine": 428
       },
@@ -1666,7 +1680,10 @@
         "unitKind": "unheaded-block",
         "anchor": "unheaded-block-54",
         "textDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
-        "ancestry": ["Work State Specification", "6. Domain Model"],
+        "ancestry": [
+          "Work State Specification",
+          "6. Domain Model"
+        ],
         "startLine": 514,
         "endLine": 523
       },
@@ -1674,7 +1691,10 @@
         "unitKind": "unheaded-block",
         "anchor": "unheaded-block-54",
         "textDigest": "c7cd4adcef84c275026db71050f63ffabfd387815f0facc80a3a8bad116fbbc7",
-        "ancestry": ["Work State Specification", "6. Domain Model"],
+        "ancestry": [
+          "Work State Specification",
+          "6. Domain Model"
+        ],
         "startLine": 514,
         "endLine": 523
       },
@@ -1695,7 +1715,11 @@
         "unitKind": "heading",
         "anchor": "9-hexagonal-architecture-view",
         "textDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
-        "ancestry": ["Component Boundary", "Added in candidate: component-boundary-advisory source carriage", "fgOS Component Boundary Advisory"],
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory"
+        ],
         "startLine": 485,
         "endLine": 485
       },
@@ -1703,7 +1727,11 @@
         "unitKind": "heading",
         "anchor": "9-hexagonal-architecture-view",
         "textDigest": "19a6fe083bfc459a903777017c47f4b4f129db45b29c9fad63271369bdeb4200",
-        "ancestry": ["Component Boundary", "Added in candidate: component-boundary-advisory source carriage", "fgOS Component Boundary Advisory"],
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory"
+        ],
         "startLine": 485,
         "endLine": 485
       },
@@ -1724,7 +1752,12 @@
         "unitKind": "unheaded-block",
         "anchor": "unheaded-block-70",
         "textDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
-        "ancestry": ["Component Boundary", "Added in candidate: component-boundary-advisory source carriage", "fgOS Component Boundary Advisory", "9. Hexagonal Architecture View"],
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ],
         "startLine": 536,
         "endLine": 575
       },
@@ -1732,7 +1765,12 @@
         "unitKind": "unheaded-block",
         "anchor": "unheaded-block-70",
         "textDigest": "5700ffb4998b177096f2f1e47a65ec9fea217d555e382d03ae84f0422c4362c5",
-        "ancestry": ["Component Boundary", "Added in candidate: component-boundary-advisory source carriage", "fgOS Component Boundary Advisory", "9. Hexagonal Architecture View"],
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "9. Hexagonal Architecture View"
+        ],
         "startLine": 536,
         "endLine": 575
       },
@@ -1741,6 +1779,1193 @@
         "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/611",
         "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json#/claims/64"
       ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/5",
+      "commit": "db00088c04d89955da160a767b1424e177ab6567",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "db00088c04d89955da160a767b1424e177ab6567 feat(events): replay a legacy event file that never reached a commit",
+        "bf41986330d2b98f7b3e1009d04667999e929c4c test: count the identity consumer in rebuild and place its module in the architecture manifest",
+        "980570f3c6715765a15025288c09b3dc3aad19a5 test(architecture): one door for every config read, in Node, Rust and shell",
+        "9fa03d1aa9252ae181dcbf29162594f087635095 fix(config): register the config-checks module, route its test through the config fixture, drop three unused shared-config readers",
+        "8b8e5f23bc960c1c7945ecf9d0526b0e1db76b1d refactor(cli): read config through the door in bin, move the fgos path cache out of config",
+        "4195a13d5b2c90323572d7d93707840d6c5f8891 feat(config): Node facade over the native config namespace",
+        "bd8ba8057c4ebbc65fdabcd04322f612658ff193 perf(event-store): hand a CLI command's seal to a short detached child",
+        "04fe80d121ac2d4bea55b2d276b465e253208889 feat(runner): coalesce the runner's lifecycle seals into one per unit of work",
+        "ced3cf78ea273d44f1b2c6b99c8367d0ead4c7d1 test: give the mailbox limits reader its layer row, allow the fixture recorder's own run-directory listings, and name why the legacy hook test spawns the CLI",
+        "53523a917e388a30562be47deb4d497ed7a5adb8 feat(work): register the events verbs and remove the retired event file readers",
+        "9f23f7438dd024535514b43d7901580916c681d4 refactor(work): remove the legacy event-file duties and their Git adapter",
+        "989d8d087bec1fd6f2e784b34f6eec456361e275 feat(work): run the Event Store triggers on maintenance facts and seal before Land, promote after",
+        "0457dc23165cb17c2bcce5d185e441926e78afd9 feat(porting): write porting records through the Event Store gate and keep the view out of git"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+      "reason": "The whole-file same-path supersede remains a whole-file successor; the manifest adds Config, Identity and Event Store layers and removes retired event/config modules.",
+      "method": "replacement bounded by unchanged complete units; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/0",
+      "beforeWitness": {
+        "unitKind": "file-block",
+        "anchor": "file-block",
+        "textDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+        "ancestry": [],
+        "startLine": 1,
+        "endLine": 369
+      },
+      "afterWitness": {
+        "unitKind": "file-block",
+        "anchor": "file-block",
+        "textDigest": "ab8e05def9170333c4898fc833fb2f10487511282a361805d501b88c565c67a0",
+        "ancestry": [],
+        "startLine": 1,
+        "endLine": 371
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/18",
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/19",
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/5",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json#/registryGaps/0",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json#/registryGaps/0",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json#/registryGaps/1"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+          "pointer": "/bindingRefresh/5",
+          "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The whole-file same-path supersede remains a whole-file successor; the manifest adds Config, Identity and Event Store layers and removes retired event/config modules.",
+          "mainCommit": "db00088c04d89955da160a767b1424e177ab6567",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/0"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+          "pointer": "/bindingRefresh/18",
+          "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The whole-file same-path supersede remains a whole-file successor; the manifest adds Config, Identity and Event Store layers and removes retired event/config modules.",
+          "mainCommit": "db00088c04d89955da160a767b1424e177ab6567",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/11"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+          "pointer": "/bindingRefresh/19",
+          "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The whole-file same-path supersede remains a whole-file successor; the manifest adds Config, Identity and Event Store layers and removes retired event/config modules.",
+          "mainCommit": "db00088c04d89955da160a767b1424e177ab6567",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/12"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/124",
+      "commit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog",
+        "ad64cea01f54d32d55fc78331d0aab14bb10f1b7 docs(observe,agent-protocol): specs, boundary rows and changelog follow the shard door and the outcome authority",
+        "8c4d3280eb8893acca785e27285fadecb12a4ba6 docs(event-store): describe the Work cutover layout, conflicts and removed repair",
+        "61ff8a16ee74d6968b6066e4967fc4605863c2ac docs(mailbox): record the V3 hook payload contract on its branch",
+        "e297a7ac10aa25b29af4bdb39a819790e428e11e docs(mailbox): record the V1 core on its branch"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "595c24b458551acc9a290f388c5d3c2850615ca3",
+      "reason": "The same component table remains a supersede of its historical table. Config, Event Store, Mailbox and Observe implementation status changed; no equality or new component authority is claimed.",
+      "method": "replacement bounded by unchanged complete units; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/1",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "textDigest": "afe8743b9a9643e0b93ed4fed196aa476a500be2ddd7303cf1c963185f51ae96",
+        "ancestry": [
+          "Component Boundary",
+          "4. Current High-Level Components"
+        ],
+        "startLine": 66,
+        "endLine": 97
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "textDigest": "2d4fecfa3558347d303be27a662410a75d500b89364ed15ccd7d7c8c3cd634a4",
+        "ancestry": [
+          "Component Boundary",
+          "4. Current High-Level Components"
+        ],
+        "startLine": 66,
+        "endLine": 97
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/124",
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/6",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s15-navigation-review-fixes.json#/bindingRefresh/0",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s15-navigation-review-fixes.json#/bindingRefresh/5",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json#/registryGaps/2"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+          "pointer": "/bindingRefresh/124",
+          "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The same component table remains a supersede of its historical table. Config, Event Store, Mailbox and Observe implementation status changed; no equality or new component authority is claimed.",
+          "mainCommit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/1"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "pointer": "/registryGaps/5",
+      "commit": "8f366ccc378e9535a1eda0df4712ec7e6f9b7439",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "ccc6b32e68539fea7b7289df41ef91660a2e3715 refactor(event-store): merge two doctor rows into their neighbours",
+        "cccdb805a6780ae93149422456937a6288c83100 refactor(event-store): drop the machine-id and refspec setup fixes",
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog",
+        "16743ab25bd9981c8a83c0f63d82826efc7ef044 fix(setup): keep project skill files that are newer or uncommitted",
+        "733fcf7a6f7050e48ec80a3bd18b6ab79ff47aa5 fix(githooks): carry in only .fgos changes the merge parent made since the merge base",
+        "8f366ccc378e9535a1eda0df4712ec7e6f9b7439 fix(distribution): keep the workspace sh launcher from spinning when its carriage return is lost",
+        "754c4880391e32013ad712daada8244b00e45d96 fix(state): keep recorded conflicts out of durable records, show them, and throw when the writer saw everything",
+        "5d0a4c7cf89ff39859e380895124df198141eefd docs(work): record the events verbs, the Event Store doctor rows and the removed event file tooling"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+      "reason": "The same distribution rule remains a supersede; main adds shell-builtin launcher parsing and rename replacement, without removing the named workspace-launcher obligation.",
+      "method": "replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/2",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "textDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+        "ancestry": [
+          "Spec: Distribution",
+          "Business Rules"
+        ],
+        "startLine": 315,
+        "endLine": 338
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "textDigest": "29969cf49198f62ad9cf871ccd1c7635b14289383f5425b1e1b23b0106ba0e09",
+        "ancestry": [
+          "Spec: Distribution",
+          "Business Rules"
+        ],
+        "startLine": 313,
+        "endLine": 336
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json#/registryGaps/5"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+          "pointer": "/registryGaps/5",
+          "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The same distribution rule remains a supersede; main adds shell-builtin launcher parsing and rename replacement, without removing the named workspace-launcher obligation.",
+          "mainCommit": "8f366ccc378e9535a1eda0df4712ec7e6f9b7439",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/2"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/7",
+      "commit": "ccc6b32e68539fea7b7289df41ef91660a2e3715",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "ccc6b32e68539fea7b7289df41ef91660a2e3715 refactor(event-store): merge two doctor rows into their neighbours",
+        "cccdb805a6780ae93149422456937a6288c83100 refactor(event-store): drop the machine-id and refspec setup fixes",
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog",
+        "16743ab25bd9981c8a83c0f63d82826efc7ef044 fix(setup): keep project skill files that are newer or uncommitted",
+        "733fcf7a6f7050e48ec80a3bd18b6ab79ff47aa5 fix(githooks): carry in only .fgos changes the merge parent made since the merge base",
+        "8f366ccc378e9535a1eda0df4712ec7e6f9b7439 fix(distribution): keep the workspace sh launcher from spinning when its carriage return is lost",
+        "754c4880391e32013ad712daada8244b00e45d96 fix(state): keep recorded conflicts out of durable records, show them, and throw when the writer saw everything",
+        "5d0a4c7cf89ff39859e380895124df198141eefd docs(work): record the events verbs, the Event Store doctor rows and the removed event file tooling"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+      "reason": "The same Data Dictionary remains a supersede: table row identities survive; Config standard/schema replaces registered defaults and the doctor inventory is updated.",
+      "method": "replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/3",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "textDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+        "ancestry": [
+          "Spec: Distribution",
+          "Data Dictionary"
+        ],
+        "startLine": 61,
+        "endLine": 87
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "textDigest": "b99e9a01b2eb55a7cbe9899c2477e57010b509c93af1603748d22b93d75eb1f7",
+        "ancestry": [
+          "Spec: Distribution",
+          "Data Dictionary"
+        ],
+        "startLine": 61,
+        "endLine": 87
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/12",
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/16",
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/7",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json#/registryGaps/6",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json#/registryGaps/0",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json#/registryGaps/2"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+          "pointer": "/bindingRefresh/7",
+          "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The same Data Dictionary remains a supersede: table row identities survive; Config standard/schema replaces registered defaults and the doctor inventory is updated.",
+          "mainCommit": "ccc6b32e68539fea7b7289df41ef91660a2e3715",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/3"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+          "pointer": "/bindingRefresh/12",
+          "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The same Data Dictionary remains a supersede: table row identities survive; Config standard/schema replaces registered defaults and the doctor inventory is updated.",
+          "mainCommit": "ccc6b32e68539fea7b7289df41ef91660a2e3715",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/5"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+          "pointer": "/bindingRefresh/16",
+          "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The same Data Dictionary remains a supersede: table row identities survive; Config standard/schema replaces registered defaults and the doctor inventory is updated.",
+          "mainCommit": "ccc6b32e68539fea7b7289df41ef91660a2e3715",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/7"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "pointer": "/registryGaps/21",
+      "commit": "ea7dc0509823969254208774e499ec59cdae67ce",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "ea7dc0509823969254208774e499ec59cdae67ce docs(confinement): record the runtime-dir fallback, the herdr config-home mask and the new refusals",
+        "b87a931aa874b5d9197b8c35092cc3d5aaf0826e docs(confinement): record the runtime-directory and herdr masks, what workers need, and the limits",
+        "d19dc1f41829128b1d9ed0fd7b037aa3446026ea fix(confinement): mask a Claude socket dir created after launch and prove the socket check alone",
+        "029825ced774762c4e7e349ac25ab6d8d6c88056 feat(confinement): hide Claude Code session sockets from every confined dispatch",
+        "abe31e389ac5307195437d161e7cc7d4e20673ac fix(confinement): create the mailbox root only when a blind launch resolves its masks",
+        "70e02c2affdc0d68459b6c1b265f0b57e0a7755e feat(confinement): hide the mailbox record from blind workers, even before it exists"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "571a996f59f3ae20e28e7f9df86867c4a2ab50ae",
+      "reason": "The complete paragraph and heading ancestry are unchanged; earlier confinement additions moved its ordinal from 147 to 150.",
+      "method": "unique complete digest; neighbouring units retained in witnesses; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/4",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-147",
+        "textDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+          "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+        ],
+        "startLine": 1422,
+        "endLine": 1423
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-150",
+        "textDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+          "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+        ],
+        "startLine": 1533,
+        "endLine": 1534
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json#/registryGaps/21",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json#/registryGaps/1"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+          "pointer": "/registryGaps/21",
+          "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The complete paragraph and heading ancestry are unchanged; earlier confinement additions moved its ordinal from 147 to 150.",
+          "mainCommit": "ea7dc0509823969254208774e499ec59cdae67ce",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/4"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+          "pointer": "/registryGaps/1",
+          "claimId": "claim_04703f011b22383992b94545055b9e56",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The complete paragraph and heading ancestry are unchanged; earlier confinement additions moved its ordinal from 147 to 150.",
+          "mainCommit": "ea7dc0509823969254208774e499ec59cdae67ce",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/6"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "pointer": "/registryGaps/15",
+      "commit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "ccc6b32e68539fea7b7289df41ef91660a2e3715 refactor(event-store): merge two doctor rows into their neighbours",
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog",
+        "ad64cea01f54d32d55fc78331d0aab14bb10f1b7 docs(observe,agent-protocol): specs, boundary rows and changelog follow the shard door and the outcome authority",
+        "754c4880391e32013ad712daada8244b00e45d96 fix(state): keep recorded conflicts out of durable records, show them, and throw when the writer saw everything",
+        "703732c4d316d40d38a6e5cc73916fd59c38e9a3 docs: correct the cutover changelog, registry contract and stale comments",
+        "5d0a4c7cf89ff39859e380895124df198141eefd docs(work): record the events verbs, the Event Store doctor rows and the removed event file tooling",
+        "9f23f7438dd024535514b43d7901580916c681d4 refactor(work): remove the legacy event-file duties and their Git adapter"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+      "reason": "The same readiness table remains a supersede. Config-door diagnostics replace retired config-not-stale and seat-binding-config rows; no verbatim equality or implementation approval is claimed.",
+      "method": "replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/8",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-37",
+        "textDigest": "7fe0554fd220e71ef2082123783d7fd9dae5886aba0216f42ea604ebd72f54a9",
+        "ancestry": [
+          "How to install fgOS in a project and use fgos doctor",
+          "4. Every doctor check",
+          "4.2. Project config (written by setup or `--fix`)"
+        ],
+        "startLine": 230,
+        "endLine": 259
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-37",
+        "textDigest": "254831b841a6b5559ac98249fea4d269279878cdfba9051f2f91beb1e6eb1f16",
+        "ancestry": [
+          "How to install fgOS in a project and use fgos doctor",
+          "4. Every doctor check",
+          "4.2. Project config (written by setup or `--fix`)"
+        ],
+        "startLine": 231,
+        "endLine": 258
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json#/registryGaps/15"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+          "pointer": "/registryGaps/15",
+          "claimId": "claim_b741539a16b6eb2792ca6c4178b23671",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The same readiness table remains a supersede. Config-door diagnostics replace retired config-not-stale and seat-binding-config rows; no verbatim equality or implementation approval is claimed.",
+          "mainCommit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/8"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "pointer": "/registryGaps/34",
+      "commit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+      "reason": "The dispatch responsibility table remains the same-file supersede; the config facade replaces bootstrap/default registration responsibilities.",
+      "method": "replacement bounded by unchanged complete units; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/9",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "textDigest": "f181007d6c80684c15dc6211eb00115a238cdab88f22bec5eb2d50453454701c",
+        "ancestry": [
+          "`src/runner/dispatch` module boundaries"
+        ],
+        "startLine": 19,
+        "endLine": 28
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "textDigest": "8aaf3caf47b92a1bf2d44a081859df40037bd18033c61ce538df1937091305db",
+        "ancestry": [
+          "`src/runner/dispatch` module boundaries"
+        ],
+        "startLine": 19,
+        "endLine": 28
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json#/registryGaps/34"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+          "pointer": "/registryGaps/34",
+          "claimId": "claim_975c8349e0d069aabf88161d933f2228",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The dispatch responsibility table remains the same-file supersede; the config facade replaces bootstrap/default registration responsibilities.",
+          "mainCommit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/9"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "pointer": "/registryGaps/35",
+      "commit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "9fa4277c544d68aad6ed3d374531b8c302398327 fix(runner): resume binds again only a seat whose last attempt ended in a failure",
+        "f2f8c3f5952f5cd641184ac49436298a7369570a feat(runner): resume binds a seat that did not pass again from the current config",
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog",
+        "2f2a66503e0db519dee02cc0806dea027163049f refactor(runner): remove the session-lead inline seat and fgos run record"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+      "reason": "The Pointers whole-unit supersede still accounts for the earlier version; Config-door pointers replace the retired read-time config writer. The Config-door rewrite replaces historical source line 10, which was carried verbatim and is absent from the six-line residual at g0fix/partial-carry-residuals.json#/rows/13. The existing partial-carry coverage is incomplete on F. Needs a delta decision; no residual or decision is rewritten here.",
+      "method": "replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/10",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-101",
+        "textDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Pointers (implementation)"
+        ],
+        "startLine": 1244,
+        "endLine": 1294
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-101",
+        "textDigest": "0d071f97922f310fd2c204603db3ae08168e8f2d7f23d6db0e715aaa750c4fb4",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Pointers (implementation)"
+        ],
+        "startLine": 1245,
+        "endLine": 1295
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json#/registryGaps/35",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json#/registryGaps/0",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json#/registryGaps/29"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+          "pointer": "/registryGaps/35",
+          "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The Pointers whole-unit supersede still accounts for the earlier version; Config-door pointers replace the retired read-time config writer.",
+          "mainCommit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/10"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "pointer": "/registryGaps/0",
+          "claimId": "claim_a63132a3f76d6b8ea05461c48c818836",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The Pointers whole-unit supersede still accounts for the earlier version; Config-door pointers replace the retired read-time config writer.",
+          "mainCommit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/13"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "pointer": "/registryGaps/29",
+          "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+          "disposition": "partial-carry",
+          "claimStillHolds": false,
+          "reason": "The Config-door rewrite replaces historical source line 10, which was carried verbatim and is absent from the six-line residual at g0fix/partial-carry-residuals.json#/rows/13. The existing partial-carry coverage is incomplete on F. Needs a delta decision; no residual or decision is rewritten here.",
+          "mainCommit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+          "status": "needs-delta-decision"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/3",
+      "commit": "2f2a66503e0db519dee02cc0806dea027163049f",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "9fa4277c544d68aad6ed3d374531b8c302398327 fix(runner): resume binds again only a seat whose last attempt ended in a failure",
+        "f2f8c3f5952f5cd641184ac49436298a7369570a feat(runner): resume binds a seat that did not pass again from the current config",
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog",
+        "2f2a66503e0db519dee02cc0806dea027163049f refactor(runner): remove the session-lead inline seat and fgos run record"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+      "reason": "The existing partial-carry remains valid: its only absent source line was already retained in residual row 4. Removing the obsolete inline alternative changes only that already-replaced line.",
+      "method": "replacement bounded by unchanged complete units; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/14",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-134",
+        "textDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Dispatch operability implementation slice (2026-09-16)"
+        ],
+        "startLine": 1531,
+        "endLine": 1531
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-134",
+        "textDigest": "bd7fc1876ac496622c83efeb33be81227220a5f5cf7e9e0e25168fa9344db654",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Dispatch operability implementation slice (2026-09-16)"
+        ],
+        "startLine": 1532,
+        "endLine": 1532
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json#/registryGaps/3"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "pointer": "/registryGaps/3",
+          "claimId": "claim_f4058f068a378962aaf237ae038db5af",
+          "disposition": "partial-carry",
+          "claimStillHolds": true,
+          "reason": "The existing partial-carry remains valid: its only absent source line was already retained in residual row 4. Removing the obsolete inline alternative changes only that already-replaced line.",
+          "mainCommit": "2f2a66503e0db519dee02cc0806dea027163049f",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/14"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/19",
+      "commit": "2f2a66503e0db519dee02cc0806dea027163049f",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "9fa4277c544d68aad6ed3d374531b8c302398327 fix(runner): resume binds again only a seat whose last attempt ended in a failure",
+        "f2f8c3f5952f5cd641184ac49436298a7369570a feat(runner): resume binds a seat that did not pass again from the current config",
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog",
+        "2f2a66503e0db519dee02cc0806dea027163049f refactor(runner): remove the session-lead inline seat and fgos run record"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+      "reason": "The current partial-carry proof promises every replaced nonblank historical line in its residual. F annotates source line 6 (fgos run record removed); the exact-line residual at g0fix/partial-carry-residuals.json#/rows/5 contains only source line 9. A delta must decide this changed carriage basis; no decision is authored here.",
+      "method": "replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/15",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-317",
+        "textDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]"
+        ],
+        "startLine": 3144,
+        "endLine": 3153
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-317",
+        "textDigest": "559f90f41fdc819f5657df4493df688cbdd86d942364b8c47d216d6a94eb5150",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]"
+        ],
+        "startLine": 3145,
+        "endLine": 3154
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json#/registryGaps/19"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "pointer": "/registryGaps/19",
+          "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+          "disposition": "partial-carry",
+          "claimStillHolds": false,
+          "reason": "The current partial-carry proof promises every replaced nonblank historical line in its residual. F annotates source line 6 (fgos run record removed); the exact-line residual at g0fix/partial-carry-residuals.json#/rows/5 contains only source line 9. A delta must decide this changed carriage basis; no decision is authored here.",
+          "mainCommit": "2f2a66503e0db519dee02cc0806dea027163049f",
+          "status": "needs-delta-decision"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/22",
+      "commit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "9fa4277c544d68aad6ed3d374531b8c302398327 fix(runner): resume binds again only a seat whose last attempt ended in a failure",
+        "f2f8c3f5952f5cd641184ac49436298a7369570a feat(runner): resume binds a seat that did not pass again from the current config",
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog",
+        "2f2a66503e0db519dee02cc0806dea027163049f refactor(runner): remove the session-lead inline seat and fgos run record"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+      "reason": "The rationale says all 18 historical lines recur verbatim, with additions only. Main 5820e1a43 replaces the inventory line from ~/.fgos/config.json with ~/.fgos/private/accounts.yaml, so that premise is no longer true. Needs a delta decision, not a digest-only rebind.",
+      "method": "replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/16",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-322",
+        "textDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
+        ],
+        "startLine": 3183,
+        "endLine": 3201
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-322",
+        "textDigest": "5ca4a7241306096e2cbb24fb732e6e7fa6b7cc807b2b9603c8d3cee16d01f930",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
+        ],
+        "startLine": 3184,
+        "endLine": 3202
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json#/registryGaps/22"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+          "pointer": "/registryGaps/22",
+          "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
+          "disposition": "supersede",
+          "claimStillHolds": false,
+          "reason": "The rationale says all 18 historical lines recur verbatim, with additions only. Main 5820e1a43 replaces the inventory line from ~/.fgos/config.json with ~/.fgos/private/accounts.yaml, so that premise is no longer true. Needs a delta decision, not a digest-only rebind.",
+          "mainCommit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+          "status": "needs-delta-decision"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+      "pointer": "/bindingRefresh/43",
+      "commit": "9fa4277c544d68aad6ed3d374531b8c302398327",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "9fa4277c544d68aad6ed3d374531b8c302398327 fix(runner): resume binds again only a seat whose last attempt ended in a failure",
+        "f2f8c3f5952f5cd641184ac49436298a7369570a feat(runner): resume binds a seat that did not pass again from the current config",
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog",
+        "2f2a66503e0db519dee02cc0806dea027163049f refactor(runner): remove the session-lead inline seat and fgos run record"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+      "reason": "All source rule IDs remain in the same whole-unit supersede; main adds resume rebinding and removes the unreachable inline seat. Historical carried source lines remain verbatim; recomputation still finds exactly source lines 2,10,15,19,20 absent, the same five lines retained in residual row 11.",
+      "method": "replacement bounded by unchanged complete units; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/17",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-93",
+        "textDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Business Rules"
+        ],
+        "startLine": 1098,
+        "endLine": 1152
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-93",
+        "textDigest": "aaa908b672fa544b05140aa1990b977854f36fe89ba1228bf8f3ac29f9686ac2",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Business Rules"
+        ],
+        "startLine": 1098,
+        "endLine": 1153
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/43",
+        "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/44",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json#/registryGaps/26",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json#/registryGaps/27"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+          "pointer": "/bindingRefresh/43",
+          "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "All source rule IDs remain in the same whole-unit supersede; main adds resume rebinding and removes the unreachable inline seat.",
+          "mainCommit": "9fa4277c544d68aad6ed3d374531b8c302398327",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/15"
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+          "pointer": "/bindingRefresh/44",
+          "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+          "disposition": "partial-carry",
+          "claimStillHolds": true,
+          "reason": "Historical carried source lines remain verbatim; recomputation still finds exactly source lines 2,10,15,19,20 absent, the same five lines retained in residual row 11.",
+          "mainCommit": "9fa4277c544d68aad6ed3d374531b8c302398327",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/16"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "pointer": "/registryGaps/0",
+      "commit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "8c4d3280eb8893acca785e27285fadecb12a4ba6 docs(event-store): describe the Work cutover layout, conflicts and removed repair",
+        "26c4e166f13852433fafc478bd292f6bf80a3673 refactor(work): read Work history through the Event Store facade in readers, doctor rows, scripts and the Rust sources"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "ad98c388214efc727740a95beab33a7028369e86",
+      "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+      "method": "repeated complete digest disambiguated by immediate neighbours; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/20",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-117",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "Hệ quả"
+        ],
+        "startLine": 1404,
+        "endLine": 1404
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-124",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "Hệ quả"
+        ],
+        "startLine": 1430,
+        "endLine": 1430
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/0"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+          "pointer": "/registryGaps/0",
+          "claimId": "claim_dd06c2555dc0e81c54c80376fee8ff91",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+          "mainCommit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/17"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "pointer": "/registryGaps/1",
+      "commit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "8c4d3280eb8893acca785e27285fadecb12a4ba6 docs(event-store): describe the Work cutover layout, conflicts and removed repair",
+        "26c4e166f13852433fafc478bd292f6bf80a3673 refactor(work): read Work history through the Event Store facade in readers, doctor rows, scripts and the Rust sources"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "ad98c388214efc727740a95beab33a7028369e86",
+      "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+      "method": "repeated complete digest disambiguated by immediate neighbours; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/21",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-121",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "0003 — Đặt tên & bố cục dữ liệu",
+          "Hệ quả"
+        ],
+        "startLine": 1431,
+        "endLine": 1431
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-128",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "0003 — Đặt tên & bố cục dữ liệu",
+          "Hệ quả"
+        ],
+        "startLine": 1457,
+        "endLine": 1457
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/1"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+          "pointer": "/registryGaps/1",
+          "claimId": "claim_16abc69cd658a382c456cdaf23f64d87",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+          "mainCommit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/18"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "pointer": "/registryGaps/2",
+      "commit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "8c4d3280eb8893acca785e27285fadecb12a4ba6 docs(event-store): describe the Work cutover layout, conflicts and removed repair",
+        "26c4e166f13852433fafc478bd292f6bf80a3673 refactor(work): read Work history through the Event Store facade in readers, doctor rows, scripts and the Rust sources"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "ad98c388214efc727740a95beab33a7028369e86",
+      "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+      "method": "repeated complete digest disambiguated by immediate neighbours; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/22",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-126",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "0004 — Phạm vi & non-goal",
+          "Hệ quả"
+        ],
+        "startLine": 1462,
+        "endLine": 1462
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-133",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "0004 — Phạm vi & non-goal",
+          "Hệ quả"
+        ],
+        "startLine": 1488,
+        "endLine": 1488
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/2"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+          "pointer": "/registryGaps/2",
+          "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+          "mainCommit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/19"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "pointer": "/registryGaps/3",
+      "commit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "8c4d3280eb8893acca785e27285fadecb12a4ba6 docs(event-store): describe the Work cutover layout, conflicts and removed repair",
+        "26c4e166f13852433fafc478bd292f6bf80a3673 refactor(work): read Work history through the Event Store facade in readers, doctor rows, scripts and the Rust sources"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "ad98c388214efc727740a95beab33a7028369e86",
+      "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+      "method": "repeated complete digest disambiguated by immediate neighbours; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/23",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-138",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "0007 — Tiến hoá schema & event",
+          "Hệ quả"
+        ],
+        "startLine": 1534,
+        "endLine": 1534
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-145",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "0007 — Tiến hoá schema & event",
+          "Hệ quả"
+        ],
+        "startLine": 1560,
+        "endLine": 1560
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/3"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+          "pointer": "/registryGaps/3",
+          "claimId": "claim_7a0776311f7105750a4f234681f513a3",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+          "mainCommit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/20"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "pointer": "/registryGaps/4",
+      "commit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "8c4d3280eb8893acca785e27285fadecb12a4ba6 docs(event-store): describe the Work cutover layout, conflicts and removed repair",
+        "26c4e166f13852433fafc478bd292f6bf80a3673 refactor(work): read Work history through the Event Store facade in readers, doctor rows, scripts and the Rust sources"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "ad98c388214efc727740a95beab33a7028369e86",
+      "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+      "method": "repeated complete digest disambiguated by immediate neighbours; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/24",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-144",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "0011 — Version tường minh cho mọi contract",
+          "Hệ quả"
+        ],
+        "startLine": 1588,
+        "endLine": 1588
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-151",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "0011 — Version tường minh cho mọi contract",
+          "Hệ quả"
+        ],
+        "startLine": 1614,
+        "endLine": 1614
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/4"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+          "pointer": "/registryGaps/4",
+          "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+          "mainCommit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/21"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "pointer": "/registryGaps/5",
+      "commit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "8c4d3280eb8893acca785e27285fadecb12a4ba6 docs(event-store): describe the Work cutover layout, conflicts and removed repair",
+        "26c4e166f13852433fafc478bd292f6bf80a3673 refactor(work): read Work history through the Event Store facade in readers, doctor rows, scripts and the Rust sources"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "ad98c388214efc727740a95beab33a7028369e86",
+      "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+      "method": "repeated complete digest disambiguated by immediate neighbours; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/25",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-150",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+          "Hệ quả"
+        ],
+        "startLine": 1665,
+        "endLine": 1665
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-157",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+          "Hệ quả"
+        ],
+        "startLine": 1691,
+        "endLine": 1691
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/5"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+          "pointer": "/registryGaps/5",
+          "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+          "mainCommit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/22"
+        }
+      ],
+      "status": "authored-pending-independent-review"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "pointer": "/registryGaps/6",
+      "commit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+      "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+      "mainPathChanges": [
+        "8c4d3280eb8893acca785e27285fadecb12a4ba6 docs(event-store): describe the Work cutover layout, conflicts and removed repair",
+        "26c4e166f13852433fafc478bd292f6bf80a3673 refactor(work): read Work history through the Event Store facade in readers, doctor rows, scripts and the Rust sources"
+      ],
+      "causeDefinition": "The named main commit changes this subject; mainPathChanges lists the complete non-merge path history imported at F (additional edits may contribute). The recorded before/after edge is the aggregate old binding to F, not a claim that one commit alone made all changes.",
+      "beforeCommit": "ad98c388214efc727740a95beab33a7028369e86",
+      "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+      "method": "repeated complete digest disambiguated by immediate neighbours; before/current ancestry and immediate neighbours retained in f-refresh-analysis.json",
+      "witnessSource": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json#/26",
+      "beforeWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-174",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+          "Hệ quả"
+        ],
+        "startLine": 1878,
+        "endLine": 1878
+      },
+      "afterWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-181",
+        "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+          "Hệ quả"
+        ],
+        "startLine": 1904,
+        "endLine": 1904
+      },
+      "affectedBindings": [
+        "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/6"
+      ],
+      "bindingJudgments": [
+        {
+          "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+          "pointer": "/registryGaps/6",
+          "claimId": "claim_1d724afb521915455a45db2b1f3b34cd",
+          "disposition": "supersede",
+          "claimStillHolds": true,
+          "reason": "The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match.",
+          "mainCommit": "8c4d3280eb8893acca785e27285fadecb12a4ba6",
+          "status": "authored-pending-independent-review",
+          "successor": "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json#/bindingRefresh/23"
+        }
+      ],
+      "status": "authored-pending-independent-review"
     }
   ],
   "rows": [

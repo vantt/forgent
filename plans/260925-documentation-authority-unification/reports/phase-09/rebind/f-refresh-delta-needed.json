@@ -1,0 +1,123 @@
+{
+  "status": "needs-delta-decision",
+  "decisionsAuthored": false,
+  "rows": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/19",
+      "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+      "disposition": "partial-carry",
+      "claimStillHolds": false,
+      "reason": "The current partial-carry proof promises every replaced nonblank historical line in its residual. F annotates source line 6 (fgos run record removed); the exact-line residual at g0fix/partial-carry-residuals.json#/rows/5 contains only source line 9. A delta must decide this changed carriage basis; no decision is authored here.",
+      "mainCommit": "2f2a66503e0db519dee02cc0806dea027163049f",
+      "status": "needs-delta-decision",
+      "sourceWitness": {
+        "ref": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json#/rows/5/sourceWitness",
+        "digest": "5a99ae10ac39e5bf6d8b29289aaba42958a45534c58e9e2dfa85fbb744472f14"
+      },
+      "exactLineProof": {
+        "historicalSourceLines": 10,
+        "missingAtPriorBinding": [
+          9
+        ],
+        "retainedResidualSourceLines": [
+          9
+        ],
+        "missingAtF": [
+          6,
+          9
+        ],
+        "newlyReplacedSourceLines": [
+          {
+            "line": 6,
+            "text": "  3. **Một cửa chạy `fgos run` (`src/runner/execution/run.mjs`):** Bọc `executeAssignment`, mặc định spawn qua pane herdr (G7), cli fallback. Có `fgos run record` cho producer inline với nonce một lần phát kèm chỉ dẫn và kiểm chứng `evidenceRefs`.",
+            "textStillPresentAsSubstring": false
+          }
+        ],
+        "qualification": "Exact-line conservation premise, not a claim that all textual content disappeared. The line about run record remains as a prefix with an added removal annotation; changing that proof basis needs a delta, not silent approval."
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/22",
+      "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
+      "disposition": "supersede",
+      "claimStillHolds": false,
+      "reason": "The rationale says all 18 historical lines recur verbatim, with additions only. Main 5820e1a43 replaces the inventory line from ~/.fgos/config.json with ~/.fgos/private/accounts.yaml, so that premise is no longer true. Needs a delta decision, not a digest-only rebind.",
+      "mainCommit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+      "status": "needs-delta-decision",
+      "sourceWitness": {
+        "commit": "444c03a59f33e419e206ee6927e3d0c7cb2d7bee",
+        "path": "docs/specs/runner.md",
+        "anchor": "unheaded-block-317",
+        "digest": "1fd1ba41ab74a3e7207569fd1756de81dbbddbc579bb8b3fffac943d1d7fd4cf"
+      },
+      "exactLineProof": {
+        "historicalSourceLines": 18,
+        "missingAtPriorBinding": [],
+        "retainedResidualSourceLines": [],
+        "missingAtF": [
+          16
+        ],
+        "newlyReplacedSourceLines": [
+          {
+            "line": 16,
+            "text": "  - Inventory account (`runner.providers.<provider>.accounts`) chỉ ở `~/.fgos/config.json` toàn máy; mỗi máy phải tự khai, `fgos setup` không tạo; `fgos doctor` (`confined-pane-accounts`) đọc inventory từ config toàn máy bất kể cwd (không cần project config) và chỉ ra pane thiếu entry; config toàn máy không đọc được thì check FAIL, nêu mã lỗi và đường dẫn.",
+            "textStillPresentAsSubstring": false
+          }
+        ],
+        "qualification": "Exact-line conservation premise, not a claim that all textual content disappeared. The line about run record remains as a prefix with an added removal annotation; changing that proof basis needs a delta, not silent approval."
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/29",
+      "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+      "disposition": "partial-carry",
+      "claimStillHolds": false,
+      "reason": "The Config-door rewrite replaces historical source line 10, which was carried verbatim and is absent from the six-line residual at g0fix/partial-carry-residuals.json#/rows/13. The existing partial-carry coverage is incomplete on F. Needs a delta decision; no residual or decision is rewritten here.",
+      "mainCommit": "5820e1a43e3ad0fee0a504f551109d0b85047c08",
+      "status": "needs-delta-decision",
+      "sourceWitness": {
+        "ref": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json#/rows/13/sourceWitness",
+        "digest": "b323720a9d4e93b156af47db347755f342dd8ad9fb9720466bb161732ebef4e3"
+      },
+      "exactLineProof": {
+        "historicalSourceLines": 51,
+        "missingAtPriorBinding": [
+          2,
+          13,
+          18,
+          30,
+          47,
+          49
+        ],
+        "retainedResidualSourceLines": [
+          2,
+          13,
+          18,
+          30,
+          47,
+          49
+        ],
+        "missingAtF": [
+          2,
+          10,
+          13,
+          18,
+          30,
+          47,
+          49
+        ],
+        "newlyReplacedSourceLines": [
+          {
+            "line": 10,
+            "text": "- `.fgos/config.json`'s `runner` section (tsk-5vf; tsk-5hv xoá hẳn fallback về file flat legacy cũ — đây giờ là nguồn config DUY NHẤT, `fgos setup` là verb thực hiện move thật) — config committed (executor template + `modelPolicies.claude` nano/haiku, standard/sonnet, frontier/opus [tsk-5tm, thay `models` phẳng cũ; 6-tier vocab từ 2026-09-17] + timeoutMs); `executor.args` mang `--permission-mode acceptEdits`, không còn quyền git — runner commit thay worker (0052) (quyền TỐI THIỂU, xem RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp)); khối `parallel` TÙY CHỌN — `maxRoots`/`maxLeavesPerRoot` (Data Dictionary #6, mặc định trong-code 4/4 khi khối vắng mặt, mọi config cũ vẫn chạy không cần sửa); `src/runner/dispatch.mjs`'s `ensureRunnerConfigForDir(dir)` — shared-file-aware: tại đường MẶC ĐỊNH (không `--config`) vắng file, gọi `detectAssistantCli` (quét PATH thuần, không spawn — `KNOWN_ASSISTANT_CLI_NAMES`) rồi viết `DEFAULT_RUNNER_CONFIG` với executor từ `SUPPORTED_EXECUTOR_TEMPLATES[detected]` khi trợ lý dò được có mẫu đã kiểm chứng (hôm nay chỉ `claude`, y hệt `DEFAULT_RUNNER_CONFIG.executor`), hoặc executor placeholder tự-báo-lỗi khi không (RUL48b) — rồi mới nạp, kèm một dòng thông báo tên file + executor được chọn (RUL48 (cấu hình runner tự sinh tại đường mặc định khi vắng mặt — không bao giờ đòi người tạo tay trước)); `bin/fgos.mjs`'s verb `discover` và `bin/fgos-runner.mjs`'s vòng chính đều gọi `ensureRunnerConfigForDir` cho nhánh đường mặc định, `loadRunnerConfig` thẳng cho nhánh `--config` tường minh của `discover` (`fgos-runner` chỉ còn đường mặc định, RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)); đọc qua `mergeWithGlobalConfig` trước khi tách phần `runner` (project luôn thắng `~/.fgos/config.json` theo key, tsk-5vf)",
+            "textStillPresentAsSubstring": false
+          }
+        ],
+        "qualification": "Exact-line conservation premise, not a claim that all textual content disappeared. The line about run record remains as a prefix with an added removal annotation; changing that proof basis needs a delta, not silent approval."
+      }
+    }
+  ]
+}

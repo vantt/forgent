@@ -1,0 +1,30 @@
+{
+  "status": "pass",
+  "oldEdgesPreserved": 155,
+  "newEdges": 19,
+  "affectedBindingsComplete": true,
+  "newTargetOverlays": 24,
+  "deltaRowsNotRebound": 3,
+  "originalCarryOverlaysPreserved": 25,
+  "newCarryOverlays": 13,
+  "writeScope": "exact assignment scope; no docs or fchain changes",
+  "changedPaths": [
+    "plans/260925-documentation-authority-unification/ledger/decisions/carries-current-rebindings.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/f-target-rebindings.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/f-binding-refresh.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/final-pin-duties.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/source-heading-parity.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/source-parity.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/test-live-parity.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-analysis.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-delta-needed.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-final-proofs.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-initial-proofs.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-ownership-before.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/rebind/f-refresh-ratchet.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json",
+    "scripts/check-legacy-docs-ratchet.exceptions.json"
+  ],
+  "impactAnalysis": "degraded: no impact-analysis tools exposed; assignment forbids fgos CLI. Static caller cross-check finds refresh-carries.py called by g0rework/verify.py only; carries falsification cases remain in test-live-parity.py. No product symbol or public API changed."
+}

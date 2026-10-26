@@ -60,7 +60,7 @@ def main():
                 paths = {d['path'] for d in drift}
                 assert {'bin/fgos.mjs', 'docs/backlog.md'} <= paths
                 if target == Path(unlisted):
-                    assert unlisted in paths and len(paths) == 3
+                    assert paths == {d['path'] for d in duties['pointerPatchDrift']} | {unlisted}
             results.append(dict(behavior=label, command=cp.args, exit=cp.returncode,
                                 expected='nonzero', diagnostic=diagnostic))
     print(json.dumps(dict(status='pass', probes=results), ensure_ascii=False, indent=2))
