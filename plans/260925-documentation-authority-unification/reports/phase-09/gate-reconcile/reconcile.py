@@ -519,7 +519,8 @@ for path in git('diff', '--name-only', GENERATED_PIN, CURRENT_PIN, '--', str(BAS
 for rel in ['owner-answers.md', 'w32-register-catchup-brief.md', 'g0rework/final-pin-duties.json',
             'fchain/check.py', 'fchain/links.py', 'fchain/manifest.json', 'fchain/link-retargets.json',
             'fchain/rebased-patches.json', 'g0rework/ownership-reader-proof.json',
-            'w35-register-update-brief.md', 'fchain/receipt.md', 'rebind/g0-rework-rebindings.json']:
+            'w35-register-update-brief.md', 'w39-register-refresh-brief.md', 'cutover-approval-packet.md',
+            'fchain/receipt.md', 'fchain/check.json', 'rebind/g0-rework-rebindings.json']:
     current_source(BASE / rel)
 
 # Prove that the owning fchain engine and every local record it can read are
@@ -561,7 +562,7 @@ composed, states = fchain.compose(CURRENT_PIN)
 assert composed['exit'] == 0 and not composed['findings'], 'current F chain fails'
 current_proofs.append(dict(command='python3 -B fchain/check.py --pin ' + CURRENT_PIN,
     invocation='Committed check.py compose(pin) API; identical engine, output kept inside gate-reconcile instead of fchain/check.json.',
-    exit=composed['exit'], counts=composed['counts'], linkIntoMoveSet=composed['counts'].get('linkIntoMoveSet', 0),
+    exit=composed['exit'], counts=composed['counts'],
     files=len(composed['files']), executed=len(composed['executed']),
     linkGuard=dict(findings=composed['counts'].get('linkGuard', 0),
         population='All composed docs/platform/**/*.md, Related headers included',
@@ -598,13 +599,15 @@ dump(OUT / 'current-proofs.json', dict(sourceCommit=CURRENT_PIN, commands=curren
 register['asOf']['originalSnapshotCommit'] = PIN
 register['asOf']['commit'] = register['asOf']['currentCommit'] = CURRENT_PIN
 register['asOf']['basis'] = ('Historical snapshots and fingerprints are retained separately; current status uses committed inputs at '
-    + CURRENT_PIN + '. W23–W37 reviews and L13-16–28 are reconciled at exact scopes; current command proofs do not invent independent approval or F.')
+    + CURRENT_PIN + '. W23–W38 reviews and L13-16–30 are reconciled at exact scopes; current command proofs do not invent independent approval or F.')
 g(0)['commit'] = CURRENT_PIN
 for number in (0, 6, 9):
     g(number).update(status='met-local', blockers=[], remaining='')
 g(0)['note'] = ('Current committed join exits 0: 1,929/1,929 effective rows approved, with no missing, mismatched, stale, open REWORK, invalid bindings or unresolved rows. '
     'W24–W30 per-row reviews replace the historical verdict-record gaps, including decision-field freshness under L13-25. '
-    '134 w8/w9 overlay approvals remain conditional on atomic placement at F, not approval of the unapplied final body.')
+    '134 w8/w9 overlay approvals remain conditional on atomic placement at F, not approval of the unapplied final body. '
+    'Rebind records 0–148 (594fe4194) were reviewed in reviews/w26-g0-rework-verdicts.md; records 149–154 in reviews/w33-ownership-audit-review.json (5 APPROVE / 0 REWORK).')
+evidence(0, 'reviews/w26-g0-rework-verdicts.md', 'reviews/w33-ownership-audit-review.json')
 g(0)['atFinalPinUnderLease'] = [*g(0)['atFinalPinUnderLease'],
     'Replay g0rework/final-pin-duties.json at actual F. Apply all 134 conditional overlays (44 headings / 90 bodies) atomically with selected predecessor rebased:w8:repin:w2:predecessor:docs/platform/component-boundary.md (composition/patch-specs.json#/patches/137), selected rebased:w8:gap05:relocation (composition/patch-specs.json#/patches/138, after 6b457550660701bf10f5f25f2f466df5e601dafa8df441410d7060ae1cd370db) and w8:gap05:history; otherwise reopen approvals (L13-23.4). The relocation hash is not the final file hash; recompute final composition including link-retargets.json#/patches/4 at F and delta-review changed units.']
 evidence(0, 'g0rework/final-pin-duties.json', 'gate-reconcile/current-proofs.json',
@@ -625,7 +628,8 @@ g(6)['atFinalPinUnderLease'].extend([
     'Guard 3 landed with the cutover must agree with fchain/links.py linkGuard on the composed tree at actual F: same whole docs/platform/** population including Related headers, moved-source removal, fence/code-span and unit-extractor anchor semantics and label rules; both must report 0 findings (L13-28.4). Do not inherit scripts/check-doc-candidate-status.mjs disagreements: its stripCode counts 398 literal occurrences (394 fenced + 4 multi-line inline-code), and relatedPaths() does not split file plus anchor for 44 Related #anchor entries (w35, w37 low note). Align that product reader or keep it out of this post-cutover guard; no exemption from the whole-population check.',
     'Final-F delta-review the changed shard-2 patch bytes named by fchain/link-retargets.json finalFDuties: f06461/f06591/f07205 and the seven newly extended owners (ten row copies: f06504, f06697, f06699, f06700, f06702, f06790/f06791/f06794/f06799, f06823). Prior approvals do not transfer to changed proposed hashes (w35-10, w37-8/11).',
 ])
-g(7)['note'] += (' Effective spec rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md still has independentVerdict pending; w32 and w33-work-state-rebase verify a pure rebase with an identical change set (diff and rollbackDiff byte-identical to its predecessor), not approval transfer to the new final body. Recheck/delta-review at F.')
+g(7)['note'] += (' Effective spec rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md still has independentVerdict pending; w32 and reviews/w33-link-retargets-review.json item work-state-rebase verify a pure rebase with an identical change set (diff and rollbackDiff byte-identical to its predecessor), not approval transfer to the new final body. Recheck/delta-review at F.')
+evidence(7, 'reviews/w33-link-retargets-review.json')
 evidence(6, 'reviews/w23-g6-shard-1-review.json', 'reviews/w23-g6-shard-2-review.json',
     'reviews/w23-g6-shard-3-review.json', 'reviews/w28-fchain-and-premise-rework-review.json',
     'fchain/link-retargets.json', 'fchain/manifest.json', 'gate-reconcile/current-proofs.json')
@@ -642,16 +646,18 @@ g(9)['atFinalPinUnderLease'].append('Replay every prepared source through fchain
 evidence(9, 'reviews/w25-g9-dependencies-review.json', 'reviews/w28-fchain-and-premise-rework-review.json',
     'fchain/manifest.json', 'fchain/link-retargets.json', 'gate-reconcile/current-proofs.json')
 # L13-27 is an audit reader repair, not new conservation or pair-accounting authority.
-audit_pin = git('rev-parse', '4a4fefbe8').decode().strip()
+audit_pin = git('rev-parse', '23e3c34b7').decode().strip()
 audit_inputs = []
 for path in [BASE.parent / 'phase-08/audit-report.py',
              BASE.parent / 'phase-06/step10-round5-reproduction.json',
              BASE.parent / 'phase-06/step10-sync4d-reproduction.json']:
     raw = git('show', f'{audit_pin}:{path}')
+    assert raw == current_source(path) == (ROOT / path).read_bytes(), 'ownership audit input differs from HEAD: ' + str(path)
     audit_inputs.append(dict(path=str(path), sha256=hashlib.sha256(raw).hexdigest()))
-register['ownershipAudit'] = dict(authority='L13-27', status='reported-ok', commit=audit_pin,
-    source='w32-register-catchup-brief.md', inputs=audit_inputs,
-    note='The committed Lead brief reports audit-report.py ok at 4a4fefbe8 after pair accounting. Drift is authenticated only through rebind.py --check; unaccounted drift still fails and raw diagnostics remain. No committed full audit stdout was found; this is explicitly a Lead-reported outcome, not a fresh execution or invented receipt. Never ran audit-report.py or pair accounting here.')
+register['ownershipAudit'] = dict(authority='L13-27; L13-29.1', status='reported-ok', commit=audit_pin,
+    source='owner-answers.md', ruling='L13-29.1', packet='cutover-approval-packet.md', inputs=audit_inputs,
+    unaccountedPairs=0, B='ok', reproduction=dict(passed=8, total=8), allowedPathExceptionsDropped=58,
+    note='L13-29.1 and the committed cutover packet report the audit at the latest accounting, 23e3c34b7: 0 unaccounted pairs, B ok, reproduction 8/8, 58 allowed-path exceptions dropped. Pinned inputs match HEAD. Drift is authenticated only through rebind.py --check; unaccounted drift still fails and raw diagnostics remain. Lead-reported outcome, not a fresh audit execution or invented receipt. Never ran audit-report.py or pair accounting here.')
 manifest_now = current_load('fchain/manifest.json')
 links_now = current_load('fchain/link-retargets.json')
 rebased_now = current_load('fchain/rebased-patches.json')
@@ -667,41 +673,48 @@ f_window['fComposition'] = dict(source='fchain/check.py composed replay (gate-re
     basePatchSteps=sum(len(row['steps']) for row in composed['baseChain']['files']),
     additionalExecutedPatches=len(composed['executed']), composedFiles=len(composed['files']),
     rebasedEntries=len(rebased_now['patches']), linkRetargetPatches=len(links_now['patches']),
-    linkRetargetRows=len(links_now['rows']), linkIntoMoveSet=composed['counts'].get('linkIntoMoveSet', 0),
-    linkGuard=composed['counts'].get('linkGuard', 0),
+    linkRetargetRows=len(links_now['rows']),
+    linkGuard=current_load('fchain/check.json')['counts'].get('linkGuard', 0),
+    linkGuardSource='fchain/check.json#/counts/linkGuard (absent finding means 0)',
     rule='Counts are witnesses, not additive populations; replay once through the single door at F.')
 readiness = register['cutoverReadiness']
 readiness['summary'] = ('Local preparation is met-local: G0 1,929/1,929 approved, G2 judgments reviewed, G6 787 premises settled and G9 158 decisions settled. '
-    'Send the owner packet at met-local before approval, lease and F (L13-6). G5 owner acceptance, G8 publication, G9 backlog intent and G4/G10/G11 external dependencies remain open. '
-    'W32 reviewed the prior catch-up (18 APPROVE / 3 REWORK); its findings are addressed by the w33/w35/w37 review chain and Lead mechanical fix, not erased. This register update still needs independent records review before the packet; no F, release, lease, publication, cutover or Land approval is inferred.')
+    'The owner packet was sent (6586bbc46); L13-30 records owner approval of option A on 2026-10-26, conditional on lead:LAND confirming before the lease. '
+    'G8 publication permission is covered by A; G5 owner acceptance, G9 backlog intent and G4/G10/G11 external dependencies remain open. '
+    'W38 independently reviewed e7e6c129c (11 APPROVE / 0 REWORK), including the Lead duplicate-id fix. This L13-29.2 refresh needs light review before the lease; no lease, F, release, publication execution or Land approval is claimed.')
 readiness['beforeFinalPin'] = []
 # Every REWORK stays visible with its exact closure, not converted to a blanket
-# APPROVE. The current regeneration still needs independent records review.
+# APPROVE. W38 reviewed the prior register; this refresh still needs light review.
 readiness['localCorrectionReview'] = [
     dict(commits=['a319902ab'], review='reviews/w33-link-retargets-review.json',
         verdictCounts={'APPROVE': 4, 'REWORK': 1, 'NOTE': 3}, affectedGates=['G6'],
         reworkResolutions={'link-retargets-record': '8ea185bfd; row L13-26:link:125, independently APPROVE in w35-7'}, openRework=[]),
     dict(commits=['8ea185bfd'], review='reviews/w35-link-guard-review.json',
-        verdictCounts={'APPROVE': 7, 'REWORK': 3}, affectedGates=['G6'],
+        verdictCounts={'APPROVE': 7, 'REWORK': 3}, affectedGates=['G6', 'G9'],
         reworkResolutions={key: 'b467e09fe; independently APPROVE in w37-1..5' for key in ['w35-1', 'w35-2', 'w35-3']}, openRework=[]),
     dict(commits=['b467e09fe'], review='reviews/w37-link-guard-rereview.json',
-        verdictCounts={'APPROVE': 10, 'REWORK': 1}, affectedGates=['G6'],
-        reworkResolutions={'w37-6': 'Lead mechanical-defect fix edf816838: coexistence row L13-28:related:86 becomes L13-28:related:118; check.py refuses duplicate ids. Owning check exit 0 and duplicate-id probe exit 1 (expected rejection), gate-reconcile/current-proofs.json. Not a new independent semantic review.'}, openRework=[]),
+        verdictCounts={'APPROVE': 10, 'REWORK': 1}, affectedGates=['G6', 'G9'],
+        reworkResolutions={'w37-6': 'Lead mechanical-defect fix edf816838: coexistence row L13-28:related:86 becomes L13-28:related:118; check.py refuses duplicate ids. Owning check exit 0 and duplicate-id probe exit 1 (expected rejection), gate-reconcile/current-proofs.json. Independently checked in reviews/w38-register-update-review.json item w38-3 (APPROVE).'}, openRework=[]),
     dict(commits=['73e89962e', '98d71bef2', 'ca3179b3c', 'c3882df26'],
         review='reviews/w33-ownership-audit-review.json', verdictCounts={'APPROVE': 5},
         note='Review also covers 4a4fefbe8 accounting; no accounting performed here.',
         affectedGates=['G0'], reworkResolutions={}, openRework=[]),
     dict(commits=['c50b78db9'], review='reviews/w32-register-review.json',
-        verdictCounts={'APPROVE': 18, 'REWORK': 3}, affectedGates=['G6'],
+        verdictCounts={'APPROVE': 18, 'REWORK': 3}, affectedGates=['G6', 'cutoverReadiness'],
         reworkResolutions={
             'G6': 'w33/w35/w37 chain and Lead mechanical fix above; L13-28 whole-population linkGuard proof',
             'f-composition': 'Same reviewed chain, current composed replay and L13-28 guard-agreement duty',
             'cutoverReadiness.summary-and-localCorrectionReview': 'w33 ownership review plus complete correction inventory here; rebind status reviewed; packet approval is a precondition'},
-        openRework=[], note='W32 reviews the prior catch-up, not this regeneration. Independently review this register update and its proofs before sending the owner packet.'),
+        openRework=[], note='W32 reviews the prior catch-up; reviews/w38-register-update-review.json items w38-2 and w38-5 independently approve the correction inventory and resolutions.'),
+    dict(commits=['e7e6c129c'], review='reviews/w38-register-update-review.json',
+        verdictCounts={'APPROVE': 11}, affectedGates=['G0', 'G6', 'G7', 'G9', 'cutoverReadiness'],
+        reworkResolutions={}, openRework=[], note='11 APPROVE / 0 REWORK; five low notes applied by this L13-29.2 refresh, which needs light review before the lease.'),
 ]
 for correction in readiness['localCorrectionReview']:
     if correction['openRework']:
         for gate_id in correction['affectedGates']:
+            if gate_id == 'cutoverReadiness':
+                continue  # shared readiness becomes partial below; gate owners remain explicit
             gate = g(int(gate_id[1:]))
             blocker = correction['review'] + ': open REWORK ' + ', '.join(correction['openRework'])
             gate.update(status='partial', remaining=blocker)
@@ -709,7 +722,25 @@ for correction in readiness['localCorrectionReview']:
         f_window['fComposition']['status'] = 'partial'
 readiness['beforeFinalPin'] = [f"{gate['g']}: {item}" for gate in register['gates'] for item in gate['blockers']]
 readiness['atFinalPinUnderLease'][-1] = ('Write and independently review the final status ledger after passing F duties, before Land; precondition: the owner has approved the cutover packet (L13-6).')
-readiness['ownerItems'] = [f"{gate['g']}: {item}" for gate in register['gates'] for item in gate['ownerItems']] + ['Owner separately approves cutover, documentation lease and Land; packet includes the F-window scope/budget and stop conditions.']
+readiness['ownerDecision'] = dict(
+    source='owner-answers.md', ruling='L13-30', date='2026-10-26', time='09:57', option='A', status='approved',
+    packet='cutover-approval-packet.md', packetCommit=git('rev-parse', '6586bbc46').decode().strip(),
+    ownerText='đồng ý A, khi nào lead LAND báo ổn thì em làm.',
+    condition=dict(owner='lead:LAND', requiredBefore='Acquire documentation write lease; freeze starts', status='pending',
+                   action='Confirm lease/freeze, F import and F-window heavy IO are OK before starting.'),
+    allowed=['Documentation lease', 'One main import as F with accounting', 'F duties on plan branch and clones',
+             'Archive ref publication', 'Write and independently review final ledger'],
+    notAllowed=['Land on main without separate approval after final ledger review', 'Delete files on main',
+                'Push .fgos/events*', 'Widen the frame when F exceeds counts; stop and ask again'])
+readiness['order'] = [dict(step=step, status='done' if i < 3 else 'pending',
+    **({'evidence': ['cutover-approval-packet.md', 'owner-answers.md'],
+        'packetCommit': readiness['ownerDecision']['packetCommit'], 'ruling': 'L13-30'} if i in (1, 2) else {}))
+    for i, step in enumerate(readiness['order'])]
+g(8)['ownerItems'] = []
+g(8)['note'] = g(8)['note'].replace('Publication remains owner-gated;', 'L13-30 option A covers publication permission; actual publication remains an F duty, conditional on lead:LAND confirmation before the lease;')
+g(8)['atFinalPinUnderLease'].append('Publish the archive ref within option A scope (L13-30) after lead:LAND confirms and F custody/rebuild proofs pass; permission is approved, publication is not executed.')
+g(11)['external'][1] = 'L13-30 approves option A only, conditional on lead:LAND confirmation before the lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh.'
+readiness['ownerItems'] = [f"{gate['g']}: {item}" for gate in register['gates'] for item in gate['ownerItems']] + ['Land still needs separate owner approval after final ledger review; L13-30 option A is conditional on lead:LAND confirmation before the lease and retains the packet scope/budget and stop conditions.']
 readiness['external'] = [f"{gate['g']}: {item}" for gate in register['gates'] for item in gate['external']]
 # Reproject from owning gate duties, retaining the common duties and L13-6 order.
 readiness['atFinalPinUnderLease'] = [s for s in readiness['atFinalPinUnderLease'] if not re.match(r'^G\d+:', s)]
@@ -719,6 +750,8 @@ register['followUps'] = [
     dict(item='RUL59 declares intent retired but still describes edit --intent and intent write errors.', sourceReview='reviews/w30-g0-verdicts-b11.md', path='docs/platform/work-state/spec.md'),
     dict(item='About 15 old Vietnamese heading titles remain quoted after the headings were renamed.', sourceReview='reviews/w29-g0-verdicts-b10.md', path='docs/platform/work-state/spec.md'),
     dict(item='36 rationale/reason strings in s2/s6/s14 start with whitespace; out-of-scope ledger cleanup.', sourceReview='reviews/w30-g0-verdicts-b11.md', path=str(BASE.parents[1] / 'ledger/decisions')),
+    dict(item='Have audit-report.py also report the raw drift count alongside unaccounted drift.', sourceReview='reviews/w33-ownership-audit-review.md', path=str(BASE.parent / 'phase-08/audit-report.py')),
+    dict(item='Make rebind records 149–150 use the same file/pointer keying as records 151–154.', sourceReview='reviews/w33-ownership-audit-review.md', path=str(BASE / 'rebind/g0-rework-rebindings.json')),
 ]
 for followup in register['followUps']:
     followup.update(owner='lead:DOC', destination='separate backlog item, filed when the cutover lands (backlog on main is outside PRE-FLIP scope)')
@@ -755,7 +788,7 @@ blocker_map = {
  5: [],
  6: [('cleared', c7), ('cleared', c8), ('moved to F', None), ('moved to F', None)],
  7: [('cleared', c9), ('cleared', c10), ('cleared', c10), ('cleared', c11), ('moved to F', None), ('moved to F', None)],
- 8: [('cleared', c12), ('moved to F', None), ('moved to F', None), ('still open', None)],
+ 8: [('cleared', c12), ('moved to F', None), ('moved to F', None), ('cleared', None)],
  9: [('moved to F', None), ('cleared', c13), ('cleared', c14), ('cleared', c13)],
  10: [('still open', None), ('moved to F', None), ('moved to F', None)],
  11: [('still open', None), ('moved to F', None), ('still open', None)],
@@ -771,6 +804,8 @@ for i, old in enumerate(original['gates']):
         else:
             explanation = 'Still open with corrected scope/owner: ' + ' '.join(g(i)['blockers'] + g(i)['external'])
         parts = None
+        if i == 8 and j == 3:
+            explanation = 'L13-30 option A approves archive ref publication permission; actual F custody and publication remain pending, after lead:LAND confirmation before the lease.'
         if i == 9 and j == 1:
             parts = [cleared_part(c13)]
             explanation = 'Interim re-judgment/review is cleared; final source-delta review is not cleared and remains in G9 atFinalPinUnderLease/0 and the original final-pin occurrence.'
@@ -842,8 +877,12 @@ for j, item in enumerate(original['cutoverReadiness']['atFinalPinUnderLease']):
 for j, item in enumerate(original['cutoverReadiness']['external']):
     numbers = [[4], [10], [11], [10], [8], []][j]
     decide(f'/cutoverReadiness/external/{j}', item, 'still open',
-           'Retain the external decision/execution dependency; apply L13-12 A\' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.',
-           numbers, ['owner-answers.md', 'preflip-execution-plan.md'])
+           ('L13-30 option A approves archive publication permission, conditional on lead:LAND confirmation before the lease; actual F custody/publication and separate Land approval for the main manifest merge stay pending.' if j == 4 else
+            'Retain the external execution dependency; L13-30 approves option A, not Land or release execution. Apply L13-12 A\' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.'),
+           numbers, ['owner-answers.md', 'preflip-execution-plan.md'],
+           parts=[{'decision': 'cleared', 'item': 'Archive ref publication permission under L13-30 option A; execution remains pending.', 'evidence': ['owner-answers.md', 'cutover-approval-packet.md']},
+                  {'decision': 'still open', 'item': 'Main manifest merge requires separate Land approval after final ledger review.', 'evidence': ['owner-answers.md']}]
+           if j == 4 else None)
 
 # Read and fingerprint all evidence actually cited by the projection. This reads
 # committed blobs only, even when a concurrent author is editing the same file.
@@ -874,7 +913,7 @@ for old, new in zip(original['gates'], register['gates']):
     }, 'originalDecisions': dict(collections.Counter(d['decision'] for d in decisions if d['sourcePointer'].startswith('/gates/' + str(register['gates'].index(new)) + '/')))})
 
 receipt = {
-    'version': 1, 'authority': 'L12-137; w17-gate-register-reconcile-brief; w21-register-catchup-brief; w23-register-corrections-brief; w32-register-catchup-brief; w35-register-update-brief; L13-16–28',
+    'version': 1, 'authority': 'L12-137; w17-gate-register-reconcile-brief; w21-register-catchup-brief; w23-register-corrections-brief; w32-register-catchup-brief; w35-register-update-brief; w39-register-refresh-brief; L13-16–30',
     'asOf': CURRENT_PIN, 'originalSnapshotCommit': PIN, 'status': 'reconciled-not-cutover-approval',
     'followUp': {'sourceCommit': FOLLOWUP, 'ruling': 'owner-answers.md L13-17',
                  'inputs': FOLLOWUP_READ, 'settlementReceipt': 'census-join/receipt.md',
@@ -901,7 +940,7 @@ receipt = {
         'reviewInventory': current_reviews, 'proofs': 'gate-reconcile/current-proofs.json',
         'countsPerGate': [dict(g=new['g'], before=old['status'], after=new['status'])
                           for old, new in zip(current_before['gates'], register['gates'])],
-        'scope': 'Committed W23–W37 reviews and L13-16–28. Historical occurrence accounting remains at its original pin; this separate table compares current turn-start register statuses.'},
+        'scope': 'Committed W23–W38 reviews and L13-16–30. Historical occurrence accounting remains at its original pin; this separate table compares current turn-start register statuses.'},
     'newlyVisibleOpenItems': register['cutoverReadiness']['beforeFinalPin'],
     'scopeLimits': [
         'No parallel uncommitted carries/g0rework content read; original inputs come from git show at asOf, W18 and W19 from their separately fingerprinted committed layers.',
@@ -944,24 +983,26 @@ lines += ['', '## Evidence decisions', '',
     '- G6: W23 reviews all 787; W28 approves the 85 fixes and confirms prior approvals unchanged. The w33 (4 APPROVE / 1 REWORK), w35 (7/3) and w37 (10/1) chain covers link retargets and the whole-population L13-28 guard. Row 125 is approved in w35; w35 rework is approved in w37; its duplicate-id REWORK is a Lead mechanical fix in edf816838, verified by owning compose exit 0 and a rejecting duplicate-id probe (exit 1). No open review REWORK is hidden as met-local. The 137 current-passage-unbound rows and changed shard-2 patch delta reviews remain at F.',
     '- G9: all 158 decisions, not 33. W25 is 158 APPROVE / 12 REWORK across entry and cross-cutting scopes, not blanket approval. L13-23/24 plus W28 settle the proposals/overlaps with unchanged decisions. WORK and registry exports remain external; two backlog-intent choices remain owner-owned.',
     '- F composition: every prepared source is in fchain/manifest.json, including rebased-patches.json and link-retargets.json. Current replay exits 0, whole-population linkGuard=0, Related included. Guard 3 must agree at F (including 398 literal-code occurrences and 44 Related #anchor operands that the current product reader misreads); both must report 0. This is preparation only, not a separate retarget pass.',
-    '- Ownership: w33-ownership-audit independently records 5 APPROVE / 0 REWORK, covering 73e89962e, 98d71bef2, ca3179b3c and c3882df26 (plus existing accounting). Rebind status now cites that review; edges are byte-identical. L13-27 routes drift judgment through rebind.py --check. The committed Lead brief reports audit-report.py ok at 4a4fefbe8 after pair accounting; no committed full audit stdout was found. The register labels this reported-ok, with pinned script/manifest hashes, not an independently reproduced audit. The forbidden audit was never run.',
-    '- G4 is external: local repairs are complete, but Git/HARDEN review is not accepted. G5 still needs owner acceptance of exactly 8 restatements. G8 creates the local archive ref only at F before G10; publication is owner-gated. G10/G11 remain external.', '',
+    '- Ownership: rebind records 0–148 cite W26 (594fe4194); records 149–154 cite w33-ownership-audit (5 APPROVE / 0 REWORK). Only status changed; all edge bytes are conserved. L13-29.1 and packet 6586bbc46 report the latest accounting at 23e3c34b7: 0 unaccounted pairs, B ok, reproduction 8/8, 58 allowed-path exceptions dropped. Audit inputs are pinned and equal HEAD; the audit was not rerun and no pair accounting was performed.',
+    '- Owner decision: L13-30 approves option A on 2026-10-26, conditional on lead:LAND confirmation before the lease. Sending the packet and owner approval are done; lease and every later step are pending. G8 publication permission is covered, not executed. Land needs separate approval after final ledger review; G5 and G9 owner items remain open. No frame widening, deletion on main or events push is authorized.',
+    '- Review/citations: e7e6c129c now has its w38 entry (11 APPROVE / 0 REWORK); w38 also independently checked edf816838. W35/W37 include G9, W32 includes cutoverReadiness, and G7 cites reviews/w33-link-retargets-review.json item work-state-rebase. The obsolete constant field/control is retired; whole-population linkGuard is retained and the register reads it from fchain/check.json.',
+    '- G4 is external: local repairs are complete, but Git/HARDEN review is not accepted. G5 still needs owner acceptance of exactly 8 restatements. G8 creates the local archive ref only at F before G10. G10/G11 remain external. No component-boundary change.', '',
     '## F-window size', '', '```json', json.dumps(f_window, ensure_ascii=False, indent=2), '```', '',
     '## Outside-plan follow-ups', '']
 for followup in register['followUps']:
     lines.append('- ' + followup['item'] + ' Source: `' + followup['sourceReview'] + '`. Owner: ' + followup['owner'] + '; destination: ' + followup['destination'] + '.')
 lines += ['', '## Commands and exits', '',
-    'Read-only inventory commands (`git status --short`, `pwd`, `ls`, `git rev-parse HEAD`, `git log` including -S history, `git diff --name-only/--stat`, `git show` including --stat, `git ls-tree`, `rg`) exited 0; none mutated Git. Source reads and full JSON review parsing/fingerprinting are recorded by currentCatchUp.inputs/reviewInventory. No product tests, CLI, native addons, pair accounting, lease/ref or other records were written.', '',
+    'Read-only inventory commands (`git status --short`, `git rev-parse`, `git log` including -S history, `git diff` including --name-only/--stat, `git show`, `git ls-tree`, `git for-each-ref`, and Python JSON inspection) exited 0; none mutated Git. The three changed Python scripts passed ast.parse in a python3 -B inline preflight (exit 0). Source reads and full JSON review parsing/fingerprinting are recorded by currentCatchUp.inputs/reviewInventory. No product tests, CLI, native addons, pair accounting, lease/ref or other records were written.', '',
     '| Command | Exit | Evidence |', '|---|---:|---|',
     '| python3 -B P/g0join/join.py --pin ' + CURRENT_PIN + ' | 0 | current-proofs.json: argv, counts, stdout hash, stderr |',
     '| python3 -B P/fchain/check.py --pin ' + CURRENT_PIN + ' (compose API, output-only adapter) | 0 | current-proofs.json: full engine, sources, counts, report hash; no out-of-scope check.json write |',
     '| python3 -B P/gate-reconcile/reconcile.py (twice) | 0 / 0 | deterministic generated register/receipts/sources/current-proofs |',
     '| python3 -B P/gate-reconcile/verify.py | 0 | verification.json |',
-    '| python3 -B P/gate-reconcile/controls.py | 0 | controls.json: all existing controls retained, plus current review/guard/status regressions |',
+    '| python3 -B P/gate-reconcile/controls.py | 0 | controls.json: obsolete constant-field control retired; linkGuard control owns the measured link regression, plus decision/provenance regressions |',
     '| python3 -B P/rebind/rebind.py --check | 0 | register-update-proof.json; drift 0, 7 superseded origins, 16 groups |',
     '| fchain.compose(pin), duplicate-id probe through load seam | 1 (expected) | current-proofs.json; rejects duplicate L13-28:related:86 after Lead fix edf816838 |',
     '| git diff --check | 0 | no whitespace errors |', '',
-    'Exact current argv, exits, stdout/stderr and deterministic hashes: `register-update-proof.json`. Historical execution-proof.json remains unchanged. The current proof also records rebind.py --check (exit 0) and the expected-failing duplicate-id probe (exit 1, rejected). The first integrated verify attempt exited 1 on a case-sensitive wording check (Independently vs independent); that text check is now case-insensitive, with the approval/review boundary unchanged. Rebind record status alone is updated to cite w33; every other byte is conserved. Current status table above compares the register at turn-start HEAD, not an invented pre-F approval. No evidence or validation predicate was bypassed.', '',
+    'Exact current argv, exits, stdout/stderr and deterministic hashes: `register-update-proof.json`. Historical execution-proof.json remains unchanged. The owning duplicate-id probe still rejects (exit 1, expected). Rebind status alone now cites W26 for records 0–148 and w33 for 149–154; every other byte is conserved. Current status table compares turn-start HEAD, not final acceptance. The obsolete moved-path constant control is retired because linkGuard owns that measured behaviour; its existing whole-population regression control remains. No evidence or validation predicate was bypassed.', '',
     'P = plans/260925-documentation-authority-unification/reports/phase-09. The current proofs retain production checks; only the F replay output sink uses the owning compose API to respect the exact write grant. Frozen historical/generated hashes are checked against their committed pins, not today’s live files. Only verification.json checkedAtHead is volatile and restored when it is the only rerun change. Scratch: exit-cleaned tempfile directories under /tmp/fgos-work/. No preview service under this scope. needsWrites: [].', '']
 (OUT / 'receipt.md').write_text('\n'.join(lines))
 print(json.dumps({'gates': len(register['gates']), 'originalOccurrences': len(decisions),

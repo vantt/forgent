@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "authority": "L12-137; w17-gate-register-reconcile-brief; w21-register-catchup-brief; w23-register-corrections-brief; w32-register-catchup-brief; w35-register-update-brief; L13-16–28",
-  "asOf": "a734c3f47ff6eb39d80ba1c16e6dd88d44cc2d53",
+  "authority": "L12-137; w17-gate-register-reconcile-brief; w21-register-catchup-brief; w23-register-corrections-brief; w32-register-catchup-brief; w35-register-update-brief; w39-register-refresh-brief; L13-16–30",
+  "asOf": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
   "originalSnapshotCommit": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
   "status": "reconciled-not-cutover-approval",
   "followUp": {
@@ -230,13 +230,12 @@
         "blockers": 0,
         "remainingEntries": 0,
         "cleared": 2,
-        "atFinalPinUnderLease": 2,
+        "atFinalPinUnderLease": 3,
         "external": 0
       },
       "originalDecisions": {
-        "cleared": 1,
-        "moved to F": 3,
-        "still open": 1
+        "cleared": 2,
+        "moved to F": 3
       }
     },
     {
@@ -310,7 +309,7 @@
     },
     "atFinalPinUnderLease": {
       "before": 19,
-      "after": 31
+      "after": 32
     },
     "external": {
       "before": 6,
@@ -318,9 +317,9 @@
     }
   },
   "decisionCounts": {
-    "cleared": 24,
+    "cleared": 25,
     "moved to F": 48,
-    "still open": 15
+    "still open": 14
   },
   "decisions": [
     {
@@ -363,6 +362,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -378,7 +379,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -431,6 +431,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -446,7 +448,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -499,6 +500,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -514,7 +517,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -567,6 +569,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -582,7 +586,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -635,6 +638,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -650,7 +655,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -703,6 +707,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -718,7 +724,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -771,6 +776,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -786,7 +793,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -1991,7 +1997,8 @@
         "reviews/w14-g0-content-rereview.json",
         "reviews/w17-parity-rework-review.json",
         "reviews/w8-composition-review.md",
-        "reviews/w14-check-hardening-review.json"
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w33-link-retargets-review.json"
       ],
       "parts": [
         {
@@ -2052,7 +2059,8 @@
         "reviews/w14-g0-content-rereview.json",
         "reviews/w17-parity-rework-review.json",
         "reviews/w8-composition-review.md",
-        "reviews/w14-check-hardening-review.json"
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w33-link-retargets-review.json"
       ]
     },
     {
@@ -2087,7 +2095,8 @@
         "reviews/w14-g0-content-rereview.json",
         "reviews/w17-parity-rework-review.json",
         "reviews/w8-composition-review.md",
-        "reviews/w14-check-hardening-review.json"
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w33-link-retargets-review.json"
       ]
     },
     {
@@ -2122,7 +2131,8 @@
         "reviews/w14-g0-content-rereview.json",
         "reviews/w17-parity-rework-review.json",
         "reviews/w8-composition-review.md",
-        "reviews/w14-check-hardening-review.json"
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w33-link-retargets-review.json"
       ]
     },
     {
@@ -2157,7 +2167,8 @@
         "reviews/w14-g0-content-rereview.json",
         "reviews/w17-parity-rework-review.json",
         "reviews/w8-composition-review.md",
-        "reviews/w14-check-hardening-review.json"
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w33-link-retargets-review.json"
       ]
     },
     {
@@ -2192,7 +2203,8 @@
         "reviews/w14-g0-content-rereview.json",
         "reviews/w17-parity-rework-review.json",
         "reviews/w8-composition-review.md",
-        "reviews/w14-check-hardening-review.json"
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w33-link-retargets-review.json"
       ]
     },
     {
@@ -2226,7 +2238,8 @@
         "reviews/w17-parity-rework-review.json",
         "reviews/w8-composition-review.md",
         "reviews/w14-check-hardening-review.json",
-        "preflip-execution-plan.md"
+        "preflip-execution-plan.md",
+        "reviews/w33-link-retargets-review.json"
       ],
       "parts": [
         {
@@ -2332,7 +2345,7 @@
       "sourcePointer": "/gates/8/blockers/1",
       "item": "Partition bound to d3efc70c5; rebuild required at F",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Create the repository-local archive ref from the F rebuild before G10, with commit, partition hash, path, blob, size and SHA256 agreement (L13-18); a disposable rehearsal ref is not custody. Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
+      "resolution": "Retained as an explicit F duty, not cleared: Create the repository-local archive ref from the F rebuild before G10, with commit, partition hash, path, blob, size and SHA256 agreement (L13-18); a disposable rehearsal ref is not custody. Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count. Publish the archive ref within option A scope (L13-30) after lead:LAND confirms and F custody/rebuild proofs pass; permission is approved, publication is not executed.",
       "gates": [
         "G8"
       ],
@@ -2360,7 +2373,7 @@
       "sourcePointer": "/gates/8/blockers/2",
       "item": "No local archive ref in the repository (rehearsal clone only)",
       "decision": "moved to F",
-      "resolution": "Retained as an explicit F duty, not cleared: Create the repository-local archive ref from the F rebuild before G10, with commit, partition hash, path, blob, size and SHA256 agreement (L13-18); a disposable rehearsal ref is not custody. Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
+      "resolution": "Retained as an explicit F duty, not cleared: Create the repository-local archive ref from the F rebuild before G10, with commit, partition hash, path, blob, size and SHA256 agreement (L13-18); a disposable rehearsal ref is not custody. Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count. Publish the archive ref within option A scope (L13-30) after lead:LAND confirms and F custody/rebuild proofs pass; permission is approved, publication is not executed.",
       "gates": [
         "G8"
       ],
@@ -2387,8 +2400,8 @@
     {
       "sourcePointer": "/gates/8/blockers/3",
       "item": "Publication (S2) needs owner cutover approval",
-      "decision": "still open",
-      "resolution": "Still open with corrected scope/owner: ",
+      "decision": "cleared",
+      "resolution": "L13-30 option A approves archive ref publication permission; actual F custody and publication remain pending, after lead:LAND confirmation before the lease.",
       "gates": [
         "G8"
       ],
@@ -2481,26 +2494,11 @@
           ]
         },
         {
-          "decision": "still open",
-          "item": "Owner cutover approval S2 is required for archive ref publication and main manifest merge; local rehearsal is not that permission.",
+          "decision": "moved to F",
+          "item": "Publish the archive ref within option A scope (L13-30) after lead:LAND confirms and F custody/rebuild proofs pass; permission is approved, publication is not executed.",
           "evidence": [
-            "archive/receipt.md",
-            "archive/design.md",
-            "archive/manifest.json",
-            "archive/verification.json",
-            "archive/rehearsal.json",
-            "archive/link-closure.json",
-            "reviews/w2-g8-archive-review.json",
-            "reviews/w4-g8-archive-review.json",
-            "reviews/w5-d5c-archive-review.json",
-            "reviews/w14-g8-retention-timing-review.json",
-            "reviews/w8-lead-fixes-review.json",
-            "reviews/w20-census-settlement-review.json",
-            "reviews/w20-census-settlement-review.md",
-            "reviews/w21-census-rework-and-g5-review.json",
-            "archive/receipt.json",
-            "owner-answers.md",
-            "preflip-execution-plan.md"
+            "preflip-execution-plan.md",
+            "owner-answers.md"
           ]
         }
       ]
@@ -2932,7 +2930,7 @@
       "sourcePointer": "/gates/11/blockers/0",
       "item": "SEAT release not staged",
       "decision": "still open",
-      "resolution": "Still open with corrected scope/owner: SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11). Owner cutover/lease/Land approval remains separate. L13-12 historical host stop constraints do not prohibit the main import already performed on design-lap; W22 retires the stale no-pull wording.",
+      "resolution": "Still open with corrected scope/owner: SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11). L13-30 approves option A only, conditional on lead:LAND confirmation before the lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh.",
       "gates": [
         "G11"
       ],
@@ -2958,7 +2956,7 @@
       "sourcePointer": "/gates/11/blockers/2",
       "item": "WORK cutover stop: DOC launches no fgos run, pull or push until \"cutover xong\" (L13-9)",
       "decision": "still open",
-      "resolution": "Still open with corrected scope/owner: SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11). Owner cutover/lease/Land approval remains separate. L13-12 historical host stop constraints do not prohibit the main import already performed on design-lap; W22 retires the stale no-pull wording.",
+      "resolution": "Still open with corrected scope/owner: SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11). L13-30 approves option A only, conditional on lead:LAND confirmation before the lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh.",
       "gates": [
         "G11"
       ],
@@ -2998,7 +2996,7 @@
         },
         {
           "decision": "still open",
-          "item": "Owner cutover/lease/Land approval remains separate. L13-12 historical host stop constraints do not prohibit the main import already performed on design-lap; W22 retires the stale no-pull wording.",
+          "item": "L13-30 approves option A only, conditional on lead:LAND confirmation before the lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh.",
           "evidence": [
             "owner-answers.md",
             "preflip-execution-plan.md"
@@ -3047,6 +3045,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -3062,7 +3062,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -3087,7 +3086,8 @@
         "w2-review-notes.md",
         "reviews/w8-composition-review.json",
         "reviews/w8-composition-review.md",
-        "reviews/w14-check-hardening-review.json"
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w33-link-retargets-review.json"
       ],
       "parts": [
         {
@@ -3159,6 +3159,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -3174,7 +3176,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -3234,6 +3235,7 @@
         "reviews/w8-composition-review.json",
         "reviews/w8-composition-review.md",
         "reviews/w14-check-hardening-review.json",
+        "reviews/w33-link-retargets-review.json",
         "archive/receipt.md",
         "archive/design.md",
         "archive/manifest.json",
@@ -3535,6 +3537,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -3550,7 +3554,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -3641,6 +3644,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -3656,7 +3661,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -3847,6 +3851,7 @@
         "reviews/w17-parity-rework-review.json",
         "reviews/w8-composition-review.md",
         "reviews/w14-check-hardening-review.json",
+        "reviews/w33-link-retargets-review.json",
         "late-areas/receipt.md",
         "late-areas/legacy-drift.json",
         "import2/receipt.md",
@@ -3960,6 +3965,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -3975,7 +3982,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -4054,7 +4060,8 @@
         "reviews/w14-g0-content-rereview.json",
         "reviews/w17-parity-rework-review.json",
         "reviews/w8-composition-review.md",
-        "reviews/w14-check-hardening-review.json"
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w33-link-retargets-review.json"
       ],
       "parts": [
         {
@@ -4321,6 +4328,14 @@
             "preflip-execution-plan.md",
             "owner-answers.md"
           ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Publish the archive ref within option A scope (L13-30) after lead:LAND confirms and F custody/rebuild proofs pass; permission is approved, publication is not executed.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
         }
       ]
     },
@@ -4376,6 +4391,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -4391,7 +4408,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -4416,7 +4432,8 @@
         "w2-review-notes.md",
         "reviews/w8-composition-review.json",
         "reviews/w8-composition-review.md",
-        "reviews/w14-check-hardening-review.json"
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w33-link-retargets-review.json"
       ],
       "parts": [
         {
@@ -4510,6 +4527,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -4525,7 +4544,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -4550,7 +4568,8 @@
         "w2-review-notes.md",
         "reviews/w8-composition-review.json",
         "reviews/w8-composition-review.md",
-        "reviews/w14-check-hardening-review.json"
+        "reviews/w14-check-hardening-review.json",
+        "reviews/w33-link-retargets-review.json"
       ],
       "parts": [
         {
@@ -4728,6 +4747,14 @@
             "preflip-execution-plan.md",
             "owner-answers.md"
           ]
+        },
+        {
+          "decision": "moved to F",
+          "item": "Publish the archive ref within option A scope (L13-30) after lead:LAND confirms and F custody/rebuild proofs pass; permission is approved, publication is not executed.",
+          "evidence": [
+            "preflip-execution-plan.md",
+            "owner-answers.md"
+          ]
         }
       ]
     },
@@ -4771,6 +4798,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -4786,7 +4815,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -4837,7 +4865,7 @@
       "sourcePointer": "/cutoverReadiness/external/0",
       "item": "Git owner / HARDEN reviews the 25 git one-door declarations on review/doc-git-one-door (G4)",
       "decision": "still open",
-      "resolution": "Retain the external decision/execution dependency; apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
+      "resolution": "Retain the external execution dependency; L13-30 approves option A, not Land or release execution. Apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
       "gates": [
         "G4"
       ],
@@ -4850,7 +4878,7 @@
       "sourcePointer": "/cutoverReadiness/external/1",
       "item": "Git owner gives section 7 consent (G10)",
       "decision": "still open",
-      "resolution": "Retain the external decision/execution dependency; apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
+      "resolution": "Retain the external execution dependency; L13-30 approves option A, not Land or release execution. Apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
       "gates": [
         "G10"
       ],
@@ -4863,7 +4891,7 @@
       "sourcePointer": "/cutoverReadiness/external/2",
       "item": "SEAT stages the docs-lease release from the F code commit; the Lead proves the four routes in a disposable clone (G11)",
       "decision": "still open",
-      "resolution": "Retain the external decision/execution dependency; apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
+      "resolution": "Retain the external execution dependency; L13-30 approves option A, not Land or release execution. Apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
       "gates": [
         "G11"
       ],
@@ -4876,7 +4904,7 @@
       "sourcePointer": "/cutoverReadiness/external/3",
       "item": "Lead runs the G10 holder Land rehearsal on the shrunk clone with that release",
       "decision": "still open",
-      "resolution": "Retain the external decision/execution dependency; apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
+      "resolution": "Retain the external execution dependency; L13-30 approves option A, not Land or release execution. Apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
       "gates": [
         "G10"
       ],
@@ -4889,20 +4917,37 @@
       "sourcePointer": "/cutoverReadiness/external/4",
       "item": "Owner decides S2, the archive ref push and main manifest merge (G8 publication)",
       "decision": "still open",
-      "resolution": "Retain the external decision/execution dependency; apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
+      "resolution": "L13-30 option A approves archive publication permission, conditional on lead:LAND confirmation before the lease; actual F custody/publication and separate Land approval for the main manifest merge stay pending.",
       "gates": [
         "G8"
       ],
       "evidence": [
         "owner-answers.md",
         "preflip-execution-plan.md"
+      ],
+      "parts": [
+        {
+          "decision": "cleared",
+          "item": "Archive ref publication permission under L13-30 option A; execution remains pending.",
+          "evidence": [
+            "owner-answers.md",
+            "cutover-approval-packet.md"
+          ]
+        },
+        {
+          "decision": "still open",
+          "item": "Main manifest merge requires separate Land approval after final ledger review.",
+          "evidence": [
+            "owner-answers.md"
+          ]
+        }
       ]
     },
     {
       "sourcePointer": "/cutoverReadiness/external/5",
       "item": "Owner approves the cutover (lease + Land) as a separate decision",
       "decision": "still open",
-      "resolution": "Retain the external decision/execution dependency; apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
+      "resolution": "Retain the external execution dependency; L13-30 approves option A, not Land or release execution. Apply L13-12 A' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.",
       "gates": [],
       "evidence": [
         "owner-answers.md",
@@ -5029,7 +5074,7 @@
     "scope": "Historical W22/L13-20 layer only; its then-authored G6/G9 packets were not independent approvals. Generated evidence is preserved from committed d7126c5b9, not from current working-tree files."
   },
   "currentCatchUp": {
-    "sourceCommit": "a734c3f47ff6eb39d80ba1c16e6dd88d44cc2d53",
+    "sourceCommit": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
     "generatedHistoricalPin": "d7126c5b9",
     "inputs": [
       {
@@ -5633,6 +5678,18 @@
         "sha256": "056d0a130ba084e5c946db233a5e38a7bac0c07a1f151b29c1e6de5dd79d8829"
       },
       {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "sha256": "4260a32e72ba2a2a3e1b1723626cb6dd8543fce42e9e95e76837fc99d1698be1"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "sha256": "72baad4d9b55a233df9dc98594487dc60b8feef0f32639fb725a8fc926f021fa"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
+        "sha256": "71d6c0c2799861e4cc80e9eb4c7f8faaa9bac3a7e3c564de5e452d0134ca5116"
+      },
+      {
         "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-cutover-move-set.json",
         "sha256": "3b8f1999d1e2b4b32e5219185ab61493569b8ade135ebebd784ceef5ab2cf5db"
       },
@@ -5705,6 +5762,14 @@
         "sha256": "a724f895e9d3df4e1b8849f0f655fbe3d0a164071d82cb5dfeb55590ada094e6"
       },
       {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/cutover-approval-packet.md",
+        "sha256": "bf96ca06abb8579ac0b4b480a9665da95de81541e155fcb3b9b579efd951a9f2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/check.json",
+        "sha256": "f80416b15bcd711a5d035014c3d6b7e35b436989a5ca78356e14104643a3279b"
+      },
+      {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/fchain/check.py",
         "sha256": "373a5b88baf786b17cd94c92e0c5b4ac1f8a074a4ba5819a7c366809e000df63"
       },
@@ -5766,11 +5831,11 @@
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md",
-        "sha256": "78e17b0a34fafd9de6e0ad42db0aabcf0950940ac4ce41b05251e0144b0f8d06"
+        "sha256": "d3a956429693268fb7d32fef8e4a06db7b9634bc1c7f23e2729bf991d1b7a2ef"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/preflip-gate-status.json",
-        "sha256": "6efd0c4765755a608ffccc9d4ed26ce0401e91c96351769e00dcdb1f5d7756e3"
+        "sha256": "e99b3ec351b6fc10002317ac336b663c314825cbcb6bbdd7dd1f2e2e96d78b9d"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/judgments.json",
@@ -5810,7 +5875,7 @@
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json",
-        "sha256": "bbe108e5af0a0cd6f0449e6dbbaf6908aa8e611bcc6d2c1f938ca1a58cb4c8ce"
+        "sha256": "1576bcdf1d31fbc02a1ebfa788852f551a71e42dfbbd78f6738ca044f8f6cea5"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b1-review.json",
@@ -6165,6 +6230,14 @@
         "sha256": "5f033102a8fec532f3f97498b72ab264cc43c4a0b2f5ed080dccf0794e9ae1a6"
       },
       {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w38-register-update-review.json",
+        "sha256": "4a667b828bd481b4e64d912923f176c3f7866f98e9f65707d9c7386f46b4dd42"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w38-register-update-review.md",
+        "sha256": "e720810a9584fac5c6af9482698e57cd8711a6bbd12630f2c96463f801c82f59"
+      },
+      {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-g4-declare-review.json",
         "sha256": "64970be3264f68e4d267dadfdbee81a8013206c4582bbefa6030a18850ee1096"
       },
@@ -6243,6 +6316,10 @@
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/w35-register-update-brief.md",
         "sha256": "f3b290ee9b7c6fb79f25d7f2c0d4cdc913d4084c206fdcab434820846dcc3a07"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w39-register-refresh-brief.md",
+        "sha256": "f7ece375226be1bb8419d8b9379a5ee89a99ede68f0c9d0671a9563fb0a88d71"
       }
     ],
     "reviewInventory": [
@@ -7204,6 +7281,18 @@
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w37-link-guard-rereview.md",
         "sha256": "5f033102a8fec532f3f97498b72ab264cc43c4a0b2f5ed080dccf0794e9ae1a6"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w38-register-update-review.json",
+        "sha256": "4a667b828bd481b4e64d912923f176c3f7866f98e9f65707d9c7386f46b4dd42",
+        "verdictCounts": {
+          "APPROVE": 11
+        },
+        "nonApproveRows": []
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w38-register-update-review.md",
+        "sha256": "e720810a9584fac5c6af9482698e57cd8711a6bbd12630f2c96463f801c82f59"
       }
     ],
     "proofs": "gate-reconcile/current-proofs.json",
@@ -7269,7 +7358,7 @@
         "after": "external"
       }
     ],
-    "scope": "Committed W23–W37 reviews and L13-16–28. Historical occurrence accounting remains at its original pin; this separate table compares current turn-start register statuses."
+    "scope": "Committed W23–W38 reviews and L13-16–30. Historical occurrence accounting remains at its original pin; this separate table compares current turn-start register statuses."
   },
   "newlyVisibleOpenItems": [],
   "scopeLimits": [

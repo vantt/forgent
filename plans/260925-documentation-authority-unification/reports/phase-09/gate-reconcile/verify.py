@@ -147,7 +147,7 @@ def check():
     require(g0['exit'] == 0 and g0['counts']['approved'] == g0['counts']['effectiveRows'] == 1929 and
             all(g0['counts'][key] == 0 for key in ['missing', 'mismatched', 'stale', 'openRework', 'invalidBindings', 'unresolved']),
             'current G0 proof not green')
-    require(chain['exit'] == 0 and chain['counts'] == {} and chain['linkIntoMoveSet'] == 0 and
+    require(chain['exit'] == 0 and chain['counts'] == {} and
             chain['linkGuard']['findings'] == 0 and chain['linkGuard']['platformMarkdownFiles'] == 628 and
             chain['linkGuard']['population'] == 'All composed docs/platform/**/*.md, Related headers included',
             'current F composition proof not green')
@@ -165,10 +165,14 @@ def check():
         'met-local', 'met-local', 'met-local', 'met-local', 'external', 'met-local',
         'met-local', 'met-local', 'met-local', 'met-local', 'external', 'external'],
             'current gate statuses drift')
-    require(len(register['followUps']) == 4 and all(str(BASE / row['sourceReview']) in current_inputs
+    require(len(register['followUps']) == 6 and all(str(BASE / row['sourceReview']) in current_inputs
             and row.get('owner') == 'lead:DOC' and row.get('destination') ==
             'separate backlog item, filed when the cutover lands (backlog on main is outside PRE-FLIP scope)'
-            for row in register['followUps']), 'outside-plan follow-up provenance drift')
+            for row in register['followUps']) and
+            [(row['sourceReview'], row['path']) for row in register['followUps'][-2:]] == [
+                ('reviews/w33-ownership-audit-review.md', str(BASE.parent / 'phase-08/audit-report.py')),
+                ('reviews/w33-ownership-audit-review.md', str(BASE / 'rebind/g0-rework-rebindings.json'))],
+            'outside-plan follow-up provenance drift')
     corrections_now = register['cutoverReadiness']['localCorrectionReview']
     required_coverage = {
         'reviews/w33-link-retargets-review.json': ['a319902ab'],
@@ -176,6 +180,7 @@ def check():
         'reviews/w37-link-guard-rereview.json': ['b467e09fe'],
         'reviews/w33-ownership-audit-review.json': ['73e89962e', '98d71bef2', 'ca3179b3c', 'c3882df26'],
         'reviews/w32-register-review.json': ['c50b78db9'],
+        'reviews/w38-register-update-review.json': ['e7e6c129c'],
     }
     require(isinstance(corrections_now, list) and len(corrections_now) == len(required_coverage) and
             {r['review']: r['commits'] for r in corrections_now} == required_coverage,
@@ -189,9 +194,14 @@ def check():
                 set(resolved) | set(correction['openRework']) == reworks and
                 not set(resolved) & set(correction['openRework']) and all(resolved.values()),
                 'local correction verdict/resolution drift')
-        require(not correction['openRework'] or all(register['gates'][int(g[1:])]['status'] == 'partial'
-                and correction['review'] in ' '.join(register['gates'][int(g[1:])]['blockers'])
+        require(not correction['openRework'] or all(
+                (register['cutoverReadiness']['fWindowSize']['fComposition']['status'] == 'partial'
+                 if g == 'cutoverReadiness' else
+                 register['gates'][int(g[1:])]['status'] == 'partial' and
+                 correction['review'] in ' '.join(register['gates'][int(g[1:])]['blockers']))
                 for g in correction['affectedGates']), 'open review REWORK hidden as met-local')
+    require(corrections_now[1]['affectedGates'] == corrections_now[2]['affectedGates'] == ['G6', 'G9'] and
+            corrections_now[4]['affectedGates'] == ['G6', 'cutoverReadiness'], 'affected gate coverage drift')
     require('edf816838' in corrections_now[2]['reworkResolutions']['w37-6'] and
             'mechanical' in corrections_now[2]['reworkResolutions']['w37-6'] and
             'independent' in corrections_now[4]['note'].lower(), 'mechanical fix or register review boundary drift')
@@ -200,16 +210,30 @@ def check():
     new_rebind = rebind_path.read_bytes()
     old_status = json.loads(old_rebind)['status']
     require(json.loads(new_rebind)['status'] ==
-            'reviewed; reviews/w33-ownership-audit-review.json (5 APPROVE / 0 REWORK)' and
-            new_rebind.replace(json.dumps(json.loads(new_rebind)['status']).encode(),
-                               json.dumps(old_status).encode(), 1) == old_rebind,
+            'reviewed; records 0–148 (594fe4194): reviews/w26-g0-rework-verdicts.md; records 149–154: reviews/w33-ownership-audit-review.json (5 APPROVE / 0 REWORK)' and
+            new_rebind.replace(json.dumps(json.loads(new_rebind)['status'], ensure_ascii=False).encode(),
+                               json.dumps(old_status, ensure_ascii=False).encode(), 1) == old_rebind and
+            all(term in register['gates'][0]['note'] for term in [
+                '0–148', '594fe4194', 'reviews/w26-g0-rework-verdicts.md',
+                '149–154', 'reviews/w33-ownership-audit-review.json']),
             'rebind reviewed status or edge-byte conservation drift')
-    require(register['ownershipAudit']['status'] == 'reported-ok' and
-            register['ownershipAudit']['commit'] == git('rev-parse', '4a4fefbe8').decode().strip(),
+    audit = register['ownershipAudit']
+    require(audit['status'] == 'reported-ok' and
+            audit['commit'] == git('rev-parse', '23e3c34b7').decode().strip() and
+            audit['source'] == 'owner-answers.md' and audit['ruling'] == 'L13-29.1' and
+            audit['packet'] == 'cutover-approval-packet.md' and
+            audit['unaccountedPairs'] == 0 and audit['B'] == 'ok' and
+            audit['reproduction'] == {'passed': 8, 'total': 8} and audit['allowedPathExceptionsDropped'] == 58,
             'ownership audit provenance drift')
-    for entry in register['ownershipAudit']['inputs']:
-        require(hashlib.sha256(git('show', f"{register['ownershipAudit']['commit']}:{entry['path']}")).hexdigest() == entry['sha256'],
-                'ownership audit input drift')
+    require({entry['path'] for entry in audit['inputs']} == {str(BASE.parent / rel) for rel in [
+        'phase-08/audit-report.py', 'phase-06/step10-round5-reproduction.json',
+        'phase-06/step10-sync4d-reproduction.json']} and len(audit['inputs']) == 3,
+        'ownership audit input coverage drift')
+    for entry in audit['inputs']:
+        raw = git('show', f"{audit['commit']}:{entry['path']}")
+        require(raw == git('show', f"{current_pin}:{entry['path']}") == git('show', f"HEAD:{entry['path']}") ==
+                (ROOT / entry['path']).read_bytes() and hashlib.sha256(raw).hexdigest() == entry['sha256'] and
+                current_inputs[entry['path']]['sha256'] == entry['sha256'], 'ownership audit input drift')
     evidence_pins = {path: review_pin for path in review_inputs}
     evidence_pins.update({path: catchup_pin for path in catchup_inputs})
     evidence_pins.update({path: correction_pin for path in correction_inputs})
@@ -321,9 +345,10 @@ def check():
             'linkGuard' in register['gates'][6]['note'] and
             'rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md' in register['gates'][7]['note'] and
             'pending' in register['gates'][7]['note'] and 'identical change set' in register['gates'][7]['note'] and
+            'reviews/w33-link-retargets-review.json item work-state-rebase' in register['gates'][7]['note'] and
             all(term in register['gates'][9]['note'] for term in ['138', '136', '2 history-only', '60', '288']),
             'current gate note disclosure drift')
-    require(readiness['order'] == [
+    require([row['step'] for row in readiness['order']] == [
         'Complete and independently review local work to met-local',
         'Send owner cutover packet at met-local (L13-6)',
         'Owner cutover approval within the stated scope and budget',
@@ -331,7 +356,35 @@ def check():
         'Final main import with accounting; record F',
         'Execute F duties and delta reviews; stop if any fails',
         'Write and independently review the final status ledger',
-        'Land within the separately approved frame'], 'cutover order drift')
+        'Land within the separately approved frame'] and
+            [row['status'] for row in readiness['order']] == ['done'] * 3 + ['pending'] * 5,
+            'cutover order drift')
+    decision = readiness['ownerDecision']
+    require(decision['source'] == 'owner-answers.md' and decision['ruling'] == 'L13-30' and
+            decision['date'] == '2026-10-26' and decision['time'] == '09:57' and
+            decision['option'] == 'A' and decision['status'] == 'approved' and
+            decision['packet'] == 'cutover-approval-packet.md' and
+            decision['packetCommit'] == git('rev-parse', '6586bbc46').decode().strip() and
+            decision['ownerText'] == 'đồng ý A, khi nào lead LAND báo ổn thì em làm.' and
+            decision['ownerText'] in git('show', f'{current_pin}:{BASE}/owner-answers.md').decode() and
+            decision['condition'] == dict(owner='lead:LAND', requiredBefore=readiness['order'][3]['step'], status='pending',
+                action='Confirm lease/freeze, F import and F-window heavy IO are OK before starting.') and
+            decision['allowed'] == ['Documentation lease', 'One main import as F with accounting',
+                'F duties on plan branch and clones', 'Archive ref publication', 'Write and independently review final ledger'] and
+            decision['notAllowed'] == ['Land on main without separate approval after final ledger review',
+                'Delete files on main', 'Push .fgos/events*', 'Widen the frame when F exceeds counts; stop and ask again'] and
+            all(row['evidence'] == ['cutover-approval-packet.md', 'owner-answers.md'] and
+                row['packetCommit'] == decision['packetCommit'] and row['ruling'] == 'L13-30'
+                for row in readiness['order'][1:3]) and
+            git('show', f"{decision['packetCommit']}:{BASE}/cutover-approval-packet.md") ==
+            git('show', f'{current_pin}:{BASE}/cutover-approval-packet.md'),
+            'conditional owner approval drift')
+    require(not register['gates'][8]['ownerItems'] and
+            'L13-30' in register['gates'][8]['note'] and
+            any('Publish the archive ref' in duty and 'L13-30' in duty for duty in register['gates'][8]['atFinalPinUnderLease']) and
+            register['gates'][5]['ownerItems'] and register['gates'][9]['ownerItems'] and
+            'still needs independent records review' not in readiness['summary'] and
+            'before sending the owner packet' not in corrections_now[4]['note'], 'owner/review summary drift')
     for field in ['atFinalPinUnderLease', 'external', 'ownerItems']:
         for gate in register['gates']:
             require(all(f"{gate['g']}: {item}" in readiness[field] for item in gate[field]),
@@ -360,7 +413,11 @@ def check():
     rebased = json.loads(git('show', f'{current_pin}:{BASE}/fchain/rebased-patches.json'))
     dependencies = json.loads(git('show', f'{current_pin}:{BASE}/g9/phase9-decisions.json'))
     composition = window['fComposition']
-    require('composed replay' in composition['source'] and composition['linkGuard'] == 0 and
+    check_record = json.loads(git('show', f'{current_pin}:{BASE}/fchain/check.json'))
+    require(check_record['exit'] == 0 and check_record['counts'] == chain['counts'] and
+            composition['linkGuard'] == check_record['counts'].get('linkGuard', 0) == chain['linkGuard']['findings'] and
+            composition['linkGuardSource'] == 'fchain/check.json#/counts/linkGuard (absent finding means 0)' and
+            'composed replay' in composition['source'] and composition['linkGuard'] == 0 and
             composition['status'] == 'met-local' and
             composition['manifestSources'] == len(manifest['sources']) and
             composition['baseChainFiles'] == len(chain['baseChain']['files']) and
@@ -369,7 +426,6 @@ def check():
             composition['linkRetargetPatches'] == len(retargets['patches']) and
             composition['linkRetargetRows'] == len(retargets['rows']) and
             composition['additionalExecutedPatches'] == chain['executed'] and composition['composedFiles'] == chain['files'] and
-            composition['linkIntoMoveSet'] == 0 and
             set(s['path'] for s in manifest['sources']) == set(s['path'] for s in chain['sources']) and
             window['deltaReviewsPerGate']['G0']['effectiveBindingsAtSourcePin'] == g0['counts']['effectiveRows'] and
             window['deltaReviewsPerGate']['G9']['localDependencies'] == len(dependencies['entries']) == 158 and
