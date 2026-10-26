@@ -7,7 +7,9 @@
 // running in it once the round is over.
 //
 // WHAT COUNTS AS "INSIDE". A process whose executable or working directory is inside `dir`. An
-// argument that merely names the directory (a `rm -rf`, an editor) does not count.
+// argument that merely names the directory (a `rm -rf`, an editor) does not count. A caller may also
+// name environment variables whose value, when inside `dir`, makes the process count: a detached
+// child that will run a staged program later names it there before it runs anything from it.
 //
 // LINUX ONLY. The process door scans /proc. Where it cannot scan nothing is known to be running and it
 // stops nothing; confinement itself is Linux-only, so the leak it closes is too. `processesInside` is the
@@ -23,20 +25,23 @@ const sleepSync = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),
 const withoutDeletedSuffix = (p) => (typeof p === 'string' && p.endsWith(' (deleted)') ? p.slice(0, -' (deleted)'.length) : p);
 
 /**
- * The process views (other than this one and its parent) whose executable or working directory is inside `dir`.
+ * The process views (other than this one and its parent) whose executable or working directory is inside `dir`,
+ * or whose environment variable named in `envKeys` holds a path inside `dir`.
  * A view is the door's `{pid, tuple, exe, cwd, ...}`; `tuple` is null when the identity could not be read.
  * @param {string} dir
+ * @param {{ envKeys?: string[] }} [options]
  * @returns {object[]}
  */
-export function processesInside(dir) {
+export function processesInside(dir, { envKeys = [] } = {}) {
   let root;
   try { root = fs.realpathSync(dir); } catch { root = path.resolve(dir); }
   const inside = (p) => typeof p === 'string' && (p === root || p.startsWith(root + path.sep));
 
-  const views = scan({});
+  const views = scan({ envKeys });
   if (views === 'unsupported') return [];
   return views.filter((view) => view.pid !== process.pid && view.pid !== process.ppid
-    && (inside(withoutDeletedSuffix(view.exe)) || inside(withoutDeletedSuffix(view.cwd))));
+    && (inside(withoutDeletedSuffix(view.exe)) || inside(withoutDeletedSuffix(view.cwd))
+      || envKeys.some((key) => inside(view.env?.[key]))));
 }
 
 const stillThere = (view) => view.tuple === null || judge(view.tuple) === 'alive';

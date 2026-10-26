@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a8619a53b93eaf4be0c57beb75c87ab91970de48f5397ce66e98df1c500c0a8e",
+  "payloadDigest": "eccebeebf65eff2cf6df36c797a0ece79f99b8914859c3ff09d3fae83493fb51",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -864,7 +864,7 @@
     "scripts/project-agents.mjs": "5fd5bfacfda8d8814c9620c1c3086136de167957f7cd5d781e663a9b9c6a268f",
     "scripts/record-mailbox-hook-fixtures.mjs": "f1a1f57799f537c46cf582310a1b00deecb2befeba3eab73b33789b8822a1cf3",
     "scripts/regenerate-observe-fixtures.mjs": "19b954de8f832a233d9ddea71f603ddfa4ec94a75e95497c83e87503e06733bd",
-    "scripts/run-rust-dev-host.mjs": "e10af7fa8c280ecb62cbde50e8d2e2160e1135b2bdd20c02867d0f0351ba641b",
+    "scripts/run-rust-dev-host.mjs": "ccd4b8fd4af0e6d5512b137a9f8256ee2f81211f726030317aeae838df03b5a4",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
     "scripts/run-tests.mjs": "ef79b8344e01d0856cab3c80508b449a3458c275c45c2bb763632ab71f8d3858",
     "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
@@ -1014,7 +1014,7 @@
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runtime-inspection.mjs": "9cfb34e1c8b7a78ac3285fb354402d2c7ab014f729b7c3557d847358dbee588b",
     "src/runner/dispatch/settlement.mjs": "171c6ba0444214c62db034f7ebcfc301e04de77091ea2437139f417262dac780",
-    "src/runner/dispatch/stop-processes-inside.mjs": "705cafdb80283046c205646fd4f4742b47469172557d770ec67e468a96d28bb1",
+    "src/runner/dispatch/stop-processes-inside.mjs": "10a7fdb1a488dbe3ee4190cb1f20a76af744dd53dbb23bee6ed26979c303f8ec",
     "src/runner/dispatch/stray-writes.mjs": "8ab287ef44a7e731d4c22fb50e820017645d707e9b41b63a75b7fb4bc028f2ff",
     "src/runner/dispatch/terminal-slot.mjs": "82ed4279c054f2486bb8f3223182c9a1043426d0cae2a846449eda29967665df",
     "src/runner/dispatch/tier-cell.mjs": "3c1a50df77c26c22c6bc88d00da6b90012008e633bdbb27c4d854fb1a369b722",
