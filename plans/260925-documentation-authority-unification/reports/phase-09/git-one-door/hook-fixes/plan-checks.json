@@ -1,0 +1,66 @@
+{
+  "sourceHead": "6215e614f97d520b6caa43060a6a72e1bb5c381f",
+  "g0join": {
+    "contract": "g0-verdict-join.v2",
+    "pin": "6215e614f97d520b6caa43060a6a72e1bb5c381f",
+    "status": "passed",
+    "exit": 0,
+    "counts": {
+      "aggregateOnly": 63,
+      "approved": 1929,
+      "effectiveRows": 1929,
+      "frozenChangedBindings": 257,
+      "invalidBindings": 0,
+      "mismatched": 0,
+      "missing": 0,
+      "obligations": 2187,
+      "openRework": 0,
+      "perRowVerdicts": 2695,
+      "reviewFiles": 85,
+      "stale": 0,
+      "unresolved": 0
+    }
+  },
+  "fchain": {
+    "exit": 0,
+    "counts": {},
+    "files": 595,
+    "executed": 229,
+    "links": 20,
+    "trackedCheckUnchangedSha256": "f80416b15bcd711a5d035014c3d6b7e35b436989a5ca78356e14104643a3279b",
+    "outputSinkRedirected": true
+  },
+  "rebind": {
+    "exit": 0,
+    "drift": 0,
+    "authenticatedSupersededOrigins": 7
+  },
+  "targetBindingAudit": {
+    "method": "ledgerfix/bindings.py documents() + recursive rows(), excluding only its canonical snapshot keys; dual frozen extractors via rebind.extract()",
+    "documents": 150,
+    "bindingRows": 13930,
+    "editedOwner": "docs/platform/git/spec.md",
+    "boundRows": [],
+    "oldFileSha256": "63856aff2b0d80be616388cd3059ccfbebcd096d9e55ec83b19cd3ec4a748d9e",
+    "newFileSha256": "a665f92ca3f862f2769065f413984d1add13199f5a1aae536f758372cb763d8c",
+    "extractors": [
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "lib": "step10-sync287-lib.mjs",
+        "sha256": "083795c90eac1d5601fedc2261390f15668fceed68a3053777960fea9a927dc3"
+      },
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "lib": "lib.mjs",
+        "sha256": "48e153938d145bd41986b47ba816d4506db1a90c664170ee08e17bc60341ba41"
+      }
+    ],
+    "edgesRequired": 0,
+    "reason": "No ledger/pilot current target binding names the edited Git spec; no G0 target-digest edge to author. No ownership audit or pair-accounting recipe executed."
+  },
+  "limits": [
+    "G0 join and F-chain are HEAD-pinned, not a validation of uncommitted source bytes.",
+    "rebind --check and the target binding scan read live working-tree target bytes.",
+    "No independent approval or cutover readiness is claimed."
+  ]
+}

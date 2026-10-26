@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ab178e23066969ab10070181ece952f5840c53a43030d5693bf850f2c43046bd",
+  "payloadDigest": "3a41b3da8695341cfe791ad69d7e2f57ac3e3d22cdd3c45a618a6e8ea2e5ec02",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -930,7 +930,7 @@
     "src/runner/dispatch/worker-session-boot.mjs": "d9f342274b532c3793d36faf26273c3c357c61d2d10d24e6d30f94727076a114",
     "src/runner/dispatch/worker-session.mjs": "e7618015166c418f3646b77fca8909ad7e3d8c0012386e91682b68a223b9f4b4",
     "src/runner/dispatch/write-scope.mjs": "b926332413077cfb8246da969373de205ecf003b3a263baf6c08177a27d3885a",
-    "src/runner/documentation-cutover-lease-hook.mjs": "4dc5cc1750e0f3b30acf2a2293d0dcee383229da3e913fdfa7a7fbca001fcc84",
+    "src/runner/documentation-cutover-lease-hook.mjs": "cb013ba9be3dd687cc7ee6b78471bb6e300ba60b492756cf74dd071233c52ac9",
     "src/runner/documentation-cutover-lease.mjs": "b3c65748bca734e1e9ced5820131cb636a293409a640bd6984adf1b3417d4641",
     "src/runner/execution/account-pin.mjs": "0a9d8f632bd5b814c056139df3b4e340aac0574d8bd7db6b60c7a7b0305d4cfe",
     "src/runner/execution/account-rotation.mjs": "f538c5b3f787f0add709535aa0f6629bd007520575a316e19781cef43050553a",
@@ -1128,7 +1128,7 @@
     "src/workflow/store.mjs": "1ffea57e5d5afb57f8558107d253d80982e780ea7649d5e950cb1874e2f90da7",
     "src/workflow/unit-handoff.mjs": "af84e939515499624ded2e37a628f6486e7cb425249eacf7f7d93cfcf0e2494b",
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3",
-    "scripts/lib/git-one-door-declarations.v1.json": "77fb3b32076d82e414331c18bd7e95a99d8c2654b191027c05fa725c14fa5b2d"
+    "scripts/lib/git-one-door-declarations.v1.json": "4afcf3acdfbee8bddef66e204a91cef8231d7f40e722e2cb86bd574f31dbfc88"
   },
   "sites": [],
   "classes": [
@@ -1493,18 +1493,20 @@
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
-      "siteId": "leaseGitRead:90abf7f3892c18964a007d28726432916f3a7e606601ccbe23b87c8623e62463",
+      "siteId": "leaseGitRead:d9a1f33e2e9afb746b3e5f13fce0e821d3549d382ead649df4aeed7e9f2655c8",
       "callerDigests": [
+        "18a4b680a003d47628181c88a916850a32b2eae2dbbae1011b2065ef746fc027",
         "307e191fbe28ee61a44466b663cac0f1bfb9fe3cb871cefc98b9cefc87f0cb0f",
         "3b5228841de568039de9635263347a2911a53ac8573de5a7fdbda8d81a2f4491",
         "4440bc188380750bb59aa3cf7d6c771e66a76352b377c08cdf6232d681979101",
-        "447577fa871f99004e70acfc19f0cc424b4f19f0f747a8f0016bd2647eeccb40",
         "614748b726f4f66ff14dd6fe3a39dce82bbf1cd5caf809ed679bb62ebe98b037",
         "640435846d151c508d250164e9de895b3ebc0f22076d0db84bec3aa50c4944fc",
         "77f7bf619bd6b111ec7537eed465d2a46abf30545f07aefbdcd7682c7d478215",
         "85e53bf9f9938b49e76fbb8d2a3a206d1561eb0018a3bf4480a1bbc422ea7e71",
         "932a5e12ce7d2a6c1657d1ec6bd44fc5f5e218950f0641aa3e6a358351e4a831",
-        "f20c3ad557799f9f4046f07bb1e51d16052d9410fcf3556deffd0e46d6053cf2"
+        "a569589a2119767f1b7a0052aa1c2c01f7b41249151614274fc1031a28b374c4",
+        "f20c3ad557799f9f4046f07bb1e51d16052d9410fcf3556deffd0e46d6053cf2",
+        "f3ebb8cfb91925294e2913bb16131cee2e773ec18be4567bea0dd11c0e9750b6"
       ],
       "escapes": [],
       "class": "hook-read-context",
@@ -1519,7 +1521,8 @@
         "symbolic-ref read",
         "rev-parse",
         "diff-tree",
-        "rev-list"
+        "rev-list",
+        "merge-base"
       ]
     },
     {

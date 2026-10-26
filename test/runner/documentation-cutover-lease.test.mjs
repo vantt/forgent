@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { guardReferenceTransaction } from '../../src/runner/documentation-cutover-lease-hook.mjs';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
@@ -37,6 +38,61 @@ function fixture(t) {
   const worktree = (branch = 'holder') => { const root = path.join(temp, branch); git(['worktree', 'add', '-qb', branch, root]); return root; };
   return { repoRoot, temp, git, put, worktree };
 }
+
+// The transition tests all begin with main present. This owns the absent-ref
+// baseline: inspect the entire candidate against the object-format empty tree,
+// not its parent, and keep refusing an unpublished sidecar bootstrap.
+test('creating absent main compares its candidate with the empty tree', t => {
+  const f = fixture(t);
+  f.git(['branch', '-m', 'seed']);
+  const plain = f.git(['rev-parse', 'HEAD']);
+  f.put(DEFAULT_SIDECAR_PATH, JSON.stringify({ state: 'held', holderTokenHash: 'a'.repeat(64) }));
+  f.git(['add', DEFAULT_SIDECAR_PATH]); f.git(['commit', '-qm', 'unpublished sidecar']);
+  const candidate = f.git(['rev-parse', 'HEAD']);
+  const calls = [];
+  const git = args => {
+    calls.push(args);
+    return execFileSync('git', args, { cwd: f.repoRoot, stdio: ['ignore', 'pipe', 'pipe'] });
+  };
+  const zero = '0'.repeat(candidate.length);
+  assert.equal(guardReferenceTransaction({ git, root: f.repoRoot, input: `${zero} ${plain} refs/heads/main\n`, env: {} }), null);
+  const refused = guardReferenceTransaction({ git, root: f.repoRoot, input: `${zero} ${candidate} refs/heads/main\n`, env: {} });
+  assert.match(refused, /unauthorized lease transition/);
+  const empty = f.git(['hash-object', '-t', 'tree', '--stdin']);
+  assert.ok(calls.some(args => args[0] === 'diff-tree' && args.at(-2) === empty && args.at(-1) === candidate));
+  assert.ok(!calls.some(args => args[0] === 'rev-parse' && args.includes('refs/heads/main')));
+});
+
+// The two-clone e2e owns pull wiring. This owns ancestry/error classification:
+// only yes admits published history, and probe failures never turn into yes.
+test('published main admission distinguishes ancestry from absence and read errors', () => {
+  const old = '1'.repeat(40), next = '2'.repeat(40), published = '3'.repeat(40);
+  const held = JSON.stringify({ state: 'held', holderTokenHash: 'a'.repeat(64) });
+  for (const scenario of ['equal', 'ancestor', 'unpublished', 'no-origin', 'ref-error', 'ancestry-error', 'delete']) {
+    const target = scenario === 'equal' ? published : scenario === 'delete' ? '0'.repeat(40) : next;
+    const fail = status => { throw Object.assign(new Error('probe failure'), { status }); };
+    const git = args => {
+      if (args[0] === 'cat-file') return Buffer.from(held);
+      if (args[0] === 'rev-parse') {
+        if (scenario === 'no-origin') return fail(1);
+        if (scenario === 'ref-error') return fail(128);
+        return Buffer.from(published);
+      }
+      if (args[0] === 'merge-base') {
+        assert.deepEqual(args.slice(1), ['--is-ancestor', target, published]);
+        if (scenario === 'unpublished') return fail(1);
+        if (scenario === 'ancestry-error') return fail(128);
+        return Buffer.alloc(0);
+      }
+      if (args[0] === 'diff-tree') return Buffer.from('docs/local.md\0');
+      if (args[0] === 'rev-list') return Buffer.from(`${next} ${old}\n`);
+      assert.fail(`unexpected Git read: ${args.join(' ')}`);
+    };
+    const result = guardReferenceTransaction({ git, root: '/unused', input: `${old} ${target} refs/heads/main\n`, env: {} });
+    if (['equal', 'ancestor'].includes(scenario)) assert.equal(result, null, scenario);
+    else assert.match(result, /reference-transaction refused/, scenario);
+  }
+});
 
 test('scope matcher derives all roots from one list and accepts byte paths without whitespace trimming', () => {
   for (const pattern of LEASE_SCOPE_PATTERNS) {
