@@ -111,8 +111,9 @@ runner:
         # @fgos:doc The tier and executors one role, persona or seat prefers.
         red-team:
           # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: ["xai","claude","openai"].
-          # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
+          # @fgos:why [6be6fc05-6e06-43af-a3f3-07eb170ce533] COOK 2026-10-26: reviewer seats prefer xai, so a red-team seat limited to xai has no independent family at high rigor and the round settled independence-unsatisfiable (unit-run-1792987741620-ae5ebf3f). Putting openai first gives producer, reviewer, red-team three families. Unset or restore [xai] if openai seats stall.
           prefer:
+            - openai
             - xai
         # @fgos:doc The tier and executors one role, persona or seat prefers.
         reviewer:
