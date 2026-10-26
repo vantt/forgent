@@ -1,0 +1,724 @@
+{
+  "version": 1,
+  "status": "authored-pending-independent-review",
+  "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+  "bindingRefresh": [
+    {
+      "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceUnitDigest": "6e362a74d975a16c477b8f474f062c5ec769515a149a15dfbba1de7f6e7650a3",
+      "disposition": "supersede",
+      "targetOwner": "docs/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "rationale": "F current-byte rebind: The whole-file same-path supersede remains a whole-file successor; the manifest adds Config, Identity and Event Store layers and removes retired event/config modules. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/5. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "targetUnitDigest": "ab8e05def9170333c4898fc833fb2f10487511282a361805d501b88c565c67a0",
+      "targetAncestry": [],
+      "bindingSha256": "773b4b66a805f8dad7c60bc9d04494426931cdbd196dd80b042fb49e4ef7f27f",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/5",
+        "targetOwner": "docs/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+        "targetAncestry": []
+      },
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "rebindReason": "F import: The whole-file same-path supersede remains a whole-file successor; the manifest adds Config, Identity and Event Store layers and removes retired event/config modules. Main db00088c04d89955da160a767b1424e177ab6567; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+      "sourcePath": "docs/platform/component-boundary.md",
+      "sourceUnitDigest": "e7f609881002fff0d6f1ac41035f63cdb09095bb5fbba2f073856682e8f7027b",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-11",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "rationale": "F current-byte rebind: The same component table remains a supersede of its historical table. Config, Event Store, Mailbox and Observe implementation status changed; no equality or new component authority is claimed. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/124. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "targetUnitDigest": "2d4fecfa3558347d303be27a662410a75d500b89364ed15ccd7d7c8c3cd634a4",
+      "targetAncestry": [
+        "Component Boundary",
+        "4. Current High-Level Components"
+      ],
+      "bindingSha256": "04a5f48e9e4ecdddd2a65e6a64439b91376416def80d934d3cbb2a74095f5750",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/124",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-11",
+        "targetUnitDigest": "afe8743b9a9643e0b93ed4fed196aa476a500be2ddd7303cf1c963185f51ae96",
+        "targetAncestry": [
+          "Component Boundary",
+          "4. Current High-Level Components"
+        ]
+      },
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "rebindReason": "F import: The same component table remains a supersede of its historical table. Config, Event Store, Mailbox and Observe implementation status changed; no equality or new component authority is claimed. Main 5820e1a43e3ad0fee0a504f551109d0b85047c08; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceUnitDigest": "fa3f748914efbaea7c57bef01798385bca7de83421cb30c59670cc603d278f54",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/distribution.md",
+      "targetAnchor": "unheaded-block-14",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "rationale": "F current-byte rebind: The same distribution rule remains a supersede; main adds shell-builtin launcher parsing and rename replacement, without removing the named workspace-launcher obligation. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json#/registryGaps/5. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "targetUnitDigest": "29969cf49198f62ad9cf871ccd1c7635b14289383f5425b1e1b23b0106ba0e09",
+      "targetAncestry": [
+        "Spec: Distribution",
+        "Business Rules"
+      ],
+      "bindingSha256": "a3178d5761f3cc1f4e7a16958f8d3d053e7093b92dd63c0896ece0127b17bbc6",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+        "pointer": "/registryGaps/5",
+        "targetOwner": "docs/specs/distribution.md",
+        "targetAnchor": "unheaded-block-14",
+        "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+        "targetAncestry": [
+          "Spec: Distribution",
+          "Business Rules"
+        ]
+      },
+      "rebindReason": "F import: The same distribution rule remains a supersede; main adds shell-builtin launcher parsing and rename replacement, without removing the named workspace-launcher obligation. Main 8f366ccc378e9535a1eda0df4712ec7e6f9b7439; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceUnitDigest": "cdf23ebc6949803aa19ec83913121c79ebc370e9ef29134c0fb3bf49af44a99c",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/distribution.md",
+      "targetAnchor": "unheaded-block-5",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "rationale": "F current-byte rebind: The same Data Dictionary remains a supersede: table row identities survive; Config standard/schema replaces registered defaults and the doctor inventory is updated. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/7. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "targetUnitDigest": "b99e9a01b2eb55a7cbe9899c2477e57010b509c93af1603748d22b93d75eb1f7",
+      "targetAncestry": [
+        "Spec: Distribution",
+        "Data Dictionary"
+      ],
+      "bindingSha256": "e906b75e9576a10edbc08552cca7d332544e3863c50810605cc53e5cde0d785b",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/7",
+        "targetOwner": "docs/specs/distribution.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+        "targetAncestry": [
+          "Spec: Distribution",
+          "Data Dictionary"
+        ]
+      },
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "rebindReason": "F import: The same Data Dictionary remains a supersede: table row identities survive; Config standard/schema replaces registered defaults and the doctor inventory is updated. Main ccc6b32e68539fea7b7289df41ef91660a2e3715; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceUnitDigest": "f99e0d4d9f055f630281cd3e3aead0de52d35fd8fa152c8d429bf0af333ca246",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/confinement-authority.md",
+      "targetAnchor": "unheaded-block-150",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "rationale": "F current-byte rebind: The complete paragraph and heading ancestry are unchanged; earlier confinement additions moved its ordinal from 147 to 150. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json#/registryGaps/21. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+      ],
+      "bindingSha256": "39dcfe2b45cf30df54e63850089c1bba38f7adcd18aa895e25c851b3ce1c5d3a",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+        "pointer": "/registryGaps/21",
+        "targetOwner": "docs/specs/confinement-authority.md",
+        "targetAnchor": "unheaded-block-147",
+        "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+        "targetAncestry": [
+          "Spec: Agent Confinement Authority",
+          "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+          "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+        ]
+      },
+      "rebindReason": "F import: The complete paragraph and heading ancestry are unchanged; earlier confinement additions moved its ordinal from 147 to 150. Main ea7dc0509823969254208774e499ec59cdae67ce; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceUnitDigest": "034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/distribution.md",
+      "targetAnchor": "unheaded-block-5",
+      "rationale": "F current-byte rebind: The same Data Dictionary remains a supersede: table row identities survive; Config standard/schema replaces registered defaults and the doctor inventory is updated. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/12. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_26f62a1ae1abc17d0f02706788bfd399, residual SHA256 4894dcf4de3a1254ebc5e89c78ffed0afafc58859c82fa2b2781ac8216b08424. Source 034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3; primary target 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
+      "targetUnitDigest": "b99e9a01b2eb55a7cbe9899c2477e57010b509c93af1603748d22b93d75eb1f7",
+      "targetAncestry": [
+        "Spec: Distribution",
+        "Data Dictionary"
+      ],
+      "bindingSha256": "e906b75e9576a10edbc08552cca7d332544e3863c50810605cc53e5cde0d785b",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/12",
+        "targetOwner": "docs/specs/distribution.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+        "targetAncestry": [
+          "Spec: Distribution",
+          "Data Dictionary"
+        ]
+      },
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "rebindReason": "F import: The same Data Dictionary remains a supersede: table row identities survive; Config standard/schema replaces registered defaults and the doctor inventory is updated. Main ccc6b32e68539fea7b7289df41ef91660a2e3715; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_04703f011b22383992b94545055b9e56",
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceUnitDigest": "12018d6ddfb98564eca2e0dbd9267ffa859e1e5e69c11db3f506886fa0ab717c",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/confinement-authority.md",
+      "targetAnchor": "unheaded-block-150",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "rationale": "F current-byte rebind: The complete paragraph and heading ancestry are unchanged; earlier confinement additions moved its ordinal from 147 to 150. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json#/registryGaps/1. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+      ],
+      "bindingSha256": "39dcfe2b45cf30df54e63850089c1bba38f7adcd18aa895e25c851b3ce1c5d3a",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+        "pointer": "/registryGaps/1",
+        "targetOwner": "docs/specs/confinement-authority.md",
+        "targetAnchor": "unheaded-block-147",
+        "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+        "targetAncestry": [
+          "Spec: Agent Confinement Authority",
+          "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+          "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+        ]
+      },
+      "rebindReason": "F import: The complete paragraph and heading ancestry are unchanged; earlier confinement additions moved its ordinal from 147 to 150. Main ea7dc0509823969254208774e499ec59cdae67ce; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceUnitDigest": "0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/distribution.md",
+      "targetAnchor": "unheaded-block-5",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "rationale": "F current-byte rebind: The same Data Dictionary remains a supersede: table row identities survive; Config standard/schema replaces registered defaults and the doctor inventory is updated. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/16. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "targetUnitDigest": "b99e9a01b2eb55a7cbe9899c2477e57010b509c93af1603748d22b93d75eb1f7",
+      "targetAncestry": [
+        "Spec: Distribution",
+        "Data Dictionary"
+      ],
+      "bindingSha256": "e906b75e9576a10edbc08552cca7d332544e3863c50810605cc53e5cde0d785b",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/16",
+        "targetOwner": "docs/specs/distribution.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+        "targetAncestry": [
+          "Spec: Distribution",
+          "Data Dictionary"
+        ]
+      },
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "rebindReason": "F import: The same Data Dictionary remains a supersede: table row identities survive; Config standard/schema replaces registered defaults and the doctor inventory is updated. Main ccc6b32e68539fea7b7289df41ef91660a2e3715; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_b741539a16b6eb2792ca6c4178b23671",
+      "sourcePath": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "sourceAnchor": "unheaded-block-37",
+      "sourceUnitDigest": "e7eb39699c8b988fcf1907e294d4d34ded00f4a8b3194bd0f3388260bceb749b",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "targetAnchor": "unheaded-block-37",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "rationale": "F current-byte rebind: The same readiness table remains a supersede. Config-door diagnostics replace retired config-not-stale and seat-binding-config rows; no verbatim equality or implementation approval is claimed. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json#/registryGaps/15. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "targetUnitDigest": "254831b841a6b5559ac98249fea4d269279878cdfba9051f2f91beb1e6eb1f16",
+      "targetAncestry": [
+        "How to install fgOS in a project and use fgos doctor",
+        "4. Every doctor check",
+        "4.2. Project config (written by setup or `--fix`)"
+      ],
+      "bindingSha256": "e26407422d47339305e8df11d81a24f6e04320eebf8ae72c689752288348aae2",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+        "pointer": "/registryGaps/15",
+        "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+        "targetAnchor": "unheaded-block-37",
+        "targetUnitDigest": "7fe0554fd220e71ef2082123783d7fd9dae5886aba0216f42ea604ebd72f54a9",
+        "targetAncestry": [
+          "How to install fgOS in a project and use fgos doctor",
+          "4. Every doctor check",
+          "4.2. Project config (written by setup or `--fix`)"
+        ]
+      },
+      "rebindReason": "F import: The same readiness table remains a supersede. Config-door diagnostics replace retired config-not-stale and seat-binding-config rows; no verbatim equality or implementation approval is claimed. Main 5820e1a43e3ad0fee0a504f551109d0b85047c08; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_975c8349e0d069aabf88161d933f2228",
+      "sourcePath": "docs/reference/dispatch-module-boundaries.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceUnitDigest": "8da7e14a80bb5d560d4f6b4ed3a1b4daed64a609bae48059c6c7ec25c3846c18",
+      "disposition": "supersede",
+      "targetOwner": "docs/reference/dispatch-module-boundaries.md",
+      "targetAnchor": "unheaded-block-3",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "rationale": "F current-byte rebind: The dispatch responsibility table remains the same-file supersede; the config facade replaces bootstrap/default registration responsibilities. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json#/registryGaps/34. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "targetUnitDigest": "8aaf3caf47b92a1bf2d44a081859df40037bd18033c61ce538df1937091305db",
+      "targetAncestry": [
+        "`src/runner/dispatch` module boundaries"
+      ],
+      "bindingSha256": "b6a5c27b2ad3f97d33dc6428513b70702211399fadc64c35c528cd4d8762cc97",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+        "pointer": "/registryGaps/34",
+        "targetOwner": "docs/reference/dispatch-module-boundaries.md",
+        "targetAnchor": "unheaded-block-3",
+        "targetUnitDigest": "f181007d6c80684c15dc6211eb00115a238cdab88f22bec5eb2d50453454701c",
+        "targetAncestry": [
+          "`src/runner/dispatch` module boundaries"
+        ]
+      },
+      "rebindReason": "F import: The dispatch responsibility table remains the same-file supersede; the config facade replaces bootstrap/default registration responsibilities. Main 5820e1a43e3ad0fee0a504f551109d0b85047c08; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-100",
+      "sourceUnitDigest": "a9da2cf6e58fce799612fa0621321bd73b52671c571c30d19146f0e982f19d72",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-101",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "rationale": "F current-byte rebind: The Pointers whole-unit supersede still accounts for the earlier version; Config-door pointers replace the retired read-time config writer. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json#/registryGaps/35. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "targetUnitDigest": "0d071f97922f310fd2c204603db3ae08168e8f2d7f23d6db0e715aaa750c4fb4",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Pointers (implementation)"
+      ],
+      "bindingSha256": "38b0e1b93a9b3cbf2db8493f2ec1e01b79cc2e424db453742defb29a6617e44c",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+        "pointer": "/registryGaps/35",
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-101",
+        "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Pointers (implementation)"
+        ]
+      },
+      "rebindReason": "F import: The Pointers whole-unit supersede still accounts for the earlier version; Config-door pointers replace the retired read-time config writer. Main 5820e1a43e3ad0fee0a504f551109d0b85047c08; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
+      "disposition": "supersede",
+      "targetOwner": "docs/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "rationale": "F current-byte rebind: The whole-file same-path supersede remains a whole-file successor; the manifest adds Config, Identity and Event Store layers and removes retired event/config modules. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/18. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "targetUnitDigest": "ab8e05def9170333c4898fc833fb2f10487511282a361805d501b88c565c67a0",
+      "targetAncestry": [],
+      "bindingSha256": "773b4b66a805f8dad7c60bc9d04494426931cdbd196dd80b042fb49e4ef7f27f",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/18",
+        "targetOwner": "docs/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+        "targetAncestry": []
+      },
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "rebindReason": "F import: The whole-file same-path supersede remains a whole-file successor; the manifest adds Config, Identity and Event Store layers and removes retired event/config modules. Main db00088c04d89955da160a767b1424e177ab6567; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceUnitDigest": "92391ce631b0c3602a5e22947a73182a6fd37f148e4b052cb4749a55b7657a6d",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "targetOwner": "docs/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "rationale": "F current-byte rebind: The whole-file same-path supersede remains a whole-file successor; the manifest adds Config, Identity and Event Store layers and removes retired event/config modules. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/19. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "targetUnitDigest": "ab8e05def9170333c4898fc833fb2f10487511282a361805d501b88c565c67a0",
+      "targetAncestry": [],
+      "bindingSha256": "773b4b66a805f8dad7c60bc9d04494426931cdbd196dd80b042fb49e4ef7f27f",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/19",
+        "targetOwner": "docs/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+        "targetAncestry": []
+      },
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "rebindReason": "F import: The whole-file same-path supersede remains a whole-file successor; the manifest adds Config, Identity and Event Store layers and removes retired event/config modules. Main db00088c04d89955da160a767b1424e177ab6567; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_a63132a3f76d6b8ea05461c48c818836",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceUnitDigest": "3f6a59c3d3764c1b978073ad68eb16ce1b0382d6bf362815f45ad79dd1625224",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-101",
+      "rationale": "F current-byte rebind: The Pointers whole-unit supersede still accounts for the earlier version; Config-door pointers replace the retired read-time config writer. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json#/registryGaps/0. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "targetUnitDigest": "0d071f97922f310fd2c204603db3ae08168e8f2d7f23d6db0e715aaa750c4fb4",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Pointers (implementation)"
+      ],
+      "bindingSha256": "38b0e1b93a9b3cbf2db8493f2ec1e01b79cc2e424db453742defb29a6617e44c",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/0",
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-101",
+        "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Pointers (implementation)"
+        ]
+      },
+      "rebindReason": "F import: The Pointers whole-unit supersede still accounts for the earlier version; Config-door pointers replace the retired read-time config writer. Main 5820e1a43e3ad0fee0a504f551109d0b85047c08; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_f4058f068a378962aaf237ae038db5af",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceUnitDigest": "d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "disposition": "partial-carry",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-134",
+      "targetUnitDigest": "bd7fc1876ac496622c83efeb33be81227220a5f5cf7e9e0e25168fa9344db654",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Dispatch operability implementation slice (2026-09-16)"
+      ],
+      "rationale": "F current-byte rebind: The existing partial-carry remains valid: its only absent source line was already retained in residual row 4. Removing the obsolete inline alternative changes only that already-replaced line. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json#/registryGaps/3. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "remainder": "The same verbatim historical residual remains at plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json#/rows/4 (file SHA256 5e360c9c521cae0bfc207433bb7b96422d3606d21a4ddeed9528c2973568e20c, residual SHA256 d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8). Its immutable primary-target witness is historical; the current primary target is docs/specs/runner.md#unheaded-block-134 SHA256 bd7fc1876ac496622c83efeb33be81227220a5f5cf7e9e0e25168fa9344db654. Exact source-line coverage was recomputed and is unchanged. A34Accepted=false; independent review pending; cutover remains blocked. Complete earlier reference metadata stays in the superseded predecessor.",
+      "residualRef": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json",
+        "row": 4,
+        "fileSha256": "5e360c9c521cae0bfc207433bb7b96422d3606d21a4ddeed9528c2973568e20c",
+        "residualSha256": "d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8",
+        "targetUnitDigest": "bd7fc1876ac496622c83efeb33be81227220a5f5cf7e9e0e25168fa9344db654",
+        "A34Accepted": false,
+        "historicalTargetUnitDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd"
+      },
+      "bindingSha256": "6c31df0e43e17b29824befbc2c4870d47bc70fa8bfd8db9daadf5b258a89c00d",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "pointer": "/registryGaps/3",
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-134",
+        "targetUnitDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Dispatch operability implementation slice (2026-09-16)"
+        ]
+      },
+      "rebindReason": "F import: The existing partial-carry remains valid: its only absent source line was already retained in residual row 4. Removing the obsolete inline alternative changes only that already-replaced line. Main 2f2a66503e0db519dee02cc0806dea027163049f; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceUnitDigest": "eb016bbb57ba643787f71c06f78838c1bf0bd938c028c8536acb66ee7c9a8d75",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-93",
+      "targetUnitDigest": "aaa908b672fa544b05140aa1990b977854f36fe89ba1228bf8f3ac29f9686ac2",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Business Rules"
+      ],
+      "rationale": "F current-byte rebind: All source rule IDs remain in the same whole-unit supersede; main adds resume rebinding and removes the unreachable inline seat. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/43. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "bindingSha256": "9b59bfecd8e559cd9df0ab5cd742079db0ba152e3f9a1a01593a83b960ddc309",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/43",
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-93",
+        "targetUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Business Rules"
+        ]
+      },
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "rebindReason": "F import: All source rule IDs remain in the same whole-unit supersede; main adds resume rebinding and removes the unreachable inline seat. Main 9fa4277c544d68aad6ed3d374531b8c302398327; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceUnitDigest": "77083ab43b25bd2e30eb1ff1f2b24db87e02420e7cc187773951d44a3a9df49f",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "disposition": "partial-carry",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-93",
+      "targetUnitDigest": "aaa908b672fa544b05140aa1990b977854f36fe89ba1228bf8f3ac29f9686ac2",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Business Rules"
+      ],
+      "rationale": "F current-byte rebind: Historical carried source lines remain verbatim; recomputation still finds exactly source lines 2,10,15,19,20 absent, the same five lines retained in residual row 11. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json#/bindingRefresh/44. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "remainder": "The same verbatim historical residual remains at plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json#/rows/11 (file SHA256 5e360c9c521cae0bfc207433bb7b96422d3606d21a4ddeed9528c2973568e20c, residual SHA256 ea10d1385fee5a50a164e194170a24c319fc53353fe77eea4cf094366133403e). Its immutable primary-target witness is historical; the current primary target is docs/specs/runner.md#unheaded-block-93 SHA256 aaa908b672fa544b05140aa1990b977854f36fe89ba1228bf8f3ac29f9686ac2. Exact source-line coverage was recomputed and is unchanged. A34Accepted=false; independent review pending; cutover remains blocked. Complete earlier reference metadata stays in the superseded predecessor.",
+      "residualRef": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json",
+        "row": 11,
+        "fileSha256": "5e360c9c521cae0bfc207433bb7b96422d3606d21a4ddeed9528c2973568e20c",
+        "residualSha256": "ea10d1385fee5a50a164e194170a24c319fc53353fe77eea4cf094366133403e",
+        "targetUnitDigest": "aaa908b672fa544b05140aa1990b977854f36fe89ba1228bf8f3ac29f9686ac2",
+        "A34Accepted": false,
+        "historicalTargetUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208"
+      },
+      "bindingSha256": "9b59bfecd8e559cd9df0ab5cd742079db0ba152e3f9a1a01593a83b960ddc309",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",
+        "pointer": "/bindingRefresh/44",
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-93",
+        "targetUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Business Rules"
+        ]
+      },
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "rebindReason": "F import: Historical carried source lines remain verbatim; recomputation still finds exactly source lines 2,10,15,19,20 absent, the same five lines retained in residual row 11. Main 9fa4277c544d68aad6ed3d374531b8c302398327; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_dd06c2555dc0e81c54c80376fee8ff91",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-124",
+      "rationale": "F current-byte rebind: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/0. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "Hệ quả"
+      ],
+      "bindingSha256": "812e73a5b3373d7ec9cb0a6129ce9e0a49c4eb602ffa048346aab7897bca7975",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+        "pointer": "/registryGaps/0",
+        "targetOwner": "docs/specs/work-state.md",
+        "targetAnchor": "unheaded-block-117",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null
+      },
+      "rebindReason": "F import: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Main 8c4d3280eb8893acca785e27285fadecb12a4ba6; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_16abc69cd658a382c456cdaf23f64d87",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-128",
+      "rationale": "F current-byte rebind: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/1. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0003 — Đặt tên & bố cục dữ liệu",
+        "Hệ quả"
+      ],
+      "bindingSha256": "16621a056300f3fdefc6622d68668cdaa7245712adc04dc181c85b97775839f7",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+        "pointer": "/registryGaps/1",
+        "targetOwner": "docs/specs/work-state.md",
+        "targetAnchor": "unheaded-block-121",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null
+      },
+      "rebindReason": "F import: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Main 8c4d3280eb8893acca785e27285fadecb12a4ba6; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-133",
+      "rationale": "F current-byte rebind: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/2. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0004 — Phạm vi & non-goal",
+        "Hệ quả"
+      ],
+      "bindingSha256": "a46c972cc96710f86981ff1c6ff956728a103429a1c2c7f6b3e2870eccd2aae5",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+        "pointer": "/registryGaps/2",
+        "targetOwner": "docs/specs/work-state.md",
+        "targetAnchor": "unheaded-block-126",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null
+      },
+      "rebindReason": "F import: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Main 8c4d3280eb8893acca785e27285fadecb12a4ba6; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_7a0776311f7105750a4f234681f513a3",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-145",
+      "rationale": "F current-byte rebind: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/3. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0007 — Tiến hoá schema & event",
+        "Hệ quả"
+      ],
+      "bindingSha256": "b930323d36aabfb460cf71f10e92497f465ea0d245066765d6c95ef08691ac9d",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+        "pointer": "/registryGaps/3",
+        "targetOwner": "docs/specs/work-state.md",
+        "targetAnchor": "unheaded-block-138",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null
+      },
+      "rebindReason": "F import: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Main 8c4d3280eb8893acca785e27285fadecb12a4ba6; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-151",
+      "rationale": "F current-byte rebind: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/4. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Hệ quả"
+      ],
+      "bindingSha256": "5a36a7a51d91bf7b7c6ae20457c74a040cf2282dcf5614bf1ccce330f0386dae",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+        "pointer": "/registryGaps/4",
+        "targetOwner": "docs/specs/work-state.md",
+        "targetAnchor": "unheaded-block-144",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null
+      },
+      "rebindReason": "F import: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Main 8c4d3280eb8893acca785e27285fadecb12a4ba6; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-157",
+      "rationale": "F current-byte rebind: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/5. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Hệ quả"
+      ],
+      "bindingSha256": "a49650c37d40d09b746dd4433d0255f5f26403b6b169a0a84307ff0f8c1ee849",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+        "pointer": "/registryGaps/5",
+        "targetOwner": "docs/specs/work-state.md",
+        "targetAnchor": "unheaded-block-150",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null
+      },
+      "rebindReason": "F import: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Main 8c4d3280eb8893acca785e27285fadecb12a4ba6; current target authenticated with both unchanged extractors. No independent approval carried."
+    },
+    {
+      "claimId": "claim_1d724afb521915455a45db2b1f3b34cd",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-181",
+      "rationale": "F current-byte rebind: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Source identity and disposition are unchanged; the complete earlier rationale/review fields stay at plans/260925-documentation-authority-unification/pilot/decisions/b-files.json#/registryGaps/6. Earlier locators/digests in that predecessor are historical, not current assertions. Independent review pending; no content, authority or cutover approval.",
+      "authoredBy": "fgos-run_unit-run-179299265d5643",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+        "Hệ quả"
+      ],
+      "bindingSha256": "c65c13805d2f5ad5e58ab967f6e5c9a8d606d0c1785e71f9bb61bfcd2eb69990",
+      "reviewStatus": "pending",
+      "rebindStatus": "authored-pending-independent-review",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+        "pointer": "/registryGaps/6",
+        "targetOwner": "docs/specs/work-state.md",
+        "targetAnchor": "unheaded-block-174",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": null
+      },
+      "rebindReason": "F import: The repeated footer is byte-identical and retains its distinct enclosing decision ancestry and immediate neighbours. Earlier Work/Event Store additions move the ordinal; this is not a numerical-offset match. Main 8c4d3280eb8893acca785e27285fadecb12a4ba6; current target authenticated with both unchanged extractors. No independent approval carried."
+    }
+  ]
+}

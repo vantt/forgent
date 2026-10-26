@@ -1,0 +1,2634 @@
+{
+  "head": "30ae959eac6a4e4b255c0dd78c94042e1f4d60f9",
+  "nativeAddons": "disabled for every Node proof",
+  "commands": [
+    {
+      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py --check",
+      "exit": 1,
+      "stderr": "",
+      "stdoutSha256": "268d23a4a9a57e66ce388cea46cf07be269754ad90800c7102a9fd5df4bee383",
+      "output": {
+        "drift": 3,
+        "rows": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "pointer": "/registryGaps/19",
+            "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+            "before": {
+              "targetOwner": "docs/specs/runner.md",
+              "targetAnchor": "unheaded-block-317",
+              "targetUnitDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+              "targetAncestry": [
+                "Spec: Runner (vòng tự hành)",
+                "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+                "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]"
+              ]
+            },
+            "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "pointer": "/registryGaps/22",
+            "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
+            "before": {
+              "targetOwner": "docs/specs/runner.md",
+              "targetAnchor": "unheaded-block-322",
+              "targetUnitDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+              "targetAncestry": [
+                "Spec: Runner (vòng tự hành)",
+                "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+                "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
+              ]
+            },
+            "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json"
+          },
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "pointer": "/registryGaps/29",
+            "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+            "before": {
+              "targetOwner": "docs/specs/runner.md",
+              "targetAnchor": "unheaded-block-101",
+              "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+              "targetAncestry": [
+                "Spec: Runner (vòng tự hành)",
+                "Pointers (implementation)"
+              ]
+            },
+            "effectiveFile": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json"
+          }
+        ],
+        "authenticatedSupersededOrigins": 31,
+        "authenticatedIdenticalUnitGroups": 16
+      }
+    },
+    {
+      "command": "node plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs",
+      "exit": 0,
+      "stderr": "",
+      "stdoutSha256": "d9dc456adf13f72212700b30a2ab608977143efc8d619b29aac3ffb4ac42411d",
+      "output": {
+        "status": "pass",
+        "claims": 44,
+        "candidateUnits": 1009,
+        "refreshedDecisions": 121,
+        "droppedClaims": 17,
+        "pointerFiles": 24,
+        "currentSourceUnits": 346,
+        "historicalHeadingWitnesses": 91,
+        "liveHeadingRows": 91,
+        "liveSectionBlocks": 321,
+        "livePointerPatchDrift": [
+          {
+            "path": "AGENTS.md",
+            "beforeSha256": "30f6499b652d02e15f1f24144dd90731a1ad49a312e968dae3b04fc11cd7227d",
+            "liveSha256": "97dccd952beb724e430d2c74f3d73c1cd5fcc246e05a5558832d0cff0ae661a5",
+            "finalPinDuty": {
+              "path": "AGENTS.md",
+              "reason": "F imports main 733fcf7a6 (merge-parent carry-in guard). The historical unapplied pointer patch is not rebased here; F composition owner must recompose and independently review it. No permission to apply or cutover is granted."
+            }
+          },
+          {
+            "path": "core/skills/_shared/executor-dispatch-fallback.md",
+            "beforeSha256": "1ddb25179a37b27b49feaaa52c8c8d7c367a9f522607a9caf7abedbe78ef1f29",
+            "liveSha256": "92707800be6879b5c327c925bfa53006547b531bc28f3d74e7a0091f732490d4",
+            "finalPinDuty": {
+              "path": "core/skills/_shared/executor-dispatch-fallback.md",
+              "reason": "F imports main 5820e1a43 (Config-door wording). The historical unapplied pointer patch needs recomposition by the F composition owner, not silent preimage replacement in this records slice."
+            }
+          },
+          {
+            "path": ".agents/skills/_shared/executor-dispatch-fallback.md",
+            "beforeSha256": "be25f15a828a2558ef5ffa931f10002760133dca0db77399eb489a63ebde40c0",
+            "liveSha256": "d0665dd57db038f16e0b7c916a94e71313a7d3d7c7b3cb2301e3adbeffadab5a",
+            "finalPinDuty": {
+              "path": ".agents/skills/_shared/executor-dispatch-fallback.md",
+              "reason": "F imports main 4f26163fe (regenerated Config skill renders). The historical unapplied pointer patch needs recomposition by the F composition owner; generated bytes are not edited here."
+            }
+          },
+          {
+            "path": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+            "beforeSha256": "be25f15a828a2558ef5ffa931f10002760133dca0db77399eb489a63ebde40c0",
+            "liveSha256": "d0665dd57db038f16e0b7c916a94e71313a7d3d7c7b3cb2301e3adbeffadab5a",
+            "finalPinDuty": {
+              "path": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+              "reason": "F imports main 4f26163fe (regenerated Config skill renders). The historical unapplied pointer patch needs recomposition by the F composition owner; generated bytes are not edited here."
+            }
+          },
+          {
+            "path": "bin/fgos.mjs",
+            "beforeSha256": "4ad9ed0cb07518ae19774ddcf058d78484b53de25b850ae641b7b53011010d5f",
+            "liveSha256": "c008fc7125c557c1f3a426107f04846a1268a23c4884bc5a81e300071fa954da",
+            "finalPinDuty": {
+              "path": "bin/fgos.mjs",
+              "reason": "main changed after authoring; recompose at the final main import"
+            }
+          },
+          {
+            "path": "apps/fgos-gateway/src/gateway.rs",
+            "beforeSha256": "24439c4bc70c23b47979f1d3aa853b653828d73b1b3d7a1264c03f94c5de4a47",
+            "liveSha256": "037b6108a3a6af81e24d9cdb7d324419ea5ee5b2d7d3758677959ce9f4b11887",
+            "finalPinDuty": {
+              "path": "apps/fgos-gateway/src/gateway.rs",
+              "reason": "F imports main 28de422a3 (gateway reads Config). The historical unapplied pointer patch needs recomposition by the F composition owner; no code or patch preimage is changed here."
+            }
+          },
+          {
+            "path": "packages/distribution/rust/src/workspace.rs",
+            "beforeSha256": "a1ed550bb846d8a256048134a8a631afa2801f78163ba6f39b73c4ecb19e1f3f",
+            "liveSha256": "275a65b4e7346ceb1e3f31f080516d62ad24aec05aac761a5bbe837df2f3afb5",
+            "finalPinDuty": {
+              "path": "packages/distribution/rust/src/workspace.rs",
+              "reason": "F imports main 3fb3c15e5 (trusted-root resolution). The historical unapplied pointer patch needs recomposition by the F composition owner; no code or patch preimage is changed here."
+            }
+          },
+          {
+            "path": "docs/backlog.md",
+            "beforeSha256": "344552da9931e8c5ca9f946e49e0a25c40ff42b61dbf6d99c73310d5e14b7c33",
+            "liveSha256": "afbe353da47427a2acd569659536f9ca8d444cded50b36820c6ba98874a73b58",
+            "finalPinDuty": {
+              "path": "docs/backlog.md",
+              "reason": "main changed after authoring; recompose at the final main import"
+            }
+          }
+        ],
+        "finalPinDuties": {
+          "version": 1,
+          "pointerPatchDrift": [
+            {
+              "path": "AGENTS.md",
+              "reason": "F imports main 733fcf7a6 (merge-parent carry-in guard). The historical unapplied pointer patch is not rebased here; F composition owner must recompose and independently review it. No permission to apply or cutover is granted."
+            },
+            {
+              "path": "core/skills/_shared/executor-dispatch-fallback.md",
+              "reason": "F imports main 5820e1a43 (Config-door wording). The historical unapplied pointer patch needs recomposition by the F composition owner, not silent preimage replacement in this records slice."
+            },
+            {
+              "path": ".agents/skills/_shared/executor-dispatch-fallback.md",
+              "reason": "F imports main 4f26163fe (regenerated Config skill renders). The historical unapplied pointer patch needs recomposition by the F composition owner; generated bytes are not edited here."
+            },
+            {
+              "path": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+              "reason": "F imports main 4f26163fe (regenerated Config skill renders). The historical unapplied pointer patch needs recomposition by the F composition owner; generated bytes are not edited here."
+            },
+            {
+              "path": "apps/fgos-gateway/src/gateway.rs",
+              "reason": "F imports main 28de422a3 (gateway reads Config). The historical unapplied pointer patch needs recomposition by the F composition owner; no code or patch preimage is changed here."
+            },
+            {
+              "path": "packages/distribution/rust/src/workspace.rs",
+              "reason": "F imports main 3fb3c15e5 (trusted-root resolution). The historical unapplied pointer patch needs recomposition by the F composition owner; no code or patch preimage is changed here."
+            },
+            {
+              "path": "bin/fgos.mjs",
+              "reason": "main changed after authoring; recompose at the final main import"
+            },
+            {
+              "path": "docs/backlog.md",
+              "reason": "main changed after authoring; recompose at the final main import"
+            }
+          ]
+        },
+        "witnessPin": "f534aeaea59ebdc39613aab02c109dbd30fd36b8",
+        "currentLedgerSuccessors": {
+          "status": "pass",
+          "origins": 1208,
+          "currentBindings": 1208
+        },
+        "sourceParityQualification": "Current rows require exact source anchor/digest and normalized full-source inclusion at a named current target. Split/adapted rows also check target digests; explicit zero-fuzz adaptations are not false equality. Original heading census, placement and unapplied patch witnesses replay at witnessPin. Live heading census, direct-section block coverage and pointer-patch drift also check working-tree bytes; only explicitly listed final-pin duties permit drift. Patch recomposition and authority/cutover acceptance are not certified.",
+        "reviewStatus": "pending; no gate accepted"
+      }
+    },
+    {
+      "command": "node scripts/check-legacy-docs-ratchet.mjs",
+      "exit": 0,
+      "stderr": "",
+      "stdoutSha256": "8455c17af073b12ad5f017ec105e629d2045c70362efd474a11acdabfd468d32",
+      "output": "check-legacy-docs-ratchet: clean (997 legacy files checked; 29 accounted edit(s), 3 accounted new file(s)).\n"
+    },
+    {
+      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g0rework/refresh-carries.py --check",
+      "exit": 0,
+      "stderr": "",
+      "stdoutSha256": "d6db75d65ffdc8475143536c178c0f551fad3ea902f5ea9efad537ab532be3fd",
+      "output": {
+        "status": "pass",
+        "mode": "check",
+        "parityRows": 346,
+        "liveHeadingRows": 91,
+        "historicalRefreshedParityRows": 35,
+        "historicalTargetOnlyParityRows": 62,
+        "historicalRefreshedCandidateBindings": 25,
+        "fRefreshChanges": 32,
+        "fRefreshedCandidateBindings": 13
+      }
+    },
+    {
+      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g0join/join.py --pin HEAD",
+      "exit": 0,
+      "stderr": "",
+      "stdoutSha256": "381c58b8e7d59543775936e5b6f769f3b39d6d5c1e03caa3cbb51a18d72aaacb",
+      "output": {
+        "contract": "g0-verdict-join.v2",
+        "counts": {
+          "aggregateOnly": 66,
+          "approved": 1929,
+          "effectiveRows": 1929,
+          "frozenChangedBindings": 257,
+          "invalidBindings": 0,
+          "mismatched": 0,
+          "missing": 0,
+          "obligations": 2187,
+          "openRework": 0,
+          "perRowVerdicts": 2695,
+          "reviewFiles": 88,
+          "stale": 0,
+          "unresolved": 0
+        },
+        "exit": 0,
+        "frozenSourcePin": "5e03159334df726e43ffe9505ad4ed43f72ba94d",
+        "method": "Committed blobs only; changedBindings plus all explicit supersessions/bindingRefresh/rebindReason rows and in-place payload changes since frozen source; exact lineage; decision changes include disposition, rationale/reason, changedClauses, reviewStatus, supersedes links and bindings (including enclosing claim decisions). Verdicts require descendant review-file commit or matching rowFingerprint (SHA256 of compact sorted UTF-8 decision context JSON plus LF); no author reviewStatus inheritance or prose-to-verdict expansion. The obligation population is unchanged; freshness rejects stale verdicts rather than inventing obligations for previously unreviewed rows. Matching two stored digests is not a live target-content audit.",
+        "pin": "30ae959eac6a4e4b255c0dd78c94042e1f4d60f9",
+        "status": "passed"
+      }
+    },
+    {
+      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g0rework/test-live-parity.py",
+      "exit": 0,
+      "stderr": "",
+      "stdoutSha256": "2ef1b91ac8406e385e9549aca42998709da39e72d1209d6763bf2ab319f9a03a",
+      "output": {
+        "status": "pass",
+        "probes": [
+          {
+            "behavior": "stale live heading is refused",
+            "command": [
+              "node",
+              "--require",
+              "/tmp/fgos-work/live-parity-probes-h5q595n2/overlay.cjs",
+              "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+            ],
+            "exit": 1,
+            "expected": "nonzero",
+            "diagnostic": "live source heading: docs/specs/distribution.md#data-dictionary"
+          },
+          {
+            "behavior": "uncovered current section block is refused",
+            "command": [
+              "node",
+              "--require",
+              "/tmp/fgos-work/live-parity-probes-h5q595n2/overlay.cjs",
+              "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+            ],
+            "exit": 1,
+            "expected": "nonzero",
+            "diagnostic": "live direct section block unaccounted: docs/specs/distribution.md#unheaded-block-17"
+          },
+          {
+            "behavior": "new live heading outside the census is refused",
+            "command": [
+              "node",
+              "--require",
+              "/tmp/fgos-work/live-parity-probes-h5q595n2/overlay.cjs",
+              "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+            ],
+            "exit": 1,
+            "expected": "nonzero",
+            "diagnostic": "live heading census: docs/specs/distribution.md"
+          },
+          {
+            "behavior": "unlisted patch drift is refused and all drift paths are named",
+            "command": [
+              "node",
+              "--require",
+              "/tmp/fgos-work/live-parity-probes-h5q595n2/overlay.cjs",
+              "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+            ],
+            "exit": 1,
+            "expected": "nonzero",
+            "diagnostic": "unlisted live pointer-patch drift"
+          },
+          {
+            "behavior": "known drift without explicit duties is refused",
+            "command": [
+              "node",
+              "--require",
+              "/tmp/fgos-work/live-parity-probes-h5q595n2/overlay.cjs",
+              "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+            ],
+            "exit": 1,
+            "expected": "nonzero",
+            "diagnostic": "unlisted live pointer-patch drift"
+          }
+        ]
+      }
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0,
+      "stderr": "",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    }
+  ],
+  "ownership": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "scriptHashes": {
+        "step10-sync287-lib.mjs": "083795c90eac1d5601fedc2261390f15668fceed68a3053777960fea9a927dc3",
+        "ownership.mjs": "22f475f8bfe371ec715eb7fbabc18963f409578a8caf318184a70e7647da045f",
+        "audit-ownership.mjs": "384f81cdfb34c6ed214fd62438134118f30a51c1b90e102ee79ecac1ca213e33"
+      },
+      "commands": [
+        {
+          "command": "node /tmp/fgos-work/f-refresh-final-8ep5a63t/step10-round5/ownership.mjs --output-dir /tmp/fgos-work/f-refresh-final-8ep5a63t/step10-round5",
+          "exit": 0,
+          "stdoutSha256": "46753c2095f9bd63ba7bcca44e749c2f426e35ea5ef5ff35260c8d05fd1b0cd2",
+          "stderr": ""
+        },
+        {
+          "command": "node /tmp/fgos-work/f-refresh-final-8ep5a63t/step10-round5/audit-ownership.mjs --output-dir /tmp/fgos-work/f-refresh-final-8ep5a63t/step10-round5",
+          "exit": 1,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(current.noNewDoubleOwnership)\n\n    at file:///tmp/fgos-work/f-refresh-final-8ep5a63t/step10-round5/audit-ownership.mjs:8:56 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n"
+        }
+      ],
+      "ownership": {
+        "noNewDoubleOwnership": false,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": [],
+        "targetDigestDrift": [
+          {
+            "claimId": "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "3-work-item-data-dictionary",
+            "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+            "targetAncestry": [
+              "Work State Specification",
+              "3. Work Item Data Dictionary"
+            ],
+            "bindingSha256": "ed3bfd0a1cba90117b030fe20af8347e01aa86dd92082d0969e51c5919863537",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "unheaded-block-4",
+            "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
+            "targetAncestry": [
+              "Work State Specification",
+              "3. Work Item Data Dictionary"
+            ],
+            "bindingSha256": "f8487c8c7365f91f4e87c415067b4f97973c4d26365f9534d6a498c2d8b71412",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "6-domain-model",
+            "targetUnitDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
+            "targetAncestry": [
+              "Work State Specification"
+            ],
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "unheaded-block-54",
+            "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+            "targetAncestry": [
+              "Work State Specification",
+              "6. Domain Model"
+            ],
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "11-business-rules",
+            "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc",
+            "targetAncestry": [
+              "Work State Specification",
+              "11. Business Rules"
+            ],
+            "bindingSha256": "a7fc34fed5186df1fbbae1e7545b66eb1cb69b61f60adb2aa5194c93f809e70f",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_dd06c2555dc0e81c54c80376fee8ff91",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-117",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_16abc69cd658a382c456cdaf23f64d87",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-121",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-126",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_7a0776311f7105750a4f234681f513a3",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-138",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-144",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-150",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_1d724afb521915455a45db2b1f3b34cd",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-174",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+            "targetOwner": "docs/architecture-manifest.json",
+            "targetAnchor": "file-block",
+            "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+            "targetAncestry": [],
+            "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "unheaded-block-11",
+            "targetUnitDigest": "afe8743b9a9643e0b93ed4fed196aa476a500be2ddd7303cf1c963185f51ae96",
+            "targetAncestry": [
+              "Component Boundary",
+              "4. Current High-Level Components"
+            ],
+            "bindingSha256": "2c48bb9d4d9424ac0a3633701df88efee6794dad4ca0f9d340daeb06f6e79ca0",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-14",
+            "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Business Rules"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-5",
+            "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Data Dictionary"
+            ],
+            "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+            "targetOwner": "docs/specs/confinement-authority.md",
+            "targetAnchor": "unheaded-block-147",
+            "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+            "targetAncestry": [
+              "Spec: Agent Confinement Authority",
+              "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+              "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+            ],
+            "bindingSha256": "03765f0b0cb5de3faefaba3cf20b4e75d15acf8d89855cc9b4d7580bdabe738f",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-5",
+            "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Data Dictionary"
+            ],
+            "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_04703f011b22383992b94545055b9e56",
+            "targetOwner": "docs/specs/confinement-authority.md",
+            "targetAnchor": "unheaded-block-147",
+            "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+            "targetAncestry": [
+              "Spec: Agent Confinement Authority",
+              "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+              "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+            ],
+            "bindingSha256": "03765f0b0cb5de3faefaba3cf20b4e75d15acf8d89855cc9b4d7580bdabe738f",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-5",
+            "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Data Dictionary"
+            ],
+            "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b741539a16b6eb2792ca6c4178b23671",
+            "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+            "targetAnchor": "unheaded-block-37",
+            "targetUnitDigest": "7fe0554fd220e71ef2082123783d7fd9dae5886aba0216f42ea604ebd72f54a9",
+            "targetAncestry": [
+              "How to install fgOS in a project and use fgos doctor",
+              "4. Every doctor check",
+              "4.2. Project config (written by setup or `--fix`)"
+            ],
+            "bindingSha256": "1221dfd5b7548c66328b51535f46502b54982ee89dae1b2037abd5b612994e01",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_975c8349e0d069aabf88161d933f2228",
+            "targetOwner": "docs/reference/dispatch-module-boundaries.md",
+            "targetAnchor": "unheaded-block-3",
+            "targetUnitDigest": "f181007d6c80684c15dc6211eb00115a238cdab88f22bec5eb2d50453454701c",
+            "targetAncestry": [
+              "`src/runner/dispatch` module boundaries"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-101",
+            "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Pointers (implementation)"
+            ],
+            "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+            "targetOwner": "docs/architecture-manifest.json",
+            "targetAnchor": "file-block",
+            "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+            "targetAncestry": [],
+            "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+            "targetOwner": "docs/architecture-manifest.json",
+            "targetAnchor": "file-block",
+            "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+            "targetAncestry": [],
+            "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_96e947d6daf7dd7612cc711be8e3e22e",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "9-hexagonal-architecture-view",
+            "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+            "targetAncestry": [
+              "Component Boundary",
+              "Added in candidate: component-boundary-advisory source carriage",
+              "fgOS Component Boundary Advisory"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_4e86e8414c4e3b780e81f77255853447",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "unheaded-block-70",
+            "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+            "targetAncestry": [
+              "Component Boundary",
+              "Added in candidate: component-boundary-advisory source carriage",
+              "fgOS Component Boundary Advisory",
+              "9. Hexagonal Architecture View"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_a63132a3f76d6b8ea05461c48c818836",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-101",
+            "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Pointers (implementation)"
+            ],
+            "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_f4058f068a378962aaf237ae038db5af",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-134",
+            "targetUnitDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Dispatch operability implementation slice (2026-09-16)"
+            ],
+            "bindingSha256": "fa8476567a95294d55c1322f0c7299088716f03ff1a9e4db2577919e7ea87e6d",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_69311391fbb9b1cf924197e6063e5cad",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_cad110bd532badff055f69c0a236644a",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_33c41de79cf4a52288035a9656c09735",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-317",
+            "targetUnitDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]"
+            ],
+            "bindingSha256": "db7cfcbdb675c88facd4fa40d8c94e0e3c4c3e0c7571c5c0458de2256a8b1577",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-322",
+            "targetUnitDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
+            ],
+            "bindingSha256": "8d6e2ce098e66cf7bcb6b6f145a4cceb60ed0ee1ac38d47d7272e2773e4bf23d",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-93",
+            "targetUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Business Rules"
+            ],
+            "bindingSha256": "5aaed018777863e022c765e96ca77e633dce304b488f15eb8f9b0ad1a11d3017",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-93",
+            "targetUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Business Rules"
+            ],
+            "bindingSha256": "5aaed018777863e022c765e96ca77e633dce304b488f15eb8f9b0ad1a11d3017",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-101",
+            "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Pointers (implementation)"
+            ],
+            "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          }
+        ],
+        "accountedTargetDigestDrift": [
+          {
+            "claimId": "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "3-work-item-data-dictionary",
+            "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+            "targetAncestry": [
+              "Work State Specification",
+              "3. Work Item Data Dictionary"
+            ],
+            "bindingSha256": "ed3bfd0a1cba90117b030fe20af8347e01aa86dd92082d0969e51c5919863537",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "unheaded-block-4",
+            "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
+            "targetAncestry": [
+              "Work State Specification",
+              "3. Work Item Data Dictionary"
+            ],
+            "bindingSha256": "f8487c8c7365f91f4e87c415067b4f97973c4d26365f9534d6a498c2d8b71412",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "6-domain-model",
+            "targetUnitDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
+            "targetAncestry": [
+              "Work State Specification"
+            ],
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "unheaded-block-54",
+            "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+            "targetAncestry": [
+              "Work State Specification",
+              "6. Domain Model"
+            ],
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "11-business-rules",
+            "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc",
+            "targetAncestry": [
+              "Work State Specification",
+              "11. Business Rules"
+            ],
+            "bindingSha256": "a7fc34fed5186df1fbbae1e7545b66eb1cb69b61f60adb2aa5194c93f809e70f",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_dd06c2555dc0e81c54c80376fee8ff91",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-117",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_16abc69cd658a382c456cdaf23f64d87",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-121",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-126",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_7a0776311f7105750a4f234681f513a3",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-138",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-144",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-150",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_1d724afb521915455a45db2b1f3b34cd",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-174",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+            "targetOwner": "docs/architecture-manifest.json",
+            "targetAnchor": "file-block",
+            "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+            "targetAncestry": [],
+            "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "unheaded-block-11",
+            "targetUnitDigest": "afe8743b9a9643e0b93ed4fed196aa476a500be2ddd7303cf1c963185f51ae96",
+            "targetAncestry": [
+              "Component Boundary",
+              "4. Current High-Level Components"
+            ],
+            "bindingSha256": "2c48bb9d4d9424ac0a3633701df88efee6794dad4ca0f9d340daeb06f6e79ca0",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-14",
+            "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Business Rules"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-5",
+            "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Data Dictionary"
+            ],
+            "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+            "targetOwner": "docs/specs/confinement-authority.md",
+            "targetAnchor": "unheaded-block-147",
+            "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+            "targetAncestry": [
+              "Spec: Agent Confinement Authority",
+              "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+              "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+            ],
+            "bindingSha256": "03765f0b0cb5de3faefaba3cf20b4e75d15acf8d89855cc9b4d7580bdabe738f",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-5",
+            "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Data Dictionary"
+            ],
+            "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_04703f011b22383992b94545055b9e56",
+            "targetOwner": "docs/specs/confinement-authority.md",
+            "targetAnchor": "unheaded-block-147",
+            "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+            "targetAncestry": [
+              "Spec: Agent Confinement Authority",
+              "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+              "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+            ],
+            "bindingSha256": "03765f0b0cb5de3faefaba3cf20b4e75d15acf8d89855cc9b4d7580bdabe738f",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-5",
+            "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Data Dictionary"
+            ],
+            "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b741539a16b6eb2792ca6c4178b23671",
+            "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+            "targetAnchor": "unheaded-block-37",
+            "targetUnitDigest": "7fe0554fd220e71ef2082123783d7fd9dae5886aba0216f42ea604ebd72f54a9",
+            "targetAncestry": [
+              "How to install fgOS in a project and use fgos doctor",
+              "4. Every doctor check",
+              "4.2. Project config (written by setup or `--fix`)"
+            ],
+            "bindingSha256": "1221dfd5b7548c66328b51535f46502b54982ee89dae1b2037abd5b612994e01",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_975c8349e0d069aabf88161d933f2228",
+            "targetOwner": "docs/reference/dispatch-module-boundaries.md",
+            "targetAnchor": "unheaded-block-3",
+            "targetUnitDigest": "f181007d6c80684c15dc6211eb00115a238cdab88f22bec5eb2d50453454701c",
+            "targetAncestry": [
+              "`src/runner/dispatch` module boundaries"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-101",
+            "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Pointers (implementation)"
+            ],
+            "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+            "targetOwner": "docs/architecture-manifest.json",
+            "targetAnchor": "file-block",
+            "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+            "targetAncestry": [],
+            "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+            "targetOwner": "docs/architecture-manifest.json",
+            "targetAnchor": "file-block",
+            "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+            "targetAncestry": [],
+            "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_96e947d6daf7dd7612cc711be8e3e22e",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "9-hexagonal-architecture-view",
+            "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+            "targetAncestry": [
+              "Component Boundary",
+              "Added in candidate: component-boundary-advisory source carriage",
+              "fgOS Component Boundary Advisory"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_4e86e8414c4e3b780e81f77255853447",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "unheaded-block-70",
+            "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+            "targetAncestry": [
+              "Component Boundary",
+              "Added in candidate: component-boundary-advisory source carriage",
+              "fgOS Component Boundary Advisory",
+              "9. Hexagonal Architecture View"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_a63132a3f76d6b8ea05461c48c818836",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-101",
+            "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Pointers (implementation)"
+            ],
+            "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_f4058f068a378962aaf237ae038db5af",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-134",
+            "targetUnitDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Dispatch operability implementation slice (2026-09-16)"
+            ],
+            "bindingSha256": "fa8476567a95294d55c1322f0c7299088716f03ff1a9e4db2577919e7ea87e6d",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_69311391fbb9b1cf924197e6063e5cad",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_cad110bd532badff055f69c0a236644a",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_33c41de79cf4a52288035a9656c09735",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-93",
+            "targetUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Business Rules"
+            ],
+            "bindingSha256": "5aaed018777863e022c765e96ca77e633dce304b488f15eb8f9b0ad1a11d3017",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-93",
+            "targetUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Business Rules"
+            ],
+            "bindingSha256": "5aaed018777863e022c765e96ca77e633dce304b488f15eb8f9b0ad1a11d3017",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          }
+        ],
+        "unaccountedTargetDigestDrift": [
+          {
+            "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-317",
+            "targetUnitDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]"
+            ],
+            "bindingSha256": "db7cfcbdb675c88facd4fa40d8c94e0e3c4c3e0c7571c5c0458de2256a8b1577",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-322",
+            "targetUnitDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
+            ],
+            "bindingSha256": "8d6e2ce098e66cf7bcb6b6f145a4cceb60ed0ee1ac38d47d7272e2773e4bf23d",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-101",
+            "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Pointers (implementation)"
+            ],
+            "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          }
+        ]
+      }
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "scriptHashes": {
+        "lib.mjs": "48e153938d145bd41986b47ba816d4506db1a90c664170ee08e17bc60341ba41",
+        "ownership.mjs": "e0f7e53f5acb5176294e10456c5fa6955cf3d6f31a9946440699d952b2a7a345",
+        "audit-ownership.mjs": "c00a47df2e7fb9bd44734edac52b706df24552d120969468db7b866d35da72ac"
+      },
+      "commands": [
+        {
+          "command": "node /tmp/fgos-work/f-refresh-final-8ep5a63t/step10-sync4d/ownership.mjs --output-dir /tmp/fgos-work/f-refresh-final-8ep5a63t/step10-sync4d",
+          "exit": 0,
+          "stdoutSha256": "46753c2095f9bd63ba7bcca44e749c2f426e35ea5ef5ff35260c8d05fd1b0cd2",
+          "stderr": ""
+        },
+        {
+          "command": "node /tmp/fgos-work/f-refresh-final-8ep5a63t/step10-sync4d/audit-ownership.mjs --output-dir /tmp/fgos-work/f-refresh-final-8ep5a63t/step10-sync4d",
+          "exit": 1,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(current.noNewDoubleOwnership)\n\n    at file:///tmp/fgos-work/f-refresh-final-8ep5a63t/step10-sync4d/audit-ownership.mjs:8:56 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n"
+        }
+      ],
+      "ownership": {
+        "noNewDoubleOwnership": false,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": [],
+        "targetDigestDrift": [
+          {
+            "claimId": "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "3-work-item-data-dictionary",
+            "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+            "targetAncestry": [
+              "Work State Specification",
+              "3. Work Item Data Dictionary"
+            ],
+            "bindingSha256": "ed3bfd0a1cba90117b030fe20af8347e01aa86dd92082d0969e51c5919863537",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "unheaded-block-4",
+            "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
+            "targetAncestry": [
+              "Work State Specification",
+              "3. Work Item Data Dictionary"
+            ],
+            "bindingSha256": "f8487c8c7365f91f4e87c415067b4f97973c4d26365f9534d6a498c2d8b71412",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "6-domain-model",
+            "targetUnitDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
+            "targetAncestry": [
+              "Work State Specification"
+            ],
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "unheaded-block-54",
+            "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+            "targetAncestry": [
+              "Work State Specification",
+              "6. Domain Model"
+            ],
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "11-business-rules",
+            "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc",
+            "targetAncestry": [
+              "Work State Specification",
+              "11. Business Rules"
+            ],
+            "bindingSha256": "a7fc34fed5186df1fbbae1e7545b66eb1cb69b61f60adb2aa5194c93f809e70f",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_dd06c2555dc0e81c54c80376fee8ff91",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-117",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_16abc69cd658a382c456cdaf23f64d87",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-121",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-126",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_7a0776311f7105750a4f234681f513a3",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-138",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-144",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-150",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_1d724afb521915455a45db2b1f3b34cd",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-174",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+            "targetOwner": "docs/architecture-manifest.json",
+            "targetAnchor": "file-block",
+            "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+            "targetAncestry": [],
+            "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "unheaded-block-11",
+            "targetUnitDigest": "afe8743b9a9643e0b93ed4fed196aa476a500be2ddd7303cf1c963185f51ae96",
+            "targetAncestry": [
+              "Component Boundary",
+              "4. Current High-Level Components"
+            ],
+            "bindingSha256": "2c48bb9d4d9424ac0a3633701df88efee6794dad4ca0f9d340daeb06f6e79ca0",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-14",
+            "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Business Rules"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-5",
+            "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Data Dictionary"
+            ],
+            "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+            "targetOwner": "docs/specs/confinement-authority.md",
+            "targetAnchor": "unheaded-block-147",
+            "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+            "targetAncestry": [
+              "Spec: Agent Confinement Authority",
+              "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+              "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+            ],
+            "bindingSha256": "03765f0b0cb5de3faefaba3cf20b4e75d15acf8d89855cc9b4d7580bdabe738f",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-5",
+            "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Data Dictionary"
+            ],
+            "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_04703f011b22383992b94545055b9e56",
+            "targetOwner": "docs/specs/confinement-authority.md",
+            "targetAnchor": "unheaded-block-147",
+            "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+            "targetAncestry": [
+              "Spec: Agent Confinement Authority",
+              "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+              "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+            ],
+            "bindingSha256": "03765f0b0cb5de3faefaba3cf20b4e75d15acf8d89855cc9b4d7580bdabe738f",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-5",
+            "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Data Dictionary"
+            ],
+            "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b741539a16b6eb2792ca6c4178b23671",
+            "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+            "targetAnchor": "unheaded-block-37",
+            "targetUnitDigest": "7fe0554fd220e71ef2082123783d7fd9dae5886aba0216f42ea604ebd72f54a9",
+            "targetAncestry": [
+              "How to install fgOS in a project and use fgos doctor",
+              "4. Every doctor check",
+              "4.2. Project config (written by setup or `--fix`)"
+            ],
+            "bindingSha256": "1221dfd5b7548c66328b51535f46502b54982ee89dae1b2037abd5b612994e01",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_975c8349e0d069aabf88161d933f2228",
+            "targetOwner": "docs/reference/dispatch-module-boundaries.md",
+            "targetAnchor": "unheaded-block-3",
+            "targetUnitDigest": "f181007d6c80684c15dc6211eb00115a238cdab88f22bec5eb2d50453454701c",
+            "targetAncestry": [
+              "`src/runner/dispatch` module boundaries"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-101",
+            "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Pointers (implementation)"
+            ],
+            "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+            "targetOwner": "docs/architecture-manifest.json",
+            "targetAnchor": "file-block",
+            "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+            "targetAncestry": [],
+            "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+            "targetOwner": "docs/architecture-manifest.json",
+            "targetAnchor": "file-block",
+            "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+            "targetAncestry": [],
+            "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_96e947d6daf7dd7612cc711be8e3e22e",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "9-hexagonal-architecture-view",
+            "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+            "targetAncestry": [
+              "Component Boundary",
+              "Added in candidate: component-boundary-advisory source carriage",
+              "fgOS Component Boundary Advisory"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_4e86e8414c4e3b780e81f77255853447",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "unheaded-block-70",
+            "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+            "targetAncestry": [
+              "Component Boundary",
+              "Added in candidate: component-boundary-advisory source carriage",
+              "fgOS Component Boundary Advisory",
+              "9. Hexagonal Architecture View"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_a63132a3f76d6b8ea05461c48c818836",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-101",
+            "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Pointers (implementation)"
+            ],
+            "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_f4058f068a378962aaf237ae038db5af",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-134",
+            "targetUnitDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Dispatch operability implementation slice (2026-09-16)"
+            ],
+            "bindingSha256": "fa8476567a95294d55c1322f0c7299088716f03ff1a9e4db2577919e7ea87e6d",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_69311391fbb9b1cf924197e6063e5cad",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_cad110bd532badff055f69c0a236644a",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_33c41de79cf4a52288035a9656c09735",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-317",
+            "targetUnitDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]"
+            ],
+            "bindingSha256": "db7cfcbdb675c88facd4fa40d8c94e0e3c4c3e0c7571c5c0458de2256a8b1577",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-322",
+            "targetUnitDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
+            ],
+            "bindingSha256": "8d6e2ce098e66cf7bcb6b6f145a4cceb60ed0ee1ac38d47d7272e2773e4bf23d",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-93",
+            "targetUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Business Rules"
+            ],
+            "bindingSha256": "5aaed018777863e022c765e96ca77e633dce304b488f15eb8f9b0ad1a11d3017",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-93",
+            "targetUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Business Rules"
+            ],
+            "bindingSha256": "5aaed018777863e022c765e96ca77e633dce304b488f15eb8f9b0ad1a11d3017",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-101",
+            "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Pointers (implementation)"
+            ],
+            "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          }
+        ],
+        "accountedTargetDigestDrift": [
+          {
+            "claimId": "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "3-work-item-data-dictionary",
+            "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+            "targetAncestry": [
+              "Work State Specification",
+              "3. Work Item Data Dictionary"
+            ],
+            "bindingSha256": "ed3bfd0a1cba90117b030fe20af8347e01aa86dd92082d0969e51c5919863537",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "unheaded-block-4",
+            "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
+            "targetAncestry": [
+              "Work State Specification",
+              "3. Work Item Data Dictionary"
+            ],
+            "bindingSha256": "f8487c8c7365f91f4e87c415067b4f97973c4d26365f9534d6a498c2d8b71412",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "6-domain-model",
+            "targetUnitDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
+            "targetAncestry": [
+              "Work State Specification"
+            ],
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "unheaded-block-54",
+            "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+            "targetAncestry": [
+              "Work State Specification",
+              "6. Domain Model"
+            ],
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+            "targetOwner": "docs/platform/work-state/spec.md",
+            "targetAnchor": "11-business-rules",
+            "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc",
+            "targetAncestry": [
+              "Work State Specification",
+              "11. Business Rules"
+            ],
+            "bindingSha256": "a7fc34fed5186df1fbbae1e7545b66eb1cb69b61f60adb2aa5194c93f809e70f",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_dd06c2555dc0e81c54c80376fee8ff91",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-117",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_16abc69cd658a382c456cdaf23f64d87",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-121",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-126",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_7a0776311f7105750a4f234681f513a3",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-138",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-144",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-150",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_1d724afb521915455a45db2b1f3b34cd",
+            "targetOwner": "docs/specs/work-state.md",
+            "targetAnchor": "unheaded-block-174",
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+            "targetOwner": "docs/architecture-manifest.json",
+            "targetAnchor": "file-block",
+            "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+            "targetAncestry": [],
+            "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "unheaded-block-11",
+            "targetUnitDigest": "afe8743b9a9643e0b93ed4fed196aa476a500be2ddd7303cf1c963185f51ae96",
+            "targetAncestry": [
+              "Component Boundary",
+              "4. Current High-Level Components"
+            ],
+            "bindingSha256": "2c48bb9d4d9424ac0a3633701df88efee6794dad4ca0f9d340daeb06f6e79ca0",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-14",
+            "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Business Rules"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-5",
+            "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Data Dictionary"
+            ],
+            "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+            "targetOwner": "docs/specs/confinement-authority.md",
+            "targetAnchor": "unheaded-block-147",
+            "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+            "targetAncestry": [
+              "Spec: Agent Confinement Authority",
+              "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+              "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+            ],
+            "bindingSha256": "03765f0b0cb5de3faefaba3cf20b4e75d15acf8d89855cc9b4d7580bdabe738f",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-5",
+            "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Data Dictionary"
+            ],
+            "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_04703f011b22383992b94545055b9e56",
+            "targetOwner": "docs/specs/confinement-authority.md",
+            "targetAnchor": "unheaded-block-147",
+            "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+            "targetAncestry": [
+              "Spec: Agent Confinement Authority",
+              "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+              "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+            ],
+            "bindingSha256": "03765f0b0cb5de3faefaba3cf20b4e75d15acf8d89855cc9b4d7580bdabe738f",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+            "targetOwner": "docs/specs/distribution.md",
+            "targetAnchor": "unheaded-block-5",
+            "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+            "targetAncestry": [
+              "Spec: Distribution",
+              "Data Dictionary"
+            ],
+            "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b741539a16b6eb2792ca6c4178b23671",
+            "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+            "targetAnchor": "unheaded-block-37",
+            "targetUnitDigest": "7fe0554fd220e71ef2082123783d7fd9dae5886aba0216f42ea604ebd72f54a9",
+            "targetAncestry": [
+              "How to install fgOS in a project and use fgos doctor",
+              "4. Every doctor check",
+              "4.2. Project config (written by setup or `--fix`)"
+            ],
+            "bindingSha256": "1221dfd5b7548c66328b51535f46502b54982ee89dae1b2037abd5b612994e01",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_975c8349e0d069aabf88161d933f2228",
+            "targetOwner": "docs/reference/dispatch-module-boundaries.md",
+            "targetAnchor": "unheaded-block-3",
+            "targetUnitDigest": "f181007d6c80684c15dc6211eb00115a238cdab88f22bec5eb2d50453454701c",
+            "targetAncestry": [
+              "`src/runner/dispatch` module boundaries"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-101",
+            "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Pointers (implementation)"
+            ],
+            "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+            "targetOwner": "docs/architecture-manifest.json",
+            "targetAnchor": "file-block",
+            "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+            "targetAncestry": [],
+            "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+            "targetOwner": "docs/architecture-manifest.json",
+            "targetAnchor": "file-block",
+            "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+            "targetAncestry": [],
+            "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_96e947d6daf7dd7612cc711be8e3e22e",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "9-hexagonal-architecture-view",
+            "targetUnitDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+            "targetAncestry": [
+              "Component Boundary",
+              "Added in candidate: component-boundary-advisory source carriage",
+              "fgOS Component Boundary Advisory"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_4e86e8414c4e3b780e81f77255853447",
+            "targetOwner": "docs/platform/component-boundary.md",
+            "targetAnchor": "unheaded-block-70",
+            "targetUnitDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+            "targetAncestry": [
+              "Component Boundary",
+              "Added in candidate: component-boundary-advisory source carriage",
+              "fgOS Component Boundary Advisory",
+              "9. Hexagonal Architecture View"
+            ],
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+            "collection": "claims"
+          },
+          {
+            "claimId": "claim_a63132a3f76d6b8ea05461c48c818836",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-101",
+            "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Pointers (implementation)"
+            ],
+            "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_f4058f068a378962aaf237ae038db5af",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-134",
+            "targetUnitDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Dispatch operability implementation slice (2026-09-16)"
+            ],
+            "bindingSha256": "fa8476567a95294d55c1322f0c7299088716f03ff1a9e4db2577919e7ea87e6d",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_69311391fbb9b1cf924197e6063e5cad",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_cad110bd532badff055f69c0a236644a",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_33c41de79cf4a52288035a9656c09735",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
+            "targetOwner": "docs/specs/runner.md",
+            "bindingSha256": "18ae866a0739f11d0dc2379eeaef3dd0c320d308ba3ae41cdf199646ff377bbb",
+            "targetAnchor": null,
+            "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+            "targetAncestry": null,
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-93",
+            "targetUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Business Rules"
+            ],
+            "bindingSha256": "5aaed018777863e022c765e96ca77e633dce304b488f15eb8f9b0ad1a11d3017",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-93",
+            "targetUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Business Rules"
+            ],
+            "bindingSha256": "5aaed018777863e022c765e96ca77e633dce304b488f15eb8f9b0ad1a11d3017",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          }
+        ],
+        "unaccountedTargetDigestDrift": [
+          {
+            "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-317",
+            "targetUnitDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]"
+            ],
+            "bindingSha256": "db7cfcbdb675c88facd4fa40d8c94e0e3c4c3e0c7571c5c0458de2256a8b1577",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-322",
+            "targetUnitDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
+            ],
+            "bindingSha256": "8d6e2ce098e66cf7bcb6b6f145a4cceb60ed0ee1ac38d47d7272e2773e4bf23d",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          },
+          {
+            "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+            "targetOwner": "docs/specs/runner.md",
+            "targetAnchor": "unheaded-block-101",
+            "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+            "targetAncestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Pointers (implementation)"
+            ],
+            "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5",
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "collection": "registryGaps"
+          }
+        ]
+      }
+    }
+  ]
+}

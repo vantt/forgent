@@ -46,7 +46,12 @@ def main():
     headings = json.loads(subprocess.check_output(['git', 'show', heading_pin + ':' + str(heading_path)]))
     paths.update(h['sourcePath'] for h in headings)
     paths.update(t['path'] for h in headings for t in h['targets'])
-    cat = rebind['extract'](dict(paths=sorted(paths)))['catalog']
+    # Replay the original accounting on its last verified bytes, then extend
+    # it to live bytes below. Old placement/parity witnesses are not rewritten
+    # by running a historical recipe against a later main import.
+    witness_pin = '5a3f7580a'
+    cat = rebind['extract'](dict(virtual=[dict(path=p, content=subprocess.check_output(
+        ['git', 'show', witness_pin + ':' + p], text=True)) for p in sorted(paths)]))['catalog']
     normalize = lambda t: re.sub(r'\s+', ' ', re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', re.sub(r'^#{1,6} ', '', t))).strip()
     def adapt(row, source, owner, target, reason):
         row['status'] = 'accounted-current-source-adaptation'
@@ -203,13 +208,154 @@ def main():
     outputs = {PARITY: parity, heading_path: headings,
         SHARD: dict(version=1, authority='Records-only current carry rebind; independent review pending, no gate accepted', bindingRefresh=overlays),
         R / 'carries/current-binding-refresh.json': dict(historicalParityCommit='c25e8cf6a', parityRowsRefreshed=35, targetOnlyParityRows=target_only, candidateBindingsRefreshed=25, changes=changes)}
+    # F refresh: same extractors, correspondence and four-field binding door.
+    # Keep complete previous rows in the existing history fields. Adaptations
+    # are reversible text accounting, never equality or independent approval.
+    live = rebind['extract'](dict(paths=sorted(paths)))['catalog']
+    f_changes = []
+
+    def live_unit(owner, anchor, unit_digest):
+        old = next(u for u in cat[owner]['units']
+                   if u['anchor'] == anchor and u['textDigest'] == unit_digest)
+        exact = [u for u in live[owner]['units']
+                 if u['anchor'] == anchor and u['textDigest'] == unit_digest]
+        if len(exact) == 1:
+            return exact[0]
+        # The Event Store registry paragraph is rewritten in e8809d2af, not
+        # removed. Authenticate its named subject and unchanged neighbours;
+        # the generic similarity threshold rightly does not choose it.
+        if (owner == 'docs/platform/packaging-distribution/contracts/setup-doctor-registry.md' and
+                anchor == 'unheaded-block-6'):
+            assert old['text'].startswith('`event-store` registers the `eventStore`')
+            candidates = [u for u in live[owner]['units']
+                          if u['text'].startswith("The `eventStore` section's standard values")
+                          and u['ancestry'] == old['ancestry']]
+            assert len(candidates) == 1, 'ambiguous Event Store registry successor'
+            new = candidates[0]
+            for neighbour in ('unheaded-block-4', 'unheaded-block-8'):
+                assert next(u['textDigest'] for u in cat[owner]['units'] if u['anchor'] == neighbour) == next(
+                    u['textDigest'] for u in live[owner]['units'] if u['anchor'] == neighbour)
+            return new
+        return rebind['locate'](cat[owner]['units'], old, live[owner]['units'], None)[0]
+
+    for i, row in enumerate(parity):
+        before = copy.deepcopy(row)
+        source = live_unit(row['sourcePath'], row['sourceAnchor'], row['sourceUnitDigest'])
+        row.update(sourceAnchor=source['anchor'], sourceUnitDigest=source['textDigest'])
+        if row['status'] == 'accounted-selected-design-not-implementation':
+            assert row == before, 'selected-design source needs a delta decision'
+            continue  # Its binding is deliberately an immutable design witness.
+        if row == before:
+            if row['status'] == 'current-complete-unit-present' and any(
+                    u['anchor'] == t['anchor'] and normalize(source['text']) in normalize(u['text'])
+                    for t in row['targets'] for u in live[t['path']]['units']):
+                continue
+            if row['status'] != 'current-complete-unit-present' and all(any(
+                    u['anchor'] == t['anchor'] and u['textDigest'] == t['targetUnitDigest']
+                    for u in live[t['path']]['units']) for t in row['targets']):
+                continue
+        hits = [(p, u) for p in dict.fromkeys(t['path'] for t in row['targets'])
+                for u in live[p]['units'] if normalize(source['text']) in normalize(u['text'])]
+        if hits:
+            row['status'] = 'current-complete-unit-present'
+            targets = hits
+        else:
+            targets = []
+            old_source = next(u for u in cat[row['sourcePath']]['units']
+                              if u['anchor'] == before['sourceAnchor'] and
+                              u['textDigest'] == before['sourceUnitDigest'])
+            for t in row['targets']:
+                old = next(u for u in cat[t['path']]['units'] if u['anchor'] == t['anchor'])
+                # Old complete-unit rows promised inclusion, not target digest
+                # equality; the owning checker has always read them that way.
+                if row['status'] == 'current-complete-unit-present':
+                    if normalize(old_source['text']) not in normalize(old['text']):
+                        continue
+                else:
+                    assert old['textDigest'] == t['targetUnitDigest'], (i, t)
+                targets.append((t['path'], live_unit(t['path'], old['anchor'], old['textDigest'])))
+            if (len(targets) > 1 and
+                    normalize('\n'.join(u['text'] for _, u in targets)) == normalize(source['text'])):
+                row['status'] = 'current-complete-unit-split-present'
+            else:
+                assert len(targets) == 1, ('ambiguous source adaptation', i)
+                row.setdefault('accounting', {})
+                owner, target = targets[0]
+                adapt(row, source, owner, target,
+                      'F refresh: the current source and its named successor differ; the complete historical row is retained. No implementation or authority judgment is made.')
+        row['targets'] = [dict(path=p, anchor=u['anchor'], targetUnitDigest=u['textDigest'])
+                          for p, u in targets]
+        if row != before:
+            row.setdefault('accounting', {}).update(previousParityRow=before,
+                historicalSourcePin=witness_pin, currentSourceAnchor=source['anchor'],
+                newLegacyDigest=source['textDigest'], reviewStatus='pending')
+            f_changes.append(dict(kind='source-parity', index=i, before=before, after=copy.deepcopy(row)))
+
+    for i, h in enumerate(headings):
+        before = copy.deepcopy(h)
+        source = live_unit(h['sourcePath'], h['sourceAnchor'], h['sourceUnitDigest'])
+        us = live[h['sourcePath']]['units']
+        members = []
+        for u in us[us.index(source) + 1:]:
+            if u['unitKind'] == 'heading':
+                break
+            members.append(u['anchor'])
+        h.update(sourceAnchor=source['anchor'], sourceUnitDigest=source['textDigest'],
+                 sourceLevel=source['level'], sourceDirectPayloadDigest=source['sectionPayloadDigest'],
+                 directSourceBlocks=members)
+        for t in h['targets']:
+            target = live_unit(t['path'], t['anchor'], t['targetUnitDigest'])
+            t.update(anchor=target['anchor'], targetUnitDigest=target['textDigest'],
+                     level=target['level'], directPayloadDigest=target['sectionPayloadDigest'])
+        if h != before:
+            h['accounting'] = dict(previousParityRow=before, historicalSourcePin=witness_pin,
+                oldLegacyAnchor=before['sourceAnchor'], oldLegacyDigest=before['sourceUnitDigest'],
+                rationale='F refresh of live heading and complete direct-block census; no approval carried.',
+                reviewStatus='pending')
+            f_changes.append(dict(kind='source-heading', index=i, before=before, after=copy.deepcopy(h)))
+
+    live_selfcat = rebind['self_inclusive'](copy.deepcopy(dict(catalog=live)))['catalog']
+    base_docs = dict(docs, **{str(SHARD): outputs[SHARD]})
+    base_links = supersessions(base_docs)
+    f_current = [effective(f, p, r, base_docs, base_links) for f, p, r in current]
+    for f, pointer, row in f_current:
+        if rebind['matches'](row, live[row['targetOwner']]['units']):
+            continue
+        new = live_unit(row['targetOwner'], row['targetAnchor'], row['targetUnitDigest'])
+        updated = copy.deepcopy(row)
+        updated.update(rebind['binding'](row['targetOwner'], new), reviewStatus='pending',
+            supersedesBinding=dict(shard=f, pointer=pointer, **payload(row)),
+            rebindReason='F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried.')
+        updated['bindingSha256'] = digest(updated)
+        su = next(u for u in live_selfcat[row['targetOwner']]['units'] if u['anchor'] == new['anchor'])
+        updated['placement'] = placement(live_selfcat[row['targetOwner']]['units'], su)
+        for k in list(updated):
+            if k.startswith('review') and k != 'reviewStatus':
+                del updated[k]
+        index = len(overlays)
+        overlays.append(updated)
+        f_changes.append(dict(kind='candidate-binding', shard=f, pointer=pointer,
+            successorPointer='/bindingRefresh/' + str(index), before=row, after=updated))
+    changed_paths = set()
+    for c in f_changes:
+        row = c['after']
+        if c['kind'] == 'candidate-binding':
+            changed_paths.add(row['targetOwner'])
+        else:
+            changed_paths.add(row['sourcePath'])
+            changed_paths.update(t['path'] for t in row['targets'])
+    outputs[R / 'carries/f-binding-refresh.json'] = dict(
+        witnessPin=witness_pin, importCommit='eb161da46ee95c7082e6f7a80959c758da21c2f3',
+        mainPathChanges={p: subprocess.check_output(['git', 'log', '--no-merges', '--format=%H %s',
+            'eb161da46^1..eb161da46^2', '--', p], text=True).splitlines() for p in sorted(changed_paths)},
+        status='authored-pending-independent-review', changes=f_changes)
     for path, value in outputs.items():
         text = json.dumps(value, ensure_ascii=False, indent=2) + '\n'
         if args.check:
             assert path.read_text() == text, str(path)
-        elif path.read_text() != text:
+        elif not path.exists() or path.read_text() != text:
             path.write_text(text)
-    print(json.dumps(dict(status='pass', mode='check' if args.check else 'author', parityRows=len(parity), liveHeadingRows=len(headings), refreshedParityRows=35, targetOnlyParityRows=len(target_only), refreshedCandidateBindings=25)))
+    print(json.dumps(dict(status='pass', mode='check' if args.check else 'author', parityRows=len(parity), liveHeadingRows=len(headings), historicalRefreshedParityRows=35, historicalTargetOnlyParityRows=len(target_only), historicalRefreshedCandidateBindings=25, fRefreshChanges=len(f_changes), fRefreshedCandidateBindings=sum(c['kind'] == 'candidate-binding' for c in f_changes))))
 
 
 if __name__ == '__main__':

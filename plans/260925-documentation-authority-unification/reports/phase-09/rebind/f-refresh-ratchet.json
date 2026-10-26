@@ -1,0 +1,125 @@
+{
+  "importCommit": "eb161da46ee95c7082e6f7a80959c758da21c2f3",
+  "previousExceptionsCommit": "30ae959eac6a4e4b255c0dd78c94042e1f4d60f9",
+  "changes": [
+    {
+      "path": "docs/specs/confinement-authority.md",
+      "kind": "allowed-edit",
+      "beforeExpectedDigest": "f13fc58b938d464fb8a0db4fe651720d7566ea02d5a003f4a581717defba0564",
+      "expectedDigest": "21f9b28a9bc9e58776bfaa3a397f006c7d00d5420b0d3014e7ee3e53d1cc84e0",
+      "mainCommits": [
+        "ea7dc0509823969254208774e499ec59cdae67ce docs(confinement): record the runtime-dir fallback, the herdr config-home mask and the new refusals",
+        "b87a931aa874b5d9197b8c35092cc3d5aaf0826e docs(confinement): record the runtime-directory and herdr masks, what workers need, and the limits",
+        "d19dc1f41829128b1d9ed0fd7b037aa3446026ea fix(confinement): mask a Claude socket dir created after launch and prove the socket check alone",
+        "029825ced774762c4e7e349ac25ab6d8d6c88056 feat(confinement): hide Claude Code session sockets from every confined dispatch",
+        "abe31e389ac5307195437d161e7cc7d4e20673ac fix(confinement): create the mailbox root only when a blind launch resolves its masks",
+        "70e02c2affdc0d68459b6c1b265f0b57e0a7755e feat(confinement): hide the mailbox record from blind workers, even before it exists"
+      ],
+      "exceptionAdded": false
+    },
+    {
+      "path": "docs/specs/distillery.md",
+      "kind": "allowed-edit",
+      "beforeExpectedDigest": null,
+      "expectedDigest": "60065ff90eab9c58dcc49264f19cda527383d11efa930056e16212752290b9e6",
+      "mainCommits": [
+        "8c4d3280eb8893acca785e27285fadecb12a4ba6 docs(event-store): describe the Work cutover layout, conflicts and removed repair"
+      ],
+      "exceptionAdded": true
+    },
+    {
+      "path": "docs/specs/distribution.md",
+      "kind": "allowed-edit",
+      "beforeExpectedDigest": "4680732f846701d6a60de5229735131456b695a71ca120f7b48634177b8efc12",
+      "expectedDigest": "ce077370273da9868cb66a8dd9974ebf463e13c13cd1f97db9a9552a920c3d33",
+      "mainCommits": [
+        "ccc6b32e68539fea7b7289df41ef91660a2e3715 refactor(event-store): merge two doctor rows into their neighbours",
+        "cccdb805a6780ae93149422456937a6288c83100 refactor(event-store): drop the machine-id and refspec setup fixes",
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog",
+        "16743ab25bd9981c8a83c0f63d82826efc7ef044 fix(setup): keep project skill files that are newer or uncommitted",
+        "733fcf7a6f7050e48ec80a3bd18b6ab79ff47aa5 fix(githooks): carry in only .fgos changes the merge parent made since the merge base",
+        "8f366ccc378e9535a1eda0df4712ec7e6f9b7439 fix(distribution): keep the workspace sh launcher from spinning when its carriage return is lost",
+        "754c4880391e32013ad712daada8244b00e45d96 fix(state): keep recorded conflicts out of durable records, show them, and throw when the writer saw everything",
+        "5d0a4c7cf89ff39859e380895124df198141eefd docs(work): record the events verbs, the Event Store doctor rows and the removed event file tooling"
+      ],
+      "exceptionAdded": false
+    },
+    {
+      "path": "docs/specs/observe.md",
+      "kind": "allowed-new-file",
+      "beforeExpectedDigest": "e187b76c1727b2de75cdd7be664bd2fbea4ad842132d050783d8ec00d868c42c",
+      "expectedDigest": "3c09a687a047a9043512c4c019fe74cb2b21f0b4c15a25245682cc404aff7f6d",
+      "mainCommits": [
+        "2f2a66503e0db519dee02cc0806dea027163049f refactor(runner): remove the session-lead inline seat and fgos run record",
+        "87a7aa449f3ac4cb44d72eaf874b3e119c980fed refactor(observe): drop metrics harness sections that carry no measurement",
+        "ad64cea01f54d32d55fc78331d0aab14bb10f1b7 docs(observe,agent-protocol): specs, boundary rows and changelog follow the shard door and the outcome authority"
+      ],
+      "exceptionAdded": false
+    },
+    {
+      "path": "docs/specs/reading-map.md",
+      "kind": "allowed-edit",
+      "beforeExpectedDigest": "46c52e950dab2606b1ca5e6fb0c76d310c3316b065855e77c00e3834bd2d7e8e",
+      "expectedDigest": "609aea2e376a148894c72486c8e0fd7975e411a61683514e5e101ec7b3a7c24b",
+      "mainCommits": [
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog",
+        "ad64cea01f54d32d55fc78331d0aab14bb10f1b7 docs(observe,agent-protocol): specs, boundary rows and changelog follow the shard door and the outcome authority",
+        "e4c07dbc51b79b7b329b0cb5cc21642324fbdf7b docs(mailbox): record the pi and omp adapter and prove its resolver and host route",
+        "a8af00ebf86c0f5fbf3fe6c0d11a0b22ced1a011 feat(mailbox): add list and report-only status and read the record in the doctor row",
+        "8c4d3280eb8893acca785e27285fadecb12a4ba6 docs(event-store): describe the Work cutover layout, conflicts and removed repair",
+        "30c24744329bd429fa0b71aa9a819d6a4b06eaaf docs(mailbox): record what the native hook door built, measured and left, and point the handoff contract at the mailbox",
+        "46c0f162af327c02f70f997ff1e6f6716eefe02e docs(mailbox): record V4 as built on the branch, its gates and its hand-off",
+        "61ff8a16ee74d6968b6066e4967fc4605863c2ac docs(mailbox): record the V3 hook payload contract on its branch",
+        "e297a7ac10aa25b29af4bdb39a819790e428e11e docs(mailbox): record the V1 core on its branch"
+      ],
+      "exceptionAdded": false
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "kind": "allowed-edit",
+      "beforeExpectedDigest": "88d0e89522a29eed0d222da57c26c1dfd3912cd3e463e36887e211bbf74e5279",
+      "expectedDigest": "9e1e5e6a13825080b286690de48fb49035039c46febeeec9bc54c3795244e100",
+      "mainCommits": [
+        "9fa4277c544d68aad6ed3d374531b8c302398327 fix(runner): resume binds again only a seat whose last attempt ended in a failure",
+        "f2f8c3f5952f5cd641184ac49436298a7369570a feat(runner): resume binds a seat that did not pass again from the current config",
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog",
+        "2f2a66503e0db519dee02cc0806dea027163049f refactor(runner): remove the session-lead inline seat and fgos run record"
+      ],
+      "exceptionAdded": false
+    },
+    {
+      "path": "docs/specs/seat-binding.md",
+      "kind": "allowed-new-file",
+      "beforeExpectedDigest": "be53fb710688f798fe9dd488466e21e5dd539e27550dfa7910522ac0056a20be",
+      "expectedDigest": "a63d17d0b27296078a0cdbd2847f61a6142b07721064d8c59f88ecceb4656a43",
+      "mainCommits": [
+        "67524cfe187479860bc16f5c04865e2209f0b7f2 docs(seat-binding): gloss the D-ADR0072 citation in the Slice C history line",
+        "5820e1a43e3ad0fee0a504f551109d0b85047c08 docs(config): close out the Node door cutover in the specs, setup guides and changelog",
+        "2f2a66503e0db519dee02cc0806dea027163049f refactor(runner): remove the session-lead inline seat and fgos run record"
+      ],
+      "exceptionAdded": false
+    },
+    {
+      "path": "docs/specs/work-state.md",
+      "kind": "allowed-edit",
+      "beforeExpectedDigest": "f2b527e28dc122ae52f86001a90b93d401a1cb7b565ea9eb1b95eb6a1c34d0da",
+      "expectedDigest": "3614a7afaa7de203e11e34d83c728896e07283f13cb1dbd86bc4fdc9e58fd0b8",
+      "mainCommits": [
+        "8c4d3280eb8893acca785e27285fadecb12a4ba6 docs(event-store): describe the Work cutover layout, conflicts and removed repair",
+        "26c4e166f13852433fafc478bd292f6bf80a3673 refactor(work): read Work history through the Event Store facade in readers, doctor rows, scripts and the Rust sources"
+      ],
+      "exceptionAdded": false
+    },
+    {
+      "path": "docs/specs/workflow.md",
+      "kind": "allowed-new-file",
+      "beforeExpectedDigest": "df63011fa93f440316bf2e0367b1757568c5323d2c45c7815894a69ef63c2e34",
+      "expectedDigest": "d4f3748d92d5f91de84e73ffc0b86dccff4cf66c7b5e6814c8d9a5aef3ac9fc1",
+      "mainCommits": [
+        "24d8816ba04474692ffdcb3770055857d799f854 docs(workflow): gloss the superseded decision cited in the vocabulary heading",
+        "2d33290ff33c49355d519a3b0419407d5ccea625 docs(workflow): settle one word per tier for workflow, case, unit, pattern and run"
+      ],
+      "exceptionAdded": false
+    }
+  ]
+}

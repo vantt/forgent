@@ -1582,6 +1582,863 @@
         ]
       },
       "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "1-purpose",
+      "targetUnitDigest": "0ec0a540632ce6036fdd7bb80a9c035166853783677b5bd2a326560bdaed53ba",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "1. Purpose"
+      ],
+      "bindingSha256": "8fc53f87cb1cf6e539c90b1ba5a4129d174db604be0d0406448be21efd308ec2",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "retained-shifted-context",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "1-purpose",
+          "unitKind": "heading",
+          "title": "1. Purpose",
+          "textDigest": "0ec0a540632ce6036fdd7bb80a9c035166853783677b5bd2a326560bdaed53ba",
+          "startLine": 28,
+          "endLine": 28,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "1. Purpose"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 1",
+          "textDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+          "startLine": 3,
+          "endLine": 26,
+          "ancestry": [
+            "Contract: Setup Doctor Registry"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-2",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 2",
+          "textDigest": "4ea8e113fe0d8069d1a0ae5eef891f79afa30452b9ab910c6177fe5bcf1ee935",
+          "startLine": 30,
+          "endLine": 30,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "1. Purpose"
+          ]
+        },
+        "content": "## 1. Purpose"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/248",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "1-purpose",
+        "targetUnitDigest": "dd7d5b40f1d9981d48b9d683db6be68aa8993e6b876d56fb279c52af47d7ccdf",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "1. Purpose"
+        ]
+      },
+      "rebindReason": "F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-2",
+      "targetUnitDigest": "4ea8e113fe0d8069d1a0ae5eef891f79afa30452b9ab910c6177fe5bcf1ee935",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "1. Purpose"
+      ],
+      "bindingSha256": "1cb2bb800151050decac9d0c2d8bdee17b5551afe3a73242281dc473d6b6d29c",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "retained-shifted-context",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-2",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 2",
+          "textDigest": "4ea8e113fe0d8069d1a0ae5eef891f79afa30452b9ab910c6177fe5bcf1ee935",
+          "startLine": 30,
+          "endLine": 30,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "1. Purpose"
+          ]
+        },
+        "previous": {
+          "anchor": "1-purpose",
+          "unitKind": "heading",
+          "title": "1. Purpose",
+          "textDigest": "0ec0a540632ce6036fdd7bb80a9c035166853783677b5bd2a326560bdaed53ba",
+          "startLine": 28,
+          "endLine": 28,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "1. Purpose"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 3",
+          "textDigest": "50af62f64bbaed6ea8dcb72f0152d1c1548d4b6f40ea2f14a5e6ac2476d4dc7b",
+          "startLine": 32,
+          "endLine": 32,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "1. Purpose"
+          ]
+        },
+        "content": "The doctor/fix registry is the extension point for environment readiness. Modules register checks and fixes instead of adding one-off repair logic. Config defaults are not registered: the standard (`core/config-standard`) holds every default and the schemas (`core/config-schema`) every shape rule, read through the config door."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/249",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-2",
+        "targetUnitDigest": "32c705528748c56a85d705990e3ed5672b84a509ddf12e88fb8e54121ed7e85f",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "1. Purpose"
+        ]
+      },
+      "rebindReason": "F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "2-registry-types",
+      "targetUnitDigest": "5443272a614d5ca3aef2bcd78e6a202cc1fa68b1f9dd234bd4d47e3f677af8c6",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "2. Registry Types"
+      ],
+      "bindingSha256": "5348ccf7f1bee41240362d4742cf92eee02fe4134f96f5522be13376723aff62",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "retained-shifted-context",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "2-registry-types",
+          "unitKind": "heading",
+          "title": "2. Registry Types",
+          "textDigest": "5443272a614d5ca3aef2bcd78e6a202cc1fa68b1f9dd234bd4d47e3f677af8c6",
+          "startLine": 36,
+          "endLine": 36,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "2. Registry Types"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-4",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 4",
+          "textDigest": "8ec96758c1e38d19f4770f10758dc39983581fb990d63f18225fed3dfbc18cca",
+          "startLine": 34,
+          "endLine": 34,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "1. Purpose"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 5",
+          "textDigest": "a43f0ab91e9977fe94cb5c228d4f48fb24355ad48492bdd35d652bcad282c033",
+          "startLine": 38,
+          "endLine": 41,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "2. Registry Types"
+          ]
+        },
+        "content": "## 2. Registry Types"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "rebindReason": "F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/252",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "2-registry-types",
+        "targetUnitDigest": "512f3b8855ddb8f956130c154a8f24c7b2df06ea21fbe11f6bf013aa19f57e55",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "2. Registry Types"
+        ]
+      }
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "a43f0ab91e9977fe94cb5c228d4f48fb24355ad48492bdd35d652bcad282c033",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "2. Registry Types"
+      ],
+      "bindingSha256": "7f28d65c6277a0e15d97d365ac7911c6b7263c03bfd779ad2a23b4826bd8b3fd",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "retained-shifted-context",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 5",
+          "textDigest": "a43f0ab91e9977fe94cb5c228d4f48fb24355ad48492bdd35d652bcad282c033",
+          "startLine": 38,
+          "endLine": 41,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "2. Registry Types"
+          ]
+        },
+        "previous": {
+          "anchor": "2-registry-types",
+          "unitKind": "heading",
+          "title": "2. Registry Types",
+          "textDigest": "5443272a614d5ca3aef2bcd78e6a202cc1fa68b1f9dd234bd4d47e3f677af8c6",
+          "startLine": 36,
+          "endLine": 36,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "2. Registry Types"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-6",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 6",
+          "textDigest": "1d9b8323a1994bfcfb448dae1c6a2ac728f54def4d96e127562a5cd0b25473db",
+          "startLine": 43,
+          "endLine": 43,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "2. Registry Types"
+          ]
+        },
+        "content": "| Registry | Function | Meaning |\n| --- | --- | --- |\n| Check | `registerCheck` | A named diagnostic reported by `fgos doctor`. |\n| Fix | `registerFix` | A named repair run by `fgos doctor --fix`; current legacy `fgos setup` also runs fixes while it remains implemented. |"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/253",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "e90bc6e26e222a5c4bc8cc58ad5256d3b266c5dfb7d397eeb3111d4742687686",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "2. Registry Types"
+        ]
+      },
+      "rebindReason": "F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "1d9b8323a1994bfcfb448dae1c6a2ac728f54def4d96e127562a5cd0b25473db",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "2. Registry Types"
+      ],
+      "bindingSha256": "dfee3faf3c94c73ccf089023d146e86212e20ef43301f29cd2d22d359a4643a6",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "retained-shifted-context",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-6",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 6",
+          "textDigest": "1d9b8323a1994bfcfb448dae1c6a2ac728f54def4d96e127562a5cd0b25473db",
+          "startLine": 43,
+          "endLine": 43,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "2. Registry Types"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 5",
+          "textDigest": "a43f0ab91e9977fe94cb5c228d4f48fb24355ad48492bdd35d652bcad282c033",
+          "startLine": 38,
+          "endLine": 41,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "2. Registry Types"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-7",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 7",
+          "textDigest": "570d3c4891141aa421696f42b6855c17c4d7f0c1f62af5492a731af0663cb051",
+          "startLine": 45,
+          "endLine": 45,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "2. Registry Types"
+          ]
+        },
+        "content": "The `eventStore` section's standard values (`seal.intervalSec`, `seal.coalesceSec`, `sync.intervalSec`, `rebuild.maxAttempts`, `remote`) live in `core/config-standard/eventStore.yaml` with its shape in `core/config-schema/eventStore.schema.yaml`; `EVENT_STORE_DEFAULTS` in `src/event-store/config.mjs` names the same values and a test pins that they agree. `seal.coalesceSec` (default 30, an integer of at least 1) is the runner's seal batching window, and a malformed value fails every Event Store doctor row with `event-store-config: invalid seal.coalesceSec`. The `eventStore.remote` default (`origin`) is the standard's; the `git-repository-config` check diagnoses obsolete exact legacy mappings on the configured remote and on historical `origin`, and the `git-publication-refspecs` fix repairs them."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "rebindReason": "F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/254",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-6",
+        "targetUnitDigest": "03024c345457b1dd391e1db4abb02b4ac98212f6a14ed4f25250b38a10e08861",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "2. Registry Types"
+        ]
+      }
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetUnitDigest": "570d3c4891141aa421696f42b6855c17c4d7f0c1f62af5492a731af0663cb051",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "2. Registry Types"
+      ],
+      "bindingSha256": "4c8ad6d38aa181e9c4d446bb1d6cb944698cc4ada6ce998920f050102639a8e7",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "retained-shifted-context",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-7",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 7",
+          "textDigest": "570d3c4891141aa421696f42b6855c17c4d7f0c1f62af5492a731af0663cb051",
+          "startLine": 45,
+          "endLine": 45,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "2. Registry Types"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-6",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 6",
+          "textDigest": "1d9b8323a1994bfcfb448dae1c6a2ac728f54def4d96e127562a5cd0b25473db",
+          "startLine": 43,
+          "endLine": 43,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "2. Registry Types"
+          ]
+        },
+        "next": {
+          "anchor": "3-doctor-contract",
+          "unitKind": "heading",
+          "title": "3. Doctor Contract",
+          "textDigest": "c91f8fecc715aaf15f4944b71fdb89e41facadba598dd278421bda1795482f6c",
+          "startLine": 47,
+          "endLine": 47,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "3. Doctor Contract"
+          ]
+        },
+        "content": "The registries are independent. A module may register only a check, only a fix, or both. The rows over the config files (`config-*`, and `gateway-token-configured` for the machine files) are registered from the config crate's `doctor-rows.v1.json` contract by `src/setup/config-checks.mjs`."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/255",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-7",
+        "targetUnitDigest": "574bb4df131d3b5475f34478e2b3e3ac8cf2a8f99dca89b52869c62dee937e80",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "2. Registry Types"
+        ]
+      },
+      "rebindReason": "F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "3-doctor-contract",
+      "targetUnitDigest": "c91f8fecc715aaf15f4944b71fdb89e41facadba598dd278421bda1795482f6c",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "3. Doctor Contract"
+      ],
+      "bindingSha256": "c1655d4aeec9d1d78ca6872e59242ba884e4784e5c6f551ee27d7ac493a846bd",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "retained-shifted-context",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "3-doctor-contract",
+          "unitKind": "heading",
+          "title": "3. Doctor Contract",
+          "textDigest": "c91f8fecc715aaf15f4944b71fdb89e41facadba598dd278421bda1795482f6c",
+          "startLine": 47,
+          "endLine": 47,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "3. Doctor Contract"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-7",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 7",
+          "textDigest": "570d3c4891141aa421696f42b6855c17c4d7f0c1f62af5492a731af0663cb051",
+          "startLine": 45,
+          "endLine": 45,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "2. Registry Types"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-8",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 8",
+          "textDigest": "1054adf2ffc0c9bd235e0f376f683364ebf733be8cec969ecccf85900777b599",
+          "startLine": 49,
+          "endLine": 54,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "3. Doctor Contract"
+          ]
+        },
+        "content": "## 3. Doctor Contract"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "rebindReason": "F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/256",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "3-doctor-contract",
+        "targetUnitDigest": "b8b7131fe2deb8eb26c659f21e4c06f6d1a3bd56398356d550a89de6cf0ff67b",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "3. Doctor Contract"
+        ]
+      }
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetUnitDigest": "3c8372c31401039617c43dc75293cbc2d4d3c28df8d0b2e4fdaf2556ac8f54c4",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "3. Doctor Contract"
+      ],
+      "bindingSha256": "4386686c3613bc474368c7e4c677c32bc0384e448f75c456d427bf4909fabdf6",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "retained-shifted-context",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-9",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 9",
+          "textDigest": "3c8372c31401039617c43dc75293cbc2d4d3c28df8d0b2e4fdaf2556ac8f54c4",
+          "startLine": 56,
+          "endLine": 68,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "3. Doctor Contract"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-8",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 8",
+          "textDigest": "1054adf2ffc0c9bd235e0f376f683364ebf733be8cec969ecccf85900777b599",
+          "startLine": 49,
+          "endLine": 54,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "3. Doctor Contract"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-10",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 10",
+          "textDigest": "5e78d2354bf6b6426c2ef8a99d43a0e3983990997bb7df7dd989d203798e7d3c",
+          "startLine": 70,
+          "endLine": 76,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "3. Doctor Contract"
+          ]
+        },
+        "content": "Run coverage is checked by `observe-run-coverage`: the host's `metrics coverage`\nmust report layout rule `v2` and valid observed/skipped accounting. Doctor\ncompares the host's candidate-directory/barrier count against the Node layout\nscan; it does not re-admit runs in Node (the shared run-layout fixture is the\none proof of admission).\nBoth read the main checkout store, including from a worktree. A candidate run\ndirectory changed in the last 60 seconds permits a bounded transient difference,\neven before a result exists; future mtimes are recent for clock skew. The host's\n`recentRuns` remains result-file based. Diagnostic paths are sample candidates,\nnot verified host omissions. An unknown coverage subcommand or a response\nwithout `layoutRule` identifies an old host positively and reports\npassed-but-degraded with an upgrade instruction; other host errors fail.\nThis check is read-only, introduces no config default, and never rewrites runs."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/258",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-9",
+        "targetUnitDigest": "026a432df485ec60f2e3f10080b772c10d8ffe5298dcb4da289ff9b032af553a",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "3. Doctor Contract"
+        ]
+      },
+      "rebindReason": "F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "4-legacy-setup-compatibility",
+      "targetUnitDigest": "2a975891c4f3145b277f1e28af22a8ee5abe346bbae8cdf74841dcfafcb49f90",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "4. Legacy Setup Compatibility"
+      ],
+      "bindingSha256": "d7bce91fd5a74fce0facdc9db3aa19bf554df5421e3033be2c0fc44b892b59ed",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "retained-shifted-context",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "4-legacy-setup-compatibility",
+          "unitKind": "heading",
+          "title": "4. Legacy Setup Compatibility",
+          "textDigest": "2a975891c4f3145b277f1e28af22a8ee5abe346bbae8cdf74841dcfafcb49f90",
+          "startLine": 103,
+          "endLine": 103,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "4. Legacy Setup Compatibility"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-14",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 14",
+          "textDigest": "9b7b39415a483861865739e4a90b69a7e034c9afc3a3ee6c22fd4056eb06ce1d",
+          "startLine": 97,
+          "endLine": 101,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "3. Doctor Contract"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-15",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 15",
+          "textDigest": "ff88825f072e643451a90e34275ece205320797f38da7888e13ff9771e6fa7bc",
+          "startLine": 105,
+          "endLine": 105,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "4. Legacy Setup Compatibility"
+          ]
+        },
+        "content": "## 4. Legacy Setup Compatibility"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/264",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "4-legacy-setup-compatibility",
+        "targetUnitDigest": "c3eca8e2f79a6e7c80bc0c2b29340fddc2bfb22261e955d9f590a2aa45121732",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "4. Legacy Setup Compatibility"
+        ]
+      },
+      "rebindReason": "F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetUnitDigest": "0c1208bbe208fcecbf13258a46a8a546ce4d06d2a5b7fbfafa8c01a8007788a7",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "4. Legacy Setup Compatibility"
+      ],
+      "bindingSha256": "b7f62650b4d9fd92309c13c6d92ef4ed5eb05566ea0a03d5fe1cb87a6ca77e9e",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "retained-shifted-context",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-16",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 16",
+          "textDigest": "0c1208bbe208fcecbf13258a46a8a546ce4d06d2a5b7fbfafa8c01a8007788a7",
+          "startLine": 107,
+          "endLine": 111,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "4. Legacy Setup Compatibility"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-15",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 15",
+          "textDigest": "ff88825f072e643451a90e34275ece205320797f38da7888e13ff9771e6fa7bc",
+          "startLine": 105,
+          "endLine": 105,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "4. Legacy Setup Compatibility"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-17",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 17",
+          "textDigest": "6a31ff3a9291f5367770015d9bc38e818abf1b25e930a4de17e2e178f34ae0e1",
+          "startLine": 113,
+          "endLine": 113,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "4. Legacy Setup Compatibility"
+          ]
+        },
+        "content": "- wires known local support such as shell integration and hooks where applicable;\n- creates a header-only project and machine config file when none exists (`fgos config init`); it seeds no default;\n- runs every registered fix unconditionally;\n- reports changes;\n- preserves idempotency when run repeatedly."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/266",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-16",
+        "targetUnitDigest": "ff5d9f60a647d422a09332bd0543cdab007ab9b557af3312e56ae7a5cca9049b",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "4. Legacy Setup Compatibility"
+        ]
+      },
+      "rebindReason": "F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "registered-inventory",
+      "targetUnitDigest": "b7b8824c50858a4e9aa862d1a720f53c4b01a6146d70f5c75039398e0c613767",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "Registered inventory"
+      ],
+      "bindingSha256": "0f4094d98c38f5abd3da6248a678f9de6ef16472a7083b0f09f70128a17f0479",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "retained-shifted-context",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "registered-inventory",
+          "unitKind": "heading",
+          "title": "Registered inventory",
+          "textDigest": "b7b8824c50858a4e9aa862d1a720f53c4b01a6146d70f5c75039398e0c613767",
+          "startLine": 143,
+          "endLine": 143,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Registered inventory"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-22",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 22",
+          "textDigest": "67e9211a15f5ed8461a1ea519ca54b769f73dd21cf02c2606937bab7e77cf1d9",
+          "startLine": 141,
+          "endLine": 141,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "8. Open Follow-Up"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-23",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 23",
+          "textDigest": "40dd565e58dd67c0c2ea12bcb0f52caa638511745e256eb80bbf65573d3aa3b7",
+          "startLine": 145,
+          "endLine": 145,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Registered inventory"
+          ]
+        },
+        "content": "## Registered inventory"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "rebindReason": "F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/277",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "registered-inventory",
+        "targetUnitDigest": "a9a56f607a54c5ea31e3ad7a1da41e7172f20953cede3180a4819ffc5f1edd42",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Registered inventory"
+        ]
+      }
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetUnitDigest": "a33c382db2250e6ae6026ebaca193d26cc6f027eda246cb9f85de5dbaa179458",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "Registered inventory"
+      ],
+      "bindingSha256": "be77327d3345e078f0ef779f5c61fea70c08c32d8ff7e586437ed39f6e9828dd",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "retained-shifted-context",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-24",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 24",
+          "textDigest": "a33c382db2250e6ae6026ebaca193d26cc6f027eda246cb9f85de5dbaa179458",
+          "startLine": 147,
+          "endLine": 147,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Registered inventory"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-23",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 23",
+          "textDigest": "40dd565e58dd67c0c2ea12bcb0f52caa638511745e256eb80bbf65573d3aa3b7",
+          "startLine": 145,
+          "endLine": 145,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Registered inventory"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-25",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 25",
+          "textDigest": "55782807f709c730820342dde29ba1985275453dfbab4af26281e770aad2f6e8",
+          "startLine": 149,
+          "endLine": 149,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Registered inventory"
+          ]
+        },
+        "content": "Today's registered checks: `active-release-matches-checkout`, `agent-claims-resolve`, `agent-cli-project-trusted`, `agent-type-names-unique`, `agy-hook-wired`, `agy-permissions-configured`, `agy-sub-homes-configured`, `blind-steps-use-proven-pools`, `bwrap-available`, `cancel-wait`, `capability-serves-valid`, `changelog-unreleased-stale`, `claude-plugin-marketplace`, `cli-version-visible`, `codex-hook-wired`, `command-routes-drift`, `config-comment-migrated-why`, `config-comment-missing-doc`, `config-comment-missing-why`, `config-doc-drift`, `config-format-legacy-json`, `config-global-permissions`, `config-key-in-wrong-file`, `config-legacy-shadowed`, `config-migrate-backup-stale`, `config-parse`, `config-redundant-value`, `config-schema`, `config-secret-outside-private`, `config-unknown-key`, `confined-pane-accounts`, `confinement-backend-registry-readable`, `confinement-blind-read`, `confinement-bwrap-platform`, `confinement-herdr-maturity`, `confinement-orphaned-resources-reaped`, `confinement-policies-declared`, `confinement-probe-freshness`, `confinement-strict-readiness`, `convention-conformance`, `coordination-example-requests-valid`, `coordination-protocol-dead-vocabulary`, `coordination-protocol-fixtures-valid`, `credential-copies-retained`, `curl-available`, `decision-index-stale`, `delivered-not-on-trunk`, `dependencies-installed`, `dispatch-decide-hook-wired`, `doc-active-duplicate`, `doc-alias-broken`, `doc-current-path-missing`, `doc-near-duplicate`, `doc-provisional-aged`, `doc-registry-stale`, `doc-role-underused`, `doc-source-conservation`, `doc-source-unreachable`, `doc-topic-oversized`, `documentation-cutover-lease`, `domain-registry-compiled`, `domain-workflow-operations-coverage`, `enduser-docs-index-stale`, `event-store-integrity`, `event-store-legacy-layout`, `event-store-machine-id`, `event-store-native-addon`, `event-store-open-root`, `event-store-refspec`, `event-store-sync`, `event-store-unsealed`, `executor-confinement`, `executor-family-unique`, `executor-posture-coverage`, `executor-profile-warnings`, `executor-skills-installed`, `gate-kill-grace`, `gateway-token-configured`, `git-component-compatible`, `git-mutation-one-door`, `git-native-locks`, `git-operation-journal`, `git-repository-config`, `git-worktree-recovery`, `global-model-policies-portable`, `herdr-executor-kinds`, `identity-ids-unique`, `identity-machine-id`, `identity-machine-key`, `identity-pinned-machines`, `identity-project-id`, `identity-shared-directory`, `identity-ssh-keygen`, `instruction-projections-stale`, `invocation-git-write-grants`, `leaf-notify-drift`, `legacy-attempts-stuck`, `legacy-node-payload-present`, `llm-accounts-shape`, `llm-accounts-vs-legacy`, `lock-borrow-vectors`, `lock-holders`, `lock-kernel-semantics`, `mailbox-hook`, `main-checkout-hook-wired`, `model-policy-pools`, `no-stuck-merge-abort`, `node-version-and-git`, `non-claude-trust-stores-readable`, `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `observe-run-coverage`, `omp-hook-wired`, `operation-capability-resolves`, `operation-prompt-templates-valid`, `pi-hook-wired`, `plugin-dev-skills-packaged`, `plugin-skill-cli-reachable`, `process-containment`, `project-fgos-launcher`, `provider-capacity-state`, `readme-install-tag-exists`, `root-drift`, `run-attempts-stuck`, `run-supervisor-route`, `runner-generated-paths`, `runner-patterns-config`, `runtime-socket-dir`, `rust-host-binary-present`, `rust-host-target-supported`, `seat-binding-dry-bind`, `seat-binding-route`, `shadow-binder-divergence`, `shell-integration-sourced`, `task-specs-resolve`, `terminal-allocations`, `terminal-control`, `tier-fallback`, `tier-vocabulary-dead-keys`, `tool-registry-configured`, `trust-store-readable`, `units-awaiting-resume`, `work-classification-vocabulary`, `work-recorded-conflicts`, `work-step-vocabulary`, `worker-slots-ceiling-usable`, `workflow-capabilities-configured`, `workflow-case-binding-sentinel`, `workflow-case-bindings`, `writer-identity-resolvable`. This list changes with the corresponding registrations."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "rebindReason": "F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/279",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-24",
+        "targetUnitDigest": "f8c71a377dca7744cc6e7cab4c7cc371ce14d9343200d75badb42a59e9477bbf",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Registered inventory"
+        ]
+      }
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetUnitDigest": "55782807f709c730820342dde29ba1985275453dfbab4af26281e770aad2f6e8",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "Registered inventory"
+      ],
+      "bindingSha256": "d00d98786aed2aea3ba85564a6ebc4ee5b3c526decd69735f233cea817bc2f36",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "retained-shifted-context",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-25",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 25",
+          "textDigest": "55782807f709c730820342dde29ba1985275453dfbab4af26281e770aad2f6e8",
+          "startLine": 149,
+          "endLine": 149,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Registered inventory"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-24",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 24",
+          "textDigest": "a33c382db2250e6ae6026ebaca193d26cc6f027eda246cb9f85de5dbaa179458",
+          "startLine": 147,
+          "endLine": 147,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Registered inventory"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-26",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 26",
+          "textDigest": "f0daa55efc27d11e7d0a943a0c0453c151117e1319731444a19aa6900c2c8f88",
+          "startLine": 151,
+          "endLine": 151,
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Registered inventory"
+          ]
+        },
+        "content": "Today's registered fixes: `agy-hook-wired`, `agy-permissions-configured`, `bin-discovery-cache`, `claude-plugin-marketplace`, `codex-hook-wired`, `config-chmod`, `config-copy-to-destination`, `config-move-under-private`, `config-refresh-docs`, `config-remove-redundant`, `confinement-backend-registry-readable`, `confinement-orphaned-resources-reaped`, `credential-copies-retained`, `decision-index-stale`, `dispatch-decide-hook-wired`, `doc-registry-stale`, `enduser-docs-index-stale`, `event-store-lock-dirs`, `gateway-token-configured`, `git-driver-directories`, `git-land-recovery`, `git-publication-refspecs`, `git-wal-dir`, `identity-machine-id`, `identity-machine-key`, `instruction-projections-stale`, `legacy-attempts-stuck`, `lock-dirs`, `no-stuck-merge-abort`, `omp-hook-wired`, `pi-hook-wired`, `project-fgos-launcher`, `run-attempts-stuck`, `runtime-socket-dir`, `workflow-case-bindings`. This list changes with the corresponding registrations."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "rebindReason": "F current-byte carry refresh; complete predecessor retained in carries/f-binding-refresh.json. Independent review pending; no approval carried.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/280",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-25",
+        "targetUnitDigest": "61935a25b2fd8148d6a00ec3e6a764f8f4b0a547d744fed46364fa58be6a6cac",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Registered inventory"
+        ]
+      }
     }
   ]
 }
