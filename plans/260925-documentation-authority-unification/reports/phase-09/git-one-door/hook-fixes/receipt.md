@@ -48,3 +48,23 @@ The Doer turn could not commit: the census had to be regenerated, and `CHANGELOG
   | `test/runner/documentation-cutover-lease.test.mjs` | 17/0 |
   | `test/e2e/documentation-cutover-lease-hooks.test.mjs` | 36/0, including "a second clone pulls published acquire, holder docs and release but refuses unpublished main" |
   | `test/scripts/git-one-door-declarations.test.mjs` | 45/0 |
+
+## Lead rework after w42 (2026-10-26)
+
+**Finding.** The w42 review found that the published-history rule also admitted a rewind of main past the acquire commit. That would drop a held sidecar.
+
+**Fix.**
+- Main is admitted only when it moves forward onto published history: the new OID is an ancestor of, or equal to, `origin/main`, and either the old OID is an ancestor of the new one or main is being created. This uses a shared `isAncestor` read; `merge-base` is already declared.
+- The unit case `rewind` was added. It fails against the previous hook and passes now.
+- §7 states the forward-only rule and names a local `refs/remotes/origin/main` rewrite as an uncovered route.
+- The CHANGELOG line was updated.
+- The `leaseGitRead` siteId is now `75e0ded2…`, and the census was regenerated.
+
+**Native runs.**
+
+| Test file | Pass / fail |
+|---|---|
+| `test/runner/documentation-cutover-lease.test.mjs` | 17/0 |
+| `test/e2e/documentation-cutover-lease-hooks.test.mjs` | 36/0 |
+| `test/scripts/git-one-door-declarations.test.mjs` | 45/0 |
+| `test/githooks/census-drift.test.mjs` | 3/0 |

@@ -68,9 +68,10 @@ test('creating absent main compares its candidate with the empty tree', t => {
 test('published main admission distinguishes ancestry from absence and read errors', () => {
   const old = '1'.repeat(40), next = '2'.repeat(40), published = '3'.repeat(40);
   const held = JSON.stringify({ state: 'held', holderTokenHash: 'a'.repeat(64) });
-  for (const scenario of ['equal', 'ancestor', 'unpublished', 'no-origin', 'ref-error', 'ancestry-error', 'delete']) {
+  for (const scenario of ['equal', 'ancestor', 'unpublished', 'rewind', 'no-origin', 'ref-error', 'ancestry-error', 'delete']) {
     const target = scenario === 'equal' ? published : scenario === 'delete' ? '0'.repeat(40) : next;
     const fail = status => { throw Object.assign(new Error('probe failure'), { status }); };
+    let ancestryReads = 0;
     const git = args => {
       if (args[0] === 'cat-file') return Buffer.from(held);
       if (args[0] === 'rev-parse') {
@@ -78,11 +79,16 @@ test('published main admission distinguishes ancestry from absence and read erro
         if (scenario === 'ref-error') return fail(128);
         return Buffer.from(published);
       }
-      if (args[0] === 'merge-base') {
+      if (args[0] === 'merge-base' && ancestryReads++ === 0) {
         assert.deepEqual(args.slice(1), ['--is-ancestor', target, published]);
         if (scenario === 'unpublished') return fail(1);
         if (scenario === 'ancestry-error') return fail(128);
         return Buffer.alloc(0);
+      }
+      if (args[0] === 'merge-base') {
+        // Forward-only: the old main must be an ancestor of the new one.
+        assert.deepEqual(args.slice(1), ['--is-ancestor', old, target]);
+        return scenario === 'rewind' ? fail(1) : Buffer.alloc(0);
       }
       if (args[0] === 'diff-tree') return Buffer.from('docs/local.md\0');
       if (args[0] === 'rev-list') return Buffer.from(`${next} ${old}\n`);

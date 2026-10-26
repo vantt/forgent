@@ -14,6 +14,13 @@ const EMPTY_TREE = {
   sha256: '6ef19b41225c5369f1c104d45d8d85efa9b057b53b14b4b9b939dd74decc5321',
 };
 
+// `merge-base --is-ancestor` exits 1 for "not an ancestor"; any other failure
+// is a read error and must not grant admission.
+function isAncestor(git, ancestor, descendant) {
+  try { git(['merge-base', '--is-ancestor', ancestor, descendant]); return true; }
+  catch (error) { if (error.status === 1) return false; throw error; }
+}
+
 function readBlob(git, revision) {
   try { return git(['cat-file', '-p', `${revision}:${DEFAULT_SIDECAR_PATH}`]).toString('utf8'); }
   catch {
@@ -91,14 +98,13 @@ export function guardReferenceTransaction({ git, root, input, env = process.env 
       }
       // Another checkout may pull across acquire, holder Land and release.
       // Published history was admitted at its typed doors, not by this clone's
-      // local sidecar/borrower. Missing origin/main keeps the local policy.
+      // local sidecar/borrower. Only a forward move onto published history is
+      // admitted: rewinding main would drop a held sidecar. Missing origin/main
+      // keeps the local policy.
       let published;
       try { published = git(['rev-parse', '--verify', '--quiet', 'refs/remotes/origin/main']).toString('utf8').trim(); }
       catch (error) { if (error.status !== 1) throw error; }
-      if (published) {
-        try { git(['merge-base', '--is-ancestor', nextOid, published]); continue; }
-        catch (error) { if (error.status !== 1) throw error; }
-      }
+      if (published && isAncestor(git, nextOid, published) && (/^0+$/.test(oldOid) || isAncestor(git, oldOid, nextOid))) continue;
       const nextRaw = readBlob(git, nextOid);
       if (old.status !== 'held' && old.status !== 'corrupt' && raw === nextRaw) continue;
       // Creating main: compare against the empty tree of this object format,

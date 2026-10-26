@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3a41b3da8695341cfe791ad69d7e2f57ac3e3d22cdd3c45a618a6e8ea2e5ec02",
+  "payloadDigest": "59589dfcc4674d3b5f8edc36f3880d6bde8a163d712f335d89d55931623c2495",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -930,7 +930,7 @@
     "src/runner/dispatch/worker-session-boot.mjs": "d9f342274b532c3793d36faf26273c3c357c61d2d10d24e6d30f94727076a114",
     "src/runner/dispatch/worker-session.mjs": "e7618015166c418f3646b77fca8909ad7e3d8c0012386e91682b68a223b9f4b4",
     "src/runner/dispatch/write-scope.mjs": "b926332413077cfb8246da969373de205ecf003b3a263baf6c08177a27d3885a",
-    "src/runner/documentation-cutover-lease-hook.mjs": "cb013ba9be3dd687cc7ee6b78471bb6e300ba60b492756cf74dd071233c52ac9",
+    "src/runner/documentation-cutover-lease-hook.mjs": "16e382c0704fa50b46a46b953e28d8c2bd1b112fa10d6fc5c4703e7e73500cb1",
     "src/runner/documentation-cutover-lease.mjs": "b3c65748bca734e1e9ced5820131cb636a293409a640bd6984adf1b3417d4641",
     "src/runner/execution/account-pin.mjs": "0a9d8f632bd5b814c056139df3b4e340aac0574d8bd7db6b60c7a7b0305d4cfe",
     "src/runner/execution/account-rotation.mjs": "f538c5b3f787f0add709535aa0f6629bd007520575a316e19781cef43050553a",
@@ -1128,7 +1128,7 @@
     "src/workflow/store.mjs": "1ffea57e5d5afb57f8558107d253d80982e780ea7649d5e950cb1874e2f90da7",
     "src/workflow/unit-handoff.mjs": "af84e939515499624ded2e37a628f6486e7cb425249eacf7f7d93cfcf0e2494b",
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3",
-    "scripts/lib/git-one-door-declarations.v1.json": "4afcf3acdfbee8bddef66e204a91cef8231d7f40e722e2cb86bd574f31dbfc88"
+    "scripts/lib/git-one-door-declarations.v1.json": "d020d2cbfb890b824646f8097c299026be928547b51b3b122d2a3eb344bc4e7e"
   },
   "sites": [],
   "classes": [
@@ -1493,9 +1493,9 @@
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
-      "siteId": "leaseGitRead:d9a1f33e2e9afb746b3e5f13fce0e821d3549d382ead649df4aeed7e9f2655c8",
+      "siteId": "leaseGitRead:75e0ded2ab4d900e100000fffcc88e33ab0f92d29fb58f79aecf1f5edd274a71",
       "callerDigests": [
-        "18a4b680a003d47628181c88a916850a32b2eae2dbbae1011b2065ef746fc027",
+        "00c03a9e0937d04093939285f1dbfb81e1c5366a8ed5dc01db02a6898b51f74b",
         "307e191fbe28ee61a44466b663cac0f1bfb9fe3cb871cefc98b9cefc87f0cb0f",
         "3b5228841de568039de9635263347a2911a53ac8573de5a7fdbda8d81a2f4491",
         "4440bc188380750bb59aa3cf7d6c771e66a76352b377c08cdf6232d681979101",
