@@ -1,0 +1,20 @@
+f4324b27d scanner on working tree: scan blocked
+Error: git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`
+    at unavailable (file:///home/vantt/projects/forgentX-p9-w1-d2/src/native/door.mjs:14:46)
+    at loadNativeAddon (file:///home/vantt/projects/forgentX-p9-w1-d2/src/native/door.mjs:44:117)
+    at nativeDoor (file:///home/vantt/projects/forgentX-p9-w1-d2/src/native/door.mjs:80:58)
+    at parseYaml (file:///home/vantt/projects/forgentX-p9-w1-d2/src/util/yaml.mjs:33:13)
+    at readStandaloneDeclaration (file:///home/vantt/projects/forgentX-p9-w1-d2/scripts/lib/git-spawn-match.mjs:43:45)
+    at standaloneSkillOf (file:///home/vantt/projects/forgentX-p9-w1-d2/scripts/lib/git-spawn-match.mjs:30:75)
+    at Module.scan (file:///tmp/fgos-work/scanner-default-tree.NTz0Oi/historical-scanner.mjs:2679:19)
+    at file:///home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-default-reexport/full-tree-check.mjs:29:26
+current scanner on working tree: scan blocked
+Error: git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`
+    at unavailable (file:///home/vantt/projects/forgentX-p9-w1-d2/src/native/door.mjs:14:46)
+    at loadNativeAddon (file:///home/vantt/projects/forgentX-p9-w1-d2/src/native/door.mjs:44:117)
+    at nativeDoor (file:///home/vantt/projects/forgentX-p9-w1-d2/src/native/door.mjs:80:58)
+    at parseYaml (file:///home/vantt/projects/forgentX-p9-w1-d2/src/util/yaml.mjs:33:13)
+    at readStandaloneDeclaration (file:///home/vantt/projects/forgentX-p9-w1-d2/scripts/lib/git-spawn-match.mjs:43:45)
+    at standaloneSkillOf (file:///home/vantt/projects/forgentX-p9-w1-d2/scripts/lib/git-spawn-match.mjs:30:75)
+    at Module.scan (file:///home/vantt/projects/forgentX-p9-w1-d2/scripts/git-one-door-scan.mjs:2681:19)
+    at file:///home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-default-reexport/full-tree-check.mjs:29:26

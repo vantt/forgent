@@ -260,10 +260,11 @@ test('declared wrappers refuse aliased and default exports with undeclared reset
 });
 
 // Local export-alias cases above do not observe a barrel that never names the wrapper itself.
-// This proof owns refusal of star exports and exported namespace holders, including fixed argv.
-test('declared wrappers refuse star and namespace re-exports with undeclared reset callers', async (t) => {
+// This proof owns refusal of star/default re-exports and exported namespace holders, including fixed argv.
+test('declared wrappers refuse star, default and namespace re-exports with undeclared reset callers', async (t) => {
   for (const [barrel, caller] of [
     ["export * from './read.mjs';", "import { g } from './barrel.mjs'; g(['reset', '--hard']);"],
+    ["export { g as default } from './read.mjs';", "import h from './barrel.mjs'; h(['reset', '--hard']);"],
     ["export * as ns from './read.mjs';", "import { ns } from './barrel.mjs'; ns.g(['reset', '--hard']);"],
     ["import * as r from './read.mjs'; export const ns = r;", "import { ns } from './barrel.mjs'; ns.g(['reset', '--hard']);"],
   ]) {
@@ -285,8 +286,9 @@ test('declared wrappers refuse star and namespace re-exports with undeclared res
 });
 
 // Namespace refusal cases do not prove that a function's own .execute property still reaches
-// a registered value caller when an unrelated named re-export imports the same module.
-test('a configured function adapter stays classified beside an unrelated named re-export', (t) => {
+// a registered value caller when an unrelated named re-export imports the same module. The same
+// fixture also owns refusal when a default re-export hides a literal Git caller of that adapter.
+test('a configured function adapter keeps unrelated re-exports but refuses a default re-export', (t) => {
   const source = `import { spawn } from 'node:child_process';
 import { registerAdapter } from './registry.mjs';
 export const DEFAULT_ADAPTER = 'cli';
@@ -309,6 +311,14 @@ adapters.cli.execute(JSON.parse(process.env.CONFIG));
   const result = scan({ root: f.root });
   assert.deepEqual(result.sites, [], 'a named list not containing the adapter cannot hide its registered caller');
   assert.deepEqual(result.classCounts, baseline.classCounts);
+  f.write('scripts/barrel.mjs', "export { cliAdapter as default } from './transport.mjs';\n");
+  f.write('scripts/hidden-caller.mjs', "import h from './barrel.mjs'; h({ command: 'git', args: ['reset', '--hard'] });\n");
+  const hidden = scan({ root: f.root });
+  assert.equal(hidden.sites.length, 1, 'a configured adapter cannot hide a fixed Git caller through a default export');
+  assert.equal(hidden.sites[0].path, 'scripts/transport.mjs');
+  assert.ok(hidden.sites[0].escapes.some(escape => /exported as default/.test(escape)));
+  f.declare([{ ...f.entry, path: hidden.sites[0].path, siteId: hidden.sites[0].siteId, class: 'configured-binary' }]);
+  assert.throws(() => scan({ root: f.root }), /invalid Git declaration: wrapper escapes.*exported as default/);
 });
 
 // Refusing exported holders must not turn an ordinary, fully observed namespace call into an escape.

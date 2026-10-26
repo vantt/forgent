@@ -1587,7 +1587,9 @@ function computeValueFlow(ctx, file, fn) {
             if (m[1] === undefined) { aliasedExport = true; escape(other, m.index, 're-exported through a star'); }
             else for (const part of m[1].split(',')) {
               const [original, alias] = part.trim().split(/\s+as\s+/);
-              if (original === item.name) push({ ...item, file: other, name: alias ?? original, origin: false });
+              if (original !== item.name) continue;
+              if (alias === 'default') { aliasedExport = true; escape(other, m.index, 'exported as default'); }
+              else push({ ...item, file: other, name: alias ?? original, origin: false });
             }
           }
           for (const m of other.code.matchAll(/import\s*\*\s*as\s+([A-Za-z_$][\w$]*)\s+from\s*['"]([^'"]+)['"]|(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*await\s+import\s*\(\s*['"]([^'"]+)['"]\s*\)/g)) {

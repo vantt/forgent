@@ -1,0 +1,40 @@
+{
+  "status": "blocked",
+  "codeStatus": "repaired",
+  "head": "f142752fa9374b3c751df89cf2ca4dd59f3eba70",
+  "comparisonScanner": "f4324b27d188cd215e4e5339fa53852548d0f3c1",
+  "cwd": "/home/vantt/projects/forgentX-p9-w1-d2",
+  "summary": "Named default re-exports now use the existing exported-as-default escape and alias flag. Owning tests and historical negative control pass, but native-free full-tree acceptance is blocked.",
+  "environment": { "NODE_OPTIONS": "--no-addons", "CLAUDE_CODE_SESSION_ID": "unset", "scratchRoot": "/tmp/fgos-work/", "scratchRemoved": true },
+  "sourceSha256": {
+    "scripts/git-one-door-scan.mjs": "a29950f549b4a1d4c63d3df787af6c67033f4495ad9800cd9c03bc69ffcadefc",
+    "test/scripts/git-one-door-declarations.test.mjs": "1fda050755c9ace77ff0a179edb18720ec4d0829e5ddabe3ff7eb93f4c513e19"
+  },
+  "proofs": {
+    "owningTests": { "exitCode": 0, "pass": 66, "fail": 0, "skip": 0, "evidence": "declarations.log" },
+    "negativeControl": { "exitCode": 0, "historicalChildExitCode": 1, "pass": 12, "failIncludingParent": 6, "missingExpectedExceptions": 4, "configuredAdapterFails": true, "evidence": "red.log" },
+    "fullTree": { "status": "blocked", "diagnosticExitCode": 1, "undeclared": null, "classCounts": null, "parity": null, "evidence": "full-tree.log" }
+  },
+  "blocker": "The required CLI scan stages/loads the Git addon; the public API diagnostic also needs native YAML for standalone skill classification. Both historical and current scans fail with git-addon-unavailable under the mandatory no-addon contract. Lead must authorize native-backed full-tree verification; no zero-site/parity claim is made.",
+  "notRun": [
+    { "command": "node scripts/git-one-door-scan.mjs --root .", "reason": "main -> inspectRepo -> ensureScriptAddon may stage/build outside the grant; native addons forbidden" },
+    { "command": "fgos tool query --capability impact-analysis --status present", "reason": "fgOS CLI forbidden by brief; no graph tool available" }
+  ],
+  "commands": [
+    { "command": "git status --short && git log -6 --oneline -- scripts/git-one-door-scan.mjs && git log --oneline -S'exported as default' -- scripts/git-one-door-scan.mjs", "exitCode": 0 },
+    { "command": "git show --stat 2fa7fe921 -- scripts/git-one-door-scan.mjs test/scripts/git-one-door-declarations.test.mjs && git show cb7342614 -- scripts/git-one-door-scan.mjs && git rev-parse HEAD f4324b27d && git log --oneline -G'default|re.export' -- scripts/git-one-door-scan.mjs", "exitCode": 0 },
+    { "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-default-reexport/negative-control.mjs > plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-default-reexport/red.log 2>&1; code=$?; printf 'negative-control exit=%s\\n' \"$code\"; exit \"$code\"", "exitCode": 0, "childCommands": ["git show f4324b27d:scripts/git-one-door-scan.mjs (exit 0)", "node --test --test-reporter=tap '--test-name-pattern=declared wrappers refuse star, default|a configured function adapter keeps' <owned scratch>/historical-scanner.test.mjs (expected exit 1)"] },
+    { "command": "scratch=$(mktemp -d /tmp/fgos-work/scanner-default-tests.XXXXXX) && TMPDIR=\"$scratch\" env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --test test/scripts/git-one-door-declarations.test.mjs > plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-default-reexport/declarations.log 2>&1; code=$?; if [ -n \"$scratch\" ]; then rmdir \"$scratch\"; fi; printf 'declarations exit=%s\\n' \"$code\"; exit \"$code\"", "exitCode": 0 },
+    { "command": "git diff --check && git diff --stat && git diff -- scripts/git-one-door-scan.mjs test/scripts/git-one-door-declarations.test.mjs && git show f4324b27d:packages/git/contracts/mutation-census.v1.json | head -20", "exitCode": 0, "note": "Stored census inspected only, not claimed as fresh proof" },
+    { "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-default-reexport/full-tree-check.mjs > plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-default-reexport/full-tree.log 2>&1; code=$?; printf 'full-tree diagnostic exit=%s\\n' \"$code\"; exit \"$code\"", "exitCode": 1, "childCommands": ["git ls-files --cached --others --exclude-standard -z (exit 0)", "git show f4324b27d:scripts/git-one-door-scan.mjs (exit 0)"], "note": "Both unmodified scan API calls throw in native YAML; scratch cleaned in finally" },
+    { "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --check scripts/git-one-door-scan.mjs && env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --check test/scripts/git-one-door-declarations.test.mjs && env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --check plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-default-reexport/negative-control.mjs && env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --check plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-default-reexport/full-tree-check.mjs && git diff --check", "exitCode": 0 },
+    { "command": "sha256sum scripts/git-one-door-scan.mjs test/scripts/git-one-door-declarations.test.mjs && git status --short && git diff --numstat && find /tmp/fgos-work -maxdepth 1 -type d -name 'scanner-default-*' -print", "exitCode": 0 },
+    { "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --input-type=module (inline final receipt/hash/log/write-scope/scratch audit); git diff --check", "exitCode": 0, "note": "Final validation; no product scan or native-backed proof implied" }
+  ],
+  "followUps": [
+    { "id": "W45-7", "severity": "low", "implemented": false, "description": "Dynamic import then callbacks and reassigned awaited imports can hide callers; track separately, do not expand this patch." }
+  ],
+  "impactAnalysis": "degraded: no live graph tool and fgOS CLI prohibited; read-only grep/history used",
+  "censusWritten": false,
+  "needsWrites": []
+}

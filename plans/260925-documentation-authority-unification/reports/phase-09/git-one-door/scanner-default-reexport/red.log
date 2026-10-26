@@ -1,0 +1,210 @@
+Historical child: node --test --test-reporter=tap --test-name-pattern=declared wrappers refuse star, default|a configured function adapter keeps /tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs
+TAP version 13
+# Subtest: declared wrappers refuse star, default and namespace re-exports with undeclared reset callers
+    # Subtest: export * from './read.mjs'; with args
+    ok 1 - export * from './read.mjs'; with args
+      ---
+      duration_ms: 10.549394
+      type: 'test'
+      ...
+    # Subtest: via named re-export: export * from './read.mjs'; with args
+    ok 2 - via named re-export: export * from './read.mjs'; with args
+      ---
+      duration_ms: 2.258514
+      type: 'test'
+      ...
+    # Subtest: export * from './read.mjs'; with ['ls-tree', 'HEAD']
+    ok 3 - export * from './read.mjs'; with ['ls-tree', 'HEAD']
+      ---
+      duration_ms: 1.781612
+      type: 'test'
+      ...
+    # Subtest: via named re-export: export * from './read.mjs'; with ['ls-tree', 'HEAD']
+    ok 4 - via named re-export: export * from './read.mjs'; with ['ls-tree', 'HEAD']
+      ---
+      duration_ms: 1.438049
+      type: 'test'
+      ...
+    # Subtest: export { g as default } from './read.mjs'; with args
+    not ok 5 - export { g as default } from './read.mjs'; with args
+      ---
+      duration_ms: 2.281889
+      type: 'test'
+      location: '/tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:273:17'
+      failureType: 'testCodeFailure'
+      error: 'Missing expected exception.'
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+      operator: 'throws'
+      stack: |-
+        TestContext.<anonymous> (file:///tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:281:18)
+        Test.runInAsyncScope (node:async_hooks:227:14)
+        Test.run (node:internal/test_runner/test:1325:25)
+        Test.start (node:internal/test_runner/test:1191:17)
+        TestContext.test (node:internal/test_runner/test:382:20)
+        TestContext.<anonymous> (file:///tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:273:17)
+        async Test.run (node:internal/test_runner/test:1332:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+      ...
+    # Subtest: via named re-export: export { g as default } from './read.mjs'; with args
+    not ok 6 - via named re-export: export { g as default } from './read.mjs'; with args
+      ---
+      duration_ms: 2.018646
+      type: 'test'
+      location: '/tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:273:17'
+      failureType: 'testCodeFailure'
+      error: 'Missing expected exception.'
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+      operator: 'throws'
+      stack: |-
+        TestContext.<anonymous> (file:///tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:281:18)
+        Test.runInAsyncScope (node:async_hooks:227:14)
+        Test.run (node:internal/test_runner/test:1325:25)
+        Test.start (node:internal/test_runner/test:1191:17)
+        TestContext.test (node:internal/test_runner/test:382:20)
+        TestContext.<anonymous> (file:///tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:273:17)
+        async Test.run (node:internal/test_runner/test:1332:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+      ...
+    # Subtest: export { g as default } from './read.mjs'; with ['ls-tree', 'HEAD']
+    not ok 7 - export { g as default } from './read.mjs'; with ['ls-tree', 'HEAD']
+      ---
+      duration_ms: 1.237683
+      type: 'test'
+      location: '/tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:273:17'
+      failureType: 'testCodeFailure'
+      error: 'Missing expected exception.'
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+      operator: 'throws'
+      stack: |-
+        TestContext.<anonymous> (file:///tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:281:18)
+        Test.runInAsyncScope (node:async_hooks:227:14)
+        Test.run (node:internal/test_runner/test:1325:25)
+        Test.start (node:internal/test_runner/test:1191:17)
+        TestContext.test (node:internal/test_runner/test:382:20)
+        TestContext.<anonymous> (file:///tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:273:17)
+        async Test.run (node:internal/test_runner/test:1332:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+      ...
+    # Subtest: via named re-export: export { g as default } from './read.mjs'; with ['ls-tree', 'HEAD']
+    not ok 8 - via named re-export: export { g as default } from './read.mjs'; with ['ls-tree', 'HEAD']
+      ---
+      duration_ms: 1.230531
+      type: 'test'
+      location: '/tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:273:17'
+      failureType: 'testCodeFailure'
+      error: 'Missing expected exception.'
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+      operator: 'throws'
+      stack: |-
+        TestContext.<anonymous> (file:///tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:281:18)
+        Test.runInAsyncScope (node:async_hooks:227:14)
+        Test.run (node:internal/test_runner/test:1325:25)
+        Test.start (node:internal/test_runner/test:1191:17)
+        TestContext.test (node:internal/test_runner/test:382:20)
+        TestContext.<anonymous> (file:///tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:273:17)
+        async Test.run (node:internal/test_runner/test:1332:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+      ...
+    # Subtest: export * as ns from './read.mjs'; with args
+    ok 9 - export * as ns from './read.mjs'; with args
+      ---
+      duration_ms: 1.20395
+      type: 'test'
+      ...
+    # Subtest: via named re-export: export * as ns from './read.mjs'; with args
+    ok 10 - via named re-export: export * as ns from './read.mjs'; with args
+      ---
+      duration_ms: 1.536403
+      type: 'test'
+      ...
+    # Subtest: export * as ns from './read.mjs'; with ['ls-tree', 'HEAD']
+    ok 11 - export * as ns from './read.mjs'; with ['ls-tree', 'HEAD']
+      ---
+      duration_ms: 1.049409
+      type: 'test'
+      ...
+    # Subtest: via named re-export: export * as ns from './read.mjs'; with ['ls-tree', 'HEAD']
+    ok 12 - via named re-export: export * as ns from './read.mjs'; with ['ls-tree', 'HEAD']
+      ---
+      duration_ms: 1.070431
+      type: 'test'
+      ...
+    # Subtest: import * as r from './read.mjs'; export const ns = r; with args
+    ok 13 - import * as r from './read.mjs'; export const ns = r; with args
+      ---
+      duration_ms: 2.103857
+      type: 'test'
+      ...
+    # Subtest: via named re-export: import * as r from './read.mjs'; export const ns = r; with args
+    ok 14 - via named re-export: import * as r from './read.mjs'; export const ns = r; with args
+      ---
+      duration_ms: 1.803668
+      type: 'test'
+      ...
+    # Subtest: import * as r from './read.mjs'; export const ns = r; with ['ls-tree', 'HEAD']
+    ok 15 - import * as r from './read.mjs'; export const ns = r; with ['ls-tree', 'HEAD']
+      ---
+      duration_ms: 1.073776
+      type: 'test'
+      ...
+    # Subtest: via named re-export: import * as r from './read.mjs'; export const ns = r; with ['ls-tree', 'HEAD']
+    ok 16 - via named re-export: import * as r from './read.mjs'; export const ns = r; with ['ls-tree', 'HEAD']
+      ---
+      duration_ms: 1.201371
+      type: 'test'
+      ...
+    1..16
+not ok 1 - declared wrappers refuse star, default and namespace re-exports with undeclared reset callers
+  ---
+  duration_ms: 35.182173
+  type: 'test'
+  location: '/tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:264:1'
+  failureType: 'subtestsFailed'
+  error: '4 subtests failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: a configured function adapter keeps unrelated re-exports but refuses a default re-export
+not ok 2 - a configured function adapter keeps unrelated re-exports but refuses a default re-export
+  ---
+  duration_ms: 8.279909
+  type: 'test'
+  location: '/tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:291:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    a configured adapter cannot hide a fixed Git caller through a default export
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/fgos-work/scanner-default-control.uQVIb3/historical-scanner.test.mjs:317:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1325:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+    Test.postRun (node:internal/test_runner/test:1465:19)
+    Test.run (node:internal/test_runner/test:1390:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+  ...
+1..2
+# tests 18
+# suites 0
+# pass 12
+# fail 6
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 93.535329
+Historical child exit: 1
+Control passed: all four default re-export cases and the configured adapter case fail on f4324b27d; the twelve existing re-export cases pass.
