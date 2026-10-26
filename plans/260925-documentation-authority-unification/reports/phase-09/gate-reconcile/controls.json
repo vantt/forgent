@@ -1,6 +1,6 @@
 {
   "status": "passed",
-  "asOf": "a734c3f47ff6eb39d80ba1c16e6dd88d44cc2d53",
+  "asOf": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
   "positive": "passed",
   "negativeControls": [
     {
@@ -79,11 +79,6 @@
       "error": "current G0 proof not green"
     },
     {
-      "name": "Moved-path link regression is rejected",
-      "result": "rejected",
-      "error": "current F composition proof not green"
-    },
-    {
       "name": "Whole-population link guard findings are rejected",
       "result": "rejected",
       "error": "current F composition proof not green"
@@ -139,6 +134,41 @@
       "error": "ownership audit provenance drift"
     },
     {
+      "name": "Stale ownership audit fingerprint is rejected",
+      "result": "rejected",
+      "error": "ownership audit input drift"
+    },
+    {
+      "name": "Reported accounting outcome cannot be altered",
+      "result": "rejected",
+      "error": "ownership audit provenance drift"
+    },
+    {
+      "name": "Conditional approval cannot omit LAND confirmation",
+      "result": "rejected",
+      "error": "conditional owner approval drift"
+    },
+    {
+      "name": "Approved permission cannot imply an executed lease",
+      "result": "rejected",
+      "error": "cutover order drift"
+    },
+    {
+      "name": "Review gate coverage cannot omit G9",
+      "result": "rejected",
+      "error": "affected gate coverage drift"
+    },
+    {
+      "name": "Uncarried ownership follow-up is rejected",
+      "result": "rejected",
+      "error": "outside-plan follow-up provenance drift"
+    },
+    {
+      "name": "Register link guard must cite the measured finding",
+      "result": "rejected",
+      "error": "F-window source counts drift"
+    },
+    {
       "name": "Unsourced follow-up is rejected",
       "result": "rejected",
       "error": "outside-plan follow-up provenance drift"
@@ -154,6 +184,6 @@
       "error": "F-window source counts drift"
     }
   ],
-  "count": 30,
+  "count": 36,
   "method": "In-memory copies at the read_json test seam; real owning check(), path inspection and read-only git; no source file or assertion weakened."
 }

@@ -1,6 +1,6 @@
 {
   "sourceHead": "ee2ce49c4b610daccb656f79fdb29531bb41d06b",
-  "status": "reviewed; reviews/w33-ownership-audit-review.json (5 APPROVE / 0 REWORK)",
+  "status": "reviewed; records 0–148 (594fe4194): reviews/w26-g0-rework-verdicts.md; records 149–154: reviews/w33-ownership-audit-review.json (5 APPROVE / 0 REWORK)",
   "records": [
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/g0-content-redecisions.json",

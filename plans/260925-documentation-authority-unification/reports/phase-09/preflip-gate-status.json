@@ -2,19 +2,19 @@
   "version": 1,
   "authority": "L12-137",
   "asOf": {
-    "commit": "a734c3f47ff6eb39d80ba1c16e6dd88d44cc2d53",
+    "commit": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
     "date": "2026-10-25",
     "finalPinF": null,
     "followUpCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
     "followUpRuling": "L13-17 (W18 corrections)",
-    "basis": "Historical snapshots and fingerprints are retained separately; current status uses committed inputs at a734c3f47ff6eb39d80ba1c16e6dd88d44cc2d53. W23–W37 reviews and L13-16–28 are reconciled at exact scopes; current command proofs do not invent independent approval or F.",
+    "basis": "Historical snapshots and fingerprints are retained separately; current status uses committed inputs at 0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f. W23–W38 reviews and L13-16–30 are reconciled at exact scopes; current command proofs do not invent independent approval or F.",
     "evidencePathBase": "plans/260925-documentation-authority-unification/reports/phase-09",
     "reconciliation": "gate-reconcile/receipt.json",
     "reviewFollowUpCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
     "catchUpCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
     "correctionCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
     "originalSnapshotCommit": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
-    "currentCommit": "a734c3f47ff6eb39d80ba1c16e6dd88d44cc2d53"
+    "currentCommit": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f"
   },
   "gates": [
     {
@@ -53,6 +53,8 @@
         "reviews/w9-composition-fix-review.json",
         "reviews/w10-composition-rework-review.json",
         "reviews/w22-register-met-local-review.json",
+        "reviews/w26-g0-rework-verdicts.md",
+        "reviews/w33-ownership-audit-review.json",
         "g0rework/final-pin-duties.json",
         "gate-reconcile/current-proofs.json",
         "reviews/w24-g0-verdicts-b1.json",
@@ -68,7 +70,6 @@
         "reviews/w24-g0-verdicts-b6.json",
         "reviews/w24-g0-verdicts-b6.md",
         "reviews/w26-g0-rework-verdicts.json",
-        "reviews/w26-g0-rework-verdicts.md",
         "reviews/w27-g0-stale-verdicts-b7.json",
         "reviews/w27-g0-stale-verdicts-b7.md",
         "reviews/w27-g0-stale-verdicts-b8.json",
@@ -80,9 +81,9 @@
         "reviews/w30-g0-verdicts-b11.json",
         "reviews/w30-g0-verdicts-b11.md"
       ],
-      "commit": "a734c3f47ff6eb39d80ba1c16e6dd88d44cc2d53",
+      "commit": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
       "pin": null,
-      "note": "Current committed join exits 0: 1,929/1,929 effective rows approved, with no missing, mismatched, stale, open REWORK, invalid bindings or unresolved rows. W24–W30 per-row reviews replace the historical verdict-record gaps, including decision-field freshness under L13-25. 134 w8/w9 overlay approvals remain conditional on atomic placement at F, not approval of the unapplied final body.",
+      "note": "Current committed join exits 0: 1,929/1,929 effective rows approved, with no missing, mismatched, stale, open REWORK, invalid bindings or unresolved rows. W24–W30 per-row reviews replace the historical verdict-record gaps, including decision-field freshness under L13-25. 134 w8/w9 overlay approvals remain conditional on atomic placement at F, not approval of the unapplied final body. Rebind records 0–148 (594fe4194) were reviewed in reviews/w26-g0-rework-verdicts.md; records 149–154 in reviews/w33-ownership-audit-review.json (5 APPROVE / 0 REWORK).",
       "remaining": "",
       "blockers": [],
       "cleared": [
@@ -518,11 +519,12 @@
         "reviews/w17-parity-rework-review.json",
         "reviews/w8-composition-review.md",
         "reviews/w14-check-hardening-review.json",
-        "preflip-execution-plan.md"
+        "preflip-execution-plan.md",
+        "reviews/w33-link-retargets-review.json"
       ],
       "commit": "daa87810b",
       "pin": null,
-      "note": "Initial review covers 387 of 423 specs (385 APPROVE / 2 REWORK), with 36 deferred to G9/F. W8 explicitly resolves both recomposed specs; W8/W9 resolves 101 park actions and the supplemental four holder groups. GAP-05 and gloss/check hardening are reviewed through W14. W14/W16/W17 replaces the obsolete content-re-review demand, without certifying the F verdict join or full post-apply binding resolution. Effective spec rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md still has independentVerdict pending; w32 and w33-work-state-rebase verify a pure rebase with an identical change set (diff and rollbackDiff byte-identical to its predecessor), not approval transfer to the new final body. Recheck/delta-review at F.",
+      "note": "Initial review covers 387 of 423 specs (385 APPROVE / 2 REWORK), with 36 deferred to G9/F. W8 explicitly resolves both recomposed specs; W8/W9 resolves 101 park actions and the supplemental four holder groups. GAP-05 and gloss/check hardening are reviewed through W14. W14/W16/W17 replaces the obsolete content-re-review demand, without certifying the F verdict join or full post-apply binding resolution. Effective spec rebased-current:rebased:w8:gloss:docs/platform/work-state/spec.md still has independentVerdict pending; w32 and reviews/w33-link-retargets-review.json item work-state-rebase verify a pure rebase with an identical change set (diff and rollbackDiff byte-identical to its predecessor), not approval transfer to the new final body. Recheck/delta-review at F.",
       "remaining": "",
       "blockers": [],
       "cleared": [
@@ -608,7 +610,7 @@
       ],
       "commit": "f67e0f676",
       "pin": "d3efc70c5",
-      "note": "W8/W14 approve retention and cold timing; W20 C independently approves f67e0f676: contradictory sandbox fields remain verbatim in historicalSandboxAttempt, current values match verified Lead measurements. W21 A approves the additional 25e8842d3 postMeasurementEdits custody entry. Under L13-18 and L13-19.2 no before-F item remains: create the create-only LOCAL ref from the F rebuild with custody evidence before G10, not from a partition that F will replace. Publication remains owner-gated; archive/design.md now documents recovery of retained JSON path strings through the approved archive ref and partition checks (W14/W22); the committed recovery procedure is retained; no archive ref or publication is created by this catch-up.",
+      "note": "W8/W14 approve retention and cold timing; W20 C independently approves f67e0f676: contradictory sandbox fields remain verbatim in historicalSandboxAttempt, current values match verified Lead measurements. W21 A approves the additional 25e8842d3 postMeasurementEdits custody entry. Under L13-18 and L13-19.2 no before-F item remains: create the create-only LOCAL ref from the F rebuild with custody evidence before G10, not from a partition that F will replace. L13-30 option A covers publication permission; actual publication remains an F duty, conditional on lead:LAND confirmation before the lease; archive/design.md now documents recovery of retained JSON path strings through the approved archive ref and partition checks (W14/W22); the committed recovery procedure is retained; no archive ref or publication is created by this catch-up.",
       "remaining": "",
       "blockers": [],
       "cleared": [
@@ -637,12 +639,11 @@
       ],
       "atFinalPinUnderLease": [
         "Create the repository-local archive ref from the F rebuild before G10, with commit, partition hash, path, blob, size and SHA256 agreement (L13-18); a disposable rehearsal ref is not custody.",
-        "Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count."
+        "Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
+        "Publish the archive ref within option A scope (L13-30) after lead:LAND confirms and F custody/rebuild proofs pass; permission is approved, publication is not executed."
       ],
       "external": [],
-      "ownerItems": [
-        "Owner cutover approval S2 is required for archive ref publication and main manifest merge; local rehearsal is not that permission."
-      ]
+      "ownerItems": []
     },
     {
       "gateId": "source-context-and-post-pin-recomposition",
@@ -783,25 +784,61 @@
       ],
       "external": [
         "SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11).",
-        "Owner cutover/lease/Land approval remains separate. L13-12 historical host stop constraints do not prohibit the main import already performed on design-lap; W22 retires the stale no-pull wording."
+        "L13-30 approves option A only, conditional on lead:LAND confirmation before the lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh."
       ],
       "ownerItems": []
     }
   ],
   "cutoverReadiness": {
-    "summary": "Local preparation is met-local: G0 1,929/1,929 approved, G2 judgments reviewed, G6 787 premises settled and G9 158 decisions settled. Send the owner packet at met-local before approval, lease and F (L13-6). G5 owner acceptance, G8 publication, G9 backlog intent and G4/G10/G11 external dependencies remain open. W32 reviewed the prior catch-up (18 APPROVE / 3 REWORK); its findings are addressed by the w33/w35/w37 review chain and Lead mechanical fix, not erased. This register update still needs independent records review before the packet; no F, release, lease, publication, cutover or Land approval is inferred.",
+    "summary": "Local preparation is met-local: G0 1,929/1,929 approved, G2 judgments reviewed, G6 787 premises settled and G9 158 decisions settled. The owner packet was sent (6586bbc46); L13-30 records owner approval of option A on 2026-10-26, conditional on lead:LAND confirming before the lease. G8 publication permission is covered by A; G5 owner acceptance, G9 backlog intent and G4/G10/G11 external dependencies remain open. W38 independently reviewed e7e6c129c (11 APPROVE / 0 REWORK), including the Lead duplicate-id fix. This L13-29.2 refresh needs light review before the lease; no lease, F, release, publication execution or Land approval is claimed.",
     "order": [
-      "Complete and independently review local work to met-local",
-      "Send owner cutover packet at met-local (L13-6)",
-      "Owner cutover approval within the stated scope and budget",
-      "Acquire documentation write lease; freeze starts",
-      "Final main import with accounting; record F",
-      "Execute F duties and delta reviews; stop if any fails",
-      "Write and independently review the final status ledger",
-      "Land within the separately approved frame"
+      {
+        "step": "Complete and independently review local work to met-local",
+        "status": "done"
+      },
+      {
+        "step": "Send owner cutover packet at met-local (L13-6)",
+        "status": "done",
+        "evidence": [
+          "cutover-approval-packet.md",
+          "owner-answers.md"
+        ],
+        "packetCommit": "6586bbc468f2b3e230d5ef7c4abfbc484b39f768",
+        "ruling": "L13-30"
+      },
+      {
+        "step": "Owner cutover approval within the stated scope and budget",
+        "status": "done",
+        "evidence": [
+          "cutover-approval-packet.md",
+          "owner-answers.md"
+        ],
+        "packetCommit": "6586bbc468f2b3e230d5ef7c4abfbc484b39f768",
+        "ruling": "L13-30"
+      },
+      {
+        "step": "Acquire documentation write lease; freeze starts",
+        "status": "pending"
+      },
+      {
+        "step": "Final main import with accounting; record F",
+        "status": "pending"
+      },
+      {
+        "step": "Execute F duties and delta reviews; stop if any fails",
+        "status": "pending"
+      },
+      {
+        "step": "Write and independently review the final status ledger",
+        "status": "pending"
+      },
+      {
+        "step": "Land within the separately approved frame",
+        "status": "pending"
+      }
     ],
     "fWindowSize": {
-      "sourcePin": "a734c3f47ff6eb39d80ba1c16e6dd88d44cc2d53",
+      "sourcePin": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
       "meaning": "Source-derived sizing witnesses, not sums of independent populations or a wall-time estimate. Re-enumerate after F import; stop instead of widening the approved lease budget.",
       "g6UnboundRows": {
         "count": 137,
@@ -884,16 +921,15 @@
         "rebasedEntries": 5,
         "linkRetargetPatches": 88,
         "linkRetargetRows": 377,
-        "linkIntoMoveSet": 0,
         "linkGuard": 0,
+        "linkGuardSource": "fchain/check.json#/counts/linkGuard (absent finding means 0)",
         "rule": "Counts are witnesses, not additive populations; replay once through the single door at F."
       }
     },
     "ownerItems": [
       "G5: Owner acceptance of exactly 8 restatements (legacy map lines 3–9 and 34, with exact old/new text in g5/check-b57e79625.json /ownerAcceptance) is required in the cutover approval packet under L13-10; includes the banner and the full Truth-correction line, not just its suffix.",
-      "G8: Owner cutover approval S2 is required for archive ref publication and main manifest merge; local rehearsal is not that permission.",
       "G9: Backlog owner must decide the intended current STR70a/STR62 claims for batch-126.jsonl:2 and generators-skills-and-support.jsonl:66, edit docs/backlog.md directly and return exact row identities; these 2 G9 parks are not generic Lead-review debt (g9/receipt.md; W16 B-pass).",
-      "Owner separately approves cutover, documentation lease and Land; packet includes the F-window scope/budget and stop conditions."
+      "Land still needs separate owner approval after final ledger review; L13-30 option A is conditional on lead:LAND confirmation before the lease and retains the packet scope/budget and stop conditions."
     ],
     "localCorrectionReview": [
       {
@@ -924,7 +960,8 @@
           "REWORK": 3
         },
         "affectedGates": [
-          "G6"
+          "G6",
+          "G9"
         ],
         "reworkResolutions": {
           "w35-1": "b467e09fe; independently APPROVE in w37-1..5",
@@ -943,10 +980,11 @@
           "REWORK": 1
         },
         "affectedGates": [
-          "G6"
+          "G6",
+          "G9"
         ],
         "reworkResolutions": {
-          "w37-6": "Lead mechanical-defect fix edf816838: coexistence row L13-28:related:86 becomes L13-28:related:118; check.py refuses duplicate ids. Owning check exit 0 and duplicate-id probe exit 1 (expected rejection), gate-reconcile/current-proofs.json. Not a new independent semantic review."
+          "w37-6": "Lead mechanical-defect fix edf816838: coexistence row L13-28:related:86 becomes L13-28:related:118; check.py refuses duplicate ids. Owning check exit 0 and duplicate-id probe exit 1 (expected rejection), gate-reconcile/current-proofs.json. Independently checked in reviews/w38-register-update-review.json item w38-3 (APPROVE)."
         },
         "openRework": []
       },
@@ -978,7 +1016,8 @@
           "REWORK": 3
         },
         "affectedGates": [
-          "G6"
+          "G6",
+          "cutoverReadiness"
         ],
         "reworkResolutions": {
           "G6": "w33/w35/w37 chain and Lead mechanical fix above; L13-28 whole-population linkGuard proof",
@@ -986,7 +1025,26 @@
           "cutoverReadiness.summary-and-localCorrectionReview": "w33 ownership review plus complete correction inventory here; rebind status reviewed; packet approval is a precondition"
         },
         "openRework": [],
-        "note": "W32 reviews the prior catch-up, not this regeneration. Independently review this register update and its proofs before sending the owner packet."
+        "note": "W32 reviews the prior catch-up; reviews/w38-register-update-review.json items w38-2 and w38-5 independently approve the correction inventory and resolutions."
+      },
+      {
+        "commits": [
+          "e7e6c129c"
+        ],
+        "review": "reviews/w38-register-update-review.json",
+        "verdictCounts": {
+          "APPROVE": 11
+        },
+        "affectedGates": [
+          "G0",
+          "G6",
+          "G7",
+          "G9",
+          "cutoverReadiness"
+        ],
+        "reworkResolutions": {},
+        "openRework": [],
+        "note": "11 APPROVE / 0 REWORK; five low notes applied by this L13-29.2 refresh, which needs light review before the lease."
       }
     ],
     "beforeFinalPin": [],
@@ -1012,6 +1070,7 @@
       "G7: Run the full post-apply ledger resolution/rebind, covering all residual bindings, not just GAP-05. Use the W10 inventory (407 distinct = 361 chain-caused + 46 at pin; 556 assertions) only as a historical sizing witness, then re-enumerate at F (w10-composition-rework F7).",
       "G8: Create the repository-local archive ref from the F rebuild before G10, with commit, partition hash, path, blob, size and SHA256 agreement (L13-18); a disposable rehearsal ref is not custody.",
       "G8: Rebuild partition at F and keep every evidence file named by this gate register, cleared-review provenance and the final status ledger; re-enumerate readers to zero unresolved and retime cold after G10 (L13-13.4; execution plan §3 W4). W14’s 70/92 archived evidence paths is an old count, not the expanded register’s current count.",
+      "G8: Publish the archive ref within option A scope (L13-30) after lead:LAND confirms and F custody/rebuild proofs pass; permission is approved, publication is not executed.",
       "G9: After final main import record F, run g9/sweep.py --check --pin F, rejudge every changed evidence row, recompose drifted bodies (including deferred G7/predecessor specs), and get source-delta review (execution plan §2 G9 / §3 W3).",
       "G9: Fix/materialize the supersession source join or explicitly carry the 2 prepared-shard legacy scan gaps (README, repo-layout-vision), then rerun post-apply scan at F (w11-import3 F3; import3/receipt.md).",
       "G9: Retain keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a until track end under L13-13.3; completed SHA re-pinning is not permission to delete their historical witnesses.",
@@ -1028,14 +1087,46 @@
       "G9: WORK and registry owners supply the bounded knowledge/registry exports still required by inherited phase-08 parked records. All 158 local Phase-9 dependencies are decided; original external exports stay in their owning records (L13-21/24; g9/phase9-decisions.json).",
       "G10: Git owner section 7 consent is not recorded; after that consent and G11 release, Lead runs holder Land publish/ref verification, non-holder refusal and rollback on the G8 shrunk F-code clone, and commits the owning receipt (execution plan §2 G10).",
       "G11: SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11).",
-      "G11: Owner cutover/lease/Land approval remains separate. L13-12 historical host stop constraints do not prohibit the main import already performed on design-lap; W22 retires the stale no-pull wording."
-    ]
+      "G11: L13-30 approves option A only, conditional on lead:LAND confirmation before the lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh."
+    ],
+    "ownerDecision": {
+      "source": "owner-answers.md",
+      "ruling": "L13-30",
+      "date": "2026-10-26",
+      "time": "09:57",
+      "option": "A",
+      "status": "approved",
+      "packet": "cutover-approval-packet.md",
+      "packetCommit": "6586bbc468f2b3e230d5ef7c4abfbc484b39f768",
+      "ownerText": "đồng ý A, khi nào lead LAND báo ổn thì em làm.",
+      "condition": {
+        "owner": "lead:LAND",
+        "requiredBefore": "Acquire documentation write lease; freeze starts",
+        "status": "pending",
+        "action": "Confirm lease/freeze, F import and F-window heavy IO are OK before starting."
+      },
+      "allowed": [
+        "Documentation lease",
+        "One main import as F with accounting",
+        "F duties on plan branch and clones",
+        "Archive ref publication",
+        "Write and independently review final ledger"
+      ],
+      "notAllowed": [
+        "Land on main without separate approval after final ledger review",
+        "Delete files on main",
+        "Push .fgos/events*",
+        "Widen the frame when F exceeds counts; stop and ask again"
+      ]
+    }
   },
   "ownershipAudit": {
-    "authority": "L13-27",
+    "authority": "L13-27; L13-29.1",
     "status": "reported-ok",
-    "commit": "4a4fefbe8228dd18b4cfa5f6e404c92db8643cb4",
-    "source": "w32-register-catchup-brief.md",
+    "commit": "23e3c34b7d9d01cb30279e98cbdae1bad8733c95",
+    "source": "owner-answers.md",
+    "ruling": "L13-29.1",
+    "packet": "cutover-approval-packet.md",
     "inputs": [
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
@@ -1043,14 +1134,21 @@
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
-        "sha256": "b257d2cbcd6539de6153e66b44b88d988f859240240332c9a1611cceadb14512"
+        "sha256": "4260a32e72ba2a2a3e1b1723626cb6dd8543fce42e9e95e76837fc99d1698be1"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
-        "sha256": "80b397ffcd8834f55865aa4f334d37dc6f8d55155aad503d1ee390275c701107"
+        "sha256": "72baad4d9b55a233df9dc98594487dc60b8feef0f32639fb725a8fc926f021fa"
       }
     ],
-    "note": "The committed Lead brief reports audit-report.py ok at 4a4fefbe8 after pair accounting. Drift is authenticated only through rebind.py --check; unaccounted drift still fails and raw diagnostics remain. No committed full audit stdout was found; this is explicitly a Lead-reported outcome, not a fresh execution or invented receipt. Never ran audit-report.py or pair accounting here."
+    "unaccountedPairs": 0,
+    "B": "ok",
+    "reproduction": {
+      "passed": 8,
+      "total": 8
+    },
+    "allowedPathExceptionsDropped": 58,
+    "note": "L13-29.1 and the committed cutover packet report the audit at the latest accounting, 23e3c34b7: 0 unaccounted pairs, B ok, reproduction 8/8, 58 allowed-path exceptions dropped. Pinned inputs match HEAD. Drift is authenticated only through rebind.py --check; unaccounted drift still fails and raw diagnostics remain. Lead-reported outcome, not a fresh audit execution or invented receipt. Never ran audit-report.py or pair accounting here."
   },
   "followUps": [
     {
@@ -1078,6 +1176,20 @@
       "item": "36 rationale/reason strings in s2/s6/s14 start with whitespace; out-of-scope ledger cleanup.",
       "sourceReview": "reviews/w30-g0-verdicts-b11.md",
       "path": "plans/260925-documentation-authority-unification/ledger/decisions",
+      "owner": "lead:DOC",
+      "destination": "separate backlog item, filed when the cutover lands (backlog on main is outside PRE-FLIP scope)"
+    },
+    {
+      "item": "Have audit-report.py also report the raw drift count alongside unaccounted drift.",
+      "sourceReview": "reviews/w33-ownership-audit-review.md",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
+      "owner": "lead:DOC",
+      "destination": "separate backlog item, filed when the cutover lands (backlog on main is outside PRE-FLIP scope)"
+    },
+    {
+      "item": "Make rebind records 149–150 use the same file/pointer keying as records 151–154.",
+      "sourceReview": "reviews/w33-ownership-audit-review.md",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json",
       "owner": "lead:DOC",
       "destination": "separate backlog item, filed when the cutover lands (backlog on main is outside PRE-FLIP scope)"
     }
