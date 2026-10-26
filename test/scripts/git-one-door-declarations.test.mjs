@@ -329,6 +329,7 @@ test('unfollowed dynamic imports refuse a read-only wrapper declaration', async 
   for (const [name, source] of [
     ['awaited member call', "export async function write() { return (await import('./w.mjs')).runGit(['push', 'origin', 'main']); }\n"],
     ['promise callback', "import('./w.mjs').then((m) => m.runGit(['branch', '-D', 'topic']));\n"],
+    ['template-literal specifier', "export async function write() { const m = await import(`./w.mjs`); return m.runGit(['push', 'origin', 'main']); }\n"],
   ]) {
     await t.test(name, (t) => {
       const f = fixture(t, 'src/w.mjs', "import { spawnSync } from 'node:child_process';\nexport function runGit(args) { return spawnSync('git', args, { encoding: 'utf8' }); }\n");

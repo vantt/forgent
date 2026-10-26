@@ -65,10 +65,11 @@ test('the static scan reports a Git spawn in each shape a literal search misses'
   assert.deepEqual(site.callers, ['src/caller.mjs:4']);
 });
 
-test('a command read through the config door is one configured binary, never a site and never a number', () => {
+test('a command read through the config door is one configured binary, never a site and never a number; a lookalike of its name is not the door', () => {
   const { sites, classes } = scan({ root: path.join(PROBES, 'config-door-value') });
-  assert.deepEqual(sites, []);
   assert.deepEqual(classes.filter((c) => c.path === 'src/run.mjs').map((c) => c.class), ['configured-binary']);
+  // The door is trusted by where `readConfig` resolves, so a lookalike of the same name is read through.
+  assert.deepEqual(sites.map((s) => [s.path, s.binary]), [['src/lookalike.mjs', 'git']]);
 });
 
 test('a declared standalone skill and text quoted into a data command are not sites', () => {
