@@ -1,0 +1,106 @@
+{
+  "review": "w39-register-refresh",
+  "commit": "45da92781",
+  "head": "5752f5a0e",
+  "brief": "w39-register-refresh-brief.md",
+  "rulings": ["L13-29", "L13-30", "L13-31"],
+  "items": [
+    {
+      "id": "w39-1",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "generation and reproduction",
+      "evidence": "Scratch clone at 0e5925d38 (the register's current pin) with the 45da92781 versions of gate-reconcile/**, preflip-gate-status.json and rebind/g0-rework-rebindings.json: python3 -B gate-reconcile/reconcile.py exit 0, then git diff 45da92781 -- phase-09 is empty (byte-identical register, receipts, current-proofs). A run at HEAD 45da92781 differs only in commit/currentCommit/basis/sourcePin pins, as expected.",
+      "fix": ""
+    },
+    {
+      "id": "w39-2",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "owner decision L13-30",
+      "evidence": "cutoverReadiness.ownerDecision has ruling L13-30, date 2026-10-26 09:57, option A, verbatim ownerText that matches owner-answers.md, packetCommit 6586bbc46, condition {owner lead:LAND, status pending, requiredBefore the lease step}, and allowed/notAllowed lists that match the L13-30 scope. Order steps 2-3 are done with packet+L13-30 evidence; steps 4-8 (lease, F, F duties, ledger, Land) are pending. verify.py pins all of this, and controls cover condition.status=done and order[3]=done.",
+      "fix": ""
+    },
+    {
+      "id": "w39-3",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "G5/G8/G9 owner items",
+      "evidence": "G8 ownerItems is []; the note and atFinalPinUnderLease say publication permission is covered by A but not executed. G5 (8 restatements) and G9 (STR70a/STR62 backlog intent) ownerItems are still present in the gates and in readiness.ownerItems. verify.py requires all of these.",
+      "fix": ""
+    },
+    {
+      "id": "w39-4",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "linkIntoMoveSet retirement",
+      "evidence": "grep finds no linkIntoMoveSet in the register, gate-reconcile/*.py or controls.json. The verify.py chain check still requires linkGuard.findings==0, platformMarkdownFiles==628 and the full population string. A new check reads fchain/check.json at the pin and requires exit 0, counts equal, and composition.linkGuard == check counts.linkGuard (default 0) == chain findings, plus linkGuardSource. The whole-population linkGuard control is kept and a linkGuardSource control is added. No check was weakened.",
+      "fix": ""
+    },
+    {
+      "id": "w39-5",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "ownership audit at 23e3c34b7",
+      "evidence": "ownershipAudit: commit 23e3c34b7, source owner-answers.md L13-29.1, unaccountedPairs 0, B ok, reproduction 8/8, allowedPathExceptionsDropped 58. The 3 input sha256 values (audit-report.py 71d6c0c2..., round5 4260a32e..., sync4d 72baad4d...) equal the bytes at HEAD 5752f5a0e and at 23e3c34b7. verify.py now also requires byte equality across the audit pin, the current pin, HEAD and the worktree. The note marks this as a Lead-reported outcome, not a rerun.",
+      "fix": ""
+    },
+    {
+      "id": "w39-6",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "citations",
+      "evidence": "The rebind status and G0 note cite W26 (594fe4194) for records 0-148 and w33-ownership for 149-154. The G7 note cites reviews/w33-link-retargets-review.json item work-state-rebase, which is a real item id in that file. affectedGates: w35 and w37 add G9, and w32 adds cutoverReadiness. verify.py and controls pin these.",
+      "fix": ""
+    },
+    {
+      "id": "w39-7",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "w38 localCorrectionReview + summary",
+      "evidence": "The new entry for e7e6c129c has review w38 and verdictCounts {APPROVE: 11}, computed by Counter over the review's items (w38 counts: 11/0). The summary no longer says 'still needs independent records review', and the w32 note no longer says 'before sending the owner packet'. verify.py rejects both phrases.",
+      "fix": ""
+    },
+    {
+      "id": "w39-8",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "followUps",
+      "evidence": "followUps has 6 entries. The two new ones are raw drift count (phase-08/audit-report.py) and keying of records 149-150 (rebind/g0-rework-rebindings.json); each has sourceReview w33-ownership-audit-review.md, owner lead:DOC and the standard destination. verify.py pins both, and a control rejects popping one.",
+      "fix": ""
+    },
+    {
+      "id": "w39-9",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "rebind file scope and proofs",
+      "evidence": "git show 45da92781 -- rebind/g0-rework-rebindings.json changes only line 3 (status). verify.py also checks edge-byte conservation. At HEAD: gate-reconcile/verify.py exit 0, gate-reconcile/controls.py exit 0 (36 controls), rebind/rebind.py --check exit 0. verify.py changed only verification.json checkedAtHead (volatile), which was restored with git checkout --. receipt.md lists each command with its exit code.",
+      "fix": ""
+    },
+    {
+      "id": "w39-10",
+      "severity": "medium",
+      "verdict": "APPROVE",
+      "area": "start order vs L13-31 (ruling recorded after the brief)",
+      "evidence": "cutoverReadiness.order puts 'Acquire documentation write lease; freeze starts' (step 4) before 'Final main import with accounting; record F' (step 5). ownerDecision.condition.requiredBefore points at the lease step. G1 and the field name atFinalPinUnderLease imply the F duties run under the lease. L13-31 says something different: the active release 2bef8cb2 has no docs-lease verb; the freeze starts at the F import by board convention (lead:LAND posts the notice first); F is imported only after HARDEN answers; and the real lease comes after G11 release R and G10 rehearsal, which is consistent with the register's own G10/G11 duties (release R from F code, rehearsal before lease). The register and verify.py (which hard-codes this order) contradict L13-31. This is not a defect of 45da92781, since L13-31 postdates the brief, but the register is stale on the start condition.",
+      "fix": "Before the F import, run a follow-up reconcile.py refresh. Record L13-31, and add steps 'Board freeze notice posted (lead:LAND)' and 'HARDEN G4/§7 answer' before 'Final main import; record F; freeze by convention'. Move 'Acquire documentation write lease' after G11/G10. Retarget ownerDecision.condition.requiredBefore to the F import (or the board-notice step). Update the verify.py order pin and its control to match."
+    },
+    {
+      "id": "w39-11",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "condition wording",
+      "evidence": "ownerDecision.condition.action and readiness.summary say LAND confirms 'before the lease'. Under L13-31, the first gated action is the board notice and then the F import, not the lease. The owner text itself ('khi nào lead LAND báo ổn thì em làm') gates all A work.",
+      "fix": "Fold this into the w39-10 refresh: say 'before any option-A step (board notice, F import)'."
+    }
+  ],
+  "counts": {
+    "items": 11,
+    "APPROVE": 11,
+    "REWORK": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 1,
+    "none": 9
+  }
+}
