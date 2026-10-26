@@ -334,3 +334,16 @@ Scope, as the packet set it:
 - **G5 and G9:** still open; asked separately.
 
 **Work allowed before LAND answers:** the L13-29.2 register refresh only. It touches the plan branch only, needs no lease and causes no heavy IO.
+
+## L13-31 — Freeze notice on the board first, F import after HARDEN answers (owner decision)
+
+**Facts.**
+- The active release 2bef8cb2 has no `docs-lease` verb (lead:LAND, 2026-10-26).
+- Execution plan §3 W4 orders the work as follows: F import, then release R staged from the F code (staging only), then the G11 proof in a disposable clone, then the G10 rehearsal (needs the Git owner's §7 consent), and only then the real lease.
+- The lanes on the other machines are MAIL, TEST, RULE and ES. They read only the board log on origin/main, and A does not allow DOC to commit to main.
+
+**Owner choice:** 2026-10-26, option **"1. Board trước"**.
+- lead:LAND posts a DOC line in the board log. It announces the docs/ freeze from the F import until Land, which until the lease exists is held by convention only. It also asks HARDEN/Git owner for the G4 review of the 25 declarations and for §7 consent.
+- The Lead imports F only after HARDEN answers.
+
+**Not covered by this choice:** DOC committing to main, activating release R, holding the real lease before G10 and G11 pass, and Land.
