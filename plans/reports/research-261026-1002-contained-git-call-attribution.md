@@ -154,6 +154,64 @@ Out of scope, described only: the floor probe (18 contained + 1 plain per fixtur
 3. Why do WAL and mirror ref observations (63 plain calls) run without bwrap? Not traced.
 4. The activated release is older than `e73c69b52`; the line numbers and counts may shift after the next activation.
 
+## 4. After the in-process cuts (2026-10-26)
+
+Main at `d7a505143`, which contains `04d71fb40` (Event Store skips mirrors whose tip did not move) and `00a585050` (transport policy listed once per config stamp; `list_tree` asks the object kind only after a miss). Every "after" row uses the dev host built from the working tree with a private target (`harden-r13-after-target`, untraced build first); the activated release binary was never used (MAIL was upgrading it during this run). Harness: `measure.sh` unchanged for strace flags and `parse.py` unchanged; wrappers `run1.sh`, `run2.sh`, `trivial-dev.mjs` and all traces are in `/home/vantt/projects/forgent/.fgos/runtime/tmp/r13-attrib/after/`. `trivial-dev.mjs` is a new wrapper: `measure.sh trivial` takes `FGOS_HOST_BIN` from the activated release, so the wrapper stages the dev host with `stageLauncherDoor` (same env as `npm run fgos:dev`) and runs the same node test under the same strace. Counts: git execs ("contained" = under bwrap; "bwrap" counts every bwrap exec, including the `/bin/true` availability probe, one per process).
+
+### Before / after
+
+"ex-floor" removes the floor probe: 15 contained + 1 plain (`--version`, 14 probe children incl. 3 `config remote.*` and 2 `cat-file -e`, and the lazy-fetch `fetch`).
+
+| Operation | Before (build) | After (dev host) | Comparable? |
+|---|---|---|---|
+| Steady foreground `fgos list`, ex-floor | 11 contained, 0 plain, 12 bwrap (release 10-25 21:19, section 2a); dev-host row A: 11 contained ex-floor (section 3) | 10 contained, 0 plain, 11 bwrap (`devlist2`, floor record hit, no walk, no remote) | Yes for the dev-host row A (same dev host, same ex-floor shape); release 2a is a different build but the same shapes |
+| Same, first run, floor probe paid | 26 contained + 1 plain (row A, 27 total) | 25 contained + 1 plain = 26 (`devlist1`), 26 bwrap | Yes (dev host) |
+| Detached sync child work, run in foreground, 1st run | 127 git (63 contained, 64 plain), ex-floor 111 (48 / 63) | 100 git (36 / 64), ex-floor 84 (21 contained, 63 plain); 37 bwrap | Yes (both dev host, due sync with the same 3 remote ops) |
+| Same, 2nd run, steady sync | not measured | 98 git (34 / 64), ex-floor 82 (19 contained, 63 plain); 35 bwrap | n/a |
+| Trivial store test | 31 git (24 contained, 7 plain), 25 bwrap (release 10-25 21:19) | 31 git (24 / 7), 25 bwrap (dev host, `FGOS_HOST_BIN` = staged dev host) | Different builds, but the shapes are identical line for line; neither cut touches this path |
+
+Notes on the child row: in the `fgos list` traces the detached child, spawned by the foreground, still dies under the dev host (`git-addon-unavailable`, fault log 04:19Z), so it issued 5-6 git calls before failing; those are excluded from the foreground numbers above (issuer `list` only). The two foreground sync runs are the real child work. The floor probe ran in both sync runs and in `devlist1`; before and after both hit this dev-host artifact (floor key does not hold across dev-host stagings), so the ex-floor numbers are the fair ones.
+
+### Call shapes that changed (sync child, ex-floor, run 1 versus section 3)
+
+| Shape | Before | After |
+|---|---|---|
+| History walk: `rev-list --max-count=256 --stdin`, `cat-file --batch-check`, `cat-file --batch`, mirror `cat-file --batch -Z` | 24 contained (two `verify_mirrors`, 3 streams x 4) | 0 in both runs (unchanged tips skipped); remaining `cat-file --batch -Z` are the legacy/pin reads: 4 in run 1, 2 in run 2 |
+| `config --null --show-scope --list` | 6 | 1 |
+| `cat-file -t` (before `ls-tree`) | 1 per tree page | 0 in every trace |
+| `remote get-url -- origin` | 5 | 5 (unchanged) |
+| `for-each-ref -- <one ref>` plain | 40 | 40 (unchanged) |
+| `update-ref` 8, `show-ref --exists` 3, `ls-remote` 3, `fetch` 2, `push` 1, `remote-https` 4, `rev-list --objects` 2 | 63 plain total | 63 plain total, unchanged: the sync still does pull, push, second pull even when nothing changed remotely |
+| resolve-HEAD pairs (`symbolic-ref`, `rev-parse --symbolic-full-name`), `for-each-ref` mirrors | 2+2, 3 | 2+2, 2 |
+
+Foreground `fgos list`: only `cat-file -t` went (11 to 10). The other calls are the same: 5 fixed per-process probes + `for-each-ref` + 3 `cat-file --batch -Z` + `ls-tree`.
+
+### Fixed cost per new process
+
+Counted from the traces for one fresh process before any real work (the node process that holds the addon; every `fgos` invocation, sync child, and test process pays this separately):
+
+| Probe | Calls | bwrap spawns | Observed in |
+|---|---|---|---|
+| `var GIT_CONFIG_SYSTEM` + `var GIT_CONFIG_GLOBAL` | 2 | 2 | every trace, once per process |
+| bwrap `/bin/true` availability probe (not git) | 0 | 1 | every process |
+| config listing, no repository (floor key) | 1 | 1 | every process |
+| config listing, repository (`--show-origin --list`) | 1 | 1 | once per repository per process |
+| format `rev-parse --show-object-format --show-ref-format` | 1 | 1 | once per repository per process |
+| Subtotal, floor record already present | 5 git | 6 bwrap | `devlist2` foreground (10 contained: 5 of these + 5 work); the failed list child paid exactly these 5 + the probe |
+| Floor probe, when the state root has no matching record | 16 git (15 contained, 1 plain `fetch`) | 15 | `devlist1`, both sync runs, trivial test (fresh state root per test process) |
+| Total, fresh state root | 21 git (20 contained, 1 plain) | 21 | `devtrivial`: 31 git = 21 fixed + 4 work contained + 6 test-fixture plain (2 `config --global --get`, `init`, 3 `config`) |
+
+The sync child pays the 5 + probe once, then its real work (remote operations plus 16 other ex-floor contained calls in run 1 (21 minus the fixed 5)). The foreground list pays the 5 even when no floor probe runs: 5 of its 10 contained calls (half) are fixed cost. A list that spawns the sync child makes a second process that pays the same 5 + 1 bwrap before doing anything.
+
+### Caveats
+
+- Dev host only; a release containing both cuts was not measured (none activated at the time, and the release was being replaced).
+- The sync-run floor probe repeats on every dev-host invocation (dev-host key artifact, same as section 3); a release would likely skip it, so total rows including the probe overstate a release.
+- The sync "steady" run 2 still pushed and fetched twice: the remote work was not reduced by the cuts, only the local walk, config and `cat-file -t` calls.
+- Run-1 versus run-2 difference of 2 `cat-file --batch -Z` and 2 contained calls is not explained here (legacy/pin reads are tip-dependent; not verified).
+- Wall times under strace were 29 s and 23 s (before: 47 s), single samples over the network, not a benchmark.
+- Trivial test before/after were different builds (release vs dev host); the identical shape list is the evidence that the cuts do not change it.
+
 Status: DONE_WITH_CONCERNS
 Summary: Both operations are attributed to code sites with exact counts (trivial 31 git: 24 contained, 7 plain; steady `fgos list` 11 contained; sync-due 114: 51 contained, 63 plain), the harness and `measure.sh` are saved, and three in-process cuts are named.
 Concerns/Blockers: Cut 1's saving depends on an unverified memo-key cause (question 1); TEST's counts were not reproduced; the 8-row `update-ref` and 12-row network counts in 2b were summed from the `parse.py` shape list.
