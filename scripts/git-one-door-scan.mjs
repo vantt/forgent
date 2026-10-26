@@ -1569,11 +1569,29 @@ function computeValueFlow(ctx, file, fn) {
       }
       if (new RegExp(`\\bexport\\s+default\\s+(?:(?:async\\s+)?function\\s*\\*?\\s*)?${esc(item.name)}\\b`).test(f.shape)) { aliasedExport = true; escape(f, 0, 'exported as default'); }
     }
-    // A module-level binding is read wherever it is imported.
+    // A module-level binding is read wherever it is imported. Star re-exports and exported
+    // namespace holders are not followed by the caller resolver: refuse them as export escapes.
     if (!item.scope && new RegExp(`export\\s+(?:const|let|var|(?:async\\s+)?function\\s*\\*?)\\s*${esc(item.name)}\\b|export\\s*\\{[^}]*\\b${esc(item.name)}\\b`).test(f.code)) {
-      for (const [other, alias] of importedAs(ctx, f, item.name)) push({ ...item, file: other, name: alias, origin: false });
+      if (item.path.length) { aliasedExport = true; escape(f, 0, 'exported in a namespace holder'); }
+      else {
+        for (const [other, alias] of importedAs(ctx, f, item.name)) push({ ...item, file: other, name: alias, origin: false });
+        for (const other of importersOf(ctx, f)) {
+          const names = (spec) => spec.startsWith('.') && path.posix.normalize(path.posix.join(path.posix.dirname(other.name), spec)) === f.name;
+          for (const m of other.code.matchAll(/export\s*(?:\{([^}]*)\}|\*(?:\s*as\s+[A-Za-z_$][\w$]*)?)\s*from\s*['"]([^'"]+)['"]/g)) {
+            if (!names(m[2])) continue;
+            if (m[1] === undefined) { aliasedExport = true; escape(other, m.index, 're-exported through a star'); }
+            else for (const part of m[1].split(',')) {
+              const [original, alias] = part.trim().split(/\s+as\s+/);
+              if (original === item.name) push({ ...item, file: other, name: alias ?? original, origin: false });
+            }
+          }
+          for (const m of other.code.matchAll(/import\s*\*\s*as\s+([A-Za-z_$][\w$]*)\s+from\s*['"]([^'"]+)['"]|(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*await\s+import\s*\(\s*['"]([^'"]+)['"]\s*\)/g)) {
+            if (names(m[2] ?? m[4])) push({ ...item, file: other, name: m[1] ?? m[3], path: [item.name], origin: false });
+          }
+        }
+      }
     }
-    f.flowShape ??= f.shape.replace(/(?:import|export)\s*\{[^}]*\}\s*from\s*['"][^'"]*['"]/g, (m) => ' '.repeat(m.length));
+    f.flowShape ??= f.shape.replace(/(?:import|export)\s*(?:\{[^}]*\}|\*(?:\s*as\s+[A-Za-z_$][\w$]*)?)\s*from\s*['"][^'"]*['"]/g, (m) => ' '.repeat(m.length));
     const shape = f.flowShape;
     const from = item.scope ? item.scope.from : 0;
     const to = item.scope ? item.scope.to : shape.length;

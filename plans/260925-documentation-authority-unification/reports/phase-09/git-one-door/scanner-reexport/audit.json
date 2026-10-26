@@ -1,0 +1,27 @@
+{
+  "node": "v24.18.0",
+  "originalRevision": "129cbb127349909fe171da418215e383d8ea06c7",
+  "originalScannerSha256": "ecc611176b2189fe24dc0b32d29320ff96a0972f4f615dda045a74f4b878b706",
+  "finalScannerSha256": "498e0e1fb7df56ecd25c41860de1ad212cdf45d8f285ebfb0305b7fbfb3cf54a",
+  "finalTestsSha256": "3fabc8c90c29bb05f330b2ea7bf44817fb0b63bab42b517055dcad048ae96c19",
+  "red": {
+    "tests": 61,
+    "pass": 48,
+    "fail": 13,
+    "skipped": 0
+  },
+  "green": {
+    "tests": 61,
+    "pass": 61,
+    "fail": 0,
+    "skipped": 0
+  },
+  "newNegativeCases": 12,
+  "redParentFailures": 1,
+  "trackedChanges": [
+    "scripts/git-one-door-scan.mjs",
+    "test/scripts/git-one-door-declarations.test.mjs"
+  ],
+  "scratchRemoved": "/tmp/fgos-work/scanner-reexport.BYfEzv",
+  "negativeControlScratchCleanup": "finally block in negative-control.mjs"
+}
