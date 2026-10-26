@@ -88,6 +88,8 @@ The owner reopened the suite-speed work instead of closing the lane. **TEST's ma
 | Q2 | Owner 10-26: the suite env becomes an allow-list (`buildTestEnv`), done by TEST inside its frame | done 10-26: full suite 8656 pass / 1 fail before the queue-variable fix (`full-suite-queue` caught the dropped `FGOS_FULL_SUITE_QUEUE_HELD`), then that file and `run-tests` 59/0; skip set unchanged (33) |
 | Q3 | Owner 10-26: extend the `suite:` line with the Rust test count and the run's CPU; warn (never fail) when CPU per case exceeds the baseline by more than 15%, naming the file that grew most | done 10-26: the line now reads `612 files, 8088 test() calls, 2288 Rust tests, 635 s wall, 6720 s CPU`; each test file's CPU (its own plus the children it waited for) is recorded by the spawn-spy preload; `--write-baseline` takes wall, CPU and per-file CPU from the last full run on HEAD (`.fgos/runtime/test-suite-last-run.json`); baseline rewritten from that run (full suite 8658 pass / 0 fail) |
 
+Constraint received 10-26 from `lead:COMMUNICATION` (owner approved DOC's documentation cutover; board 11:05): from the moment DOC imports main as F until DOC lands, TEST writes nothing under `docs/`. Anything urgent there goes to DOC first, through the board. TEST's open items (F14c, HOME, F1/H21, F16, WAM) touch only `test/`, `scripts/` and `plans/`.
+
 ## Rules for every batch
 
 - `npm test` and `cargo test --workspace` green before and after; quote the `suite:` line both times.
