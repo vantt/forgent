@@ -824,41 +824,75 @@ runner:
     seatBinding:
       # @fgos:doc Version of the seat binding form; this release writes 2 and reads 1 and 2. Values: 1 | 2. Default: 2.
       schema: 2
+    # @fgos:doc One collaboration pattern: its promise, loop, defaults and invariants.
     solo:
+      # @fgos:doc One-sentence promise of what this pattern delivers. Default: A single worker runs the task to completion..
       promise: "A single worker runs the task to completion."
+      # @fgos:doc The execution loop that runs this pattern. Values: solo | reviewed | panel | debate. Default: solo.
       loop: solo
+    # @fgos:doc One collaboration pattern: its promise, loop, defaults and invariants.
     reviewed:
+      # @fgos:doc One-sentence promise of what this pattern delivers. Default: A producer executes the task followed by checker review rounds until acceptance or budget exhaustion..
       promise: "A producer executes the task followed by checker review rounds until acceptance or budget exhaustion."
+      # @fgos:doc The execution loop that runs this pattern. Values: solo | reviewed | panel | debate. Default: reviewed.
       loop: reviewed
+    # @fgos:doc One collaboration pattern: its promise, loop, defaults and invariants.
     panel:
+      # @fgos:doc One-sentence promise of what this pattern delivers. Default: Multiple independent producers execute the task in parallel and a synthesizer combines their results..
       promise: "Multiple independent producers execute the task in parallel and a synthesizer combines their results."
+      # @fgos:doc The execution loop that runs this pattern. Values: solo | reviewed | panel | debate. Default: panel.
       loop: panel
+    # @fgos:doc One collaboration pattern: its promise, loop, defaults and invariants.
     debate:
+      # @fgos:doc One-sentence promise of what this pattern delivers. Default: Multiple agents debate opposing viewpoints across rounds before reaching a conclusion..
       promise: "Multiple agents debate opposing viewpoints across rounds before reaching a conclusion."
+      # @fgos:doc The execution loop that runs this pattern. Values: solo | reviewed | panel | debate. Default: debate.
       loop: debate
+    # @fgos:doc One collaboration pattern: its promise, loop, defaults and invariants.
     code-change:
+      # @fgos:doc One-sentence promise of what this pattern delivers. Default: A producer changes code with reviewer and red-team review..
       promise: "A producer changes code with reviewer and red-team review."
+      # @fgos:doc The execution loop that runs this pattern. Values: solo | reviewed | panel | debate. Default: reviewed.
       loop: reviewed
+      # @fgos:doc Invariants that must not be weakened.
       invariants:
+        # @fgos:doc An invariant on one parameter: either atLeast for lists or fixed for exact value.
         minCheckers:
+          # @fgos:doc List elements that must be present in the effective value. Default: ["reviewer","red-team"].
           atLeast: [reviewer, red-team]
+    # @fgos:doc One collaboration pattern: its promise, loop, defaults and invariants.
     consult:
+      # @fgos:doc One-sentence promise of what this pattern delivers. Default: An advisor provides specialized guidance without file mutations..
       promise: "An advisor provides specialized guidance without file mutations."
+      # @fgos:doc The execution loop that runs this pattern. Values: solo | reviewed | panel | debate. Default: solo.
       loop: solo
+      # @fgos:doc Invariants that must not be weakened.
       invariants:
+        # @fgos:doc An invariant on one parameter: either atLeast for lists or fixed for exact value.
         seats:
+          # @fgos:doc Exact value the parameter must have. Default: [{"seat":"advisor","role":"producer"}].
           fixed:
             - seat: advisor
               role: producer
+    # @fgos:doc One collaboration pattern: its promise, loop, defaults and invariants.
     rfc:
+      # @fgos:doc One-sentence promise of what this pattern delivers. Default: A document or decision proposal reviewed by a reviewer and red-team against specification..
       promise: "A document or decision proposal reviewed by a reviewer and red-team against specification."
+      # @fgos:doc The execution loop that runs this pattern. Values: solo | reviewed | panel | debate. Default: reviewed.
       loop: reviewed
+      # @fgos:doc Invariants that must not be weakened.
       invariants:
+        # @fgos:doc An invariant on one parameter: either atLeast for lists or fixed for exact value.
         minCheckers:
+          # @fgos:doc List elements that must be present in the effective value. Default: ["reviewer","red-team"].
           atLeast: [reviewer, red-team]
+      # @fgos:doc Default parameter values for the loop.
       defaults:
+        # @fgos:doc Most review rounds before the unit stops. Minimum: 1. Default: 1.
         maxRounds: 1
+        # @fgos:doc Default task instructions per seat or kind.
         roleTasks:
+          # @fgos:doc Task instruction text.
           reviewer: |-
             You are the reviewer of a proposal or document another agent just produced. Do not change any file.
             Read the artifact the task names (a path or text in the task itself) and the producer's own account of it, listed under Context refs. Do not look at git history unless the task names a commit.
@@ -866,6 +900,7 @@ runner:
 
             The task that was assigned:
             {objective}
+          # @fgos:doc Task instruction text.
           red-team: |-
             You are the red-team for a proposal or document another agent just produced. Do not change any file.
             Read the artifact the task names (a path or text in the task itself) and the producer's own account of it, listed under Context refs. Do not look at git history unless the task names a commit.
@@ -873,10 +908,15 @@ runner:
 
             The task that was assigned:
             {objective}
+    # @fgos:doc One collaboration pattern: its promise, loop, defaults and invariants.
     research-fan-out:
+      # @fgos:doc One-sentence promise of what this pattern delivers. Default: Multiple researchers investigate a topic independently in parallel and a synthesizer produces the unified finding..
       promise: "Multiple researchers investigate a topic independently in parallel and a synthesizer produces the unified finding."
+      # @fgos:doc The execution loop that runs this pattern. Values: solo | reviewed | panel | debate. Default: panel.
       loop: panel
+      # @fgos:doc Default parameter values for the loop.
       defaults:
+        # @fgos:doc Default seat declarations for the loop.
         seats:
           - seat: researcher-1
             role: producer

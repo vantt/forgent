@@ -134,9 +134,19 @@ fn every_doc_line_in_a_bundled_standard_file_is_the_render_of_its_schema_node() 
     for (name, text) in bundle::STANDARD {
         let mut stack: Vec<(usize, String)> = Vec::new();
         let mut pending: Option<(usize, Vec<String>)> = None;
+        let mut scalar_indent: Option<usize> = None;
+        let mut list_item_indent: Option<usize> = None;
         for (index, line) in text.lines().enumerate() {
             let body = line.trim_start();
             let indent = line.len() - body.len();
+            if scalar_indent.is_some_and(|s| indent > s) {
+                continue;
+            }
+            scalar_indent = None;
+            if list_item_indent.is_some_and(|l| indent > l) {
+                continue;
+            }
+            list_item_indent = None;
             assert!(
                 !body.starts_with("# @fgos:why"),
                 "{name}:{}: a standard holds no reason",
@@ -152,21 +162,32 @@ fn every_doc_line_in_a_bundled_standard_file_is_the_render_of_its_schema_node() 
                     .push(doc.to_string());
                 continue;
             }
-            if body.starts_with('#') || body.starts_with('-') || body.is_empty() {
+            if body.starts_with('#') || body.is_empty() {
+                continue;
+            }
+            if body.starts_with('-') {
+                list_item_indent = Some(indent);
                 continue;
             }
             let key = match body.strip_prefix('"') {
                 Some(quoted) => quoted.split('"').next().unwrap().to_string(),
                 None => body.split(':').next().unwrap().to_string(),
             };
+            let trimmed = body.trim_end();
+            if trimmed.ends_with("|-") || trimmed.ends_with('|') {
+                scalar_indent = Some(indent);
+            }
             while stack.last().is_some_and(|(i, _)| *i >= indent) {
                 stack.pop();
             }
             stack.push((indent, key));
-            if let Some((at, doc)) = pending.take() {
-                let path: Vec<Segment> =
-                    stack.iter().map(|(_, k)| Segment::Key(k.clone())).collect();
-                let want = rendered(&schemas, &standard, &path);
+            let path: Vec<Segment> =
+                stack.iter().map(|(_, k)| Segment::Key(k.clone())).collect();
+            let want = rendered(&schemas, &standard, &path);
+            let (at, doc) = pending.take().unwrap_or((index + 1, Vec::new()));
+            let is_catalog = path.first() == Some(&Segment::Key("runner".into()))
+                && path.get(1) == Some(&Segment::Key("patterns".into()));
+            if (is_catalog && !want.is_empty()) || !doc.is_empty() {
                 assert_eq!(doc, want, "{name}:{at}: doc line of {}", format_path(&path));
                 seen += 1;
             }
