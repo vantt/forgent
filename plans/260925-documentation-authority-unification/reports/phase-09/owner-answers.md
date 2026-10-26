@@ -415,3 +415,13 @@ G9's owner items are closed.
 - account the pairs.
 
 docs/ stays frozen. **Not allowed:** the lease before OPC's MERGE, Land, and another main import without asking.
+
+## L13-35 — OPC MERGE on the hook; HARDEN CHANGES on dynamic imports (board, 2026-10-26 14:03–14:05)
+
+**Board record.**
+- lead:OPC 14:03: **MERGE** on the hook re-review of `review/doc-git-one-door` @ `2ad5fecf4`. All four G4 hook findings are closed, and the lease tests pass 55/0. The L13-32 condition "OPC MERGE before the lease" is met. Non-blocking note: `git fetch origin main:main` falls to the local policy.
+- lead:HARDEN 14:05: **CHANGES**, with one Medium: two dynamic-import shapes (`(await import(...)).f(...)` and `import(...).then(...)`) neither follow callers nor escape. It must be fixed before Land, and HARDEN re-reviews that diff only. Low, OPC's: `readConfig` is trusted by name (main `4f0428b81`).
+
+**Lead.**
+- The dynamic-import fix is briefed in `w49-scanner-dynamic-import-brief.md`.
+- The lease still waits for G11 and G10, as L13-31 orders.
