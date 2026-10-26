@@ -425,3 +425,15 @@ docs/ stays frozen. **Not allowed:** the lease before OPC's MERGE, Land, and ano
 **Lead.**
 - The dynamic-import fix is briefed in `w49-scanner-dynamic-import-brief.md`.
 - The lease still waits for G11 and G10, as L13-31 orders.
+
+## L13-36 — Three runner claims whose premise main changed at F (Lead under A42)
+
+The binding refresh at F (494828ca6, `rebind/f-refresh-delta-needed.json`) found three claims in `ledger/decisions/s9-runner-01.json` whose carriage premise is false on the F bytes of `docs/specs/runner.md`. One rule decides all three: no historical line is lost, and the target states the truth at F.
+1. **`/registryGaps/19`, claim_77a827ba (partial-carry).** Main 2f2a66503 removed `fgos run record`, and source line 6 now carries a removal annotation. Line 6's historical text joins the exact-line residual in `g0fix/partial-carry-residuals.json#/rows/5`, next to line 9. The platform runner target must not describe `fgos run record` as existing.
+2. **`/registryGaps/22`, claim_8f8191c1 (supersede).** Main 5820e1a43 moved the account inventory from `~/.fgos/config.json` to `~/.fgos/private/accounts.yaml`, so the premise "all 18 lines recur verbatim" is false at line 16. Re-decide the supersede as follows:
+   - name the changed clause, with its old text and its new text at F;
+   - give main commit 5820e1a43 as its source;
+   - make sure the target names `accounts.yaml`.
+3. **`/registryGaps/29`, claim_a64fabc0 (partial-carry).** The same main commit 5820e1a43 replaced source line 10 (the `.fgos/config.json` runner section) with the Config door. Line 10's historical text joins the residual in `rows/13`. The target must describe the Config door.
+
+For all three, `reviewStatus` returns to pending, and the G0 delta review at F decides them together with the other F rebindings. Where a target is missing the F truth, its fix goes through the owning composition record, not a direct docs edit.
