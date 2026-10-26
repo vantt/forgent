@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "dcfa7d417371f37c4ba8f468217d800e227bf7c45dabd06fff578f30ceb6a7be",
+  "payloadDigest": "2627a6c6995c73ab2a34559536ecb45e1bdba7d7b01ecc3cc88ab0592511d987",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -864,7 +864,7 @@
     "scripts/regenerate-observe-fixtures.mjs": "19b954de8f832a233d9ddea71f603ddfa4ec94a75e95497c83e87503e06733bd",
     "scripts/run-rust-dev-host.mjs": "e10af7fa8c280ecb62cbde50e8d2e2160e1135b2bdd20c02867d0f0351ba641b",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "5f26eb1b6f9368f55d4a23739dfb3b0734fc0ea266d11c0e737d1235d71be29a",
+    "scripts/run-tests.mjs": "668e45543e9941525624268083808ef936048a1a6585d24ea956821532778399",
     "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
     "scripts/test-proof-inventory.mjs": "3d5277c7d4894c4945ba9829b2fce3127add921e25988a9b1145ad4d50a6f72c",

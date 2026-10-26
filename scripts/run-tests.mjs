@@ -20,7 +20,7 @@ import path from 'node:path';
 import { spawn as spawnAsync, spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
-import { acquireFullSuiteQueue, QUEUE_HELD_ENV } from './lib/full-suite-queue.mjs';
+import { acquireFullSuiteQueue, QUEUE_HELD_ENV, QUEUE_SWITCH_ENV } from './lib/full-suite-queue.mjs';
 import { configEntries, repositoryDirs } from './lib/git-dir-layout.mjs';
 
 export { REPO_ROOT };
@@ -122,28 +122,41 @@ function stageDoorManifest(childEnv) {
   }
 }
 
+// Windows names are matched without case, as Windows reads them.
+const TEST_ENV_KEYS = new Set([
+  'PATH', 'HOME', 'USER', 'LOGNAME', 'SHELL', 'LANG', 'LANGUAGE', 'TZ', 'TERM', 'TMPDIR', 'TMP', 'TEMP', 'XDG_RUNTIME_DIR',
+  'USERPROFILE', 'APPDATA', 'LOCALAPPDATA', 'PROGRAMDATA', 'SYSTEMROOT', 'SYSTEMDRIVE', 'WINDIR', 'COMSPEC', 'PATHEXT',
+  'NODE_OPTIONS', 'RUSTFLAGS', 'FGOS_HOST_BIN', 'FGOS_ACTIVE_RELEASE_PATH', 'FGOS_ACTIVE_MANIFEST_PATH', 'FGOS_CLAUDE_COMMAND', 'FGOS_KEEP_TEST_FIXTURES',
+  QUEUE_SWITCH_ENV, QUEUE_HELD_ENV,
+]);
+const TEST_ENV_PREFIXES = ['LC_', 'CARGO_', 'RUSTUP_', 'RUSTC_', 'FGOS_TEST_'];
+
+function isTestEnvKey(key) {
+  const name = key.toUpperCase();
+  return TEST_ENV_KEYS.has(name) || TEST_ENV_PREFIXES.some((prefix) => name.startsWith(prefix));
+}
+
 /**
  * The env every spawned `node --test` run gets, whoever spawns it (the full
  * suite, the canary, the selector's related run, mutation and coverage runs):
- * - no inherited NODE_TEST_CONTEXT: an enclosing `node --test` sets it, and a
- *   nested run that inherits it reports to a parent that is not listening
- *   and exits 0 without running a single test;
- * - no inherited FGOS_STATE_ROOT: the host pins it into every payload it
- *   runs, and a suite started under fgOS would otherwise send every fixture
- *   that sets only FGOS_STATE_HOME to the real machine state root;
+ * - only the caller variables TEST_ENV_KEYS and TEST_ENV_PREFIXES name: the OS
+ *   and login inputs every process has, the toolchains the suite builds with,
+ *   and the suite's own knobs. Everything else the shell that started the run
+ *   exports would make a result depend on who started it: an enclosing
+ *   `node --test`'s NODE_TEST_CONTEXT (the nested run reports to a parent that
+ *   is not listening and exits 0 without running a test), the FGOS_STATE_ROOT
+ *   the host pins into every payload (fixtures that set only FGOS_STATE_HOME
+ *   would reach the real state root), herdr's HERDR_* (every Unit would run
+ *   through the real herdr server, ~10x as long), and an agent CLI's session
+ *   id (session identity reads it). A test that means one of these sets it;
  * - FGOS_CLAUDE_COMMAND naming a binary that does not exist, unless the
  *   caller names one: doctor and setup in a fixture would otherwise run the
  *   real `claude` CLI, reach the network and change the real user's plugin
  *   registrations; a test that probes the claude rows sets its own;
- * - no inherited HERDR_* (nor FGOS_HERDR_BIN): herdr exports them into every
- *   pane, so a suite started from an agent's pane would see a live herdr
- *   session, run every Unit through the real herdr server (real panes, polled
- *   reads) and take ~10x as long; a test that means herdr sets its own;
  * - on darwin, TMPDIR/TMP/TEMP resolved through realpath (/var -> /private/var).
  */
 export function buildTestEnv(env = process.env) {
-  const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, FGOS_HERDR_BIN: _herdrBin, ...rest } = env;
-  const childEnv = Object.fromEntries(Object.entries(rest).filter(([key]) => !key.startsWith('HERDR_')));
+  const childEnv = Object.fromEntries(Object.entries(env).filter(([key]) => isTestEnvKey(key)));
   childEnv.FGOS_CLAUDE_COMMAND ||= '/nonexistent/fgos-test-claude-binary';
   if (process.platform === 'darwin') {
     const tempRoot = env.TMPDIR || os.tmpdir();

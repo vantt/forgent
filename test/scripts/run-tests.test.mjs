@@ -153,11 +153,11 @@ test('runTests refuses with a non-zero status and an actionable message when zer
   assert.match(result.message, new RegExp(emptyRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });
 
-test('runTests spawns node --test with the discovered files as argv elements and the caller env passed through, preserving other env vars (R2/R3)', () => {
+test('runTests spawns node --test with the discovered files as argv elements and the suite env built from the caller env', () => {
   const root = tmpFixtureRoot();
   const f = write(root, 'x.test.mjs');
   let captured = null;
-  const fakeEnv = { PATH: '/usr/bin', UNRELATED: 'kept' };
+  const fakeEnv = { PATH: '/usr/bin', UNRELATED: 'dropped' };
 
   const result = runTests({
     root,
@@ -174,7 +174,7 @@ test('runTests spawns node --test with the discovered files as argv elements and
   assert.equal(captured.execPath, '/fake/node');
   assert.deepEqual(captured.argv, ['--test', GUARD_ARG, SPY_ARG, path.relative(root, f)]);
   assert.equal(captured.opts.env.PATH, '/usr/bin');
-  assert.equal(captured.opts.env.UNRELATED, 'kept');
+  assert.equal('UNRELATED' in captured.opts.env, false);
 });
 
 test('chosen test files run alone in the staged environment, and a path that is not a file fails by name before anything spawns', () => {
@@ -345,27 +345,20 @@ test('the real entrypoint still fires when invoked through a symlink pointing at
   assert.match(result.stderr, /discovered 0 test files/);
 });
 
-test('buildTestEnv drops an inherited NODE_TEST_CONTEXT so a nested node --test really runs its files', () => {
-  const env = buildTestEnv({ PATH: '/usr/bin', NODE_TEST_CONTEXT: 'child-v8', KEEP: 'yes' });
-  assert.equal('NODE_TEST_CONTEXT' in env, false);
-  assert.equal(env.KEEP, 'yes');
-});
-
-test('buildTestEnv drops the herdr session of the pane that started the suite, so no test drives the real herdr server', () => {
-  const env = buildTestEnv({ PATH: '/usr/bin', HERDR_ENV: '1', HERDR_SOCKET_PATH: '/run/herdr.sock', HERDR_PANE_ID: 'w1:p1', FGOS_HERDR_BIN: '/usr/bin/herdr', KEEP: 'yes' });
-  assert.deepEqual(Object.keys(env).filter((key) => key.includes('HERDR')), []);
-  assert.equal(env.KEEP, 'yes');
+test('buildTestEnv passes on only the OS, toolchain and suite variables of the shell that started the run', () => {
+  const env = buildTestEnv({
+    PATH: '/usr/bin', HOME: '/home/u', LC_ALL: 'C', CARGO_TARGET_DIR: '/t', RUSTUP_HOME: '/r', FGOS_TEST_KEEP_TMP: '1', SystemRoot: 'C:\\Windows',
+    // An enclosing node --test, the host's pinned state root, a herdr pane and an agent CLI's session.
+    NODE_TEST_CONTEXT: 'child-v8', FGOS_STATE_ROOT: '/real/state/fgos', FGOS_STATE_HOME: '/real/state',
+    HERDR_ENV: '1', HERDR_SOCKET_PATH: '/run/herdr.sock', FGOS_HERDR_BIN: '/usr/bin/herdr', CLAUDE_CODE_SESSION_ID: 's1', CODEX_THREAD_ID: 't1',
+  });
+  for (const key of ['PATH', 'HOME', 'LC_ALL', 'CARGO_TARGET_DIR', 'RUSTUP_HOME', 'FGOS_TEST_KEEP_TMP', 'SystemRoot']) assert.ok(key in env, key);
+  for (const key of ['NODE_TEST_CONTEXT', 'FGOS_STATE_ROOT', 'FGOS_STATE_HOME', 'HERDR_ENV', 'HERDR_SOCKET_PATH', 'FGOS_HERDR_BIN', 'CLAUDE_CODE_SESSION_ID', 'CODEX_THREAD_ID']) assert.equal(key in env, false, key);
 });
 
 test('buildTestEnv points the claude CLI at a missing binary unless the caller names one, so no test reaches the real claude', () => {
   assert.equal(buildTestEnv({ PATH: '/usr/bin' }).FGOS_CLAUDE_COMMAND, '/nonexistent/fgos-test-claude-binary');
   assert.equal(buildTestEnv({ PATH: '/usr/bin', FGOS_CLAUDE_COMMAND: '/fixture/claude' }).FGOS_CLAUDE_COMMAND, '/fixture/claude');
-});
-
-test('buildTestEnv drops an inherited FGOS_STATE_ROOT so fixtures that set FGOS_STATE_HOME stay in their own state root', () => {
-  const env = buildTestEnv({ PATH: '/usr/bin', FGOS_STATE_ROOT: '/real/state/fgos', FGOS_STATE_HOME: '/fixture/state' });
-  assert.equal('FGOS_STATE_ROOT' in env, false);
-  assert.equal(env.FGOS_STATE_HOME, '/fixture/state');
 });
 
 // --- per-run temp dir: every fixture the suite mkdtemps lands under one
