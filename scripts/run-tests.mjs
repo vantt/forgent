@@ -20,6 +20,7 @@ import path from 'node:path';
 import { spawn as spawnAsync, spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { CPU_LOG_ENV, readTestFileCpu, waitedCpuSeconds } from './lib/test-file-cpu.mjs';
 import { acquireFullSuiteQueue, QUEUE_HELD_ENV, QUEUE_SWITCH_ENV } from './lib/full-suite-queue.mjs';
 import { configEntries, repositoryDirs } from './lib/git-dir-layout.mjs';
 
@@ -482,11 +483,19 @@ export function runSelectedTests(files, {
     : null;
   const spawnLog = path.join(runTemp ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-test-spy-')), 'git-spawn-spy.jsonl');
   childEnv[GIT_SPAWN_SPY_LOG_ENV] = spawnLog;
+  const cpuLog = path.join(path.dirname(spawnLog), 'test-file-cpu.jsonl');
+  childEnv[CPU_LOG_ENV] = cpuLog;
   let gitSpawns = [];
   try {
     const started = Date.now();
+    const cpuBefore = waitedCpuSeconds();
     const spawnResult = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
-    result = { status: spawnResult.status ?? 1, files: relFiles, runTemp, wallSeconds: (Date.now() - started) / 1000 };
+    const cpuAfter = waitedCpuSeconds();
+    result = {
+      status: spawnResult.status ?? 1, files: relFiles, runTemp, wallSeconds: (Date.now() - started) / 1000,
+      cpuSeconds: cpuBefore === null || cpuAfter === null ? null : cpuAfter - cpuBefore,
+      fileCpu: readTestFileCpu(cpuLog, cwd, relFiles),
+    };
     gitSpawns = readGitSpawnLog(spawnLog);
   } finally {
     if (supervisor) timedOut = supervisor.stop();
@@ -690,15 +699,19 @@ if (isMainModule(import.meta.url)) {
     if (message) console.error(message);
     process.exit(status);
   }
-  const { status, message, files, wallSeconds } = runTests({
+  const { status, message, files, wallSeconds, cpuSeconds, fileCpu } = runTests({
     forwardedArgs: process.argv.slice(2),
     queue: (options) => queueAfterStaging(options),
   });
   if (message) console.error(message);
   let reportStatus = 0;
   if (files.length > 0) {
-    const { suiteReport } = await import('./test-proof-inventory.mjs');
-    const report = suiteReport({ files, wallSeconds });
+    const { recordLastRun, suiteReport } = await import('./test-proof-inventory.mjs');
+    // Only a whole run with no runner arguments is this tree's cost; a filtered run would set a false baseline.
+    if (typeof cpuSeconds === 'number' && process.argv.length === 2) {
+      try { recordLastRun({ wallSeconds, cpuSeconds, fileCpu }); } catch (err) { console.error(`suite: warning: this run's cost not recorded: ${err.message}`); }
+    }
+    const report = suiteReport({ files, wallSeconds, cpuSeconds, fileCpu });
     for (const line of report.lines) console.error(line);
     reportStatus = report.status;
   }

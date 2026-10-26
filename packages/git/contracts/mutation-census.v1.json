@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "37df4686029ef9da5680915743f6af79a2c90b2e8b4061d3ef098622e4845887",
+  "payloadDigest": "0bfa1b8a23e7e51c5ebf1821011144f1297d08b57d78cf77d239620fbd048f42",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -851,6 +851,7 @@
     "scripts/lib/mailbox-role-recorder.mjs": "b45702d191ab0ce223c9be0795fd9b573d73ff5a88a89007457de1da24f4c8ae",
     "scripts/lib/mailbox-wake-probe.mjs": "7dbb49a27d152d16631098acdcd122796628bfd4edd79fca9f87e23139b4590f",
     "scripts/lib/sandbox-git.mjs": "c45bc75afc8e5666e13d70f9ea65c6ff4e79243aeca7bae5046d4ea3e914088f",
+    "scripts/lib/test-file-cpu.mjs": "f54eb34a6f6f01607c123fbeb04d1a8be61805c7fe687f7887a0adac2068e4a7",
     "scripts/lib/test-file-watchdog.mjs": "ed39439477ee26003c50fba1df7511317882727704518a3a9cb96952b96fbfa8",
     "scripts/lib/test-git-config-guard.mjs": "e9bc333d889985d94b847fd80fbfed7e6dcfa1e9b2ffffc97a14e7be326153d1",
     "scripts/measure-coordination-baseline.mjs": "b890da1963fd4ee50ac84cd53e5e9b45aa7ce37a92d51c6a633bdb2374ec6a7a",
@@ -865,10 +866,10 @@
     "scripts/regenerate-observe-fixtures.mjs": "19b954de8f832a233d9ddea71f603ddfa4ec94a75e95497c83e87503e06733bd",
     "scripts/run-rust-dev-host.mjs": "e10af7fa8c280ecb62cbde50e8d2e2160e1135b2bdd20c02867d0f0351ba641b",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "668e45543e9941525624268083808ef936048a1a6585d24ea956821532778399",
+    "scripts/run-tests.mjs": "ef79b8344e01d0856cab3c80508b449a3458c275c45c2bb763632ab71f8d3858",
     "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
-    "scripts/test-proof-inventory.mjs": "3d5277c7d4894c4945ba9829b2fce3127add921e25988a9b1145ad4d50a6f72c",
+    "scripts/test-proof-inventory.mjs": "b1df922d19a85f4462ece027b949d6a3dad2e3a8f2e5b993ea673e50e9119245",
     "scripts/test-select-compare.mjs": "45ec5c8f1b192430431127a06133376cd5e5d2a50f8e6865472c1ae341ae1329",
     "scripts/test-select-coverage-map.mjs": "b313d02cce6c8fa7f03dae8acdfd14a37b8f3a04b330ae9b2c144d0287b08e85",
     "scripts/test-select-mutate.mjs": "77d8bc7ae624453d5c50d6f83d3136ef41803f69452cef41c8fd14587cd4df39",

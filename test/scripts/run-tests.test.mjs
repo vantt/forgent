@@ -253,6 +253,28 @@ test('the script itself, spawned as a real process against a tiny fixture tree w
   assert.equal(result.status, 0);
 });
 
+test('a real run measures its CPU and each test file\'s, counting the children a file waited for', { skip: process.platform !== 'linux' }, () => {
+  const root = tmpFixtureRoot();
+  // The file itself is idle; a fixed amount of work (not a wall-clock wait, which load would shorten) runs in a child it waits for.
+  write(root, 'busy.test.mjs', "import { test } from 'node:test';\nimport { spawnSync } from 'node:child_process';\ntest('busy', () => { spawnSync(process.execPath, ['-e', 'let x = 0; for (let i = 0; i < 5e7; i++) x += i; console.log(x)']); });\n");
+  write(root, 'idle.test.mjs', "import { test } from 'node:test';\ntest('idle', () => {});\n");
+  const scriptUrl = new URL('../../scripts/run-tests.mjs', import.meta.url).href;
+  const driver = path.join(root, 'drive.mjs');
+  fs.writeFileSync(
+    driver,
+    `import { runTests } from ${JSON.stringify(scriptUrl)};\n` +
+      `const { status, cpuSeconds, fileCpu } = runTests({ root: ${JSON.stringify(root)}, cwd: ${JSON.stringify(root)}, stdio: 'ignore' });\n` +
+      'console.log(JSON.stringify({ status, cpuSeconds, fileCpu }));\n',
+  );
+
+  const result = spawnSyncNode(driver);
+  const { status, cpuSeconds, fileCpu } = JSON.parse(result.stdout.trim().split('\n').at(-1));
+  assert.equal(status, 0);
+  assert.deepEqual(Object.keys(fileCpu).sort(), ['busy.test.mjs', 'idle.test.mjs']);
+  assert.ok(fileCpu['busy.test.mjs'] > fileCpu['idle.test.mjs'] + 0.1, JSON.stringify(fileCpu));
+  assert.ok(cpuSeconds >= fileCpu['busy.test.mjs'] + fileCpu['idle.test.mjs']);
+});
+
 test('the script itself, spawned for real, refuses (non-zero, no crash) over an empty tree', () => {
   const root = tmpFixtureRoot();
   const scriptUrl = new URL('../../scripts/run-tests.mjs', import.meta.url).href;
@@ -303,7 +325,7 @@ function mirroredRepoRoot(prefix) {
   fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
   fs.copyFileSync(realQueueLibPath, path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs'));
   // ...and the libraries run-tests.mjs and the distribution builder (its one-door census step) import.
-  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/git-addon-stage.mjs', 'lib/git-dir-layout.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'git-one-door-scan.mjs']) {
+  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/test-file-cpu.mjs', 'lib/git-addon-stage.mjs', 'lib/git-dir-layout.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'git-one-door-scan.mjs']) {
     fs.copyFileSync(fileURLToPath(new URL(`../../scripts/${rel}`, import.meta.url)), path.join(root, 'scripts', rel));
   }
   // run-tests.mjs builds the native addon record through the distribution builder's helpers.
