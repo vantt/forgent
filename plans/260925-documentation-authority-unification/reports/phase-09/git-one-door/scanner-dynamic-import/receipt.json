@@ -1,0 +1,101 @@
+{
+  "status": "blocked",
+  "summary": "fix(git): reject unfollowed dynamic import callers\nOwning regressions pass; a new real E3 escape and native-backed full-tree acceptance require Lead follow-up.",
+  "inputHead": "2053f072ed947377072d7487c7d79ba5a5d6b5f7",
+  "cwd": "/home/vantt/projects/forgentX-p9-w1-d2",
+  "evidenceDirectory": "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import",
+  "commandNotation": "$E is evidenceDirectory; $scratch is an invocation-owned mktemp directory under /tmp/fgos-work/scanner-dynamic-import.XXXXXX, removed after each invocation. Command groups preserve all executed shell operations; tool read/grep operations have no process exit code.",
+  "impactAnalysis": {
+    "posture": "degraded",
+    "reason": "The brief prohibits fgos CLI, including the capability query; no GitNexus MCP tools are exposed. Call graph is not independently confirmed.",
+    "sourceObservedCallers": ["valueFlowCalls", "resolveWrappers", "declaredSiteId"],
+    "boundaries": ["static scanner", "census generation and verification"]
+  },
+  "commands": [
+    {
+      "id": 1,
+      "command": "cd /home/vantt/projects/forgentX-p9-w1-d2 && p=/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792998615631-9992a818/producer/1/runs/01/outbox/ack-1.json; printf '{\"round\": 1, \"agent\": \"fgos-run_unit-run-179299a865cf3d\", \"receivedAt\": \"%s\"}\\n' \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\" > \"$p.tmp\" && mv \"$p.tmp\" \"$p\"",
+      "exitCode": 0
+    },
+    {
+      "id": 2,
+      "command": "git status --short && git rev-parse HEAD && git show origin/main:plans/reports/review-261026-1404-doc-g4-scanner-rereview.md && git log -8 --oneline -- scripts/git-one-door-scan.mjs && git log --oneline -S'ImportExpression' -- scripts/git-one-door-scan.mjs",
+      "exitCode": 0
+    },
+    {
+      "id": 3,
+      "command": "git log --oneline -G 'importersOf|computeValueFlow|await.*import' -- scripts/git-one-door-scan.mjs && git show d0dcc24ec --stat && git show 2fa7fe921 -- scripts/git-one-door-scan.mjs",
+      "exitCode": 0
+    },
+    {
+      "id": 4,
+      "command": "mkdir -p /tmp/fgos-work \"$E\" && scratch=$(mktemp -d /tmp/fgos-work/scanner-dynamic-import.XXXXXX) && TMPDIR=\"$scratch\" env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --test test/scripts/git-one-door-declarations.test.mjs > \"$E/red.log\" 2>&1; code=$?; if [ -n \"$scratch\" ]; then rm -rf \"$scratch\"; fi; printf 'declarations red exit: %s\\n' \"$code\"; exit \"$code\"",
+      "exitCode": 1,
+      "expectedFailure": true,
+      "evidence": "red.log",
+      "result": "Both new negative subtests fail against unchanged scanner: Missing expected exception. 79 pass, 3 reported failures including the parent group."
+    },
+    {
+      "id": 5,
+      "command": "scratch=$(mktemp -d /tmp/fgos-work/scanner-dynamic-import.XXXXXX) && TMPDIR=\"$scratch\" env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --test test/scripts/git-one-door-declarations.test.mjs > \"$E/declarations.log\" 2>&1; code=$?; if [ -n \"$scratch\" ]; then rm -rf \"$scratch\"; fi; printf 'declarations green exit: %s\\n' \"$code\"; exit \"$code\"",
+      "exitCode": 0,
+      "evidence": "declarations.log",
+      "result": {"tests": 82, "pass": 82, "fail": 0, "skipped": 0}
+    },
+    {
+      "id": 6,
+      "command": "git diff --check && git diff --stat && git diff -- scripts/git-one-door-scan.mjs test/scripts/git-one-door-declarations.test.mjs",
+      "exitCode": 0
+    },
+    {
+      "id": 7,
+      "command": "scratch=$(mktemp -d /tmp/fgos-work/scanner-dynamic-import.XXXXXX) && git show HEAD:scripts/git-one-door-scan.mjs > \"$scratch/baseline.mjs\" && git ls-files -co --exclude-standard -z | env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --input-type=module - \"$scratch/baseline.mjs\" > \"$E/product-subset.json\" <<'JS'\n<diagnosticScript below, but without maxBuffer in the inner git ls-files call>\nJS\ncode=$?; if [ -n \"$scratch\" ]; then rm -rf \"$scratch\"; fi; printf 'product subset comparison exit: %s\\n' \"$code\"; exit \"$code\"",
+      "exitCode": 1,
+      "result": "No scan result: inner read-only git enumeration exceeded Node default stdout buffer (spawnSync git ENOBUFS, status null, SIGTERM). Heredoc supplied stdin; the outer pipeline was redundant. Error was returned to the tool; the empty initial product-subset.json was replaced by command 8. Scratch removed."
+    },
+    {
+      "id": 8,
+      "command": "scratch=$(mktemp -d /tmp/fgos-work/scanner-dynamic-import.XXXXXX) && git show HEAD:scripts/git-one-door-scan.mjs > \"$scratch/baseline.mjs\" && env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --input-type=module - \"$scratch/baseline.mjs\" > \"$E/product-subset.json\" 2> \"$E/product-subset.stderr\" <<'JS'\n<diagnosticScript below>\nJS\ncode=$?; if [ -n \"$scratch\" ]; then rm -rf \"$scratch\"; fi; printf 'product subset comparison exit: %s\\n' \"$code\"; exit \"$code\"",
+      "exitCode": 1,
+      "evidence": ["product-subset.json", "product-subset.stderr"],
+      "result": "Supplemental ONLY, not acceptance: baseline zero sites; final one new native-loader site from three E3 inline imports; all 20 declarations match and nine subset class counts are identical."
+    },
+    {
+      "id": 9,
+      "command": "node --check scripts/git-one-door-scan.mjs && node --check test/scripts/git-one-door-declarations.test.mjs && env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --input-type=module <<'JS'\n<diagnosticAssertions below>\nJS\ncode=$?; printf 'syntax and diagnostic assertions exit: %s\\n' \"$code\"; if [ \"$code\" -ne 0 ]; then exit \"$code\"; fi; git diff --exit-code -- scripts/lib/git-one-door-declarations.v1.json src/git/native.mjs scripts/git/e3-bench.mjs && git diff --check && git status --short",
+      "exitCode": 0
+    },
+    {
+      "id": 10,
+      "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--no-addons node --input-type=module (receipt/evidence parse, source SHA-256, and git-status write-scope validation, output final-check.json); git diff --check",
+      "exitCode": 0,
+      "evidence": "final-check.json"
+    }
+  ],
+  "diagnosticScript": "import fs from 'node:fs';\nimport path from 'node:path';\nimport { pathToFileURL } from 'node:url';\nimport { execFileSync } from 'node:child_process';\nimport { scan, declaredProduct } from './scripts/git-one-door-scan.mjs';\nconst root = process.cwd();\nconst baselinePath = process.argv[2];\nconst original = fs.readFileSync(baselinePath, 'utf8');\nfs.writeFileSync(baselinePath, original.replace(/from (['\"])(\\.[^'\"]+)\\1/g, (_, quote, spec) => `from ${quote}${pathToFileURL(path.resolve(root, 'scripts', spec)).href}${quote}`));\nconst baseline = await import(pathToFileURL(baselinePath));\nconst product = execFileSync('git', ['ls-files', '-co', '--exclude-standard', '-z'], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 }).split('\\0').filter(Boolean).filter(declaredProduct(root));\nconst omitted = product.filter(f => /\\/skills\\//.test(f));\nconst files = product.filter(f => !/\\/skills\\//.test(f)).map(f => path.join(root, f));\nconst before = baseline.scan({ root, files });\nconst after = scan({ root, files });\nconst identical = JSON.stringify(before.classCounts) === JSON.stringify(after.classCounts);\nconsole.log(JSON.stringify({ scope: 'SUPPLEMENTAL ONLY: skill paths omitted because their YAML declarations require a native addon; not the full-tree gate', baseline: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), filesScanned: Object.keys(after.files).length, omitted, before: { sites: before.sites, classCounts: before.classCounts }, after: { sites: after.sites, classCounts: after.classCounts }, identicalClassCounts: identical, declarationClasses: after.classes.filter(c => c.reason), e3Classes: after.classes.filter(c => c.path === 'scripts/git/e3-bench.mjs') }, null, 2));\nprocess.exitCode = before.sites.length || after.sites.length || !identical ? 1 : 0;\n",
+  "diagnosticAssertions": "import fs from 'node:fs';\nimport assert from 'node:assert/strict';\nconst proof = JSON.parse(fs.readFileSync('plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/product-subset.json', 'utf8'));\nassert.deepEqual(proof.before.sites, []);\nassert.deepEqual(proof.before.classCounts, proof.after.classCounts);\nassert.equal(proof.after.sites.length, 1);\nassert.equal(proof.after.sites[0].path, 'src/git/native.mjs');\nassert.deepEqual(proof.after.sites[0].escapes, [703, 716, 815].map(line => `imported dynamically in a form the caller resolver does not follow (scripts/git/e3-bench.mjs:${line})`));\nassert.equal(proof.declarationClasses.length, 20);\nconsole.log('Supplemental diagnostic confirmed: same class counts, all 20 declarations match; one new site from three e3 imports. Full-tree acceptance remains unproven.');\n",
+  "fullTreeAcceptance": {
+    "command": "node scripts/git-one-door-scan.mjs --root .",
+    "status": "not-run",
+    "exitCode": null,
+    "reason": "The CLI unconditionally opens native Inspect; its bootstrap may build/stage outside the grant, and skill YAML parsing also needs the native door. No addons or bootstrap writes are permitted. Lead must run the full scan without --write-census in the staged environment.",
+    "zeroUndeclaredSitesClaimed": false,
+    "fullClassCountsVerified": false
+  },
+  "newSite": {
+    "path": "src/git/native.mjs",
+    "line": 11,
+    "family": "unresolved-binary",
+    "siteId": "loadNativeAddon:3f09be41735e41645155e76a11a308aaad340a9ba3b0ec0d8a8a0b9b48ae5ff4",
+    "escapes": ["scripts/git/e3-bench.mjs:703", "scripts/git/e3-bench.mjs:716", "scripts/git/e3-bench.mjs:815"],
+    "existingDeclaration": null,
+    "recommendation": "Lead should change the three E3 inline imports to already followed awaited namespace/destructured bindings, then rerun the full gate. No current declaration targets this site; a permissive declaration cannot safely override the export escapes."
+  },
+  "needsWrites": ["scripts/git/e3-bench.mjs"],
+  "scratchRemoved": true,
+  "nativeAddonsLoaded": false,
+  "declarationsChanged": false,
+  "readConfigTrustChanged": false,
+  "gitWritesPerformed": false,
+  "handoff": ["Lead owns E3 caller repair and native-backed acceptance", "HARDEN re-review required before Land"]
+}

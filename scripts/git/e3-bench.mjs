@@ -700,7 +700,8 @@ async function run(args) {
   for (const shape of ['intent', 'attempt']) {
     const repo = bareRepo(path.join(root, `backlog-${shape}.git`));
     const made = fixture('backlog', repo, '10000', shape, '8');
-    const native = (await import('../../src/git/native.mjs')).loadNativeAddon(loader);
+    const { loadNativeAddon } = await import('../../src/git/native.mjs');
+    const native = loadNativeAddon(loader);
     for (let i = 0; i < 3; i++) native.inspectGit(state, repo, repo);
     let last;
     const nodeMs = Array.from({ length: 20 }, () => { const [ms, facts] = time(() => native.inspectGit(state, repo, repo)); last = facts; return ms; });
@@ -713,7 +714,8 @@ async function run(args) {
   {
     const repo = bareRepo(path.join(root, 'reconcile.git'));
     const made = fixture('interrupted', state, repo, '100', WRITER);
-    const native = (await import('../../src/git/native.mjs')).loadNativeAddon(loader);
+    const { loadNativeAddon } = await import('../../src/git/native.mjs');
+    const native = loadNativeAddon(loader);
     const pendingBefore = native.inspectGit(state, repo, repo).journal.pendingCount;
     const outcomes = {};
     const [ms] = time(() => {
@@ -812,7 +814,8 @@ async function rollback(root, fgctl, descriptor, index, loader) {
   }
   const tipMatches = port.readRef({ name: reference }).oid === receipts[receipts.length - 1].next;
   port.close();
-  const native = (await import('../../src/git/native.mjs')).loadNativeAddon(loader);
+  const { loadNativeAddon } = await import('../../src/git/native.mjs');
+  const native = loadNativeAddon(loader);
   const journal = native.inspectGit(state, fs.realpathSync(ws), fs.realpathSync(ws)).journal;
   const tally = {};
   for (const a of attempts) tally[`${a.direction}: ${a.code}`] = (tally[`${a.direction}: ${a.code}`] ?? 0) + 1;

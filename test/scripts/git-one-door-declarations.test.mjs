@@ -323,12 +323,41 @@ adapters.cli.execute(JSON.parse(process.env.CONFIG));
   assert.throws(() => scan({ root: f.root }), /invalid Git declaration: wrapper escapes.*exported as default/);
 });
 
-// Refusing exported holders must not turn an ordinary, fully observed namespace call into an escape.
-test('a namespace import without a re-export remains declarable', async (t) => {
-  for (const binding of ["import * as ns from './read.mjs';", "const ns = await import('./read.mjs');"]) {
+// Static-import and export-alias proofs cannot observe an import expression without a local binding.
+// These are HARDEN's read-only static caller plus a hidden dynamic write caller, one case per shape.
+test('unfollowed dynamic imports refuse a read-only wrapper declaration', async (t) => {
+  for (const [name, source] of [
+    ['awaited member call', "export async function write() { return (await import('./w.mjs')).runGit(['push', 'origin', 'main']); }\n"],
+    ['promise callback', "import('./w.mjs').then((m) => m.runGit(['branch', '-D', 'topic']));\n"],
+  ]) {
+    await t.test(name, (t) => {
+      const f = fixture(t, 'src/w.mjs', "import { spawnSync } from 'node:child_process';\nexport function runGit(args) { return spawnSync('git', args, { encoding: 'utf8' }); }\n");
+      f.write('src/c0.mjs', "import { runGit } from './w.mjs';\nrunGit(['rev-parse', 'HEAD']);\n");
+      const [site] = scan({ root: f.root }).sites;
+      assert.deepEqual(site.callers, ['src/c0.mjs:2']);
+      f.declare([{ ...f.entry, siteId: site.siteId }]);
+      assert.deepEqual(scan({ root: f.root }).sites, [], 'the observed static read is declarable');
+      f.write('src/c4.mjs', source);
+      assert.throws(() => scan({ root: f.root }), /invalid Git declaration: wrapper escapes.*imported dynamically/, 'an unobserved dynamic write cannot inherit the read declaration');
+      f.declare([]);
+      const [escaped] = scan({ root: f.root }).sites;
+      assert.deepEqual(escaped.callers, site.callers, 'the hidden call is an escape, not a resolved caller');
+      assert.ok(escaped.escapes.some(escape => /imported dynamically.*src\/c4\.mjs:1/.test(escape)));
+    });
+  }
+});
+
+// Refusing exported holders and unfollowed imports must not reject fully observed local bindings.
+test('a namespace or destructured import without a re-export remains declarable', async (t) => {
+  const bindings = [["import * as ns from './read.mjs';", 'ns.g']];
+  for (const kind of ['const', 'let', 'var']) {
+    bindings.push([`${kind} ns = await import('./read.mjs');`, 'ns.g']);
+    bindings.push([`${kind} { g: read } = await import('./read.mjs');`, 'read']);
+  }
+  for (const [binding, callee] of bindings) {
     await t.test(binding, (t) => {
       const f = fixture(t, 'scripts/read.mjs', "import { execFileSync } from 'node:child_process';\nexport function g(args) { return execFileSync('git', args, {}); }\ng(['ls-tree', 'HEAD']);\n");
-      f.write('scripts/caller.mjs', binding + "\nns.g(['ls-tree', 'HEAD']);\n");
+      f.write('scripts/caller.mjs', binding + `\n${callee}(['ls-tree', 'HEAD']);\n`);
       const [site] = scan({ root: f.root }).sites;
       f.declare([{ ...f.entry, siteId: site.siteId }]);
       assert.deepEqual(scan({ root: f.root }).sites, []);

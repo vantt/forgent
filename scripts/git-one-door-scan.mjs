@@ -1582,6 +1582,15 @@ function computeValueFlow(ctx, file, fn) {
         for (const [other, alias] of importedAs(ctx, f, item.name)) push({ ...item, file: other, name: alias, origin: false });
         for (const other of importersOf(ctx, f)) {
           const names = (spec) => spec.startsWith('.') && path.posix.normalize(path.posix.join(path.posix.dirname(other.name), spec)) === f.name;
+          // Only awaited namespace/destructured bindings are followed by the caller resolver.
+          // An inline member or promise callback must not hide a caller behind a read declaration.
+          for (const m of other.code.matchAll(/\bimport\s*\(\s*['"]([^'"]+)['"]/g)) {
+            if (!names(m[1])) continue;
+            const bound = /\b(?:const|let|var)\s+(?:[A-Za-z_$][\w$]*|\{[^}]*\})\s*=\s*await\s*$/.test(other.shape.slice(0, m.index));
+            if (bound && /^\s*\)/.test(other.shape.slice(m.index + m[0].length))) continue;
+            aliasedExport = true;
+            escape(other, m.index, 'imported dynamically in a form the caller resolver does not follow');
+          }
           for (const m of other.code.matchAll(/export\s*(?:\{([^}]*)\}|\*(?:\s*as\s+[A-Za-z_$][\w$]*)?)\s*from\s*['"]([^'"]+)['"]/g)) {
             if (!names(m[2])) continue;
             if (m[1] === undefined) { aliasedExport = true; escape(other, m.index, 're-exported through a star'); }

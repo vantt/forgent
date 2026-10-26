@@ -1,0 +1,140 @@
+✔ a declaration classifies exactly one call, retains its rationale, and survives line shifts (24.733752ms)
+✔ deleted, edited, renamed, or ambiguous declared calls fail closed instead of reusing a line number (7.880892ms)
+✔ declarations reject duplicate keys, path patterns, unknown classes, empty reasons and invalid hook verbs (14.30536ms)
+✔ the hook read set adds only show-ref and diff-tree and still rejects their mutating neighbours (2.592009ms)
+✔ an explicitly declared unresolved consumer command uses the existing configured-binary class (5.244415ms)
+✔ new or changed write callers cannot inherit any declared pass-through wrapper (35.165072ms)
+▶ call, Reflect.apply and array-slot callers refuse declared pass-through wrappers
+  ✔ tooling wrapper: git.call(null, '.', ['reset', '--hard', 'HEAD']); (2.634066ms)
+  ✔ tooling wrapper: Reflect.apply(git, null, ['.', ['reset', '--hard', 'HEAD']]); (2.636711ms)
+  ✔ tooling wrapper: const tbl = [git]; tbl[0]('.', ['reset', '--hard', 'HEAD']); (2.311672ms)
+  ✔ callback wrapper: run.call(null, 'git', ['push', '--force', 'origin', 'HEAD']); (3.056956ms)
+  ✔ callback wrapper: Reflect.apply(run, null, ['git', ['push', '--force', 'origin', 'HEAD']]); (3.497621ms)
+  ✔ callback wrapper: const tbl = [run]; tbl[0]('git', ['push', '--force', 'origin', 'HEAD']); (2.984957ms)
+  ✔ cold-hook callback: git.call(null, ['update-ref', 'refs/heads/main', 'HEAD']); (2.999595ms)
+  ✔ cold-hook callback: Reflect.apply(git, null, [['update-ref', 'refs/heads/main', 'HEAD']]); (3.482883ms)
+  ✔ cold-hook callback: const tbl = [git]; tbl[0](['update-ref', 'refs/heads/main', 'HEAD']); (2.977966ms)
+✔ call, Reflect.apply and array-slot callers refuse declared pass-through wrappers (27.773473ms)
+▶ configured declarations refuse fixed Git callback programs, including escaping write callers
+  ✔ resolved literal git caller (3.432938ms)
+  ✔ run.call(null, 'git', ['push', '--force', 'origin', 'HEAD']); (2.851007ms)
+  ✔ Reflect.apply(run, null, ['git', ['push', '--force', 'origin', 'HEAD']]); (2.766695ms)
+  ✔ const tbl = [run]; tbl[0]('git', ['push', '--force', 'origin', 'HEAD']); (3.193123ms)
+✔ configured declarations refuse fixed Git callback programs, including escaping write callers (12.75131ms)
+▶ configured declarations refuse escaping program parameters even with a known config caller
+  ✔ unresolvedConfig() (1.7057ms)
+  ✔ JSON.parse(process.env.COMMANDS).command (1.960072ms)
+✔ configured declarations refuse escaping program parameters even with a known config caller (3.977236ms)
+✔ indexed returned configuration proves the program without trusting an escaping outer caller (4.239341ms)
+▶ tooling declarations reject literal writes and non-literal caller verbs
+  ✔ literal site: ['update-ref', 'refs/heads/x', 'HEAD'] (2.716277ms)
+  ✔ wrapper: ['update-ref', 'refs/heads/x', 'HEAD'] (1.294076ms)
+  ✔ literal site: unresolvedArgs() (1.655899ms)
+  ✔ wrapper: unresolvedArgs() (1.162629ms)
+  ✔ literal site: [verb, 'HEAD'] (1.436588ms)
+  ✔ wrapper: [verb, 'HEAD'] (1.152256ms)
+  ✔ literal site: [...prefix, 'diff', 'HEAD'] (1.57032ms)
+  ✔ wrapper: [...prefix, 'diff', 'HEAD'] (1.546424ms)
+  ✔ literal site: ['symbolic-ref', ...operands] (1.494231ms)
+  ✔ wrapper: ['symbolic-ref', ...operands] (1.114884ms)
+✔ tooling declarations reject literal writes and non-literal caller verbs (16.024375ms)
+▶ declared wrappers refuse aliased and default exports with undeclared reset callers
+  ✔ export { g as alias }; with args (2.818439ms)
+  ✔ export { g as alias }; with ['ls-tree', 'HEAD'] (1.85871ms)
+  ✔ export { g as default }; with args (2.02926ms)
+  ✔ export { g as default }; with ['ls-tree', 'HEAD'] (1.486748ms)
+✔ declared wrappers refuse aliased and default exports with undeclared reset callers (8.728164ms)
+▶ declared wrappers refuse star, default and namespace re-exports with undeclared reset callers
+  ✔ export * from './read.mjs'; with args (2.007439ms)
+  ✔ via named re-export: export * from './read.mjs'; with args (1.877047ms)
+  ✔ export * from './read.mjs'; with ['ls-tree', 'HEAD'] (2.016753ms)
+  ✔ via named re-export: export * from './read.mjs'; with ['ls-tree', 'HEAD'] (1.644773ms)
+  ✔ export { g as default } from './read.mjs'; with args (2.117902ms)
+  ✔ via named re-export: export { g as default } from './read.mjs'; with args (2.066126ms)
+  ✔ export { g as default } from './read.mjs'; with ['ls-tree', 'HEAD'] (2.104913ms)
+  ✔ via named re-export: export { g as default } from './read.mjs'; with ['ls-tree', 'HEAD'] (1.676486ms)
+  ✔ export { g as "default" } from './read.mjs'; with args (2.085188ms)
+  ✔ via named re-export: export { g as "default" } from './read.mjs'; with args (2.046259ms)
+  ✔ export { g as "default" } from './read.mjs'; with ['ls-tree', 'HEAD'] (1.636214ms)
+  ✔ via named re-export: export { g as "default" } from './read.mjs'; with ['ls-tree', 'HEAD'] (1.72494ms)
+  ✔ export { g as 'x-y' } from './read.mjs'; with args (2.395277ms)
+  ✔ via named re-export: export { g as 'x-y' } from './read.mjs'; with args (1.976111ms)
+  ✔ export { g as 'x-y' } from './read.mjs'; with ['ls-tree', 'HEAD'] (1.596387ms)
+  ✔ via named re-export: export { g as 'x-y' } from './read.mjs'; with ['ls-tree', 'HEAD'] (2.309158ms)
+  ✔ export * as ns from './read.mjs'; with args (1.762473ms)
+  ✔ via named re-export: export * as ns from './read.mjs'; with args (1.960665ms)
+  ✔ export * as ns from './read.mjs'; with ['ls-tree', 'HEAD'] (1.656029ms)
+  ✔ via named re-export: export * as ns from './read.mjs'; with ['ls-tree', 'HEAD'] (1.884028ms)
+  ✔ import * as r from './read.mjs'; export const ns = r; with args (2.735718ms)
+  ✔ via named re-export: import * as r from './read.mjs'; export const ns = r; with args (2.515382ms)
+  ✔ import * as r from './read.mjs'; export const ns = r; with ['ls-tree', 'HEAD'] (2.082592ms)
+  ✔ via named re-export: import * as r from './read.mjs'; export const ns = r; with ['ls-tree', 'HEAD'] (2.76875ms)
+✔ declared wrappers refuse star, default and namespace re-exports with undeclared reset callers (50.849736ms)
+✔ a configured function adapter keeps unrelated re-exports but refuses a default re-export (11.835219ms)
+▶ unfollowed dynamic imports refuse a read-only wrapper declaration
+  ✖ awaited member call (4.535562ms)
+  ✖ promise callback (2.443911ms)
+✖ unfollowed dynamic imports refuse a read-only wrapper declaration (7.393681ms)
+▶ a namespace or destructured import without a re-export remains declarable
+  ✔ import * as ns from './read.mjs'; (2.37731ms)
+  ✔ const ns = await import('./read.mjs'); (1.746271ms)
+  ✔ const { g: read } = await import('./read.mjs'); (1.891285ms)
+  ✔ let ns = await import('./read.mjs'); (1.687328ms)
+  ✔ let { g: read } = await import('./read.mjs'); (1.629042ms)
+  ✔ var ns = await import('./read.mjs'); (1.574977ms)
+  ✔ var { g: read } = await import('./read.mjs'); (1.637239ms)
+✔ a namespace or destructured import without a re-export remains declarable (13.267224ms)
+✔ wrapper caller identities survive line shifts but an added read caller needs a new declaration (11.107496ms)
+✔ caller fingerprints bind computed callees and duplicates but not caller ordering (3.590851ms)
+✔ declared hook verbs must equal observed literal caller verbs even after re-declaration (7.288213ms)
+✔ the census binds declaration bytes so doctor rejects missing or changed declarations (1.877845ms)
+ℹ tests 82
+ℹ suites 0
+ℹ pass 79
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 368.55431
+
+✖ failing tests:
+
+test at test/scripts/git-one-door-declarations.test.mjs:333:13
+✖ awaited member call (4.535562ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: an unobserved dynamic write cannot inherit the read declaration
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d2/test/scripts/git-one-door-declarations.test.mjs:341:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d2/test/scripts/git-one-door-declarations.test.mjs:333:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes.*imported dynamically/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:333:13
+✖ promise callback (2.443911ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: an unobserved dynamic write cannot inherit the read declaration
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d2/test/scripts/git-one-door-declarations.test.mjs:341:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d2/test/scripts/git-one-door-declarations.test.mjs:333:13)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes.*imported dynamically/,
+    operator: 'throws',
+    diff: 'simple'
+  }

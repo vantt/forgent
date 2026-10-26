@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "claimsValidated": true,
+  "changedPathsWithinScope": [
+    "scripts/git-one-door-scan.mjs",
+    "test/scripts/git-one-door-declarations.test.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/declarations.log",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/final-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/product-subset.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/product-subset.stderr",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/receipt.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/receipt.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/red.log"
+  ],
+  "sha256": {
+    "scripts/git-one-door-scan.mjs": "f455148bfccc5d1fffb35e9dbf9cb5b782a2fb6642ac214c446c0c1b23fb43a5",
+    "test/scripts/git-one-door-declarations.test.mjs": "57f63966c2699b2f29feb884a51473424d6db8237ddca69c3d7fac90c51610b3",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/receipt.md": "63121d61e81f85afe4725983a22c33229ea166a10451bb8b7e693c389fe39aa9",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/receipt.json": "6325fddb4f423b8d16d08b22ec715dac5d8600c27fa65942f86b8bedce421d23",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/red.log": "2d5f82f67fe68fa0b7eeca6e467a0eecdbfd664879db3d2eaf93c4e546e36d85",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/declarations.log": "5b985d52747146eaaa7a376542d22143da798e05621e4b2d8861136401e56594",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/product-subset.json": "43f23ae337fc0723dbeb448783ef5977cfe2b134acbd5f914dd5e8e435349059",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/scanner-dynamic-import/product-subset.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "acceptance": "BLOCKED: one E3 escape site; full native-backed tree scan not run"
+}

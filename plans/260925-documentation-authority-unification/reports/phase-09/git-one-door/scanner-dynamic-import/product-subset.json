@@ -1,0 +1,684 @@
+{
+  "scope": "SUPPLEMENTAL ONLY: skill paths omitted because their YAML declarations require a native addon; not the full-tree gate",
+  "baseline": "2053f072ed947377072d7487c7d79ba5a5d6b5f7",
+  "filesScanned": 1112,
+  "omitted": [
+    ".agents/skills/_shared/ak-cook-worker-contract.md",
+    ".agents/skills/_shared/capability-catalog.md",
+    ".agents/skills/_shared/capability-matching.md",
+    ".agents/skills/_shared/catchup-self-recovery.md",
+    ".agents/skills/_shared/citation-format.md",
+    ".agents/skills/_shared/coding-cell-policy.md",
+    ".agents/skills/_shared/coding-worker-contract.md",
+    ".agents/skills/_shared/coordination-driver.md",
+    ".agents/skills/_shared/decision-question.md",
+    ".agents/skills/_shared/executor-dispatch-fallback.md",
+    ".agents/skills/_shared/fgos-cli-fallback.md",
+    ".agents/skills/_shared/planning-capability-awareness.md",
+    ".agents/skills/_shared/private-cell-worktree.md",
+    ".agents/skills/distill/CREATION-LOG.md",
+    ".agents/skills/distill/SKILL.md",
+    ".agents/skills/distill/references/consult-protocol.md",
+    ".agents/skills/distill/references/deep-dive-protocol.md",
+    ".agents/skills/distill/references/extract-rules.md",
+    ".agents/skills/distill/scripts/distill.mjs",
+    ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+    ".agents/skills/fgos-advise/SKILL.md",
+    ".agents/skills/fgos-advise/references/request-kinds-and-routes.md",
+    ".agents/skills/fgos-architecture-panel/SKILL.md",
+    ".agents/skills/fgos-clarifying/SKILL.md",
+    ".agents/skills/fgos-coding-discovering/SKILL.md",
+    ".agents/skills/fgos-coding-driving/SKILL.md",
+    ".agents/skills/fgos-coding-driving/references/caller-contract.md",
+    ".agents/skills/fgos-coding-driving/references/loop-mechanics.md",
+    ".agents/skills/fgos-coding-driving/references/reclaim-and-role-graph.md",
+    ".agents/skills/fgos-coding-exploring/SKILL.md",
+    ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
+    ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+    ".agents/skills/fgos-coding-exploring/references/re-entry-from-planning.md",
+    ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+    ".agents/skills/fgos-coding-implement/SKILL.md",
+    ".agents/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+    ".agents/skills/fgos-coding-implement/references/return-mechanics.md",
+    ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+    ".agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+    ".agents/skills/fgos-coding-knowledge/SKILL.md",
+    ".agents/skills/fgos-coding-planning/SKILL.md",
+    ".agents/skills/fgos-coding-planning/references/approach-and-shape.md",
+    ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+    ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md",
+    ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+    ".agents/skills/fgos-coding-shaping/SKILL.md",
+    ".agents/skills/fgos-coding-validating/SKILL.md",
+    ".agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+    ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+    ".agents/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md",
+    ".agents/skills/fgos-cook/SKILL.md",
+    ".agents/skills/fgos-cook/references/case-and-doors.md",
+    ".agents/skills/fgos-cook/references/reading-ak-plans.md",
+    ".agents/skills/fgos-cook/references/route-table-pending.md",
+    ".agents/skills/fgos-fanout/SKILL.md",
+    ".agents/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
+    ".agents/skills/fgos-group-thinking/SKILL.md",
+    ".agents/skills/fgos-indexing/SKILL.md",
+    ".agents/skills/fgos-lock-fence/SKILL.md",
+    ".agents/skills/fgos-researching/SKILL.md",
+    ".agents/skills/fgos-routing/SKILL.md",
+    ".agents/skills/fgos-run/SKILL.md",
+    ".agents/skills/instruction-audit/SKILL.md",
+    ".agents/skills/instruction-audit/references/lane-prompts.md",
+    ".agents/skills/instruction-audit/references/report-template.md",
+    ".agents/skills/instruction-audit/scripts/instruction-audit.mjs",
+    "core/skills/_shared/ak-cook-worker-contract.md",
+    "core/skills/_shared/capability-catalog.md",
+    "core/skills/_shared/capability-matching.md",
+    "core/skills/_shared/catchup-self-recovery.md",
+    "core/skills/_shared/citation-format.md",
+    "core/skills/_shared/coding-worker-contract.md",
+    "core/skills/_shared/coordination-driver.md",
+    "core/skills/_shared/decision-question.md",
+    "core/skills/_shared/executor-dispatch-fallback.md",
+    "core/skills/_shared/fgos-cli-fallback.md",
+    "core/skills/_shared/planning-capability-awareness.md",
+    "core/skills/_shared/private-cell-worktree.md",
+    "core/skills/distill/CREATION-LOG.md",
+    "core/skills/distill/SKILL.md",
+    "core/skills/distill/references/consult-protocol.md",
+    "core/skills/distill/references/deep-dive-protocol.md",
+    "core/skills/distill/references/extract-rules.md",
+    "core/skills/distill/scripts/distill.mjs",
+    "core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+    "core/skills/fgos-advise/SKILL.md",
+    "core/skills/fgos-advise/references/request-kinds-and-routes.md",
+    "core/skills/fgos-architecture-panel/SKILL.md",
+    "core/skills/fgos-clarifying/SKILL.md",
+    "core/skills/fgos-cook/SKILL.md",
+    "core/skills/fgos-cook/references/case-and-doors.md",
+    "core/skills/fgos-cook/references/reading-ak-plans.md",
+    "core/skills/fgos-cook/references/route-table-pending.md",
+    "core/skills/fgos-fanout/SKILL.md",
+    "core/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
+    "core/skills/fgos-group-thinking/SKILL.md",
+    "core/skills/fgos-indexing/SKILL.md",
+    "core/skills/fgos-lock-fence/SKILL.md",
+    "core/skills/fgos-researching/SKILL.md",
+    "core/skills/fgos-routing/SKILL.md",
+    "core/skills/fgos-run/SKILL.md",
+    "core/skills/instruction-audit/SKILL.md",
+    "core/skills/instruction-audit/references/lane-prompts.md",
+    "core/skills/instruction-audit/references/report-template.md",
+    "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+    "domains/coding/skills/_shared/coding-cell-policy.md",
+    "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+    "domains/coding/skills/fgos-coding-driving/SKILL.md",
+    "domains/coding/skills/fgos-coding-driving/references/caller-contract.md",
+    "domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md",
+    "domains/coding/skills/fgos-coding-driving/references/reclaim-and-role-graph.md",
+    "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+    "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+    "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+    "domains/coding/skills/fgos-coding-exploring/references/re-entry-from-planning.md",
+    "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+    "domains/coding/skills/fgos-coding-implement/SKILL.md",
+    "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+    "domains/coding/skills/fgos-coding-implement/references/return-mechanics.md",
+    "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+    "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+    "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+    "domains/coding/skills/fgos-coding-planning/SKILL.md",
+    "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+    "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+    "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+    "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+    "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+    "domains/coding/skills/fgos-coding-validating/SKILL.md",
+    "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+    "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+    "domains/coding/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md"
+  ],
+  "before": {
+    "sites": [],
+    "classCounts": {
+      "hook-read-context": 26,
+      "configured-binary": 95,
+      "rust-test": 139,
+      "argv-runner": 14,
+      "production-sandbox-probe": 4,
+      "uncalled-wrapper": 10,
+      "git-driver": 1,
+      "declared-tooling-exemption": 19,
+      "sandbox-door": 2
+    }
+  },
+  "after": {
+    "sites": [
+      {
+        "path": "src/git/native.mjs",
+        "line": 11,
+        "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+        "binary": "param options (loadNativeAddon escapes: imported dynamically in a form the caller resolver does not follow (scripts/git/e3-bench.mjs:703))",
+        "family": "unresolved-binary",
+        "siteId": "loadNativeAddon:3f09be41735e41645155e76a11a308aaad340a9ba3b0ec0d8a8a0b9b48ae5ff4",
+        "callerDigests": [
+          "0c6e798664f81fb59a11249338b3a653e8ed75938694017febfd5f1663fc814a",
+          "11739ff328679b9a56294b97e5ad92d0e7169f562b8cdb065f17d2a81762638b",
+          "27eb2f52878daf7e1caa30f7c2f56afa9fbcafa2246bfd2d916e4d406bb92f87",
+          "2fa1d063c6cb32568136294e9bcfa224e7522d91e91d847e450c1ecb406d183b",
+          "2fa1d063c6cb32568136294e9bcfa224e7522d91e91d847e450c1ecb406d183b",
+          "3a6f681f17a3b115221c4f15b58cabc84daab3d798d4680d9e347eaff402dd12",
+          "49e472ce64ef11b55702cf97a0ea225c7b057ff20c754e31579e0e20ae2013f6",
+          "49e472ce64ef11b55702cf97a0ea225c7b057ff20c754e31579e0e20ae2013f6",
+          "509190e2e996b040cc258ebfab3b4cfb2d4bd2b362375e16fb5a8f7066c7001f",
+          "509190e2e996b040cc258ebfab3b4cfb2d4bd2b362375e16fb5a8f7066c7001f",
+          "509190e2e996b040cc258ebfab3b4cfb2d4bd2b362375e16fb5a8f7066c7001f",
+          "5546bca9d2949428fc610c931325d05af0ed83cfc991c2052db7da26848f01bf",
+          "56e0824f34ffa394102a7802b74efbc22c36d7f8f8b6fca359a7f72b48441f28",
+          "80173f851470e7b04f4198ed10944ea247a88947816e2ec492c895eaf4ad2060",
+          "9ca27a642fbf93fa4916637b72c8ff6693a9146157ac82a3ebf2b1cbe811b0ff",
+          "a5f60490d94a2002bf74aec58169ab82770e9ce7d4b2a1b98982ae0481953a19",
+          "a5f60490d94a2002bf74aec58169ab82770e9ce7d4b2a1b98982ae0481953a19",
+          "a5f60490d94a2002bf74aec58169ab82770e9ce7d4b2a1b98982ae0481953a19",
+          "a5f60490d94a2002bf74aec58169ab82770e9ce7d4b2a1b98982ae0481953a19",
+          "a5f60490d94a2002bf74aec58169ab82770e9ce7d4b2a1b98982ae0481953a19",
+          "a5f60490d94a2002bf74aec58169ab82770e9ce7d4b2a1b98982ae0481953a19",
+          "a6478eacff39cb634c6cb08df34305fbd8f566838aa689d8a85a0e32bfff129d",
+          "bf401ab9910d44ea0b3a1770cc87160f7af3ddd565f82d791e42d6581b82487b",
+          "c2e5622bba1a07d512163364cad8681802946e38f6ce40871360b30b731bf0c6",
+          "c38b88e4c7f0182a06ebcc8ac3f2dc7503e7eeda24ca460c1b2c764bcf64070c",
+          "cf72ecbf00d2db7d04d6e97b315d84091c4030f7bc7c84a738eb6822a9b8483a",
+          "d5f9d1c9c4a8fb75ff706f030ed84e25df298cfc41214322ac4ee506d6349082",
+          "d759d35394adc2ed658e258a47a3936e8509e2a127b2b42e11f6e68c38410f65",
+          "ec33b0b7e847642f7070814d9623f95ac4b7deff3019b25156bc46a7f99244c3"
+        ],
+        "escapes": [
+          "imported dynamically in a form the caller resolver does not follow (scripts/git/e3-bench.mjs:703)",
+          "imported dynamically in a form the caller resolver does not follow (scripts/git/e3-bench.mjs:716)",
+          "imported dynamically in a form the caller resolver does not follow (scripts/git/e3-bench.mjs:815)"
+        ]
+      }
+    ],
+    "classCounts": {
+      "hook-read-context": 26,
+      "configured-binary": 95,
+      "rust-test": 139,
+      "argv-runner": 14,
+      "production-sandbox-probe": 4,
+      "uncalled-wrapper": 10,
+      "git-driver": 1,
+      "declared-tooling-exemption": 19,
+      "sandbox-door": 2
+    }
+  },
+  "identicalClassCounts": true,
+  "declarationClasses": [
+    {
+      "path": ".githooks/pre-commit",
+      "line": 611,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "siteId": "leaseGitRead:fde3f196247ca9899debc1bcfa212e8f8994581863af09df7f22a20dd4866dfc",
+      "callerDigests": [
+        "00c03a9e0937d04093939285f1dbfb81e1c5366a8ed5dc01db02a6898b51f74b",
+        "307e191fbe28ee61a44466b663cac0f1bfb9fe3cb871cefc98b9cefc87f0cb0f",
+        "3b5228841de568039de9635263347a2911a53ac8573de5a7fdbda8d81a2f4491",
+        "4440bc188380750bb59aa3cf7d6c771e66a76352b377c08cdf6232d681979101",
+        "614748b726f4f66ff14dd6fe3a39dce82bbf1cd5caf809ed679bb62ebe98b037",
+        "640435846d151c508d250164e9de895b3ebc0f22076d0db84bec3aa50c4944fc",
+        "77f7bf619bd6b111ec7537eed465d2a46abf30545f07aefbdcd7682c7d478215",
+        "85e53bf9f9938b49e76fbb8d2a3a206d1561eb0018a3bf4480a1bbc422ea7e71",
+        "932a5e12ce7d2a6c1657d1ec6bd44fc5f5e218950f0641aa3e6a358351e4a831",
+        "a569589a2119767f1b7a0052aa1c2c01f7b41249151614274fc1031a28b374c4",
+        "e835ed5933030788cdc5e56ada4a441b940d633bfed2ec767cd5b62e9c8a55ff",
+        "f20c3ad557799f9f4046f07bb1e51d16052d9410fcf3556deffd0e46d6053cf2",
+        "f3ebb8cfb91925294e2913bb16131cee2e773ec18be4567bea0dd11c0e9750b6"
+      ],
+      "escapes": [],
+      "class": "hook-read-context",
+      "reason": "Owner L13-6 approves S1: the cold hook's leaseGitRead callback authenticates committed/staged lease authority for guardCommit and guardReferenceTransaction without loading the checkout addon; its callers only read Git facts.",
+      "retireWhen": "The lease reader retires, or the Git owner supplies an approved cold-client door preserving hook authentication.",
+      "verbs": [
+        "cat-file",
+        "ls-tree",
+        "show-ref",
+        "diff",
+        "show",
+        "symbolic-ref read",
+        "rev-parse",
+        "diff-tree",
+        "rev-list",
+        "merge-base"
+      ]
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "line": 397,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/check-doc-inventory-gates.mjs:1249",
+        "scripts/check-doc-constitution.mjs:698"
+      ],
+      "siteId": "validateSourceUnitCoverage:a985982eb27efbdd1763c452a4780d2dab2de98793ded58807b6a0c724fbb2ec",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: ls-tree -l needs size-only blob metadata, mode and OID. Inspect listTree lacks size; reading every body through readObjects exceeds its 32 MiB bound or reads gigabytes just to learn sizes.",
+      "retireWhen": "Migration readers and their owning proofs/consumers retire after Phase 10, or Git exposes bounded object-size metadata."
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "line": 440,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/check-doc-inventory-gates.mjs:1248",
+        "scripts/check-doc-constitution.mjs:698"
+      ],
+      "siteId": "validateCommitBlobIntegrity:a985982eb27efbdd1763c452a4780d2dab2de98793ded58807b6a0c724fbb2ec",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: immutable blob-integrity validation needs size-only ls-tree -l metadata, mode and OID. Inspect listTree has no size and readObjects would read entire large artifacts solely for metadata.",
+      "retireWhen": "Migration readers and their owning proofs/consumers retire after Phase 10, or Git exposes bounded object-size metadata."
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "line": 1384,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/check-doc-inventory-gates.mjs:1438",
+        "scripts/check-doc-retirement.mjs:239"
+      ],
+      "siteId": "loadPreviousRegistries:15b3120da8596a3cce1e4f87d4c97fdd8b2cbb220755f3d21e4abdc6e950fed7",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: committed identity-registry JSON permits 1 GiB and can exceed Inspect's 32 MiB path/object ceiling; replacing it would narrow conservation checks.",
+      "retireWhen": "Committed-registry conservation and its proofs/consumers retire, or Git supplies an equivalent large-object reader."
+    },
+    {
+      "path": "scripts/check-evidence-relocation.mjs",
+      "line": 34,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/check-evidence-relocation.mjs:42"
+      ],
+      "siteId": "git:79ebd2a981c21db1c4937f2a653310053ab9285d4af4e4e2166c56e7660a36f2",
+      "callerDigests": [
+        "9ba6d1524a3f9d0fc4b85b4955d2daf96c7dfd32410e2af89ecd8f819d6b0b8e"
+      ],
+      "escapes": [],
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: gitIndex needs live-index mode/blob/stage, including unborn repositories and index-only drift. Inspect trackedPaths supplies paths only; HEAD and filesystem bytes cannot preserve these integrity checks.",
+      "retireWhen": "The relocation tool and its before/after proofs retire together, or Git exposes live-index metadata."
+    },
+    {
+      "path": "scripts/doc-alias-resolver.mjs",
+      "line": 147,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/doc-alias-resolver.mjs:112",
+        "scripts/doc-alias-resolver.mjs:213"
+      ],
+      "siteId": "readOldDocument:700c771104fc5ac3f19c796eca2e653e1a38fb9061c9cd33e28e08969f802002",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: the historical Markdown reader permits 64 MiB; Inspect stops at 32 MiB and has no ranged/streamed blob port. Lowering the allowance would narrow the resolver contract.",
+      "retireWhen": "The historical reader and migration/alias consumers retire, or Git supplies an equivalent bounded read."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 56,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:1416",
+        "scripts/generate-doc-inventory.mjs:1475",
+        "scripts/generate-doc-inventory.mjs:1632",
+        "scripts/generate-doc-inventory.mjs:1675",
+        "scripts/generate-doc-inventory.mjs:1704"
+      ],
+      "siteId": "readBlobBufferAtCommit:75f7006a6d16ad26688b112f1750fae1106d557ca17ffd74e8c765e575e2a61d",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: immutable binary show is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; changing the generator invalidates phase-06 reproduction check B.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 166,
+      "spawn": "spawnSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:1661",
+        "scripts/generate-doc-inventory.mjs:1902"
+      ],
+      "siteId": "registryBindsToCommit:0edec6a84bd894fefd26324f8de4a213bb672be733a0c889cd32801a7c547acc",
+      "callerDigests": [
+        "49d74c4fa2526e3f442469282813ae6a34e5dbba488267f6e6759f76e24ba1e2",
+        "d3f16a0d461378bb8849283c9417a7300dfe35fd5188642e0dc5e09be057ce19"
+      ],
+      "escapes": [],
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: scope-binding diff --quiet is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 739,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:808",
+        "scripts/generate-doc-inventory.mjs:1666"
+      ],
+      "siteId": "listCommitEntries:79536f264fd406980cdb23ba68b0ca180c285aa47de32e83598ac705db685c23",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: sized tree enumeration is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 749,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "siteId": "listCommitPaths:5cabe3388545e9ecaac628cb5d7c0f72f1446b3583a54a8174033fa3a8845cd9",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: path enumeration is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 1222,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:1466",
+        "scripts/generate-doc-inventory.mjs:1625",
+        "scripts/generate-doc-inventory.mjs:1664"
+      ],
+      "siteId": "scanInScopeFiles:79536f264fd406980cdb23ba68b0ca180c285aa47de32e83598ac705db685c23",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: sized blob enumeration is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 1241,
+      "spawn": "spawnSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:1467",
+        "scripts/generate-doc-inventory.mjs:1626",
+        "scripts/generate-doc-inventory.mjs:1667"
+      ],
+      "siteId": "readCommitBlobMap:59301094edd07e7f82c4b121accc8d06f6c55c9777c1eca3bd010b8a7b0eb807",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: blob batching is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 1413,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:1945"
+      ],
+      "siteId": "carryForwardIdentityRegistry:0a943128baabe04ac45449896e2dd10fc55f15ef9dd5a1ca21237abd27c423d6",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: sized entry lookup is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "line": 63,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-shipped-path-inventory.mjs:360",
+        "scripts/generate-shipped-path-inventory.mjs:460",
+        "scripts/generate-shipped-path-inventory.mjs:542",
+        "scripts/generate-shipped-path-inventory.mjs:625",
+        "scripts/generate-shipped-path-inventory.mjs:831",
+        "scripts/generate-doc-inventory.mjs:1411",
+        "scripts/generate-doc-inventory.mjs:1457",
+        "scripts/generate-doc-inventory.mjs:1623",
+        "scripts/generate-doc-inventory.mjs:1658",
+        "scripts/generate-doc-inventory.mjs:1900"
+      ],
+      "siteId": "resolveCommitSha:67539c0c154f72f4f547c9c5483b8b9e149080c4e5dad0eb434251e200b52bdc",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: explicit commit resolution is byte-pinned reproduction evidence in blob 0f1cd7e1cee308772c0b56c37f3190333039cfb3; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "line": 78,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-shipped-path-inventory.mjs:361",
+        "scripts/generate-shipped-path-inventory.mjs:461",
+        "scripts/generate-shipped-path-inventory.mjs:544",
+        "scripts/generate-shipped-path-inventory.mjs:626"
+      ],
+      "siteId": "loadCommitTree:466434e47ec5f655be7a53b2e7c154107d75beb8f6db65c0a279c67323a688de",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: path enumeration is byte-pinned reproduction evidence in blob 0f1cd7e1cee308772c0b56c37f3190333039cfb3; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "line": 100,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-shipped-path-inventory.mjs:555",
+        "scripts/generate-doc-inventory.mjs:760",
+        "scripts/generate-doc-inventory.mjs:1017",
+        "scripts/generate-doc-inventory.mjs:1268"
+      ],
+      "siteId": "readBlobAtCommit:d9f8a50630af644e7b1c746bd04d04c8a47bb7daea80688b6ba5622a928a0821",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: immutable text show is byte-pinned reproduction evidence in blob 0f1cd7e1cee308772c0b56c37f3190333039cfb3; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/verify-phase-01.mjs",
+      "line": 169,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/verify-phase-01.mjs:475"
+      ],
+      "siteId": "runPhase01Verification:00e89929f3077d6c9f80cb91c920432bdf17441b4abd7e3981315d2d05d3211e",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: receipt needs the exact commit tree OID from rev-parse <commit>^{tree}; Inspect has commit resolution and entry listings but no typed commit-tree identity fact. Parsing commit headers here would duplicate Git parsing.",
+      "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git exposes commit-tree identity."
+    },
+    {
+      "path": "scripts/verify-phase-01.mjs",
+      "line": 370,
+      "spawn": "spawnSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/verify-phase-01.mjs:475"
+      ],
+      "siteId": "runPhase01Verification:eede3be66bbe8d82286b441978c16627c0da6cd08a936ef4d0b019f319100117",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: exact git diff --check includes repository whitespace policy and conflict-marker diagnostics; Inspect diff/diffText does not validate this and a JS approximation would weaken the verifier.",
+      "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git supplies equivalent diff validation."
+    },
+    {
+      "path": "scripts/verify-phase-02.mjs",
+      "line": 127,
+      "spawn": "runOrThrow -> scripts/verify-phase-02.mjs:88",
+      "binary": "param command (no caller found for anonymous function)",
+      "family": "unresolved-binary",
+      "siteId": "verifyForbiddenPhase02Diff:b73042bb7fc8d417b359b18111600e3c5da4cb0a07f6fd3dbcad0ea07b5eb93b",
+      "callerDigests": [
+        "a4421f7f173e2b0cd4444d760c7a8fc7dfa44d3a3c848640f6242545ee7602c7"
+      ],
+      "escapes": [],
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: run('git', ['diff', '--check', ...]) reaches runOrThrow through a callback the scanner cannot resolve. Exact repository whitespace/conflict diagnostics have no equivalent Inspect validation; no check may be dropped.",
+      "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git supplies equivalent diff validation."
+    },
+    {
+      "path": "scripts/verify-phase-02.mjs",
+      "line": 157,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/verify-phase-02.mjs:367"
+      ],
+      "siteId": "runPhase02Verification:8b527625bcede9d16cf3d29172fbd2d31a6786f56297e07d33d15708552bf51a",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: receipt needs the exact commit tree OID from rev-parse <commit>^{tree}; Inspect has no typed commit-tree identity fact. Parsing commit headers here would duplicate Git parsing.",
+      "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git exposes commit-tree identity."
+    }
+  ],
+  "e3Classes": [
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 104,
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 106,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 116,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 148,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 286,
+      "spawn": "typedOperationRows -> scripts/git/e3-bench.mjs:298",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 524,
+      "spawn": "checkoutInspect -> scripts/git/e3-bench.mjs:48",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 526,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 528,
+      "spawn": "typedOperationRows -> scripts/git/e3-bench.mjs:298",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 542,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 559,
+      "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 663,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 703,
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 716,
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 734,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:807",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 734,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:777",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 832,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:807",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 847,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 862,
+      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:832",
+      "binary": "(command-line arguments)",
+      "class": "configured-binary"
+    }
+  ]
+}
