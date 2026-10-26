@@ -1,0 +1,92 @@
+# Review: DOC G4 Git one-door declarations (origin/review/doc-git-one-door at eb744281d)
+
+Reviewer: independent reviewer for lead:HARDEN. Scope: the 25 declarations, the scanner change, the tests. The hooks and the Git spec section 7 lease text were left to lead:OPC, except the one extra check on the `leaseGitRead` row that OPC asked for through HARDEN.
+
+## Verdict
+
+CHANGES, small and scanner-only. All 25 declarations are factually sound: every one is read-only, its class fits the spec, its reason is true against the code, and the scan reports 0 undeclared sites. Two scanner checks that the spec promises are not enforced for the pass-through (callback wrapper) shape, and I reproduced both bypasses. Neither is exploitable by the current 25 declarations, but both let a later one-line declaration edit defeat the guard, so they should be closed before this lands.
+
+Required changes:
+
+1. `scripts/git-one-door-scan.mjs:2539` and `:2531`. The `configured-binary` check is only `site.family !== 'unresolved-binary'`, and the escape refusal at line 2531 exempts the whole `configured-binary` class. A fixed `git` program reached through a callback wrapper also has family `unresolved-binary`. I declared the spec's own callback shape (`run('git', ['diff','--check',...])` through `deps.run || ((command, args) => runOrThrow(command, args))`) as `configured-binary`. The scan accepted it, and it still accepted it after I added `run.call(null, 'git', ['push','--force','origin','HEAD'])`, which is a mutating escape caller. Spec section 17 says `configured-binary` is "never a fixed Git program" and that an escape "refuses the wrapper declaration". The code enforces neither for this shape. Fix: allow retained escapes and the class only when the unresolved operand traces to parsed config. Concretely, refuse when any resolved caller passes a literal `'git'` as the program operand, or when the site's operand is a wrapper parameter that has a literal-git caller. Add a test for it; the existing test only covers a literal-argv site (`test/scripts/git-one-door-declarations.test.mjs`, the `{ ...f.entry, class: 'configured-binary' }` case).
+2. `scripts/git-one-door-scan.mjs:2533` to `:2539`. `declared-tooling-exemption` is never checked against a read set. Only `hook-read-context` verifies verbs. I declared a literal `execFileSync('git', ['update-ref','refs/heads/x','HEAD'])` as `declared-tooling-exemption` and the scan accepted it (0 undeclared, one exempt class row). The class is described as evidence and tooling reads, and no test proves a mutating exemption is refused. Fix: for this class, require the observed literal verbs (`declarationVerb` / `callerVerbs`, already computed) to be in `READ_VERBS`, and refuse a non-literal verb. Alternatively, add a required `verbs` field for the class and compare it as the hook class does. Today all 19 are reads, so this is a guard, not a repair.
+
+## The 25 declarations
+
+"Reads" means every verb the site can run, following wrappers to the spawn. All spawns are `git` unless noted. RO = read-only.
+
+| # | path | function | verbs | RO | class ok | reason true | retire concrete | note |
+|---|------|----------|-------|----|----------|-------------|-----------------|------|
+| 1 | `.githooks/pre-commit:538` | `leaseGitRead` | cat-file, ls-tree, show-ref, diff (--cached), show, symbolic-ref (-q HEAD), rev-parse, diff-tree, rev-list | yes | yes | yes | yes | See the dedicated row below. |
+| 2 | `bin/fgos.mjs:3496` | `runVerb` (via `runInvariantChecks`, `src/runner/goal-check.mjs:181` `runCommand`) | none fixed; the shell runs a command string from `invariantChecks.commands` | not applicable (operator command) | yes | yes | yes | `readInvariantCheckCommands` calls `readCommandList` calls `readSharedConfig(dir)[key]`, as `src/config/shared-config-file.mjs:65-81` shows. Matches the owner Q1 rule in spec section 12. |
+| 3 | `bin/fgos.mjs:3640` | `runVerb` (same) | same | not applicable | yes | yes | yes | Second call of the same list on the main checkout. |
+| 4 | `scripts/check-doc-inventory-gates.mjs:397` | `validateSourceUnitCoverage` | `ls-tree -r -l <commit>` | yes | yes | yes | yes | `ListedTreeEntry` (`packages/git/rust/src/lib.rs:586`) has path, mode, kind and oid only, no size. `read_objects` (`inspect.rs:630`) refuses totals above its 32 MiB limit, so a size can only be learned by reading bodies. Files in the commit reach 103 MB. |
+| 5 | `scripts/check-doc-inventory-gates.mjs:440` | `validateCommitBlobIntegrity` | `ls-tree -r -l <commit>` | yes | yes | yes | yes | Same size fact. |
+| 6 | `scripts/check-doc-inventory-gates.mjs:1384` | `loadPreviousRegistries` | `show HEAD:<registry>` | yes | yes | yes | yes | The committed identity registry is 62,226,100 bytes, above the 32 MiB Inspect ceiling (`LIMIT` at `inspect.rs:10`, `max_blob_bytes` at `driver.rs:2390`). The reason is true and also covers the 1 GiB buffer. |
+| 7 | `scripts/check-evidence-relocation.mjs:34` | `git` (pass-through; one caller, `gitIndex`) | `ls-files -s -z` | yes | yes | yes | yes | `tracked_paths` (`inspect.rs:1252`) runs `ls-files -z --cached --full-name` and returns paths only, so mode, blob and stage are not served. A new caller makes the declaration stale. |
+| 8 | `scripts/doc-alias-resolver.mjs:147` | `readOldDocument` | `show <rev>:<path>` | yes | yes | yes | yes | The 64 MiB buffer exceeds the 32 MiB `pathsAtRevision` cap. The `doc-git-reads` helper caps at 20 MiB. The need is plausible but unproven, since no markdown above 56 MB was found in the tree. |
+| 9 | `scripts/generate-doc-inventory.mjs:56` | `readBlobBufferAtCommit` | `show <commit>:<path>` | yes | yes (see note) | yes | partly | Byte-pinned: `git hash-object scripts/generate-doc-inventory.mjs` is `a52981ff...`, the blob the reason cites. `doc-git-reads.readBlobAtCommit` already serves this function, so the exemption is for evidence immutability, not a port gap. The spec text explicitly allows "byte-pinned reproduction tooling". |
+| 10 | `scripts/generate-doc-inventory.mjs:166` | `registryBindsToCommit` | `diff --quiet <a> <b> -- <pathspecs>` | yes | yes (see note) | yes | partly | `doc-git-reads.commitsMatchPaths` serves it. The scanner cannot read the verb through the spread, so it binds two caller digests. That is over-strict, not unsafe: a new caller stales it. `registryCommit` comes from committed JSON and is passed unquoted before `--`, so a value like `--output=<path>` would make `git diff` write a file. Low, and the file is byte-pinned. |
+| 11 | `scripts/generate-doc-inventory.mjs:739` | `listCommitEntries` | `ls-tree -r -l <commit>` | yes | yes | yes | partly | Sized listing, so the port cannot serve it. Byte-pinned. |
+| 12 | `scripts/generate-doc-inventory.mjs:749` | `listCommitPaths` | `ls-tree -r --name-only <commit>` | yes | yes (see note) | yes | partly | Served by `listTree` in `doc-git-reads.loadCommitTree`. Exempt only as pinned. |
+| 13 | `scripts/generate-doc-inventory.mjs:1222` | `scanInScopeFiles` | `ls-tree -r -l <commit>` | yes | yes | yes | partly | Sized listing. |
+| 14 | `scripts/generate-doc-inventory.mjs:1241` | `readCommitBlobMap` | `cat-file --batch` (stdin oids) | yes | yes (see note) | yes | partly | `doc-git-reads.readCommitBlobMap` is the bounded typed copy. |
+| 15 | `scripts/generate-doc-inventory.mjs:1413` | `carryForwardIdentityRegistry` | `ls-tree -l <commit> <path>` | yes | yes | yes | partly | Sized entry lookup. |
+| 16 | `scripts/generate-shipped-path-inventory.mjs:63` | `resolveCommitSha` | `rev-parse --verify <x>^{commit}` | yes | yes (see note) | yes | partly | The generator blob is `0f1cd7e1...`, matching the reason. Served by `resolveCommit`, exempt only as pinned. |
+| 17 | `scripts/generate-shipped-path-inventory.mjs:78` | `loadCommitTree` | `ls-tree -r --name-only <commit>` | yes | yes (see note) | yes | partly | Same. |
+| 18 | `scripts/generate-shipped-path-inventory.mjs:100` | `readBlobAtCommit` | `show <commit>:<path>` | yes | yes (see note) | yes | partly | Same. |
+| 19 | `scripts/verify-phase-01.mjs:169` | `runPhase01Verification` | `rev-parse <sha>^{tree}` | yes | yes | mostly | yes | No typed commit-tree fact exists (confirmed in `inspect.rs`). The reason's claim that deriving it duplicates Git parsing is a judgment: `readObjects` returns the commit bytes, whose first line is `tree <oid>`. This is a weak, not false, reason. |
+| 20 | `scripts/verify-phase-01.mjs:370` | `runPhase01Verification` | `diff --check <base>..<end>` | yes | yes | yes | yes | `diff_text` (`inspect.rs:424`) runs a patch diff and has no `--check`. The raw spawn also lacks `--no-ext-diff` and Inspect's hardened env. Low. |
+| 21 | `scripts/verify-phase-02.mjs:127` | `verifyForbiddenPhase02Diff` (callback `run`; one caller) | `diff --check <base>..<end>` | yes | yes | yes | yes | The declaration binds the one caller call digest. Retained escapes are refused for this class (`:2531`). The `deps.run` seam is injectable by exported callers, but it is Node-level, not a Git concern. |
+| 22 | `scripts/verify-phase-02.mjs:157` | `runPhase02Verification` | `rev-parse <sha>^{tree}` | yes | yes | mostly | yes | Same as #19. |
+| 23 | `src/runner/merge.mjs:958` | `landRunnerItem` (via `runInvariantChecks`) | none fixed; operator `invariantChecks.commands` | not applicable | yes | yes | yes | The scanner reports one retained escape here, allowed only for `configured-binary`. The program is parsed config, so the escape is not a Git caller. |
+| 24 | `src/runner/merge.mjs:992` | `landRunnerItem` (same) | same | not applicable | yes | yes | yes | |
+| 25 | `src/runner/worktree.mjs:146` | `runWorktreeSetupCommands` | none fixed; shell string from `worktreeSetup.commands` | not applicable | yes | yes | yes | It carries the existing `fgos.git.consumer-command` marker, and `readWorktreeSetupCommands` calls `readCommandList`. |
+
+Notes on the "retire concrete" column. Rows 4 to 8, 19 to 22 and the configured-binary rows have a concrete, checkable retirement condition. Rows 9 to 18 say "the plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract". That is a named condition, but it has no date, owner or phase, so I marked it "partly".
+
+### Dedicated row for OPC: `.githooks/pre-commit` `leaseGitRead` (hook-read-context)
+
+| Question | Answer | Evidence |
+|----------|--------|----------|
+| 1. Does every call reaching `leaseGitRead` pass a read-only verb? | Yes. | `leaseGitRead` (`.githooks/pre-commit:537-541`) runs `git --no-replace-objects ...args`. The only callers are `guardCommit` and `guardReferenceTransaction`, which receive it as `git`. Every `git(...)` and `readBlob(git, ...)` call in `src/runner/documentation-cutover-lease-hook.mjs` passes a literal array: lines 12, 16, 20, 64, 66, 67, 68, 88, 89, 91. `git` is never passed to another function or stored, so there is no flow outside those calls. All ten calls are reads. `diff --cached` writes nothing; `diff-tree`, `rev-list`, `show-ref --verify --quiet` and `symbolic-ref -q HEAD` (read form) are reads. |
+| 2. Does `verbs` equal exactly the observed literal verbs? | Yes. | Declared: cat-file, ls-tree, show-ref, diff, show, symbolic-ref read, rev-parse, diff-tree, rev-list (9). Observed from the ten call sites: the same nine, with `rev-parse` used twice. `applyDeclarations` enforces both directions (`verbs.some(v => !entry.verbs.includes(v))` and `entry.verbs.some(v => !verbs.includes(v))`), and the scan passes. |
+| 3. Are all of them in the scanner's hook read set? | Yes. | `READ_VERBS` at `scripts/git-one-door-scan.mjs:59` now contains `show-ref` and `diff-tree` (the branch's only addition, from the diff against cac2f6ce7), plus the seven that already existed. |
+| 4. Does any caller pass a non-literal argv? | No. | Every argv is an array literal. The `${revision}` and `${nextOid}` template strings sit inside a literal element, not in the verb position. The scanner's `verbs.some(v => !v)` check would refuse a non-literal one, and the test `declared hook verbs must equal observed literal caller verbs even after re-declaration` proves the refusal. |
+
+Residual observation for OPC, not a blocker: `revision`, `nextOid` and `before` are interpolated as operands (for example `ls-tree -z <revision> --`, `diff-tree ... <before> <nextOid>`, `rev-list ... <nextOid>`) with no `--` guard in three of them. In `reference-transaction` they come from Git's own stdin, so they are hex object ids; the risk is theoretical.
+
+## Scanner findings, ranked
+
+1. High (spec contradiction, reproduced). `configured-binary` can be applied to a fixed `git` program reached through a callback wrapper, and a retained escaping mutating caller is then accepted. See required change 1. File: `scripts/git-one-door-scan.mjs:2531`, `:2539`. Probe: callback wrapper with `run('git', ['diff','--check',...])` declared as `configured-binary`, then `run.call(null,'git',['push','--force','origin','HEAD'])` added: scan returned 0 undeclared.
+2. Medium (reproduced). `declared-tooling-exemption` has no read-verb check, so a mutating literal call can be declared. Required change 2. Declaring `update-ref` as an exemption was accepted.
+3. Medium (reproduced, open gap named by the spec). An aliased export is not followed. With a declared pass-through wrapper `g` and `export { g as gAlias }`, an undeclared `import { gAlias } ...; gAlias(['reset','--hard'])` left the scan at 0 undeclared and the declaration still matched. `export { g as default }` behaves the same. A plain export, `import { g as q }` and `import * as ns` are all caught (the declaration goes stale). Grep over `src`, `scripts`, `bin` and `.githooks` finds no `export { x as y }` or default export of any declared wrapper, and the only aliased export in the tree (`scripts/git-addon.mjs:6`, `REPO_ROOT as root`) is not a Git wrapper. So the gap lets nothing through today, but it is live for any future wrapper. Recommendation: refuse (not just document) a declaration on a wrapper that has any `export { ... as ... }` or `export default` of it, until the scanner follows the alias.
+4. Low. A single-parameter pass-through (`function g(a){ return execFileSync('git', a); }`, no options object) yields two raw sites for one call, so a declaration on it fails as "matched 2 sites". It fails closed, but it will confuse a future declarer. Adding an options object makes it match.
+5. Low. `registryBindsToCommit` binds two caller digests only because `declarationVerb` refuses a spread at the end of argv. A new unrelated caller stales a declaration whose verb is already literal. Over-strict, not unsafe.
+6. Confirmed correct (probed). Identity is function name, comment-blanked call text and a sorted multiset of caller digests (`declaredSiteId`, `:2476`). A declaration matches one exact `path` plus `siteId` via equality, so it cannot exempt a file or directory. The path pattern check rejects globs, `..`, absolute, backslash and colon. Duplicate keys, missing and stale sites, and ambiguous (more than one) matches all throw. The escape refusal works for non-`configured-binary` classes (tests prove `.call`, `Reflect.apply` and array-slot callers). The census binds the declarations file by digest (`censusDrift`). Hook declarations must equal observed verbs.
+
+## Test and scan results
+
+- `scripts/run-tests.mjs` on this branch does not export `runChosenTests`, so the command in the brief failed with a `SyntaxError`. I used the exported `runSelectedTests` with the same two files, `PATH=$HOME/.cargo/bin:$HOME/.local/bin:$PATH`, logged to `/dev/shm/g4-tests.log`.
+- Result: 21 tests, 21 pass, 0 fail, 0 cancelled, 0 skipped. Both files ran: `test/scripts/git-one-door-declarations.test.mjs` and `test/setup/git-mutation-census.test.mjs`.
+- The runner staged the checkout's Git addon and compiled several crates (`Finished dev profile` in 9.45 s) into the review worktree's build output before the tests ran. This was its own staging step, not a command I issued; the worktree's `git status --short` is clean afterwards because the output is ignored.
+- `node scripts/git-one-door-scan.mjs --root .` exits 0 with "0 undeclared site(s)". Class counts: standalone-skill-script 3, hook-read-context 23, configured-binary 92, rust-test 112, argv-runner 13, production-sandbox-probe 4, uncalled-wrapper 20, git-driver 1, declared-tooling-exemption 19, sandbox-door 2. The 25 declarations account for 1 hook-read-context, 5 configured-binary and 19 declared-tooling-exemption.
+- Probes were written under the session scratchpad (`.../scratchpad/probe/`), against temp roots; nothing was written in the worktree or the main checkout.
+
+## Test gaps
+
+- No test refuses a mutating `declared-tooling-exemption` (finding 2).
+- No test refuses a fixed `git` callback wrapper declared as `configured-binary` (finding 1); the existing case covers only a literal-argv site.
+- The aliased export is documented as open and has no test pinning its current (undetected) behaviour, so closing it later has no regression marker.
+
+## Unresolved questions
+
+1. For rows 9 to 18, is the owner content with the generators staying raw Git while `doc-git-reads` holds typed copies of the same functions? The spec allows it, but it means those ten sites exist only because of the pinned blob hashes, and nothing records when those pins end.
+2. Should the declaration `retireWhen` for the byte-pinned rows name a phase or a manifest path instead of "retire together"?
+3. Is `registryCommit` from committed JSON considered trusted input (row 10)? If not, the byte-pinned file cannot be fixed, so the exemption would carry a small option-injection exposure.
+4. Is the missing `runChosenTests` export on this branch expected, or is the brief written against a different runner revision?
+
+Status: DONE_WITH_CONCERNS
+Summary: All 25 declarations are read-only, correctly classed and factually true, the scan shows 0 undeclared, and the 21 tests pass. Verdict is CHANGES because two scanner rules the spec promises (no fixed Git program as configured-binary, escape refusal) can be bypassed by class mislabelling, plus a mutating exemption is accepted; the aliased-export gap is confirmed open but unused today.
+Concerns/Blockers: The `runChosenTests` command in the brief does not exist on this branch (used `runSelectedTests`). The test runner compiled Rust crates into the worktree's ignored build output while staging the addon.
+
