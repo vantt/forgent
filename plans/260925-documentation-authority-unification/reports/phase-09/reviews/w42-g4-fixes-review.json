@@ -1,0 +1,116 @@
+{
+  "schema": "phase-09-review.v1",
+  "review": "w42-g4-fixes",
+  "date": "2026-10-26",
+  "head": "12b9e520f",
+  "commits": ["d0dcc24ec", "dc15c5030", "8d5dbabc5"],
+  "verdict": "REWORK",
+  "verdictNote": "HARDEN's three scanner items and OPC's High, Medium and two Low items are fixed as asked. One change is needed before the lease: the new published-history admission also admits rewinding main to an older published commit, which drops the held sidecar locally (a regression, reproduced). The origin/main spoof is real but no worse than the hooksPath bypass; name it in section 7.",
+  "items": [
+    {
+      "id": "R1-published-admission-rewind",
+      "severity": "medium",
+      "verdict": "REWORK",
+      "area": "src/runner/documentation-cutover-lease-hook.mjs guardReferenceTransaction (published-history admission)",
+      "evidence": "Scratch repo: c1 (code), c2 (acquire, sidecar held), origin/main=c2. guardReferenceTransaction(old=c2, next=c1) returns ADMITTED at HEAD and is refused by the pre-fix module (dc15c5030^, run from scratch). The rule only asks whether next is ancestor-or-equal of origin/main, so `git reset --hard HEAD~N` or `update-ref refs/heads/main <older published>` on main is admitted. After that, guardCommit reads the sidecar from refs/heads/main (now absent/released), so scoped commits on main pass pre-commit, and later forward moves compare the same absent sidecar (raw===nextRaw) and are admitted too. Syncing back to origin still fails without force (merge/rebase onto held origin hit the borrower check), so the damage stays local. A pull never needs a move behind origin/main.",
+      "fix": "Admit published history only for a forward move or the exact published tip: `next === published || (oldOid is zero or merge-base --is-ancestor oldOid nextOid)` together with `merge-base --is-ancestor nextOid published`. This adds one more read (merge-base is already a declared hook verb). Add the rewind case to the 'published main admission distinguishes ancestry...' unit test."
+    },
+    {
+      "id": "R2-origin-ref-spoof",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "guardReferenceTransaction trust in refs/remotes/origin/main; docs/platform/git/spec.md section 7",
+      "evidence": "Reproduced: `git update-ref refs/remotes/origin/main <scoped c3>`, then the main update c2->c3 is ADMITTED. The same update is refused while origin/main=c2, and by the pre-fix module. The shell front end ignores transactions that do not touch refs/heads/main, so writing the remote-tracking ref is never checked. This is a deliberate local act, as bad as `git -c core.hooksPath=/dev/null update-ref refs/heads/main X`, which the hooks never stopped. Section 7 already calls the lease convention plus typed doors, not enforcement. No sound local check exists: reflog and fetch provenance are locally writable too. Only a server-side check (ls-remote in the hook, or branch protection) would be sound, and that costs network access on every main move.",
+      "fix": "Do not add code. Add one sentence to section 7 'Uncovered raw routes': the published-history exemption trusts the local refs/remotes/origin/main, so anyone who rewrites that ref (or disables core.hooksPath) bypasses the reference guard. Real protection needs server-side enforcement."
+    },
+    {
+      "id": "S1-configured-binary-fixed-git",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "scripts/git-one-door-scan.mjs declarationPrograms/applyDeclarations",
+      "evidence": "Any resolved literal git program (named, .call, Reflect.apply, array-slot callers) refuses configured-binary. Escapes are kept only when every resolved program value is external, there is no aliased export, and an escaping program parameter adds an unknown. The 4+2 new cases fail against `git show 6215e614f:scripts/git-one-door-scan.mjs` and pass at HEAD.",
+      "fix": "None."
+    },
+    {
+      "id": "S2-tooling-read-verbs",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "applyDeclarations declared-tooling-exemption",
+      "evidence": "Requires non-empty observed verbs, all in READ_VERBS. update-ref, unresolved argv, a variable verb, a prefix spread and symbolic-ref with a spread are refused (10 cases, all red against the pre-fix scanner).",
+      "fix": "None."
+    },
+    {
+      "id": "S3-aliased-export",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "computeValueFlow aliasedExport",
+      "evidence": "`export { g as alias }` and `export { g as default }` now refuse (4 cases, all red against the pre-fix scanner). `export { g as h } from` and `export const alias = g` in another module make the declaration stale, which fails closed.",
+      "fix": "None for HARDEN item 3."
+    },
+    {
+      "id": "S4-star-reexport-gap",
+      "severity": "medium",
+      "verdict": "REWORK",
+      "area": "scripts/git-one-door-scan.mjs findCallers re-export branch (~:1313) and section 17 text",
+      "evidence": "Probe: declared wrapper `export function g(args){execFileSync('git',args)}` with a declared-tooling-exemption. A second module re-exports it (`export * as ns from './read.mjs'`, `export * from './read.mjs'`, or `import * as r ...; export const ns = r`) and a caller runs `reset --hard` through it. The scan stays green with 0 undeclared on both the new and the pre-fix scanner, so this is not a regression. findCallers claims to handle `export * from`, but returns early because the re-exporting module has no `export ... g` text of its own, and `export * as ns` does not match its regex. No declared wrapper is re-exported today (rg finds no `export * from` in src/scripts/bin/.githooks). It is the same class of hole as HARDEN item 3, and section 17 no longer names any open alias gap.",
+      "fix": "In computeValueFlow, also treat as an escape any other module that has `export * (as x)? from '<wrapper module>'` or a namespace-import re-export for an exported wrapper, and add one probe case to the alias test. If that waits, put an explicit open-gap sentence back in section 17."
+    },
+    {
+      "id": "S5-trailing-spread-relaxation",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "declarationVerb(argv, allowTrailingSpread)",
+      "evidence": "Verb checks for hook and tooling declarations now accept `['diff', ...extra]` as diff (probe accepted). Trailing operands can carry `--output=<file>` (a filesystem write) or `--ext-diff`. They cannot move a ref. Identity hashing is still strict. config, reflog and symbolic-ref with a spread stay unknown.",
+      "fix": "Optional: section 17 should say tooling verbs are literal but trailing operands may not be. Or keep the strict parse for hook-read-context."
+    },
+    {
+      "id": "S6-configured-unknown-still-declarable",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "applyDeclarations configured-binary without escapes",
+      "evidence": "Probe: `for (const c of readConfig()['checks']) execFileSync(c, ['push','--force'])` with readConfig returning `{checks:['git']}` gives an unresolved site, and a configured-binary declaration on it is accepted (fixedGit only sees resolved literals). This rule existed before the change, and HARDEN's ask ('refuse a resolved literal git; keep escape refusal unless proven') is met. No configured-binary declarations remain.",
+      "fix": "Optional, cheap: require programs.configured for every configured-binary declaration. A provable site auto-classifies anyway, so the declaration class would only ever cover unproven programs."
+    },
+    {
+      "id": "S7-retire-five-configured-declarations",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "scripts/lib/git-one-door-declarations.v1.json",
+      "evidence": "Scratch copy of shared-config-file/merge/worktree/goal-check: merge.mjs:958, :992 and worktree.mjs:146 auto-classify as configured-binary '(configuration file data)'. Replacing `return JSON.parse(raw)` with a literal `{invariantChecks:{commands:['git push --force']}, worktreeSetup:{commands:['git reset --hard']}}` turns all three into reported sites. bin/fgos.mjs takes the same readInvariantCheckCommands path, and the full-tree scan stays at 0 undeclared. Class counts on the real tree are identical to HARDEN's (configured-binary 92, tooling 19, hook 23 ...), so the evaluator widening reclassified exactly these five sites. The declarations' own owner-approved retireWhen ('the scanner proves parsed-config provenance') is met.",
+      "fix": "This is within HARDEN's verdict, because the declarations retire by their own condition and the proof is part of the scanner diff HARDEN re-reviews. No separate OK is needed, but name the retirement and the computed-property evaluator change explicitly in the re-review request."
+    },
+    {
+      "id": "H1-empty-tree-and-declaration",
+      "severity": "none",
+      "verdict": "APPROVE",
+      "area": "EMPTY_TREE, leaseGitRead declaration, census",
+      "evidence": "In a scratch sha256 repo, `git hash-object -t tree --stdin </dev/null` prints 6ef19b41...c5321, and `rev-parse --show-object-format` prints sha256. The sha1 id 4b825dc6... is the standard one. An unknown format throws, so the hook fails closed. The declaration verbs (9 + merge-base) are accepted by the scanner, which requires equality with the observed literal caller verbs. `node scripts/git-one-door-scan.mjs --root . --write-census` exits 0 with 0 undeclared, and `git status` stays clean, so the committed census matches.",
+      "fix": "None."
+    },
+    {
+      "id": "H2-spec-and-changelog",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "docs/platform/git/spec.md sections 7, 17, 18; CHANGELOG.md",
+      "evidence": "Section 7 matches the code: deletion is checked before the published admission, an absent origin keeps the local policy, a read/ancestry error (status not 1) is rethrown and fails closed, and absent main uses the empty tree. Uncovered routes are listed. The 2026-10-22 line was moved verbatim from section 18 to section 7 history. The section 17 alias and tooling text matches, apart from S4 and S5. The CHANGELOG lines are accurate. Missing: the R1 rewind and R2 spoof routes.",
+      "fix": "Fold in with R1/R2/S4."
+    },
+    {
+      "id": "C1-cutover-order",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "8d5dbabc5 preflip-gate-status.json cutoverReadiness.order; verify.py; controls.py",
+      "evidence": "The order is approval (L13-30) > LAND board notice (L13-31) > HARDEN answers > F import > stage R > G11 > G10 > lease > F duties > ledger > Land, which matches L13-30 and L13-31 and plan W4. verify.py exits 0. controls.py exits 0 with 39/39 rejected, including 'F import before the HARDEN answer', 'Real lease before G11', 'Real lease after G11 but before G10' and 'Reversed approval-to-Land order'. verification.json was restored with `git checkout --`. The commit (11:15) predates L13-32 (11:42), and the register does not record L13-32 yet. 'OPC MERGE before lease', 'scanner+hook fixes merged before F import' and 'HARDEN scanner re-review before Land' have no rows, and row 3 'HARDEN answers' stays pending although HARDEN and OPC answered CHANGES at 11:06 and 11:01.",
+      "fix": "At the next register refresh, encode L13-32: split row 3 into 'fixes merged + review branch pushed', add 'OPC hook MERGE' before the lease, add 'HARDEN scanner re-review' before Land, and add exact-order controls for each."
+    },
+    {
+      "id": "T1-tests",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "focused proofs",
+      "evidence": "With FGOS_HOST_BIN=<active release>/bin/fgos and CLAUDE_CODE_SESSION_ID unset: documentation-cutover-lease 17/0, git-one-door-declarations 45/0, githooks/census-drift 3/0, setup/git-mutation-census 1/0. Negative control: the HEAD test file against the 6215e614f scanner gives 20 pass and 25 fail. All 21 new leaf cases are red and all 20 old cases pass. test/git/one-door.test.mjs is 4/2: both failures are HolderLockError addon-not-shipped before any scan, and the receipt handed this file to the Lead, but the Lead's completion table does not list it.",
+      "fix": "The Lead should run test/git/one-door.test.mjs through an addon-shipping door (fgos:dev or a staged release) before HARDEN's re-review, or record why the full-tree scan CLI covers it."
+    }
+  ],
+  "counts": { "high": 0, "medium": 2, "low": 6, "none": 5, "rework": 2, "approve": 11, "total": 13 }
+}
