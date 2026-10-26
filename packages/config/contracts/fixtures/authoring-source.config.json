@@ -1416,10 +1416,7 @@
         ]
       }
     },
-    "patterns": {
-      "defaultRule": {
-        "mutatingMinRigor": "standard"
-      },
+    "loops": {
       "reviewed": {
         "maxRounds": 2,
         "checkersByRigor": {
@@ -1436,9 +1433,96 @@
             "tester"
           ]
         }
-      },
+      }
+    },
+    "patterns": {
       "seatBinding": {
-        "schema": 1
+        "schema": 2
+      },
+      "solo": {
+        "promise": "A single worker runs the task to completion.",
+        "loop": "solo"
+      },
+      "reviewed": {
+        "promise": "A producer executes the task followed by checker review rounds until acceptance or budget exhaustion.",
+        "loop": "reviewed"
+      },
+      "panel": {
+        "promise": "Multiple independent producers execute the task in parallel and a synthesizer combines their results.",
+        "loop": "panel"
+      },
+      "debate": {
+        "promise": "Multiple agents debate opposing viewpoints across rounds before reaching a conclusion.",
+        "loop": "debate"
+      },
+      "code-change": {
+        "promise": "A producer changes code with reviewer and red-team review.",
+        "loop": "reviewed",
+        "invariants": {
+          "minCheckers": {
+            "atLeast": [
+              "reviewer",
+              "red-team"
+            ]
+          }
+        }
+      },
+      "consult": {
+        "promise": "An advisor provides specialized guidance without file mutations.",
+        "loop": "solo",
+        "invariants": {
+          "seats": {
+            "fixed": [
+              {
+                "seat": "advisor",
+                "role": "producer"
+              }
+            ]
+          }
+        }
+      },
+      "rfc": {
+        "promise": "A document or decision proposal reviewed by a reviewer and red-team against specification.",
+        "loop": "reviewed",
+        "invariants": {
+          "minCheckers": {
+            "atLeast": [
+              "reviewer",
+              "red-team"
+            ]
+          }
+        },
+        "defaults": {
+          "maxRounds": 1,
+          "roleTasks": {
+            "reviewer": "You are the reviewer of a proposal or document another agent just produced. Do not change any file.\nRead the artifact the task names (a path or text in the task itself) and the producer's own account of it, listed under Context refs. Do not look at git history unless the task names a commit.\nCheck it against the task below and report what is wrong, unsupported, or missing, with quoted evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\n{objective}",
+            "red-team": "You are the red-team for a proposal or document another agent just produced. Do not change any file.\nRead the artifact the task names (a path or text in the task itself) and the producer's own account of it, listed under Context refs. Do not look at git history unless the task names a commit.\nTry to break it: wrong claims, hidden assumptions, missed cases, failure modes, and anything the task forbade. Report concrete failures with quoted evidence, or say plainly that you found none.\n\nThe task that was assigned:\n{objective}"
+          }
+        }
+      },
+      "research-fan-out": {
+        "promise": "Multiple researchers investigate a topic independently in parallel and a synthesizer produces the unified finding.",
+        "loop": "panel",
+        "defaults": {
+          "seats": [
+            {
+              "seat": "researcher-1",
+              "role": "producer"
+            },
+            {
+              "seat": "researcher-2",
+              "role": "producer"
+            },
+            {
+              "seat": "researcher-3",
+              "role": "producer"
+            },
+            {
+              "seat": "synthesizer",
+              "role": "synthesizer"
+            }
+          ]
+        }
       }
     },
     "generatedPaths": [

@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "urn:fgos:config-schema:runner:v1"
+$id: "urn:fgos:config-schema:runner:v2"
 $comment: "owner: runner"
 description: "The runner: executors, capabilities, model policies, tier fallback, patterns and run limits."
 type: object
@@ -176,21 +176,21 @@ properties:
             items:
               type: string
               minLength: 1
-  patterns:
-    description: "Settings of the collaboration patterns."
+  loops:
+    description: "Tuning and bounds of the execution loops."
     type: object
     properties:
-      defaultRule:
-        description: "The rule applied when a pattern names none."
+      solo:
+        description: "Tuning and bounds of the solo loop."
         type: object
+        additionalProperties: false
         properties:
-          mutatingMinRigor:
-            description: "Lowest rigor a unit that changes files may run at."
-            type: string
-            enum: [low, standard, high, critical]
+          bounds:
+            $ref: "#/$defs/loopBounds"
       reviewed:
-        description: "The reviewed pattern: rounds and checkers."
+        description: "Tuning and bounds of the reviewed loop."
         type: object
+        additionalProperties: false
         properties:
           maxRounds:
             description: "Most review rounds before the unit stops."
@@ -204,34 +204,62 @@ properties:
                 description: "Checker seats at this rigor."
                 type: array
                 items:
+                  description: "Checker seat name."
                   type: string
                   enum: [reviewer, red-team, tester]
               standard:
                 description: "Checker seats at this rigor."
                 type: array
                 items:
+                  description: "Checker seat name."
                   type: string
                   enum: [reviewer, red-team, tester]
               high:
                 description: "Checker seats at this rigor."
                 type: array
                 items:
+                  description: "Checker seat name."
                   type: string
                   enum: [reviewer, red-team, tester]
               critical:
                 description: "Checker seats at this rigor."
                 type: array
                 items:
+                  description: "Checker seat name."
                   type: string
                   enum: [reviewer, red-team, tester]
+          bounds:
+            $ref: "#/$defs/loopBounds"
+      panel:
+        description: "Tuning and bounds of the panel loop."
+        type: object
+        additionalProperties: false
+        properties:
+          bounds:
+            $ref: "#/$defs/loopBounds"
+      debate:
+        description: "Tuning and bounds of the debate loop."
+        type: object
+        additionalProperties: false
+        properties:
+          bounds:
+            $ref: "#/$defs/loopBounds"
+    additionalProperties: false
+  patterns:
+    description: "Settings of the collaboration patterns."
+    type: object
+    x-fgos-merge: deep
+    properties:
       seatBinding:
         description: "Marker that this project reads the seat binding form of the config."
         type: object
         properties:
           schema:
-            description: "Version of the seat binding form; the only value this release reads is 1."
+            description: "Version of the seat binding form; this release writes 2 and reads 1 and 2."
             type: integer
-            const: 1
+            enum: [1, 2]
+    additionalProperties:
+      $ref: "#/$defs/patternEntry"
   generatedPaths:
     description: "Generated trees a unit write scope widens to when it touches their source."
     type: array
@@ -819,3 +847,101 @@ $defs:
         type: array
         items:
           type: string
+  loopBounds:
+    description: "Bounds on loop parameters."
+    type: object
+    additionalProperties:
+      description: "Bounds for one parameter: minimum and maximum allowed values."
+      type: object
+      additionalProperties: false
+      properties:
+        min:
+          description: "Minimum allowed value for this parameter."
+          type: integer
+        max:
+          description: "Maximum allowed value for this parameter."
+          type: integer
+  patternEntry:
+    description: "One collaboration pattern: its promise, loop, defaults and invariants."
+    type: object
+    additionalProperties: false
+    properties:
+      promise:
+        description: "One-sentence promise of what this pattern delivers."
+        type: string
+      loop:
+        description: "The execution loop that runs this pattern."
+        type: string
+        enum: [solo, reviewed, panel, debate]
+      defaults:
+        description: "Default parameter values for the loop."
+        type: object
+        properties:
+          maxRounds:
+            description: "Most review rounds before the unit stops."
+            type: integer
+            minimum: 1
+          minCheckers:
+            description: "Minimum checker seats required for a review round."
+            type: array
+            items:
+              description: "A checker seat name."
+              type: string
+              enum: [reviewer, red-team, tester]
+          seats:
+            description: "Default seat declarations for the loop."
+            type: array
+            items:
+              $ref: "#/$defs/declaredSeat"
+          roleTasks:
+            description: "Default task instructions per seat or kind."
+            type: object
+            additionalProperties:
+              description: "Task instruction text."
+              type: string
+          rebuttal:
+            description: "Whether rebuttal is enabled in debate."
+            type: boolean
+      invariants:
+        description: "Invariants that must not be weakened."
+        type: object
+        additionalProperties:
+          $ref: "#/$defs/patternInvariant"
+  declaredSeat:
+    description: "One declared seat in a pattern or unit."
+    type: object
+    additionalProperties: false
+    properties:
+      seat:
+        description: "Unique name of the seat."
+        type: string
+        minLength: 1
+      role:
+        description: "Role the seat performs in the loop."
+        type: string
+        enum: [producer, synthesizer, reviewer, red-team, judge]
+      persona:
+        description: "Persona specialization for the seat."
+        type: string
+        minLength: 1
+      tier:
+        $ref: "#/$defs/tierName"
+    required: [seat, role]
+  patternInvariant:
+    description: "An invariant on one parameter: either atLeast for lists or fixed for exact value."
+    type: object
+    additionalProperties: false
+    properties:
+      atLeast:
+        description: "List elements that must be present in the effective value."
+        type: array
+        items:
+          description: "Required element."
+          type: string
+      fixed:
+        description: "Exact value the parameter must have."
+    oneOf:
+      - description: "Minimum elements that must be present in a list parameter."
+        required: [atLeast]
+      - description: "Exact value the parameter must equal."
+        required: [fixed]

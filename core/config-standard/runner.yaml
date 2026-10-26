@@ -804,13 +804,9 @@ runner:
   confinement:
     # @fgos:doc When true every capability must declare its own confinement. Default: false.
     strict: false
-  # @fgos:doc Settings of the collaboration patterns.
-  patterns:
-    # @fgos:doc The rule applied when a pattern names none.
-    defaultRule:
-      # @fgos:doc Lowest rigor a unit that changes files may run at. Values: low | standard | high | critical. Default: standard.
-      mutatingMinRigor: standard
-    # @fgos:doc The reviewed pattern: rounds and checkers.
+  # @fgos:doc Tuning and bounds of the execution loops.
+  loops:
+    # @fgos:doc Tuning and bounds of the reviewed loop.
     reviewed:
       # @fgos:doc Most review rounds before the unit stops. Minimum: 1. Default: 2.
       maxRounds: 2
@@ -822,9 +818,73 @@ runner:
         high: [reviewer, red-team]
         # @fgos:doc Checker seats at this rigor. Default: ["reviewer","red-team","tester"].
         critical: [reviewer, red-team, tester]
+  # @fgos:doc Settings of the collaboration patterns.
+  patterns:
     # @fgos:doc Marker that this project reads the seat binding form of the config.
     seatBinding:
-      # @fgos:doc Version of the seat binding form; the only value this release reads is 1. Default: 1.
-      schema: 1
+      # @fgos:doc Version of the seat binding form; this release writes 2 and reads 1 and 2. Values: 1 | 2. Default: 2.
+      schema: 2
+    solo:
+      promise: "A single worker runs the task to completion."
+      loop: solo
+    reviewed:
+      promise: "A producer executes the task followed by checker review rounds until acceptance or budget exhaustion."
+      loop: reviewed
+    panel:
+      promise: "Multiple independent producers execute the task in parallel and a synthesizer combines their results."
+      loop: panel
+    debate:
+      promise: "Multiple agents debate opposing viewpoints across rounds before reaching a conclusion."
+      loop: debate
+    code-change:
+      promise: "A producer changes code with reviewer and red-team review."
+      loop: reviewed
+      invariants:
+        minCheckers:
+          atLeast: [reviewer, red-team]
+    consult:
+      promise: "An advisor provides specialized guidance without file mutations."
+      loop: solo
+      invariants:
+        seats:
+          fixed:
+            - seat: advisor
+              role: producer
+    rfc:
+      promise: "A document or decision proposal reviewed by a reviewer and red-team against specification."
+      loop: reviewed
+      invariants:
+        minCheckers:
+          atLeast: [reviewer, red-team]
+      defaults:
+        maxRounds: 1
+        roleTasks:
+          reviewer: |-
+            You are the reviewer of a proposal or document another agent just produced. Do not change any file.
+            Read the artifact the task names (a path or text in the task itself) and the producer's own account of it, listed under Context refs. Do not look at git history unless the task names a commit.
+            Check it against the task below and report what is wrong, unsupported, or missing, with quoted evidence, or say plainly that you found nothing.
+
+            The task that was assigned:
+            {objective}
+          red-team: |-
+            You are the red-team for a proposal or document another agent just produced. Do not change any file.
+            Read the artifact the task names (a path or text in the task itself) and the producer's own account of it, listed under Context refs. Do not look at git history unless the task names a commit.
+            Try to break it: wrong claims, hidden assumptions, missed cases, failure modes, and anything the task forbade. Report concrete failures with quoted evidence, or say plainly that you found none.
+
+            The task that was assigned:
+            {objective}
+    research-fan-out:
+      promise: "Multiple researchers investigate a topic independently in parallel and a synthesizer produces the unified finding."
+      loop: panel
+      defaults:
+        seats:
+          - seat: researcher-1
+            role: producer
+          - seat: researcher-2
+            role: producer
+          - seat: researcher-3
+            role: producer
+          - seat: synthesizer
+            role: synthesizer
   # @fgos:doc Generated trees a unit write scope widens to when it touches their source. Default: [].
   generatedPaths: []

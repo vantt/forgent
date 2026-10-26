@@ -169,7 +169,7 @@ fn this_repositorys_project_file_migrates_with_the_same_effective_value() {
     let report = project(&ctx, &roots, &writer, &opts, |_| Ok(())).unwrap();
     // The one-key sections `gateway` and `lock` go, the tier ladder `$comment` converts, 37 values stay (the two tool executors, the impact-analysis pool and nine pools that never fall back to Codex are this repository's own).
     assert_eq!(report.kept.len(), 37);
-    assert_eq!(report.dropped_redundant.len(), 235);
+    assert_eq!(report.dropped_redundant.len(), 257);
     assert_eq!(report.dropped_retired, ["lock.predecessorKillWaitMs"]);
     assert_eq!(
         report.dropped_out_of_scope,
