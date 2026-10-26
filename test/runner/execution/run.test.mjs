@@ -1323,7 +1323,10 @@ test('a resumed unit recorded before write scopes existed hands its own writes t
   fs.writeFileSync(unitJson, JSON.stringify(record, null, 2));
   fs.rmSync(path.join(unitDir, 'producer'), { recursive: true, force: true });
   await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktreeDir });
-  const assignment = JSON.parse(fs.readFileSync(path.join(unitDir, 'producer', '1', 'assignment.json'), 'utf8'));
+  // A producer that did not pass is bound again as a new attempt, so the assignment is the last attempt's.
+  const attempts = JSON.parse(fs.readFileSync(unitJson, 'utf8')).bindings['producer/1'];
+  const lastDir = attempts.length === 1 ? '1' : `1-fb${attempts.length - 1}`;
+  const assignment = JSON.parse(fs.readFileSync(path.join(unitDir, 'producer', lastDir, 'assignment.json'), 'utf8'));
   assert.deepEqual(assignment.writes, ['core/skills/z.md']);
   assert.equal(JSON.parse(fs.readFileSync(unitJson, 'utf8')).writeScope, undefined);
 });

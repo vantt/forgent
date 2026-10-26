@@ -327,8 +327,15 @@ fn worst_cases(pair: &Pair, key_text: &str, now: fgos_mailbox_core::Timestamp) -
         .items
         .iter()
         .map(|item| {
-            let bytes = pair.state.message(&item.id).map_or(0, |h| h.body_bytes);
-            fgos_mailbox_core::worst_case_len(item, bytes, &pair.limits)
+            let header = pair.state.message(&item.id);
+            match header.and_then(|h| h.body_rendered_bytes) {
+                Some(rendered) => fgos_mailbox_core::bounded_len(item, rendered, &pair.limits),
+                None => fgos_mailbox_core::worst_case_len(
+                    item,
+                    header.map_or(0, |h| h.body_bytes),
+                    &pair.limits,
+                ),
+            }
         })
         .collect()
 }
@@ -341,9 +348,11 @@ fn bound_for(budget: usize) -> u64 {
 #[test]
 fn a_step_claim_takes_messages_in_order_only_while_their_worst_case_frames_fit_the_bound() {
     let mut pair = Pair::new(t(100));
-    let first = pair.send("a", B_NAME, "one", t(100));
-    let second = pair.send("a", B_NAME, "two, a little longer", t(101));
-    let third = pair.send("a", B_NAME, "six", t(102));
+    // Bodies longer than the body-missing line, so each frame's size follows
+    // its body.
+    let first = pair.send("a", B_NAME, &"o".repeat(600), t(100));
+    let second = pair.send("a", B_NAME, &"t".repeat(800), t(101));
+    let third = pair.send("a", B_NAME, &"s".repeat(620), t(102));
     let sizes = worst_cases(&pair, "b", t(110));
     // The second fits alone but not beside the first; the third would fit
     // beside the first, and is still not taken: the claim keeps the order.
@@ -474,6 +483,44 @@ fn a_bounded_step_repeated_in_the_millisecond_its_stamp_and_the_newest_mail_shar
         .state
         .claim(&key("b"), G1, bound, t(110), &pair.limits, &mut pair.ids);
     assert_eq!((again.changed, again.too_large), (false, 1));
+}
+
+#[test]
+fn a_step_claim_measures_a_body_it_can_see_instead_of_assuming_the_worst_case() {
+    let bound = 8192u64;
+    let prose = "A line of ordinary text, about sixty bytes long, no more.\n".repeat(33);
+    let mut pair = Pair::new(t(100));
+    let id = pair.send("a", B_NAME, &prose, t(100));
+    let claim = pair.state.claim(
+        &key("b"),
+        G1,
+        Checkpoint::BoundedStep(bound),
+        t(110),
+        &pair.limits,
+        &mut pair.ids,
+    );
+    assert_eq!(claim.too_large, 0, "a ~1.9 KB mail fits an 8 KiB step");
+    assert_eq!(claim.items.len(), 1);
+    assert_eq!(claim.items[0].id, id);
+    let blind = fgos_mailbox_core::worst_case_len(&claim.items[0], prose.len() as u64, &pair.limits);
+    assert!(
+        blind + fgos_mailbox_core::pointer_reserve() > bound as usize,
+        "the byte-count bound alone would have refused it ({blind} bytes)"
+    );
+
+    // A body whose escaped form really is that large is still too large.
+    let hostile = "&".repeat(2_000);
+    let mut pair = Pair::new(t(100));
+    pair.send("a", B_NAME, &hostile, t(100));
+    let claim = pair.state.claim(
+        &key("b"),
+        G1,
+        Checkpoint::BoundedStep(bound),
+        t(110),
+        &pair.limits,
+        &mut pair.ids,
+    );
+    assert_eq!((claim.items.len(), claim.too_large), (0, 1));
 }
 
 #[test]

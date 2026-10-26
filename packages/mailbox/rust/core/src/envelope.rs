@@ -67,6 +67,11 @@ pub struct Header {
     /// this field.
     pub effective_wake: bool,
     pub body_bytes: u64,
+    /// The body's size inside its frame once escaped and guttered, measured
+    /// at send; `None` on a message recorded before it was kept, whose fit
+    /// is then bounded by its byte count alone.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub body_rendered_bytes: Option<u64>,
     /// Whether the store still keeps the body.
     pub body_kept: bool,
     pub recorded_at: Timestamp,

@@ -36,7 +36,8 @@ pub use delivery::{
 };
 pub use envelope::{Header, Kind, MessageState, RefusalReason};
 pub use frame::{
-    frame_sections, pointer_reserve, render, too_large_pointer, worst_case_len, FRAME_SEPARATOR,
+    bounded_len, frame_sections, pointer_reserve, render, rendered_body_len, too_large_pointer,
+    worst_case_len, FRAME_SEPARATOR,
 };
 pub use ids::{
     AttemptToken, Cli, Generation, IdSource, InvalidValue, MessageId, ShortName, WriterKey,

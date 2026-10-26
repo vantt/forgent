@@ -118,11 +118,21 @@ fn a_full_record_refuses_sends_and_keeps_draining() {
                 rec::register(state, head, T0, &limits, ids);
             }
             let mut now = T0;
+            // What one head's window of sends adds: the larger of a floor
+            // (two writer keys per send) and what the record actually grew
+            // by, so the fill stops short of the cap however large a header
+            // is.
+            let mut window_growth = budget * 2 * limits.frame.max_header_chars as usize;
+            let mut previous = None::<usize>;
             'fill: for window in 0..u64::from(limits.session.lifetime_cap) {
                 now = T0.plus_secs(window * step);
                 for head in &heads {
                     let size = serde_json::to_vec(&*state).unwrap().len();
-                    if size + budget * 2 * limits.frame.max_header_chars as usize > write_cap {
+                    if let Some(previous) = previous {
+                        window_growth = window_growth.max(size.saturating_sub(previous));
+                    }
+                    previous = Some(size);
+                    if size + window_growth > write_cap {
                         break 'fill;
                     }
                     for i in 0..budget {
