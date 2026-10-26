@@ -318,3 +318,19 @@ Rulings:
 1. The cutover approval packet goes out now, at met-local (L13-6). It cites w38 and states the ownership audit at 23e3c34b7: 0 unaccounted pairs, B ok, reproduction 8/8. The 58 exceptions for already-allowed paths are dropped, as w33 recommended.
 2. The five w38 low notes and the two uncarried w33 ownership follow-ups (raw drift count; consistent keying of records 149–150) are applied in one register refresh through `reconcile.py`. The refresh runs after the owner answers and before the lease, with a light review. `linkIntoMoveSet` is removed from the register, `verify.py` and its control, not left as a constant.
 3. Record commits after 23e3c34b7 (reviews, this ruling, the packet) are pair-accounted at the next accounting, at the latest in the F import accounting.
+
+## L13-30 — Owner approves cutover option A (owner decision)
+
+**Owner text:** 2026-10-26 09:57, answer to the cutover approval packet (6586bbc46): **"đồng ý A, khi nào lead LAND báo ổn thì em làm."**
+
+Scope, as the packet set it:
+- **Allowed:** take the documentation lease; import main once as F, with accounting; run the F duties on the plan branch and clones; publish the archive ref; write and independently review the final ledger.
+- **Not allowed:** Land on main, which needs a separate approval after the final ledger review; deleting files on main; pushing `.fgos/events*`; widening the frame when F exceeds the counts. In that last case the Lead stops and asks again.
+
+**Condition:** start only after lead:LAND says it is OK. The Lead asked LAND at 09:58 about the lease and freeze, the F import and the F-window heavy IO.
+
+**Owner items:**
+- **G8:** the archive ref publication is covered by A's scope.
+- **G5 and G9:** still open; asked separately.
+
+**Work allowed before LAND answers:** the L13-29.2 register refresh only. It touches the plan branch only, needs no lease and causes no heavy IO.
