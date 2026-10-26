@@ -1,0 +1,108 @@
+{
+  "schema": "git-one-door-scanner-fixes-audit.v1",
+  "head": "6215e614f97d520b6caa43060a6a72e1bb5c381f",
+  "sourceSha256": {
+    "scripts/git-one-door-scan.mjs": "ecc611176b2189fe24dc0b32d29320ff96a0972f4f615dda045a74f4b878b706",
+    "scripts/lib/git-one-door-declarations.v1.json": "77fb3b32076d82e414331c18bd7e95a99d8c2654b191027c05fa725c14fa5b2d",
+    "test/scripts/git-one-door-declarations.test.mjs": "f64e9bc6037a01842fde46fc7c86ef27f343393c8641156ebdfdd8eaa2334865"
+  },
+  "declarationsBefore": 25,
+  "declarationsAfter": 20,
+  "unchangedRetainedDeclarations": true,
+  "retiredConfiguredDeclarations": [
+    {
+      "path": "bin/fgos.mjs",
+      "siteId": "runVerb:5015bae31309f661fda9ed9e2e7c69052e479737c20a6d248620eaf23f8a9377",
+      "class": "configured-binary",
+      "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "siteId": "runVerb:7c4188212f1a46f409d6c6c8c060ac228b3e2bec876a988791dd2ed25b3ef2e7",
+      "class": "configured-binary",
+      "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "siteId": "landRunnerItem:cc9889cc48b52606b9bc90ec69d9c7e3216188c53719a6b06f5243f78ef87115",
+      "class": "configured-binary",
+      "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "siteId": "landRunnerItem:a7d2645a7b32b2cbd3ccc8248ee7b4e5b369da5845a9e8f02bf176709ac52b51",
+      "class": "configured-binary",
+      "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+    },
+    {
+      "path": "src/runner/worktree.mjs",
+      "siteId": "runWorktreeSetupCommands:248e44e1134e762a1a88f3d776215e3515492e402a14b26abdb11f281e78d2a1",
+      "class": "configured-binary",
+      "reason": "Owner L13-6: worktreeSetup.commands is JSON project configuration, not product-selected Git; the existing consumer-command marker agrees with runtime classification but indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this setup-command consumer retires."
+    }
+  ],
+  "retirementProvenByActualSubsetClasses": [
+    {
+      "path": "bin/fgos.mjs",
+      "line": 3496,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "line": 3640,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "line": 958,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "line": 992,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/worktree.mjs",
+      "line": 146,
+      "spawn": "execFileSync",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    }
+  ],
+  "focusedTests": {
+    "exitCode": 0,
+    "passed": 45,
+    "failed": 0,
+    "skipped": 0
+  },
+  "originalScannerNegativeControl": {
+    "exitCode": 1,
+    "passed": 20,
+    "failedIncludingParents": 25,
+    "newDistinctFailingCases": 21,
+    "onlyImportLocationsAdapted": true
+  },
+  "fullNativeAcceptance": "blocked; not certified by subset",
+  "subset": {
+    "exitCode": 0,
+    "filesScanned": 999,
+    "omittedPaths": 128,
+    "undeclared": 0,
+    "declarationsMatched": 20
+  },
+  "censusRegenerated": false
+}

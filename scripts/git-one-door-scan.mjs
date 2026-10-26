@@ -28,8 +28,8 @@
 //     (owner decision 2026-10-20): outside the product one-door boundary, reported and counted.
 // Explicit owner declarations extend these classes by exact path + function/call digest, never by
 // line number. Pass-through argv binds the sorted multiset of resolved wrapper caller-call digests;
-// unresolved caller escapes refuse the declaration, except for configured-binary provenance.
-// Hook verb claims must equal the callers' literal read verbs.
+// unresolved caller escapes refuse the declaration unless the program has proven configuration
+// provenance. Hook verb claims must equal literal caller verbs; tooling declarations require reads.
 // Tooling that cannot use an existing port has its own declared-tooling-exemption class; every
 // declaration carries its reason and retirement condition and must match exactly one raw site.
 //
@@ -345,6 +345,11 @@ class JsFile {
     if (callMember) {
       const close = splitArgs(shapeExpr, callMember[0].length - 1).close;
       const tail = shapeExpr.slice(close + 1).trim();
+      // A computed property of a returned config object keeps that object's provenance too.
+      if (tail.startsWith('[') && splitArgs(tail, 0).close === tail.length - 1) {
+        const key = /^\[\s*(['"])(.*?)\1\s*\]$/.exec(expr.slice(close + 1).trim())?.[2] ?? '*';
+        return this.property(expr.slice(0, close + 1), [key], index, depth + 1);
+      }
       if (tail && /^(?:\??\.[A-Za-z_$][\w$]*)+$/.test(tail)) {
         const keys = tail.split(/\??\./).filter(Boolean);
         if (/^[A-Z][A-Z0-9]*_[A-Z0-9_]+$/.test(keys.at(-1))) return [{ external: `env ${keys.at(-1)}` }];
@@ -1199,7 +1204,7 @@ function scanJs(name, source, ctx) {
       if (cls === 'other') continue;
       if (cls === 'external') { ctx.classes.push({ ...record, class: 'configured-binary' }); continue; }
       if (cls === 'param') { ctx.wrappers.push({ file, site, entry, record }); continue; }
-      ctx.raw.push({ ...record, family: cls === 'unknown' ? 'unresolved-binary' : cls === 'hook' ? 'hook-spawn' : entry.shell ? 'shell' : site.fn === 'runBorrowed' ? 'borrowed' : 'spawn', file, site, enclosing: enclosing(file.spans, site.open) });
+      ctx.raw.push({ ...record, family: cls === 'unknown' ? 'unresolved-binary' : cls === 'hook' ? 'hook-spawn' : entry.shell ? 'shell' : site.fn === 'runBorrowed' ? 'borrowed' : 'spawn', programValue: entry.value, file, site, enclosing: enclosing(file.spans, site.open) });
     }
   }
   // The consumer-command marker is accepted only on a spawn whose binary is not a literal: it marks data
@@ -1381,6 +1386,7 @@ function valueFlowCalls(ctx, file, fn) {
 function computeValueFlow(ctx, file, fn) {
   const calls = [];
   const escapes = [];
+  let aliasedExport = false;
   const items = [];
   const seen = new Set();
   const followed = new Set();
@@ -1552,6 +1558,17 @@ function computeValueFlow(ctx, file, fn) {
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const f = item.file;
+    // The caller resolver cannot follow export aliases/defaults. Treat those value flows as escapes,
+    // including aliases of a local alias, rather than letting a declaration hide their callers.
+    if (!item.scope) {
+      for (const exported of f.shape.matchAll(/\bexport\s*\{([^}]*)\}(?!\s*from\b)/g)) {
+        if (exported[1].split(',').some(part => {
+          const [local, alias] = part.trim().split(/\s+as\s+/);
+          return local === item.name && alias && alias !== local;
+        })) { aliasedExport = true; escape(f, exported.index, 'exported under an alias'); }
+      }
+      if (new RegExp(`\\bexport\\s+default\\s+(?:(?:async\\s+)?function\\s*\\*?\\s*)?${esc(item.name)}\\b`).test(f.shape)) { aliasedExport = true; escape(f, 0, 'exported as default'); }
+    }
     // A module-level binding is read wherever it is imported.
     if (!item.scope && new RegExp(`export\\s+(?:const|let|var|(?:async\\s+)?function\\s*\\*?)\\s*${esc(item.name)}\\b|export\\s*\\{[^}]*\\b${esc(item.name)}\\b`).test(f.code)) {
       for (const [other, alias] of importedAs(ctx, f, item.name)) push({ ...item, file: other, name: alias, origin: false });
@@ -1580,7 +1597,7 @@ function computeValueFlow(ctx, file, fn) {
     }
     drain();
   }
-  return { calls, escapes };
+  return { calls, escapes, aliasedExport };
 }
 
 /** Calls of a named function by name: in its own file and where it is imported (under any alias). */
@@ -1692,11 +1709,11 @@ function resolveWrappers(ctx) {
       continue;
     }
     if (!callers.length) {
-      ctx.raw.push({ ...w.record, family: 'unresolved-binary', binary: `${w.record.binary} (no caller found for ${fn?.name ?? 'anonymous function'})`, file: w.file, site: w.site, enclosing: enclosing(w.file.spans, w.site.open) });
+      ctx.raw.push({ ...w.record, family: 'unresolved-binary', binary: `${w.record.binary} (no caller found for ${fn?.name ?? 'anonymous function'})`, programValue: value, file: w.file, site: w.site, enclosing: enclosing(w.file.spans, w.site.open) });
       continue;
     }
     // The value also goes somewhere the flow cannot follow: the call sites found are not all of them.
-    if (flow?.escapes.length) ctx.raw.push({ ...w.record, family: 'unresolved-binary', binary: `${w.record.binary} (${fn.name} escapes: ${flow.escapes[0]})`, file: w.file, site: w.site, enclosing: enclosing(w.file.spans, w.site.open) });
+    if (flow?.escapes.length) ctx.raw.push({ ...w.record, family: 'unresolved-binary', binary: `${w.record.binary} (${fn.name} escapes: ${flow.escapes[0]})`, programValue: value, file: w.file, site: w.site, enclosing: enclosing(w.file.spans, w.site.open) });
     for (const c of callers) {
       budget.steps = 0; budget.memo.clear(); budget.stack.length = 0;
       const { args } = splitArgs(c.file.shape, c.open);
@@ -1726,7 +1743,7 @@ function resolveWrappers(ctx) {
         if (cls === 'external') ctx.classes.push({ ...record, class: 'configured-binary' });
         else if (cls === 'param') queue.push({ file: c.file, site: { ...w.site, open: c.open }, entry, record, via: key });
         else if (cls === 'git' || cls === 'hook' || cls === 'unknown' || cls === 'shell' || cls === 'passthrough') {
-          ctx.raw.push({ ...record, family: cls === 'unknown' ? 'unresolved-binary' : cls === 'hook' ? 'hook-spawn' : 'wrapper-caller', file: c.file, site: { ...w.site, open: c.open }, enclosing: enclosing(c.file.spans, c.open) });
+          ctx.raw.push({ ...record, family: cls === 'unknown' ? 'unresolved-binary' : cls === 'hook' ? 'hook-spawn' : 'wrapper-caller', programValue: v, file: c.file, site: { ...w.site, open: c.open }, enclosing: enclosing(c.file.spans, c.open) });
         }
       }
     }
@@ -2453,13 +2470,15 @@ function declarationCallText(file, open) {
 }
 
 /** A literal argv verb, preserving unknown operands rather than mistaking their string fragments
- * for a verb. Spreads are unresolved: they can insert options or a verb, including write forms. */
-function declarationVerb(argv) {
+ * for a verb. Identity stays strict about spreads; read validation may accept a spread after a
+ * fixed verb, except when trailing operands select that verb's read/write form. */
+function declarationVerb(argv, allowTrailingSpread = false) {
   const text = argv.trim();
   const shape = lexSource(text).shape;
   if (!text.startsWith('[') || splitArgs(shape, 0).close !== text.length - 1) return undefined;
   const items = splitArgs(shape, 0).args.map(({ from, to }) => text.slice(from, to).trim());
-  if (items.some(item => item.startsWith('...'))) return undefined;
+  const spread = items.findIndex(item => item.startsWith('...'));
+  if (!allowTrailingSpread && spread >= 0) return undefined;
   const words = items.map(item => /^(['"])((?:\\.|(?!\1).)*)\1$/s.exec(item)?.[2]);
   let i = 0;
   for (; i < words.length;) {
@@ -2467,8 +2486,36 @@ function declarationVerb(argv) {
     if (/^(?:--(?:no-replace-objects|no-optional-locks|bare|literal-pathspecs)|--(?:git-dir|work-tree)=.+)$/.test(words[i] ?? '')) { i++; continue; }
     break;
   }
-  if (!words[i] || words[i].startsWith('-')) return undefined;
+  if (!words[i] || words[i].startsWith('-') || (spread >= 0 && (spread <= i || ['config', 'reflog', 'symbolic-ref'].includes(words[i])))) return undefined;
   return hookVerb(words.slice(i).map(word => word ?? '__operand__'));
+}
+
+/** Resolve declaration program operands through the same named/value callers as wrapper resolution.
+ * Escaping binary parameters cannot prove config: an unseen caller could supply a fixed Git program. */
+function declarationPrograms(ctx, file, programValue) {
+  budget.steps = 0; budget.memo.clear(); budget.stack.length = 0;
+  const seen = new Set();
+  const resolve = (values, depth = 0) => values.flatMap(v => {
+    if (v.param === undefined) return [v];
+    const home = v.file ?? file;
+    const key = `${home.name}:${v.fn.from}:${v.index}:${(v.path ?? []).join('.')}`;
+    if (depth > MAX_DEPTH || seen.has(key)) return [{ unknown: 'cyclic declaration program' }];
+    seen.add(key);
+    const flow = valueFlowCalls(ctx, home, v.fn);
+    const callers = dedupeCalls([...(v.fn.name ? callersOf(ctx, home, v.fn.name) : []), ...flow.calls]);
+    const resolved = callers.flatMap(c => {
+      const supplied = splitArgs(c.file.shape, c.open).args.map(a => c.file.code.slice(a.from, a.to));
+      return resolve(argumentValues(c.file, v, supplied, c.open, 0), depth + 1);
+    });
+    seen.delete(key);
+    if (!callers.length || flow.escapes.length) resolved.push({ unknown: 'unresolved declaration program caller' });
+    return resolved;
+  });
+  const values = resolve([programValue ?? { unknown: 'unresolved program' }]);
+  return {
+    fixedGit: values.some(v => binaryClass(v) === 'git'),
+    configured: values.length > 0 && values.every(v => binaryClass(v) === 'external'),
+  };
 }
 
 /** A pass-through site's identity also binds the sorted call digests of its wrapper. Reuse both
@@ -2481,8 +2528,9 @@ function declaredSiteId(ctx, file, site) {
   const { args } = splitArgs(file.shape, site.open);
   const argv = args[1] ? file.code.slice(args[1].from, args[1].to) : '';
   const verb = declarationVerb(argv);
-  if (verb) return { siteId: `${fn?.name ?? '<module>'}:${sha256(call)}`, callerVerbs: [verb] };
   const flow = owner ? valueFlowCalls(ctx, file, owner) : { calls: [], escapes: [] };
+  const aliasedExport = flow.aliasedExport;
+  if (verb) return { siteId: `${fn?.name ?? '<module>'}:${sha256(call)}`, callerVerbs: [verb], aliasedExport, ...(flow.escapes.length ? { escapes: flow.escapes } : {}) };
   const callers = owner ? dedupeCalls([
     ...(owner.name ? callersOf(ctx, file, owner.name) : []),
     ...flow.calls,
@@ -2490,18 +2538,19 @@ function declaredSiteId(ctx, file, site) {
   const callerDigests = callers.map(c => sha256(`${c.file.name}\0${declarationCallText(c.file, c.open)}`)).sort();
   budget.steps = 0; budget.memo.clear(); budget.stack.length = 0;
   const parameters = argv ? file.elements(argv, site.open, 0).filter(v => v.param !== undefined) : [];
-  const callerVerbs = callers.flatMap(c => {
+  const observedVerb = declarationVerb(argv, true);
+  const callerVerbs = observedVerb ? [observedVerb] : callers.flatMap(c => {
     const { args: supplied } = splitArgs(c.file.shape, c.open);
     return parameters.map(v => {
       const arg = supplied[v.index];
-      return arg ? declarationVerb(c.file.code.slice(arg.from, arg.to)) : undefined;
+      return arg ? declarationVerb(c.file.code.slice(arg.from, arg.to), true) : undefined;
     });
   });
-  return { siteId: `${fn?.name ?? '<module>'}:${sha256(JSON.stringify([call, callerDigests]))}`, callerDigests, callerVerbs, escapes: flow.escapes };
+  return { siteId: `${fn?.name ?? '<module>'}:${sha256(JSON.stringify([call, callerDigests]))}`, callerDigests, callerVerbs, aliasedExport, escapes: flow.escapes };
 }
 
 /** Owner declarations classify raw sites only; stale/ambiguous inputs never yield a green census. */
-function applyDeclarations(root, sites, classes, digests, observedVerbs) {
+function applyDeclarations(root, sites, classes, digests, observations, ctx) {
   let bytes;
   try { bytes = fs.readFileSync(path.join(root, GIT_DECLARATIONS_PATH), 'utf8'); }
   catch (err) { if (err.code === 'ENOENT') return sites; throw err; }
@@ -2528,15 +2577,17 @@ function applyDeclarations(root, sites, classes, digests, observedVerbs) {
     if (found.length !== 1) throw new Error(`stale or ambiguous Git declaration: ${entry.path} ${entry.siteId} matched ${found.length} sites`);
     const [site] = found;
     const { escapes = [] } = site;
-    if (escapes.length && entry.class !== 'configured-binary') invalid(`wrapper escapes for ${entry.path}: ${escapes[0]}`);
-    const verbs = observedVerbs.get(site);
+    const { callerVerbs: verbs, aliasedExport, file, programValue } = observations.get(site) ?? {};
+    const programs = entry.class === 'configured-binary' ? declarationPrograms(ctx, file, programValue) : null;
+    if (escapes.length && !(programs?.configured && !aliasedExport)) invalid(`wrapper escapes for ${entry.path}: ${escapes[0]}`);
     if (entry.class === 'hook-read-context') {
       if (!entry.path.startsWith(`${HOOKS_DIR}/`) || site.binary !== 'git'
         || !Array.isArray(entry.verbs) || !entry.verbs.length || !entry.verbs.every(v => READ_VERBS.has(v))
         || !verbs?.length || verbs.some(v => !v || !entry.verbs.includes(v))
         || entry.verbs.some(v => !verbs.includes(v))) invalid(`hook read verbs for ${entry.path}: declared verbs must equal literal caller verbs`);
     } else if (entry.verbs !== undefined) invalid(`verbs on non-hook ${entry.path}`);
-    if (entry.class === 'configured-binary' && site.family !== 'unresolved-binary') invalid(`fixed program is not configured data: ${entry.path}`);
+    if (entry.class === 'declared-tooling-exemption' && (!verbs?.length || verbs.some(v => !READ_VERBS.has(v)))) invalid(`tooling read verbs for ${entry.path}: expected literal read verbs`);
+    if (entry.class === 'configured-binary' && (site.family !== 'unresolved-binary' || programs?.fixedGit)) invalid(`fixed program is not configured data: ${entry.path}`);
     classes.push({ ...site, ...entry });
     matched.add(site);
   }
@@ -2590,9 +2641,9 @@ export function scan({ root = REPO, files, openInspect } = {}) {
     if (own) doors.add(mk.path); else ctx.raw.push({ path: mk.path, line: mk.line, spawn: 'sandbox marker', binary: 'marker outside the sandbox door', family: 'sandbox-marker' });
   }
   const sites = [];
-  const observedVerbs = new Map();
+  const observations = new Map();
   for (const s of ctx.raw) {
-    const { file, site, enclosing: _e, ...record } = s;
+    const { file, site, enclosing: _e, programValue, ...record } = s;
     const skill = standaloneSkillOf(path.join(root, record.path), root);
     if (skill) { ctx.classes.push({ ...record, class: STANDALONE_SKILL_CLASS, skill }); continue; }
     if (doors.has(record.path) && file && /\[\s*SANDBOX_DOOR\s*\]/.test(file.code.slice(site.open, splitArgs(file.shape, site.open).close))) {
@@ -2611,15 +2662,15 @@ export function scan({ root = REPO, files, openInspect } = {}) {
       if (verbs.every((v) => v && READ_VERBS.has(v))) { ctx.classes.push({ ...record, class: 'hook-read-context', verbs }); continue; }
     }
     if (file && site) {
-      const { callerVerbs, ...identity } = declaredSiteId(ctx, file, site);
+      const { callerVerbs, aliasedExport, ...identity } = declaredSiteId(ctx, file, site);
       const identified = { ...record, ...identity };
-      observedVerbs.set(identified, callerVerbs);
+      observations.set(identified, { callerVerbs, aliasedExport, file, programValue });
       sites.push(identified);
     } else sites.push(record);
   }
   const key = (s) => `${s.path}:${String(s.line).padStart(6, '0')}:${s.binary}`;
   const unique = (list) => [...new Map(list.map((s) => [key(s), s])).values()].sort((a, b) => key(a).localeCompare(key(b)));
-  const finalSites = unique(applyDeclarations(root, sites, ctx.classes, digests, observedVerbs));
+  const finalSites = unique(applyDeclarations(root, sites, ctx.classes, digests, observations, ctx));
   const classes = unique(ctx.classes);
   const families = {};
   for (const s of finalSites) families[s.family] = (families[s.family] ?? 0) + 1;

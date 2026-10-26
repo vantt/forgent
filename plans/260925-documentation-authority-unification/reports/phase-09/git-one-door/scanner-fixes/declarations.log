@@ -1,0 +1,58 @@
+✔ a declaration classifies exactly one call, retains its rationale, and survives line shifts (14.392025ms)
+✔ deleted, edited, renamed, or ambiguous declared calls fail closed instead of reusing a line number (4.526741ms)
+✔ declarations reject duplicate keys, path patterns, unknown classes, empty reasons and invalid hook verbs (8.323843ms)
+✔ the hook read set adds only show-ref and diff-tree and still rejects their mutating neighbours (1.482138ms)
+✔ an explicitly declared unresolved consumer command uses the existing configured-binary class (3.025708ms)
+✔ new or changed write callers cannot inherit any declared pass-through wrapper (18.332033ms)
+▶ call, Reflect.apply and array-slot callers refuse declared pass-through wrappers
+  ✔ tooling wrapper: git.call(null, '.', ['reset', '--hard', 'HEAD']); (1.314264ms)
+  ✔ tooling wrapper: Reflect.apply(git, null, ['.', ['reset', '--hard', 'HEAD']]); (1.137938ms)
+  ✔ tooling wrapper: const tbl = [git]; tbl[0]('.', ['reset', '--hard', 'HEAD']); (1.524335ms)
+  ✔ callback wrapper: run.call(null, 'git', ['push', '--force', 'origin', 'HEAD']); (1.787052ms)
+  ✔ callback wrapper: Reflect.apply(run, null, ['git', ['push', '--force', 'origin', 'HEAD']]); (2.251856ms)
+  ✔ callback wrapper: const tbl = [run]; tbl[0]('git', ['push', '--force', 'origin', 'HEAD']); (1.742401ms)
+  ✔ cold-hook callback: git.call(null, ['update-ref', 'refs/heads/main', 'HEAD']); (1.834311ms)
+  ✔ cold-hook callback: Reflect.apply(git, null, [['update-ref', 'refs/heads/main', 'HEAD']]); (1.937386ms)
+  ✔ cold-hook callback: const tbl = [git]; tbl[0](['update-ref', 'refs/heads/main', 'HEAD']); (1.734507ms)
+✔ call, Reflect.apply and array-slot callers refuse declared pass-through wrappers (15.892081ms)
+▶ configured declarations refuse fixed Git callback programs, including escaping write callers
+  ✔ resolved literal git caller (1.908765ms)
+  ✔ run.call(null, 'git', ['push', '--force', 'origin', 'HEAD']); (2.465295ms)
+  ✔ Reflect.apply(run, null, ['git', ['push', '--force', 'origin', 'HEAD']]); (1.894611ms)
+  ✔ const tbl = [run]; tbl[0]('git', ['push', '--force', 'origin', 'HEAD']); (1.952872ms)
+✔ configured declarations refuse fixed Git callback programs, including escaping write callers (8.520283ms)
+▶ configured declarations refuse escaping program parameters even with a known config caller
+  ✔ unresolvedConfig() (1.1174ms)
+  ✔ JSON.parse(process.env.COMMANDS).command (1.155359ms)
+✔ configured declarations refuse escaping program parameters even with a known config caller (2.449594ms)
+✔ indexed returned configuration proves the program without trusting an escaping outer caller (2.49147ms)
+▶ tooling declarations reject literal writes and non-literal caller verbs
+  ✔ literal site: ['update-ref', 'refs/heads/x', 'HEAD'] (1.401439ms)
+  ✔ wrapper: ['update-ref', 'refs/heads/x', 'HEAD'] (0.954382ms)
+  ✔ literal site: unresolvedArgs() (1.060547ms)
+  ✔ wrapper: unresolvedArgs() (0.769638ms)
+  ✔ literal site: [verb, 'HEAD'] (0.890368ms)
+  ✔ wrapper: [verb, 'HEAD'] (0.702178ms)
+  ✔ literal site: [...prefix, 'diff', 'HEAD'] (0.922243ms)
+  ✔ wrapper: [...prefix, 'diff', 'HEAD'] (0.664927ms)
+  ✔ literal site: ['symbolic-ref', ...operands] (1.261452ms)
+  ✔ wrapper: ['symbolic-ref', ...operands] (0.652349ms)
+✔ tooling declarations reject literal writes and non-literal caller verbs (9.82015ms)
+▶ declared wrappers refuse aliased and default exports with undeclared reset callers
+  ✔ export { g as alias }; with args (1.605528ms)
+  ✔ export { g as alias }; with ['ls-tree', 'HEAD'] (1.137183ms)
+  ✔ export { g as default }; with args (0.944759ms)
+  ✔ export { g as default }; with ['ls-tree', 'HEAD'] (1.206348ms)
+✔ declared wrappers refuse aliased and default exports with undeclared reset callers (5.154134ms)
+✔ wrapper caller identities survive line shifts but an added read caller needs a new declaration (6.666997ms)
+✔ caller fingerprints bind computed callees and duplicates but not caller ordering (2.43479ms)
+✔ declared hook verbs must equal observed literal caller verbs even after re-declaration (4.352733ms)
+✔ the census binds declaration bytes so doctor rejects missing or changed declarations (1.157741ms)
+ℹ tests 45
+ℹ suites 0
+ℹ pass 45
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 162.752297

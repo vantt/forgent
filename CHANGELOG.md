@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Git one-door declarations now refuse pass-through wrapper escapes, including `.call`, `Reflect.apply` and array-slot callers; configured-command provenance remains exempt.
+- Git one-door declarations now refuse pass-through wrapper escapes, including `.call`, `Reflect.apply` and array-slot callers, and wrappers with aliased or default exports. A configured-binary declaration is refused when any caller passes a literal Git program, and keeps escapes only when the program is proven to come from parsed configuration; tooling exemptions need literal read verbs. The scanner now proves indexed configuration reads, so the five configured-command declarations are retired.
 
 - Git one-door declarations now bind pass-through wrappers to their caller-call digests: new or changed callers, including reads, require re-declaration; cold-hook verb claims are checked against literal caller verbs.
 

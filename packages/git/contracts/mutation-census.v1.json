@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "aebd9f51ee42f550986b0aa6d1cc892c3f444c631b4bfd4672e31c22ca60a29d",
+  "payloadDigest": "ab178e23066969ab10070181ece952f5840c53a43030d5693bf850f2c43046bd",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -1128,7 +1128,7 @@
     "src/workflow/store.mjs": "1ffea57e5d5afb57f8558107d253d80982e780ea7649d5e950cb1874e2f90da7",
     "src/workflow/unit-handoff.mjs": "af84e939515499624ded2e37a628f6486e7cb425249eacf7f7d93cfcf0e2494b",
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3",
-    "scripts/lib/git-one-door-declarations.v1.json": "f115aa3bb6f30a8aa09820cd1f518fbb97a1d7adc7f6eee7eb899ffd8e4c0c97"
+    "scripts/lib/git-one-door-declarations.v1.json": "77fb3b32076d82e414331c18bd7e95a99d8c2654b191027c05fa725c14fa5b2d"
   },
   "sites": [],
   "classes": [
@@ -1799,31 +1799,15 @@
       "path": "bin/fgos.mjs",
       "line": 3496,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? readSharedConfig(dir)[key]",
-      "family": "unresolved-binary",
-      "siteId": "runVerb:5015bae31309f661fda9ed9e2e7c69052e479737c20a6d248620eaf23f8a9377",
-      "callerDigests": [
-        "b998668a76604c0e5f56267e0fffd5fb0dde0a836c17f766d364e77f3ca78da5"
-      ],
-      "escapes": [],
-      "class": "configured-binary",
-      "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
-      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
       "line": 3640,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? readSharedConfig(dir)[key]",
-      "family": "unresolved-binary",
-      "siteId": "runVerb:7c4188212f1a46f409d6c6c8c060ac228b3e2bec876a988791dd2ed25b3ef2e7",
-      "callerDigests": [
-        "b998668a76604c0e5f56267e0fffd5fb0dde0a836c17f766d364e77f3ca78da5"
-      ],
-      "escapes": [],
-      "class": "configured-binary",
-      "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
-      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
     },
     {
       "path": "core/skills/distill/scripts/distill.mjs",
@@ -3404,49 +3388,22 @@
       "path": "src/runner/merge.mjs",
       "line": 958,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? elements of section.commands",
-      "family": "unresolved-binary",
-      "siteId": "landRunnerItem:cc9889cc48b52606b9bc90ec69d9c7e3216188c53719a6b06f5243f78ef87115",
-      "callerDigests": [],
-      "escapes": [
-        "passed to an unresolved callee (src/runner/merge.mjs:919)"
-      ],
-      "class": "configured-binary",
-      "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
-      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
     },
     {
       "path": "src/runner/merge.mjs",
       "line": 992,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
-      "binary": "? elements of section.commands",
-      "family": "unresolved-binary",
-      "siteId": "landRunnerItem:a7d2645a7b32b2cbd3ccc8248ee7b4e5b369da5845a9e8f02bf176709ac52b51",
-      "callerDigests": [
-        "4de7c2717184fdba8f7f1b017a6ce53a3d527978fe0ce8d184c95de99ac26969",
-        "82473f253ab13fd30ad7b23b52a9f1823606077e200c1a67f4d0640ce58adbc7"
-      ],
-      "escapes": [],
-      "class": "configured-binary",
-      "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
-      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
     },
     {
       "path": "src/runner/worktree.mjs",
       "line": 146,
       "spawn": "execFileSync",
-      "binary": "? readSharedConfig(dir)[key]",
-      "family": "unresolved-binary",
-      "siteId": "runWorktreeSetupCommands:248e44e1134e762a1a88f3d776215e3515492e402a14b26abdb11f281e78d2a1",
-      "callerDigests": [
-        "a57a1a129bac20c39cac3f800b21d3572b64cf1388f19e9266bb8f882ade9b05",
-        "c1d61a7df27c8bb7eb3cd56b09c6f966ad9c3d7af4c5e5206c4f1d7d064c6a59",
-        "fa545c9254fead58d86d5ede9ec00c29cc6478cb35a5e721511fe5a5ea5dc3ec"
-      ],
-      "escapes": [],
-      "class": "configured-binary",
-      "reason": "Owner L13-6: worktreeSetup.commands is JSON project configuration, not product-selected Git; the existing consumer-command marker agrees with runtime classification but indexed configuration loses static provenance.",
-      "retireWhen": "The scanner proves parsed-config provenance, or this setup-command consumer retires."
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
     },
     {
       "path": "src/seat-binding/client.mjs",

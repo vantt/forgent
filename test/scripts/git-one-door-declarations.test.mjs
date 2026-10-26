@@ -175,6 +175,89 @@ test('call, Reflect.apply and array-slot callers refuse declared pass-through wr
   }
 });
 
+// The literal-site class check cannot see a fixed program passed through the verifier callback.
+test('configured declarations refuse fixed Git callback programs, including escaping write callers', async (t) => {
+  const shape = WRAPPERS[1];
+  for (const call of ['', ...shape.escapingCallers]) {
+    await t.test(call || 'resolved literal git caller', (t) => {
+      const f = wrapperFixture(t, shape);
+      if (call) f.change(call);
+      f.declare([]);
+      const [site] = scan({ root: f.root }).sites;
+      f.declare([{ ...f.entry, siteId: site.siteId, class: 'configured-binary' }]);
+      assert.throws(() => scan({ root: f.root }), /invalid Git declaration.*(?:fixed program|wrapper escapes)/);
+    });
+  }
+});
+
+// Configured-binary used to exempt every escape, even without any configuration provenance.
+test('configured declarations refuse escaping program parameters even with a known config caller', async (t) => {
+  for (const program of ['unresolvedConfig()', 'JSON.parse(process.env.COMMANDS).command']) {
+    await t.test(program, (t) => {
+      const source = `import { execFileSync } from 'node:child_process';\nfunction verify(command) { execFileSync(command, { shell: true }); }\nverify(${program});\nverify.call(null, 'git');\n`;
+      const f = fixture(t, 'scripts/read.mjs', source);
+      f.declare([{ ...f.entry, class: 'configured-binary' }]);
+      assert.throws(() => scan({ root: f.root }), /invalid Git declaration: wrapper escapes/);
+    });
+  }
+});
+
+// This is the indexed-config shape behind the five retiring configured declarations. No other
+// declaration test proves their provenance independently of an owner-supplied class label.
+test('indexed returned configuration proves the program without trusting an escaping outer caller', (t) => {
+  const f = fixture(t);
+  const source = `import { execFileSync } from 'node:child_process';
+function readConfig() { return JSON.parse(process.env.CONFIG); }
+function commands(key) { const section = readConfig()[key]; return section.commands; }
+function verify(root) { for (const command of commands('checks')) execFileSync(command, { shell: true, cwd: root }); }
+verify('.');
+verify.call(null, '.');
+`;
+  f.write('scripts/read.mjs', source);
+  f.declare([]);
+  const result = scan({ root: f.root });
+  assert.deepEqual(result.sites, []);
+  assert.equal(result.classes[0].class, 'configured-binary');
+  f.write('scripts/read.mjs', source.replace('JSON.parse(process.env.CONFIG)', "{ checks: { commands: ['git'] } }"));
+  assert.ok(scan({ root: f.root }).sites.length, 'the same computed property cannot turn a fixed Git default into config');
+});
+
+// A valid digest/rationale is not evidence of a tooling read; the hook test owns only hook claims.
+test('tooling declarations reject literal writes and non-literal caller verbs', async (t) => {
+  for (const argv of ["['update-ref', 'refs/heads/x', 'HEAD']", 'unresolvedArgs()', "[verb, 'HEAD']", "[...prefix, 'diff', 'HEAD']", "['symbolic-ref', ...operands]"]) {
+    for (const wrapper of [false, true]) {
+      await t.test(`${wrapper ? 'wrapper' : 'literal site'}: ${argv}`, (t) => {
+        const source = wrapper
+          ? `import { execFileSync } from 'node:child_process';\nfunction g(args) { return execFileSync('git', args, {}); }\ng(${argv});\n`
+          : `import { execFileSync } from 'node:child_process';\nfunction g() { return execFileSync('git', ${argv}, {}); }\ng();\n`;
+        const f = fixture(t, 'scripts/read.mjs', source);
+        f.declare([f.entry]);
+        assert.throws(() => scan({ root: f.root }), /invalid Git declaration.*tooling read verbs/);
+      });
+    }
+  }
+});
+
+// The caller resolver does not follow export aliases; refuse rather than declare a hidden write safe.
+test('declared wrappers refuse aliased and default exports with undeclared reset callers', async (t) => {
+  for (const [exported, imported] of [
+    ['export { g as alias };', "import { alias } from './read.mjs'; alias(['reset', '--hard']);"],
+    ['export { g as default };', "import alias from './read.mjs'; alias(['reset', '--hard']);"],
+  ]) {
+    for (const argv of ['args', "['ls-tree', 'HEAD']"]) {
+      await t.test(`${exported} with ${argv}`, (t) => {
+        const source = `import { execFileSync } from 'node:child_process';\nfunction g(args) { return execFileSync('git', ${argv}, {}); }\ng(['ls-tree', 'HEAD']);\n`;
+        const f = fixture(t, 'scripts/read.mjs', source);
+        f.declare([f.entry]);
+        assert.deepEqual(scan({ root: f.root }).sites, [], 'baseline declaration matches');
+        f.write('scripts/read.mjs', source + exported + '\n');
+        f.write('scripts/caller.mjs', imported + '\n');
+        assert.throws(() => scan({ root: f.root }), /invalid Git declaration: wrapper escapes/);
+      });
+    }
+  }
+});
+
 test('wrapper caller identities survive line shifts but an added read caller needs a new declaration', (t) => {
   for (const shape of WRAPPERS) {
     const f = wrapperFixture(t, shape);

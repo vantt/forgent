@@ -1,0 +1,107 @@
+{
+  "schema": "git-one-door-scanner-fixes-receipt.v1",
+  "head": "6215e614f97d520b6caa43060a6a72e1bb5c381f",
+  "outcome": "implementation-complete-native-acceptance-blocked",
+  "fullGatePassed": false,
+  "fixes": [
+    {
+      "name": "configured program provenance",
+      "behavior": "Reject any resolved literal Git program; retain escapes only with proven configuration, never an escaping binary parameter or aliased export.",
+      "tests": [
+        "configured declarations refuse fixed Git callback programs, including escaping write callers",
+        "configured declarations refuse escaping program parameters even with a known config caller",
+        "indexed returned configuration proves the program without trusting an escaping outer caller"
+      ]
+    },
+    {
+      "name": "tooling read validation",
+      "behavior": "Require observed literal read verbs; reject writes, unknown verbs and unsafe spread positions without changing existing identities.",
+      "tests": ["tooling declarations reject literal writes and non-literal caller verbs"]
+    },
+    {
+      "name": "aliased export refusal",
+      "behavior": "Mark aliased/default export flows as escapes and refuse wrapper declarations, including fixed-verb wrappers.",
+      "tests": ["declared wrappers refuse aliased and default exports with undeclared reset callers"]
+    }
+  ],
+  "declarations": {
+    "before": 25,
+    "after": 20,
+    "retainedEntriesUnchanged": true,
+    "retired": 5,
+    "retirementReason": "Their existing retireWhen condition is met: computed properties of call results now preserve parsed-config provenance through the existing property evaluator.",
+    "automaticConfiguredSitesVerified": [
+      "bin/fgos.mjs:3496",
+      "bin/fgos.mjs:3640",
+      "src/runner/merge.mjs:958",
+      "src/runner/merge.mjs:992",
+      "src/runner/worktree.mjs:146"
+    ]
+  },
+  "environment": {
+    "cwd": "/home/vantt/projects/forgentX-p9-w1-d2",
+    "node": "v24.18.0",
+    "CLAUDE_CODE_SESSION_ID": "unset for Node proofs",
+    "NODE_OPTIONS": "--no-addons",
+    "TMPDIR": "/tmp/fgos-work/scanner-fixes.2nVd27",
+    "scratchRemovedAtHandoff": true,
+    "nativeAddonLoaded": false
+  },
+  "commands": [
+    {"command":"node --test test/scripts/git-one-door-declarations.test.mjs","attempt":"initial tests against unchanged scanner","exitCode":1,"newTopLevelFailures":4},
+    {"command":"node --test test/scripts/git-one-door-declarations.test.mjs","attempt":"first repair; unsafe positive config-parameter expectation then corrected","exitCode":1,"passed":23,"total":24},
+    {"command":"node --test test/scripts/git-one-door-declarations.test.mjs","attempt":"expanded subtests; config fixture then aligned to actual reader shape","exitCode":1,"passed":43,"total":44},
+    {"command":"node --test test/scripts/git-one-door-declarations.test.mjs","attempt":"subsequent repair before final alias cases; repeated twice","exitCode":0,"passed":44,"total":44},
+    {"command":"node --test /tmp/fgos-work/scanner-fixes.2nVd27/original-scanner.test.mjs","attempt":"final tests against input scanner, only import locations adapted","exitCode":1,"passed":20,"failedIncludingParents":25,"distinctNewFailingCases":21,"log":"red.log"},
+    {"command":"node --test test/scripts/git-one-door-declarations.test.mjs","attempt":"final source","exitCode":0,"passed":45,"total":45,"skipped":0,"log":"declarations.log"},
+    {"command":"node --test test/git/one-door.test.mjs","attempt":"both no-addon attempts","exitCode":1,"passed":4,"total":6,"nativeBackedProof":"not run; two scans require checkout addon","log":"one-door.log"},
+    {"command":"git ls-files -co --exclude-standard -z | node --input-type=module <full-product scan({root,files}) expression in receipt.md>","attempt":"final source","exitCode":1,"reason":"Standalone skill classification requires native YAML; git-addon-not-shipped","log":"full-api.stderr"},
+    {"command":"git ls-files -co --exclude-standard -z | node --input-type=module <product-subset scan({root,files}), omitting skill paths explicitly>","attempt":"supplemental only; repeated","exitCode":0,"scannedInputs":999,"omittedPaths":128,"undeclared":0,"declarationsMatched":20,"log":"product-subset.json","fullGateProof":false},
+    {"command":"node --check scripts/git-one-door-scan.mjs","exitCode":0},
+    {"command":"node --check test/scripts/git-one-door-declarations.test.mjs","exitCode":0},
+    {"command":"python3 declaration-retirement, source-hash and baseline-import audit","exitCode":0,"evidence":"audit.json"},
+    {"command":"git diff --check","exitCode":0}
+  ],
+  "diagnostics": [
+    {"command":"node /tmp/fgos-work/scanner-fixes.2nVd27/diagnostic.mjs","scope":"initial erroneous all-repository-files enumeration, not product-only","exitCode":null,"outcome":"tool timeout at 120 seconds; process exit not reported"},
+    {"command":"node /tmp/fgos-work/scanner-fixes.2nVd27/diagnostic.mjs","scope":"same erroneous enumeration","exitCode":null,"outcome":"tool timeout at 600 seconds; process exit not reported"},
+    {"command":"node /tmp/fgos-work/scanner-fixes.2nVd27/diagnostic.mjs","scope":"corrected full product","exitCode":1,"outcome":"native YAML dependency"},
+    {"command":"node /tmp/fgos-work/scanner-fixes.2nVd27/diagnostic.mjs","scope":"Node/scripts/hooks only; input scanner","exitCode":0},
+    {"command":"node /tmp/fgos-work/scanner-fixes.2nVd27/diagnostic.mjs","scope":"Node/scripts/hooks after indexed-config repair","exitCode":1,"outcome":"configured declarations now stale, retired in same change"},
+    {"command":"node /tmp/fgos-work/scanner-fixes.2nVd27/diagnostic.mjs","scope":"after retirement","exitCode":1,"outcome":"tooling validation exposed pinned reader's trailing spread; parser corrected conservatively"},
+    {"command":"node /tmp/fgos-work/scanner-fixes.2nVd27/diagnostic.mjs","scope":"Node/scripts/hooks after fixes","exitCode":0}
+  ],
+  "notRun": [
+    {"command":"node scripts/git-one-door-scan.mjs --root . --json","reason":"Default Inspect path can auto-stage/build the missing addon outside the exact write grant; prohibited."},
+    {"command":"node scripts/git-one-door-scan.mjs --root . --write-census --json","reason":"Additionally writes the out-of-scope mutation census."},
+    {"command":"native-backed test/git/one-door.test.mjs","reason":"No native addons permitted; no-addon attempt cannot execute two repository scans."},
+    {"command":"fgos CLI, GitNexus graph impact/detect_changes, npm test, scripts/run-tests.mjs, cargo test --workspace, MDView","reason":"Forbidden or outside the task's write/capability grant."}
+  ],
+  "impactAnalysis": {
+    "posture": "degraded-under-no-fgos-CLI",
+    "graphConfirmed": false,
+    "sourceImpact": "scan/declarations, shared JS evaluator and value flow, census generation and downstream verification; no runtime Git operation changed",
+    "highRiskFindingReportedBeforeEdits": true
+  },
+  "optionalFollowUps": [
+    "Rows 19/22: typed tree-OID reader requires out-of-scope consumer edits.",
+    "Rows 9-18: Lead/owner should choose a retirement phase/date for byte-pinned evidence; no deadline invented."
+  ],
+  "needsWrites": [
+    "packages/git/contracts/mutation-census.v1.json",
+    "docs/platform/git/spec.md",
+    "CHANGELOG.md"
+  ],
+  "needsWritesReason": "Lead must regenerate the census after full native verification because declaration bytes changed; refresh the now-stale aliased-export gap text/tooling-read contract and add the Unreleased fix entry. None was written outside scope.",
+  "constraints": {
+    "gitWrites": false,
+    "fgosCLI": false,
+    "nativeAddonLoads": false,
+    "runtimeBuildArtifactsCreated": false,
+    "productionCheckBypassAdded": false,
+    "existingTestsRemovedOrWeakened": false,
+    "censusManuallyEditedOrRegenerated": false,
+    "outsideScopeWorkspaceWrites": false
+  },
+  "evidenceRefs": ["receipt.md", "audit.json", "red.log", "declarations.log", "one-door.log", "full-api.stderr", "product-subset.json"]
+}
