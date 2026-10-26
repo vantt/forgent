@@ -87,8 +87,16 @@ export function guardCommit({ git, root, env = process.env }) {
 export function guardReferenceTransaction({ git, root, input, env = process.env }) {
   try {
     const updates = input.trim().split('\n').filter(Boolean).map(line => line.trim().split(/\s+/));
-    for (const [oldOid, nextOid, ref] of updates) {
+    for (const [claimedOld, nextOid, ref] of updates) {
       if (ref !== 'refs/heads/main') continue;
+      // `update-ref` without an expected old value and `branch -f` hand the hook
+      // a zero old value even when main exists. Only a main proven absent is a
+      // creation; otherwise judge the move from the main that is really there.
+      let oldOid = claimedOld;
+      if (/^0+$/.test(claimedOld)) {
+        try { oldOid = git(['rev-parse', '--verify', '--quiet', 'refs/heads/main']).toString('utf8').trim() || claimedOld; }
+        catch (error) { if (error.status !== 1) throw error; }
+      }
       const raw = readBlob(git, 'refs/heads/main');
       const old = parseSidecarJson(raw);
       if (/^0+$/.test(nextOid)) {

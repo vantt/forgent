@@ -841,6 +841,24 @@ test('a second clone pulls published acquire, holder docs and release but refuse
   pull('released');
 });
 
+// `update-ref` without an expected old value and `branch -f` reach the hook with a zero old
+// value; neither may rewind main past the acquire commit, even onto published history.
+test('reference guard refuses a zero-old-value rewind of main past the lease', t => {
+  const f = fixture(t);
+  const before = f.git(['rev-parse', 'main']);
+  f.setupLease();
+  const held = f.git(['rev-parse', 'main']);
+  assert.notEqual(held, before);
+  f.git(['update-ref', 'refs/remotes/origin/main', before]);
+  f.git(['checkout', '-q', '--detach']);
+  for (const args of [['update-ref', 'refs/heads/main', before], ['branch', '-f', 'main', before]]) {
+    const result = spawnSync('git', args, { cwd: f.repo, env, encoding: 'utf8', timeout: 30_000 });
+    assert.notEqual(result.status, 0, args.join(' '));
+    assert.match(result.stderr, /reference-transaction refused/);
+    assert.equal(f.git(['rev-parse', 'main']), held);
+  }
+});
+
 for (const operation of ['cherry-pick', 'rebase', 'am', 'pull']) {
   test(`reference guard refuses ${operation} of scoped changes onto main`, t => {
     const f = fixture(t);

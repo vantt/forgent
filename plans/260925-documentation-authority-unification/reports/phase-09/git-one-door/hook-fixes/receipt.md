@@ -68,3 +68,29 @@ The Doer turn could not commit: the census had to be regenerated, and `CHANGELOG
 | `test/e2e/documentation-cutover-lease-hooks.test.mjs` | 36/0 |
 | `test/scripts/git-one-door-declarations.test.mjs` | 45/0 |
 | `test/githooks/census-drift.test.mjs` | 3/0 |
+
+## Lead rework after w45 (2026-10-26)
+
+**Finding (W45-1).** `git update-ref refs/heads/main <oid>` without an expected old value, and `git branch -f main <oid>`, hand the reference-transaction hook a zero old value even when main exists. The guard read zero as "main is being created", so it skipped the forward-only check.
+
+**Fix.** When the old value is zero, the guard now resolves the real main with `rev-parse --verify --quiet refs/heads/main`. Exit status 1 means main is absent, and only then is the update treated as a creation. Any other read failure fails closed.
+
+**Proof.**
+- New unit case "a zero old value does not turn a rewind of an existing main into a creation". It fails on the previous hook (0/1) and passes now.
+- New e2e case "reference guard refuses a zero-old-value rewind of main past the lease". It uses real `update-ref` and `branch -f` with the hooks wired. It fails on the previous hook (0/1) and passes now.
+
+**Documentation (W45-3).**
+- §7 states the zero-old rule.
+- §17 now says "a namespace import that is exported again", which matches the code.
+- The CHANGELOG claim "a rewind stays refused" is now true.
+
+**Census.** The `leaseGitRead` siteId is now `fde3f196…`, and the census is regenerated with 0 undeclared sites.
+
+**Native runs.**
+
+| Test file | Pass / fail |
+|---|---|
+| `test/runner/documentation-cutover-lease.test.mjs` | 18/0 |
+| `test/e2e/documentation-cutover-lease-hooks.test.mjs` | 37/0 |
+| `test/githooks/census-drift.test.mjs` | 5/0 |
+| `test/scripts/git-one-door-declarations.test.mjs` | 62/0 |

@@ -3,7 +3,7 @@
   "declarations": [
     {
       "path": ".githooks/pre-commit",
-      "siteId": "leaseGitRead:75e0ded2ab4d900e100000fffcc88e33ab0f92d29fb58f79aecf1f5edd274a71",
+      "siteId": "leaseGitRead:fde3f196247ca9899debc1bcfa212e8f8994581863af09df7f22a20dd4866dfc",
       "class": "hook-read-context",
       "reason": "Owner L13-6 approves S1: the cold hook's leaseGitRead callback authenticates committed/staged lease authority for guardCommit and guardReferenceTransaction without loading the checkout addon; its callers only read Git facts.",
       "retireWhen": "The lease reader retires, or the Git owner supplies an approved cold-client door preserving hook authentication.",

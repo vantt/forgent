@@ -60,7 +60,23 @@ test('creating absent main compares its candidate with the empty tree', t => {
   assert.match(refused, /unauthorized lease transition/);
   const empty = f.git(['hash-object', '-t', 'tree', '--stdin']);
   assert.ok(calls.some(args => args[0] === 'diff-tree' && args.at(-2) === empty && args.at(-1) === candidate));
-  assert.ok(!calls.some(args => args[0] === 'rev-parse' && args.includes('refs/heads/main')));
+  // A zero old value is checked against the real main, which is absent here.
+  assert.ok(calls.some(args => args[0] === 'rev-parse' && args.includes('refs/heads/main')));
+});
+
+test('a zero old value does not turn a rewind of an existing main into a creation', t => {
+  const f = fixture(t);
+  f.git(['checkout', '-q', '-B', 'main']);
+  const before = f.git(['rev-parse', 'HEAD']);
+  f.put(DEFAULT_SIDECAR_PATH, JSON.stringify({ state: 'held', holderTokenHash: 'a'.repeat(64) }));
+  f.git(['add', DEFAULT_SIDECAR_PATH]); f.git(['commit', '-qm', 'acquire']);
+  const held = f.git(['rev-parse', 'HEAD']);
+  f.git(['update-ref', 'refs/remotes/origin/main', before]);
+  const git = args => execFileSync('git', args, { cwd: f.repoRoot, stdio: ['ignore', 'pipe', 'pipe'] });
+  const zero = '0'.repeat(held.length);
+  // `git update-ref refs/heads/main <before>` and `git branch -f` report a zero old value.
+  assert.match(guardReferenceTransaction({ git, root: f.repoRoot, input: `${zero} ${before} refs/heads/main\n`, env: {} }), /reference-transaction refused/);
+  assert.match(guardReferenceTransaction({ git, root: f.repoRoot, input: `${held} ${before} refs/heads/main\n`, env: {} }), /reference-transaction refused/);
 });
 
 // The two-clone e2e owns pull wiring. This owns ancestry/error classification:
