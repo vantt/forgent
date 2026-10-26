@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
-import { initGitCwd, addOk, run } from '../cli/helpers/fgos-cli-harness.mjs';
+import { initGitCwd, addViaCli, run } from '../cli/helpers/fgos-cli-harness.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
 import { scan, judge, signalByIdentity } from '../../src/runner/dispatch/process-identity.mjs';
@@ -27,7 +27,8 @@ const waitFor = async (what, predicate, timeoutMs = 20000) => {
 
 function workspace() {
   const cwd = fs.realpathSync(initGitCwd());
-  assert.equal(addOk(cwd, 'bs-1').status, 0);
+  // Through a CLI child, so this test process never holds a pending seal of its own that would race the receipts.
+  assert.equal(addViaCli(cwd, 'bs-1').status, 0);
   const dir = path.join(cwd, '.fgos');
   const store = prepareWorkStore(dir, dir).store;
   const eventRoot = path.join(cwd, '.git', 'fgos', 'events');

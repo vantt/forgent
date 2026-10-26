@@ -17,6 +17,7 @@ import {
   addDiscovery,
   addGoalItem,
   addOk,
+  addViaCli,
   addOutcome,
   addWork,
   advanceThroughDiscoveryToPlanning,
@@ -134,7 +135,7 @@ test('submit on a directory with no .fgos/ at all is refused, exit 4, writes not
 test('add creates exactly one work.add event and the view reflects the new item, exit 0', () => {
   const cwd = tmpCwdFromTemplate();
   const before = eventLines(cwd).length;
-  const result = addOk(cwd, 'build-cli', { title: 'Build CLI', kind: 'feature', risk: 'standard', verify: "node --test 'test/cli/*.test.mjs'" });
+  const result = addViaCli(cwd, 'build-cli', { title: 'Build CLI', kind: 'feature', risk: 'standard', verify: "node --test 'test/cli/*.test.mjs'" });
   assert.equal(result.status, 0);
   assert.equal(eventLines(cwd).length, before + 1);
 
@@ -180,7 +181,7 @@ test('add --description persists the given description on the new item, exit 0',
 
 test('add with an invalid (non kebab-case) id is rejected as validation, exit 4', () => {
   const cwd = tmpCwdFromTemplate();
-  const result = addOk(cwd, 'Not_Kebab');
+  const result = addViaCli(cwd, 'Not_Kebab');
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, 0);
 });
@@ -188,9 +189,9 @@ test('add with an invalid (non kebab-case) id is rejected as validation, exit 4'
 
 test('add with a duplicate id is rejected as validation, exit 4, no extra event written', () => {
   const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'dup-id');
+  addViaCli(cwd, 'dup-id');
   const before = eventLines(cwd).length;
-  const result = addOk(cwd, 'dup-id');
+  const result = addViaCli(cwd, 'dup-id');
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, before);
 });
@@ -296,12 +297,12 @@ test('move reports the real event seq in its envelope data, not undefined', () =
 
 test('add --parent sets lineage; omitting --parent leaves it unset', () => {
   const cwd = tmpCwdFromTemplate();
-  assert.equal(addOk(cwd, 'parent-root').status, 0);
+  assert.equal(addViaCli(cwd, 'parent-root').status, 0);
 
   const withParent = run(cwd, ['add', 'parent-child', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--parent', 'parent-root', '--description', 'tsk-535 fixture description.']);
   assert.equal(withParent.status, 0);
   assert.equal(stateView(cwd).work['parent-child'].parent, 'parent-root');
 
-  assert.equal(addOk(cwd, 'parent-none').status, 0);
+  assert.equal(addViaCli(cwd, 'parent-none').status, 0);
   assert.equal(stateView(cwd).work['parent-none'].parent, undefined);
 });

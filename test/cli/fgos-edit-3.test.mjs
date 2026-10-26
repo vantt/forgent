@@ -98,15 +98,6 @@ import {
 // item created via `addOk` can no longer "have none" -- reframed to prove
 // `edit --description` still overwrites an existing one, the same
 // capability this test always covered.
-test.todo('edit --description overwrites an existing description, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit --footprint sets footprint on an item that had none, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit --action sets action directive prose on an item, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
-
 test('edit --action with empty string is rejected as validation, exit 4', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-action-empty');
@@ -124,12 +115,6 @@ test('edit --acceptance is refused when a clause supplies text+evidence together
   assert.match(result.stderr, /evidence/);
   assert.equal(stateView(cwd).work['edit-untraceable'].acceptance, undefined, 'the rejected patch never applies');
 });
-
-
-test.todo('edit --acceptance persists work.acceptance as the given array - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit --acceptance replaces the whole array (latest-wins), same semantics as --refs/--deps - migrated to test/direct/fgos-edit.test.mjs');
 
 
 test('edit with a malformed --acceptance is rejected as validation, exit 4, no event written', () => {
@@ -174,12 +159,6 @@ test('editing in the missing evidence after a refusal, then retrying move --to d
 // tsk-34o: edit --role, mirroring take --role's own optional-flag pattern --
 // role only ever lands in the raw event's payload (never projected onto
 // work[id], unlike take's claimRole), so these read eventLines directly.
-test.todo('edit --role session tags the stored event payload.role "session" instead of the default human - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit omitting --role still stamps payload.role "human" -- unchanged default for every existing caller - migrated to test/direct/fgos-edit.test.mjs');
-
-
 test('edit --role with an invalid value is rejected as validation, exit 4, no event written', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-role-bad');

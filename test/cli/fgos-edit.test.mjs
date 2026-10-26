@@ -90,8 +90,6 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-test.todo('edit use case changes only the targeted field, every other field unchanged - migrated to test/direct/fgos-edit.test.mjs');
-
 // tsk-1t2: real events for tsk-26r (work.move/work.outcome/work.edit) were
 // once found sitting in the shared repo's frozen `.fgos/events.jsonl`
 // baseline (seq 24089-24092) instead of a per-writer shard under
@@ -163,15 +161,6 @@ test('edit rejects a patch targeting id/status/stage/domain, exit 4, no event wr
 });
 
 
-test.todo('edit succeeds identically regardless of the item current status - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit omitting --refs/--deps leaves the field untouched; an explicit empty value clears it - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit omitting --parent leaves it untouched; an explicit --parent sets it; --parent "" clears it - migrated to test/direct/fgos-edit.test.mjs');
-
-
 test('edit --parent (bare, no value) is rejected as a valueless flag, distinct from --parent ""', () => {
   const cwd = tmpCwdFromTemplate();
   assert.equal(addOk(cwd, 'parent-edit-bad').status, 0);
@@ -194,9 +183,6 @@ test('edit --parent closing a cycle is rejected at the CLI, same "graph cycle" m
 });
 
 
-test.todo('editWork rejects a patch containing id/status/stage/domain as validation, before merge, no event written - migrated to test/direct/fgos-edit.test.mjs');
-
-
 test('edit reports the real event seq in its envelope data, not undefined', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-seq-check'); // event #1
@@ -217,12 +203,6 @@ test('edit reports the real event seq in its envelope data, not undefined', () =
 // equivalent there by design, so no test asserts a negative for `add` —
 // the flags simply don't appear in its parser wiring at all).
 
-test.todo('edit --priority sets the item priority field to the given integer, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit --intent accepts a negative value (no sign constraint), exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
-
 for (const [label, badFlagArgs, fieldName] of EDIT_BAD_FLAG_CASES) {
   test(`edit with ${label} is rejected as validation, exit 4, no event written, field left unset`, () => {
     const cwd = tmpCwdFromTemplate();
@@ -234,9 +214,6 @@ for (const [label, badFlagArgs, fieldName] of EDIT_BAD_FLAG_CASES) {
     assert.equal(stateView(cwd).work['edit-bad-flag-item'][fieldName], undefined);
   });
 }
-
-test.todo('edit --urgent/--impact/--effort set the item fields to the given values, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
 
 for (const [label, badFlagArgs, fieldName] of EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES) {
   test(`edit with ${label} is rejected as validation, exit 4, no event written, field left unset`, () => {

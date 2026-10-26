@@ -138,14 +138,6 @@ test('discover with a bare --risk (no value) is rejected as validation, exit 4',
 });
 
 
-test.todo('plan --verdict pass-through moves the item to executing - migrated to test/direct/fgos-stage.test.mjs');
-
-test.todo('plan --verdict need-human --reason parks in awaiting-human with that exact reason - migrated to test/direct/fgos-stage.test.mjs');
-
-test.todo('plan --verdict decompose --children writes real children - migrated to test/direct/fgos-stage.test.mjs');
-
-
-
 test('plan --verdict decompose with malformed --children JSON is rejected as validation, exit 4', () => {
   const cwd = tmpCwdFromTemplate();
   // tsk-5q5-1: a clear caller-supplied verdict with a real `verify` still
@@ -192,9 +184,5 @@ test('plan --verdict with an unrecognized value is rejected as validation, exit 
   assert.equal(result.status, 4);
   assert.match(result.stderr, /"pass-through", "need-human", or "decompose"/);
 });
-
-
-test.todo('discover (sync verb) on a clear verdict stamps role "session" on the work.step event and folds into a clarify-pass settlement - migrated to test/direct/fgos-stage.test.mjs');
-
 
 

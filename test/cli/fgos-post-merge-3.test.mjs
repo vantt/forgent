@@ -17,6 +17,7 @@ import {
   addDiscovery,
   addGoalItem,
   addOk,
+  addViaCli,
   addOutcome,
   addWork,
   advanceThroughDiscoveryToPlanning,
@@ -369,7 +370,7 @@ test('the CLI usage message for an unknown verb lists catchup in the surface', (
 
 test('an item added with no --acceptance flag has work.acceptance absent (undefined), not an empty array', () => {
   const cwd = tmpCwd();
-  const result = addOk(cwd, 'no-acceptance-item');
+  const result = addViaCli(cwd, 'no-acceptance-item');
   assert.equal(result.status, 0);
   const view = stateView(cwd);
   assert.equal('acceptance' in view.work['no-acceptance-item'], false, 'an omitted --acceptance leaves the field absent, not []');
