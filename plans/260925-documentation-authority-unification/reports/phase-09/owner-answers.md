@@ -391,3 +391,27 @@ The claim text is unchanged. At F, the Lead edits `docs/backlog.md` directly, be
 - records the resulting row identities in the G9 records.
 
 G9's owner items are closed.
+
+## L13-34 — Rebuild the composition delta at F (owner decision)
+
+**Facts.**
+- F is the merge eb161da46, at origin/main 947dc3103. After it, the shared composition replay (the g9 check through `fchain/check.py` with the F additions) reports 199 findings on 61 files:
+  - `conflict` 149: 67 stale chain entries, 55 whole-body witness preimage drifts, 11 composed preimage hash changes, 9 absent `composedBy` postimages;
+  - `linkGuard` 42: 32 moved-target, 6 stale-label, 3 missing-file and 1 other;
+  - `ownerless` 8.
+
+  21 of the 61 files are docs; 40 are code or tests.
+- The ownership audit has 27 unaccounted target-digest drift rows in runner, work-state, distribution, architecture-manifest, confinement-authority, component-boundary, install how-to and dispatch-module-boundaries.
+- The carries checker fails on `s11-preflip-carries.json /unitCarries/248`.
+- The legacy ratchet reports 9 unaccounted legacy edits with stale exception digests.
+- The findings are saved at `fchain/f-delta-findings-947dc3103.json`.
+
+**Owner choice:** 2026-10-26 ~13:00, option **"1. Làm tiếp ở F này"**. The Lead rebuilds the delta at this F on the plan branch:
+- rebuild the patches and chain entries on the F preimages;
+- fix the links and owners;
+- rebind the drift rows;
+- refresh the carries and the ratchet exceptions with provenance;
+- run delta reviews;
+- account the pairs.
+
+docs/ stays frozen. **Not allowed:** the lease before OPC's MERGE, Land, and another main import without asking.
