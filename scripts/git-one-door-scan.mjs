@@ -1391,9 +1391,11 @@ function computeValueFlow(ctx, file, fn) {
   const seen = new Set();
   const followed = new Set();
   const escape = (f, at, why) => escapes.push(`${why} (${f.name}:${lineOf(f.source, Math.max(0, at))})`);
+  // A nonempty path can be a registry slot or a function's own .execute property, not a
+  // module namespace. Keep namespace-import provenance until the held function is selected.
   const push = (item) => {
     if (item.path.length > 4) return; // a cycle such as `fn.execute = fn`: shorter paths already cover its reads
-    const key = `${item.kind}:${item.file.name}:${item.scope?.from ?? -1}:${item.name}:${item.path.join('.')}`;
+    const key = `${item.kind}:${item.file.name}:${item.scope?.from ?? -1}:${item.name}:${item.path.join('.')}:${!!item.namespace}`;
     if (seen.has(key)) return;
     if (seen.size >= MAX_FLOW_ITEMS) { escape(item.file, 0, 'value flow too wide'); return; }
     seen.add(key);
@@ -1407,27 +1409,27 @@ function computeValueFlow(ctx, file, fn) {
     return f.binding(id, at)?.scope ?? null;
   };
   // A parameter receiving the value (at `path`): a plain name, or a destructuring that takes its key.
-  const intoParam = (f, span, param, path, at) => {
+  const intoParam = (f, span, param, path, at, namespace) => {
     const text = param.trim();
     if (text.startsWith('...')) { escape(f, at, 'passed into a rest parameter'); return; }
     if (text.startsWith('{')) {
       const pattern = text.slice(0, splitArgs(lexSource(text).shape, 0).close + 1);
       if (!path.length) { escape(f, at, 'destructured as a function'); return; }
-      for (const [key, local] of destructuredPairs(pattern)) if (key === path[0]) push({ kind: 'name', file: f, scope: span, name: local, path: path.slice(1) });
+      for (const [key, local] of destructuredPairs(pattern)) if (key === path[0]) push({ kind: 'name', file: f, scope: span, name: local, path: path.slice(1), namespace: namespace && path.length > 1 });
       return;
     }
     const name = text.replace(/\s*=[\s\S]*$/, '');
-    if (IDENT_RE.test(name)) push({ kind: 'name', file: f, scope: span, name, path });
+    if (IDENT_RE.test(name)) push({ kind: 'name', file: f, scope: span, name, path, namespace });
     else escape(f, at, 'passed into an unreadable parameter');
   };
   // A value handed to a callee the scan cannot resolve, under a key: every receiver of that key.
-  const byKey = (f, at, path) => {
+  const byKey = (f, at, path, namespace) => {
     if (!path.length) { escape(f, at, 'passed to an unresolved callee'); return; }
     const index = keyIndex(ctx);
-    for (const d of index.destructured.get(path[0]) ?? []) push({ kind: 'name', file: d.file, scope: d.scope, name: d.local, path: path.slice(1) });
+    for (const d of index.destructured.get(path[0]) ?? []) push({ kind: 'name', file: d.file, scope: d.scope, name: d.local, path: path.slice(1), namespace: namespace && path.length > 1 });
     for (const r of index.reads.get(path[0]) ?? []) {
       const start = r.at - (/[\w$.?\][)]*$/.exec(r.file.shape.slice(Math.max(0, r.at - 200), r.at))?.[0].length ?? 0);
-      follow(r.file, start, r.at + r.length, path.slice(1));
+      follow(r.file, start, r.at + r.length, path.slice(1), namespace && path.length > 1);
     }
   };
   // The expression [start, end) in `f` holds the function at property `path` of its value. Follows
@@ -1436,8 +1438,8 @@ function computeValueFlow(ctx, file, fn) {
   const pending = [];
   const follow = (...flow) => { pending.push(flow); };
   const drain = () => { while (pending.length) followNow(...pending.shift()); };
-  const followNow = (f, start, end, path) => {
-    const flowKey = `${f.name}:${start}:${end}:${path.join('.')}`;
+  const followNow = (f, start, end, path, namespace = false) => {
+    const flowKey = `${f.name}:${start}:${end}:${path.join('.')}:${!!namespace}`;
     if (followed.has(flowKey)) return;
     followed.add(flowKey);
     for (;;) {
@@ -1446,9 +1448,9 @@ function computeValueFlow(ctx, file, fn) {
       if (path.length) {
         if ((m = new RegExp(`^\\s*(?:\\?\\.|\\.)\\s*(${IDENT})`).exec(tail))) {
           if (m[1] !== path[0] && path[0] !== '*') return; // another property: not this value
-          end += m[0].length; path = path.slice(1); continue;
+          end += m[0].length; path = path.slice(1); namespace &&= path.length > 0; continue;
         }
-        if ((m = /^\s*(?:\?\.)?\[/.exec(tail))) { end = splitArgs(f.shape, end + m[0].length - 1).close + 1; path = path.slice(1); continue; }
+        if ((m = /^\s*(?:\?\.)?\[/.exec(tail))) { end = splitArgs(f.shape, end + m[0].length - 1).close + 1; path = path.slice(1); namespace &&= path.length > 0; continue; }
         if (/^\s*(?:\?\.)?\(/.test(tail)) return; // calling the holder: its result is not the holder
       } else {
         if ((m = /^\s*(?:\?\.|\.)\s*bind\s*\(/.exec(tail))) { end = splitArgs(f.shape, end + m[0].length - 1).close + 1; continue; }
@@ -1468,13 +1470,13 @@ function computeValueFlow(ctx, file, fn) {
     if (stop === '=') {
       if ((m = /\b(?:const|let|var)\s*\{([^}]*)\}\s*$/.exec(head))) {
         if (!path.length) { escape(f, at, 'destructured as a function'); return; }
-        for (const [key, local] of destructuredPairs(`{${f.code.slice(at - m[0].length, at).match(/\{([^}]*)\}/)[1]}}`)) if (key === path[0]) push({ kind: 'name', file: f, scope: enclosing(f.spans, at), name: local, path: path.slice(1) });
+        for (const [key, local] of destructuredPairs(`{${f.code.slice(at - m[0].length, at).match(/\{([^}]*)\}/)[1]}}`)) if (key === path[0]) push({ kind: 'name', file: f, scope: enclosing(f.spans, at), name: local, path: path.slice(1), namespace: namespace && path.length > 1 });
         return;
       }
-      if ((m = new RegExp(`(?<![\\w$.])(${IDENT})\\s*$`).exec(head))) { push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path }); return; }
-      if ((m = new RegExp(`(?<![\\w$.])(${IDENT})\\s*(?:\\?\\.)?\\[[^\\]\\n]*\\]\\s*$`).exec(head))) { push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path: ['*', ...path] }); return; }
+      if ((m = new RegExp(`(?<![\\w$.])(${IDENT})\\s*$`).exec(head))) { push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path, namespace }); return; }
+      if ((m = new RegExp(`(?<![\\w$.])(${IDENT})\\s*(?:\\?\\.)?\\[[^\\]\\n]*\\]\\s*$`).exec(head))) { push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path: ['*', ...path], namespace }); return; }
       if ((m = new RegExp(`(?<![\\w$.])(${IDENT})((?:\\s*\\.\\s*${IDENT})+)\\s*$`).exec(head))) {
-        push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path: [...m[2].split('.').map((k) => k.trim()).filter(Boolean), ...path] });
+        push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path: [...m[2].split('.').map((k) => k.trim()).filter(Boolean), ...path], namespace });
         return;
       }
       escape(f, at, 'assigned to an unreadable place');
@@ -1485,7 +1487,7 @@ function computeValueFlow(ctx, file, fn) {
       let outer = flowContext(f.shape, at);
       while (outer.stop === ',' || outer.stop === ':') outer = flowContext(f.shape, outer.at);
       if (outer.stop !== '{') { escape(f, at, 'an unreadable object key'); return; }
-      follow(f, outer.at, splitArgs(f.shape, outer.at).close + 1, [key?.[1] ?? key?.[2] ?? '*', ...path]);
+      follow(f, outer.at, splitArgs(f.shape, outer.at).close + 1, [key?.[1] ?? key?.[2] ?? '*', ...path], namespace);
       return;
     }
     if (stop === 'return') {
@@ -1494,7 +1496,7 @@ function computeValueFlow(ctx, file, fn) {
       if (literalMemberAt(f.shape, span) >= 0) { escape(f, at, `returned from method ${span.name}`); return; }
       for (const c of directCalls(ctx, f, span.name)) {
         const callee = new RegExp(`${IDENT}(?:\\s*\\.\\s*${IDENT})*\\s*(?:\\?\\.)?\\s*$`).exec(c.file.shape.slice(Math.max(0, c.open - 200), c.open));
-        follow(c.file, c.open - (callee?.[0].length ?? 0), splitArgs(c.file.shape, c.open).close + 1, path);
+        follow(c.file, c.open - (callee?.[0].length ?? 0), splitArgs(c.file.shape, c.open).close + 1, path, namespace);
       }
       return;
     }
@@ -1507,29 +1509,29 @@ function computeValueFlow(ctx, file, fn) {
       if (!spread && !IDENT_RE.test(ref)) return; // a statement inside a block: the value is not kept
       if (spread && !path.length) return; // spreading a function copies its own properties, not the function
       if (!/(?:[=(,:?[]|\breturn|=>)\s*$/.test(f.shape.slice(Math.max(0, outer.at - 12), outer.at))) return; // a block, not an object literal
-      follow(f, outer.at, close, spread ? path : [ref, ...path]);
+      follow(f, outer.at, close, spread ? path : [ref, ...path], namespace);
       return;
     }
     if (outer.stop === '(') {
       const calleeMatch = new RegExp(`(${IDENT}(?:\\s*\\.\\s*${IDENT})*)\\s*(?:\\?\\.)?\\s*$`).exec(f.shape.slice(Math.max(0, outer.at - 200), outer.at));
       const callee = calleeMatch?.[1].replace(/\s+/g, '');
       const close = splitArgs(f.shape, outer.at).close + 1;
-      if (!callee) { follow(f, outer.at, close, path); return; } // parentheses around the value
+      if (!callee) { follow(f, outer.at, close, path, namespace); return; } // parentheses around the value
       if (/^(if|while|switch|for|typeof|catch|with)$/.test(callee)) return; // tested, not kept
       const { args } = splitArgs(f.shape, outer.at);
       const index = args.findIndex(({ from, to }) => from <= start && end <= to);
       if (index < 0) return;
       if (callee === 'Reflect.set' && index === 2) {
         const table = f.code.slice(args[0].from, args[0].to).trim();
-        if (IDENT_RE.test(table)) push({ kind: 'name', file: f, scope: scopeOf(f, table, outer.at), name: table, path: ['*', ...path] });
+        if (IDENT_RE.test(table)) push({ kind: 'name', file: f, scope: scopeOf(f, table, outer.at), name: table, path: ['*', ...path], namespace });
         else escape(f, outer.at, 'stored into an unreadable table');
         return;
       }
-      if (callee === 'Object.freeze') { follow(f, outer.at - calleeMatch[0].length, close, path); return; }
+      if (callee === 'Object.freeze') { follow(f, outer.at - calleeMatch[0].length, close, path, namespace); return; }
       if (NO_FLOW_CALLEES.test(callee) || (callee === 'Reflect.set' && index === 0)) return; // reads or prints the value, never calls it
       const target = resolveFunction(ctx, f, callee);
-      if (target && target.fn.params[index] !== undefined) { intoParam(target.file, target.fn, target.fn.params[index], path, outer.at); return; }
-      byKey(f, outer.at, path);
+      if (target && target.fn.params[index] !== undefined) { intoParam(target.file, target.fn, target.fn.params[index], path, outer.at, namespace); return; }
+      byKey(f, outer.at, path, namespace);
       return;
     }
     if (outer.stop === '[') { escape(f, outer.at, 'stored in an array'); return; }
@@ -1572,7 +1574,7 @@ function computeValueFlow(ctx, file, fn) {
     // A module-level binding is read wherever it is imported. Star re-exports and exported
     // namespace holders are not followed by the caller resolver: refuse them as export escapes.
     if (!item.scope && new RegExp(`export\\s+(?:const|let|var|(?:async\\s+)?function\\s*\\*?)\\s*${esc(item.name)}\\b|export\\s*\\{[^}]*\\b${esc(item.name)}\\b`).test(f.code)) {
-      if (item.path.length) { aliasedExport = true; escape(f, 0, 'exported in a namespace holder'); }
+      if (item.namespace) { aliasedExport = true; escape(f, 0, 'exported in a namespace holder'); }
       else {
         for (const [other, alias] of importedAs(ctx, f, item.name)) push({ ...item, file: other, name: alias, origin: false });
         for (const other of importersOf(ctx, f)) {
@@ -1586,7 +1588,7 @@ function computeValueFlow(ctx, file, fn) {
             }
           }
           for (const m of other.code.matchAll(/import\s*\*\s*as\s+([A-Za-z_$][\w$]*)\s+from\s*['"]([^'"]+)['"]|(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*await\s+import\s*\(\s*['"]([^'"]+)['"]\s*\)/g)) {
-            if (names(m[2] ?? m[4])) push({ ...item, file: other, name: m[1] ?? m[3], path: [item.name], origin: false });
+            if (names(m[2] ?? m[4])) push({ ...item, file: other, name: m[1] ?? m[3], path: [item.name, ...item.path], namespace: true, origin: false });
           }
         }
       }
@@ -1607,11 +1609,11 @@ function computeValueFlow(ctx, file, fn) {
       if (params) {
         // Inside a parameter list: a default value flows into its parameter; a parameter name is a declaration.
         const dflt = new RegExp(`(${IDENT})\\s*=\\s*[^,]*$`).exec(shape.slice(params.from + 1, at));
-        if (dflt && params.params.some((p) => paramNames(p).includes(dflt[1]))) push({ kind: 'name', file: f, scope: params, name: dflt[1], path: item.path });
+        if (dflt && params.params.some((p) => paramNames(p).includes(dflt[1]))) push({ kind: 'name', file: f, scope: params, name: dflt[1], path: item.path, namespace: item.namespace });
         continue;
       }
       if (item.origin && /^\s*\.\s*[A-Za-z_$][\w$]*\s*=(?![=>])/.test(shape.slice(after, after + 80))) continue; // `fn.prop = ...` describes the function
-      follow(f, at, after, item.path);
+      follow(f, at, after, item.path, item.namespace);
     }
     drain();
   }

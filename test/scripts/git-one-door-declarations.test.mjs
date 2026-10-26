@@ -283,6 +283,33 @@ test('declared wrappers refuse star and namespace re-exports with undeclared res
   }
 });
 
+// Namespace refusal cases do not prove that a function's own .execute property still reaches
+// a registered value caller when an unrelated named re-export imports the same module.
+test('a configured function adapter stays classified beside an unrelated named re-export', (t) => {
+  const source = `import { spawn } from 'node:child_process';
+import { registerAdapter } from './registry.mjs';
+export const DEFAULT_ADAPTER = 'cli';
+export function cliAdapter(invocation) { return spawn(invocation.command, invocation.args); }
+cliAdapter.execute = cliAdapter;
+registerAdapter(DEFAULT_ADAPTER, cliAdapter);
+`;
+  const f = fixture(t, 'scripts/transport.mjs', source);
+  f.write('scripts/registry.mjs', `export const adapters = {};
+export function registerAdapter(name, adapter) { adapters[name] = adapter; }
+`);
+  f.write('scripts/caller.mjs', `import { adapters } from './registry.mjs';
+import './transport.mjs';
+adapters.cli.execute(JSON.parse(process.env.CONFIG));
+`);
+  const baseline = scan({ root: f.root });
+  assert.deepEqual(baseline.sites, [], 'the adapter program is parsed configuration');
+  assert.equal(baseline.classCounts['configured-binary'], 1);
+  f.write('scripts/barrel.mjs', "export { DEFAULT_ADAPTER } from './transport.mjs';\n");
+  const result = scan({ root: f.root });
+  assert.deepEqual(result.sites, [], 'a named list not containing the adapter cannot hide its registered caller');
+  assert.deepEqual(result.classCounts, baseline.classCounts);
+});
+
 // Refusing exported holders must not turn an ordinary, fully observed namespace call into an escape.
 test('a namespace import without a re-export remains declarable', async (t) => {
   for (const binding of ["import * as ns from './read.mjs';", "const ns = await import('./read.mjs');"]) {
