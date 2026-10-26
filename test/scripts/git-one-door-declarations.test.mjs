@@ -265,6 +265,8 @@ test('declared wrappers refuse star, default and namespace re-exports with undec
   for (const [barrel, caller] of [
     ["export * from './read.mjs';", "import { g } from './barrel.mjs'; g(['reset', '--hard']);"],
     ["export { g as default } from './read.mjs';", "import h from './barrel.mjs'; h(['reset', '--hard']);"],
+    ["export { g as \"default\" } from './read.mjs';", "import h from './barrel.mjs'; h(['reset', '--hard']);"],
+    ["export { g as 'x-y' } from './read.mjs';", "import { 'x-y' as h } from './barrel.mjs'; h(['reset', '--hard']);"],
     ["export * as ns from './read.mjs';", "import { ns } from './barrel.mjs'; ns.g(['reset', '--hard']);"],
     ["import * as r from './read.mjs'; export const ns = r;", "import { ns } from './barrel.mjs'; ns.g(['reset', '--hard']);"],
   ]) {

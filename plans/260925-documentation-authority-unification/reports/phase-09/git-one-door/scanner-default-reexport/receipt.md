@@ -49,3 +49,19 @@ Source SHA-256: scanner `a29950f549b4a1d4c63d3df787af6c67033f4495ad9800cd9c03bc6
 ## Lead completion (2026-10-26)
 
 The Lead ran the full-tree parity check that the Doer could not run. On top of plan HEAD `c5750a967`, `node scripts/git-one-door-scan.mjs --root .` reports 0 undeclared sites, and its class counts are byte-identical before and after this change: configured-binary 95, hook-read-context 26, declared-tooling-exemption 19, uncalled-wrapper 10, rust-test 139, argv-runner 14, standalone-skill-script 4, production-sandbox-probe 4, sandbox-door 2 and git-driver 1. A native run of `test/scripts/git-one-door-declarations.test.mjs` passes 66/0. The census is regenerated.
+
+## Lead fix after w47 (2026-10-26)
+
+**Finding (W47-1).** An export name written as a string literal, such as `export { g as "default" } from` or `as 'x-y'`, still hid callers, because the scanner compared the alias with its quotes still on.
+
+**Fix.** The scanner now strips the quotes before comparing.
+- An unquoted `default` takes the existing "exported as default" escape.
+- Any other quoted name that is not a plain identifier escapes as "exported under a string name".
+
+**Proof.**
+- Two new shapes are in the re-export matrix, giving 8 new cases.
+- Against the previous scanner, 65 tests pass and 9 fail: the 8 new cases plus their parent.
+- Against the fixed scanner, 74/0 pass.
+- The full-tree scan reports 0 undeclared sites, with class counts identical to the previous run.
+- Spec §17 names the string spelling.
+- The census is regenerated.

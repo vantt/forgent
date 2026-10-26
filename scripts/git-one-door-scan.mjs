@@ -1586,9 +1586,12 @@ function computeValueFlow(ctx, file, fn) {
             if (!names(m[2])) continue;
             if (m[1] === undefined) { aliasedExport = true; escape(other, m.index, 're-exported through a star'); }
             else for (const part of m[1].split(',')) {
-              const [original, alias] = part.trim().split(/\s+as\s+/);
+              const [original, quoted] = part.trim().split(/\s+as\s+/);
               if (original !== item.name) continue;
+              // Export names may be string literals (`as "default"`, `as 'x-y'`).
+              const alias = quoted?.replace(/^(['"])(.*)\1$/, '$2');
               if (alias === 'default') { aliasedExport = true; escape(other, m.index, 'exported as default'); }
+              else if (alias !== undefined && !/^[A-Za-z_$][\w$]*$/.test(alias)) { aliasedExport = true; escape(other, m.index, 'exported under a string name'); }
               else push({ ...item, file: other, name: alias ?? original, origin: false });
             }
           }
