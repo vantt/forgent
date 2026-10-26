@@ -90,8 +90,6 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-test.todo('edit use case changes only the targeted field, every other field unchanged - migrated to test/direct/fgos-edit.test.mjs');
-
 // tsk-1t2: real events for tsk-26r (work.move/work.outcome/work.edit) were
 // once found sitting in the shared repo's frozen `.fgos/events.jsonl`
 // baseline (seq 24089-24092) instead of a per-writer shard under
@@ -104,28 +102,22 @@ test.todo('edit use case changes only the targeted field, every other field unch
 // through). `logPath(cwd)` (TA-D12's baseline-0) must never gain a single
 // byte across add/edit/move/edit again: every event this whole sequence
 // produces belongs under `.fgos/events/` instead.
-test('a full add -> edit -> move -> edit CLI lifecycle never appends to the frozen events.jsonl baseline -- every event lands under .fgos/events/', () => {
+test('a full add -> edit -> move -> edit CLI lifecycle lands every event in the Event Store and writes no tracked event file', () => {
   const cwd = tmpCwdFromTemplate();
-  const baselineBefore = fs.readFileSync(logPath(cwd), 'utf8');
-  assert.equal(baselineBefore, '', 'tmpCwdFromTemplate(): baseline should start empty (init writes no events, just an empty file)');
+  assert.deepEqual(eventLines(cwd), [], 'tmpCwdFromTemplate(): the store should start empty');
 
   assert.equal(addOk(cwd, 'tsk-write-path-guard').status, 0);
   assert.equal(run(cwd, ['edit', 'tsk-write-path-guard', '--verify', 'echo first']).status, 0);
   // tsk-40m: blocked stands in for the retired todo->doing edge -- this
-  // test only cares that a work.move event lands in the shard, not which
+  // test only cares that a work.move event lands in the store, not which
   // status it targets.
   assert.equal(run(cwd, ['move', 'tsk-write-path-guard', '--to', 'blocked']).status, 0);
   assert.equal(run(cwd, ['edit', 'tsk-write-path-guard', '--verify', 'echo second']).status, 0);
 
-  const baselineAfter = fs.readFileSync(logPath(cwd), 'utf8');
-  assert.equal(baselineAfter, '', 'the frozen events.jsonl baseline must stay byte-identical (empty) -- every event above belongs in a per-writer shard, never here');
-
-  const eventsDir = path.join(cwd, '.fgos', 'events');
-  const shardFiles = fs.readdirSync(eventsDir).filter((name) => name.endsWith('.jsonl'));
-  assert.equal(shardFiles.length, 1, 'exactly one writer, one open shard file');
-  const shardLines = fs.readFileSync(path.join(eventsDir, shardFiles[0]), 'utf8').split('\n').filter(Boolean);
-  const shardTypes = shardLines.map((line) => JSON.parse(line).type);
-  assert.deepEqual(shardTypes, ['work.add', 'work.edit', 'work.move', 'work.edit'], 'the whole lifecycle landed in the shard, in order, none of it in the baseline');
+  const types = eventLines(cwd).map((line) => JSON.parse(line).type);
+  assert.deepEqual(types, ['work.add', 'work.edit', 'work.move', 'work.edit'], 'the whole lifecycle landed in the store, in order');
+  assert.equal(fs.existsSync(logPath(cwd)), false, 'no frozen events.jsonl baseline is written');
+  assert.equal(fs.existsSync(path.join(cwd, '.fgos', 'events')), false, 'no per-writer shard directory is written');
 });
 
 test('edit on an unknown id is rejected as validation, exit 4, no event written', () => {
@@ -169,15 +161,6 @@ test('edit rejects a patch targeting id/status/stage/domain, exit 4, no event wr
 });
 
 
-test.todo('edit succeeds identically regardless of the item current status - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit omitting --refs/--deps leaves the field untouched; an explicit empty value clears it - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit omitting --parent leaves it untouched; an explicit --parent sets it; --parent "" clears it - migrated to test/direct/fgos-edit.test.mjs');
-
-
 test('edit --parent (bare, no value) is rejected as a valueless flag, distinct from --parent ""', () => {
   const cwd = tmpCwdFromTemplate();
   assert.equal(addOk(cwd, 'parent-edit-bad').status, 0);
@@ -200,9 +183,6 @@ test('edit --parent closing a cycle is rejected at the CLI, same "graph cycle" m
 });
 
 
-test.todo('editWork rejects a patch containing id/status/stage/domain as validation, before merge, no event written - migrated to test/direct/fgos-edit.test.mjs');
-
-
 test('edit reports the real event seq in its envelope data, not undefined', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-seq-check'); // event #1
@@ -223,12 +203,6 @@ test('edit reports the real event seq in its envelope data, not undefined', () =
 // equivalent there by design, so no test asserts a negative for `add` —
 // the flags simply don't appear in its parser wiring at all).
 
-test.todo('edit --priority sets the item priority field to the given integer, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit --intent accepts a negative value (no sign constraint), exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
-
 for (const [label, badFlagArgs, fieldName] of EDIT_BAD_FLAG_CASES) {
   test(`edit with ${label} is rejected as validation, exit 4, no event written, field left unset`, () => {
     const cwd = tmpCwdFromTemplate();
@@ -240,9 +214,6 @@ for (const [label, badFlagArgs, fieldName] of EDIT_BAD_FLAG_CASES) {
     assert.equal(stateView(cwd).work['edit-bad-flag-item'][fieldName], undefined);
   });
 }
-
-test.todo('edit --urgent/--impact/--effort set the item fields to the given values, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
 
 for (const [label, badFlagArgs, fieldName] of EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES) {
   test(`edit with ${label} is rejected as validation, exit 4, no event written, field left unset`, () => {

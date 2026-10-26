@@ -13,7 +13,7 @@ use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
 
-use fgos_git::{GitDriver, OperationError, ResolveRepo};
+use fgos_git::{GitDriver, OperationError};
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
     OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
@@ -134,6 +134,8 @@ pub enum Verb {
     Migrate {
         global: bool,
         finish: bool,
+        /// With `global`: convert the global JSON file to YAML instead of moving the keys.
+        convert: bool,
         machine_checked: bool,
         accept_machine_overrides: bool,
         dry_run: bool,
@@ -248,13 +250,9 @@ fn roots(root: &Path) -> Result<SnapshotRequest, Refusal> {
     };
     let git = |e: OperationError| refuse("git-read-failed", e.cause);
     let project_root = canonical(root)?;
-    let driver = GitDriver::new(&fgos_holder_lock::state_root::state_root().0).map_err(git)?;
-    let trusted_root = match driver
-        .resolve_repo(&project_root, &project_root)
-        .map_err(git)?
-    {
-        ResolveRepo::Repository(repo) => canonical(repo.trusted_main_root())?,
-        _ => project_root.clone(),
+    let trusted_root = match GitDriver::trusted_root_at(&project_root).map_err(git)? {
+        Some(root) => canonical(&root)?,
+        None => project_root.clone(),
     };
     let class = session_class(|key| std::env::var(key).ok());
     Ok(SnapshotRequest {
@@ -306,6 +304,16 @@ fn answer(req: &ConfigRequest) -> Result<ConfigOutcome, Refusal> {
         }
         _ => unix_verbs::run(&bundle, &roots, &req.verb),
     }
+}
+
+/// The effective value at `path` (text form, e.g. `eventStore.remote`) for the
+/// project at `root`: project over global over the standard, as `config show`
+/// prints it. `None` when no layer sets it. For host code that needs one
+/// setting in process, so none reads the config files itself.
+pub fn effective_value(root: &Path, path: &str) -> Result<Option<Value>, Refusal> {
+    let request = ConfigRequest { root: root.to_owned(), verb: Verb::Show { path: Some(path.to_owned()) } };
+    let shown = answer(&request)?.data;
+    Ok(shown["present"].as_bool().filter(|present| *present).and_then(|_| shown.get("value").cloned()).filter(|value| !value.is_null()))
 }
 
 #[derive(Debug, Clone)]

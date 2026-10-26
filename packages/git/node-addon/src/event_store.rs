@@ -12,7 +12,10 @@ use napi::{bindgen_prelude::External, Error, Result};
 use napi_derive::napi;
 use serde::Deserialize;
 use serde_json::{json, Value};
-use std::{path::Path, sync::Arc};
+use std::{
+    path::Path,
+    sync::{Arc, OnceLock},
+};
 
 fn available() -> Result<()> {
     check()?;
@@ -26,12 +29,22 @@ fn guarantee(g: &fgos_holder_lock::Guarantee) -> Value {
 }
 
 #[napi(object)]
+pub struct EventStoreCheckpoint {
+    pub path: String,
+    pub reuse: bool,
+}
+
+#[napi(object)]
 pub struct EventStoreReadRequest {
     pub streams: Vec<String>,
     pub cursor: Value,
     pub folded: String,
     pub project: bool,
     pub view: Option<External<fgos_event_store::read::VerifiedView>>,
+    pub checkpoint: Option<EventStoreCheckpoint>,
+    /// Digest of the legacy events the caller already holds from an earlier
+    /// read; the same legacy history is then not sent again.
+    pub legacy_held: Option<String>,
 }
 
 #[napi(object)]
@@ -46,7 +59,12 @@ pub struct EventStore {
     registry: Registry,
     machine: String,
     resolved: (Arc<GitDriver>, Arc<RepoHandle>),
-    write_refusal: Option<String>,
+    /// Legacy-migration admission: asked by the first write or the pre-gate
+    /// `admit_writes`, never by a read, and kept once the answer is settled.
+    write_refusal: OnceLock<Option<String>>,
+    publication_remote: String,
+    /// What this store's last complete read answered; see `ReadMemo`.
+    read_memo: fgos_event_store::read::ReadMemo,
 }
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -58,6 +76,13 @@ struct Input {
 }
 #[napi]
 impl EventStore {
+    /// Settle write admission outside the Work gate. A refusal is raised by
+    /// the write that needs it; only a failure that may clear is raised here.
+    #[napi]
+    pub fn admit_writes(&self, held_ranks: Vec<u32>, hot_lock_depth: u32) -> Result<()> {
+        self.context(&held_ranks, hot_lock_depth)?;
+        self.write_admission(&held_ranks).map(|_| ())
+    }
     #[napi]
     pub fn append(
         &self,
@@ -68,7 +93,7 @@ impl EventStore {
         held_ranks: Vec<u32>,
     ) -> Result<Value> {
         available()?;
-        if let Some(reason) = &self.write_refusal {
+        if let Some(reason) = self.write_admission(&held_ranks)? {
             return Err(error(reason));
         }
         let stream = StreamId::parse(&stream).map_err(error)?;
@@ -194,17 +219,15 @@ pub fn open_store(
     if machine_id != resolved_root.machine {
         return Err(error("event-store-machine-id"));
     }
+    if let Some(remote) = &publication_remote {
+        fgos_event_store::refspec::mappings(remote).map_err(error)?;
+    }
     let mut registry = Registry::default();
     registry.load_files(&registry_files).map_err(error)?;
-    let write_refusal = fgos_event_store::legacy_import::write_readiness(
-        &resolved_root.driver,
-        &resolved_root.repo,
-        publication_remote.as_deref().unwrap_or("origin"),
-    )
-    .err()
-    .map(|e| e.to_string());
     Ok(EventStore {
-        write_refusal,
+        write_refusal: OnceLock::new(),
+        read_memo: fgos_event_store::read::ReadMemo::new(),
+        publication_remote: publication_remote.unwrap_or_else(|| "origin".into()),
         layout: Layout::from_common_dir(Some(resolved_root.repo.common_dir())).map_err(error)?,
         registry,
         machine: machine_id,
@@ -215,7 +238,7 @@ pub fn open_store(
     })
 }
 fn sealed(result: fgos_event_store::seal::Sealed) -> Value {
-    json!({"segments":result.segments,"busy":result.busy,"lastSeq":result.last_seq})
+    json!({"segments":result.segments,"busy":result.busy,"lastSeq":result.last_seq,"checkpointError":result.checkpoint_error})
 }
 fn stream_ids(streams: &[String]) -> Result<Vec<StreamId>> {
     streams
@@ -223,7 +246,41 @@ fn stream_ids(streams: &[String]) -> Result<Vec<StreamId>> {
         .map(|s| StreamId::parse(s).map_err(error))
         .collect()
 }
+/// A missing pinned legacy ref is not settled: `fgos events sync` fetches it
+/// while a long-lived process keeps running. A required migration is, because
+/// it runs with every writer stopped.
+fn is_settled_refusal(code: fgos_event_store::errors::ErrorCode) -> bool {
+    matches!(code, fgos_event_store::errors::ErrorCode::EventStoreMigrationRequired)
+}
 impl EventStore {
+    /// The reason writes are refused, or `None`. A settled answer is kept per
+    /// store; a failure that may clear is asked again by the next write. Git is
+    /// never asked inside the Work gate (rank 60):
+    /// a write that arrives there before `admit_writes` ran is refused, not
+    /// answered with a process spawn.
+    fn write_admission(&self, held_ranks: &[u32]) -> Result<Option<&str>> {
+        if let Some(known) = self.write_refusal.get() {
+            return Ok(known.as_deref());
+        }
+        if held_ranks.contains(&60) {
+            return Err(error("event-store-admission-required"));
+        }
+        let (driver, repo) = &self.resolved;
+        match fgos_event_store::legacy_import::write_readiness(
+            driver,
+            repo,
+            &self.publication_remote,
+        ) {
+            Ok(()) => Ok(self.write_refusal.get_or_init(|| None).as_deref()),
+            Err(e) if is_settled_refusal(e.code) => {
+                let asked = Some(e.to_string());
+                Ok(self.write_refusal.get_or_init(|| asked).as_deref())
+            }
+            // Any other failure may clear (a fetch, a Git or I/O error), so it is
+            // returned to this write and the next write asks again.
+            Err(e) => Err(error(e)),
+        }
+    }
     fn context(&self, ranks: &[u32], depth: u32) -> Result<(&GitDriver, &RepoHandle, &str)> {
         available()?;
         fgos_event_store::locks::validate_seal_context(ranks, depth).map_err(error)?;
@@ -240,11 +297,12 @@ impl EventStore {
         held_ranks: Vec<u32>,
         hot_lock_depth: u32,
         opportunistic: Option<bool>,
+        checkpoint_path: Option<String>,
     ) -> Result<Value> {
         let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
         let stream = StreamId::parse(&stream).map_err(error)?;
         Ok(sealed(
-            fgos_event_store::seal::seal(
+            fgos_event_store::seal::seal_checkpointed(
                 driver,
                 repo,
                 fgos_event_store::seal::SealRequest {
@@ -255,6 +313,8 @@ impl EventStore {
                     hot_lock_depth,
                     opportunistic: opportunistic.unwrap_or(false),
                 },
+                &fgos_event_store::fsio::OsFileSystem,
+                checkpoint_path.as_deref().map(std::path::Path::new),
             )
             .map_err(error)?,
         ))
@@ -314,7 +374,7 @@ impl EventStore {
         hot_lock_depth: u32,
     ) -> Result<Value> {
         let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
-        if let Some(reason) = &self.write_refusal {
+        if let Some(reason) = self.write_admission(&held_ranks)? {
             return Err(error(reason));
         }
         #[derive(Deserialize)]
@@ -365,6 +425,7 @@ impl EventStore {
         no_push: bool,
         held_ranks: Vec<u32>,
         hot_lock_depth: u32,
+        opportunistic: Option<bool>,
     ) -> Result<Value> {
         let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
         let result = fgos_event_store::sync::sync(
@@ -375,40 +436,20 @@ impl EventStore {
                 machine,
                 remote: &remote,
                 no_push,
+                opportunistic: opportunistic.unwrap_or(false),
                 held_ranks: &held_ranks,
                 hot_lock_depth,
             },
         )
         .map_err(error)?;
-        Ok(json!({"mirrorsChanged":result.mirrors_changed,"warnings":result.warnings}))
+        Ok(
+            json!({"mirrorsChanged":result.mirrors_changed,"warnings":result.warnings,"busy":result.busy}),
+        )
     }
     #[napi]
     pub fn maintenance(&self, held_ranks: Vec<u32>, hot_lock_depth: u32) -> Result<Value> {
         self.context(&held_ranks, hot_lock_depth)?;
         fgos_event_store::diagnostics::maintenance(&self.layout).map_err(error)
-    }
-    #[napi]
-    pub fn unpublished_summary(
-        &self,
-        remote: String,
-        held_ranks: Vec<u32>,
-        hot_lock_depth: u32,
-    ) -> Result<Value> {
-        let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
-        let result = fgos_event_store::sync::guarded_unpublished_summary(
-            driver,
-            repo,
-            fgos_event_store::sync::SyncRequest {
-                layout: &self.layout,
-                machine,
-                remote: &remote,
-                no_push: true,
-                held_ranks: &held_ranks,
-                hot_lock_depth,
-            },
-        )
-        .map_err(error)?;
-        Ok(Value::Array(result.into_iter().map(|v| json!({"stream":v.stream.as_str(),"sealedPushed":v.sealed_pushed,"oldestUnsealedAgeSec":v.oldest_unsealed_age_sec})).collect()))
     }
     #[napi]
     pub fn read(
@@ -423,6 +464,8 @@ impl EventStore {
             folded,
             project,
             view,
+            checkpoint,
+            legacy_held,
         } = request;
         let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
         let origin = match std::fs::symlink_metadata(self.layout.store()) {
@@ -441,19 +484,39 @@ impl EventStore {
         };
         let folded = serde_json::from_str::<Vec<fgos_event_store::envelope::Envelope>>(&folded)
             .map_err(error)?;
-        let result = fgos_event_store::read::read_with_view(
-            driver,
-            repo,
-            fgos_event_store::read::ReadRequest {
-                layout: &self.layout,
-                origin: &origin,
-                streams: &stream_ids(&streams)?,
-                cursor: &cursor,
-                folded: &folded,
-                project,
-            },
-            view.as_deref(),
-        )
+        let request = fgos_event_store::read::ReadRequest {
+            layout: &self.layout,
+            origin: &origin,
+            machine,
+            streams: &stream_ids(&streams)?,
+            cursor: &cursor,
+            folded: &folded,
+            project,
+        };
+        let memoized = Some(fgos_event_store::read::Memoized {
+            memo: &self.read_memo,
+            legacy_held: legacy_held.as_deref(),
+        });
+        let result = match checkpoint {
+            Some(checkpoint) => fgos_event_store::read::read_checkpointed(
+                driver,
+                repo,
+                request,
+                view.as_deref(),
+                &fgos_event_store::checkpoint::Checkpoint {
+                    path: checkpoint.path.into(),
+                    reuse: checkpoint.reuse,
+                },
+                memoized,
+            ),
+            None => fgos_event_store::read::read_with_view(
+                driver,
+                repo,
+                request,
+                view.as_deref(),
+                memoized,
+            ),
+        }
         .map_err(error)?;
         // The facade already owns the supplied prefix. Return only changed
         // envelopes across N-API; compare complete envelopes, not just hashes.
@@ -470,9 +533,21 @@ impl EventStore {
             }
         };
         let view = External::new(result.verified_view);
+        // The caller holds exactly this legacy history: it is the same bytes
+        // (the digest names every event), so none of it crosses again.
+        let legacy_unchanged = legacy_held.is_some() && legacy_held == result.cursor.legacy_digest;
+        let legacy: Vec<Value> = if legacy_unchanged {
+            Vec::new()
+        } else {
+            result
+                .legacy
+                .iter()
+                .map(|e| json!({"raw":e.raw,"provenance":e.provenance}))
+                .collect()
+        };
         Ok(EventStoreRead {
             view,
-            result: json!({"events":result.events,"sequence":&result.sequence[sequence_prefix..],"sequencePrefix":sequence_prefix,"legacy":result.legacy.into_iter().map(|e| json!({"event":e.event,"raw":e.raw,"provenance":e.provenance})).collect::<Vec<_>>(),"deferred":result.deferred,"missing":result.missing,"concurrent":result.concurrent,"cursor":result.cursor,"fold":fold,"fullOrder":result.full_order}),
+            result: json!({"events":result.events,"sequence":&result.sequence[sequence_prefix..],"sequencePrefix":sequence_prefix,"legacy":legacy,"legacyUnchanged":legacy_unchanged,"deferred":result.deferred,"missing":result.missing,"concurrent":result.concurrent,"cursor":result.cursor,"fold":fold,"checkpoint":{"continued":result.checkpoint.continued,"ignored":result.checkpoint.ignored,"written":result.checkpoint.written,"writeError":result.checkpoint.write_error},"skippedMirrors":result.skipped_mirrors}),
         })
     }
 }
@@ -499,24 +574,6 @@ pub fn event_store_facts(
     };
     fgos_event_store::diagnostics::facts(&driver, &repo, Path::new(&state_root), &remote)
         .map_err(error)
-}
-#[napi]
-pub fn ensure_event_store_refspecs(
-    cwd: String,
-    state_root: String,
-    trusted_main: String,
-    remote: String,
-) -> Result<()> {
-    available()?;
-    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
-    let repo = match driver
-        .resolve_repo(Path::new(&cwd), Path::new(&trusted_main))
-        .map_err(operation)?
-    {
-        ResolveRepo::Repository(repo) => repo,
-        ResolveRepo::NotARepository => return Err(error("event-store-no-repository")),
-    };
-    fgos_event_store::refspec::ensure_refspecs(&driver, &repo, &remote).map_err(error)
 }
 #[napi]
 impl EventStore {
@@ -584,6 +641,7 @@ impl EventStore {
         let request = fgos_event_store::export::ExportRequest {
             layout: &self.layout,
             origin: &origin,
+            machine,
             streams: &streams,
             since: &since,
             out: Path::new(&out),
@@ -620,9 +678,11 @@ impl EventStore {
         };
         let repo = &main;
         let inv = fgos_event_store::legacy_import::inventory(driver, repo).map_err(error)?;
-        if check {
-            fgos_event_store::legacy_import::ensure_clean(driver, repo, &inv).map_err(error)?;
-        }
+        let empty_legacy = if check {
+            fgos_event_store::legacy_import::ensure_clean(driver, repo, &inv).map_err(error)?
+        } else {
+            vec![]
+        };
         let (data_tree, legacy_oid) =
             fgos_event_store::legacy_import::import_identity(driver, repo, &inv).map_err(error)?;
         let existing_legacy = match driver
@@ -642,7 +702,7 @@ impl EventStore {
         )
         .map_err(error)?;
         Ok(
-            json!({"dataTree":data_tree.as_str(),"legacyRefOid":legacy_oid.as_str(),"existingLegacyOid":existing_legacy,"legacyMirrors":fgos_event_store::legacy_import::legacy_mirrors(driver, repo).map_err(error)?.into_iter().map(|r| json!({"name":r.name,"oid": match r.value { fgos_git::RefValue::Direct(oid) => Some(oid.as_str().to_owned()), _ => None }})).collect::<Vec<_>>(),"inventory":inv,"events":events.into_iter().map(|e|json!({"event":e.event,"raw":e.raw,"provenance":e.provenance})).collect::<Vec<_>>()}),
+            json!({"dataTree":data_tree.as_str(),"legacyRefOid":legacy_oid.as_str(),"existingLegacyOid":existing_legacy,"legacyMirrors":fgos_event_store::legacy_import::legacy_mirrors(driver, repo).map_err(error)?.into_iter().map(|r| json!({"name":r.name,"oid": match r.value { fgos_git::RefValue::Direct(oid) => Some(oid.as_str().to_owned()), _ => None }})).collect::<Vec<_>>(),"inventory":inv,"emptyLegacy":empty_legacy,"events":events.into_iter().map(|e|json!({"event":e.event,"raw":e.raw,"provenance":e.provenance})).collect::<Vec<_>>()}),
         )
     }
     #[napi]

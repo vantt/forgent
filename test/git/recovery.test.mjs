@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fixture } from './land-fixture.mjs';
 import { createGitRecovery, createGitSafeRestore } from '../../src/git/index.mjs';
-import { fixLandRecovery, checkGit } from '../../src/setup/git-checks.mjs';
+import { fixGitOperationRecovery, checkGit } from '../../src/setup/git-checks.mjs';
 
 test('Recovery lists and inspects an interrupted Land and delegates to its existing recovery', async () => {
   const f = fixture();
@@ -33,11 +33,11 @@ test('doctor --fix recovers an interrupted Land through the Recovery door and th
     const land = f.port();
     await land.prepare({operationId:'interrupted-fix',request:f.request});
     land.close();
-    const fixed = fixLandRecovery(f.repo,f.loader,f.options);
+    const fixed = fixGitOperationRecovery(f.repo,f.loader,f.options);
     assert.equal(fixed.changed,true,fixed.message);
-    assert.match(fixed.message,/recovered interrupted Land operations: interrupted-fix/);
+    assert.match(fixed.message,/recovered interrupted Git operations: interrupted-fix/);
     assert.equal(createGitRecovery(f.options,f.loader).inspectOperation({operationId:'interrupted-fix'}).terminal,true);
-    assert.deepEqual(fixLandRecovery(f.repo,f.loader,f.options),{changed:false,message:'no interrupted Land operation'});
+    assert.deepEqual(fixGitOperationRecovery(f.repo,f.loader,f.options),{changed:false,message:'no interrupted Land or ScopedCommit operation'});
   } finally { f.close(); }
 });
 test('the journal row warns, never fails, about a finished Land whose candidate is still retained', async () => {
@@ -51,7 +51,7 @@ test('the journal row warns, never fails, about a finished Land whose candidate 
     const pending = checkGit(f.repo,'git-operation-journal',f.loader,f.options);
     assert.equal(pending.passed,false);
     assert.match(pending.message,/1 Git operation\(s\) unresolved.*git-land-recovery/);
-    fixLandRecovery(f.repo,f.loader,f.options);
+    fixGitOperationRecovery(f.repo,f.loader,f.options);
     const row = checkGit(f.repo,'git-operation-journal',f.loader,f.options);
     assert.equal(row.passed,true,row.message);
     assert.match(row.message,/^warning: retained Land candidates: retained-land \(/);

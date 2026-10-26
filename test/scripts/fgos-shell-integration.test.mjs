@@ -6,7 +6,6 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { writeGlobalConfig } from '../helpers/config-fixture.mjs';
 
 if (process.platform === 'win32') {
   test('POSIX shell integration is unsupported on Windows', { skip: 'POSIX shell integration (bash/zsh) is only supported on POSIX platforms' }, () => {});
@@ -19,8 +18,8 @@ function mkTempDir(prefix) {
 }
 
 // tsk-2qc-1: an isolated HOME for every test in this file. The shell
-// script's tier-3 resolution now reads `$HOME/.fgos/config.json` (the
-// bin-discovery config-cache, D4) -- without this, any real cached
+// script's tier-3 resolution now reads `$HOME/.fgos/runtime/bin-cache.json` (the
+// bin-discovery cache, D4) -- without this, any real cached
 // `bin.globalFgosPath` left on the machine running these tests (from a
 // real `fgos setup`/`doctor --fix` run) would make a test resolve to that
 // real global fgos instead of the fixture the test itself set up,
@@ -30,6 +29,12 @@ function mkTempDir(prefix) {
 // tests) -- one shared isolated dir for the whole file is enough.
 const isolatedHome = mkTempDir('fgos-shell-integration-home-');
 const SHELL_ENV = { ...process.env, HOME: isolatedHome };
+
+function writeBinCache(home, globalFgosPath) {
+  const dir = path.join(home, '.fgos', 'runtime');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'bin-cache.json'), `${JSON.stringify({ globalFgosPath })}\n`);
+}
 
 function writeBinStub(repoRoot, name, marker) {
   const binDir = path.join(repoRoot, 'bin');
@@ -203,7 +208,7 @@ test('fgos-runner returns non-zero and prints an error to stderr outside any git
 });
 
 // ─── tsk-2qc-1 D2/D3: tier 2 (project-local node_modules/.bin/fgos) and
-// tier 3's config-cache (bin.globalFgosPath), extending this file's
+// tier 3's bin cache (runtime/bin-cache.json), extending this file's
 // pre-existing tier-1/tier-3-PATH coverage to all 3 tiers.
 
 test('fgos resolves tier 2 (project-local node_modules/.bin/fgos) when the resolved root has no bin/fgos.mjs and no PATH install exists', () => {
@@ -252,13 +257,12 @@ test('fgos tier 2 walks up from a nested cwd to find node_modules/.bin/fgos at t
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
-test('fgos resolves tier 3 from the config-cache (bin.globalFgosPath) without shelling out to a live PATH lookup', () => {
+test('fgos resolves tier 3 from the bin cache (runtime/bin-cache.json) without shelling out to a live PATH lookup', () => {
   const repoRoot = setupRepoWithoutBin('fgos-shell-integration-tier3-cache-');
   const cachedBinDir = mkTempDir('fgos-shell-integration-cached-bin-');
   const cachedBinPath = writePathStub(cachedBinDir, 'fgos', 'CACHED_GLOBAL_FGOS_MARKER');
   const cacheHome = mkTempDir('fgos-shell-integration-cache-home-');
-  fs.mkdirSync(path.join(cacheHome, '.fgos'), { recursive: true });
-  writeGlobalConfig(cacheHome, { bin: { globalFgosPath: cachedBinPath } });
+  writeBinCache(cacheHome, cachedBinPath);
 
   // A minimal real PATH (no cachedBinDir on it, no real fgos anywhere on
   // it) -- a pass here proves the cache was actually used, not a live
@@ -275,11 +279,10 @@ test('fgos resolves tier 3 from the config-cache (bin.globalFgosPath) without sh
   fs.rmSync(cacheHome, { recursive: true, force: true });
 });
 
-test('fgos self-heals past a stale config-cache entry (cached path no longer exists on disk) by falling back to a live PATH probe', () => {
+test('fgos self-heals past a stale bin cache entry (cached path no longer exists on disk) by falling back to a live PATH probe', () => {
   const repoRoot = setupRepoWithoutBin('fgos-shell-integration-tier3-stale-cache-');
   const cacheHome = mkTempDir('fgos-shell-integration-stale-cache-home-');
-  fs.mkdirSync(path.join(cacheHome, '.fgos'), { recursive: true });
-  writeGlobalConfig(cacheHome, { bin: { globalFgosPath: '/nonexistent/stale-fgos-path' } });
+  writeBinCache(cacheHome, '/nonexistent/stale-fgos-path');
   const pathStubDir = mkTempDir('fgos-shell-integration-pathstub-');
   writePathStub(pathStubDir, 'fgos', 'LIVE_PATH_FGOS_MARKER');
 

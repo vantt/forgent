@@ -4,8 +4,6 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { normalizeContextRefs } from './definition.mjs';
@@ -17,11 +15,12 @@ import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { expandWorkflowSeats, normalizeSeats, personaNameOf, seatedPanelUnits } from './seats.mjs';
 import { digestContextRefs, digestText } from './ref-digests.mjs';
 import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
-import { RunnerConfigError, assertReasoningEffort, ensureRunnerConfigForDir, parseRunTimeout, assertRunTimeoutMs } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError, assertReasoningEffort, loadRunnerConfigForDir, parseRunTimeout, assertRunTimeoutMs } from '../runner/dispatch/config.mjs';
 import { providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
 import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
 import { parseAccountPin } from '../runner/execution/account-pin.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
+import { spawnDetachedCli } from '../cli/detached-child.mjs';
 import { ADVANCE_DETACHED_ENV } from './case-lock.mjs';
 import { assertWriteChains, workflowCheckout } from './unit-handoff.mjs';
 import { RIGOR_ORDER } from './case-projection.mjs';
@@ -118,27 +117,14 @@ export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = wo
  * advance.log beside the event log. `--foreground` is what keeps the child from detaching again.
  */
 export function spawnDetachedAdvance({ mainRoot, workflowRunId, runDir, worktree, cwd, cliPath }) {
-  const cli = cliPath ?? fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
-  const args = [cli, 'workflow', 'resume', workflowRunId, '--dir', mainRoot];
+  const args = ['workflow', 'resume', workflowRunId, '--dir', mainRoot];
   if (worktree) args.push('--worktree', worktree);
   args.push('--foreground');
 
   const logPath = path.join(runDir, 'advance.log');
-  const logFd = fs.openSync(logPath, 'a');
-  let child;
-  try {
-    child = spawn(process.execPath, args, {
-      cwd: cwd ?? process.cwd(),
-      detached: true,
-      env: { ...process.env, [ADVANCE_DETACHED_ENV]: '1' },
-      stdio: ['ignore', logFd, logFd],
-    });
-  } finally {
-    fs.closeSync(logFd);
-  }
-  child.on('error', () => {});
-  child.unref();
-  return { pid: child.pid ?? null, logPath, statusCommand: `fgos workflow status ${workflowRunId}` };
+  const child = spawnDetachedCli({ args, cwd, logPath, cliPath, env: { ...process.env, [ADVANCE_DETACHED_ENV]: '1' } });
+  if (child.error) throw new Error(`cannot start the detached advance: ${child.error}`);
+  return { pid: child.pid, logPath, statusCommand: `fgos workflow status ${workflowRunId}` };
 }
 
 export function detachedResult({ mainRoot, workflowRunId, detached }) {
@@ -241,7 +227,7 @@ export function admitRecordedWorkflow({ mainRoot, workflowRunId }) {
 export async function preflightWorkflowSeats(params = {}) {
   if (params.seats === undefined) return { warnings: [] };
   const { mainRoot, workflow } = resolveStart(params);
-  const runnerConfig = ensureRunnerConfigForDir(mainRoot);
+  const runnerConfig = loadRunnerConfigForDir(mainRoot);
   const session = { headless: true, herdrPresent: detectHerdrPresent() };
   const warnings = [];
   const refused = [];
@@ -289,7 +275,7 @@ export function prepareWorkflowRun(params) {
   const documentationAdmission = params.documentationAdmission ?? admitDocumentationExecution({ repoRoot: mainRoot, callerCheckout: worktreePath });
   // A frame flag that widens the guide's defaults refuses here, so it creates no run.
   const frame = resolveFrame(workflow.guide, params.frame);
-  const liveConfig = ensureRunnerConfigForDir(mainRoot);
+  const liveConfig = loadRunnerConfigForDir(mainRoot);
   const configSnapshot = snapshotRunnerConfig(mainRoot, liveConfig);
   if (account !== null) {
     const pin = parseAccountPin(account);

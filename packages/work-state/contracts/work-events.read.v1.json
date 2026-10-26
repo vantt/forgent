@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "work-events.read.v1",
   "title": "Work State Events Read Contract for Observe Source v1",
-  "description": "Defines the subset of fields read by Observe's LegacyFrictionSource and WorkSource from .fgos/events.jsonl and .fgos/events/*.jsonl.",
+  "description": "Defines the subset of fields read by Observe's LegacyFrictionSource and WorkSource through the in-process Event Store crate (project stream and authenticated legacy provenance).",
   "type": "object",
   "properties": {
     "type": {

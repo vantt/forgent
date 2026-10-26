@@ -10,7 +10,7 @@
 import { resolvePattern } from './patterns/presets.mjs';
 
 const posture = (fields) => Object.freeze({
-  readOnly: false, writer: false, forceOutOfProcess: false, inlineAllowed: false, stance: false, verdict: false, ...fields,
+  readOnly: false, writer: false, forceOutOfProcess: false, stance: false, verdict: false, ...fields,
 });
 const seat = (name, role, fields) => Object.freeze({ seat: name, role, posture: posture(fields) });
 

@@ -1,21 +1,17 @@
 #!/usr/bin/env node
 // run-tests.mjs -- portable full-suite door (TFC-D02/TFC-D04). Replaces the
-// old `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'`
-// npm script: that string relied on the invoking SHELL to leave the glob
-// unexpanded (a single-quoted arg) and on Node's OWN CLI glob support to
-// then expand it -- Ubuntu/macOS's Node 20 CI lane never resolves that
-// pattern to any file at all (glob support for `--test` file arguments
-// landed in a later Node), and Windows's default `cmd.exe` npm shell
-// rejects the leading `VAR=value` POSIX env-assignment syntax outright.
-// Both failures happen before a single test ever runs.
+// old `node --test 'test/**/*.test.mjs'` npm script: that string relied on
+// the invoking SHELL to leave the glob unexpanded (a single-quoted arg) and
+// on Node's OWN CLI glob support to then expand it -- Ubuntu/macOS's Node 20
+// CI lane never resolves that pattern to any file at all (glob support for
+// `--test` file arguments landed in a later Node). That failure happens
+// before a single test ever runs.
 //
 // This script discovers every `*.test.mjs` file under `test/` itself with
 // `fs.readdirSync` (Node >=18, no glob dependency), passes the resulting
 // paths to `node --test` as literal argv elements (never a shell string,
-// so spaces/quotes/backslashes in a path can never be misinterpreted), and
-// sets `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1` directly on the spawned
-// child's own env object (never a shell prefix), so the exact same
-// invocation works unchanged on every OS's default shell.
+// so spaces/quotes/backslashes in a path can never be misinterpreted), so the
+// exact same invocation works unchanged on every OS's default shell.
 
 import fs from 'node:fs';
 import { REPO_ROOT, ensureGitAddon, ensureHostBin, gitAddonDirectory } from './lib/git-addon-stage.mjs';
@@ -24,7 +20,8 @@ import path from 'node:path';
 import { spawn as spawnAsync, spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
-import { acquireFullSuiteQueue, QUEUE_HELD_ENV } from './lib/full-suite-queue.mjs';
+import { CPU_LOG_ENV, readTestFileCpu, waitedCpuSeconds } from './lib/test-file-cpu.mjs';
+import { acquireFullSuiteQueue, QUEUE_HELD_ENV, QUEUE_SWITCH_ENV } from './lib/full-suite-queue.mjs';
 import { configEntries, repositoryDirs } from './lib/git-dir-layout.mjs';
 
 export { REPO_ROOT };
@@ -126,16 +123,33 @@ function stageDoorManifest(childEnv) {
   }
 }
 
+// Windows names are matched without case, as Windows reads them.
+const TEST_ENV_KEYS = new Set([
+  'PATH', 'HOME', 'USER', 'LOGNAME', 'SHELL', 'LANG', 'LANGUAGE', 'TZ', 'TERM', 'TMPDIR', 'TMP', 'TEMP', 'XDG_RUNTIME_DIR',
+  'USERPROFILE', 'APPDATA', 'LOCALAPPDATA', 'PROGRAMDATA', 'SYSTEMROOT', 'SYSTEMDRIVE', 'WINDIR', 'COMSPEC', 'PATHEXT',
+  'NODE_OPTIONS', 'RUSTFLAGS', 'FGOS_HOST_BIN', 'FGOS_ACTIVE_RELEASE_PATH', 'FGOS_ACTIVE_MANIFEST_PATH', 'FGOS_CLAUDE_COMMAND', 'FGOS_KEEP_TEST_FIXTURES',
+  QUEUE_SWITCH_ENV, QUEUE_HELD_ENV,
+]);
+const TEST_ENV_PREFIXES = ['LC_', 'CARGO_', 'RUSTUP_', 'RUSTC_', 'FGOS_TEST_'];
+
+function isTestEnvKey(key) {
+  const name = key.toUpperCase();
+  return TEST_ENV_KEYS.has(name) || TEST_ENV_PREFIXES.some((prefix) => name.startsWith(prefix));
+}
+
 /**
  * The env every spawned `node --test` run gets, whoever spawns it (the full
  * suite, the canary, the selector's related run, mutation and coverage runs):
- * - FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1;
- * - no inherited NODE_TEST_CONTEXT: an enclosing `node --test` sets it, and a
- *   nested run that inherits it reports to a parent that is not listening
- *   and exits 0 without running a single test;
- * - no inherited FGOS_STATE_ROOT: the host pins it into every payload it
- *   runs, and a suite started under fgOS would otherwise send every fixture
- *   that sets only FGOS_STATE_HOME to the real machine state root;
+ * - only the caller variables TEST_ENV_KEYS and TEST_ENV_PREFIXES name: the OS
+ *   and login inputs every process has, the toolchains the suite builds with,
+ *   and the suite's own knobs. Everything else the shell that started the run
+ *   exports would make a result depend on who started it: an enclosing
+ *   `node --test`'s NODE_TEST_CONTEXT (the nested run reports to a parent that
+ *   is not listening and exits 0 without running a test), the FGOS_STATE_ROOT
+ *   the host pins into every payload (fixtures that set only FGOS_STATE_HOME
+ *   would reach the real state root), herdr's HERDR_* (every Unit would run
+ *   through the real herdr server, ~10x as long), and an agent CLI's session
+ *   id (session identity reads it). A test that means one of these sets it;
  * - FGOS_CLAUDE_COMMAND naming a binary that does not exist, unless the
  *   caller names one: doctor and setup in a fixture would otherwise run the
  *   real `claude` CLI, reach the network and change the real user's plugin
@@ -143,8 +157,7 @@ function stageDoorManifest(childEnv) {
  * - on darwin, TMPDIR/TMP/TEMP resolved through realpath (/var -> /private/var).
  */
 export function buildTestEnv(env = process.env) {
-  const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, ...rest } = env;
-  const childEnv = { ...rest, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
+  const childEnv = Object.fromEntries(Object.entries(env).filter(([key]) => isTestEnvKey(key)));
   childEnv.FGOS_CLAUDE_COMMAND ||= '/nonexistent/fgos-test-claude-binary';
   if (process.platform === 'darwin') {
     const tempRoot = env.TMPDIR || os.tmpdir();
@@ -174,7 +187,7 @@ export function buildTestEnv(env = process.env) {
  * Runs `node --test` against an EXPLICIT, already-resolved file list (P03:
  * the shared seam between the full-suite door and the canary runner).
  * Applies the exact same env/argv construction `runTests()` always has
- * (FGOS_DISABLE_OPPORTUNISTIC_CHECKS, the darwin TMPDIR realpath fix, argv
+ * (the test env, the darwin TMPDIR realpath fix, argv
  * as a literal array -- never a shell string) so a canary run and the full
  * run are byte-for-byte identical in every way except which files are
  * selected. Returns `{ status, files }`, same shape as `runTests()`.
@@ -334,12 +347,11 @@ export function leftoverTempPrefixes(root, readdir = fs.readdirSync) {
 export const SENSITIVE_FGOS_FILES = new Set(['secrets.local.env', 'secrets.env']);
 
 // Derived files that any read of the live store may rewrite: the state view is a cache folded
-// from the event log, and the truncation guard records the last log size it saw. A test that
-// reads the store therefore refreshes them without leaking anything; test-written state still
-// shows up as added or changed event, observe and work files, which stay guarded.
+// from the event log. A test that reads the store therefore refreshes it without leaking
+// anything; test-written state still shows up as added or changed event, observe and work
+// files, which stay guarded.
 export const DERIVED_FGOS_FILES = new Set([
   path.join('cache', 'state.json'),
-  path.join('runtime', 'events-jsonl.truncation-guard.json'),
 ]);
 
 /**
@@ -471,11 +483,19 @@ export function runSelectedTests(files, {
     : null;
   const spawnLog = path.join(runTemp ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-test-spy-')), 'git-spawn-spy.jsonl');
   childEnv[GIT_SPAWN_SPY_LOG_ENV] = spawnLog;
+  const cpuLog = path.join(path.dirname(spawnLog), 'test-file-cpu.jsonl');
+  childEnv[CPU_LOG_ENV] = cpuLog;
   let gitSpawns = [];
   try {
     const started = Date.now();
+    const cpuBefore = waitedCpuSeconds();
     const spawnResult = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
-    result = { status: spawnResult.status ?? 1, files: relFiles, runTemp, wallSeconds: (Date.now() - started) / 1000 };
+    const cpuAfter = waitedCpuSeconds();
+    result = {
+      status: spawnResult.status ?? 1, files: relFiles, runTemp, wallSeconds: (Date.now() - started) / 1000,
+      cpuSeconds: cpuBefore === null || cpuAfter === null ? null : cpuAfter - cpuBefore,
+      fileCpu: readTestFileCpu(cpuLog, cwd, relFiles),
+    };
     gitSpawns = readGitSpawnLog(spawnLog);
   } finally {
     if (supervisor) timedOut = supervisor.stop();
@@ -657,16 +677,41 @@ export function queueAfterStaging(options, {
   }
 }
 
+/**
+ * Runs only the chosen test files, in the same staged environment as the full run (`runSelectedTests`
+ * stages the addon and host through `buildTestEnv`), without the full-suite queue. Paths resolve against
+ * `cwd`; one that is not an existing file fails the run by name before anything spawns.
+ */
+export function runChosenTests(paths, { cwd = REPO_ROOT, ...options } = {}) {
+  const files = paths.map((file) => path.resolve(cwd, file));
+  const missing = paths.filter((_, i) => !fs.existsSync(files[i]) || !fs.statSync(files[i]).isFile());
+  if (missing.length > 0) {
+    return { status: 1, files: [], message: `run-tests: no such test file: ${missing.join(', ')}` };
+  }
+  return runSelectedTests(files, { cwd, ...options });
+}
+
 if (isMainModule(import.meta.url)) {
-  const { status, message, files, wallSeconds } = runTests({
+  const argv = process.argv.slice(2);
+  const chosen = argv.filter((arg) => arg.endsWith(TEST_FILE_SUFFIX));
+  if (chosen.length > 0) {
+    const { status, message } = runChosenTests(chosen, { forwardedArgs: argv.filter((arg) => !chosen.includes(arg)) });
+    if (message) console.error(message);
+    process.exit(status);
+  }
+  const { status, message, files, wallSeconds, cpuSeconds, fileCpu } = runTests({
     forwardedArgs: process.argv.slice(2),
     queue: (options) => queueAfterStaging(options),
   });
   if (message) console.error(message);
   let reportStatus = 0;
   if (files.length > 0) {
-    const { suiteReport } = await import('./test-proof-inventory.mjs');
-    const report = suiteReport({ files, wallSeconds });
+    const { recordLastRun, suiteReport } = await import('./test-proof-inventory.mjs');
+    // Only a whole run with no runner arguments is this tree's cost; a filtered run would set a false baseline.
+    if (typeof cpuSeconds === 'number' && process.argv.length === 2) {
+      try { recordLastRun({ wallSeconds, cpuSeconds, fileCpu }); } catch (err) { console.error(`suite: warning: this run's cost not recorded: ${err.message}`); }
+    }
+    const report = suiteReport({ files, wallSeconds, cpuSeconds, fileCpu });
     for (const line of report.lines) console.error(line);
     reportStatus = report.status;
   }

@@ -132,12 +132,15 @@ pub(crate) struct ConfigCache {
     formats: Option<(ObjectFormat, RefStorage)>,
 }
 
-// Both caches are per process, not per driver: each Node port opens its own
+// These caches are per process, not per driver: each Node port opens its own
 // driver, and a verb opens many. Every use still rechecks the source stamps;
 // the source list is keyed by the selected Git and the variables its answer
 // depends on.
 static CONFIG_SOURCES: Mutex<BTreeMap<(PathBuf, ConfigEnvironment), Vec<PathBuf>>> = Mutex::new(BTreeMap::new());
 static REPOSITORY_CONFIG: Mutex<BTreeMap<PathBuf, ConfigCache>> = Mutex::new(BTreeMap::new());
+// A main checkout's repository-scoped transport keys, valid exactly while the
+// config stamp they were listed under still matches.
+static TRANSPORT_POLICY: Mutex<BTreeMap<PathBuf, (ConfigStamp, Vec<String>)>> = Mutex::new(BTreeMap::new());
 
 fn io(error: std::io::Error) -> OperationError {
     failure(format!("git-driver-io: {error}"))
@@ -293,6 +296,7 @@ impl GitDriver {
     }
 
     /// Only the grant-check host calls this after proving its inherited borrower.
+    #[cfg(unix)]
     pub(crate) fn hook_deletions(&self, repo: &RepoHandle, index: &Path) -> Result<Vec<String>> {
         let out = self.invoke_context(
             Some(repo),
@@ -343,6 +347,19 @@ impl GitDriver {
             ResolveRepo::NotARepository => None,
         })
     }
+    /// The trusted main checkout holding `path`, through a driver on this
+    /// process's fgOS state root; `None` outside a repository. It runs the same
+    /// disk-only topology check as every resolve and no Git: a caller that only
+    /// needs the root never pays the config and format probes an operation needs.
+    pub fn trusted_root_at(path: &Path) -> Result<Option<PathBuf>> {
+        Self::new(&fgos_holder_lock::state_root::state_root().0)?.trusted_root(path)
+    }
+    pub(crate) fn trusted_root(&self, path: &Path) -> Result<Option<PathBuf>> {
+        Ok(match self.resolve_topology(path, path)? {
+            ResolveRepo::Repository(repo) => Some(repo.trusted_main_root),
+            ResolveRepo::NotARepository => None,
+        })
+    }
     pub fn resolve_repo(&self, path: &Path, trusted_main: &Path) -> Result<ResolveRepo> {
         self.require_floor()?;
         let mut repo = match self.resolve_topology(path, trusted_main)? {
@@ -358,11 +375,11 @@ impl GitDriver {
         self.check_config(repo, &config)?;
         // Formats are config facts: reused exactly while the stamp that proved
         // them still matches, read afresh when the stamp moved.
-        let formats = match self.cached_formats(repo)? {
+        let formats = match self.config_entry(repo, |entry| entry.formats)?.flatten() {
             Some(formats) => formats,
             None => {
                 let formats = self.repository_formats(repo)?;
-                self.keep_formats(repo, formats)?;
+                self.config_entry(repo, |entry| entry.formats = Some(formats))?;
                 formats
             }
         };
@@ -375,26 +392,36 @@ impl GitDriver {
 
     // A checkout handle answers from its own operation-local cache, any other
     // handle from the process-wide one; both only ever hold a validated stamp.
-    fn cached_formats(&self, repo: &RepoHandle) -> Result<Option<(ObjectFormat, RefStorage)>> {
+    // `None` when no entry exists yet.
+    fn config_entry<T>(&self, repo: &RepoHandle, use_entry: impl FnOnce(&mut ConfigCache) -> T) -> Result<Option<T>> {
         if let Some(local) = &repo.checkout_config {
-            let local = local.lock().map_err(|_| failure("config-cache-poisoned"))?;
-            return Ok(local.as_ref().and_then(|entry| entry.formats));
+            return Ok(local.lock().map_err(|_| failure("config-cache-poisoned"))?.as_mut().map(use_entry));
         }
         Ok(REPOSITORY_CONFIG.lock().map_err(|_| failure("config-cache-poisoned"))?
-            .get(&repo.git_dir).and_then(|entry| entry.formats))
+            .get_mut(&repo.git_dir).map(use_entry))
     }
 
-    fn keep_formats(&self, repo: &RepoHandle, formats: (ObjectFormat, RefStorage)) -> Result<()> {
-        if let Some(local) = &repo.checkout_config {
-            if let Some(entry) = local.lock().map_err(|_| failure("config-cache-poisoned"))?.as_mut() {
-                entry.formats = Some(formats);
-            }
-        } else if let Some(entry) = REPOSITORY_CONFIG.lock()
-            .map_err(|_| failure("config-cache-poisoned"))?.get_mut(&repo.git_dir)
-        {
-            entry.formats = Some(formats);
+    /// Remote admission's question, asked once per config stamp of a main
+    /// checkout: its one listing reads exactly the files the validated listing
+    /// stamped. A linked handle also lists its main checkout's worktree policy,
+    /// which its own stamp does not cover, so it asks every time.
+    fn transport_policy(&self, repo: &RepoHandle) -> Result<Vec<String>> {
+        if repo.git_dir != repo.common_dir {
+            return self.untrusted_transport_config(repo);
         }
-        Ok(())
+        self.preflight(repo)?;
+        let Some(stamp) = self.config_entry(repo, |entry| entry.stamp.clone())? else {
+            return self.untrusted_transport_config(repo);
+        };
+        let poisoned = || failure("config-cache-poisoned");
+        if let Some((known, keys)) = TRANSPORT_POLICY.lock().map_err(|_| poisoned())?.get(&repo.git_dir) {
+            if *known == stamp {
+                return Ok(keys.clone());
+            }
+        }
+        let keys = self.untrusted_transport_config(repo)?;
+        TRANSPORT_POLICY.lock().map_err(|_| poisoned())?.insert(repo.git_dir.clone(), (stamp, keys.clone()));
+        Ok(keys)
     }
 
     fn repository_formats(&self, repo: &RepoHandle) -> Result<(ObjectFormat, RefStorage)> {
@@ -420,41 +447,9 @@ impl GitDriver {
     /// Disk-only authority check, kept before every checkout child. Git config
     /// and storage probes belong to the operation, not topology discovery.
     pub(crate) fn resolve_topology(&self, path: &Path, trusted_main: &Path) -> Result<ResolveRepo> {
-        let mut main = fs::canonicalize(trusted_main).map_err(io)?;
         let path = fs::canonicalize(path).map_err(io)?;
-        // Callers may supply a cwd beneath a checkout. Locate only on disk;
-        // never let Git or GIT_* environment select topology authority.
-        while !main.join(".git").exists()
-            && !(main.join("HEAD").is_file() && main.join("objects").is_dir())
-        {
-            if !main.pop() {
-                return Ok(ResolveRepo::NotARepository);
-            }
-        }
-        // A linked cwd supplies only a discovery hint. Trust comes from the
-        // main .git directory and reciprocal registered gitdir/backlink.
-        let main = if main.join(".git").is_file() {
-            let hint = fs::read(main.join(".git")).map_err(io)?;
-            let hint = line(&hint)?
-                .strip_prefix("gitdir: ")
-                .ok_or_else(|| failure("untrusted-worktree"))?;
-            let admin = fs::canonicalize(main.join(hint)).map_err(io)?;
-            let common_hint = fs::read(admin.join("commondir"))
-                .map_err(|_| failure("trusted-main-gitfile-unsupported"))?;
-            let common = fs::canonicalize(admin.join(line(&common_hint)?)).map_err(io)?;
-            let backlink = fs::read(admin.join("gitdir")).map_err(io)?;
-            if common.file_name() != Some(std::ffi::OsStr::new(".git"))
-                || admin.parent() != Some(common.join("worktrees").as_path())
-                || Path::new(line(&backlink)?) != main.join(".git")
-            {
-                return Err(failure("untrusted-worktree"));
-            }
-            common
-                .parent()
-                .ok_or_else(|| failure("untrusted-worktree"))?
-                .to_owned()
-        } else {
-            main
+        let Some(main) = main_checkout_root(trusted_main)? else {
+            return Ok(ResolveRepo::NotARepository);
         };
         let common = if main.join(".git").is_dir() {
             let dir = main.join(".git");
@@ -860,6 +855,15 @@ impl GitDriver {
         Ok(())
     }
 
+    /// Names a revision that is not a commit or tree. Asked only after a read
+    /// of it missed or failed, so a read that succeeds spends no call on it.
+    fn require_commit_or_tree(&self, repo: &RepoHandle, revision: &Oid) -> Result<()> {
+        let kind = self.checked(repo, &["cat-file", "-t", revision.as_str()], Policy::Inspect)?;
+        if kind != b"commit\n" && kind != b"tree\n" {
+            return Err(failure("revision-not-commit-or-tree"));
+        }
+        Ok(())
+    }
     pub(crate) fn checked(&self, repo: &RepoHandle, args: &[&str], policy: Policy) -> Result<Vec<u8>> {
         self.require_floor()?;
         self.preflight(repo)?;
@@ -1117,7 +1121,7 @@ impl GitDriver {
             if let Some(repo) = repo {
                 // Repository transport policy is untrusted, including URL-scoped
                 // values which outrank generic -c values. Refuse the whole family.
-                if let Some(key) = self.untrusted_transport_config(repo)?.first() {
+                if let Some(key) = self.transport_policy(repo)?.first() {
                     return Err(failure(format!(
                         "repository-transport-config-untrusted: {key}"
                     )));
@@ -1637,6 +1641,54 @@ fn text_path(path: &Path) -> Result<String> {
         .map(str::to_owned)
         .ok_or_else(|| failure("non-utf8-authority-path"))
 }
+/// The main checkout of the repository holding `start` (or the repository
+/// directory of a bare one), read from disk only: it walks up from `start`
+/// to the first `.git` (or bare layout) and, for a linked worktree's `.git`
+/// file, follows `gitdir:` to the worktree's admin directory, its
+/// `commondir` and its `gitdir` back-link, which must name each other. No
+/// subprocess, no state root, no lock, no write. `None` outside a
+/// repository. [`GitDriver`]'s topology check starts from it.
+pub fn main_checkout_root(start: &Path) -> Result<Option<PathBuf>> {
+    let mut main = fs::canonicalize(start).map_err(io)?;
+    // Callers may supply a cwd beneath a checkout. Locate only on disk;
+    // never let Git or GIT_* environment select topology authority.
+    while !main.join(".git").exists()
+        && !(main.join("HEAD").is_file() && main.join("objects").is_dir())
+    {
+        if !main.pop() {
+            return Ok(None);
+        }
+    }
+    if !main.join(".git").is_file() {
+        return Ok(Some(main));
+    }
+    // A linked cwd supplies only a discovery hint. Trust comes from the
+    // main .git directory and reciprocal registered gitdir/backlink.
+    let hint = fs::read(main.join(".git")).map_err(io)?;
+    let hint = line(&hint)?
+        .strip_prefix("gitdir: ")
+        .ok_or_else(|| failure("untrusted-worktree"))?;
+    let admin = fs::canonicalize(main.join(hint)).map_err(io)?;
+    let common_hint = fs::read(admin.join("commondir"))
+        .map_err(|_| failure("trusted-main-gitfile-unsupported"))?;
+    let common = fs::canonicalize(admin.join(line(&common_hint)?)).map_err(io)?;
+    let backlink = fs::read(admin.join("gitdir")).map_err(io)?;
+    // Git may write the back-link relative to the admin directory
+    // (`worktree.useRelativePaths`); read it as git does, then compare the
+    // real paths.
+    let backlink = fs::canonicalize(admin.join(line(&backlink)?)).ok();
+    if common.file_name() != Some(std::ffi::OsStr::new(".git"))
+        || admin.parent() != Some(common.join("worktrees").as_path())
+        || backlink != Some(main.join(".git"))
+    {
+        return Err(failure("untrusted-worktree"));
+    }
+    common
+        .parent()
+        .map(|p| Some(p.to_owned()))
+        .ok_or_else(|| failure("untrusted-worktree"))
+}
+
 fn line(bytes: &[u8]) -> Result<&str> {
     let bytes = bytes.strip_suffix(b"\n").unwrap_or(bytes);
     std::str::from_utf8(bytes).map_err(|_| failure("git-protocol-invalid-utf8"))
@@ -2167,14 +2219,6 @@ impl Inspect for GitDriver {
         {
             return Err(failure("tree-cursor-query-mismatch"));
         }
-        let kind = self.checked(
-            repo,
-            &["cat-file", "-t", revision.as_str()],
-            Policy::Inspect,
-        )?;
-        if kind != b"commit\n" && kind != b"tree\n" {
-            return Err(failure("revision-not-commit-or-tree"));
-        }
         // Resolve the literal containing directory with NUL-framed byte input.
         // Git emits only that subtree, rather than the whole project each page.
         let directory = prefix
@@ -2190,6 +2234,7 @@ impl Inspect for GitDriver {
             input.push(0);
             let output = self.inspect_input(repo, &["cat-file", "--batch-check", "-Z"], &input)?;
             if output.ends_with(b" missing\0") {
+                self.require_commit_or_tree(repo, revision)?;
                 if let Some(cause) = object_gap_cause(&repo.layout) {
                     return Err(failure(cause));
                 }
@@ -2209,7 +2254,7 @@ impl Inspect for GitDriver {
             )
             .map_err(|_| failure("invalid-tree-oid"))?;
         }
-        let bytes = self.checked(
+        let bytes = match self.checked(
             repo,
             &[
                 "ls-tree",
@@ -2220,7 +2265,13 @@ impl Inspect for GitDriver {
                 tree_revision.as_str(),
             ],
             Policy::Inspect,
-        )?;
+        ) {
+            Ok(bytes) => bytes,
+            Err(error) => {
+                self.require_commit_or_tree(repo, revision)?;
+                return Err(error);
+            }
+        };
         let mut entries = Vec::new();
         for record in bytes.split(|b| *b == 0).filter(|r| !r.is_empty()) {
             let tab = record
@@ -2390,102 +2441,52 @@ impl Inspect for GitDriver {
         if paths.len() > 4096 || max_blob_bytes == 0 || max_blob_bytes > 32 * 1024 * 1024 {
             return Err(failure("invalid-path-read-bounds"));
         }
-        // Validate the root separately so a missing root never becomes absent paths.
-        let kind = self.checked(
+        let miss = match self.read_path_group(
             repo,
-            &["cat-file", "-t", revision.as_str()],
-            Policy::Inspect,
-        )?;
-        if kind != b"commit\n" && kind != b"tree\n" {
-            return Err(failure("revision-not-commit-or-tree"));
-        }
-        let mut input = Vec::new();
-        for path in paths {
-            if path.is_empty()
-                || path.len() > 4096
-                || path.contains(&0)
-                || path.starts_with(b"/")
-                || path
-                    .split(|b| *b == b'/')
-                    .any(|p| p == b".." || p == b"." || p.is_empty())
-            {
-                return Err(failure("invalid-literal-path"));
+            &[(revision.clone(), paths.to_vec())],
+            max_blob_bytes,
+        )? {
+            Ok(mut answers) => return Ok(answers.pop().unwrap_or_default()),
+            Err(miss) => miss,
+        };
+        // A missing root never becomes absent paths: name it before anything else.
+        self.require_commit_or_tree(repo, revision)?;
+        Err(match miss {
+            GroupMiss::Failed(error) => error,
+            GroupMiss::Root => failure("path-read-failed"),
+        })
+    }
+
+    fn read_paths_at_many(
+        &self,
+        repo: &RepoHandle,
+        reads: &[(Oid, Vec<Vec<u8>>)],
+        max_blob_bytes: usize,
+    ) -> Result<Vec<Vec<PathRead>>> {
+        // One process answers a bounded group, so a walk page costs a few
+        // processes however many commits it holds. Anything the group cannot
+        // answer (a refused root, a failed, oversized or slow process) is
+        // re-asked one revision at a time, which owns the refusal and cause
+        // mapping.
+        const GROUP: usize = 64;
+        let mut all = Vec::with_capacity(reads.len());
+        for group in reads.chunks(GROUP) {
+            match self.read_path_group(repo, group, max_blob_bytes)? {
+                Ok(answers) => all.extend(answers),
+                Err(_) => {
+                    for (revision, paths) in group {
+                        all.push(Inspect::read_paths_at(
+                            self,
+                            repo,
+                            revision,
+                            paths,
+                            max_blob_bytes,
+                        )?);
+                    }
+                }
             }
-            input.extend_from_slice(revision.as_str().as_bytes());
-            input.push(b':');
-            input.extend_from_slice(path);
-            input.push(0);
         }
-        self.require_floor()?;
-        self.preflight(repo)?;
-        let out = self.invoke_input(
-            Some(repo),
-            &repo.trusted_main_root,
-            &["cat-file", "--batch", "-Z"],
-            Policy::Inspect,
-            None,
-            true,
-            PATH_LIMIT,
-            Duration::from_secs(30),
-            &input,
-        )?;
-        if !out.success {
-            return Err(out.error(layout_cause(&repo.layout, "path-read-failed")));
-        }
-        let mut rest = out.stdout.as_slice();
-        let mut result = Vec::new();
-        for path in paths {
-            let end = rest
-                .iter()
-                .position(|b| *b == 0)
-                .ok_or_else(|| failure("invalid-path-header"))?;
-            let header = &rest[..end];
-            rest = &rest[end + 1..];
-            let value = if header.ends_with(b" missing") {
-                object_gap_cause(&repo.layout).map_or(PathValue::Absent, |cause| PathValue::Error(failure(cause)))
-            } else {
-                let fields: Vec<_> = header.split(|b| *b == b' ').collect();
-                if fields.len() != 3 {
-                    return Err(failure("invalid-path-header"));
-                }
-                Oid::parse(
-                    std::str::from_utf8(fields[0]).map_err(|_| failure("invalid-object-oid"))?,
-                    repo.object_format(),
-                )
-                .map_err(|_| failure("invalid-object-oid"))?;
-                let kind = match fields[1] {
-                    b"blob" => ObjectType::Blob,
-                    b"tree" => ObjectType::Tree,
-                    b"commit" => ObjectType::Commit,
-                    b"tag" => ObjectType::Tag,
-                    _ => return Err(failure("invalid-object-type")),
-                };
-                let size = std::str::from_utf8(fields[2])
-                    .ok()
-                    .and_then(|s| s.parse::<usize>().ok())
-                    .ok_or_else(|| failure("invalid-object-size"))?;
-                if size >= rest.len() || rest[size] != 0 {
-                    return Err(failure("invalid-object-size"));
-                }
-                let value = if kind != ObjectType::Blob {
-                    PathValue::NotABlob(kind)
-                } else if size > max_blob_bytes {
-                    PathValue::Error(failure("blob-too-large"))
-                } else {
-                    PathValue::Blob(rest[..size].to_vec())
-                };
-                rest = &rest[size + 1..];
-                value
-            };
-            result.push(PathRead {
-                path: path.clone(),
-                value,
-            });
-        }
-        if !rest.is_empty() {
-            return Err(failure("unexpected-path-output"));
-        }
-        Ok(result)
+        Ok(all)
     }
 
     fn configured_fetch_refspecs(
@@ -2592,6 +2593,164 @@ pub(crate) fn config_facts(driver: &GitDriver, repo: &RepoHandle, key: &str) -> 
             })
         })
         .collect()
+}
+
+/// Why a grouped read has no answer for the caller to return as it is.
+enum GroupMiss {
+    /// The root is missing, or neither a commit nor a tree.
+    Root,
+    /// The request or the process failed with this error.
+    Failed(OperationError),
+}
+
+/// A path that is not a plain relative literal inside a tree.
+fn invalid_literal_path(path: &[u8]) -> bool {
+    path.is_empty()
+        || path.len() > 4096
+        || path.contains(&0)
+        || path.starts_with(b"/")
+        || path
+            .split(|b| *b == b'/')
+            .any(|p| p == b".." || p == b"." || p.is_empty())
+}
+
+/// One `cat-file --batch -Z` object: `None` for a missing object, otherwise its
+/// type and content, with the unread remainder.
+type BatchObject<'a> = (Option<(&'a [u8], &'a [u8])>, &'a [u8]);
+fn next_batch_object(rest: &[u8], format: ObjectFormat) -> Result<BatchObject<'_>> {
+    let end = rest
+        .iter()
+        .position(|b| *b == 0)
+        .ok_or_else(|| failure("invalid-path-header"))?;
+    let header = &rest[..end];
+    let rest = &rest[end + 1..];
+    if header.ends_with(b" missing") {
+        return Ok((None, rest));
+    }
+    let fields: Vec<_> = header.split(|b| *b == b' ').collect();
+    if fields.len() != 3 {
+        return Err(failure("invalid-path-header"));
+    }
+    Oid::parse(
+        std::str::from_utf8(fields[0]).map_err(|_| failure("invalid-object-oid"))?,
+        format,
+    )
+    .map_err(|_| failure("invalid-object-oid"))?;
+    let size = std::str::from_utf8(fields[2])
+        .ok()
+        .and_then(|s| s.parse::<usize>().ok())
+        .ok_or_else(|| failure("invalid-object-size"))?;
+    if size >= rest.len() || rest[size] != 0 {
+        return Err(failure("invalid-object-size"));
+    }
+    Ok((Some((fields[1], &rest[..size])), &rest[size + 1..]))
+}
+
+impl GitDriver {
+    /// Answers `reads` through one `cat-file --batch -Z` process, the one place
+    /// that parses its output. `Ok(Err(miss))` means the group has no answer
+    /// and the caller names the cause: a root that is not a commit or tree, an
+    /// invalid path, or a process that failed, overflowed or timed out. A
+    /// malformed request or output is an `Err`.
+    fn read_path_group(
+        &self,
+        repo: &RepoHandle,
+        reads: &[(Oid, Vec<Vec<u8>>)],
+        max_blob_bytes: usize,
+    ) -> Result<std::result::Result<Vec<Vec<PathRead>>, GroupMiss>> {
+        if max_blob_bytes == 0 || max_blob_bytes > 32 * 1024 * 1024 {
+            return Err(failure("invalid-path-read-bounds"));
+        }
+        let mut input = Vec::new();
+        for (revision, paths) in reads {
+            Oid::parse(revision.as_str(), repo.object_format())
+                .map_err(|_| failure("object-format-mismatch"))?;
+            if paths.len() > 4096 {
+                return Err(failure("invalid-path-read-bounds"));
+            }
+            if paths.iter().any(|path| invalid_literal_path(path)) {
+                return Ok(Err(GroupMiss::Failed(failure("invalid-literal-path"))));
+            }
+            // The bare revision answers whether the root exists and what it is,
+            // which a path lookup cannot tell apart from an absent path.
+            input.extend_from_slice(revision.as_str().as_bytes());
+            input.push(0);
+            for path in paths {
+                input.extend_from_slice(revision.as_str().as_bytes());
+                input.push(b':');
+                input.extend_from_slice(path);
+                input.push(0);
+            }
+        }
+        if input.is_empty() {
+            return Ok(Ok(Vec::new()));
+        }
+        self.require_floor()?;
+        self.preflight(repo)?;
+        let out = self.invoke_input(
+            Some(repo),
+            &repo.trusted_main_root,
+            &["cat-file", "--batch", "-Z"],
+            Policy::Inspect,
+            None,
+            true,
+            PATH_LIMIT,
+            Duration::from_secs(30),
+            &input,
+        );
+        // A group whose answers together exceed the output bound or the time
+        // bound may still succeed one revision at a time.
+        let out = match out {
+            Ok(out) => out,
+            Err(e) if matches!(e.cause.as_str(), "git-output-limit" | "git-timeout") => {
+                return Ok(Err(GroupMiss::Failed(e)));
+            }
+            Err(e) => return Err(e),
+        };
+        if !out.success {
+            return Ok(Err(GroupMiss::Failed(
+                out.error(layout_cause(&repo.layout, "path-read-failed")),
+            )));
+        }
+        let format = repo.object_format();
+        let mut rest = out.stdout.as_slice();
+        let mut answers = Vec::with_capacity(reads.len());
+        for (_, paths) in reads {
+            let (root, after) = next_batch_object(rest, format)?;
+            rest = after;
+            if !matches!(root, Some((kind, _)) if kind == b"commit" || kind == b"tree") {
+                return Ok(Err(GroupMiss::Root));
+            }
+            let mut answer = Vec::with_capacity(paths.len());
+            for path in paths {
+                let (object, after) = next_batch_object(rest, format)?;
+                rest = after;
+                let value = match object {
+                    None => object_gap_cause(&repo.layout)
+                        .map_or(PathValue::Absent, |cause| PathValue::Error(failure(cause))),
+                    Some((kind, content)) => match kind {
+                        b"blob" if content.len() > max_blob_bytes => {
+                            PathValue::Error(failure("blob-too-large"))
+                        }
+                        b"blob" => PathValue::Blob(content.to_vec()),
+                        b"tree" => PathValue::NotABlob(ObjectType::Tree),
+                        b"commit" => PathValue::NotABlob(ObjectType::Commit),
+                        b"tag" => PathValue::NotABlob(ObjectType::Tag),
+                        _ => return Err(failure("invalid-object-type")),
+                    },
+                };
+                answer.push(PathRead {
+                    path: path.clone(),
+                    value,
+                });
+            }
+            answers.push(answer);
+        }
+        if !rest.is_empty() {
+            return Err(failure("unexpected-path-output"));
+        }
+        Ok(Ok(answers))
+    }
 }
 
 #[cfg(test)]
@@ -2719,6 +2878,26 @@ mod tests {
         let text = fs::read_to_string(log).unwrap_or_default();
         (text.lines().filter(|l| l.contains("--show-origin")).count(),
          text.lines().filter(|l| l.contains("--show-object-format")).count())
+    }
+
+    #[test]
+    fn the_trusted_root_of_a_linked_worktree_is_its_main_checkout_and_spawns_no_git() {
+        let state = Temp::new();
+        let dir = Temp::new();
+        let logs = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        git(&dir.0, &["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "root"]);
+        let linked = dir.0.join("linked");
+        git(&dir.0, &["worktree", "add", "-q", linked.to_str().unwrap()]);
+        // Config a resolve refuses: the root never reads it.
+        git(&dir.0, &["config", "filter.external.clean", "touch /unreachable"]);
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        let log = log_git_children(&mut driver, &logs.0);
+        let main = fs::canonicalize(&dir.0).unwrap();
+        assert_eq!(driver.trusted_root(&linked).unwrap(), Some(main.clone()));
+        assert_eq!(driver.trusted_root(&main).unwrap(), Some(main));
+        assert_eq!(driver.trusted_root(&logs.0).unwrap(), None);
+        assert_eq!(fs::read_to_string(&log).unwrap_or_default(), "", "no Git child ran");
     }
 
     #[test]
@@ -3064,6 +3243,58 @@ mod tests {
         expect(causes(&resolve(&driver, &dir.0)), "alternate-object-unavailable");
     }
     #[test]
+    fn a_tree_listing_asks_the_object_kind_only_after_a_read_missed() {
+        let state = Temp::new();
+        let dir = Temp::new();
+        let logs = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        fs::create_dir(dir.0.join("d")).unwrap();
+        fs::write(dir.0.join("d/f"), "f").unwrap();
+        git(&dir.0, &["add", "."]);
+        git(&dir.0, &["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "root"]);
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        let log = log_git_children(&mut driver, &logs.0);
+        let repo = resolve(&driver, &dir.0);
+        let oid = |rev: &str| Oid::parse(String::from_utf8(git(&dir.0, &["rev-parse", rev])).unwrap().trim(), repo.object_format()).unwrap();
+        let kinds = || fs::read_to_string(&log).unwrap().lines().filter(|l| l.contains(" cat-file -t ")).count();
+        for prefix in [&b""[..], b"d/"] {
+            assert!(!driver.list_tree(&repo, &oid("HEAD"), prefix, None, 10).unwrap().entries.is_empty());
+        }
+        assert_eq!(kinds(), 0, "a commit's listing spends no call on its kind");
+        assert!(driver.list_tree(&repo, &oid("HEAD"), b"nope/x", None, 10).unwrap().entries.is_empty());
+        for prefix in [&b""[..], b"d/x"] {
+            let error = driver.list_tree(&repo, &oid("HEAD:d/f"), prefix, None, 10).unwrap_err();
+            assert_eq!(error.cause, "revision-not-commit-or-tree");
+        }
+        assert_eq!(kinds(), 3, "only the missed reads ask for the kind");
+    }
+    #[test]
+    fn a_main_checkout_lists_its_transport_policy_once_per_config_stamp() {
+        let state = Temp::new();
+        let dir = Temp::new();
+        let logs = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        git(&dir.0, &["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "root"]);
+        let linked = dir.0.join("linked");
+        git(&dir.0, &["worktree", "add", "-q", linked.to_str().unwrap()]);
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        driver.require_floor().unwrap();
+        let log = log_git_children(&mut driver, &logs.0);
+        let listings = || fs::read_to_string(&log).unwrap_or_default().lines().filter(|l| l.contains("--show-scope")).count();
+        let repo = resolve(&driver, &dir.0);
+        assert!(driver.transport_policy(&repo).unwrap().is_empty());
+        assert!(driver.transport_policy(&repo).unwrap().is_empty());
+        assert_eq!(listings(), 1, "an unchanged stamp answers from the first listing");
+        git(&dir.0, &["config", "http.sslCAInfo", "/unreachable"]);
+        assert_eq!(driver.transport_policy(&repo).unwrap(), vec!["http.sslcainfo"]);
+        assert_eq!(listings(), 2, "a config write is seen at once");
+        let linked = resolve(&driver, &linked);
+        let before = listings();
+        driver.transport_policy(&linked).unwrap();
+        driver.transport_policy(&linked).unwrap();
+        assert_eq!(listings() - before, 4, "a linked handle lists both contexts every time");
+    }
+    #[test]
     fn a_missing_tree_or_path_is_an_alternates_error_and_stays_absent_when_only_shallow() {
         // The tree and path reads answer a missing object themselves: with alternates the object
         // may live elsewhere, so absence is an error; a shallow boundary alone cuts history, not
@@ -3319,9 +3550,11 @@ mod tests {
     }
     /// Delegates to the machine's driver but can never empty a domain, as when
     /// a member is stuck in uninterruptible I/O.
+    #[cfg(unix)]
     struct UnemptiedDriver {
         inner: Box<dyn ContainmentDriver>,
     }
+    #[cfg(unix)]
     impl ContainmentDriver for UnemptiedDriver {
         fn name(&self) -> &'static str {
             self.inner.name()

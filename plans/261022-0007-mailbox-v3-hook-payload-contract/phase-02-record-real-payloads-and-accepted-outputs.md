@@ -170,6 +170,49 @@ Write the tests before recording. They fail at first (there are no fixtures yet)
    Delete nothing the CLIs own.
 10. **Commit:** regenerate the census, then commit `test(mailbox): record Claude Code, Codex and agy hook payloads as fixtures`. Sync at the end of the phase, run the proof, push.
 
+## Deviations and results (implementation lead, 2026-10-22)
+
+**Recorded.** 9 recorder invocations, 7 of them reaching a model: Claude Code 2.1.307 dump, accept, subagent; Codex 0.161.0 dump (failed at login, no model call); agy 1.4.4 dump (first attempt refused its flags before any model call, so it ran once more), accept, accept with the fallback shape, subagent. No other repeat.
+
+**Deviations from the steps above.**
+
+- **Claude version** is 2.1.307 (the plan saw 2.1.306); recorded as installed. `--setting-sources ""` was not tried: `--setting-sources project` in a workspace with no project settings loads nothing but `--settings`, and the transcripts show no hook but the recorder's.
+- **Tool prompt.** `printenv A B C` prints values without names, so a missing variable shifts the others. The prompt runs `env | grep -E '^(CODEX_THREAD_ID|CLAUDE_CODE_SESSION_ID|FGOS_SESSION_ID)='` instead, which keeps the names.
+- **agy flags.** agy 1.4.4 reads the word right after `-p` as the prompt, so the recorder puts `-p <prompt>` last. agy's transcript is `transcript_full.jsonl`, named by the payload's `transcriptPath`.
+- **Environment evidence file.** The raw directory is deleted at the end of the phase, so the id variables each hook process and tool process saw are kept in a redacted `env.json` per CLI (placeholders keep equality with the payloads). Phases 5 and 6 read it instead of raw ids.
+- **Extra fixture.** agy's subagent fires a Stop of its own; it is kept as `stop-subagent.json`.
+- **Empty strings** stay empty (they carry nothing); every other string outside the safe list becomes `<redacted>`.
+- **Codex: deferred, nothing recorded.** The `tetnu` account's Codex login is expired: every token refresh answered "refresh token was already used", then 401, so the dump run fired no hook. The `auth.json` link was intact and the account file's bytes unchanged after the run (checked by digest); no login was attempted. The accept and subagent runs were not made. Re-recording needs the owner to log that account in again.
+- **agy PostToolUse context: no shape accepted (step 5 stop).** Both candidates were refused before reaching the model; agy's log: `failed to unmarshal result ... via protojson: unknown field "additionalContext"` (flat), and the same for `hookSpecificOutput` (nested). The 1.4.4 binary's `PostToolHookResult` has only `overwriteResult`. agy 1.4.2 accepted `additionalContext` on 2026-10-19 (spec §7), so this changed between 1.4.2 and 1.4.4. The agy Stop block is accepted, and the agy payloads are recorded.
+- **`adapters.v1.json`** lists only Claude Code under `testedAgainst`; Codex and agy are under a new `deferred` list, each with its reason. The test `every_cli_of_the_first_slice_is_tested` became `every_cli_of_the_first_slice_is_tested_or_deferred_with_a_reason`: a CLI must sit in exactly one of the two lists, so no gap is silent.
+
+**Subagent evidence (owner question Q1).**
+
+- Claude Code: the subagent's PostToolUse carries `agent_id` and `agent_type`; it fires `SubagentStart`/`SubagentStop` and no `Stop` of its own; its tool process sees the head's `CLAUDE_CODE_SESSION_ID`. Q1 closes for Claude with no change.
+- agy: `invoke_subagent` starts a separate conversation; the subagent's PostToolUse and Stop carry no `agent_id`/`agent_type` and differ from the head's only by `conversationId`; it fires its own Stop (`executionNum` 0); its tool process sees no id variable. Q1 option A's condition ("no Stop of its own") fails, so the provisional default is C. A head-bound `conversationId` (the handle) would tell the two apart; that is a design input for the controller, not decided here.
+- Codex: not recorded (login).
+
+**Hook PID namespace** equals the recorder's for every recorded call (Claude, agy).
+
+**Left outside the raw directory** (not deleted): Claude transcripts under `~/.claude/projects/-tmp-fgos-work-mailbox-v3-record-claude-{dump,accept,subagent}-ws/`; five agy conversations under the `tetnu` agy home's `.gemini/antigravity-cli/brain/` and its `cache/last_conversations.json`. No agy `trustedWorkspaces` entry was found.
+
+## Codex recording (implementation lead, 2026-10-22, after phase 7's gates)
+
+- **Account:** `tetnu`, logged in again by the owner at 09:56; `tetcu72` stayed an unused fallback. Three runs (dump, accept, subagent), no repeat.
+- **Login guard, corrected by the plan owner.** A live account may refresh its tokens during a run, so the recorder no longer compares the account file's bytes. Before and after every run it checks that the run home's `auth.json` is still a symlink to the account's file (a refresh then writes the real file, never a copy) and that `codex login status` succeeds. All three runs: still a link, status ok.
+- **Results** (Codex 0.161.0): `PostToolUse` nested `hookSpecificOutput.additionalContext` injected (canary in the rollout's `response_item` developer message, echoed by the model); `Stop` block accepted (a second Stop with `stop_hook_active: true`, echoed); a subagent's event carries `agent_id` and `agent_type` and the head's `session_id`, it fires `SubagentStart`/`SubagentStop` and no Stop of its own; the hook process sees no id variable, while the tool process sees `CODEX_THREAD_ID` equal to the payload's `session_id`; hook PID namespace equals the recorder's.
+- **Codex is now under `testedAgainst`** and drained (phase 6). The evidence answers the plan owner's condition: a subagent marker and both shapes.
+- **Recorder changes:** `--account <name>`; `redact` keeps a CLI's existing `vectors`; the version in `source` is the bare `x.y.z`; `cmdRun` counts calls without listing a directory itself (the repository's assignment-tree listing guard flagged it).
+- **Guard refinement:** a `home` directory inside another path (Codex's isolated home under the run directory) is not a user's home, and `/` separates base64 runs so a path of short segments is not a secret; planted values (a foreign `/home/<x>/`, a long base64 run, an e-mail) are still caught.
+- **Left outside the raw directory:** nothing; Codex wrote its rollouts inside the run home, which was deleted.
+
+## Plan owner decisions (2026-10-22, after phase 3; plan owner (agent))
+
+1. **M4, one binding per head.** A second key from the same head replaces the old binding like a dead-head takeover: a new generation, its own name, `stop_blocks` 0, and mail queued for the old key is never shown to the new context. Implemented in phase 5 with its owning test.
+2. **agy drain deferred in V3, for every event.** An agy subagent carries no marker and fires its own Stop; under decision 1 a subagent's first hook would replace the head's binding and take its mail, which is worse than missing mail. The agy fixtures stay as contract evidence (parse tests only); agy stays under `deferred` in `adapters.v1.json` (no subagent marker; 1.4.4 refuses `additionalContext`). `overwriteResult` is rejected as a delivery channel: it rewrites a tool's real output with peer text and mixes trust levels. Q1 resolves as option C for agy. What would unblock agy: a payload field naming the parent conversation, or a hook scope that fires for the head conversation only.
+3. **Codex deferred** until the owner logs the `tetnu` account in again; Codex is not run. Its parse and render are built only where a report already recorded the real shape; everything else stays deferred.
+4. **Phases 4 to 7 continue** with Claude Code as the only live-proven adapter. Phase 7 runs the branch docs and the crate and workspace gates; `npm test` only if a Node file changes; no code-review step (the plan owner runs an independent review).
+
 ## Acceptance criteria
 
 - Fixtures exist for all three CLIs and both events, recorded on the installed versions with no version change during a run. Each `source` names the versions, date, commands, removed variables and the injection record types; `adapters.v1.json` lists the same versions.

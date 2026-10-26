@@ -1,3 +1,5 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/decision-relation.test.mjs — tsk-1lv-1: `fgos decision`
 // requires `--relation none|supersedes:<id>|touches:<id>` (D2/D8), refuses
 // a write whose text narrates a supersession without declaring one (STR72's
@@ -14,7 +16,6 @@
 // `decision` verb's own enforcement + sweep wiring, which live only in
 // bin/fgos.mjs, never in `addDecision` itself.
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -36,7 +37,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
 function tmpRepoRoot() {
-  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-relation-')));
+  return path.dirname(initializeWorkRepository(fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-relation-')))));
 }
 
 function run(cwd, args) {

@@ -274,6 +274,137 @@
    }
   },
   {
+   "id": "copy-reads-no-project-file-so-an-unmigrated-one-cannot-refuse-it",
+   "why": "spec 13: stage 1 concerns the global file and the machine files only; a project file that still holds gateway keys is neither read nor able to stop the copy half-way",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "raw": {
+     "project/.fgos/config.json": "{\"gateway\":{\"port\":1,\"token\":\"project-SENTINEL-0123\"}}\n"
+    },
+    "steps": [
+     {
+      "op": "copy"
+     }
+    ]
+   },
+   "expect": {
+    "paths": [
+     "gateway.token",
+     "runner.llmAccounts",
+     "runner.providers.gemini.accounts",
+     "runner.providers.codex.accounts",
+     "runner.providers.pi.accounts"
+    ],
+    "globalUnchanged": true,
+    "accounts": {
+     "runner": {
+      "llmAccounts": {
+       "claude": {
+        "work": {
+         "login": "~/.claude-work"
+        },
+        "home": {
+         "login": "~/.claude-home"
+        }
+       }
+      },
+      "providers": {
+       "gemini": {
+        "accounts": {
+         "g1": {
+          "login": "~/.gemini-1"
+         },
+         "g2": {
+          "login": "~/.gemini-2"
+         }
+        }
+       },
+       "codex": {
+        "accounts": {
+         "c1": {
+          "login": "~/.codex-1"
+         }
+        }
+       },
+       "pi": {
+        "accounts": {
+         "p1": {
+          "login": "~/.pi-1"
+         }
+        }
+       }
+      }
+     }
+    },
+    "accountsText": "[migrate] carried over from ~/.fgos/config.json, reason never recorded",
+    "token": "tok-SENTINEL-0123456789\n",
+    "modes": {
+     "private": "700",
+     "private/accounts.yaml": "600",
+     "private/gateway-token": "600"
+    }
+   }
+  },
+  {
    "id": "copy-then-snapshot-passes-and-the-destination-wins",
    "why": "spec 13: after the copy the key is in both files, the snapshot passes with a notice per key and the value comes from the accounts file",
    "input": {

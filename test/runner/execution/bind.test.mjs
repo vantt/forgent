@@ -142,7 +142,7 @@ function createMockRunnerConfig() {
 }
 
 // Seats as the resolver describes them: the posture, not the role name, decides how a seat may run.
-const POSTURE = { readOnly: false, writer: false, forceOutOfProcess: false, inlineAllowed: false, stance: false, verdict: false };
+const POSTURE = { readOnly: false, writer: false, forceOutOfProcess: false, stance: false, verdict: false };
 const CHECKER = { seat: 'reviewer', role: 'reviewer', posture: { ...POSTURE, readOnly: true, forceOutOfProcess: true, verdict: true } };
 const PANEL_MEMBER = { seat: 'member-9', role: 'producer', posture: { ...POSTURE, readOnly: true, forceOutOfProcess: true, stance: true } };
 const DEBATE_POSTURE = { ...POSTURE, readOnly: true, forceOutOfProcess: true };
@@ -390,41 +390,6 @@ test('bind: headless session refuses when no candidate executor is found', () =>
   assert.equal(result.refused.reason, 'headless-no-executor');
 });
 
-test('bind: lead session falls back to inline for producer when no candidates configured', () => {
-  const runnerConfig = createMockRunnerConfig();
-  const unit = {
-    id: 'u1',
-    capability: 'unknown:verb',
-    writes: ['src/foo.js'],
-  };
-  const ask = {
-    unit,
-    role: 'producer',
-  };
-  const ctx = { runnerConfig, session: { headless: false, hasNativeAgent: true, provider: 'claude' } };
-
-  const result = bind(ask, ctx);
-  assert.equal(result.mechanism, 'inline');
-  assert.equal(result.executor, 'claude');
-});
-
-test('bind: a seat whose posture forces it out of process NEVER gets inline mechanism', () => {
-  const runnerConfig = createMockRunnerConfig();
-  const unit = {
-    id: 'u1',
-    capability: 'unknown:verb',
-    writes: [],
-  };
-  const ask = {
-    unit,
-    ...CHECKER,
-  };
-  const ctx = { runnerConfig, session: { headless: false, hasNativeAgent: true, provider: 'claude' } };
-
-  const result = bind(ask, ctx);
-  assert.ok(result.refused); // Refuses rather than falling back to inline lead!
-});
-
 test('bind: in-process mechanism allowed for native agent without CLI', () => {
   const runnerConfig = createMockRunnerConfig();
   runnerConfig.capabilities['native:run'] = {
@@ -443,7 +408,7 @@ test('bind: in-process mechanism allowed for native agent without CLI', () => {
   assert.equal(result.mechanism, 'in-process');
 });
 
-test('bind: a blind role is never bound in-process or inline, and is refused with a named reason when nothing else is left', () => {
+test('bind: a blind role is never bound in-process, and is refused with a named reason when nothing else is left', () => {
   const runnerConfig = createMockRunnerConfig();
   runnerConfig.capabilities['native:run'] = { prefer: [{ executor: 'native-agent' }] };
   const unit = { id: 'u1', capability: 'native:run', writes: [] };
@@ -937,27 +902,18 @@ test('bind skills: an executor with no supports.skills declares none, and a unit
   assert.equal(plain.executor, 'codex');
 });
 
-test('bind skills: a live session lead never takes over a unit that needs skills', () => {
-  const unit = { id: 'u-skills', capability: 'docs:write', writes: ['README.md'], skills: ['kubectl'] };
-  const ctx = { runnerConfig: skillsConfig(), session: { headless: false, provider: 'claude', hasNativeAgent: true } };
-  assert.equal(bind({ unit, role: 'producer', independentOf: [] }, ctx).refused.reason, 'skills-unavailable');
-  // without the requirement the lead still takes the inline fallback when no candidate fits
-  const noPool = { ...ctx, runnerConfig: { ...skillsConfig(), capabilities: {} } };
-  assert.equal(bind({ unit: { ...unit, skills: undefined }, role: 'producer', independentOf: [] }, noPool).mechanism, 'inline');
-});
-
 test('bind skills: checker and panel seats are chosen on independence, not on the producer skills', () => {
   const unit = { id: 'u-skills', capability: 'docs:write', writes: [], skills: ['mermaid'] };
   const reviewer = bind({ unit, ...CHECKER, readOnly: true, independentOf: ['claude'] }, { runnerConfig: skillsConfig(), session: { headless: true } });
   assert.equal(reviewer.executor, 'codex');
 });
 
-test('bind: debate seats never run inline or in-process and are not asked for the unit skills', () => {
+test('bind: debate seats never run in-process and are not asked for the unit skills', () => {
   const runnerConfig = createMockRunnerConfig();
   const unit = { id: 'u-debate', capability: 'unknown:verb', writes: [] };
   const ctx = { runnerConfig, session: { headless: false, hasNativeAgent: true, provider: 'claude' } };
   for (const seat of ['thesis', 'antithesis', 'judge']) {
-    assert.ok(bind({ unit, seat, role: seat === 'judge' ? 'judge' : 'producer', posture: DEBATE_POSTURE }, ctx).refused, `${seat} is refused rather than falling back to the lead inline`);
+    assert.ok(bind({ unit, seat, role: seat === 'judge' ? 'judge' : 'producer', posture: DEBATE_POSTURE }, ctx).refused, `${seat} is refused when nothing serves it`);
   }
   const skilled = { id: 'u-skills', capability: 'docs:write', writes: [], skills: ['mermaid'] };
   const judge = bind({ unit: skilled, seat: 'judge', role: 'judge', posture: DEBATE_POSTURE, readOnly: true, independentOf: ['claude'] }, { runnerConfig: skillsConfig(), session: { headless: true } });
@@ -965,7 +921,7 @@ test('bind: debate seats never run inline or in-process and are not asked for th
   assert.equal(judge.mechanism, 'out-of-process');
 });
 
-// ---- ranking owned by Seat Binding: pins, effort, inline lead, continuity ----------------------------
+// ---- ranking owned by Seat Binding: pins, effort, continuity ----------------------------
 
 const pinnedConfig = (entry) => {
   const runnerConfig = createMockRunnerConfig();
@@ -1002,14 +958,6 @@ test('bind: an effort the executor does not declare, or its CLI cannot render, r
   blind.modelPolicies.claude.standard = [{ model: 'claude-3-5-sonnet', effort: 'high' }];
   const cannot = bind(implementAsk, { runnerConfig: blind, session: {} });
   assert.equal(cannot.refused.reason, 'effort-unsupported', 'the cell promises an effort no launch of this CLI can render');
-});
-
-test('bind: with a lead present and every configured candidate refused the seat is refused by name, never run inline', () => {
-  const runnerConfig = createMockRunnerConfig();
-  runnerConfig.governance = { disallowedExecutors: ['claude', 'codex', 'gemini-cli'] };
-  const result = bind({ ...implementAsk, posture: { ...POSTURE, writer: true, inlineAllowed: true } }, { runnerConfig, session: { headless: false, hasNativeAgent: true, provider: 'claude' } });
-  assert.equal(result.refused.reason, 'governance');
-  assert.equal(result.mechanism, undefined);
 });
 
 test('bind: a seat that keeps its candidate keeps executor, model and effort; a failure then refuses it instead of moving it', () => {

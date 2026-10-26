@@ -65,6 +65,12 @@ test('the static scan reports a Git spawn in each shape a literal search misses'
   assert.deepEqual(site.callers, ['src/caller.mjs:4']);
 });
 
+test('a command read through the config door is one configured binary, never a site and never a number', () => {
+  const { sites, classes } = scan({ root: path.join(PROBES, 'config-door-value') });
+  assert.deepEqual(sites, []);
+  assert.deepEqual(classes.filter((c) => c.path === 'src/run.mjs').map((c) => c.class), ['configured-binary']);
+});
+
 test('a declared standalone skill and text quoted into a data command are not sites', () => {
   // The skill is known by its own SKILL.md declaration: the same script in an undeclared skill is a site.
   const skills = scan({ root: path.join(PROBES, 'standalone-skill') });
@@ -98,6 +104,19 @@ test('the scan judges every file its root declares as product, whatever the dire
     // With no product declared at its root, every file of the tree is judged.
     fs.rmSync(path.join(root, 'package.json'));
     assert.ok(scan({ root }).sites.some((s) => s.path === 'test/z.test.mjs'));
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
+
+test('a Rust file in a crate-root examples or benches target is test code, a product directory called examples is not', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-one-door-examples-'));
+  try {
+    const write = (file, text) => { fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true }); fs.writeFileSync(path.join(root, file), text); };
+    const push = 'pub fn push() -> std::io::Result<std::process::Output> {\n    std::process::Command::new("git").args(["push", "origin", "main"]).output()\n}\n';
+    write('packages/demo/rust/Cargo.toml', '[package]\nname = "demo"\n');
+    write('packages/demo/rust/examples/bench.rs', push);
+    write('packages/demo/rust/benches/cost.rs', push);
+    write('packages/demo/rust/src/examples/live.rs', push);
+    assert.deepEqual(scan({ root }).sites.map((s) => s.path), ['packages/demo/rust/src/examples/live.rs']);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
 

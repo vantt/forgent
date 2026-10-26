@@ -46,7 +46,7 @@ import { closeCaseUnderHold } from './case-close.mjs';
 import { workflowPersonaScope } from './loader.mjs';
 import { unitFieldsOfTemplate } from './steps.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError, loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { leaseAdmission } from '../runner/documentation-cutover-lease.mjs';
 
 /** One log line for the events that mark a step's progress, null for every other event. */
@@ -366,7 +366,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                 overrides: await (async () => {
                   let unitAccount = state.account ?? null;
                   if (unitAccount !== null) {
-                    const runnerConfig = ensureRunnerConfigForDir(mainRoot);
+                    const runnerConfig = loadRunnerConfigForDir(mainRoot);
                     const testOverrides = unitOverridesOf(u, state.seats?.personas, {
                       effort: state.effort,
                       timeoutMs: state.timeoutMs,

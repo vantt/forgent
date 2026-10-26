@@ -80,26 +80,6 @@ runner:
       providerModel: z-ai
       supports:
         skills: ["ak:cook"]
-    gitnexus:
-      kind: tool
-      description: "Code-graph blast radius"
-      for: [impact-analysis]
-      scanTarget: ".gitnexus"
-      responsibility: Verification
-      invocations:
-        - via: mcp
-          command: "mcp:gitnexus"
-          tools:
-            impact-analysis: mcp__gitnexus__impact
-    herdr:
-      kind: tool
-      for: [pane-labeling]
-      responsibility: Chrome
-      description: "herdr pane label writer (herdr pane rename) for /fgOS:terminal"
-      invocations:
-        - via: cli
-          command: herdr
-          args: []
     openai:
       kind: agent
       description: "OpenAI provider, 2 bins merged into one executor (2026-09-17 provider-naming pass): codex CLI (native OpenAI Codex CLI) + pi CLI (multi-provider agent, --provider omitted -- each ~/.pi/accounts/<name> dir carries exactly one provider's credentials, confirmed via real invocation test). Invocation id = <bin>-<mode>-<account>, self-descriptive regardless of which bin actually runs. Both bins now use modelPolicies like every other executor."
@@ -356,7 +336,6 @@ runner:
     impact-analysis:
       description: "Code-graph blast radius"
       aliases: [impact_analysis, "Impact Analysis"]
-      prefer: gitnexus
     pane-labeling:
       description: "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
     advise:
@@ -364,6 +343,8 @@ runner:
       prefer:
         - executor: claude
           invocation: claude-cli-bwrap
+        - executor: openai
+          invocation: codex-cli-bwrap
       confinement:
         mode: required
         policy: host-write-denied
@@ -377,6 +358,7 @@ runner:
         - executor: deepseek
         - executor: glm
         - claude
+        - openai
       serves:
         outputKind: change
         mutates: true
@@ -390,13 +372,14 @@ runner:
         outputKind: finding
         mutates: false
     fgos-coding-implement:
-      description: "code-implement work for the coding domain executing stage -- preferred executor gemini through omp, claude as fallback."
+      description: "code-implement work for the coding domain executing stage -- preferred executor gemini through omp, claude then openai as fallback."
       prefer:
         - executor: gemini
           invocation: omp-herdr
         - executor: deepseek
         - executor: glm
         - claude
+        - openai
       tier: advanced
     "code:implement":
       description: "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)"
@@ -406,6 +389,7 @@ runner:
         - executor: deepseek
         - executor: glm
         - claude
+        - openai
       serves:
         outputKind: change
         domain: code
@@ -431,6 +415,7 @@ runner:
         - executor: deepseek
         - executor: glm
         - claude
+        - openai
       serves:
         outputKind: verification
         domain: code
@@ -454,6 +439,7 @@ runner:
         - executor: deepseek
         - executor: glm
         - claude
+        - openai
       serves:
         outputKind: change
         domain: code
@@ -695,6 +681,7 @@ runner:
         - executor: deepseek
         - executor: glm
         - claude
+        - openai
       description: "Workflow unit capability \"coding:implement\" -- declare a \"prefer\" pool to choose which executors serve it."
     "docs:write":
       description: "Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a \"prefer\" pool to choose which executors serve it."
@@ -707,12 +694,12 @@ runner:
     "code:*":
       roles:
         red-team:
-          prefer: [xai]
+          prefer: [xai, claude, openai]
       tier: advanced
     "marketing:*":
       roles:
         red-team:
-          prefer: [claude]
+          prefer: [claude, openai]
   # @fgos:doc The model each family uses at each tier, by family then tier.
   # @fgos:doc Tier ladder, weakest first:
   # @fgos:doc nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote
@@ -805,7 +792,7 @@ runner:
   defaults:
     # @fgos:doc The tier a seat runs at when nothing else names one. Values: nano | mini | standard | advanced | flagship | frontier. Default: standard.
     tier: standard
-  # @fgos:doc Milliseconds one run may take before it is stopped. Minimum: 60000. Maximum: 14400000. Default: 900000.
+  # @fgos:doc Milliseconds one run may take before it is stopped. Maximum: 14400000. Default: 900000.
   timeoutMs: 900000
   # @fgos:doc How many units run at once.
   parallel:

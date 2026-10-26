@@ -1,6 +1,5 @@
 {
   "cli": "agy",
-  "stdinPolicy": "null-device",
   "source": "real stderr line from an agy run",
   "vectors": [
     {

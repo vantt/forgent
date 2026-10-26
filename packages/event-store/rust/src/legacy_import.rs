@@ -1,17 +1,18 @@
 //! HEAD-only inventory and legacy publication. Git owns objects, refs and WAL.
 use crate::{
+    commit_memo::CommitMemo,
     envelope::Seal,
     errors::{invalid, Error, ErrorCode},
     layout::{Layout, StreamId},
     legacy::{self, LegacyEvent},
-    walk::{blob, git_error},
+    walk::{blobs, git_error},
 };
 use fgos_git::*;
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};
 use std::result::Result;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Inventory {
     pub from_commit: Oid,
@@ -40,15 +41,14 @@ pub fn inventory(port: &dyn Inspect, repo: &RepoHandle) -> Result<Inventory, Err
 }
 /// The existing pre-migration consumer roots; broad porting discovery belongs
 /// to migrate/doctor, never the routine admission/read path.
-fn consumer_inventory(port: &dyn Inspect, repo: &RepoHandle) -> Result<Inventory, Error> {
-    let head = port.resolve_head(repo).map_err(git_error)?;
-    let from_commit = committed_head(&head)?;
-    let refs = crate::refs::list(
-        port,
-        repo,
-        &[RefPrefix::parse("refs/fgos/legacy").map_err(|e| invalid(e.to_string()))?],
-    )?;
-    let hint = refs.iter().find_map(|r| {
+fn consumer_inventory(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    head: &HeadFact,
+    legacy_refs: &[RefEntry],
+) -> Result<Inventory, Error> {
+    let from_commit = committed_head(head)?;
+    let hint = legacy_refs.iter().find_map(|r| {
         if r.name.as_str() == "refs/fgos/legacy" {
             if let RefValue::Direct(oid) = &r.value {
                 return Some(oid);
@@ -113,14 +113,59 @@ fn committed_head(head: &HeadFact) -> Result<&Oid, Error> {
         HeadFact::Unborn { .. } => Err(invalid("migration requires a committed HEAD")),
     }
 }
+/// The tracked legacy files of one commit never change, so every read and
+/// admission of a process shares one inventory per commit and root set.
+static INVENTORIES: CommitMemo<Inventory> = CommitMemo::new();
+
 fn inventory_roots_at(
     port: &dyn Inspect,
     repo: &RepoHandle,
     from_commit: &Oid,
     roots: &[&[u8]],
 ) -> Result<Inventory, Error> {
+    let question = roots.join(&0u8);
+    INVENTORIES.get_or_compute(repo, from_commit, &question, || {
+        read_inventory_roots_at(port, repo, from_commit, roots)
+    })
+}
+/// The directory roots the commit does not track, answered by one Git read of
+/// all of them: listing a missing directory costs several Git processes to
+/// learn it is empty. Anything but a plain "absent" answer (a present path, an
+/// error of any kind) leaves the root to the listing, which owns the answer.
+fn absent_roots<'a>(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    from_commit: &Oid,
+    roots: &[&'a [u8]],
+) -> BTreeSet<&'a [u8]> {
+    let probed: Vec<(&[u8], Vec<u8>)> = roots
+        .iter()
+        .filter_map(|root| Some((*root, root.strip_suffix(b"/")?.to_vec())))
+        .filter(|(_, path)| !path.is_empty())
+        .collect();
+    if probed.is_empty() {
+        return BTreeSet::new();
+    }
+    let paths: Vec<_> = probed.iter().map(|(_, path)| path.clone()).collect();
+    let Ok(reads) = port.read_paths_at(repo, from_commit, &paths, 1) else {
+        return BTreeSet::new();
+    };
+    probed
+        .iter()
+        .zip(reads)
+        .filter(|(_, read)| matches!(read.value, PathValue::Absent))
+        .map(|((root, _), _)| *root)
+        .collect()
+}
+fn read_inventory_roots_at(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    from_commit: &Oid,
+    roots: &[&[u8]],
+) -> Result<Inventory, Error> {
     let mut entries = Vec::new();
-    for root in roots {
+    let absent = absent_roots(port, repo, from_commit, roots);
+    for root in roots.iter().filter(|root| !absent.contains(*root)) {
         let mut cursor = None;
         loop {
             let page = port
@@ -151,8 +196,8 @@ fn inventory_roots_at(
     let sibling = porting_log
         .as_ref()
         .map(|p| format!("{}state.json", p.strip_suffix("events.jsonl").unwrap()));
-    let mut files = BTreeMap::new();
     let mut migrated = false;
+    let mut wanted = Vec::new();
     for entry in entries {
         let path =
             std::str::from_utf8(&entry.path).map_err(|_| invalid("non-UTF8 tracked path"))?;
@@ -165,10 +210,16 @@ fn inventory_roots_at(
         if entry.kind != ObjectType::Blob || entry.mode != 0o100644 {
             return Err(invalid("legacy paths must be regular files"));
         }
+        wanted.push(entry.path);
+    }
+    // One Git process reads every legacy file of the commit, however many.
+    let mut files = BTreeMap::new();
+    for (path, bytes) in wanted.iter().zip(blobs(port, repo, from_commit, &wanted)?) {
         files.insert(
-            path.into(),
-            blob(port, repo, from_commit, &entry.path)?
-                .ok_or_else(|| invalid("legacy file disappeared"))?,
+            std::str::from_utf8(path)
+                .map_err(|_| invalid("non-UTF8 tracked path"))?
+                .to_owned(),
+            bytes.ok_or_else(|| invalid("legacy file disappeared"))?,
         );
     }
     Ok(Inventory {
@@ -294,6 +345,60 @@ fn import_files(inv: &Inventory) -> BTreeMap<String, Vec<u8>> {
         })
         .collect()
 }
+/// The id Git gives a tree of these entries, computed without writing the object.
+fn hashed_tree(driver: &GitDriver, repo: &RepoHandle, entries: &[TreeEntry]) -> Result<Oid, Error> {
+    let mut entries: Vec<_> = entries.iter().collect();
+    entries.sort_by_key(|e| {
+        let mut key = e.name.clone();
+        if e.mode == 0o040000 {
+            key.push(b'/');
+        }
+        key
+    });
+    let mut bytes = Vec::new();
+    for e in entries {
+        bytes.extend_from_slice(format!("{:o} ", e.mode).as_bytes());
+        bytes.extend_from_slice(&e.name);
+        bytes.push(0);
+        for pair in e.oid.as_str().as_bytes().as_chunks::<2>().0 {
+            bytes.push(u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap());
+        }
+    }
+    driver
+        .hash_object(repo, ObjectType::Tree, &bytes)
+        .map_err(git_error)
+}
+/// The id of the tree these full-path blobs form, nested by directory, without writing objects.
+fn nested_tree(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    blobs: &BTreeMap<Vec<u8>, Oid>,
+) -> Result<Oid, Error> {
+    let mut dirs = BTreeMap::<Vec<u8>, BTreeMap<Vec<u8>, Oid>>::new();
+    let mut entries = Vec::new();
+    for (path, oid) in blobs {
+        match path.iter().position(|b| *b == b'/') {
+            Some(i) => {
+                dirs.entry(path[..i].to_vec())
+                    .or_default()
+                    .insert(path[i + 1..].to_vec(), oid.clone());
+            }
+            None => entries.push(TreeEntry {
+                name: path.clone(),
+                mode: 0o100644,
+                oid: oid.clone(),
+            }),
+        }
+    }
+    for (name, children) in dirs {
+        entries.push(TreeEntry {
+            name,
+            mode: 0o040000,
+            oid: nested_tree(driver, repo, &children)?,
+        });
+    }
+    hashed_tree(driver, repo, &entries)
+}
 /// Compute migration identities without installing Git objects or changing refs.
 pub fn import_identity(
     driver: &GitDriver,
@@ -308,30 +413,7 @@ pub fn import_identity(
                     .hash_object(repo, ObjectType::Blob, bytes)
                     .map_err(git_error)
             },
-            &|entries| {
-                let mut entries: Vec<_> = entries.iter().collect();
-                entries.sort_by_key(|e| {
-                    let mut key = e.name.clone();
-                    if e.mode == 0o040000 {
-                        key.push(b'/');
-                    }
-                    key
-                });
-                let mut bytes = Vec::new();
-                for e in entries {
-                    bytes.extend_from_slice(format!("{:o} ", e.mode).as_bytes());
-                    bytes.extend_from_slice(&e.name);
-                    bytes.push(0);
-                    for pair in e.oid.as_str().as_bytes().as_chunks::<2>().0 {
-                        bytes.push(
-                            u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap(),
-                        );
-                    }
-                }
-                driver
-                    .hash_object(repo, ObjectType::Tree, &bytes)
-                    .map_err(git_error)
-            },
+            &|entries| hashed_tree(driver, repo, entries),
         )
     };
     let mut files = import_files(inv);
@@ -365,8 +447,8 @@ pub fn import_identity(
     Ok((data_tree, commit))
 }
 /// Authenticate the complete data tree (the legacy commit tree sans seal.json).
-pub fn verify_legacy_tree(port: &dyn Inspect, repo: &RepoHandle, oid: &Oid) -> Result<(), Error> {
-    let expected = match crate::walk::header(port, repo, oid)? {
+pub fn verify_legacy_tree(driver: &GitDriver, repo: &RepoHandle, oid: &Oid) -> Result<(), Error> {
+    let expected = match crate::walk::header(driver, repo, oid)? {
         Seal::Legacy {
             tree_of_fgos_events,
             ..
@@ -374,33 +456,30 @@ pub fn verify_legacy_tree(port: &dyn Inspect, repo: &RepoHandle, oid: &Oid) -> R
             .map_err(|e| invalid(e.to_string()))?,
         _ => return Err(invalid("expected legacy seal")),
     };
-    let entries =
-        |oid: &Oid, strip_seal: bool| -> Result<BTreeMap<Vec<u8>, (u32, String)>, Error> {
-            let mut out = BTreeMap::new();
-            for e in all_entries(port, repo, oid)? {
-                let p = std::str::from_utf8(&e.path).map_err(|_| invalid("legacy path UTF8"))?;
-                if strip_seal && p == "seal.json" {
-                    continue;
-                }
-                let directory = e.mode == 0o040000
-                    && e.kind == ObjectType::Tree
-                    && (p == "events"
-                        || p == "porting"
-                        || crate::export::allowed(&format!("{p}/events.jsonl")));
-                if !directory
-                    && (e.mode != 0o100644
-                        || e.kind != ObjectType::Blob
-                        || p == "seal.json"
-                        || !crate::export::allowed(p))
-                {
-                    return Err(invalid("unsafe legacy tree entry"));
-                }
-                out.insert(e.path, (e.mode, e.oid.as_str().into()));
-            }
-            Ok(out)
-        };
-    // Top directory OIDs also change if they contain an unrelated extra blob.
-    if entries(oid, true)? != entries(&expected, false)? {
+    // The listing is recursive: blobs carry full paths, directories appear as their own rows.
+    let mut blobs = BTreeMap::new();
+    for e in all_entries(driver, repo, oid)? {
+        let p = std::str::from_utf8(&e.path).map_err(|_| invalid("legacy path UTF8"))?;
+        if p == "seal.json" {
+            continue;
+        }
+        let directory = e.mode == 0o040000
+            && e.kind == ObjectType::Tree
+            && (p == "events"
+                || p == "porting"
+                || crate::export::allowed(&format!("{p}/events.jsonl")));
+        if directory {
+            continue;
+        }
+        if e.mode != 0o100644 || e.kind != ObjectType::Blob || !crate::export::allowed(p) {
+            return Err(invalid("unsafe legacy tree entry"));
+        }
+        blobs.insert(e.path, e.oid);
+    }
+    // The seal names the data tree by id only: that tree object exists only in the clone that ran
+    // the import, so every other clone recomputes the id from the published commit's own entries.
+    // Top directory ids also change if they contain an unrelated extra blob.
+    if nested_tree(driver, repo, &blobs)? != expected {
         return Err(invalid("legacy tree differs from seal.treeOfFgosEvents"));
     }
     Ok(())
@@ -584,14 +663,43 @@ pub fn import_legacy(
         serde_json::json!({"legacyRefOid":oid.as_str(),"sealDigest":seal.digest()?,"fromCommit":inv.from_commit.as_str(),"operationId":operation_id}),
     )
 }
-pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> Result<(), Error> {
+/// Refuses dirty or untracked migration inputs and a fence the checkout's
+/// ignore rules would keep out of the cutover commit. Returns the untracked
+/// legacy files that are empty: they hold no history, so they count as absent.
+pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> Result<Vec<String>, Error> {
+    if !driver
+        .ignored_paths(repo, &[b".fgos/events".to_vec()])
+        .map_err(git_error)?
+        .is_empty()
+    {
+        return Err(Error::new(
+            ErrorCode::EventStoreMigrationFenceIgnored,
+            "the ignore rules exclude .fgos/events, so the cutover commit cannot track the fence; re-include it (for example `!/.fgos/events` in .gitignore) and migrate again",
+        ));
+    }
+    let mut empty = vec![];
     let mut cursor = None;
     loop {
         let page = driver
-            .status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)
+            .status(
+                repo,
+                Untracked::All,
+                Submodules::Configured,
+                Ignored::Excluded,
+                cursor,
+                4096,
+            )
             .map_err(git_error)?;
         for e in page.entries {
             let p = std::str::from_utf8(&e.path).map_err(|_| invalid("status path UTF8"))?;
+            if e.untracked
+                && retired_path(p)
+                && std::fs::symlink_metadata(repo.trusted_main_root().join(p))
+                    .is_ok_and(|m| m.is_file() && m.len() == 0)
+            {
+                empty.push(p.to_owned());
+                continue;
+            }
             if retired_path(p)
                 || inv.files.contains_key(p)
                 || p == ".fgos/events"
@@ -601,7 +709,7 @@ pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> R
             }
         }
         if page.complete {
-            return Ok(());
+            return Ok(empty);
         }
         cursor = Some(
             page.next_cursor
@@ -615,13 +723,19 @@ pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> R
 pub fn write_readiness(driver: &GitDriver, repo: &RepoHandle, remote: &str) -> Result<(), Error> {
     let authority = crate::fence::authority(driver, repo)?;
     let repo = &authority;
-    if matches!(
-        driver.resolve_head(repo).map_err(git_error)?,
-        HeadFact::Unborn { .. }
-    ) {
+    // One listing answers the whole admission: the legacy refs and, for an attached HEAD within the
+    // listing, HEAD itself; otherwise HEAD is observed separately.
+    let prefix = |p| RefPrefix::parse(p).map_err(|e| invalid(e.to_string()));
+    let prefixes = [prefix("refs/fgos/legacy")?, prefix("refs/fgos/remotes/")?];
+    let (listed, listed_head) = crate::refs::list_with_head(driver, repo, &prefixes)?;
+    let head = match listed_head {
+        Some(head) => head,
+        None => driver.resolve_head(repo).map_err(git_error)?,
+    };
+    if matches!(head, HeadFact::Unborn { .. }) {
         return Ok(());
     }
-    let inv = consumer_inventory(driver, repo)?;
+    let inv = consumer_inventory(driver, repo, &head, &listed)?;
     if !inv.migrated {
         if inv.files.keys().any(|p| retired_path(p)) {
             return Err(Error::new(
@@ -631,7 +745,7 @@ pub fn write_readiness(driver: &GitDriver, repo: &RepoHandle, remote: &str) -> R
         }
         return Ok(());
     }
-    let pin = crate::fence::pinned_legacy(driver, repo)
+    let pin = crate::fence::pinned_at_head(driver, repo, &head)
         .map_err(|e| {
             Error::new(
                 ErrorCode::EventStoreRefspecMissing,
@@ -639,9 +753,7 @@ pub fn write_readiness(driver: &GitDriver, repo: &RepoHandle, remote: &str) -> R
             )
         })?
         .ok_or_else(|| invalid("fence missing"))?;
-    let prefixes = [RefPrefix::parse("refs/fgos/").map_err(|e| invalid(e.to_string()))?];
-    let refs = crate::refs::list(driver, repo, &prefixes)?;
-    let refs: Vec<_> = refs
+    let refs: Vec<_> = listed
         .iter()
         .filter(|e| {
             e.name.as_str() == "refs/fgos/legacy"
@@ -767,19 +879,20 @@ fn cutover_operation_id(repo: &RepoHandle, head: &str) -> Result<String, Error> 
         .map_err(|e| invalid(e.to_string()))?;
     for attempt in 1..=100_000 {
         let id = format!("{prefix}-{attempt}");
-        let outcome = if let Some(receipt) =
-            wal.compacted(&id).map_err(|e| invalid(e.to_string()))?
-        {
-            Some(receipt.outcome().map_err(|e| invalid(e.to_string()))?)
-        } else {
-            match wal.inspect(&id) {
-                Ok(chain) => chain.outcome().cloned(),
-                Err(fgos_git::wal::WalError::Io(e)) if e.kind() == std::io::ErrorKind::NotFound => {
-                    return Ok(id)
-                }
-                Err(e) => return Err(invalid(e.to_string())),
-            }
-        };
+        let outcome =
+            if let Some(receipt) = wal.compacted(&id).map_err(|e| invalid(e.to_string()))? {
+                Some(receipt.outcome().map_err(|e| invalid(e.to_string()))?)
+            } else if !wal.known_id(&id).map_err(|e| invalid(e.to_string()))? {
+                // Free, or a directory that never received record zero: a crash or
+                // refusal between mkdir and the intent left nothing to recover, and
+                // ScopedCommit reuses such a directory on its next begin.
+                return Ok(id);
+            } else {
+                wal.inspect(&id)
+                    .map_err(|e| invalid(e.to_string()))?
+                    .outcome()
+                    .cloned()
+            };
         // Only a settled no-effect attempt frees its id. An open chain, a commit
         // (even one whose HEAD was later reset by hand) and an effect-unknown
         // rejection keep the id, so Git's recovery refusal stays binding.

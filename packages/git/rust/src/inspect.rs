@@ -1194,6 +1194,46 @@ impl GitDriver {
             })
             .collect()
     }
+    /// The literal paths the main checkout's ignore rules exclude, whether or
+    /// not they exist yet; a tracked path is never ignored.
+    pub fn ignored_paths(&self, repo: &RepoHandle, paths: &[Vec<u8>]) -> Result<Vec<Vec<u8>>> {
+        // check-ignore reads its input as pathspecs and refuses literal mode,
+        // so a leading colon (pathspec magic) is refused here instead.
+        if paths.is_empty()
+            || paths.len() > 4096
+            || paths.iter().any(|p| p.is_empty() || p.contains(&0) || p.starts_with(b":"))
+            || paths.iter().map(|p| p.len() + 1).sum::<usize>() > LIMIT
+        {
+            return Err(failure("invalid-literal-path"));
+        }
+        let mut input = Vec::new();
+        for path in paths {
+            input.extend_from_slice(path);
+            input.push(0);
+        }
+        self.require_floor()?;
+        self.preflight(repo)?;
+        let out = self.invoke_input(
+            Some(repo),
+            repo.trusted_main_root(),
+            &["check-ignore", "-z", "--stdin"],
+            Policy::Inspect,
+            None,
+            true,
+            LIMIT,
+            Duration::from_secs(30),
+            &input,
+        )?;
+        // Exit 1 means no path is ignored; anything else but 0 is a failure.
+        if !out.success && out.code != Some(1) {
+            return Err(out.error("git-command-failed"));
+        }
+        let ignored = records(&out.stdout)?;
+        if ignored.iter().any(|p| !paths.iter().any(|q| q.as_slice() == *p)) {
+            return Err(failure("invalid-check-ignore-protocol"));
+        }
+        Ok(ignored.into_iter().map(<[u8]>::to_vec).collect())
+    }
     /// The earliest merge commit on the ancestry path from `ancestor` to
     /// `descendant` (both commits), or none.
     pub fn first_ancestry_merge(&self, repo: &RepoHandle, ancestor: &Oid, descendant: &Oid) -> Result<Option<Oid>> {

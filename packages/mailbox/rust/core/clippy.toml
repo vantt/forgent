@@ -1,0 +1,74 @@
+# clippy.toml - purity lint of the mailbox core.
+# This file replaces the workspace root `clippy.toml` for this crate only;
+# copy any root setting added later into it.
+# It narrows spec §4 rule 3 (the core performs no I/O and takes time and ids
+# as parameters) to the entry points listed here. Review still owns the rule.
+
+disallowed-methods = [
+    { path = "std::fs::read", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::read_to_string", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::read_dir", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::write", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::copy", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::rename", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::remove_file", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::remove_dir", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::remove_dir_all", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::create_dir", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::create_dir_all", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::metadata", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::symlink_metadata", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::canonicalize", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::hard_link", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::path::Path::exists", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::path::Path::try_exists", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::path::Path::is_file", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::path::Path::is_dir", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::path::Path::metadata", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::path::Path::read_dir", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::path::Path::canonicalize", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::env::var", reason = "spec §4 rule 3: inputs are parameters, not the environment" },
+    { path = "std::env::var_os", reason = "spec §4 rule 3: inputs are parameters, not the environment" },
+    { path = "std::env::vars", reason = "spec §4 rule 3: inputs are parameters, not the environment" },
+    { path = "std::env::vars_os", reason = "spec §4 rule 3: inputs are parameters, not the environment" },
+    { path = "std::env::args", reason = "spec §4 rule 3: inputs are parameters, not the environment" },
+    { path = "std::env::args_os", reason = "spec §4 rule 3: inputs are parameters, not the environment" },
+    { path = "std::env::current_dir", reason = "spec §4 rule 3: inputs are parameters, not the environment" },
+    { path = "std::env::set_current_dir", reason = "spec §4 rule 3: the core changes no process state" },
+    { path = "std::env::set_var", reason = "spec §4 rule 3: the core changes no process state" },
+    { path = "std::env::remove_var", reason = "spec §4 rule 3: the core changes no process state" },
+    { path = "std::env::temp_dir", reason = "spec §4 rule 3: inputs are parameters, not the environment" },
+    { path = "std::env::home_dir", reason = "spec §4 rule 3: inputs are parameters, not the environment" },
+    { path = "std::io::stdin", reason = "spec §4 rule 3: the core performs no I/O; stdout is the hook's frame channel" },
+    { path = "std::io::stdout", reason = "spec §4 rule 3: the core performs no I/O; stdout is the hook's frame channel" },
+    { path = "std::io::stderr", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::process::exit", reason = "spec §4 rule 3: the core never ends the process" },
+    { path = "std::process::abort", reason = "spec §4 rule 3: the core never ends the process" },
+    { path = "std::process::id", reason = "spec §4 rule 3: process identity is an opaque input" },
+    { path = "std::time::SystemTime::now", reason = "spec §4 rule 3: the current time is a parameter" },
+    { path = "std::time::Instant::now", reason = "spec §4 rule 3: the current time is a parameter" },
+    { path = "std::thread::sleep", reason = "spec §4 rule 3: the core never waits" },
+    { path = "std::thread::spawn", reason = "spec §4 rule 3: the core starts no thread" },
+]
+
+disallowed-types = [
+    { path = "std::fs::File", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::fs::OpenOptions", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::process::Command", reason = "spec §4 rule 3: the core starts no process" },
+    { path = "std::net::TcpStream", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::net::TcpListener", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::net::UdpSocket", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::os::unix::net::UnixStream", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::os::unix::net::UnixListener", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::os::unix::net::UnixDatagram", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::time::SystemTime", reason = "spec §4 rule 3: the current time is a parameter" },
+    { path = "std::time::Instant", reason = "spec §4 rule 3: the current time is a parameter" },
+]
+
+disallowed-macros = [
+    { path = "std::println", reason = "a stray print would land on the hook's stdout, the frame channel" },
+    { path = "std::eprintln", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::print", reason = "a stray print would land on the hook's stdout, the frame channel" },
+    { path = "std::eprint", reason = "spec §4 rule 3: the core performs no I/O" },
+    { path = "std::dbg", reason = "spec §4 rule 3: the core performs no I/O" },
+]

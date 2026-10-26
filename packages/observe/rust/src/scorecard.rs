@@ -10,6 +10,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeMap, HashMap};
 
+/// The observation source whose `run.settled` records the runs section counts.
+pub const RUN_RESULT_SOURCE: &str = "run-result";
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct CaseSection {
     pub name: String,
@@ -46,18 +49,6 @@ pub struct RunsSection {
     pub by_adapter: BTreeMap<String, RunStatusBuckets>,
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub by_role: BTreeMap<String, RunStatusBuckets>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct SessionsSection {
-    pub estimate: bool,
-    pub total_evaluated: u64,
-    pub active_count: u64,
-    pub assignments_p50: f64,
-    pub assignments_p90: f64,
-    pub duration_sec_p50: f64,
-    pub duration_sec_p90: f64,
-    pub first_pass_count: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
@@ -107,46 +98,18 @@ pub struct WorkSection {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct ComplexitySection {
-    pub lines_of_code: LocBreakdown,
-    pub protocols_used: u64,
-    pub protocols_defined: u64,
-    pub native_routes: usize,
-    pub total_routes: usize,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
-pub struct LocBreakdown {
-    pub total: u64,
-    pub runner: u64,
-    pub packages: u64,
-    pub apps: u64,
-    pub herdr_plugin: u64,
-    pub tests: u64,
-    pub other: u64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Scorecard {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub case: Option<CaseSection>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub runs: Option<Value>, // Value::String("n/a") or RunsSection
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub sessions: Option<Value>, // Value::String("n/a") or SessionsSection
     pub tokens: TokensSection,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub commits: Option<CommitsSection>,
-    pub friction: Value, // "n/a (pre-F5)"
-    pub complexity: ComplexitySection,
     pub work: Option<Value>, // Value::String("n/a") or WorkSection
     pub faults: FaultsSection,
     pub warnings: Vec<String>,
 }
-fn parse_iso_secs(s: &str) -> Option<i64> {
-    parse_iso_prefix_secs(s)
-}
-
 fn now_unix_secs() -> i64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -158,7 +121,7 @@ fn now_unix_secs() -> i64 {
 pub fn compute_case(cw: &CaseWindow) -> (CaseSection, Vec<String>) {
     let mut warnings = Vec::new();
     let duration_min = if let (Some(until_str), since_str) = (&cw.until, &cw.since) {
-        if let (Some(t0), Some(t1)) = (parse_iso_secs(since_str), parse_iso_secs(until_str)) {
+        if let (Some(t0), Some(t1)) = (parse_iso_prefix_secs(since_str), parse_iso_prefix_secs(until_str)) {
             let diff_sec = (t1 - t0).max(0);
             let min = (diff_sec as f64) / 60.0;
             if min > 24.0 * 60.0 {
@@ -174,7 +137,7 @@ pub fn compute_case(cw: &CaseWindow) -> (CaseSection, Vec<String>) {
         }
     } else {
         // Still open
-        if let Some(t0) = parse_iso_secs(&cw.since) {
+        if let Some(t0) = parse_iso_prefix_secs(&cw.since) {
             let now = now_unix_secs();
             let min = ((now - t0).max(0) as f64) / 60.0;
             if min > 24.0 * 60.0 {
@@ -211,7 +174,7 @@ pub fn compute_runs(observations: &[Observation]) -> RunsSection {
     let mut by_role: BTreeMap<String, RunStatusBuckets> = BTreeMap::new();
 
     for obs in observations {
-        if obs.source != "run-result" || obs.kind != "run.settled" {
+        if obs.source != RUN_RESULT_SOURCE || obs.kind != "run.settled" {
             continue;
         }
         let executor = obs
@@ -233,71 +196,23 @@ pub fn compute_runs(observations: &[Observation]) -> RunsSection {
 
         let classification = obs.attrs.get("classification").and_then(|v| v.as_object());
 
-        let category = obs
-            .attrs
-            .get("category")
-            .and_then(|v| v.as_str())
-            .or_else(|| {
-                classification
-                    .and_then(|c| c.get("outcome"))
-                    .and_then(|o| o.get("category"))
-                    .and_then(|s| s.as_str())
-            });
+        let category = obs.attrs.get("category").and_then(|v| v.as_str());
         let verdict = classification
             .and_then(|c| c.get("assessment"))
             .and_then(|a| a.get("verdict"))
             .and_then(|v| v.as_str())
             .unwrap_or("");
 
-        // Helper to update bucket based on category (single path)
         let classify = |b: &mut RunStatusBuckets| {
             b.total += 1;
-            if let Some(cat) = category {
-                match cat {
-                    "ok" => b.ok += 1,
-                    "infra" | "corrupt" => b.exec_failed += 1,
-                    "policy" => b.policy_refused += 1,
-                    "blocked" => b.blocked += 1,
-                    "verdict" => {
-                        if verdict == "inconclusive" {
-                            b.inconclusive += 1;
-                        } else {
-                            b.verdict_fail += 1;
-                        }
-                    }
-                    _ => b.unclassified += 1,
-                }
-            } else if let Some(cls) = classification {
-                let exec_status = cls
-                    .get("execution")
-                    .and_then(|e| e.get("status"))
-                    .and_then(|s| s.as_str())
-                    .unwrap_or("unknown");
-                let policy_disp = cls
-                    .get("policy")
-                    .and_then(|p| p.get("disposition"))
-                    .and_then(|d| d.as_str())
-                    .unwrap_or("allow");
-
-                if exec_status != "completed" {
-                    b.exec_failed += 1;
-                } else if policy_disp == "refuse" {
-                    b.policy_refused += 1;
-                } else if policy_disp == "needs-input" {
-                    b.exec_failed += 1;
-                } else if verdict == "findings" {
-                    b.verdict_fail += 1;
-                } else if verdict == "blocked" {
-                    b.blocked += 1;
-                } else if verdict == "pass" || verdict == "not-applicable" {
-                    b.ok += 1;
-                } else if verdict == "inconclusive" {
-                    b.inconclusive += 1;
-                } else {
-                    b.unclassified += 1;
-                }
-            } else {
-                b.unclassified += 1;
+            match category {
+                Some("ok") => b.ok += 1,
+                Some("infra" | "corrupt") => b.exec_failed += 1,
+                Some("policy") => b.policy_refused += 1,
+                Some("blocked") => b.blocked += 1,
+                Some("verdict") if verdict == "inconclusive" => b.inconclusive += 1,
+                Some("verdict") => b.verdict_fail += 1,
+                _ => b.unclassified += 1,
             }
         };
 
@@ -337,98 +252,6 @@ fn percentile(mut vals: Vec<f64>, p: f64) -> f64 {
         vals[0]
     } else {
         vals[(idx - 1).min(vals.len() - 1)]
-    }
-}
-
-/// Compute sessions section (#3, estimate: true)
-pub fn compute_sessions(observations: &[Observation]) -> SessionsSection {
-    // 1. Group observations by session id
-    let mut session_obs: HashMap<String, Vec<&Observation>> = HashMap::new();
-    for obs in observations {
-        if (obs.source == "coordination" || obs.source == "workflow")
-            && obs.subject.kind == crate::contract::SubjectKind::Session
-        {
-            session_obs
-                .entry(obs.subject.id.clone())
-                .or_default()
-                .push(obs);
-        }
-    }
-
-    let mut total_evaluated = 0u64;
-    let mut active_count = 0u64;
-    let mut first_pass_count = 0u64;
-    let mut assignments_counts = Vec::new();
-    let mut durations_sec = Vec::new();
-
-    for (_sess_id, events) in session_obs {
-        let result_linked_events: Vec<&&Observation> = events
-            .iter()
-            .filter(|e| e.kind == "session.result_linked")
-            .collect();
-
-        if result_linked_events.is_empty() {
-            // "Session có result-linked trong khung"
-            continue;
-        }
-
-        total_evaluated += 1;
-
-        // Check if session is active or terminal
-        let terminal_event = events.iter().find(|e| e.kind == "session.closed");
-        let is_active = terminal_event.is_none();
-        if is_active {
-            active_count += 1;
-        }
-
-        // Assignment count
-        let asgn_count = events
-            .iter()
-            .filter(|e| e.kind == "session.assignment")
-            .count() as f64;
-        assignments_counts.push(asgn_count);
-
-        // Duration: from first result-linked to last result-linked
-        let mut rl_ts: Vec<i64> = result_linked_events
-            .iter()
-            .filter_map(|e| parse_iso_secs(&e.ts))
-            .collect();
-        rl_ts.sort_unstable();
-        if let (Some(&first), Some(&last)) = (rl_ts.first(), rl_ts.last()) {
-            let diff = (last - first).max(0) as f64;
-            durations_sec.push(diff);
-        }
-
-        // firstPass = không có assignment của actor fixer và status completed hoặc partial
-        let has_fixer = events.iter().any(|e| {
-            e.kind == "session.assignment"
-                && e.attrs.get("actorId").and_then(|v| v.as_str()) == Some("fixer")
-        });
-
-        let status = terminal_event
-            .and_then(|e| e.attrs.get("status"))
-            .and_then(|v| v.as_str());
-        let is_completed_or_partial = matches!(status, Some("completed") | Some("partial"));
-
-        if !has_fixer && is_completed_or_partial {
-            first_pass_count += 1;
-        }
-    }
-
-    let assignments_p50 = percentile(assignments_counts.clone(), 50.0);
-    let assignments_p90 = percentile(assignments_counts, 90.0);
-    let duration_sec_p50 = percentile(durations_sec.clone(), 50.0);
-    let duration_sec_p90 = percentile(durations_sec, 90.0);
-
-    SessionsSection {
-        estimate: true,
-        total_evaluated,
-        active_count,
-        assignments_p50,
-        assignments_p90,
-        duration_sec_p50,
-        duration_sec_p90,
-        first_pass_count,
     }
 }
 
@@ -476,7 +299,7 @@ pub fn compute_tokens(observations: &[Observation]) -> TokensSection {
             {
                 sec.cache_read_input_tokens += c_read;
             }
-        } else if obs.source == "run-result" && obs.kind == "run.settled" {
+        } else if obs.source == RUN_RESULT_SOURCE && obs.kind == "run.settled" {
             // Token usage from RunResult for non-Claude executors
             if let Some(usage) = obs.attrs.get("usage").and_then(|v| v.as_object()) {
                 let usage_source = usage.get("source").and_then(|v| v.as_str());
@@ -640,7 +463,7 @@ pub fn compute_work(
             // #1: add -> delivered
             if let Some(dm) = delivered_move {
                 if let (Some(t_add), Some(t_del)) =
-                    (added_ts.and_then(parse_iso_secs), parse_iso_secs(&dm.ts))
+                    (added_ts.and_then(parse_iso_prefix_secs), parse_iso_prefix_secs(&dm.ts))
                 {
                     let diff_hours = ((t_del - t_add).max(0) as f64) / 3600.0;
                     add_to_delivered_hours.push(diff_hours);
@@ -681,7 +504,7 @@ pub fn compute_work(
                     });
                     if let Some(pd) = prev_doing {
                         if let (Some(t_start), Some(t_end)) =
-                            (parse_iso_secs(&pd.ts), parse_iso_secs(&m.ts))
+                            (parse_iso_prefix_secs(&pd.ts), parse_iso_prefix_secs(&m.ts))
                         {
                             let diff_hours = ((t_end - t_start).max(0) as f64) / 3600.0;
                             doing_to_approval_hours.push(diff_hours);
@@ -805,144 +628,27 @@ mod tests {
 
     #[test]
     fn test_compute_runs() {
-        let mut obs = Vec::new();
-        // 1. Ok run (verdict: pass)
-        obs.push(Observation {
+        let run = |id: &str, attrs: serde_json::Value| Observation {
             ts: "2026-09-01T00:00:00Z".to_string(),
             subject: Subject {
                 kind: SubjectKind::Run,
-                id: "r1".to_string(),
+                id: id.to_string(),
             },
             kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "claude",
-                "adapter": "herdr-spawn",
-                "role": "implementer",
-                "classification": {
-                    "execution": { "status": "completed" },
-                    "assessment": { "verdict": "pass" },
-                    "policy": { "disposition": "allow" }
-                }
-            }))
-            .unwrap(),
+            attrs: serde_json::from_value(attrs).unwrap(),
             source: "run-result",
-        });
-
-        // 2. Exec failed
-        obs.push(Observation {
-            ts: "2026-09-01T00:01:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: "r2".to_string(),
-            },
-            kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "claude",
-                "adapter": "herdr-spawn",
-                "classification": {
-                    "execution": { "status": "failed" },
-                    "assessment": { "verdict": "findings" },
-                    "policy": { "disposition": "allow" }
-                }
-            }))
-            .unwrap(),
-            source: "run-result",
-        });
-
-        // 3. Verdict fail
-        obs.push(Observation {
-            ts: "2026-09-01T00:02:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: "r3".to_string(),
-            },
-            kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "agy",
-                "classification": {
-                    "execution": { "status": "completed" },
-                    "assessment": { "verdict": "findings" },
-                    "policy": { "disposition": "allow" }
-                }
-            }))
-            .unwrap(),
-            source: "run-result",
-        });
-
-        // 4. Policy refused
-        obs.push(Observation {
-            ts: "2026-09-01T00:03:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: "r4".to_string(),
-            },
-            kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "agy",
-                "classification": {
-                    "execution": { "status": "completed" },
-                    "assessment": { "verdict": "pass" },
-                    "policy": { "disposition": "refuse" }
-                }
-            }))
-            .unwrap(),
-            source: "run-result",
-        });
-
-        // 5. Inconclusive
-        obs.push(Observation {
-            ts: "2026-09-01T00:04:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: "r5".to_string(),
-            },
-            kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "claude",
-                "classification": {
-                    "execution": { "status": "completed" },
-                    "assessment": { "verdict": "inconclusive" },
-                    "policy": { "disposition": "allow" }
-                }
-            }))
-            .unwrap(),
-            source: "run-result",
-        });
-
-        // 6. Blocked
-        obs.push(Observation {
-            ts: "2026-09-01T00:05:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: "r6".to_string(),
-            },
-            kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "claude",
-                "classification": {
-                    "execution": { "status": "completed" },
-                    "assessment": { "verdict": "blocked" },
-                    "policy": { "disposition": "allow" }
-                }
-            }))
-            .unwrap(),
-            source: "run-result",
-        });
-
-        // 7. Unclassified (no classification)
-        obs.push(Observation {
-            ts: "2026-09-01T00:06:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: "r7".to_string(),
-            },
-            kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(json!({
-                "executor": "claude"
-            }))
-            .unwrap(),
-            source: "run-result",
-        });
+        };
+        let verdict = |verdict: &str| json!({ "assessment": { "verdict": verdict } });
+        let obs = vec![
+            run("r1", json!({ "executor": "claude", "adapter": "herdr-spawn", "role": "implementer", "category": "ok" })),
+            run("r2", json!({ "executor": "claude", "adapter": "herdr-spawn", "category": "infra" })),
+            run("r3", json!({ "executor": "agy", "category": "verdict", "classification": verdict("findings") })),
+            run("r4", json!({ "executor": "agy", "category": "policy" })),
+            run("r5", json!({ "executor": "claude", "category": "verdict", "classification": verdict("inconclusive") })),
+            run("r6", json!({ "executor": "claude", "category": "blocked" })),
+            // The producer always writes `category`; a record without one is unclassified.
+            run("r7", json!({ "executor": "claude", "classification": verdict("pass") })),
+        ];
 
         let runs = compute_runs(&obs);
         assert_eq!(runs.total, 7);
@@ -957,118 +663,8 @@ mod tests {
 
         assert_eq!(runs.by_executor.get("claude").unwrap().total, 5);
         assert_eq!(runs.by_executor.get("agy").unwrap().total, 2);
-    }
-
-    #[test]
-    fn test_compute_sessions() {
-        let mut obs = Vec::new();
-        // Session 1: completed, no fixer -> firstPass = true
-        obs.push(Observation {
-            ts: "2026-09-01T10:00:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s1".to_string(),
-            },
-            kind: "session.opened".to_string(),
-            attrs: Default::default(),
-            source: "coordination",
-        });
-        obs.push(Observation {
-            ts: "2026-09-01T10:05:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s1".to_string(),
-            },
-            kind: "session.assignment".to_string(),
-            attrs: serde_json::from_value(json!({ "actorId": "doer", "assignmentId": "a1" }))
-                .unwrap(),
-            source: "coordination",
-        });
-        obs.push(Observation {
-            ts: "2026-09-01T10:10:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s1".to_string(),
-            },
-            kind: "session.result_linked".to_string(),
-            attrs: Default::default(),
-            source: "coordination",
-        });
-        obs.push(Observation {
-            ts: "2026-09-01T10:20:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s1".to_string(),
-            },
-            kind: "session.result_linked".to_string(),
-            attrs: Default::default(),
-            source: "coordination",
-        });
-        obs.push(Observation {
-            ts: "2026-09-01T10:25:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s1".to_string(),
-            },
-            kind: "session.closed".to_string(),
-            attrs: serde_json::from_value(json!({ "status": "completed" })).unwrap(),
-            source: "coordination",
-        });
-
-        // Session 2: active, has fixer -> firstPass = false
-        obs.push(Observation {
-            ts: "2026-09-01T11:00:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s2".to_string(),
-            },
-            kind: "session.opened".to_string(),
-            attrs: Default::default(),
-            source: "coordination",
-        });
-        obs.push(Observation {
-            ts: "2026-09-01T11:01:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s2".to_string(),
-            },
-            kind: "session.assignment".to_string(),
-            attrs: serde_json::from_value(json!({ "actorId": "fixer", "assignmentId": "a2" }))
-                .unwrap(),
-            source: "coordination",
-        });
-        obs.push(Observation {
-            ts: "2026-09-01T11:02:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s2".to_string(),
-            },
-            kind: "session.result_linked".to_string(),
-            attrs: Default::default(),
-            source: "coordination",
-        });
-
-        // Session 3: no result-linked -> should be ignored
-        obs.push(Observation {
-            ts: "2026-09-01T12:00:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Session,
-                id: "s3".to_string(),
-            },
-            kind: "session.opened".to_string(),
-            attrs: Default::default(),
-            source: "coordination",
-        });
-
-        let sec = compute_sessions(&obs);
-        assert!(sec.estimate);
-        assert_eq!(sec.total_evaluated, 2);
-        assert_eq!(sec.active_count, 1);
-        assert_eq!(sec.first_pass_count, 1);
-        assert_eq!(sec.assignments_p50, 1.0);
-        // duration for s1 is 10:20 - 10:10 = 10m = 600s; s2 is single result-linked so 0s
-        assert_eq!(sec.duration_sec_p50, 0.0);
-        assert_eq!(sec.duration_sec_p90, 600.0);
+        assert_eq!(runs.by_adapter.get("herdr-spawn").unwrap().total, 2);
+        assert_eq!(runs.by_role.get("implementer").unwrap().total, 1);
     }
 
     #[test]

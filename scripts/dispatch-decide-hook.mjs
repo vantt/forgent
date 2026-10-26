@@ -22,12 +22,27 @@
 // enforcement layer on TOP of a working dispatch surface, never a second
 // point of failure for it (same fail-open discipline
 // `~/.claude/hooks/scout-block.cjs` already uses for its own unexpected
-// errors).
+// errors). ONE failure fails CLOSED: `decide` refusing because the config
+// is unusable (a `config-*` refusal: it does not parse, breaks its schema
+// or sits in the wrong scope, docs/platform/config/spec.md section 11).
+// That is not a hiccup of the dispatch surface but a verdict on the
+// project, and allowing the guarded call would let it bypass the dispatch
+// rules the broken file declares; the block names the refusal ids and
+// `fgos config check`, which lists every one with its fix.
 
 import fs from 'node:fs';
 import { decideExecutorCli, runDoorHint } from '../src/runner/dispatch.mjs';
+import { isConfigRefusal } from '../src/config/facade.mjs';
+import { RunnerConfigError } from '../src/runner/dispatch/config.mjs';
 
 const AGENT_TOOL_NAMES = new Set(['Agent', 'Task']);
+
+/** The refusal ids of a config refusal (never a value: a refusal message carries ids, files and positions only), or null for any other failure. */
+function configRefusalText(err) {
+  if (isConfigRefusal(err)) return err.message;
+  if (err instanceof RunnerConfigError && typeof err.code === 'string' && err.code.startsWith('config-')) return err.code;
+  return null;
+}
 
 async function decideBlock() {
   const raw = fs.readFileSync(0, 'utf8');
@@ -50,8 +65,9 @@ async function decideBlock() {
   let decided;
   try {
     decided = await decideExecutorCli(undefined, { cwd: payloadCwd, for: subagentType, needsSoul: true, hasLiveTaskAccess: true });
-  } catch {
-    return null;
+  } catch (err) {
+    const refusal = configRefusalText(err);
+    return refusal === null ? null : { toolName, subagentType, refusal };
   }
   if (decided.mechanism === 'in-process') return null;
   return { toolName, subagentType, runDoor: runDoorHint({ cwd: payloadCwd, executorId: decided.executorId, capability: subagentType }) };
@@ -64,6 +80,13 @@ try {
   blocked = null; // fail-open -- see file header
 }
 
+if (blocked?.refusal) {
+  process.stderr.write(
+    `BLOCKED: this ${blocked.toolName} call cannot be routed because the config is unusable: ${blocked.refusal}. ` +
+      `Run \`fgos config check\` to list every refusal with its fix, correct the file, then retry.\n`,
+  );
+  process.exit(2);
+}
 if (blocked) {
   process.stderr.write(
     `BLOCKED: this ${blocked.toolName} call resolves to out-of-process dispatch (no native in-process handler for "${blocked.subagentType}"). ` +

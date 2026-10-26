@@ -80,3 +80,9 @@ Start and end: merge `origin/main`. Commits on the branch only, conventional, no
 - Claude Code may need a writable path outside HOME (for example `~/.cache` when HOME is honoured, or `$XDG_RUNTIME_DIR`): HOME is the private home; any other path found is added as a run-directory bind, never a host bind.
 - A mask over `~/.codex` hides the Codex binary unless the release directory is bound back: test 2's stub runs the real `codex --version` path check (no session) to prove it stays executable.
 - Rollback: the new module and test are new files; the `codex-auth-guard` extension is one function with its test.
+
+## Plan-owner decisions after the gate (2026-10-23)
+
+- G-SAFE passed (`plans/reports/research-261023-1135-mailbox-v6-preparation.md`).
+- W8 is no: outcome 3 is dropped from V6; recording the claim start is a V7 candidate, not built here.
+- Accepted touches outside the mailbox, to be listed in the closing report under "touches outside mailbox": the read-only Claude Code expiry reader in `src/runner/dispatch/provider-credential-renewal.mjs`.

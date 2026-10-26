@@ -21,7 +21,7 @@
 // a committed path.
 
 import { EXIT_CODES, categoryOf } from '../src/state/store.mjs';
-import { ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { resolveRepoRoot, runOnce, runWatch } from '../src/runner/loop.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 
@@ -93,10 +93,9 @@ async function main() {
   try {
     const flags = parseArgs(process.argv.slice(2));
     const repoRoot = resolveRepoRoot(process.cwd());
-    // The repo's own `.fgos/config.json` is the one runner config: every
-    // worker runs as a Unit run, which binds from it too. A missing config is
-    // bootstrapped (D1/D3, ensureRunnerConfigForDir — tsk-5vf D1/D2).
-    const config = ensureRunnerConfigForDir(repoRoot);
+    // The repo's own project config is the one runner config: every worker runs
+    // as a Unit run, which binds from it too. A project with none reads the standard.
+    const config = loadRunnerConfigForDir(repoRoot);
 
     if (flags.watch) {
       // Persistent mode (D8): the ONLY termination trigger is an explicit

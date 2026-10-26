@@ -17,12 +17,14 @@ function ranksOf(heldRanks) {
   }
   return ranks;
 }
+// The crate refuses rank 60 and a hot-lock depth on every route that takes ranks; only the entry points that pass no
+// ranks to native (they spawn Git themselves) need the depth refusal here.
+function outsideState() {
+  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
+}
 function outsideGate(heldRanks) {
   available();
-  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
-  const ranks = ranksOf(heldRanks);
-  if (ranks.includes(60)) throw refusal('event-store-seal-under-state');
-  return ranks;
+  return ranksOf(heldRanks);
 }
 function call(fn) {
   available();
@@ -40,7 +42,7 @@ function call(fn) {
   }
 }
 // serde_json's map representation does not preserve JavaScript insertion order.
-// Legacy view revisions depend on that order: parse the authenticated raw line.
+// Legacy view revisions depend on that order: parse the authenticated raw line (the read carries no parsed copy).
 function historical(result, key) {
   return { ...result, [key]: result[key].map(record => ({ ...record, event: JSON.parse(record.raw) })) };
 }
@@ -49,7 +51,7 @@ const prepared = new Map();
 export function prepareStore(cwd, { stateRoot, trustedMain, loaderOptions, config } = {}) {
   available();
   const settings = eventStoreConfig(config);
-  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
+  outsideState();
   if (typeof trustedMain !== 'string' || !trustedMain) throw refusal('event-store-trusted-main-required');
   const root = path.resolve(cwd);
   const trusted = path.resolve(trustedMain);
@@ -66,34 +68,52 @@ export function prepareStore(cwd, { stateRoot, trustedMain, loaderOptions, confi
 /** Open only an opaque root obtained from Git's resolver outside the gate. */
 export function openStore(resolvedRoot, machineId, files, loaderOptions, remote = 'origin') {
   available();
-  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
+  outsideState();
   const native = call(() => loadNativeAddon(loaderOptions).openStore(resolvedRoot, machineId, files, remote));
   const views = new WeakMap();
+  // The legacy history this store's last read returned, as the raw records native sent. The next read names its
+  // digest, and native sends the records again only when they changed; each read still gets its own parsed events.
+  let legacyHeld = null;
   const facade = {
     commonDir: resolvedRoot.commonDir,
     machineId,
     // null means this clone has no local store identity yet (no append).
     get ownOrigin() { return call(() => native.ownOrigin); },
+    /** Settle the store's write admission (the legacy-migration check) outside the gate, where Git may be asked.
+     * It never refuses by itself: the append that needs the answer raises it. */
+    admitWrites(heldRanks) {
+      const ranks = outsideGate(heldRanks);
+      call(() => native.admitWrites(ranks, hotLockDepth()));
+    },
     append(stream, events, cursor, writer, heldRanks) {
       available();
       const ranks = ranksOf(heldRanks);
       return call(() => native.append(stream, events, cursor, writer, ranks));
     },
     readInGate(origin, stream, cursorSeq) { return call(() => native.readInGate(origin, stream, cursorSeq)); },
-    read({ streams, cursor = null, folded = [], project = true }, heldRanks) {
+    /** `checkpoint: { path, reuse }` names the consumer's cache file of the history a complete read folded: a read
+     * that holds no retained history of its own continues from it (`reuse`), and every read replaces it when it
+     * certified new commits. A file that does not match the store is ignored; the answer never depends on it. */
+    read({ streams, cursor = null, folded = [], project = true, checkpoint }, heldRanks) {
       const ranks = outsideGate(heldRanks);
       const retained = JSON.stringify(folded);
-      const response = call(() => native.read({ streams, cursor, folded: retained, project, view: views.get(folded) }, ranks, hotLockDepth()));
-      const { sequencePrefix, ...result } = historical(response.result, 'legacy');
+      const response = call(() => native.read({ streams, cursor, folded: retained, project, view: views.get(folded), checkpoint,
+        legacyHeld: legacyHeld?.digest }, ranks, hotLockDepth()));
+      const { legacyUnchanged, ...answer } = response.result;
+      if (legacyUnchanged) answer.legacy = legacyHeld.records.map(record => ({ ...record, provenance: { ...record.provenance } }));
+      else legacyHeld = answer.cursor.legacyDigest ? { digest: answer.cursor.legacyDigest, records: answer.legacy } : null;
+      const { sequencePrefix, ...result } = historical(answer, 'legacy');
       // Preserve independent snapshots and use the exact bytes native verified,
       // including when a caller supplied objects with custom JSON serialization.
       result.sequence = (sequencePrefix ? JSON.parse(retained).slice(0, sequencePrefix) : []).concat(result.sequence);
       views.set(result.sequence, response.view);
       return result;
     },
-    seal(stream, heldRanks, { opportunistic = false } = {}) {
+    /** `checkpointPath` names the consumer's history checkpoint file: a seal that publishes new commits moves it to
+     * them, so the next read does not walk them again. The file is a cache; a failure is reported as `checkpointError`. */
+    seal(stream, heldRanks, { opportunistic = false, checkpointPath } = {}) {
       const ranks = outsideGate(heldRanks);
-      return call(() => native.seal(stream, ranks, hotLockDepth(), opportunistic));
+      return call(() => native.seal(stream, ranks, hotLockDepth(), opportunistic, checkpointPath));
     },
     sealIfDue(stream, intervalSec, heldRanks) {
       const ranks = outsideGate(heldRanks);
@@ -107,9 +127,10 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
       const ranks = outsideGate(heldRanks);
       return call(() => native.promote({ branch, throughSeq, cursor, writer, ts }, ranks, hotLockDepth()));
     },
-    sync({ remote = 'origin', noPush = false } = {}, heldRanks) {
+    /** `opportunistic` tries the seal lock and returns `{ busy: true }` instead of waiting when another process holds it. */
+    sync({ remote = 'origin', noPush = false, opportunistic = false } = {}, heldRanks) {
       const ranks = outsideGate(heldRanks);
-      return call(() => native.sync(remote, noPush, ranks, hotLockDepth()));
+      return call(() => native.sync(remote, noPush, ranks, hotLockDepth(), opportunistic));
     },
     maintenance(heldRanks) {
       const ranks = outsideGate(heldRanks);
@@ -139,30 +160,24 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
       const ranks = outsideGate(heldRanks);
       return call(() => native.legacyLayout(ranks, hotLockDepth()));
     },
-    unpublishedSummary(remote, heldRanks) {
-      const ranks = outsideGate(heldRanks);
-      return call(() => native.unpublishedSummary(remote, ranks, hotLockDepth()));
-    },
   };
   return Object.freeze(facade);
 }
 
 /** Read facts without requiring a machine id or creating a store. */
 export function eventStoreFacts(cwd, { stateRoot, trustedMain = cwd, remote = 'origin', loaderOptions } = {}) {
-  outsideGate([]);
+  available();
+  outsideState();
   return call(() => loadNativeAddon(loaderOptions).eventStoreFacts(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote));
 }
-export function ensureEventStoreRefspecs(cwd, { stateRoot, trustedMain = cwd, remote = 'origin', loaderOptions } = {}) {
-  outsideGate([]);
-  return call(() => loadNativeAddon(loaderOptions).ensureEventStoreRefspecs(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote));
-}
 export function eventStoreAddonAvailable(loaderOptions) {
-  outsideGate([]);
+  available();
+  outsideState();
   const native = call(() => loadNativeAddon(loaderOptions));
   return typeof native.resolveEventStore === 'function' && typeof native.openStore === 'function'
-    && typeof native.eventStoreFacts === 'function' && typeof native.ensureEventStoreRefspecs === 'function'
+    && typeof native.eventStoreFacts === 'function'
     && typeof native.eventStoreBranchKey === 'function'
-    && ['read', 'append', 'promote', 'sync', 'maintenance', 'status', 'exportJsonl', 'exportLegacyLayout', 'readLegacyFromHead', 'importLegacy', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
+    && ['read', 'append', 'admitWrites', 'promote', 'sync', 'maintenance', 'status', 'exportJsonl', 'exportLegacyLayout', 'readLegacyFromHead', 'importLegacy', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
 }
 
 /** Decode an explicit legacy inventory through the crate's frozen ordering rule. */

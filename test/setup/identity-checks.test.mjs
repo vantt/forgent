@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
-import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from '../../src/setup/identity-checks.mjs';
+import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from '../../src/setup/identity-checks.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
 
@@ -44,6 +44,15 @@ test('warns while no machine id exists, mints once on fix, then passes without r
   const second = fixIdentityMachineId(root, { stateRoot: state });
   assert.equal(second.changed, false);
   assert.equal(fs.readFileSync(path.join(state, 'machine-id'), 'utf8').trim(), id);
+});
+
+test('minting resolves a state root beneath symlinked ancestors to its canonical directory', (t) => {
+  const { root, state } = withStateRoot(t);
+  const linked = path.join(root, 'linked-state');
+  fs.symlinkSync(state, linked);
+  assert.equal(fixIdentityMachineId(root, { stateRoot: path.join(linked, 'nested') }).changed, true);
+  assert.equal(fixIdentityMachineId(root, { stateRoot: path.join(linked, 'nested') }).changed, false);
+  assert.match(fs.readFileSync(path.join(state, 'nested/machine-id'), 'utf8'), /^[a-z0-9-]+\n$/);
 });
 
 test('key row warns while no key exists, mints once on fix, then shows the fingerprint without replacing the key', (t) => {
@@ -84,7 +93,11 @@ test('pinned-machines row lists what the host reports and always passes', (t) =>
   fs.writeFileSync(path.join(state, 'identity', 'pins', 'peer-abc234'), JSON.stringify({
     v: 1, machineId: 'peer-abc234', publicKey: 'ssh-ed25519 AAAA', fingerprint: 'SHA256:abc', firstSeen: '2026-10-23T00:00:00.000Z',
   }));
-  assert.deepEqual(checkIdentityPinnedMachines(root, { hostBin: HOST }), { passed: true, message: '1 pinned: peer-abc234 SHA256:abc' });
+  assert.deepEqual(checkIdentityPinnedMachines(root, { hostBin: HOST }), { passed: true, message: '1 pinned (1 seen, not yet confirmed: peer-abc234): peer-abc234 SHA256:abc' });
+  fs.writeFileSync(path.join(state, 'identity', 'pins', 'peer-abc234'), JSON.stringify({
+    v: 1, machineId: 'peer-abc234', publicKey: 'ssh-ed25519 AAAA', fingerprint: 'SHA256:abc', firstSeen: '2026-10-23T00:00:00.000Z', state: 'confirmed', confirmedAt: '2026-10-24T00:00:00.000Z',
+  }));
+  assert.deepEqual(checkIdentityPinnedMachines(root, { hostBin: HOST }), { passed: true, message: '1 pinned (all confirmed): peer-abc234 SHA256:abc' });
 });
 
 test('fails when the machine id file is not a valid id', (t) => {
@@ -117,6 +130,32 @@ test('project id row warns while the repository has none, passes after the expli
   const broken = checkIdentityProjectId(repo, { hostBin: HOST });
   assert.equal(broken.passed, false);
   assert.match(broken.message, /project-id-unreadable|not a project file/);
+});
+
+test('shared-directory row reads only the cache: passes with counts, warns on dropped, foreign and shared-handle entries', (t) => {
+  const { root } = withStateRoot(t);
+  const repo = path.join(root, 'shared-dir');
+  fs.mkdirSync(path.join(repo, '.fgos', 'cache'), { recursive: true });
+  assert.deepEqual(checkIdentitySharedDirectory(repo), { passed: true, message: 'no shared directory yet' });
+  fs.writeFileSync(path.join(repo, '.fgos', 'project.json'), JSON.stringify({ v: 1, projectId: 'p1', handle: 'demo' }));
+  const cacheFile = path.join(repo, '.fgos', 'cache', 'identity-directory.json');
+  assert.equal(checkIdentitySharedDirectory(repo).message, 'no shared directory yet', 'a clone with no cache yet');
+  const entry = (id, projectId, handle) => ({ id: `${id}/s`, projectId, machine: { id, handle } });
+  const write = (entries, dropped) => fs.writeFileSync(cacheFile, JSON.stringify({ v: 1, fetchedAt: '2026-10-24T03:00:00.000Z', entries, dropped, verified: [] }));
+
+  write([entry('alpha-aaaaaa', 'p1', 'alpha'), entry('beta-bbbbbb', 'p1', 'beta')], []);
+  assert.deepEqual(checkIdentitySharedDirectory(repo), { passed: true, message: '2 machine(s), 2 entries, fetched 2026-10-24T03:00:00.000Z' });
+
+  write([entry('alpha-aaaaaa', 'p2', 'alpha'), entry('beta-bbbbbb', 'p1', 'beta-bbbbbb')], [{ reason: 'key-changed', machineId: 'gamma-cccccc' }]);
+  const warned = checkIdentitySharedDirectory(repo);
+  assert.equal(warned.passed, true);
+  assert.match(warned.message, /^warning: 2 machine\(s\), 2 entries/);
+  assert.match(warned.message, /1 dropped \(key-changed from gamma-cccccc\)/);
+  assert.match(warned.message, /1 of another project \(p2\)/);
+  assert.match(warned.message, /machine handle shared, shown by id: beta-bbbbbb/);
+
+  fs.writeFileSync(cacheFile, 'not json');
+  assert.equal(checkIdentitySharedDirectory(repo).message, 'no shared directory yet', 'an unreadable cache is rebuilt by the next read, not reported');
 });
 
 test('ids row passes on a clean registry and names each repeated id, title clash and file number', (t) => {

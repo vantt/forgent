@@ -9,7 +9,10 @@
 // the `init`-inside-worktree refusal, a bad `--dir`, and arg parsing. A
 // refusal raised inside a verb's own handler ("work X not found", an Iron Law
 // trip, a held lock) is correct behavior rather than misuse, and is never
-// recorded. The caller decides which is which by position and passes a
+// recorded. The two exceptions have no caller to read their failure: the end
+// trigger of a command (its answer is already printed) and the detached seal and
+// publish children (nobody waits for them); a failure of either leaves a record.
+// The caller decides which is which by position and passes a
 // `faultClass`; this module never inspects `message` to classify, because
 // that would couple the log to ~73 hand-written error strings.
 //
@@ -24,11 +27,10 @@
 //       store is absent, the record goes to the main checkout's existing
 //       store or nowhere.
 //
-// The log is `.fgos/`-resident but deliberately NOT `events.jsonl`: that file
-// is the rebuild source for all state, and a pure-observability record has no
-// business in it. It is also gitignored — `.fgos/` is only partly ignored and
-// `events.jsonl` is tracked on purpose, so without that entry every recorded
-// argv would be committed and pushed.
+// The log is `.fgos/`-resident but deliberately NOT a Work event: the Event
+// Store is the source of all Work state, and a pure-observability record has
+// no business in it. It is also gitignored — `.fgos/` is only partly ignored,
+// so without that entry every recorded argv would be committed and pushed.
 
 import fs from 'node:fs';
 import path from 'node:path';

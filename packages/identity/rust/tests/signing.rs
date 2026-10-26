@@ -2,6 +2,7 @@
 //! the real `ssh-keygen` on temporary state roots; never touches the real
 //! state root.
 
+use fgos_identity::pins::PinState;
 use fgos_identity::{pins, signing, Signature};
 use std::fs;
 use std::path::PathBuf;
@@ -186,4 +187,81 @@ fn pins_list_by_machine_forget_one_and_refuse_what_they_do_not_hold() {
     assert_eq!(refusal_of(pins::list(&verifier)).reason, "pins-unreadable");
     let again = signing::sign(&machine("alpha-aaaaaa"), BYTES).unwrap();
     assert_eq!(refusal_of(signing::verify(&verifier, BYTES, &again)).reason, "pins-unreadable", "a broken pin is never replaced by a new sighting");
+}
+
+#[test]
+fn a_pin_is_seen_until_the_owner_confirms_its_fingerprint_and_forgetting_resets_it() {
+    let signer = machine("alpha-aaaaaa");
+    let verifier = state_root();
+    let signature = signing::sign(&signer, BYTES).unwrap();
+    let fingerprint = signing::key_fingerprint(&signer).unwrap().unwrap();
+
+    assert_eq!(refusal_of(pins::confirm(&verifier, "alpha-aaaaaa", &fingerprint)).reason, "pin-missing");
+    let first = signing::verify(&verifier, BYTES, &signature).unwrap();
+    assert_eq!(first.state, PinState::Seen);
+    assert_eq!(pins::list(&verifier).unwrap()[0].confirmed_at, None);
+
+    let wrong = refusal_of(pins::confirm(&verifier, "alpha-aaaaaa", "SHA256:other"));
+    assert_eq!(wrong.reason, "fingerprint-mismatch");
+    assert!(wrong.detail.contains(&fingerprint) && wrong.detail.contains("SHA256:other"), "{}", wrong.detail);
+    assert_eq!(signing::verify(&verifier, BYTES, &signature).unwrap().state, PinState::Seen, "a refused confirm changes nothing");
+
+    let confirmed = pins::confirm(&verifier, "alpha-aaaaaa", &fingerprint).unwrap();
+    assert_eq!(confirmed.state, PinState::Confirmed);
+    let stamp = confirmed.confirmed_at.clone().expect("confirmedAt is set");
+    let after = signing::verify(&verifier, BYTES, &signature).unwrap();
+    assert_eq!((after.state, after.first_seen), (PinState::Confirmed, false));
+    assert_eq!(pins::confirm(&verifier, "alpha-aaaaaa", &fingerprint).unwrap().confirmed_at, Some(stamp), "confirming again is a no-op");
+    let raw = fs::read_to_string(pins::directory(&verifier).join("alpha-aaaaaa")).unwrap();
+    assert!(raw.contains("\"state\":\"confirmed\"") && raw.contains("\"confirmedAt\""), "{raw}");
+
+    pins::forget(&verifier, "alpha-aaaaaa").unwrap();
+    assert_eq!(refusal_of(pins::confirm(&verifier, "alpha-aaaaaa", &fingerprint)).reason, "pin-missing");
+    let again = signing::verify(&verifier, BYTES, &signature).unwrap();
+    assert_eq!((again.first_seen, again.state), (true, PinState::Seen));
+}
+
+#[test]
+fn a_pin_file_without_state_reads_as_seen_and_the_own_machine_verifies_as_confirmed() {
+    let verifier = state_root();
+    let signature = signing::sign(&machine("alpha-aaaaaa"), BYTES).unwrap();
+    let fingerprint = signing::fingerprint(&signature.public_key).unwrap();
+    fs::create_dir_all(pins::directory(&verifier)).unwrap();
+    let legacy = format!(
+        "{{\"v\":1,\"machineId\":\"alpha-aaaaaa\",\"publicKey\":\"{}\",\"fingerprint\":\"{fingerprint}\",\"firstSeen\":\"2026-10-23T00:00:00.000Z\"}}\n",
+        signature.public_key
+    );
+    fs::write(pins::directory(&verifier).join("alpha-aaaaaa"), legacy).unwrap();
+    assert_eq!(pins::list(&verifier).unwrap()[0].state, PinState::Seen);
+    assert_eq!(signing::verify(&verifier, BYTES, &signature).unwrap().state, PinState::Seen);
+
+    let own = machine("alpha-aaaaaa");
+    let mine = signing::sign(&own, BYTES).unwrap();
+    assert_eq!(signing::verify(&own, BYTES, &mine).unwrap().state, PinState::Confirmed);
+    assert_eq!(pins::list(&own).unwrap()[0].state, PinState::Confirmed, "the own pin is recorded as confirmed");
+}
+
+#[test]
+fn a_confirm_racing_a_forget_never_leaves_a_confirmed_pin_after_the_forget() {
+    for _ in 0..8 {
+        let signer = machine("alpha-aaaaaa");
+        let verifier = state_root();
+        signing::verify(&verifier, BYTES, &signing::sign(&signer, BYTES).unwrap()).unwrap();
+        let fingerprint = signing::key_fingerprint(&signer).unwrap().unwrap();
+        let barrier = Arc::new(Barrier::new(2));
+        let (confirm, forget) = std::thread::scope(|scope| {
+            let c = scope.spawn(|| {
+                barrier.wait();
+                pins::confirm(&verifier, "alpha-aaaaaa", &fingerprint)
+            });
+            let f = scope.spawn(|| {
+                barrier.wait();
+                pins::forget(&verifier, "alpha-aaaaaa")
+            });
+            (c.join().unwrap(), f.join().unwrap())
+        });
+        forget.unwrap();
+        assert!(confirm.is_ok() || confirm.unwrap_err().reason == "pin-missing");
+        assert!(pins::list(&verifier).unwrap().is_empty(), "a forgotten key stays forgotten");
+    }
 }

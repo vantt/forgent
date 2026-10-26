@@ -1,0 +1,189 @@
+{
+  "cli": "claude",
+  "source": "recorded 2026-10-23 from claude 2.1.309 on this machine by scripts/record-mailbox-hook-fixtures.mjs (redaction rules version 1); dump run: `claude -p --model haiku --dangerously-skip-permissions --setting-sources project --settings /run-dir/claude/dump/settings.json <prompt>` (exit 0); accept run: `claude -p --model haiku --dangerously-skip-permissions --setting-sources project --settings /run-dir/claude/accept/settings.json <prompt>` (exit 0); subagent run: `claude -p --model haiku --dangerously-skip-permissions --setting-sources project --settings /run-dir/claude/subagent/settings.json <prompt>` (exit 0); replaces the recording of 2026-10-22 from claude 2.1.308; replaces the recording of 2026-10-22 from claude 2.1.307; variables removed from the parent environment: FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID, CLAUDECODE; injection at PostToolUse (nested shape) matched record type attachment:hook_additional_context; types rejected as raw hook output: attachment:hook_success; model echoed the context canary: true; Stop block accepted by a continued Stop call: true; model echoed the Stop canary: true; hook PID namespace is the same as the recorder's; post-tool-use-subagent.json: recorded; the subagent fired no Stop of its own; user hooks that fired: none (--setting-sources project in a workspace with no project settings; the 2.1.309 transcripts hold no hook attachment but the recorder's own); subagent: its tool process saw the run's head CLAUDE_CODE_SESSION_ID (env.json subagentToolIdVars equals the session_id of post-tool-use-subagent.json), so the environment does not tell a subagent apart; agent-head run (2.1.309 (Claude Code)): `claude -p --model haiku --dangerously-skip-permissions --setting-sources project --settings /run-dir/claude/dump-agent-head/settings.json --agents '{\"mbx-head\":{\"description\":\"Mailbox fixture head agent\",\"prompt\":\"Follow the user instruction exactly.\"}}' --agent mbx-head <prompt>` (exit 0), the head session started with --agent; its own PostToolUse: agent_id absent, agent_type present; its own Stop: agent_id absent, agent_type present",
+  "vectors": [
+    {
+      "name": "head-stop-first-of-its-turn",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "stop",
+      "file": "stop.json",
+      "expect": {
+        "subordinate": false,
+        "firstStop": true,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "head-stop-continued-after-a-block",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "stop",
+      "file": "stop-continued.json",
+      "expect": {
+        "subordinate": false,
+        "firstStop": false,
+        "session": "00000000-0000-4000-8000-000000000003"
+      }
+    },
+    {
+      "name": "head-post-tool-use",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "expect": {
+        "subordinate": false,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "subagent-post-tool-use",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "post-tool-use",
+      "file": "post-tool-use-subagent.json",
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000006"
+      }
+    },
+    {
+      "name": "head-started-as-an-agent-stop",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "stop",
+      "file": "stop-agent-head.json",
+      "expect": {
+        "subordinate": false,
+        "firstStop": true,
+        "session": "00000000-0000-4000-8000-000000000010"
+      }
+    },
+    {
+      "name": "head-started-as-an-agent-post-tool-use",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "post-tool-use",
+      "file": "post-tool-use-agent-head.json",
+      "expect": {
+        "subordinate": false,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000010"
+      }
+    },
+    {
+      "name": "empty-input",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "stop",
+      "text": "",
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "not-json",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "text": "not json",
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "a-json-array",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "stop",
+      "json": [],
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "a-stop-sent-as-post-tool-use",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "stop.json",
+      "expect": {
+        "unparsed": "event-mismatch"
+      }
+    },
+    {
+      "name": "a-post-tool-use-cut-in-half",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "truncate": true,
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "agent-id-empty",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "agent_id": ""
+      },
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "agent-id-null",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "agent_id": null
+      },
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "agent-id-a-number",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "agent_id": 7
+      },
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "head-with-agent-type-alone",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "agent_type": "general-purpose"
+      },
+      "expect": {
+        "subordinate": false,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    }
+  ]
+}

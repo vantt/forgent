@@ -25,6 +25,7 @@ pub struct WorktreeHandle {
 }
 /// The pid a `git worktree lock` reason names: the number after a `pid`
 /// token (`pid 42`, `(pid=42`, `pid:42`). Generic, not tied to any harness.
+#[cfg(target_os = "linux")]
 fn pid_named_by(reason: &str) -> Option<u32> {
     let lower = reason.to_ascii_lowercase();
     let mut from = 0;
@@ -380,13 +381,13 @@ impl GitDriver {
                     _ => return Err(failure("worktree-custody-held-or-unknown")),
                 }
             }
+            Ok(())
         }
         #[cfg(not(unix))]
         {
             let _ = (repo, scope, path);
-            return Err(failure("git-lockscope-unavailable-windows"));
+            Err(failure("git-lockscope-unavailable-windows"))
         }
-        Ok(())
     }
     fn worktree_not_live(&self, path: &Path, warned: &mut BTreeSet<u32>) -> Result<()> {
         use fgos_process::facts::{scan, Scan, ScanFilter};
@@ -401,9 +402,7 @@ impl GitDriver {
                     }
                     if row.cwd.is_none()
                         && row.unreadable.iter().any(|s| s.starts_with("cwd:"))
-                        && cwd_owner_requires_judgment(row.effective_uid, unsafe {
-                            libc::geteuid()
-                        })
+                        && cwd_owner_requires_judgment(row.effective_uid, current_euid())
                     {
                         use fgos_process::facts::{observe, Observed};
                         if !matches!(observe(row.pid), Observed::Absent | Observed::Zombie)
@@ -447,20 +446,24 @@ impl GitDriver {
         if writer.is_empty() {
             return Err(failure("writer-required"));
         }
-        let mut resource_set = wal::worktree_resources(&kind)?;
-        let existing = match &kind {
-            OperationKind::WorktreeRemove { path, .. } => Some(path.as_ref()),
-            OperationKind::WorktreeMove { source, .. } => Some(source.as_ref()),
-            _ => None,
-        };
+        let resource_set = wal::worktree_resources(&kind)?;
         #[cfg(unix)]
-        if let Some(path) = existing {
-            if !missing(Path::new(path))? {
-            let custody = crate::refs::custody_lock_path(repo, Path::new(path))?;
-            resource_set.push(format!("worktree:{path}:custody:{}", custody.display()));
-            resource_set.sort();
+        let resource_set = {
+            let mut resource_set = resource_set;
+            let existing = match &kind {
+                OperationKind::WorktreeRemove { path, .. } => Some(path.as_ref()),
+                OperationKind::WorktreeMove { source, .. } => Some(source.as_ref()),
+                _ => None,
+            };
+            if let Some(path) = existing {
+                if !missing(Path::new(path))? {
+                    let custody = crate::refs::custody_lock_path(repo, Path::new(path))?;
+                    resource_set.push(format!("worktree:{path}:custody:{}", custody.display()));
+                    resource_set.sort();
+                }
             }
-        }
+            resource_set
+        };
         admission(wal, id, &resource_set)?;
         let request_digest =
             wal::canonical_digest(&(&kind, &old, &next, writer))?;
@@ -588,7 +591,7 @@ impl GitDriver {
         }
         #[cfg(not(unix))]
         {
-            let _ = (scope, parent, base, writer, id);
+            let _ = (repo, scope, parent, base, writer, id);
             Err(failure("git-lockscope-unavailable-windows"))
         }
     }
@@ -1601,18 +1604,34 @@ fn existing<F: wal::FileSystem>(wal: &Wal<F>, id: &str) -> Result<Option<wal::Ch
     }
 }
 
-fn cwd_owner_requires_judgment(owner: Option<u32>, current: u32) -> bool {
-    owner.is_none_or(|uid| uid == current)
+/// An unreadable cwd is outside this check's scope only when both owners are known and
+/// differ. An unknown owner, or no uid notion at all (Windows), is conservative: it needs
+/// judgment, so the warning is raised rather than dropped.
+fn cwd_owner_requires_judgment(owner: Option<u32>, current: Option<u32>) -> bool {
+    match (owner, current) {
+        (Some(owner), Some(current)) => owner == current,
+        _ => true,
+    }
+}
+#[cfg(unix)]
+fn current_euid() -> Option<u32> {
+    // SAFETY: geteuid has no preconditions and cannot fail.
+    Some(unsafe { libc::geteuid() })
+}
+#[cfg(not(unix))]
+fn current_euid() -> Option<u32> {
+    None
 }
 #[cfg(test)]
 mod review_tests {
     use super::*;
     #[test]
     fn unreadable_foreign_cwd_is_outside_scope_but_unknown_and_own_are_not() {
-        assert!(!cwd_owner_requires_judgment(Some(0), 1000));
-        assert!(!cwd_owner_requires_judgment(Some(1001), 1000));
-        assert!(cwd_owner_requires_judgment(Some(1000), 1000));
-        assert!(cwd_owner_requires_judgment(None, 1000));
+        assert!(!cwd_owner_requires_judgment(Some(0), Some(1000)));
+        assert!(!cwd_owner_requires_judgment(Some(1001), Some(1000)));
+        assert!(cwd_owner_requires_judgment(Some(1000), Some(1000)));
+        assert!(cwd_owner_requires_judgment(None, Some(1000)));
+        assert!(cwd_owner_requires_judgment(Some(1000), None));
     }
 }
 

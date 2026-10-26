@@ -18,7 +18,6 @@ use crate::driver;
 #[cfg(not(windows))]
 use crate::port::{NotBorrowerReason, BORROW_SLOT, LOCK_FD_ENV};
 use crate::port::{BorrowedCheck, Mode, Wait, DEFAULT_KILL_WAIT_MS};
-use crate::state_root;
 
 mod hold;
 
@@ -386,25 +385,9 @@ mod quiesce {
         dirs
     }
 
-    /// The argv names a fgOS payload, or runs something inside the workspace
-    /// (any argument that is a path under the root or one of its worktrees,
-    /// including `--cwd <path>`).
-    fn names_payload(argv: &[String], dirs: &[PathBuf], state_root: &Path) -> bool {
-        let under = |arg: &str| {
-            let p = Path::new(arg.split_once('=').map_or(arg, |(_, v)| v));
-            p.is_absolute() && dirs.iter().any(|d| p.starts_with(d))
-        };
-        argv.iter().any(|arg| {
-            let base = Path::new(arg).file_name().and_then(|n| n.to_str()).unwrap_or("");
-            arg.ends_with("bin/fgos.mjs")
-                || crate::origin::FGOS_BINARIES.contains(&base)
-                || Path::new(arg).starts_with(state_root.join("releases"))
-                || under(arg)
-        })
-    }
-
-    /// Explicit execution roots, rather than the installed payload's path,
-    /// establish workspace membership for C5. Resolve relative roots at cwd.
+    /// A typed execution root (`--dir`, `--worktree`, `--cwd`, `-C`) that
+    /// resolves inside the workspace. Only these typed values count; any other
+    /// argument, a prompt or a path, is text. Relative values resolve at cwd.
     fn workspace_argument(argv: &[String], cwd: Option<&Path>, dirs: &[PathBuf]) -> bool {
         argv.iter().enumerate().any(|(i, arg)| {
             let value = if let Some((key, value)) = arg.split_once('=') {
@@ -443,8 +426,27 @@ mod quiesce {
         let Some(argv) = argv else { return true };
         let Some(first) = argv.first() else { return false };
         let base = Path::new(first).file_name().and_then(|n| n.to_str()).unwrap_or("");
-        let versioned_node = base.strip_prefix("node").is_some_and(|rest| rest.is_empty() || rest.starts_with(|c: char| c.is_ascii_digit() || c == '.' || c == '-' || c == 'j'));
-        versioned_node || matches!(base, "bun" | "deno" | "fgos" | "fgos-runner" | "fgos-gateway")
+        crate::origin::is_script_runtime(base) || crate::origin::FGOS_BINARIES.contains(&base)
+    }
+
+    /// How a process belongs to one workspace, if it does: its cwd is inside
+    /// the workspace (`cwd`), or a typed execution root in its argv resolves
+    /// inside it (`cmdline`). Both count in workspace-only mode (the caller
+    /// filters what the process is); otherwise only for a process whose argv
+    /// could be fgOS, so an idle shell, an agent session or `git -C` is not a
+    /// writer. A process whose argv cannot be read still counts. Argument
+    /// text alone never counts.
+    fn workspace_hit(cmdline: Option<&[String]>, cwd: Option<&Path>, dirs: &[PathBuf], workspace_only: bool) -> Option<&'static str> {
+        if !workspace_only && !could_be_fgos(cmdline) {
+            return None;
+        }
+        if cwd.is_some_and(|cwd| dirs.iter().any(|d| cwd.starts_with(d))) {
+            Some("cwd")
+        } else if workspace_argument(cmdline.unwrap_or_default(), cwd, dirs) {
+            Some("cmdline")
+        } else {
+            None
+        }
     }
 
     /// Owner uid of `/proc/<pid>`: a process that made itself non-dumpable
@@ -472,9 +474,8 @@ mod quiesce {
         if !fgos_process::facts::pid_ns().is_initial {
             return emit(Some("unavailable"), json!({ "processes": [], "unreadable": 0, "detail": "the scan runs inside a PID namespace that hides the host's processes; run it from the host" }), EXIT_UNAVAILABLE);
         }
-        let state_root = state_root::state_root().0;
         let per_root: Vec<(PathBuf, Vec<PathBuf>)> = roots.iter().map(|r| (r.clone(), workspace_dirs(r, linked))).collect();
-        let filter = ScanFilter { env_keys: vec![state_root::PINNED_ROOT_ENV.to_string()], include_self: false };
+        let filter = ScanFilter { env_keys: Vec::new(), include_self: false };
         let views = match scan_processes(&filter) {
             Scan::Views(views) => views,
             Scan::Unsupported => {
@@ -488,26 +489,11 @@ mod quiesce {
                 continue;
             }
             let argv = view.cmdline.clone().unwrap_or_default();
-            // A process working in a given workspace is attributed to it; one
-            // that only carries the machine-wide pinned state root is a fgOS
-            // process of some workspace and blocks a stop-everything cutover
-            // all the same, without a root.
-            let mut hit: Option<(&str, Option<&Path>)> = None;
-            for (root, dirs) in &per_root {
-                if view.cwd.as_deref().is_some_and(|cwd| dirs.iter().any(|d| cwd.starts_with(d))) {
-                    hit = Some(("cwd", Some(root.as_path())));
-                } else if (workspace_only && workspace_argument(&argv, view.cwd.as_deref(), dirs))
-                    || (!workspace_only && names_payload(&argv, dirs, &state_root))
-                {
-                    hit = Some(("cmdline", Some(root.as_path())));
-                }
-                if hit.is_some() {
-                    break;
-                }
-            }
-            if !workspace_only && hit.is_none() && view.env_subset.contains_key(state_root::PINNED_ROOT_ENV) {
-                hit = Some(("environ", None));
-            }
+            // A process belongs to the workspace whose directory it works in
+            // or is directed into; a process of another workspace is not ours.
+            let hit = per_root.iter().find_map(|(root, dirs)| {
+                workspace_hit(view.cmdline.as_deref(), view.cwd.as_deref(), dirs, workspace_only).map(|matched| (matched, root.as_path()))
+            });
             match hit {
                 Some((matched, root)) => {
                     if workspace_only && view.cmdline.is_none() {
@@ -518,8 +504,9 @@ mod quiesce {
                         "startTime": view.tuple.as_ref().map(|t| t.start_time.clone()),
                         "cwd": view.cwd.as_ref().map(|c| c.to_string_lossy().into_owned()),
                         "cmdline": argv.join(" "),
+                        "argv": argv,
                         "matched": matched,
-                        "root": root.map(|r| r.to_string_lossy().into_owned()),
+                        "root": root.to_string_lossy(),
                     }));
                 }
                 None if !workspace_only && !view.unreadable.is_empty() && same_user(view.pid.0) && could_be_fgos(view.cmdline.as_deref()) => unreadable += 1,
@@ -538,7 +525,7 @@ mod quiesce {
     mod tests {
         use super::could_be_fgos;
         #[cfg(unix)]
-        use super::{workspace_argument, workspace_dirs};
+        use super::{workspace_argument, workspace_dirs, workspace_hit};
         #[cfg(unix)]
         use std::path::{Path, PathBuf};
 
@@ -589,6 +576,25 @@ mod quiesce {
                 "duplicates collapse and a vanished directory is kept as given"
             );
             std::fs::remove_dir_all(&base).unwrap();
+        }
+
+        #[cfg(unix)]
+        #[test]
+        fn a_cwd_in_the_workspace_counts_only_for_a_process_that_could_be_fgos() {
+            let dirs = vec![PathBuf::from("/workspace")];
+            let cwd = Some(Path::new("/workspace/sub"));
+            let hit = |parts: &[&str], only: bool| workspace_hit(Some(&argv(parts)), cwd, &dirs, only);
+            assert_eq!(hit(&["/usr/bin/zsh"], false), None, "an idle shell is not a writer");
+            assert_eq!(hit(&["claude"], false), None, "an agent session is not a writer");
+            assert_eq!(hit(&["node", "bin/fgos.mjs", "run"], false), Some("cwd"));
+            assert_eq!(hit(&["fgos", "run", "x"], false), Some("cwd"));
+            assert_eq!(hit(&["/usr/bin/zsh"], true), Some("cwd"), "workspace-only leaves the filtering to the caller");
+            assert_eq!(workspace_hit(None, cwd, &dirs, false), Some("cwd"), "an unreadable argv still counts");
+            assert_eq!(workspace_hit(Some(&argv(&["/usr/bin/zsh"])), Some(Path::new("/elsewhere")), &dirs, false), None);
+            let elsewhere = Some(Path::new("/elsewhere"));
+            assert_eq!(workspace_hit(Some(&argv(&["fgos", "run", "do /workspace/x", "/workspace/y"])), elsewhere, &dirs, false), None, "a prompt or positional path is text, not a root");
+            assert_eq!(workspace_hit(Some(&argv(&["fgos", "run", "--worktree", "/workspace/y"])), elsewhere, &dirs, false), Some("cmdline"), "a typed root counts");
+            assert_eq!(workspace_hit(Some(&argv(&["git", "-C", "/workspace"])), elsewhere, &dirs, false), None, "git is not fgOS outside workspace-only mode");
         }
 
         #[test]

@@ -1,13 +1,19 @@
 //! Machine files (spec sections 3, 8, 9): the private directory, the gateway token file, the
 //! accounts-only read and the mode findings of the four machine paths. File access reuses the
 //! no-follow primitives of Durable File; this module owns the rules and never echoes a value.
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
 
 use fgos_yaml_doc::Profile;
 use serde_json::{json, Map, Value};
 
+use crate::detect::{Detectors, NoDetectors};
 use crate::files::{read_beneath, FileError, PRIVATE_FILE_MODE};
-use crate::snapshot::{accounts_source, split_global, SnapshotError};
+use crate::schema::Schemas;
+use crate::session::session_class;
+use crate::snapshot::{accounts_source, machine_sources, split_global, SnapshotError};
+use crate::snapshot::{build, Context, SessionClass, Snapshot, SnapshotRequest};
+use crate::standard::Standard;
 use crate::ConfigRefusal;
 
 #[cfg(unix)]
@@ -45,6 +51,63 @@ pub fn ensure_private_dir(global_dir: &Path) -> Result<DirIdentity, SnapshotErro
     ensure_dir_beneath(parent, &dir.join("private"), PRIVATE_DIR_MODE)
         .and_then(|made| made.identity())
         .map_err(beneath)
+}
+
+/// The bundled schemas and standard, parsed once per process: immutable data, so there is nothing
+/// to go stale, and every in-process caller shares one copy instead of parsing 16 schemas and 15
+/// standard files per call. Only the detectors differ between callers.
+pub fn context(detectors: &dyn Detectors) -> Result<Context<'_>, ConfigRefusal> {
+    type Bundle = (Schemas, Standard, String);
+    static BUNDLE: OnceLock<Result<Bundle, ConfigRefusal>> = OnceLock::new();
+    let load = || -> Result<Bundle, ConfigRefusal> {
+        let (schemas, digest) = Schemas::bundled()?;
+        let standard = Standard::bundled(&schemas)?;
+        Ok((schemas, standard, digest))
+    };
+    let (schemas, standard, digest) = BUNDLE.get_or_init(load).as_ref().map_err(Clone::clone)?;
+    Ok(Context {
+        schemas,
+        standard,
+        digest,
+        detectors,
+    })
+}
+
+/// The effective value of the machine alone: the global file, the accounts file when unconfined and
+/// the standard, with the same scope and validation rules and no project file. A reader whose keys are
+/// `global-only` (the gateway) uses this, so a project file can never fail or change its value.
+pub fn snapshot(
+    ctx: &Context,
+    global_dir: &Path,
+    class: SessionClass,
+) -> Result<Snapshot, SnapshotError> {
+    // `build` reads only the class and the global directory from the request.
+    let none = PathBuf::new();
+    let req = SnapshotRequest {
+        project_root: none.clone(),
+        trusted_root: none,
+        global_dir: global_dir.into(),
+        class,
+    };
+    build(ctx, &req, &machine_sources(&req)?)
+}
+
+/// The effective value for one project, for an in-process reader that holds only its root and the
+/// process environment (`lookup`, like `session_class`): the global directory is `$HOME/.fgos` and the
+/// class comes from the confined marker. The root is also the trusted root: the caller passes the
+/// main checkout.
+pub fn project_snapshot(
+    root: &Path,
+    lookup: impl Fn(&str) -> Option<String>,
+) -> Result<Snapshot, SnapshotError> {
+    let home = lookup("HOME").ok_or_else(|| std::io::Error::other("HOME is not set"))?;
+    let req = SnapshotRequest {
+        project_root: root.into(),
+        trusted_root: root.into(),
+        global_dir: Path::new(&home).join(".fgos"),
+        class: session_class(lookup),
+    };
+    crate::snapshot::snapshot(&context(&NoDetectors)?, &req)
 }
 
 /// A token or other secret value carried in process: no `Display`, and `Debug` shows none of it.
@@ -133,7 +196,7 @@ pub mod token {
 
 pub mod accounts {
     use super::*;
-    use crate::snapshot::{build, AccountsState, Context, SessionClass, SnapshotRequest};
+    use crate::snapshot::AccountsState;
 
     /// The account pools: `{runner: {llmAccounts, providers: {<name>: {accounts}}}}`, the plain
     /// data the account readers consume, and whether the file exists.

@@ -27,7 +27,6 @@ import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { HotLockError, hotLockDepth, enterHotLock } from '../holder-lock/hot-guard.mjs';
 export { HotLockError, hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
-import { appendEventCore } from './event-log.mjs';
 
 const RESOURCES = Object.freeze(['state', 'porting-events']);
 const WAIT_TIMEOUT_MS = 5000;
@@ -236,31 +235,42 @@ function underDir(fgosDir, target) {
   return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel);
 }
 
-function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eventStore = null, extraRoots = [] } = {}) {
+/** An exact ISO time as `Date#toISOString` writes it (`YYYY-MM-DDTHH:mm:ss.sssZ`), the only form an imported event keeps. */
+export function isExactIsoTime(value) {
+  return typeof value === 'string' && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString() === value;
+}
+
+function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, extraRoots = [], readRoots = [], stageEffects = false, commitEvents = null, afterApply = null } = {}) {
   let live = true;
   const roots = [fgosDir, ...extraRoots];
-  const guard = (target) => {
+  const effects = [];
+  const events = [];
+  const stagedFiles = stageEffects ? new Map() : null;
+  let staging = stageEffects;
+  const effect = (apply) => { if (staging) effects.push(apply); else return apply(); };
+  const guard = (target, reading = false) => {
     if (!live) throw new HotLockError('state-tx-revoked', 'the state transaction was used after its callback returned');
-    if (target !== undefined && !roots.some((root) => underDir(root, target))) {
+    if (target !== undefined && ![...roots, ...(reading ? readRoots : [])].some((root) => underDir(root, target))) {
       throw new HotLockError('state-tx-path-outside', `"${target}" is not under ${fgosDir}; a state transaction touches only its own .fgos`);
     }
   };
   const tx = {
     fgosDir: path.resolve(fgosDir),
     mainFgosDir,
-    eventStore,
     head,
     writer,
-    /** Append one event; same seq/hash derivation as the plain append. */
-    append(logPath, opts) {
-      guard(logPath);
-      return appendEventCore(logPath, opts, fgosDir, tx);
-    },
-    /** One already-built log line (the primitive `append` writes through). */
-    appendLine(logPath, line) {
-      guard(logPath);
-      fs.mkdirSync(path.dirname(logPath), { recursive: true });
-      fs.appendFileSync(logPath, line, 'utf8');
+    /** Only a prepared consumer gate may acknowledge typed events. */
+    append(opts) {
+      guard();
+      if (!staging || !commitEvents) throw new HotLockError('state-tx-consumer-required', 'append requires a prepared consumer gate');
+      if (typeof opts?.type !== 'string' || !opts.type.trim()) throw new HotLockError('validation', 'event type is required');
+      // An import of historical events keeps each one's original time; every other write is stamped now.
+      if (opts.ts !== undefined && !isExactIsoTime(opts.ts)) {
+        throw new HotLockError('validation', 'event ts must be an ISO time (YYYY-MM-DDTHH:mm:ss.sssZ)');
+      }
+      const event = { type: opts.type.trim(), payload: structuredClone(opts.payload ?? null), ts: opts.ts ?? new Date().toISOString() };
+      events.push(event);
+      return event;
     },
     writeJson(target, value) {
       tx.writeText(target, `${JSON.stringify(value, null, 2)}\n`);
@@ -268,15 +278,48 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
     /** Replace `target` with `text` atomically (temp file, then rename). */
     writeText(target, text) {
       guard(target);
-      fs.mkdirSync(path.dirname(target), { recursive: true });
-      const tmp = `${target}.tmp-${uniqueTmpTag()}`;
-      fs.writeFileSync(tmp, text, 'utf8');
-      fs.renameSync(tmp, target);
+      if (staging) stagedFiles.set(path.resolve(target), String(text));
+      effect(() => {
+        fs.mkdirSync(path.dirname(target), { recursive: true });
+        const tmp = `${target}.tmp-${uniqueTmpTag()}`;
+        fs.writeFileSync(tmp, text, 'utf8');
+        fs.renameSync(tmp, target);
+      });
+    },
+    readText(target) {
+      guard(target, true);
+      const key = path.resolve(target);
+      if (staging && stagedFiles.has(key)) {
+        const text = stagedFiles.get(key);
+        if (text === null) throw Object.assign(new Error(`ENOENT: ${target}`), { code: 'ENOENT' });
+        return text;
+      }
+      return fs.readFileSync(target, 'utf8');
+    },
+    exists(target) {
+      guard(target, true);
+      const key = path.resolve(target);
+      return staging && stagedFiles.has(key) ? stagedFiles.get(key) !== null : fs.existsSync(target);
+    },
+    /** The files directly inside `target`, as a read without a transaction would list them (never subdirectories). */
+    list(target) {
+      guard(path.join(target, '.'), true);
+      let names;
+      try {
+        names = new Set(fs.readdirSync(target, { withFileTypes: true }).filter(entry => entry.isFile()).map(entry => entry.name));
+      } catch (error) { if (error.code !== 'ENOENT') throw error; names = new Set(); }
+      if (staging) for (const [file, text] of stagedFiles) {
+        if (path.dirname(file) === path.resolve(target)) {
+          if (text === null) names.delete(path.basename(file));
+          else names.add(path.basename(file));
+        }
+      }
+      return [...names].sort();
     },
     readJson(target) {
-      guard(target);
+      guard(target, true);
       try {
-        return JSON.parse(fs.readFileSync(target, 'utf8'));
+        return JSON.parse(tx.readText(target));
       } catch (err) {
         if (err.code === 'ENOENT') return null;
         throw err;
@@ -286,21 +329,49 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
     rename(from, to) {
       guard(from);
       guard(to);
-      fs.mkdirSync(path.dirname(to), { recursive: true });
-      fs.renameSync(from, to);
+      if (staging) {
+        const text = tx.readText(from);
+        stagedFiles.set(path.resolve(from), null);
+        stagedFiles.set(path.resolve(to), text);
+      }
+      effect(() => {
+        fs.mkdirSync(path.dirname(to), { recursive: true });
+        fs.renameSync(from, to);
+      });
     },
     unlink(target) {
       guard(target);
-      try {
-        fs.unlinkSync(target);
-        return true;
-      } catch (err) {
-        if (err.code === 'ENOENT') return false;
-        throw err;
-      }
+      const existed = staging ? tx.exists(target) : undefined;
+      if (staging) stagedFiles.set(path.resolve(target), null);
+      const removed = effect(() => {
+        try { fs.unlinkSync(target); return true; }
+        catch (err) { if (err.code !== 'ENOENT') throw err; return false; }
+      });
+      return staging ? existed : removed;
     },
   };
-  return { tx, revoke: () => { live = false; } };
+  return {
+    tx,
+    commit() {
+      // A refusal leaves every effect unapplied. Only the consumer knows how
+      // to acknowledge its staged event batch; the mutex owns effect ordering.
+      if (!stageEffects) return;
+      try {
+        commitEvents?.(tx, events);
+        staging = false;
+        for (const apply of effects) apply();
+        afterApply?.(tx);
+      } catch (cause) {
+        // Once the consumer has acknowledged the batch, it is durable: a failing effect or cache write must
+        // not look like a refused mutation, because a caller that retries would append the events twice.
+        if (!tx.acked) throw cause;
+        throw new HotLockError('event-store-acked-effects-incomplete',
+          `the events were acknowledged but a later effect failed: ${cause?.message ?? cause}; do not retry the mutation`,
+          { ackedEvents: tx.acked, cause });
+      }
+    },
+    revoke: () => { live = false; },
+  };
 }
 
 /**
@@ -312,6 +383,7 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
  * caller did not pass it. A reentrant call throws `hot-lock-reentry` at once.
  * `prefetched.extraRoots` lists further directories the transaction may write
  * under (a log directory that is not the lock's own `.fgos`).
+ * `prefetched.readRoots` grants only reads, e.g. already-resolved Git refs.
  */
 export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} } = {}) {
   assertResource(resource);
@@ -321,18 +393,32 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
   const writer = prefetched.writer ?? resolveWriterIdentity(fgosDir).id;
   const paths = acquireRecord(fgosDir, resource, recordOfSelf(writer));
   const leaveHotLock = enterHotLock();
-  const { tx, revoke } = createTx(fgosDir, { ...prefetched, writer });
+  const { tx, commit, revoke } = createTx(fgosDir, { ...prefetched, writer });
   let result;
+  let failure;
   try {
     result = fn(tx);
+    if (result && typeof result.then === 'function') {
+      result.then(undefined, () => {});
+      throw new HotLockError('state-tx-async', `${resource}: the transaction callback must be synchronous`);
+    }
+    commit();
+  } catch (error) {
+    failure = { error };
+    throw error;
   } finally {
     revoke();
     leaveHotLock();
-    releaseRecord(paths, resource);
-  }
-  if (result && typeof result.then === 'function') {
-    result.then(undefined, () => {});
-    throw new HotLockError('state-tx-async', `${resource}: the transaction callback returned a promise; it must be synchronous (the lock is already released)`);
+    try {
+      releaseRecord(paths, resource);
+    } catch (releaseError) {
+      // A record that could not be removed (`hot-lock-release-stuck` or a non-retryable unlink error) must not
+      // replace the callback's own error, nor turn a committed result into a failure: a caller that saw a
+      // failure would retry and append twice. The record stays; the next acquirer waits it out and reports it
+      // with `fgos lock fence`, and a failed callback carries it as `releaseFailure`.
+      if (typeof failure?.error === 'object' && failure.error !== null) failure.error.releaseFailure ??= releaseError;
+      else if (!failure) process.stderr.write(`fgos: warning: ${releaseError?.code ?? 'hot-lock-release-failed'} ${resource}: the record at "${paths.record}" stays; run \`fgos lock fence ${resource}\` once this process is gone\n`);
+    }
   }
   return result;
 }

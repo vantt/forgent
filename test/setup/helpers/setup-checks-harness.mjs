@@ -20,17 +20,10 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../../src/setup/checks.mjs';
-import { DEFAULT_RUNNER_CONFIG } from '../../../src/runner/dispatch.mjs';
 import { DEFAULT_LEVEL } from '../../../src/state/gate-bypass.mjs';
-import {
-  DEFAULT_CLEANUP_TTL_DAYS,
-  DEFAULT_CLEANUP_LEAF_TTL_DAYS,
-  DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
-  DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
-} from '../../../src/setup/registrations.mjs';
-import { DEFAULT_INVARIANT_CHECK_COMMANDS } from '../../../src/config/shared-config-file.mjs';
 import { initStore, addWork } from '../../../src/state/store.mjs';
-import { appendEvent } from '../../../src/state/events.mjs';
+import { appendEvent } from '../../helpers/legacy-event-fixture.mjs';
+import { initFixtureRepo } from '../../helpers/git-fixture.mjs';
 
 const __dirname = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -78,14 +71,6 @@ function writeEnduserManifest(tmp, entries) {
   fs.writeFileSync(path.join(tmp, 'docs', 'enduser-docs-index.json'), `${JSON.stringify(entries, null, 2)}\n`);
 }
 
-// ─── config-awareness (docs/history/global-project-config-awareness/ ──────
-// CONTEXT.md D1): always passes (informational, read-only, same contract as
-// tool-registry-configured) -- only the message and `active` distinguish
-// which level is in play. Every case overrides HOME (same pattern the
-// shell-integration-sourced tests above already use) so this never touches
-// the real ~/.fgos/config.json; project config is checked at the temp cwd's
-// own .fgos/config.json, matching describeConfigAwareness's real defaults.
-
 function withHome(homeDir, fn) {
   const prevHome = process.env.HOME;
   const prevUserProfile = process.env.USERPROFILE;
@@ -106,23 +91,10 @@ function withHome(homeDir, fn) {
 // ─── D2/D3: the shell-integration path is canonicalized to the main checkout ─
 
 function initRepo(prefix) {
-  const dir = mkTemp(prefix);
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: dir });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
-  fs.writeFileSync(path.join(dir, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt'], { cwd: dir });
-  execFileSync('git', ['commit', '-qm', 'seed'], { cwd: dir });
-  return dir;
+  return initFixtureRepo(mkTemp(prefix), { branch: 'main' });
 }
 export {
-  DEFAULT_CLEANUP_LEAF_TTL_DAYS,
-  DEFAULT_CLEANUP_TTL_DAYS,
-  DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
-  DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
-  DEFAULT_INVARIANT_CHECK_COMMANDS,
   DEFAULT_LEVEL,
-  DEFAULT_RUNNER_CONFIG,
   DOCTOR_CHECKS,
   FGOS,
   FIX_REGISTRATIONS,

@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
 import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -10,12 +11,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
 import { initStore, addWork, moveWork, settleClaim, listWork, FsmError, readRawEvents } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
-import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
-import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
-import { probe } from '../../src/holder-lock/index.mjs';
-import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { holdStateLockInChild } from '../helpers/hold-state-lock-in-child.mjs';
-import { git, initRepoWithHook, commitCount, HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const CLAIM_PORT_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/runner/claim-port.mjs');
@@ -35,8 +31,7 @@ function runUnclaim(repoRoot, id, { sessionId } = {}) {
   }
 }
 
-// claimWork takes the main checkout mutex through repo-locks.mjs; these tests
-// need a host binary (FGOS_HOST_BIN). Every test here builds its own disposable git repo + .fgos store; nothing touches
+// Every test here builds its own disposable git repo + .fgos store; nothing touches
 // THIS repo's own checkout.
 
 function initTempRepo() {
@@ -75,139 +70,6 @@ function setup() {
   return { repoRoot, dir };
 }
 
-// tsk-3jh: claimWork used to parse events.jsonl twice for the same
-// unmutated data (listWork, then readRawEvents) before moveWork/addOutcome
-// ever ran their own separate reads (CAS reread + appendEventCore's own
-// seq-computation read, both load-bearing and untouched by this item — see
-// docs/history/tsk-3jh-dedupe-redundant-state-reads/RESEARCH.md). Counts
-// real fs.readFileSync calls against the log surface to prove the dedupe,
-// not just the resulting shape.
-//
-// Tầng A/T2/T3 (eventlog-tier-a-multifile-content-hash): a writer's own
-// events now land in a per-writer file under `.fgos/events/`, not baseline-0
-// `.fgos/events.jsonl` — so the single `target === logPath` check this test
-// used to make no longer sees most of the activity (it silently degenerated
-// to counting only the near-empty baseline file). Widened to count a full
-// read of EITHER the baseline file OR any file under `.fgos/events/`,
-// preserving the original intent (prove the full-log-read count stays
-// bounded) across the new multi-file shape.
-test('claimWork reads the event log fully at most 7 times per call, not 8+ (tsk-3jh dedupe + tsk-49e incremental snapshot + Tầng A multi-file + tsk-40m claim/doing split + tsk-40m TOCTOU re-fold)', async () => {
-  const { repoRoot, dir } = setup();
-  const eventsDir = path.join(dir, 'events');
-  const baselinePath = path.join(dir, 'events.jsonl');
-  const originalReadFileSync = fs.readFileSync;
-  let logReadCount = 0;
-  fs.readFileSync = function patched(target, ...rest) {
-    const t = String(target);
-    if (t === baselinePath || t.startsWith(eventsDir + path.sep)) logReadCount++;
-    return originalReadFileSync.call(fs, target, ...rest);
-  };
-  try {
-    await claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
-  } finally {
-    fs.readFileSync = originalReadFileSync;
-  }
-
-  // Up to 5 FULL fs.readFileSync reads: (1) discovery's baseline-0 read
-  // (empty/absent, per discoverEventFilePaths always listing it), (2)
-  // discovery's single read of the one existing writer file (replay.mjs's
-  // readFileWithRawLines — reads+parses from ONE buffer, tsk-3jh's own
-  // "never re-read data already in hand" discipline), (3)+(4)
-  // runOpportunisticMainCheckoutChecks's own truncation-guard read of the
-  // same two files (events-jsonl-truncation-guard.mjs, unrelated to and
-  // unchanged by tsk-40m — pre-existing: verified directly against the
-  // pre-tsk-40m baseline commit 435444ef, where this same call already read
-  // both files every time run in isolation, meaning this assertion already
-  // undercounted them at 4 before tsk-40m touched anything; under full-
-  // suite concurrency the guard's own read count for those two files can
-  // come in lower, an environment-sensitivity this test does not try to
-  // pin down further since it belongs to that unrelated subsystem), (5)
-  // addOutcome's appendEventCore seq-read of the writer file, predicted-
-  // outcome bookkeeping for the claim (unchanged by tsk-40m). tsk-40m's own
-  // change — claimWork no longer calls moveWork to durably move the item to
-  // 'doing' (acquireClaim writes the runtime claim file instead, no
-  // event-log read) — actually DROPS the worst case by one from this same
-  // baseline's real (previously unasserted) total of 6: moveWork's own
-  // appendEventCore seq-read of the writer file is gone. None of these
-  // reads go through rebuildView, so tsk-49e's snapshot fast path never
-  // applies to them. (6)+(7) tsk-40m code-review finding (blocker, TOCTOU):
-  // claimWork now re-folds the durable log a SECOND time, fresh, right
-  // before acquireClaim — always, not conditionally — so a genuinely
-  // different process's durable write landing between the initial read at
-  // the top of this call and the actual claim write is never missed. That
-  // one `readRawEvents` call costs 2 full reads by this same counting
-  // (baseline-0 + the one writer file), the same shape as (1)+(2) above.
-  // Asserted as an upper bound (never a lower one) because this call's own
-  // read count is bounded-above and deterministic, but the truncation
-  // guard's is not, in ways this test does not own.
-  assert.ok(logReadCount >= 2 && logReadCount <= 7, `expected 2-7 full log reads, got ${logReadCount}`);
-});
-
-test('claimWork refuses with a categorized ClaimError naming the lock and the holder pid while another process holds main, and claims nothing', { skip: HOOK_TEST_SKIP }, async () => {
-  delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
-  const { repoRoot, dir } = setup();
-  const holder = await holdLockInChild('main-checkout', { fgosDir: dir });
-  try {
-    await assert.rejects(
-      () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot }),
-      (err) => {
-        assert.ok(err instanceof ClaimError);
-        assert.equal(err.code, 'lock-held');
-        assert.equal(err.category, 'lock-timeout', 'must be categorized so the runner halts gracefully instead of crashing the whole drain-run');
-        assert.equal(err.lock, 'main-checkout');
-        assert.deepEqual(err.holders, [holder.child.pid]);
-        assert.match(err.message, new RegExp(`pid ${holder.child.pid}`));
-        return true;
-      },
-    );
-    assert.equal(readClaim(dir, 'item-a'), null, 'a refused claim leaves no claim behind');
-    assert.ok(fs.existsSync(resolveFgosFile(dir, FGOS_FILE.GUARD_MARK)), 'Work truncation policy runs even when main remains held and checkpoint admission refuses');
-  } finally {
-    holder.child.kill('SIGKILL');
-    await holder.exited;
-  }
-});
-
-test('claimWork with waitMs waits for the holder of main and then claims', { skip: HOOK_TEST_SKIP }, async () => {
-  const { repoRoot, dir } = setup();
-  const holder = await holdLockInChild('main-checkout', { fgosDir: dir });
-  setTimeout(() => holder.child.kill('SIGKILL'), 400);
-  const claim = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot, waitMs: 15_000 });
-  await holder.exited;
-  assert.equal(claim.id, 'item-a');
-  assert.equal(claim.to, 'doing');
-});
-
-test('claimWork checkpoints .fgos through the borrowed main mutex under the real hook, and releases main when it returns', { skip: HOOK_TEST_SKIP }, async () => {
-  delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
-  const repoRoot = initRepoWithHook();
-  activateGitFixture(repoRoot);
-  const dir = path.join(repoRoot, '.fgos');
-  initStore(dir);
-  addWork(dir, { id: 'item-a', title: 'Item A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  writeProjectConfig(repoRoot, { checkpoint: { fallbackIntervalSec: 0 } });
-  const before = commitCount(repoRoot);
-
-  const claim = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
-
-  assert.equal(claim.to, 'doing');
-  assert.equal(commitCount(repoRoot), before + 1, 'the checkpoint made exactly one commit');
-  assert.match(git(repoRoot, ['log', '-1', '--format=%s']), /chore\(\.fgos\): fallback events checkpoint/);
-  assert.match(git(repoRoot, ['show', '--name-only', '--format=', 'HEAD']), /^\.fgos\/events\//m, 'the checkpoint committed the event files');
-  assert.equal(probe('main-checkout', { fgosDir: dir }).result, 'free');
-});
-
-test('claimWork releases main before it creates the worktree, and a failed worktree still frees main', { skip: HOOK_TEST_SKIP }, async () => {
-  const { repoRoot, dir } = setup();
-  const claim = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
-  assert.ok(claim.worktree.path);
-  assert.equal(probe('main-checkout', { fgosDir: dir }).result, 'free');
-
-  addWork(dir, { id: 'item-b', title: 'Item B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  await assert.rejects(() => claimWork(dir, { id: 'item-b', actor: 'session', isolate: true, repoRoot, worktreeDir: unusableWorktreeDir() }), (err) => err.code === 'ENOTDIR');
-  assert.equal(probe('main-checkout', { fgosDir: dir }).result, 'free');
-  assert.equal(readClaim(dir, 'item-b'), null);
-});
 // tsk-2zv: a claim-lock §3b release (originally src/intake/plan.mjs's
 // releaseClaimOnExecuting, retired to a no-op by tsk-40m D5 — simulated
 // below via a direct settleClaim call, since no live code path produces
@@ -479,7 +341,7 @@ test('a stale-claim reclaim records a durable work.attempt(result:"reclaimed") b
 
 test('tsk-37t: a stale-claim reclaim succeeds even when the repo is already drifted past its worker-slot ceiling', async () => {
   const { repoRoot, dir } = setup();
-  writeSharedConfig(repoRoot, { workerSlots: { ceiling: 1 } });
+  writeProjectConfig(repoRoot, { workerSlots: { ceiling: 1 } });
 
   // item-a is claimed and its worktree goes conclusively quiet.
   const first = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
@@ -501,7 +363,7 @@ test('tsk-37t: a stale-claim reclaim succeeds even when the repo is already drif
 
 test('tsk-37t: a genuinely NEW claim still refuses when the repo is at ceiling, unchanged (the exemption never widens past reclaims)', async () => {
   const { repoRoot, dir } = setup();
-  writeSharedConfig(repoRoot, { workerSlots: { ceiling: 1 } });
+  writeProjectConfig(repoRoot, { workerSlots: { ceiling: 1 } });
 
   addWork(dir, { id: 'item-b', title: 'Item B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
   acquireClaim(dir, { id: 'item-b', actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
@@ -705,29 +567,6 @@ test('fgos unclaim of another writer\'s claim on an unknown item records an id-l
   assert.equal(readRawEvents(dir).filter((e) => e.type === 'decision' && e.payload?.source === 'unclaim').length, 1);
 });
 
-test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and succeeds even when truncation guard detects a break', async () => {
-  delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
-  const { repoRoot, dir } = setup();
-  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
-  const warnPath = resolveFgosFile(dir, FGOS_FILE.MAIN_CHECKOUT_GUARD_WARNINGS);
-  const eventsDir = path.join(dir, 'events');
-
-  // Tầng A/T5: the guard sidecar is now a map keyed by fileKey ("events.jsonl"
-  // for baseline-0, "events/<name>" for a per-writer file); setup()'s addWork
-  // wrote into a real per-writer file, so seed a deliberately-regressed mark
-  // for THAT file -- a real structural break the guard must still catch now
-  // that claimWork does its own real multi-file discovery (no more synthetic
-  // single-file `rawLog` injection).
-  const writerFileName = fs.readdirSync(eventsDir).find((f) => f.endsWith('.jsonl'));
-  fs.mkdirSync(path.dirname(guardPath), { recursive: true });
-  fs.writeFileSync(guardPath, JSON.stringify({ [`events/${writerFileName}`]: { seq: 9999, hash: 'badhash' } }));
-
-  // claimWork should succeed normally despite truncation break, and write warning
-  const res = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
-  assert.ok(res);
-  assert.equal(fs.existsSync(warnPath), true, 'warning file must be created on truncation break during claimWork');
-});
-
 // tsk-40m code-review finding (blocker, TOCTOU race): claimWork used to
 // validate preClaimStatus against a snapshot read at the very top of the
 // call, reused unchanged all the way to acquireClaim -- everything in
@@ -781,16 +620,14 @@ try {
   });
   assert.equal(ack.status, 'todo', "the child's own pre-check must see 'todo' before this test's racing write lands");
 
-  // Directly append the durable move to a writer file -- a holder child holds
-  // the state lock (above), so the public moveWork would block behind it;
-  // this is the same event shape moveWork itself would append, simulating
-  // "a different process's moveWork already ran" before the lock is released.
-  const eventsDir = path.join(dir, 'events');
-  fs.mkdirSync(eventsDir, { recursive: true });
-  fs.writeFileSync(
-    path.join(eventsDir, 'racer.jsonl'),
-    `${JSON.stringify({ seq: 1, ts: new Date().toISOString(), type: 'work.move', payload: { id: 'item-a', from: 'todo', to: 'blocked' }, v: 2 })}\n`,
-  );
+  // Append the durable move straight to the Event Store -- a holder child holds
+  // the state lock (above), so the public moveWork would block behind it; this
+  // is the same event moveWork itself would append, simulating "a different
+  // process's moveWork already ran" before the lock is released.
+  prepareWorkStore(dir, dir).store.append('project', [{
+    eventType: 'work.move', schemaVersion: 1, ts: new Date().toISOString(),
+    payload: { id: 'item-a', from: 'todo', to: 'blocked' },
+  }], {}, 'racer', []);
 
   await stateHolder.release();
   const result = await new Promise((resolve, reject) => {

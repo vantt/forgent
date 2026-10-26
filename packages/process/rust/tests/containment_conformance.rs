@@ -19,6 +19,7 @@ struct Props {
     name: &'static str,
     level: GuaranteeLevel,
     escapes: &'static [&'static str],
+    #[cfg(unix)]
     double_fork_escapee_survives: bool,
     term_without_handler_kills: bool,
     term_phase: bool,
@@ -64,7 +65,6 @@ const WINDOWS_JOB_PROPS: Props = Props {
     name: "windows-job",
     level: GuaranteeLevel::Kernel,
     escapes: &["service", "COM server"],
-    double_fork_escapee_survives: false,
     term_without_handler_kills: true,
     term_phase: false,
     leader_exit_ends_domain: false,
@@ -131,7 +131,8 @@ fn workload(w: Workload) -> SpawnSpec {
         Workload::Exit(code) => common::win_spec("exit", &std::env::temp_dir(), &[("FGOS_TEST_EXIT_CODE", &code.to_string())]),
         Workload::Lingering(dir) => common::win_spec("lingering", dir, &[]),
         Workload::Echo(dir) => attach_stdio(common::win_spec("echo", dir, &[("FGOS_CONF_A", "alpha"), ("FGOS_CONF_B", "beta")]), dir),
-        Workload::TermProbe(dir, _) => {
+        Workload::TermProbe(dir, handler) => {
+            let _ = handler;
             let _ = fs::write(dir.join("ready.txt"), "ready\n");
             common::win_spec("sleep", dir, &[])
         }

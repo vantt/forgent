@@ -28,7 +28,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { mergeConfigDefaults } from './config-merge.mjs';
-import { readSharedConfig } from '../config/shared-config-file.mjs';
+import { isConfigRefusal, readConfig } from '../config/facade.mjs';
 
 /**
  * Deny-rules chosen to mirror this repo's own already-documented incident
@@ -171,9 +171,10 @@ export function findAgySubHomes(cwd = process.cwd(), { homeDir = process.env.HOM
   let cfg = config;
   if (!cfg) {
     try {
-      cfg = readSharedConfig(cwd);
-    } catch {
-      return [];
+      cfg = readConfig({ projectRoot: cwd, sections: ['runner'] }).value;
+    } catch (err) {
+      if (!isConfigRefusal(err)) throw err;
+      return []; // a config the door refuses names no sub-home; `fgos doctor` reports the refusal itself
     }
   }
 

@@ -1,5 +1,7 @@
 import { bindable } from '../helpers/work-seat-config.mjs';
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { committedConfigDir, committedRunnerConfig } from '../helpers/committed-config.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -10,10 +12,7 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import http from 'node:http';
 import {
   loadRunnerConfig,
-  loadRunnerConfigFromDir,
-  ensureRunnerConfigForDir,
-  DEFAULT_RUNNER_CONFIG,
-  detectAssistantCli,
+  loadRunnerConfigForDir,
   resolveExecutorCommand,
   resolveExecutorEnv,
   executeExecutorCli,
@@ -32,7 +31,6 @@ import {
   validateProviderAccountInventory,
   ProviderCapacityConfigError,
 } from '../../src/runner/dispatch.mjs';
-import { FRESH_PROJECT_RUNNER_CONFIG } from '../../src/runner/dispatch/config.mjs';
 import { buildPrompt, executorIdForWork } from '../../src/runner/work-compat.mjs';
 import { spawnWorker, resolveAgentTypeForWork, resolveWorkForDispatch, workDispatchHint } from '../../src/runner/work-dispatch.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
@@ -41,7 +39,6 @@ import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 import { resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 import { buildDispatchResult } from '../../src/runner/dispatch/result-ladder.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
-import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
@@ -72,8 +69,9 @@ function mkTempGitRepo() {
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
   const headCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  activateGitFixture(repoRoot);
   const fgosDir = path.join(repoRoot, '.fgos');
-  fs.mkdirSync(fgosDir);
+  fs.mkdirSync(fgosDir, { recursive: true });
   return { repoRoot, fgosDir, headCommit };
 }
 
@@ -474,7 +472,7 @@ test('loadRunnerConfig rejects provider account entries that declare placement p
   assert.throws(() => loadRunnerConfig(configPath), /must not declare "model"/);
 });
 
-test('loadRunnerConfigFromDir rejects project-local provider account inventory before global merge', () => {
+test('loadRunnerConfigForDir refuses a project-local account inventory (providers or llmAccounts), naming the key', () => {
   const repo = mkTempGitRepo();
   writeProjectConfig(repo.repoRoot, {
       runner: {
@@ -490,7 +488,11 @@ test('loadRunnerConfigFromDir rejects project-local provider account inventory b
         },
       },
     });
-  assert.throws(() => loadRunnerConfigFromDir(repo.repoRoot), /global-only/);
+  withHome(mkTempDir(), () => {
+    assert.throws(() => loadRunnerConfigForDir(repo.repoRoot), (err) => err instanceof RunnerConfigError && err.code === 'config-key-in-wrong-file' && /runner\.providers/.test(err.message));
+    writeProjectConfig(repo.repoRoot, { runner: { executor: { command: 'claude', args: ['{prompt}'] }, llmAccounts: { openai: { main: { credentialSource: { kind: 'codex-home', home: '${HOME}/.codex' } } } } } });
+    assert.throws(() => loadRunnerConfigForDir(repo.repoRoot), (err) => err instanceof RunnerConfigError && err.code === 'config-key-in-wrong-file' && /runner\.llmAccounts/.test(err.message));
+  });
   fs.rmSync(repo.repoRoot, { recursive: true, force: true });
 });
 
@@ -1252,38 +1254,31 @@ test('the committed .fgos/config.json runner section declares "impact-analysis"/
   assert.equal(typeof cfg.capabilities?.['pane-labeling']?.description, 'string');
 });
 
-/** Capture what's written to process.stderr during `fn()`; restores the
- * original `write` afterward even if `fn` throws. */
-function captureStderr(fn) {
-  const original = process.stderr.write.bind(process.stderr);
-  let captured = '';
-  process.stderr.write = (chunk) => {
-    captured += chunk;
-    return true;
-  };
+/** Runs `fn` with HOME and USERPROFILE at `home` (the machine's global directory is `<home>/.fgos`), restoring both afterwards. */
+function withHome(home, fn) {
+  const prevHome = process.env.HOME;
+  const prevUserProfile = process.env.USERPROFILE;
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
   try {
-    fn();
+    return fn();
   } finally {
-    process.stderr.write = original;
+    process.env.HOME = prevHome;
+    if (prevUserProfile !== undefined) process.env.USERPROFILE = prevUserProfile;
+    else delete process.env.USERPROFILE;
   }
-  return captured;
 }
 
-/** Create a temp PATH dir containing empty, executable (mode 0o755) files
- * named `names`, prepend it to `process.env.PATH` for the duration of
- * `fn()`, and always restore the original PATH afterward (even if `fn`
- * throws) — same restore-in-finally pattern as `captureStderr`. Used so
- * `ensureRunnerConfigForDir`'s PATH-dependent `detectAssistantCli()` call
- * inside these tests is deterministic regardless of what's actually
- * installed on the host machine running the suite (str82). */
-function withKnownCliOnPath(names, fn) {
+/** Runs `fn` with a PATH that holds exactly empty executables named `names`, so the executor the config door
+ * detects does not depend on what is installed on the machine running the suite. */
+function withOnlyOnPath(names, fn) {
   const dir = mkTempDir();
   for (const name of names) {
     const binName = process.platform === 'win32' ? `${name}.cmd` : name;
     fs.writeFileSync(path.join(dir, binName), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
   }
   const originalPath = process.env.PATH;
-  process.env.PATH = `${dir}${path.delimiter}${originalPath ?? ''}`;
+  process.env.PATH = dir;
   try {
     return fn();
   } finally {
@@ -1291,198 +1286,88 @@ function withKnownCliOnPath(names, fn) {
   }
 }
 
-// --- loadRunnerConfigFromDir / ensureRunnerConfigForDir: shared config ---
-// file (tsk-2ta D1 amended / tsk-5vf D1/D2/D4; legacy fallback retired
-// per tsk-5hv D1) ----------------------------------------------------------
+const projectRunner = (extra = {}) => ({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000, ...extra } });
 
-test('loadRunnerConfigFromDir throws RunnerConfigError when the shared file does not exist', () => {
-  const dir = mkTempDir();
-  assert.throws(() => loadRunnerConfigFromDir(dir), RunnerConfigError);
-});
+// --- loadRunnerConfigForDir: the one read-only loader over the config door ---
 
-test('loadRunnerConfigFromDir reads the runner section of the shared file', () => {
+test('loadRunnerConfigForDir reads the runner section of the project file', () => {
   const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  writeProjectConfig(dir, { runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 } });
-  const cfg = loadRunnerConfigFromDir(dir);
+  writeProjectConfig(dir, projectRunner());
+  const cfg = withHome(mkTempDir(), () => loadRunnerConfigForDir(dir));
   assert.equal(cfg.executor.command, 'claude');
   assert.equal(cfg.timeoutMs, 5000);
 });
 
-test('loadRunnerConfigFromDir throws RunnerConfigError on invalid JSON in the shared file', () => {
+test('loadRunnerConfigForDir on a project with no config file reads the standard, creates nothing, and a detected claude becomes the executor', () => {
   const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  writeRawProjectConfig(dir, '{ not valid json');
-  assert.throws(() => loadRunnerConfigFromDir(dir), RunnerConfigError);
+  const cfg = withHome(mkTempDir(), () => withOnlyOnPath(['claude'], () => loadRunnerConfigForDir(dir)));
+  assert.equal(cfg.executor.command, 'claude');
+  assert.equal(cfg.timeoutMs, 900000);
+  assert.equal(fs.existsSync(path.join(dir, '.fgos')), false);
 });
 
-test('loadRunnerConfigFromDir merges a project runner section against ~/.fgos/config.json, project winning per key', () => {
+test('with no executor set and no assistant CLI on PATH the config loads, a named executor resolves, and the default refuses where it is used, naming the command that sets one', () => {
   const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  writeProjectConfig(dir, { runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 } });
+  writeProjectConfig(dir, { runner: { executors: { fake: { kind: 'agent', carries: 'repo-content', allowCrossProvider: true, invocations: [{ via: 'cli', command: 'fake-cli', args: ['{prompt}'] }] } } } });
+  const cfg = withHome(mkTempDir(), () => withOnlyOnPath([], () => loadRunnerConfigForDir(dir)));
+  assert.equal(cfg.executor, undefined);
+  assert.equal(resolveExecutorConfig(cfg, 'standard', 'fake', undefined, 'repo-content').command, 'fake-cli');
+  assert.throws(
+    () => resolveExecutorConfig(cfg, 'standard', undefined),
+    (err) => err instanceof RunnerConfigError && err.code === 'runner-executor-missing' && /fgos config set runner\.executor/.test(err.message),
+  );
+});
+
+test('loadRunnerConfigForDir refuses a project file that does not parse, with the door\'s failure id', () => {
+  const dir = mkTempDir();
+  writeRawProjectConfig(dir, '{ not valid json');
+  assert.throws(
+    () => withHome(mkTempDir(), () => loadRunnerConfigForDir(dir)),
+    (err) => err instanceof RunnerConfigError && err.code === 'config-parse',
+  );
+});
+
+test('loadRunnerConfigForDir merges a project runner section over the global file, project winning per key', () => {
+  const dir = mkTempDir();
+  writeProjectConfig(dir, projectRunner());
   const homeDir = mkTempDir();
-  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-  writeGlobalConfig(homeDir, { runner: { timeoutMs: 999999, retries: 3 } });
-  const prevHome = process.env.HOME;
-  const prevUserProfile = process.env.USERPROFILE;
-  process.env.HOME = homeDir;
-  process.env.USERPROFILE = homeDir;
-  let cfg;
-  try {
-    cfg = loadRunnerConfigFromDir(dir);
-  } finally {
-    process.env.HOME = prevHome;
-    if (prevUserProfile !== undefined) process.env.USERPROFILE = prevUserProfile;
-    else delete process.env.USERPROFILE;
-  }
+  writeGlobalConfig(homeDir, { runner: { timeoutMs: 999999, idleTimeoutMs: 1234 } });
+  const cfg = withHome(homeDir, () => loadRunnerConfigForDir(dir));
   // Project's own timeoutMs wins over global's.
   assert.equal(cfg.timeoutMs, 5000);
   // Global fills a key the project never set.
-  assert.equal(cfg.retries, 3);
+  assert.equal(cfg.idleTimeoutMs, 1234);
 });
 
-// Regression: a global config carrying a modelPolicies tier key retired by a
-// later migration (real incident, 2026-09-20/21 -- a machine's real
-// ~/.fgos/config.json still had pre-D9 tier names) must never reach
-// validation. Before the fix, this stale global key filled the gap in a
-// project config missing that same tier, then validateModelPoliciesShape
-// rejected the unknown tier key and broke every config load on that
-// machine -- not a silent wrong value, a total load failure.
-test('loadRunnerConfigFromDir drops a stale global modelPolicies tier key instead of throwing', () => {
+test('loadRunnerConfigForDir lets a global modelPolicies tier key fill a gap when the tier is valid', () => {
   const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  writeProjectConfig(dir, { runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: { claude: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } });
+  writeProjectConfig(dir, projectRunner());
   const homeDir = mkTempDir();
-  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-  // Pre-tsk-5tm-5 tier names ('lightweight'/'creative'/'analytical'/'critical'),
-  // no longer in MODEL_POLICY_TIERS, still present in a real global file.
-  writeGlobalConfig(homeDir, { runner: { modelPolicies: { claude: { lightweight: 'haiku', critical: 'opus' } } } });
-  const prevHome = process.env.HOME;
-  const prevUserProfile = process.env.USERPROFILE;
-  process.env.HOME = homeDir;
-  process.env.USERPROFILE = homeDir;
-  let cfg;
-  try {
-    cfg = loadRunnerConfigFromDir(dir);
-  } finally {
-    process.env.HOME = prevHome;
-    if (prevUserProfile !== undefined) process.env.USERPROFILE = prevUserProfile;
-    else delete process.env.USERPROFILE;
-  }
-  assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
-  assert.equal(cfg.modelPolicies.claude.lightweight, undefined);
-  assert.equal(cfg.modelPolicies.claude.critical, undefined);
-});
-
-test('loadRunnerConfigFromDir still lets a global modelPolicies tier key fill a gap when the tier is valid', () => {
-  const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  writeProjectConfig(dir, { runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: { claude: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } });
-  const homeDir = mkTempDir();
-  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
   writeGlobalConfig(homeDir, { runner: { modelPolicies: { claude: { frontier: 'opus' } } } });
-  const prevHome = process.env.HOME;
-  const prevUserProfile = process.env.USERPROFILE;
-  process.env.HOME = homeDir;
-  process.env.USERPROFILE = homeDir;
-  let cfg;
-  try {
-    cfg = loadRunnerConfigFromDir(dir);
-  } finally {
-    process.env.HOME = prevHome;
-    if (prevUserProfile !== undefined) process.env.USERPROFILE = prevUserProfile;
-    else delete process.env.USERPROFILE;
-  }
+  const cfg = withHome(homeDir, () => loadRunnerConfigForDir(dir));
   assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
   assert.equal(cfg.modelPolicies.claude.frontier, 'opus');
 });
 
-test('ensureRunnerConfigForDir bootstraps straight into the shared file on a true first run', () => {
-  withKnownCliOnPath(['claude'], () => {
-    const dir = mkTempDir();
-    assert.equal(fs.existsSync(path.join(dir, '.fgos', 'config.json')), false);
-
-    const cfg = ensureRunnerConfigForDir(dir);
-
-    assert.equal(fs.existsSync(path.join(dir, '.fgos', 'config.json')), true);
-    const written = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'config.json'), 'utf8'));
-    assert.deepEqual(written.runner, cfg);
-    assert.equal(cfg.executor.command, 'claude');
-  });
-});
-
-test('ensureRunnerConfigForDir fills missing default keys into an existing shared file\'s runner section and rewrites only that section', () => {
+test('loadRunnerConfigForDir refuses a global file that holds the retired rigorToTier key, naming the key and the fix', () => {
   const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  const sharedPath = path.join(dir, '.fgos', 'config.json');
-  writeProjectConfig(dir, {
-      runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 1000, patterns: { seatBinding: { schema: 1 } } },
-      unrelatedSection: { keep: 'me' },
-    });
-
-  const cfg = ensureRunnerConfigForDir(dir);
-
-  assert.deepEqual(cfg.parallel, DEFAULT_RUNNER_CONFIG.parallel);
-  assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
-  const written = JSON.parse(fs.readFileSync(sharedPath, 'utf8'));
-  // A sibling section this item never touches survives untouched.
-  assert.deepEqual(written.unrelatedSection, { keep: 'me' });
-  assert.deepEqual(written.runner.parallel, DEFAULT_RUNNER_CONFIG.parallel);
-});
-
-test('ensureRunnerConfigForDir on an already-complete shared file does not rewrite it', () => {
-  const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  const sharedPath = path.join(dir, '.fgos', 'config.json');
-  writeProjectConfig(dir, { runner: FRESH_PROJECT_RUNNER_CONFIG });
-  const before = fs.statSync(sharedPath).mtimeMs;
-
-  // Isolate from this machine's real global config (~/.fgos/config.json) —
-  // otherwise a stale real-world `models` shape gets merged in and this
-  // fixture stops looking "already complete".
+  writeProjectConfig(dir, projectRunner());
   const homeDir = mkTempDir();
-  const prevHome = process.env.HOME;
-  const prevUserProfile = process.env.USERPROFILE;
-  process.env.HOME = homeDir;
-  process.env.USERPROFILE = homeDir;
-  let cfg;
-  try {
-    cfg = ensureRunnerConfigForDir(dir);
-  } finally {
-    process.env.HOME = prevHome;
-    if (prevUserProfile !== undefined) process.env.USERPROFILE = prevUserProfile;
-    else delete process.env.USERPROFILE;
-  }
-
-  assert.deepEqual(cfg, FRESH_PROJECT_RUNNER_CONFIG);
-  assert.equal(fs.statSync(sharedPath).mtimeMs, before);
+  writeGlobalConfig(homeDir, { runner: { rigorToTier: { low: 'nano' } } });
+  assert.throws(
+    () => withHome(homeDir, () => loadRunnerConfigForDir(dir)),
+    (err) => err instanceof RunnerConfigError && err.message.includes('~/.fgos/config.yaml') && /rigorToTier no longer exists/.test(err.message) && /delete the key/.test(err.message) && !err.message.includes(dir),
+  );
 });
 
-// --- detectAssistantCli: pure PATH scan, injected inputs (str82) --------
-
-test('detectAssistantCli finds a candidate on an injected PATH without touching the real environment', () => {
+test('loadRunnerConfig reads a named YAML file and names the line and column of a parse failure', () => {
   const dir = mkTempDir();
-  const binName = process.platform === 'win32' ? 'claude.cmd' : 'claude';
-  fs.writeFileSync(path.join(dir, binName), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
-  const realPathBefore = process.env.PATH;
-
-  const found = detectAssistantCli(['claude', 'codex'], dir);
-
-  assert.equal(found, 'claude');
-  assert.equal(process.env.PATH, realPathBefore);
-});
-
-test('detectAssistantCli returns null when none of the candidates are present on the injected PATH', () => {
-  const dir = mkTempDir();
-  const found = detectAssistantCli(['claude', 'codex'], dir);
-  assert.equal(found, null);
-});
-
-test('detectAssistantCli delegates to tool-registry.mjs\'s shared findExecutableOnPath (D5) — same result, one implementation', () => {
-  const dir = mkTempDir();
-  const binName = process.platform === 'win32' ? 'claude.cmd' : 'claude';
-  fs.writeFileSync(path.join(dir, binName), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
-  assert.equal(detectAssistantCli(['claude', 'codex'], dir), findExecutableOnPath(['claude', 'codex'], dir));
+  const good = path.join(dir, 'runner.yaml');
+  fs.writeFileSync(good, 'executor:\n  command: claude\n  args: ["{prompt}"]\nmodelPolicies:\n  claude:\n    standard: sonnet\ndefaults:\n  tier: standard\npatterns:\n  seatBinding:\n    schema: 1\ntimeoutMs: 120000\n');
+  assert.equal(loadRunnerConfig(good).timeoutMs, 120000);
+  const bad = path.join(dir, 'bad.yaml');
+  fs.writeFileSync(bad, 'executor:\n  command: [unclosed\n');
+  assert.throws(() => loadRunnerConfig(bad), (err) => err instanceof RunnerConfigError && /line \d+, column \d+/.test(err.message));
 });
 
 test('loadRunnerConfig rejects a runner config declaring retired models map', () => {
@@ -1842,7 +1727,7 @@ test('resolveExecutorCommand substitutes {prompt} and {model} per array element'
 });
 
 test('codex\'s cli-bypass invocation consumes model placeholder in invocation args: analytical assignment resolves model from policy into argv', () => {
-  const cfg = loadRunnerConfigFromDir(committedConfigDir());
+  const cfg = loadRunnerConfigForDir(committedConfigDir());
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
@@ -2031,7 +1916,7 @@ test('resolveExecutorCommand result carries the providerModel-derived family, no
 });
 
 test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" executor is not registered and fgosDir is given', () => {
-  const dir = mkTempDir();
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
@@ -2046,7 +1931,7 @@ test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" execut
 });
 
 test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" executor is registered but not present on this machine', () => {
-  const dir = mkTempDir();
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
@@ -2061,7 +1946,7 @@ test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" execut
 });
 
 test('resolveExecutorCommand resolves a metadata-only kind:"cli" executor straight through to the global executor for the command (executors.<tier> is retired, no intermediate stop)', () => {
-  const dir = mkTempDir();
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
@@ -2091,7 +1976,7 @@ test('resolveExecutorCommand skips the fgos-tool-query presence check entirely w
 
 for (const kind of ['mcp', 'skill', 'http', 'binary']) {
   test(`resolveExecutorCommand throws a RunnerConfigError when a kind:"${kind}" executor is not registered and fgosDir is given (D13)`, () => {
-    const dir = mkTempDir();
+    const dir = initializeWorkRepository(mkTempDir());
     initStore(dir);
     const cfg = {
       executor: { command: '/global/executor', args: ['{prompt}'] },
@@ -2106,7 +1991,7 @@ for (const kind of ['mcp', 'skill', 'http', 'binary']) {
   });
 
   test(`resolveExecutorCommand throws a RunnerConfigError when a kind:"${kind}" executor is registered but not present on this machine (D13)`, () => {
-    const dir = mkTempDir();
+    const dir = initializeWorkRepository(mkTempDir());
     initStore(dir);
     const scanTarget = ['mcp', 'skill'].includes(kind) ? mkTempDir() : undefined;
     const cfg = {
@@ -2136,7 +2021,7 @@ for (const kind of ['mcp', 'skill', 'http', 'binary']) {
 }
 
 test('resolveExecutorCommand still skips both the presence check and the cross-provider check for a kind:"task" executor, even unregistered and non-Claude-shaped (D13: kind !== "task" excludes task by construction)', () => {
-  const dir = mkTempDir();
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
@@ -2185,7 +2070,7 @@ test('resolveExecutorCommand resolves a kind:"task" executor naming only agentTy
 
 test('resolveExecutorCommand resolves an agentType executor identically whether fgosDir is given (cli-dispatch/spawnWorker-style) or omitted (task-dispatch/executeExecutorCli-style)', () => {
   const cfg = agentTypeCfg();
-  const dir = mkTempDir();
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   const withFgosDir = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'my-agent-executor', fgosDir: dir });
   const withoutFgosDir = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'my-agent-executor' });
@@ -2965,7 +2850,7 @@ test('resolveExecutorCommand with no executors block at all never triggers cross
 });
 
 test('resolveExecutorCommand throws for a non-Claude "cli" executor even when fgosDir is given (cross-provider governance is independent of the retired presence gate, tsk-5tm-1 D1)', () => {
-  const dir = mkTempDir();
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
@@ -4233,7 +4118,7 @@ test('resolveAgentTypeForTaskSpec refuses (returns null) across all 4 unvalidate
 
 test('decideExecutorCli resolves work-item-based (--work) to the same result a positional executorId would, plus the resolved executorId -- explicit executors.<id> override case', async () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   addWork(fgosDir, {
     id: 'tsk-fanout-candidate',
     title: 'Fanout candidate',
@@ -4260,7 +4145,7 @@ test('decideExecutorCli resolves work-item-based (--work) to the same result a p
 
 test('resolveWorkForDispatch hands dispatch a generic hint, never the Work item', () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   addWork(fgosDir, { id: 'tsk-hint', title: 'Hint', kind: 'task', status: 'todo', deps: [], risk: 'heavy', refs: ['a.md'], verify: 'npm test', domain: 'coding' });
   const hint = resolveWorkForDispatch({ workId: 'tsk-hint', fgosDir });
   assert.deepEqual(Object.keys(hint).sort(), ['agentType', 'domain', 'rigor', 'workExecutorId']);
@@ -4271,7 +4156,7 @@ test('resolveWorkForDispatch hands dispatch a generic hint, never the Work item'
 
 test('decide --work: an item with its own agentType resolves the same executor and mechanism as one without', async () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   const base = { kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test' };
   addWork(fgosDir, { id: 'tsk-plain', title: 'Plain', ...base });
   addWork(fgosDir, { id: 'tsk-own-agent', title: 'Own agent', ...base });
@@ -4345,7 +4230,7 @@ test('dispatch doors refuse a Work item instead of ignoring it', async () => {
 
 test('decideExecutorCli resolves work-item-based (--work) via capabilities.fgos-coding-implement.prefer -- the real tsk-34n/D3 migration shape (no literal executors.fgos-coding-implement entry, only agy declaring "for")', async () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   addWork(fgosDir, {
     id: 'tsk-fanout-prefer-candidate',
     title: 'Fanout candidate resolved via prefer',
@@ -4378,7 +4263,7 @@ test('decideExecutorCli resolves work-item-based (--work) via capabilities.fgos-
 
 test('decideExecutorCli resolves work-item-based (--work) to "in-process" by default when the resolved executorId has NO explicit cfg.executors entry -- the real, common fgos-fanout case (D4 fix): a coding-domain work item is a same-provider, soul-needing rootTask (0026 rule 2), never the generic "no executor -> out-of-process" fallback a NAMED executorId lookup keeps unchanged', async () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   addWork(fgosDir, {
     id: 'tsk-fanout-unregistered',
     title: 'Fanout candidate with no executors.<id> override',
@@ -4397,8 +4282,9 @@ test('decideExecutorCli resolves work-item-based (--work) to "in-process" by def
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const byWork = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, workId: 'tsk-fanout-unregistered', hasLiveTaskAccess: true });
-  assert.deepEqual(byWork, { mechanism: 'in-process', executorId: 'fgos-coding-implement', configured: false, reasonCodes: ['native-first.rule-2.live-task-access'] });
+  // The planning stage: the standard registers a capability for the executing stage's skill, none for this one.
+  const byWork = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, workId: 'tsk-fanout-unregistered', stage: 'planning', hasLiveTaskAccess: true });
+  assert.deepEqual(byWork, { mechanism: 'in-process', executorId: 'fgos-coding-planning', configured: false, reasonCodes: ['native-first.rule-2.live-task-access'] });
   // The SAME unregistered executorId, looked up by NAME (not --work), used
   // to keep its pre-D4 byte-identical "no executor -> out-of-process"
   // behavior. H6b (D1, 2026-09-20 ACCEPTED) changed that: a bare
@@ -4407,13 +4293,13 @@ test('decideExecutorCli resolves work-item-based (--work) to "in-process" by def
   // guessed at -- only the work-item-shaped lookup (byWork, above) still
   // gets the native-first default, since a work item's OWN executorId is
   // derived, not a caller-typed name that could be a typo.
-  const byName = await decideExecutorCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: true });
+  const byName = await decideExecutorCli('fgos-coding-planning', { repoRoot: root, hasLiveTaskAccess: true });
   assert.deepEqual(byName, { mechanism: 'unavailable', configured: false, reasonCodes: ['native-first.0033.cli-spawn-shaped', 'selector.unregistered'] });
 });
 
 test('decideExecutorCli resolves work-item-based (--work) to "out-of-process" when the caller has no live Task access, even with no explicit cfg.executors entry -- never claims in-process dishonestly', async () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   addWork(fgosDir, {
     id: 'tsk-fanout-no-live-access',
     title: 'Fanout candidate, caller declares no live Task access',
@@ -4429,13 +4315,13 @@ test('decideExecutorCli resolves work-item-based (--work) to "out-of-process" wh
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const byWork = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, workId: 'tsk-fanout-no-live-access' });
-  assert.deepEqual(byWork, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: false, reasonCodes: ['native-first.rule-1.no-native-mechanism'] });
+  const byWork = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, workId: 'tsk-fanout-no-live-access', stage: 'planning' });
+  assert.deepEqual(byWork, { mechanism: 'out-of-process', executorId: 'fgos-coding-planning', configured: false, reasonCodes: ['native-first.rule-1.no-native-mechanism'] });
 });
 
 test('decideExecutorCli throws a RunnerConfigError when --work names a work item that does not exist -- never silently "unavailable" (a typo/stale id is a real usage error, unlike an unconfigured purpose)', async () => {
   const root = mkTempDir();
-  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
+  initializeWorkRepository(root);
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
@@ -4449,7 +4335,7 @@ test('decideExecutorCli throws a RunnerConfigError when --work names a work item
 
 test('a positional executorId still wins over --work when both are somehow passed, same precedence --for already has', async () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   addWork(fgosDir, {
     id: 'tsk-fanout-candidate-2',
     title: 'Fanout candidate 2',
@@ -4598,8 +4484,9 @@ test('fanoutBatchExecutorCli trims candidates to free slots when ceiling is conf
   initStore(fgosDir);
   writeProjectConfig(repo.repoRoot, { workerSlots: { ceiling: 1 } });
 
-  addWork(fgosDir, { id: 'c1', title: 'Cand 1', kind: 'task', status: 'todo', domain: 'coding', workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
-  addWork(fgosDir, { id: 'c2', title: 'Cand 2', kind: 'task', status: 'todo', domain: 'coding', workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  // Planning-stage items: the standard registers a CLI executor for the executing stage, so only these hand back to the caller's own Task tool.
+  addWork(fgosDir, { id: 'c1', title: 'Cand 1', kind: 'task', status: 'todo', domain: 'coding', workflowStep: 'planning', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  addWork(fgosDir, { id: 'c2', title: 'Cand 2', kind: 'task', status: 'todo', domain: 'coding', workflowStep: 'planning', deps: [], refs: [], risk: 'light', verify: 'npm test' });
 
   const result = await fanoutBatchExecutorCli(['c1', 'c2'], { repoRoot: repo.repoRoot, hasLiveTaskAccess: true });
   assert.equal(result.slotsFull, undefined);
@@ -4905,7 +4792,7 @@ test('registered executors.glm entry resolves command "claude" and env block', (
     const glmConfig = {
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: {
-        glm: {
+        glmbridge: {
           kind: 'agent',
           description: 'Claude Code CLI routing to OpenRouter GLM 5.2 model',
           command: 'claude',
@@ -4926,16 +4813,16 @@ test('registered executors.glm entry resolves command "claude" and env block', (
     const fgosDir = path.join(repoRoot, '.fgos');
     writeProjectConfig(repoRoot, { runner: glmConfig });
   
-    const cfg = loadRunnerConfigFromDir(repoRoot);
-    assert.ok(cfg.executors.glm, 'executors.glm is registered');
-    assert.equal(cfg.executors.glm.kind, 'agent');
-    assert.equal(cfg.executors.glm.command, 'claude');
-    assert.equal(cfg.executors.glm.env.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
-    assert.equal(cfg.executors.glm.env.ANTHROPIC_AUTH_TOKEN, '${GLM_OPENROUTER_API_KEY}');
-    assert.equal(cfg.executors.glm.env.ANTHROPIC_MODEL, 'z-ai/glm-5.2');
-    assert.equal(cfg.executors.glm.env.ANTHROPIC_API_KEY, '');
+    const cfg = loadRunnerConfigForDir(repoRoot);
+    assert.ok(cfg.executors.glmbridge, 'executors.glm is registered');
+    assert.equal(cfg.executors.glmbridge.kind, 'agent');
+    assert.equal(cfg.executors.glmbridge.command, 'claude');
+    assert.equal(cfg.executors.glmbridge.env.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
+    assert.equal(cfg.executors.glmbridge.env.ANTHROPIC_AUTH_TOKEN, '${GLM_OPENROUTER_API_KEY}');
+    assert.equal(cfg.executors.glmbridge.env.ANTHROPIC_MODEL, 'z-ai/glm-5.2');
+    assert.equal(cfg.executors.glmbridge.env.ANTHROPIC_API_KEY, '');
   
-    const res = resolveExecutorCommand(cfg, { prompt: 'test', model: 'sonnet', tier: 'standard', executorId: 'glm' });
+    const res = resolveExecutorCommand(cfg, { prompt: 'test', model: 'sonnet', tier: 'standard', executorId: 'glmbridge' });
     assert.equal(res.command, 'claude');
     assert.equal(res.provider, 'claude');
   } finally {

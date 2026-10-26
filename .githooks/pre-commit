@@ -25,7 +25,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
 import { runLockRouteSync, ROUTE_CALL_TIMEOUT_MS } from '../src/holder-lock/driver.mjs';
@@ -112,12 +112,16 @@ function resolveTtlMs() {
 // code loaded from this checkout (the in-process door refuses there).
 const HOST_CALL_TIMEOUT_MS = 20_000;
 
-function identityData(bin, args, cwd) {
+function hostStdout(bin, args, cwd) {
   const env = { ...process.env };
   delete env.FGOS_INVOCATION_RECORD_PATH;
-  const stdout = execFileSync(bin, args, {
+  return execFileSync(bin, args, {
     env, cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: HOST_CALL_TIMEOUT_MS, killSignal: 'SIGKILL', maxBuffer: 1024 * 1024, windowsHide: true,
   });
+}
+
+function identityData(bin, args, cwd) {
+  const stdout = hostStdout(bin, args, cwd);
   const envelope = JSON.parse(stdout);
   if (envelope?.contract !== 'fgos.v1' || envelope.data === null || typeof envelope.data !== 'object') throw new Error(`${bin} ${args[0]} printed an unexpected answer: ${stdout.slice(0, 200)}`);
   return envelope.data;
@@ -251,6 +255,27 @@ function stagedFgosDeletions(committingToplevel) {
     .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
 }
 
+// During a merge, a staged `.fgos` path whose index entry equals the incoming side's (absent on both,
+// or the same blob), where that side changed it since the merge base, is that side's own change carried in, not a write by this checkout: a branch cut
+// before the Event Store cutover that merges main takes main's retired shards and its fence this way.
+function fgosPathsOwnedByMergeHead(committingToplevel, paths) {
+  if (paths.length === 0) return new Set();
+  const git = (args) => execFileSync('git', args, { cwd: committingToplevel, encoding: 'utf8', maxBuffer: 1024 * 1024 * 64 });
+  const mergeHeadFile = path.resolve(committingToplevel, git(['rev-parse', '--git-path', 'MERGE_HEAD']).trim());
+  if (!fs.existsSync(mergeHeadFile)) return new Set();
+  const entries = (text, field) => new Map(text.split('\0').filter(Boolean).map((row) => {
+    const tab = row.indexOf('\t');
+    return [row.slice(tab + 1), row.slice(0, tab).split(' ')[field]];
+  }));
+  const index = entries(git(['ls-files', '-s', '-z', '--', '.fgos']), 1);
+  // The incoming side must have changed the path itself since the merge base: a path absent on
+  // both sides that this branch alone had and deleted by hand is not the incoming side's change.
+  const tree = (oid) => entries(git(['ls-tree', '-r', '-z', oid, '--', '.fgos']), 2);
+  const heads = fs.readFileSync(mergeHeadFile, 'utf8').split('\n').filter(Boolean)
+    .map((oid) => ({ head: tree(oid), base: tree(git(['merge-base', 'HEAD', oid]).trim()) }));
+  return new Set(paths.filter((p) => heads.some(({ head, base }) => head.get(p) === index.get(p) && head.get(p) !== base.get(p))));
+}
+
 // tsk-5pb -- any staged path under .fgos/ (Added, Modified, Deleted) on a
 // worker's fgw/* branch is forbidden. Git manual merge materialization can stage
 // a .fgos/* blob as Modified; worker branches must never commit changes under .fgos/.
@@ -300,6 +325,32 @@ function currentFgwBranchIfMainCheckout(repoRoot) {
   return /^fgw\//.test(branch) ? branch : null;
 }
 
+// The Event Store cutover fence is the regular file `.fgos/events`, in the index or in HEAD.
+// `fgos events migrate` installs it; before that, the tracked event logs are still the only history.
+function eventFenceExists(cwd) {
+  // A directory is legacy Work; only the indexed/HEAD regular-file fence counts.
+  const index = execFileSync('git', ['ls-files', '-s', '--', '.fgos/events'], { cwd, encoding: 'utf8' });
+  let head = '';
+  try {
+    head = execFileSync('git', ['ls-tree', 'HEAD', '--', '.fgos/events'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  } catch (err) {
+    // Only an unborn HEAD (no commit yet) means "no fence in HEAD"; any other failure leaves the fence state unknown.
+    const unborn = spawnSync('git', ['rev-parse', '--verify', '--quiet', 'HEAD'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    if (unborn.status !== 1 || unborn.stdout.trim() !== '') {
+      throw Object.assign(new Error(`commit refused: could not read HEAD's tree to look for the event fence (${String(err?.message ?? err).split('\n')[0]}) -- refusing to commit (fail-closed).`), { refusal: true });
+    }
+  }
+  return [index, head].some(text => text.split('\n').some(line => /^100(?:644|755) /.test(line) && line.split('\t')[1] === '.fgos/events'));
+}
+
+// Retired event data cannot re-enter the checkout. Only the exact fence is allowed.
+function addedEventPathRefusal(cwd) {
+  if (!eventFenceExists(cwd)) return null;
+  const added = execFileSync('git', ['diff', '--cached', '--name-only', '--no-renames', '--diff-filter=ACRT', '-z'], { cwd, encoding: 'utf8' }).split('\0');
+  const forbidden = added.filter(p => p.startsWith('.fgos/events.jsonl') || p.startsWith('.fgos/events/'));
+  return forbidden.length ? `commit refused: retired event paths cannot be added: ${forbidden.join(', ')}` : null;
+}
+
 function countLines(str) {
   let count = 0;
   for (let i = 0; i < str.length; i++) {
@@ -308,80 +359,45 @@ function countLines(str) {
   return count;
 }
 
-// tsk-1i3 -- staged .fgos/* content-precedence guard on main/default branch.
-// Refuses any commit staging a modification (--diff-filter=M) of an append-only
-// .fgos/**/*.jsonl log whose staged line count is strictly lower than HEAD's own
-// line count for that same path (D1-D4).
-function stagedFgosModificationsRegressLineCount(committingToplevel) {
+// Until the fence exists the tracked append-only `.fgos/**/*.jsonl` logs are still the event
+// history, and `fgos events migrate` imports them from HEAD. A stale checkout, stash or reset can
+// stage an older copy; refuse any commit that stages one with fewer lines than HEAD's. After the
+// fence exists the logs are retired and `addedEventPathRefusal` owns the rule, so this one is off.
+function stagedEventLogShrinkRefusal(committingToplevel) {
   let branch;
   try {
-    branch = execFileSync(
-      'git',
-      ['symbolic-ref', '--short', '-q', 'HEAD'],
-      { cwd: committingToplevel, encoding: 'utf8' },
-    ).trim();
+    branch = execFileSync('git', ['symbolic-ref', '--short', '-q', 'HEAD'], { cwd: committingToplevel, encoding: 'utf8' }).trim();
   } catch {
     branch = '';
   }
-  if (/^fgw\//.test(branch)) return { regressedPaths: [] };
+  if (/^fgw\//.test(branch)) return null;
+  if (eventFenceExists(committingToplevel)) return null;
 
   let output;
   try {
-    output = execFileSync(
-      'git',
-      ['diff', '--cached', '--name-only', '--diff-filter=M'],
-      { cwd: committingToplevel, encoding: 'utf8' },
-    );
+    output = execFileSync('git', ['diff', '--cached', '--name-only', '--diff-filter=M', '-z'], { cwd: committingToplevel, encoding: 'utf8' });
   } catch (err) {
-    return { error: `commit refused: could not run "git diff --cached" to check staged modifications under ".fgos/" (${err.message}) -- refusing to commit (fail-closed).` };
+    return `commit refused: could not run "git diff --cached" to check staged modifications under ".fgos/" (${err.message}) -- refusing to commit (fail-closed).`;
   }
+  // Only append-only logs are guarded: a config or state file is edited on purpose and may lose lines.
+  const logs = output.split('\0').filter((p) => p.startsWith('.fgos/') && p.endsWith('.jsonl'));
 
-  const modifiedFgosPaths = output
-    .split('\n')
-    .filter((p) => p !== '')
-    // Only the append-only logs (events.jsonl and the like) are guarded: a stale worktree's older log
-    // must never replace main's newer one. A config or state file is edited on purpose, and a
-    // legitimate edit may remove lines from it.
-    .filter((p) => p.startsWith('.fgos/') && p.endsWith('.jsonl'));
-
-  if (modifiedFgosPaths.length === 0) return { regressedPaths: [] };
-
-  const regressedPaths = [];
-  for (const p of modifiedFgosPaths) {
+  const shrunk = [];
+  for (const p of logs) {
     let headContent, stagedContent;
     try {
-      // maxBuffer (tsk-1i3 follow-up hotfix): execFileSync's default 1MB
-      // maxBuffer is smaller than .fgos/events.jsonl's real size (10MB+),
-      // throwing ENOBUFS on every commit that touches it and wrongly
-      // refusing the commit as "could not read blob" -- raised generously
-      // since this reads a whole git blob into memory once per commit.
+      // Event logs can exceed execFileSync's default 1MB buffer; read each whole blob once.
       const maxBuffer = 1024 * 1024 * 200;
       headContent = execFileSync('git', ['show', `HEAD:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });
       stagedContent = execFileSync('git', ['show', `:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });
-    } catch (err) {
-      return { error: `commit refused: could not read blob for "${p}" via "git show" -- refusing to commit against an unreadable ref/blob (fail-closed).` };
+    } catch {
+      return `commit refused: could not read blob for "${p}" via "git show" -- refusing to commit against an unreadable ref/blob (fail-closed).`;
     }
-
-    const headLines = countLines(headContent);
-    const stagedLines = countLines(stagedContent);
-    if (stagedLines < headLines) {
-      regressedPaths.push({ path: p, headLines, stagedLines });
-    }
+    if (countLines(stagedContent) < countLines(headContent)) shrunk.push(p);
   }
-
-  return { regressedPaths };
-}
-
-// Retired event data cannot re-enter the checkout. Only the exact fence is allowed.
-function addedEventPathRefusal(cwd) {
-  // A directory is legacy Work; only the indexed/HEAD regular-file fence activates this rule.
-  const index = execFileSync('git', ['ls-files', '-s', '--', '.fgos/events'], { cwd, encoding: 'utf8' });
-  let head = '';
-  try { head = execFileSync('git', ['ls-tree', 'HEAD', '--', '.fgos/events'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }); } catch {}
-  if (![index, head].some(text => text.split('\n').some(line => /^100(?:644|755) /.test(line) && line.split('\t')[1] === '.fgos/events'))) return null;
-  const added = execFileSync('git', ['diff', '--cached', '--name-only', '--no-renames', '--diff-filter=ACRT', '-z'], { cwd, encoding: 'utf8' }).split('\0');
-  const forbidden = added.filter(p => p.startsWith('.fgos/events.jsonl') || p.startsWith('.fgos/events/'));
-  return forbidden.length ? `commit refused: retired event paths cannot be added: ${forbidden.join(', ')}` : null;
+  return shrunk.length
+    ? `commit refused: this commit stages a modification under ".fgos/" (${shrunk.join(', ')}) whose line count is lower than HEAD -- the event logs must not shrink before "fgos events migrate" imports them, main is left unchanged. Restore these paths from HEAD (git restore --staged --worktree -- <path>) before committing.`
+    : null;
 }
 
 // STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/
@@ -456,10 +472,17 @@ async function censusDriftRefusal(committingToplevel) {
   const git = (args) => execFileSync('git', args, {
     cwd: committingToplevel, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'],
   });
-  const scanPath = path.resolve(__dirname, '../scripts/git-one-door-scan.mjs');
-  if (!fs.existsSync(scanPath)) return null; // a copied hook without its scan has no census to judge by
+  // The committing checkout's own scanner judges its own census: a branch that changes the scan's rules
+  // regenerates the census with them, so main's scanner would see drift that is not there. A checkout
+  // without one (a probe tree) falls back to the hook's own; a copied hook with neither has nothing to judge by.
+  const scanPath = [committingToplevel, path.resolve(__dirname, '..')]
+    .map((root) => path.join(root, 'scripts/git-one-door-scan.mjs')).find((file) => fs.existsSync(file));
+  if (!scanPath) return null;
   try {
     const { MUTATION_CENSUS_PATH, censusDrift, declaredProduct } = await import(pathToFileURL(scanPath).href);
+    // A branch older than this rule ships a scanner without censusDrift: it predates the check, and its drift
+    // is still caught when it merges into a tree that has the rule.
+    if (typeof censusDrift !== 'function') return null;
     if (!git(['ls-files', '--stage', '--', MUTATION_CENSUS_PATH]).trim()) return null;
     const product = declaredProduct(committingToplevel);
     const staged = git(['diff', '--cached', '--name-only', '--no-renames', '-z']).split('\0')
@@ -477,6 +500,56 @@ async function censusDriftRefusal(committingToplevel) {
   } catch (error) {
     return `commit refused: could not check the Git one-door census against the staged files (${error.message}). Repair the index or the census and retry.`;
   }
+}
+
+// A staged config file is checked before it is committed (docs/platform/config/spec.md section 11): a
+// file that does not parse stops every verb on every machine that pulls it. `fgos config check` reads
+// the working-tree file, not the staged blob (a staged-only check is not built), so the message says so.
+// A `fail` finding row that names the project file refuses the commit and names file, position and path, never a value.
+// No host binary, a host that predates the verb or any answer that is not a `config check` result is a
+// warning: the hook cannot judge the file, which is no reason to block the commit.
+const CONFIG_FILES = new Set(['.fgos/config.yaml', '.fgos/config.json']);
+
+function configCheckRefusal(committingToplevel) {
+  let staged;
+  try {
+    staged = execFileSync('git', ['diff', '--cached', '--name-only', '--no-renames', '--diff-filter=ACMR', '-z'], {
+      cwd: committingToplevel, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+    }).split('\0');
+  } catch (error) {
+    process.stderr.write(`warning: config check skipped (staged-path-read-error): ${error.message}\n`);
+    return null;
+  }
+  const files = staged.filter((name) => CONFIG_FILES.has(name));
+  if (files.length === 0) return null;
+  const { bin } = resolveActiveHostBin({ fgosDir: path.join(committingToplevel, '.fgos'), cwd: committingToplevel });
+  if (!bin) {
+    process.stderr.write(`warning: ${files.join(', ')} was not checked (no fgos host binary found); continuing.\n`);
+    return null;
+  }
+  let data;
+  try {
+    let stdout;
+    try {
+      stdout = hostStdout(bin, ['config', 'check'], committingToplevel);
+    } catch (error) {
+      if (typeof error?.stdout !== 'string' || error.stdout === '') throw error; // no answer: the catch below warns
+      stdout = error.stdout; // a failing check exits non-zero and still prints its findings
+    }
+    data = JSON.parse(stdout)?.data;
+    if (!Array.isArray(data?.findings)) throw new Error(`${bin} config check printed an unexpected answer`);
+  } catch (error) {
+    process.stderr.write(`warning: ${files.join(', ')} was not checked (${String(error?.message ?? error).split('\n')[0].slice(0, 200)}); continuing.\n`);
+    return null;
+  }
+  // Only the rows that name the project file: a machine-level row (an unset token file, say) is no reason to refuse a commit of this file.
+  const failing = data.findings.filter((row) => row?.severity === 'fail' && typeof row.file === 'string' && row.file.startsWith('project:'));
+  if (failing.length === 0) return null;
+  const rows = failing.map((row) => {
+    const where = [row.file, row.line, row.column].filter((part) => part !== null && part !== undefined).join(':');
+    return `  ${row.row}${where ? ` ${where}` : ''}${row.path ? ` at ${row.path}` : ''}${row.fix ? ` (fix: ${row.fix})` : ''}`;
+  });
+  return `commit refused: "fgos config check" fails on the working-tree config file (${files.join(', ')} is staged; the check reads the file on disk, not the staged blob):\n${rows.join('\n')}\nRun "fgos config check" to see them and fix the file before committing.`;
 }
 
 async function warnOnConventionViolations(committingToplevel) {
@@ -553,13 +626,18 @@ async function main() {
     return;
   }
 
-  const fgosDeletions = stagedFgosDeletions(committingToplevel);
+  const carriedIn = (paths) => fgosPathsOwnedByMergeHead(committingToplevel, paths);
+  const stagedDeletions = stagedFgosDeletions(committingToplevel);
+  const carriedDeletions = carriedIn(stagedDeletions);
+  const fgosDeletions = stagedDeletions.filter((p) => !carriedDeletions.has(p));
   if (fgosDeletions.length > 0 && !scopedGrantAllows(committingToplevel)) {
     refuse(`commit refused: this commit stages a deletion under ".fgos/" (${fgosDeletions.join(', ')}) -- .fgos/ is fgOS's own runner state and must never be committed as deleted. A linked worktree never keeps a working-tree copy of .fgos/ by design (ADR0020); if you ran "git add -A" here, unstage these paths first (e.g. "git restore --staged .fgos").`);
     return;
   }
 
-  const fgosWorkerChanges = stagedFgosChangesOnWorkerBranch(committingToplevel);
+  const workerChanges = stagedFgosChangesOnWorkerBranch(committingToplevel);
+  const carriedChanges = carriedIn(workerChanges);
+  const fgosWorkerChanges = workerChanges.filter((p) => !carriedChanges.has(p));
   if (fgosWorkerChanges.length > 0) {
     refuse(`commit refused: this commit on a worker branch stages changes under ".fgos/" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);
     return;
@@ -583,6 +661,12 @@ async function main() {
     return;
   }
 
+  const configRefusal = configCheckRefusal(committingToplevel);
+  if (configRefusal) {
+    refuse(configRefusal);
+    return;
+  }
+
   await warnOnConventionViolations(committingToplevel);
 
   if (!hookRunsAtHome(repoRoot, committingToplevel)) {
@@ -598,14 +682,9 @@ async function main() {
     return;
   }
 
-  const fgosRegressed = stagedFgosModificationsRegressLineCount(committingToplevel);
-  if (fgosRegressed.error) {
-    refuse(fgosRegressed.error);
-    return;
-  }
-  if (fgosRegressed.regressedPaths.length > 0) {
-    const paths = fgosRegressed.regressedPaths.map((r) => r.path).join(', ');
-    refuse(`commit refused: this commit stages a modification under ".fgos/" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);
+  const shrinkRefusal = stagedEventLogShrinkRefusal(committingToplevel);
+  if (shrinkRefusal) {
+    refuse(shrinkRefusal);
     return;
   }
 
@@ -671,5 +750,11 @@ if (process.argv[2] === 'reference-transaction' && process.argv[3] === 'prepared
   const refusal = guardReferenceTransaction({ git: leaseGitRead, root: process.cwd(), input: fs.readFileSync(0, 'utf8') });
   if (refusal) { process.stderr.write(`${refusal}\n`); process.exitCode = 1; }
 } else {
-  await main();
+  try {
+    await main();
+  } catch (err) {
+    if (!err?.refusal) throw err;
+    console.error(err.message);
+    process.exitCode = 1;
+  }
 }

@@ -4,8 +4,8 @@
 // misses.
 //
 // PURE: no fs import, no child_process import. `visitCount` takes an already
-// -read array of events (as returned by `readEvents`/`foldEvents` upstream)
-// — it never opens `.fgos/events.jsonl` itself. `createMissBreaker`'s state
+// -read array of events (as returned by `readRawEvents` upstream)
+// — it never reads the Work history itself. `createMissBreaker`'s state
 // lives only in the closure returned to the caller; nothing here touches
 // disk or a process.
 //

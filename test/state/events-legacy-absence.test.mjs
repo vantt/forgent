@@ -42,14 +42,6 @@ for (const relPath of RETIRED_FILES) {
 test('.gitattributes no longer configures merge=union for .fgos/events.jsonl (file is frozen baseline-0, Tầng A)', () => {
   const raw = fs.readFileSync(path.join(REPO_ROOT, '.gitattributes'), 'utf8');
   assert.doesNotMatch(raw, /\.fgos\/events\.jsonl\s+merge=union/, 'the retired union-merge entry must be gone');
-  // Sibling union entry for the still-tracked per-writer event shards is
-  // unrelated to this retirement and must survive untouched. The 5
-  // diagnostic-log union entries (approve-post-success-faults.jsonl etc.)
-  // were separately retired in phase-01
-  // (plans/260825-0842-fgos-logs-dir-bucketing): those files moved under
-  // the gitignored `.fgos/logs/` bucket, so git merge never sees them —
-  // see fgos-logs-bucket.test.mjs.
-  assert.match(raw, /\.fgos\/events\/\*\.jsonl merge=union/);
 });
 
 test('package.json no longer registers the check:events-seq npm script', () => {
@@ -67,15 +59,12 @@ test("fgos doctor's DOCTOR_CHECKS/FIX_REGISTRATIONS no longer register the retir
   const { DOCTOR_CHECKS, FIX_REGISTRATIONS } = await import('../../src/setup/registrations.mjs');
   assert.equal(DOCTOR_CHECKS.some((c) => c.id === 'events-jsonl-contiguous'), false);
   assert.equal(FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-contiguous'), false);
-  // The sibling truncation-detection check (tsk-cgg, a different failure
-  // class, out of this retirement's scope) must still be registered.
-  assert.equal(DOCTOR_CHECKS.some((c) => c.id === 'events-jsonl-not-truncated'), true);
 });
 
 test('no remaining production source (src/, scripts/) imports the retired contiguity modules', () => {
   // Scoped to real import-specifier couplings (a quoted module path after
   // `from`/`import(`), not free-floating prose -- other production files
-  // (e.g. src/state/replay.mjs, src/state/events-compaction.mjs) legitimately
+  // (e.g. src/state/replay.mjs) legitimately
   // still cite the retired module BY NAME in a doc-comment as historical
   // design precedent, without importing anything from it; that citation is
   // narrative, not a functional coupling, and is out of this test's scope.

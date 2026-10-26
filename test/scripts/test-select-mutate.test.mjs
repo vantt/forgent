@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { removeWorktree } from '../../src/runner/worktree.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { classifyMutant, classifyOneMutant, relatedFilesForRule, runNightlyMutations, runRelatedCaptured as realRunRelated, symlinkSharedDirs, headCheckouts, checkoutCargoTarget } from '../../scripts/test-select-mutate.mjs';
 
 test('symlinkSharedDirs: symlinks node_modules always, target only when the repo root has one', () => {
@@ -279,7 +281,7 @@ test('relatedFilesForRule dedupes directTests + boundaryTests and returns [] for
 
 // --- Integration: a real mutant, real detached git worktree, real spawns --
 
-test('integration: a real mutant (m-edit-1) is applied and classified inside a real detached git worktree', { skip: process.platform === 'win32' }, async () => {
+test('integration: a real mutant (m-edit-1) is applied and classified inside a real detached git worktree', { skip: process.platform === 'win32' }, async (t) => {
   const { mutants } = await import('../test-ownership-mutants.mjs');
   const { MANIFEST } = await import('../test-ownership.mjs');
   const mutant = mutants.find((m) => m.id === 'm-edit-1');
@@ -288,8 +290,18 @@ test('integration: a real mutant (m-edit-1) is applied and classified inside a r
   assert.ok(rule, 'rule for m-edit-1 must exist in the manifest');
 
   const repoRoot = process.cwd();
+  // The checkout is registered in a shared clone, never in this repository: a run killed mid-test then
+  // leaves a registration only in the clone, not one that blocks every later worktree add here.
+  const clone = fs.mkdtempSync(path.join(os.tmpdir(), 'mutate-clone-'));
+  t.after(() => fs.rmSync(clone, { recursive: true, force: true }));
+  execFileSync('git', ['clone', '-q', '--shared', '--no-checkout', repoRoot, clone]);
+  assert.equal(execFileSync('git', ['-C', clone, 'rev-parse', 'HEAD'], { encoding: 'utf8' }), execFileSync('git', ['-C', repoRoot, 'rev-parse', 'HEAD'], { encoding: 'utf8' }));
+  // Removing a verify checkout refuses while its commit is on no local branch; a gate runs on a detached merge.
+  execFileSync('git', ['-C', clone, 'branch', '-f', 'mutate-head', 'HEAD']);
+  activateGitFixture(clone);
+  const checkouts = headCheckouts(clone);
   let preserved = false;
-  const worktreePath = headCheckouts.create();
+  const worktreePath = checkouts.create();
   try {
     fs.symlinkSync(path.join(repoRoot, 'node_modules'), path.join(worktreePath, 'node_modules'), 'dir');
     // The related runs are real processes in a real worktree. The full-suite
@@ -311,11 +323,9 @@ test('integration: a real mutant (m-edit-1) is applied and classified inside a r
     );
     assert.equal(fs.readFileSync(path.join(worktreePath, mutant.file), 'utf8'), fs.readFileSync(path.join(repoRoot, mutant.file), 'utf8'), 'the mutated file is restored after classification');
   } finally {
-    headCheckouts.remove(worktreePath);
-    // This checkout is registered in the real repository and lives in the run's temp dir: one the guarded
-    // removal kept would outlive that dir as a registration that blocks every later worktree add.
+    checkouts.remove(worktreePath);
     preserved = fs.existsSync(worktreePath);
-    if (preserved) removeWorktree(process.cwd(), worktreePath, { force: true });
+    if (preserved) removeWorktree(clone, worktreePath, { force: true });
   }
   assert.equal(preserved, false, 'the guarded removal took the restored checkout away');
 });

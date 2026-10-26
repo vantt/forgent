@@ -9,6 +9,9 @@ mode: how-to
 ---
 # How to reconstruct fgOS tracking state after an operator mistake discards `.fgos/events.jsonl` mid-session
 
+**Superseded (Event Store cutover, 2026-10):** the cause this runbook handles, a `git stash`, `checkout` or `reset` reverting the tracked `.fgos/events.jsonl` under live appends, cannot happen to a migrated repository: Work's events are not in the working tree. Acknowledged events sit in open logs under the Git common directory and, once sealed, in `refs/fgos/events/<machine-id>`; a git operation on the checkout does not touch either. To rebuild a lost or stale view run `fgos rebuild`; see `docs/specs/work-state.md` ("Bố cục dữ liệu, thứ tự và xung đột"). The procedure below applies only to a repository that has not yet run `fgos events migrate`.
+
+
 Use this when a work item's own event history (its `work.add` and every
 transition after it) is missing from `.fgos/events.jsonl`, but the real
 code the item describes is already merged into `main` and verifiable on

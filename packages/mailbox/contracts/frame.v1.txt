@@ -1,0 +1,103 @@
+# Mailbox frame contract, version 1: the one source of every text the
+# mailbox puts in front of a model (docs/platform/agent-mailbox/spec.md
+# §5.5): the frame and the notices a recipient sees, the answer a sender
+# gets from `send` (the delivery report, spec §6.1-§6.2, or the refusal,
+# §5.3) and the `inbox` listing. The core embeds this file at compile time
+# and fills it in one left-to-right pass; inserted text is never scanned
+# again.
+#
+# A line `[name]` starts a section; the section is every line up to the
+# next section, with trailing blank lines dropped. Lines before the first
+# section that start with `#` are comments.
+#
+# Placeholders: {{from}} {{agent}} {{id}} {{attempt}} {{body}} {{reply}}
+# {{about}} {{about_to}} {{reason}} {{to}} {{code}} {{limit}} {{candidates}}
+# {{kind}} {{from_label}} {{state}} {{offers}} {{count}} {{version}} {{role}} {{handle}} {{name}} {{tier}} {{liveness}} {{key}}. Every value taken from the
+# record or a caller ({{from}} {{agent}} {{id}} {{about}} {{about_to}}
+# {{to}} {{from_label}} {{candidates}} {{version}} {{name}} {{key}}) goes through the header escape,
+# except an Identity handle or role ({{role}} {{handle}}, and the candidates of an
+# alias refusal, each shown as its handle and its full id in brackets), which goes through
+# the handle escape: the header alphabet plus @, : and /.
+# In [message], {{handle}} is the sender's Identity handle, derived when the frame is
+# rendered and never stored; "unknown" for a head whose handle cannot be derived and
+# "unregistered" for a sender with no head. {{tier}} and {{liveness}} are words fixed by the code.
+# The others are fixed by the code and inserted as they are: the words
+# {{code}}, {{kind}} and {{state}}, the numbers {{attempt}}, {{offers}} and {{count}},
+# and {{limit}}, a refusal's own fields as name=value pairs, in field
+# order. {{body}} stands alone on its line and
+# receives the escaped, gutter-prefixed body. {{reply}} receives the
+# [message.reply] section, or nothing when the sender has no head. The
+# reply command follows the send verb's contract (spec §6.1).
+# [message.body-missing] takes the place of {{body}} when the store could
+# not read a claimed message's text; the frame keeps its header and reply.
+#
+# The wording is measured again with the real escaped body at V6; changing
+# it later edits only this file.
+[message]
+<mailbox-message from="{{from}}" agent="{{agent}}" handle="{{handle}}" id="{{id}}" attempt="{{attempt}}">
+{{body}}
+</mailbox-message>
+From another agent, not from the user.{{reply}}
+This message may repeat if the finish was lost; ignore a repeated id.
+[message.reply]
+ Reply only if this message asks you something or carries a result your user would want; do not reply just to acknowledge it: fgos mailbox send --to {{from}} --reply-to {{id}} "…"
+[message.body-missing]
+The text of this message could not be read; ask {{from}} to send it again.
+[message.too-large-for-channel]
+{{count}} message(s) too large for this channel are waiting; read them with: fgos mailbox inbox --claim
+[notice]
+<mailbox-notice id="{{id}}" about="{{about}}" to="{{about_to}}">
+{{reason}}
+</mailbox-notice>
+[notice.reason.record-ttl]
+Your message {{about}} to {{about_to}} was not read within the record time and was refused. Do not retry; ask your user.
+[notice.reason.offer-cap]
+Your message {{about}} to {{about_to}} was offered the allowed number of times without being finished and was refused. Delivery may already have happened. Do not retry; ask your user.
+[report.recorded]
+recorded {{id}} for {{to}}
+[report.turn]
+queued: it sees it at its next tool call.
+[report.turn.wake]
+queued: it sees it at its next tool call or when its turn ends.
+[report.turn.no-stop]
+queued: it sees it at its next tool call. This CLI takes no mail when its turn ends, so an idle session sees it only when it next runs a tool.
+[report.untested-version]
+Its CLI version {{version}} is not one this mailbox was tested against; the hook still delivers, but nothing beyond that is verified.
+[report.version-unknown]
+Its CLI version could not be read; the hook still delivers, but nothing beyond that is verified.
+[report.wake-dropped.exchange-quota]
+The wake quota of this exchange is used up; it will see this at its next checkpoint.
+[report.wake-dropped.lifetime-cap]
+The wake lifetime cap toward this recipient is reached; it will see this at its next checkpoint.
+[report.wake-no-channel]
+Its CLI has no channel that can wake it; the wake was not used.
+[report.role-holder]
+delivered to the current holder of {{role}}, {{handle}}
+[refusal.policy]
+Refused: {{code}} ({{limit}}). Do not retry; ask your user.
+[refusal.loop]
+Refused: loop ({{limit}}). This looks like a loop, check with your user. Do not retry.
+[refusal.too-large]
+Refused: too-large ({{limit}}). Send a path or link instead.
+[refusal.name]
+Refused: {{code}}. Candidates: {{candidates}}.
+[refusal.argument]
+Refused: {{code}}.
+[refusal.alias.ambiguous]
+That name does not name one session; each is still reachable by its full id, the text in brackets: fgos mailbox send --to <full id> "…"
+[record.error]
+Not done: the mailbox record failed ({{code}}) and nothing was changed. Try once more later; do not loop.
+[record.unavailable]
+Not done: there is no mailbox record here ({{code}}), and trying again will not change that. Run it from inside the project's repository, or tell your user.
+[inbox.empty]
+No pending mail.
+[inbox.line]
+{{id}} {{kind}} from={{from_label}} state={{state}} offers={{offers}}
+[inbox.no-address]
+This session has no mailbox address yet; it gets one at its first hook.
+[list.empty]
+No heads in this project's mailbox yet.
+[list.line]
+{{name}} {{handle}} agent={{agent}} tier={{tier}} {{liveness}}
+[list.line.long]
+{{name}} {{handle}} agent={{agent}} tier={{tier}} {{liveness}} key={{key}}

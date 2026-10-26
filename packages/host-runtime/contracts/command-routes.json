@@ -123,6 +123,7 @@
       ],
       "migrate": [
         "accept-machine-overrides",
+        "convert",
         "dir",
         "dry-run",
         "finish",
@@ -338,6 +339,15 @@
       "test/rust-host/command-routes.test.mjs"
     ]
   },
+  "events": {
+    "selector": "events",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
   "friction": {
     "selector": "friction",
     "route_kind": "native",
@@ -486,6 +496,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "native_kinds": [
+      "mailbox"
     ]
   },
   "identity": {
@@ -501,6 +514,7 @@
         "dir",
         "help",
         "json",
+        "machine",
         "project",
         "prune"
       ],
@@ -518,7 +532,9 @@
         "release"
       ],
       "pins": [
+        "confirm",
         "dir",
+        "fingerprint",
         "forget",
         "help",
         "json"
@@ -601,6 +617,44 @@
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ]
+  },
+  "mailbox": {
+    "selector": "mailbox",
+    "route_kind": "native",
+    "operation_id": "mailbox.inbox",
+    "owner_path": "packages/mailbox/rust",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ],
+    "subcommands": true,
+    "subcommand_flags": {
+      "inbox": [
+        "claim",
+        "dir",
+        "help",
+        "json"
+      ],
+      "list": [
+        "dir",
+        "help",
+        "json",
+        "long"
+      ],
+      "send": [
+        "body",
+        "dir",
+        "help",
+        "json",
+        "reply-to",
+        "to",
+        "wake"
+      ],
+      "status": [
+        "dir",
+        "help",
+        "json"
+      ]
+    }
   },
   "main-checkout-reset": {
     "selector": "main-checkout-reset",
@@ -797,15 +851,6 @@
   },
   "reject": {
     "selector": "reject",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
-    "compatibility_tests": [
-      "test/rust-host/command-routes.test.mjs"
-    ]
-  },
-  "repair": {
-    "selector": "repair",
     "route_kind": "legacy-cli",
     "legacy_payload": "legacy-node",
     "owner_path": "src/cli/command-registry.mjs",

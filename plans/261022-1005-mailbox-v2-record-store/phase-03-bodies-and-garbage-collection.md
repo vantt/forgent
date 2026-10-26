@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Immutable bodies, safe reads and garbage collection"
-status: pending
+status: completed
 depends_on: [2]
 ---
 
@@ -56,3 +56,31 @@ The nine tests are green on a fresh main merge; no listing happens outside send 
 
 - Deleting every unknown entry in the record directories is safe only because every writer of those directories holds the mailbox mutex; document that invariant in `bodies.rs`. A future file beside the snapshot (V5's breaker file, spec §4.1) must be added to `Paths::is_known` in the same change, or the sweep deletes it; phase 8 writes this into spec §6.4.
 - Rollback: revert; phase 2 behaviour stays.
+
+## API drift
+
+None (main unchanged since `487f58426` at the start of this phase).
+
+## Deviations
+
+- The deletion counts are on `Held` (`collected: Collected { deleted, failed }`), because the observer receives a `Step` only.
+- A sweep that finds an entry it cannot judge (not a regular file), or a record directory whose identity changed since the hold checked it, deletes nothing. It returns a warning at `Step::Collected`, not `RecordError::RecordDirUntrusted`: the sweep runs after the rename, and the commit-point rule (phase 2) turns every later failure into a warning on a written hold. The per-hold directory check before any write still returns `record-dir-untrusted` (test 10).
+- Listing goes through the path (`read_dir`); every deletion goes through a descriptor of the checked directory (`O_DIRECTORY|O_NOFOLLOW`, device and inode equal to the hold's check) with `unlinkat` and no flags, which never follows a symlink and refuses a directory. A `fstatat` regular-file check before `unlinkat` was written and then removed: no test could tell it apart, because the listing already judged each entry and `unlinkat` alone cannot reach outside the directory.
+- `bodies::install` is public (module `record::bodies`) so test 3 calls the function the hold uses. Its doc states that only a holder of the lock may call it.
+- `Record::body` also runs the per-hold directory check, so a symlinked `bodies/` is never read through. That case was added to test 7.
+- Test 8 also proves the `mailbox.maxBodyBytes` cap: a body over the cap is not read even when its header claims that size. It is renamed `a_body_longer_than_its_header_says_or_than_the_cap_is_not_read`.
+- Test 4 also proves that a writing hold which is not a send lists nothing: the planted orphans survive it. Test 6 keeps the non-writing hook hold.
+- Two tests added for plan decision 5 and red-team finding 1, which no listed test proved:
+  - `a_send_that_finds_an_entry_it_cannot_judge_deletes_nothing`.
+  - `a_bodies_directory_swapped_during_a_hold_is_never_used_for_deletion`, which uses the observer to swap `bodies/` for another real directory after the check.
+- Test isolation: running `record_bodies` 40 times gave 4 runs with `LockBusy` under `Wait::Try`. The cause was a fork in another test of the same binary (the `mkfifo` command, the id-drawing children), which copies open lock descriptions until the child execs. The fix: `TempFgos` holds one guard per test binary for the test's life, and FIFOs are made with `libc::mkfifo`, so no child process is involved. Afterwards, 30 runs of both files had no failure. The production hook is not affected: it runs one hold at a time in its own process.
+
+## Proof
+
+- `cargo test -p fgos-mailbox -p fgos-mailbox-core`: 148 passed, 0 failed. `tests/record_bodies.rs` has 12 tests.
+- Mutants against `record_bodies`: 13 tried, 12 killed. They covered `body-exists`, the send-only sweep, the sweep's regular-file rule, the directory identity, the body length, the body cap, the body directory check, the body install, and the snapshot read reused by the bodies. The survivor is counting every header as referenced instead of only those with `body_kept`. It is equivalent under the contract values, because the header horizon equals the body retention, so no header exists with `body_kept == false`.
+- After the test-isolation fix, the phase 2 mutants were rerun: the same 6 are killed, each by the test named for its behaviour.
+
+## Later change
+
+Review fix M1 (2026-10-22): the trust check now covers every directory from `.fgos` down, with modes, and the sweep lists through the checked descriptor; see phase 8, "Review fixes".

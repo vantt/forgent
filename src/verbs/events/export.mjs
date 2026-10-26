@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
-import { listPorting } from '../../state/porting-store.mjs';
+import { parseEventLines } from '../../state/event-log.mjs';
+import { foldPortingEvents } from '../../state/porting-store.mjs';
 import { isDeepStrictEqual } from 'node:util';
 import { foldEvents } from '../../state/replay.mjs';
 import { entityDifferences } from './parity.mjs';
@@ -22,22 +22,16 @@ export function exportUseCase(ctx, options = {}) {
   const legacyView = foldEvents(legacyOrder);
   const v4View = foldEvents(v4Order);
   const differences = entityDifferences(legacyView, v4View);
-  // Use the production porting reader/reducer. It deliberately reads log order,
-  // unlike Work's multi-shard (ts, file, seq) ordering.
-  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-porting-parity-'));
-  try {
-    fs.mkdirSync(path.join(scratch, 'porting'));
-    fs.writeFileSync(path.join(scratch, 'porting/events.jsonl'), v4PortingOrder.map(e => JSON.stringify(e) + '\n').join(''));
-    const logs = result.files.filter(p => p.startsWith('porting/') && p.endsWith('/events.jsonl'));
-    const legacyScratch = path.join(scratch, 'legacy');
-    fs.mkdirSync(path.join(legacyScratch, 'porting'), { recursive: true });
-    fs.writeFileSync(path.join(legacyScratch, 'porting/events.jsonl'), logs.filter(p => p !== 'porting/events.jsonl').concat(logs.includes('porting/events.jsonl') ? ['porting/events.jsonl'] : []).map(p => fs.readFileSync(path.join(out, p), 'utf8').replace(/\n?$/, '\n')).join(''));
-    const left = listPorting(legacyScratch).porting;
-    const right = listPorting(scratch).porting;
-    for (const id of new Set([...Object.keys(left), ...Object.keys(right)])) {
-      if (!isDeepStrictEqual(left[id], right[id])) differences.push({ collection: 'porting', id, legacy: left[id] ?? null, v4: right[id] ?? null });
-    }
-  } finally { fs.rmSync(scratch, { recursive: true, force: true }); }
+  // The physical order of the frozen legacy layout and the v4 order both feed the consumer's own
+  // porting reducer; unlike Work's multi-shard (ts, file, seq) ordering it reads log order.
+  const logs = result.files.filter(p => p.startsWith('porting/') && p.endsWith('/events.jsonl'));
+  const legacyPorting = logs.filter(p => p !== 'porting/events.jsonl').concat(logs.includes('porting/events.jsonl') ? ['porting/events.jsonl'] : [])
+    .flatMap(file => parseEventLines(fs.readFileSync(path.join(out, file), 'utf8'), file));
+  const left = foldPortingEvents(legacyPorting).porting;
+  const right = foldPortingEvents(v4PortingOrder).porting;
+  for (const id of new Set([...Object.keys(left), ...Object.keys(right)])) {
+    if (!isDeepStrictEqual(left[id], right[id])) differences.push({ collection: 'porting', id, legacy: left[id] ?? null, v4: right[id] ?? null });
+  }
   const parity = { equal: differences.length === 0, differences, deferred: result.deferred, missing: result.missing };
   fs.writeFileSync(path.join(out, 'parity-report.json'), `${JSON.stringify(parity, null, 2)}\n`, { flag: 'wx' });
   return { ...result, parity };

@@ -89,7 +89,7 @@ import {
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { capabilityServedBy, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 // `fgos plan --validate` runs validate-plan as a confined Unit; posture checks consult the machine
 // backend registry, kept file-local here (the child CLI inherits the env that points at it).
@@ -103,13 +103,6 @@ seedFileLocalBwrapRegistry();
 // lands it on stage `decompose`, not `executing` directly, since chia-việc
 // is the next stop before executing. This assertion changed its expected
 // destination from `executing` to `decompose` for exactly that reason (per
-test.todo('discover on a clear verdict moves the submitted item to stage planning with the caller-supplied verify (tsk-30v D2/D6: clear skips exploring, discovery -> planning directly) - migrated to test/direct/fgos-stage.test.mjs');
-
-test.todo('plan on an item sitting at stage planning dispatches to resolvePlan and pass-throughs it on to executing (sync/async parity) - migrated to test/direct/fgos-stage.test.mjs');
-
-test.todo('fgos plan with --verdict and plan.md present directly processes caller verdict without running validate-plan assignment (Finding 2 fix) - migrated to test/direct/fgos-stage.test.mjs');
-
-
 test('fgos plan on a standard plan without caller verdict advances Work to executing after READY validation', () => {
   // validate-plan runs as a Unit: the project is a git repo outside /tmp (a confined worker sees
   // a private tmpfs there), with a confined executor and a review pool in its runner config.
@@ -199,13 +192,12 @@ test('fgos plan on a standard plan without caller verdict advances Work to execu
       },
     },
     capabilities: {
-      review: { prefer: [{ executor: 'fixture-validator' }] },
-      'coding:review': { prefer: [{ executor: 'fixture-validator' }] },
+      review: capabilityServedBy('fixture-validator', 'review'),
+      'coding:review': capabilityServedBy('fixture-validator', 'coding:review'),
     },
     modelPolicies: { node: { nano: 'n', standard: 's', flagship: 'f', frontier: 'x' } },
   };
-  const configFile = path.join(cwd, '.fgos', 'config.json');
-  const existingConfig = fs.existsSync(configFile) ? JSON.parse(fs.readFileSync(configFile, 'utf8')) : {};
+  const existingConfig = readProjectConfig(cwd);
   writeProjectConfig(cwd, { ...existingConfig, runner: runnerCfg });
 
   // Interactive fgos plan without --verdict
@@ -259,10 +251,6 @@ test('plan with no id is rejected as validation, exit 4', () => {
 });
 
 
-test.todo('discover on an unclear verdict parks the submitted item in awaiting-human with the question, and advances it to exploring (tsk-30v D2/D3: unclear no longer parks in place) - migrated to test/direct/fgos-stage.test.mjs');
-
-
-
 test('discover with no id is rejected as validation, exit 4', () => {
   const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['discover']);
@@ -270,57 +258,34 @@ test('discover with no id is rejected as validation, exit 4', () => {
 });
 
 
-// str76-runner-bootstrap-e3: a fresh cwd with no runner config used to
-// crash `discover` with RunnerConfigError/ENOENT (the bug this feature
-// fixes) — it now bootstraps the D1 default config instead, BEFORE
-// resolveDiscovery is ever called (bin/fgos.mjs's own `discover` case reads
-// `cfg` first). tsk-1x3 D1/D9/D16: the config bootstrap still happens
-// unconditionally, but resolveDiscovery itself no longer spawns a judge
-// against it for a bare (no --verdict) session-role call — it refuses
-// loudly instead. PATH is still neutralized here to prove the bootstrap
-// path is exercised the same way (no live agent invoked either way).
-test('discover on a fresh cwd with no runner config bootstraps the default config into the shared file instead of crashing on ENOENT, then still refuses without --verdict (D16)', () => {
+// A fresh cwd with no runner config and no assistant CLI on PATH: the config still loads (a missing default
+// executor is refused only where it is used, proven in test/runner/dispatch.test.mjs), so `discover` with no
+// verdict refuses for its own reason and names that fix; it writes no config file and never touches the item.
+test('discover on a fresh cwd with no runner config and no assistant CLI refuses naming its own fix and writes no config', () => {
   const cwd = tmpCwdFromTemplate();
-  const configPath = path.join(cwd, '.fgos', 'config.json');
-  assert.equal(fs.existsSync(configPath), false);
-
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing with no config yet']).stdout).data.id;
+  // The fixture's own project config holds no runner section; discover must leave it exactly as it was.
+  const configFiles = () => ['config.yaml', 'config.json'].map((name) => {
+    const file = path.join(cwd, '.fgos', name);
+    return fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null;
+  });
+  const before = configFiles();
 
   const result = run(cwd, ['discover', id], { PATH: '/usr/bin:/bin' });
-  assert.equal(result.status, 4, `expected the D16 refusal, not a RunnerConfigError/ENOENT crash: ${result.stderr}`);
-  assert.match(result.stderr, /no committed CONTEXT.md and no --verdict was given/);
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /no --verdict was given/);
 
-  assert.equal(fs.existsSync(configPath), true, 'discover should have auto-written the default runner section into .fgos/config.json BEFORE refusing');
-
+  assert.deepEqual(configFiles(), before, 'discover must not write a project config');
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'todo', 'the refused call must never mutate the item');
   assert.equal(view.work[id].workflowStep, 'discovery');
 });
-
-
-test('discover --config pointing at a missing path still throws RunnerConfigError unchanged, exit 4', () => {
-  const cwd = tmpCwdFromTemplate();
-  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing with an explicit missing config']).stdout).data.id;
-  const missingConfigPath = path.join(cwd, 'no-such-runner-config.json');
-
-  const result = run(cwd, ['discover', id, '--config', missingConfigPath]);
-  assert.equal(result.status, 4);
-  assert.match(result.stderr, /cannot read runner config/);
-  assert.equal(fs.existsSync(missingConfigPath), false, 'an explicit --config path must never be auto-written');
-});
-
 
 // --- caller-supplied verdict (tsk-27y D1/D2): `--verdict` on `discover`/
 // `decompose` lets a live caller skip the judge subprocess entirely for one
 // call. Each test below configures the runner's fake executor with the
 // OPPOSITE verdict from what `--verdict` supplies — proving the flag
 // actually bypassed the judge, not just that a real judge happened to agree.
-
-test.todo('discover --verdict clear --verify moves the item to planning with that exact verify, bypassing the configured (opposite) judge verdict (tsk-30v D2/D6: clear skips exploring) - migrated to test/direct/fgos-stage.test.mjs');
-
-test.todo('discover --verdict unclear --question parks in awaiting-human with that exact question and advances to exploring, bypassing the configured (opposite) judge verdict (tsk-30v D2/D3) - migrated to test/direct/fgos-stage.test.mjs');
-
-
 
 test('discover --verdict clear with no --verify is rejected as validation, exit 4', () => {
   const cwd = tmpCwdFromTemplate();
@@ -338,17 +303,4 @@ test('discover --verdict with an unrecognized value is rejected as validation, e
   assert.equal(result.status, 4);
   assert.match(result.stderr, /"clear" or "unclear"/);
 });
-
-
-// --- caller-supplied classification (D12): `--tier`/`--kind`/`--risk` on
-// `discover` give the interactive path the same data contract the headless
-// worker already has through its `fgos-verdict` block, routed through the
-// SAME guard (`classificationPatchFromVerdict`) rather than a second copy of
-// it. Decided at discovery on real evidence, never guessed from submit text.
-
-test.todo('discover --verdict clear with --tier/--kind/--risk applies the classification to the item - migrated to test/direct/fgos-stage.test.mjs');
-
-test.todo('discover applies only the classification fields actually passed, leaving the rest untouched - migrated to test/direct/fgos-stage.test.mjs');
-
-test.todo('discover --verdict unclear never applies classification — the same guard the headless path uses - migrated to test/direct/fgos-stage.test.mjs');
 

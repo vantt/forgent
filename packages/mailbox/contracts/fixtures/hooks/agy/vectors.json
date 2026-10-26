@@ -1,0 +1,127 @@
+{
+  "cli": "agy",
+  "source": "recorded 2026-10-22 from agy 1.4.4 on this machine by scripts/record-mailbox-hook-fixtures.mjs (redaction rules version 1); dump run: `agy --dangerously-skip-permissions --model gemini-3.8-flash-low --log-file /run-dir/agy/dump/agy.log -p <prompt>` (exit 0); accept run: `agy --dangerously-skip-permissions --model gemini-3.8-flash-low --log-file /run-dir/agy/accept/agy.log -p <prompt>` (exit 0); subagent run: `agy --dangerously-skip-permissions --model gemini-3.8-flash-low --log-file /run-dir/agy/subagent/agy.log -p <prompt>` (exit 0); accept-fallback run: `agy --dangerously-skip-permissions --model gemini-3.8-flash-low --log-file /run-dir/agy/accept-fallback/agy.log -p <prompt>` (exit 0); variables removed from the parent environment: FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID, CLAUDECODE; no PostToolUse context shape was injected (tried: flat, nested); Stop block accepted by a continued Stop call: true; model echoed the Stop canary: true; hook PID namespace is the same as the recorder's; post-tool-use-subagent.json: recorded; stop-subagent.json: the subagent fired a Stop of its own, recorded; the first dump attempt (dump-refused-flags) never reached the model: agy 1.4.4 read --dangerously-skip-permissions, the word after -p, as the prompt and exited 2; the recorder now puts -p last and the dump was run once more; hooks loaded: agy.log says \"loaded 1 named hooks from 1 hooks.json file(s)\" (the workspace's own file; no user or repository hook file); PostToolUse context: no shape accepted on agy 1.4.4. Both candidates were refused before reaching the model; agy.log: post-tool hook failed to unmarshal result via protojson: unknown field \"additionalContext\" (flat shape) and unknown field \"hookSpecificOutput\" (nested shape). The 1.4.4 binary's PostToolHookResult has only overwriteResult; additionalContext was accepted by agy 1.4.2 on 2026-10-19 (spec §7). accepted-post-tool-use.json is therefore not written; Stop block: accepted on both accept runs (a second Stop call with executionNum 1, and the model's reply carried the canary); subagent: invoke_subagent started a separate conversation; the subagent's PostToolUse and Stop payloads carry no agent_id or agent_type and differ from the head's only by conversationId (and transcriptPath); the subagent fired a Stop of its own with executionNum 0; its tool process saw none of the three id variables",
+  "vectors": [
+    {
+      "name": "stop-first-of-its-turn",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "stop",
+      "file": "stop.json",
+      "expect": {
+        "subordinate": true,
+        "firstStop": true,
+        "session": null
+      }
+    },
+    {
+      "name": "stop-continued-after-a-block",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "stop",
+      "file": "stop-continued.json",
+      "expect": {
+        "subordinate": true,
+        "firstStop": false,
+        "session": null
+      }
+    },
+    {
+      "name": "post-tool-use",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": null
+      }
+    },
+    {
+      "name": "subagent-post-tool-use",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "post-tool-use",
+      "file": "post-tool-use-subagent.json",
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": null
+      }
+    },
+    {
+      "name": "subagent-stop",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "stop",
+      "file": "stop-subagent.json",
+      "expect": {
+        "subordinate": true,
+        "firstStop": true,
+        "session": null
+      }
+    },
+    {
+      "name": "empty-input",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "stop",
+      "text": "",
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "not-json",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "text": "not json",
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "a-json-array",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "stop",
+      "json": [],
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "a-stop-sent-as-post-tool-use",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "stop.json",
+      "expect": {
+        "unparsed": "event-mismatch"
+      }
+    },
+    {
+      "name": "a-post-tool-use-sent-as-stop",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "stop",
+      "file": "post-tool-use.json",
+      "expect": {
+        "unparsed": "event-mismatch"
+      }
+    },
+    {
+      "name": "a-post-tool-use-cut-in-half",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "truncate": true,
+      "expect": {
+        "unparsed": "malformed"
+      }
+    }
+  ]
+}

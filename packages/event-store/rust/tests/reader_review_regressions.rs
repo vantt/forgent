@@ -10,24 +10,31 @@ use fgos_event_store::{
 use fgos_git::*;
 use reader_support::*;
 use std::{collections::BTreeSet, fs};
-fn read_project(
+fn try_read(
     f: &Fixture,
     cursor: &Cursor,
     folded: &[fgos_event_store::envelope::Envelope],
-) -> fgos_event_store::read::ReadResult {
+) -> std::result::Result<fgos_event_store::read::ReadResult, fgos_event_store::errors::Error> {
     read(
         &f.driver,
         &f.repo,
         ReadRequest {
             layout: &f.layout,
             origin: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            machine: "test-aa",
             streams: &[StreamId::parse("project").unwrap()],
             cursor,
             folded,
             project: true,
         },
     )
-    .unwrap()
+}
+fn read_project(
+    f: &Fixture,
+    cursor: &Cursor,
+    folded: &[fgos_event_store::envelope::Envelope],
+) -> fgos_event_store::read::ReadResult {
+    try_read(f, cursor, folded).unwrap()
 }
 #[test]
 fn identical_overlap_recovers_receipt_without_requiring_segment_deletion() {
@@ -180,6 +187,7 @@ fn spliced_ancestor_machine_and_scope_are_refused() {
             ReadRequest {
                 layout: &f.layout,
                 origin: &"d".repeat(32),
+                machine: "test-aa",
                 streams: &[StreamId::parse("project").unwrap()],
                 cursor: &Cursor::default(),
                 folded: &[],
@@ -241,6 +249,7 @@ fn tracked_fence_without_fetched_legacy_is_refspec_missing() {
         ReadRequest {
             layout: &f.layout,
             origin: &"d".repeat(32),
+            machine: "test-aa",
             streams: &[StreamId::parse("project").unwrap()],
             cursor: &Cursor::default(),
             folded: &[],
@@ -249,6 +258,56 @@ fn tracked_fence_without_fetched_legacy_is_refspec_missing() {
     )
     .unwrap_err();
     assert_eq!(error.code.as_str(), "event-store-refspec-missing");
+}
+/// A clone whose only mapping records predate Git's config sequence cannot
+/// tell which one is current. Diagnostics report that as no provenance, so
+/// the setup fix records an ordered one and the pinned URL is known again.
+#[test]
+fn unordered_historical_mapping_records_read_as_no_provenance_until_setup_records_one() {
+    use fgos_event_store::{diagnostics, refspec};
+    use fgos_git::wal::{self, OperationKind, Outcome, Phase, Wal};
+    let f = Fixture::new();
+    let url = f.driver.remote_url(&f.repo, "origin").unwrap();
+    let maps = refspec::mappings("origin").unwrap();
+    f.driver
+        .ensure_fetch_mapping(&f.repo, "origin", &maps, "shape")
+        .unwrap();
+    let journal = Wal::open(&f.repo).unwrap();
+    let mut intent = journal.inspect("shape").unwrap().intent().clone();
+    fs::remove_dir_all(f.repo.common_dir().join("fgos/git/operations/shape")).unwrap();
+    let OperationKind::ConfigChange(change) = &mut intent.kind else {
+        panic!()
+    };
+    change.config_sequence = None;
+    struct Seed;
+    impl wal::PublicationAuthority for Seed {
+        fn validate_publication_borrow(&self, _: &wal::Intent) -> wal::WalResult<()> {
+            Ok(())
+        }
+    }
+    for id in ["historical-a", "historical-b"] {
+        let wal::Begin::Created(chain) = journal.begin(id, intent.clone(), &Seed).unwrap() else {
+            panic!()
+        };
+        journal
+            .append(&chain, Phase::Outcome(Outcome::ConfigApproved))
+            .unwrap();
+    }
+    let error = refspec::pinned_url(&f.driver, &f.repo, "origin").unwrap_err();
+    assert!(error.detail.contains("fetch-provenance-order-unknown"));
+    let facts = diagnostics::facts(&f.driver, &f.repo, &f.root, "origin").unwrap();
+    assert!(facts["provenance"].is_null());
+    fgos_git::RepositoryConfig::ensure_fetch_mapping(
+        &f.driver,
+        &f.repo,
+        "origin",
+        &fgos_git::publication_fetch_mappings("origin").unwrap(),
+        "test-mapping-setup",
+    )
+    .unwrap();
+    assert_eq!(refspec::pinned_url(&f.driver, &f.repo, "origin").unwrap(), url);
+    let facts = diagnostics::facts(&f.driver, &f.repo, &f.root, "origin").unwrap();
+    assert_eq!(facts["provenance"]["url"], url);
 }
 #[test]
 fn head_legacy_ignores_project_files_and_nested_shards() {
@@ -410,6 +469,7 @@ fn certified_commit_cannot_be_reused_under_a_different_machine_ref() {
         ReadRequest {
             layout: &f.layout,
             origin: &"a".repeat(32),
+            machine: "test-aa",
             streams: &[StreamId::parse("project").unwrap()],
             cursor: &first.cursor,
             folded: &first.sequence,
@@ -660,4 +720,119 @@ fn reserved_legacy_mirror_is_not_a_phantom_event_tip() {
     assert!(result.events.is_empty());
     assert!(result.sequence.is_empty());
     assert!(result.legacy.is_empty());
+}
+
+/// A clone that has never stored an event has no `.git/fgos/events` yet. The
+/// history is then empty; today `own_bounds` lists the missing root and the
+/// read fails with an I/O error. No other test reads without the root: every
+/// fixture creates it first.
+#[test]
+fn read_without_a_store_root_is_empty_history() {
+    let f = Fixture::new();
+    fs::remove_dir_all(&f.layout.root).unwrap();
+    let result = try_read(&f, &Cursor::default(), &[]).unwrap_or_else(|error| {
+        panic!("a clone with no store root has no history yet, but the read failed: {error}")
+    });
+    assert!(result.events.is_empty());
+    assert!(result.sequence.is_empty());
+}
+
+/// One foreign mirror that fails its own checks must not take every read down
+/// with it (sync already skips such a mirror with a warning). Existing tests
+/// only cover a bad ref of the reader's own machine
+/// (`spliced_ancestor_machine_and_scope_are_refused` owns that it stays fatal).
+fn bad_foreign_mirror_is_skipped(
+    bad_name: &str,
+    code: &str,
+    bad_commit: impl Fn(&PublicationPort<'_>, &Fixture) -> Oid,
+) {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let (good, bad) = {
+        let p = f.port(&mut h, "refs/fgos/events/test-aa");
+        (
+            seal(&p, &f.repo, vec![], &[event('b', 1, 1)], "test-bb"),
+            bad_commit(&p, &f),
+        )
+    };
+    drop(h);
+    plant_foreign_mirror(&f, "test-bb", &good);
+    plant_foreign_mirror(&f, bad_name, &bad);
+    let result = try_read(&f, &Cursor::default(), &[]).unwrap_or_else(|error| {
+        panic!("one bad foreign mirror ({bad_name}) failed the whole read: {error}")
+    });
+    assert_eq!(
+        result.sequence.len(),
+        1,
+        "the other machine's events are still read"
+    );
+    let skipped: Vec<_> = result
+        .skipped_mirrors
+        .iter()
+        .map(|m| (m.ref_name.as_str(), m.machine.as_str(), m.code.as_str()))
+        .collect();
+    assert_eq!(
+        skipped,
+        [(
+            format!("refs/fgos/remotes/origin/events/{bad_name}").as_str(),
+            bad_name,
+            code
+        )],
+        "the skipped mirror is named with why"
+    );
+}
+#[test]
+fn foreign_mirror_with_an_invalid_machine_name_is_skipped_not_fatal() {
+    bad_foreign_mirror_is_skipped("EVIL", "event-store-integrity", |p, f| {
+        seal(p, &f.repo, vec![], &[event('c', 1, 1)], "test-cc")
+    });
+}
+#[test]
+fn foreign_mirror_whose_header_names_another_machine_is_skipped_not_fatal() {
+    bad_foreign_mirror_is_skipped("test-cc", "event-store-ref-tampered", |p, f| {
+        seal(p, &f.repo, vec![], &[event('c', 1, 1)], "test-dd")
+    });
+}
+/// 32 MiB is the per-blob cap of the reader; one byte over trips it.
+#[test]
+fn foreign_mirror_with_an_oversized_segment_is_skipped_not_fatal() {
+    bad_foreign_mirror_is_skipped("test-cc", "event-store-io", |p, f| {
+        let big = vec![b'x'; 32 * 1024 * 1024 + 1];
+        let header = fgos_event_store::envelope::Seal::Seal {
+            v: 1,
+            machine_id: "test-cc".into(),
+            origin: "c".repeat(32),
+            stream: "project".into(),
+            scope: Scope::Project,
+            first_seq: 1,
+            last_seq: 1,
+            count: 1,
+            sha256: fgos_event_store::envelope::sha256(&big),
+        };
+        commit(
+            p,
+            &f.repo,
+            vec![],
+            vec![
+                (b"events.jsonl", big),
+                (b"seal.json", header.canonical_line().unwrap()),
+            ],
+        )
+    });
+}
+/// A fresh clone on this machine has no own ref yet, but its first sync seals
+/// onto the remote's history of this machine id, so the mirror of its own
+/// machine is never skipped: a tampered one fails the read.
+#[test]
+fn a_tampered_mirror_of_the_own_machine_fails_a_clone_with_no_own_ref() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let bad = {
+        let p = f.port(&mut h, "refs/fgos/events/test-aa");
+        seal(&p, &f.repo, vec![], &[event('c', 1, 1)], "test-dd")
+    };
+    drop(h);
+    plant_foreign_mirror(&f, "test-aa", &bad);
+    let error = try_read(&f, &Cursor::default(), &[]).unwrap_err();
+    assert_eq!(error.code.as_str(), "event-store-ref-tampered", "{error}");
 }

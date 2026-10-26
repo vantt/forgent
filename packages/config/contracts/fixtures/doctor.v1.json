@@ -155,7 +155,7 @@
   },
   {
    "id": "legacy-json-reports-only-its-format",
-   "why": "D19: a JSON file has no comments, so it has no doc, reason or note rows",
+   "why": "D19: a JSON file has no comments, so it has no doc, reason or note rows; it fails, since no project keeps legacy JSON",
    "input": {
     "files": {
      "project/.fgos/config.json": [
@@ -173,7 +173,13 @@
       "project:config.json",
       null
      ]
-    ]
+    ],
+    "severity": {
+     "config-format-legacy-json": [
+      "fail",
+      "fail"
+     ]
+    }
    }
   },
   {

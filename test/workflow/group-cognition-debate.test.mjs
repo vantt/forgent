@@ -6,7 +6,7 @@ import path from 'node:path';
 import { loadWorkflow, startWorkflow } from '../../src/workflow/index.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -30,15 +30,14 @@ function setupRepo() {
 
 /** Keep only the first `count` executors in every capability's pool, so the pool has that many families. */
 function limitFamilies(root, count) {
-  const file = path.join(root, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const cfg = readProjectConfig(root);
   for (const capability of Object.values(cfg.runner.capabilities)) capability.prefer = capability.prefer.slice(0, count);
   writeProjectConfig(root, cfg);
 }
 
 const debateUnit = (state) => state.steps['dialectical-inquiry'].units['dialectical-critique'];
 const familyOf = (root, result) => {
-  const cfg = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'config.json'), 'utf8'));
+  const cfg = readProjectConfig(root);
   return cfg.runner.executors[result.runResult.executorId].providerModel;
 };
 

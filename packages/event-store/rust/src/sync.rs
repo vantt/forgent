@@ -26,6 +26,9 @@ pub struct SyncRequest<'a> {
     pub machine: &'a str,
     pub remote: &'a str,
     pub no_push: bool,
+    /// Try the seal lock and skip, rather than wait, when another process holds
+    /// it: the start- and end-of-command trigger never queues behind a seal.
+    pub opportunistic: bool,
     pub held_ranks: &'a [u32],
     pub hot_lock_depth: u32,
 }
@@ -92,6 +95,8 @@ impl Default for SyncRecord {
 pub struct Synced {
     pub mirrors_changed: bool,
     pub warnings: Vec<String>,
+    /// An opportunistic sync found the seal lock held and did nothing.
+    pub busy: bool,
 }
 fn now() -> Result<u64, Error> {
     SystemTime::now()
@@ -112,21 +117,6 @@ pub fn sync_status(layout: &Layout) -> Result<SyncRecord, Error> {
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(SyncRecord::default()),
         Err(e) => Err(io(e)),
     }
-}
-fn streams(layout: &Layout) -> Result<Vec<StreamId>, Error> {
-    let mut out = Vec::new();
-    for entry in fs::read_dir(&layout.root).map_err(io)? {
-        let entry = entry.map_err(io)?;
-        if entry.file_type().map_err(io)?.is_dir() {
-            if let Some(name) = entry.file_name().to_str() {
-                if let Ok(stream) = StreamId::parse(name) {
-                    out.push(stream);
-                }
-            }
-        }
-    }
-    out.sort_by(|a, b| a.as_str().cmp(b.as_str()));
-    Ok(out)
 }
 fn tip(port: &dyn Publication, repo: &RepoHandle, reference: &str) -> Result<Option<Oid>, Error> {
     match port
@@ -172,6 +162,11 @@ fn verify_mirrors(
         let Some(machine) = name.strip_prefix(&prefix) else {
             continue;
         };
+        // An unchanged tip with recorded positions was already verified, so walking it
+        // again proves nothing new. An older status file without positions is verified in full once.
+        if state.tips.get(name) == Some(value) && state.positions.contains_key(name) {
+            continue;
+        }
         let result = (|| {
             let oid =
                 Oid::parse(value, repo.object_format()).map_err(|e| invalid(e.to_string()))?;
@@ -264,7 +259,19 @@ pub fn sync_with_fs(
     req: SyncRequest<'_>,
     filesystem: &dyn crate::fsio::FileSystem,
 ) -> Result<Synced, Error> {
-    let mut guard = acquire_seal(req.layout, req.held_ranks, req.hot_lock_depth, false)?.unwrap();
+    let Some(mut guard) = acquire_seal(
+        req.layout,
+        req.held_ranks,
+        req.hot_lock_depth,
+        req.opportunistic,
+    )?
+    else {
+        return Ok(Synced {
+            mirrors_changed: false,
+            warnings: Vec::new(),
+            busy: true,
+        });
+    };
     if repo.common_dir() != req.layout.common_dir {
         return Err(invalid("repository/layout mismatch"));
     }
@@ -274,13 +281,21 @@ pub fn sync_with_fs(
         state.tips.clear();
         state.positions.clear();
     }
+    if req.opportunistic {
+        // Claim the due window before any network work: a command that ends while this publish runs
+        // reads this attempt time and starts no second publisher.
+        state.time = now()?;
+        state.remote = req.remote.into();
+        fgos_durable_file::replace_durably(&req.layout.root, "sync.json", &line(&state)?)
+            .map_err(Error::from_install_error)?;
+    }
     state
         .warnings
         .retain(|w| w.starts_with("event-store-machine-ref-shared:"));
     let mut unpublished = false;
     let result = (|| {
         let mut seal_errors = Vec::new();
-        for stream in streams(req.layout)? {
+        for stream in req.layout.streams()? {
             if let Err(error) = seal_guarded(
                 driver,
                 repo,
@@ -294,6 +309,7 @@ pub fn sync_with_fs(
                 },
                 &mut guard,
                 &crate::fsio::OsFileSystem,
+                None,
             ) {
                 seal_errors.push(error);
             }
@@ -504,6 +520,7 @@ pub fn sync_with_fs(
         Ok(Synced {
             mirrors_changed: original != state.tips,
             warnings: state.warnings.clone(),
+            busy: false,
         })
     })();
     state.time = match now() {
@@ -533,67 +550,4 @@ pub fn sync_with_fs(
         });
     }
     result
-}
-#[derive(Debug)]
-pub struct Unpublished {
-    pub stream: StreamId,
-    pub sealed_pushed: bool,
-    pub oldest_unsealed_age_sec: u64,
-}
-pub fn unpublished_summary(
-    port: &dyn Publication,
-    repo: &RepoHandle,
-    layout: &Layout,
-    machine: &str,
-    remote: &str,
-) -> Result<Vec<Unpublished>, Error> {
-    let mirror = tip(port, repo, &crate::refs::mirror_event(remote, machine))?;
-    let mut out = Vec::new();
-    for stream in streams(layout)? {
-        let own = tip(port, repo, own_ref(machine, &stream)?.as_str())?;
-        let sealed_pushed = if stream.scope() != Scope::Project {
-            true
-        } else {
-            match (&own, &mirror) {
-                (None, _) => true,
-                (Some(a), Some(b)) => descends(port, repo, b, a.as_str())?,
-                _ => false,
-            }
-        };
-        let age = crate::seal::oldest_unsealed_age_sec(layout, std::slice::from_ref(&stream))?;
-        out.push(Unpublished {
-            stream,
-            sealed_pushed,
-            oldest_unsealed_age_sec: age,
-        });
-    }
-    Ok(out)
-}
-
-/// Outside-gate facade entry. Publication authority stays inside the crate.
-pub fn guarded_unpublished_summary(
-    driver: &GitDriver,
-    repo: &RepoHandle,
-    req: SyncRequest<'_>,
-) -> Result<Vec<Unpublished>, Error> {
-    if repo.common_dir() != req.layout.common_dir {
-        return Err(invalid("repository/layout mismatch"));
-    }
-    let mut guard = acquire_seal(req.layout, req.held_ranks, req.hot_lock_depth, false)?
-        .ok_or_else(|| invalid("explicit seal acquisition returned busy"))?;
-    let reference = own_ref(req.machine, &StreamId::parse("project")?)?;
-    let identity = match fs::symlink_metadata(req.layout.store()) {
-        Ok(_) => Some(StoreIdentity::open(req.layout, req.machine)?),
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
-        Err(error) => return Err(io(error)),
-    };
-    let writer = identity
-        .as_ref()
-        .map(|i| i.store_id.as_str())
-        .unwrap_or("unpublished-summary");
-    let path = req.layout.seal_lock();
-    let authority = HolderAuthority::new(repo, &mut guard.handle, &path, reference, writer)
-        .map_err(git_error)?;
-    let port = PublicationPort::new(driver, authority);
-    unpublished_summary(&port, repo, req.layout, req.machine, req.remote)
 }

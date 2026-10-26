@@ -85,19 +85,6 @@ test('owner refusal has zero seats, and creation is never used as settlement', (
   assert.equal(buildUnitSummary(dir).settledAt, null);
 });
 
-test('inline record is a real final seat without dispatch runId and keeps its binding', (t) => {
-  const { dir } = fixture(t, { unit: { id: 'inline-answer', capability: 'docs:write', pattern: 'solo', stanceOptions: ['a', 'b'] } });
-  result(dir, 'producer', '1', '01', { runId: undefined, executorId: undefined, policy: undefined,
-    unitRunId: 'unit-run-synthetic', settledAt: undefined, recordedAt: settledAt,
-    binding: { executor: 'lead', persona: 'writer', model: 'local' }, result: { stance: { choice: 'b' } }, agentClaim: undefined });
-  const summary = buildUnitSummary(dir);
-  assert.equal(summary.inline, true);
-  assert.equal(summary.seats[0].final.runId, null);
-  assert.equal(summary.seats[0].final.executor, 'lead');
-  assert.deepEqual(summary.seats[0].final.stance, { status: 'valid', choice: 'b', confidence: null });
-  assert.equal(summary.settledAt, settledAt);
-});
-
 test('stance extraction is tolerant, exact and question-local', () => {
   assert.deepEqual(extractStance({}, ['a']), { status: 'missing' });
   assert.deepEqual(extractStance({ stance: { choice: 'other' } }, ['a']), { status: 'valid', choice: 'other', confidence: null });
@@ -276,7 +263,7 @@ test('backfill never settles a passing partial panel or a reviewed producer with
 });
 
 test('backfill skips active owner execution even with complete history or old completion evidence', (t) => {
-  for (const status of ['running', 'pending-inline', 'pending']) {
+  for (const status of ['running', 'pending']) {
     const { root, dir } = fixture(t, { pattern: 'solo', execution: { status }, settlement: { outcome: 'pass', settledAt } });
     result(dir, 'producer', '1', '01');
     const before = fs.readFileSync(path.join(dir, 'unit.json'), 'utf8');
@@ -289,22 +276,16 @@ test('backfill skips active owner execution even with complete history or old co
   }
 });
 
-test('backfill skips legacy pending inline and materialized attempts without terminal results', (t) => {
-  for (const inline of [true, false]) {
-    const { root, dir } = fixture(t, { pattern: 'solo' });
-    result(dir, 'producer', '1', '01');
-    if (inline) {
-      fs.writeFileSync(path.join(dir, 'pending-inline.json'), JSON.stringify({ role: 'producer', nonce: 'pending' }));
-    } else {
-      const live = path.join(dir, 'producer', '1', 'runs', '02');
-      fs.mkdirSync(live);
-      fs.writeFileSync(path.join(live, 'run.json'), JSON.stringify({ status: 'running', runId: 'still-working' }));
-    }
-    const report = backfillUnitSummaries({ repoRoot: root });
-    assert.equal(report.skippedActive, 1);
-    assert.equal(report.changed, 0);
-    assert.equal(fs.existsSync(path.join(dir, 'unit-summary.json')), false);
-  }
+test('backfill skips materialized attempts without terminal results', (t) => {
+  const { root, dir } = fixture(t, { pattern: 'solo' });
+  result(dir, 'producer', '1', '01');
+  const live = path.join(dir, 'producer', '1', 'runs', '02');
+  fs.mkdirSync(live);
+  fs.writeFileSync(path.join(live, 'run.json'), JSON.stringify({ status: 'running', runId: 'still-working' }));
+  const report = backfillUnitSummaries({ repoRoot: root });
+  assert.equal(report.skippedActive, 1);
+  assert.equal(report.changed, 0);
+  assert.equal(fs.existsSync(path.join(dir, 'unit-summary.json')), false);
 });
 
 test('backfill requires real completion, including every dispatched checker and verify result', (t) => {

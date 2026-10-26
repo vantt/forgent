@@ -2,6 +2,8 @@
 pub use crate::order::VerifiedView;
 use crate::{
     append::Positions,
+    checkpoint::{self, Checkpoint, CheckpointReport, Retained},
+    commit_memo::CommitMemo,
     cursor::{fold_answer, Cursor, Fold},
     envelope::{Envelope, Scope},
     errors::{invalid, Error, ErrorCode},
@@ -9,10 +11,13 @@ use crate::{
     legacy::{self, LegacyEvent},
     open_read::read_own,
     order::{order, order_retained, stream_key},
-    walk::{self, blob, git_error},
+    walk::{self, blobs, git_error},
 };
 use fgos_git::{HeadFact, Inspect, ObjectType, Oid, RefPrefix, RefValue, RepoHandle};
-use std::collections::{BTreeMap, BTreeSet};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    sync::{Arc, Mutex},
+};
 #[derive(Debug)]
 pub struct ReadResult {
     pub events: Vec<Envelope>,
@@ -25,8 +30,28 @@ pub struct ReadResult {
     pub fold: Fold,
     pub full_order: Vec<String>,
     pub verified_view: VerifiedView,
+    /// What this read did with its checkpoint; default when it had none.
+    pub checkpoint: CheckpointReport,
+    /// The answer came from the process's `ReadMemo`: every observed input was
+    /// the remembered one, so nothing was walked, certified or ordered.
+    pub memoized: bool,
+    /// Foreign mirrors this answer did not take as they are; never dropped
+    /// silently. A rewound one still answers with its earlier tip.
+    pub skipped_mirrors: Vec<SkippedMirror>,
+}
+/// One foreign mirror a read did not use as it is, and why.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SkippedMirror {
+    pub ref_name: String,
+    pub machine: String,
+    pub code: String,
+    pub detail: String,
 }
 pub struct ReadRequest<'a> {
+    /// This machine's id. Its mirror is its own history: a failure there
+    /// refuses the read, where a peer's mirror is skipped and named.
+    pub machine: &'a str,
     pub layout: &'a Layout,
     pub origin: &'a str,
     /// Include all streams the view observes in `seen`; a predecessor outside
@@ -38,12 +63,150 @@ pub struct ReadRequest<'a> {
     pub folded: &'a [Envelope],
     pub project: bool,
 }
+#[derive(Clone, PartialEq)]
 struct Tip {
     name: String,
     oid: Oid,
     machine: String,
     scope: Scope,
     mirror: bool,
+}
+
+/// The legacy events one read answers with and the digest that names them.
+struct LegacyView {
+    events: Vec<LegacyEvent>,
+    digest: Option<String>,
+}
+impl LegacyView {
+    /// The same view object (one commit's memoized parse) or the same content.
+    fn same_as(self: &Arc<Self>, other: &Arc<Self>) -> bool {
+        Arc::ptr_eq(self, other) || (self.digest == other.digest && self.events == other.events)
+    }
+}
+
+/// What this process's last complete read answered, and the real inputs it
+/// answered them from. A repeat read observes every one of those inputs again
+/// (own files, every ref tip, the legacy files at HEAD) and returns the same
+/// answer only when all of them are exactly what the memo saw and the caller
+/// holds exactly the history the memo answered; any difference reads normally.
+/// The memo is a per-store value: it is never shared and never outlives its
+/// store.
+#[derive(Default)]
+pub struct ReadMemo {
+    last: Mutex<Option<Last>>,
+}
+struct Last {
+    origin: String,
+    streams: BTreeSet<String>,
+    project: bool,
+    tips: Vec<Tip>,
+    legacy_refs: BTreeMap<String, Oid>,
+    local: Vec<Envelope>,
+    legacy: Arc<LegacyView>,
+    cursor: Cursor,
+    sequence: Vec<Envelope>,
+    missing: BTreeSet<(String, u64)>,
+    concurrent: Vec<(String, String)>,
+    full_order: Vec<String>,
+    skipped_mirrors: Vec<SkippedMirror>,
+}
+impl ReadMemo {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    fn lock(&self) -> std::sync::MutexGuard<'_, Option<Last>> {
+        self.last
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+    /// The answer for a caller that holds exactly the remembered history while
+    /// every observed input is the remembered one; `None` when anything differs.
+    fn answer(
+        &self,
+        req: &ReadRequest<'_>,
+        observed: &Observed<'_>,
+        legacy: &Arc<LegacyView>,
+        legacy_held: Option<&str>,
+    ) -> Option<ReadResult> {
+        let guard = self.lock();
+        let last = guard.as_ref()?;
+        if last.origin != req.origin
+            || last.project != req.project
+            || last.streams
+                != req
+                    .streams
+                    .iter()
+                    .map(|s| s.as_str().to_owned())
+                    .collect::<BTreeSet<_>>()
+            || last.cursor != *req.cursor
+            || last.tips != observed.tips
+            || last.legacy_refs != *observed.legacy_refs
+            || last.local != observed.local
+            || !last.legacy.same_as(legacy)
+            || last.sequence != req.folded
+        {
+            return None;
+        }
+        Some(ReadResult {
+            events: Vec::new(),
+            sequence: last.sequence.clone(),
+            legacy: if legacy_held.is_some() && legacy_held == last.legacy.digest.as_deref() {
+                Vec::new()
+            } else {
+                last.legacy.events.clone()
+            },
+            deferred: Vec::new(),
+            missing: last.missing.clone(),
+            concurrent: last.concurrent.clone(),
+            cursor: last.cursor.clone(),
+            fold: Fold::Incremental,
+            full_order: last.full_order.clone(),
+            verified_view: VerifiedView {
+                events: last.sequence.clone(),
+            },
+            checkpoint: CheckpointReport::default(),
+            memoized: true,
+            skipped_mirrors: last.skipped_mirrors.clone(),
+        })
+    }
+    fn remember(
+        &self,
+        req: &ReadRequest<'_>,
+        observed: &Observed<'_>,
+        legacy: &Arc<LegacyView>,
+        answer: &ReadResult,
+    ) {
+        *self.lock() = Some(Last {
+            origin: req.origin.into(),
+            streams: req.streams.iter().map(|s| s.as_str().to_owned()).collect(),
+            project: req.project,
+            tips: observed.tips.to_vec(),
+            legacy_refs: observed.legacy_refs.clone(),
+            local: observed.local.to_vec(),
+            legacy: legacy.clone(),
+            cursor: answer.cursor.clone(),
+            sequence: answer.sequence.clone(),
+            missing: answer.missing.clone(),
+            concurrent: answer.concurrent.clone(),
+            full_order: answer.full_order.clone(),
+            skipped_mirrors: answer.skipped_mirrors.clone(),
+        });
+    }
+}
+/// A read's use of its process memo.
+#[derive(Clone, Copy)]
+pub struct Memoized<'a> {
+    pub memo: &'a ReadMemo,
+    /// Digest of the legacy events the caller already holds from an earlier
+    /// answer. A memo answer whose legacy history has this digest leaves
+    /// `ReadResult::legacy` empty: the caller keeps its own copy.
+    pub legacy_held: Option<&'a str>,
+}
+/// The inputs of one read that were observed from the real store.
+struct Observed<'a> {
+    tips: &'a [Tip],
+    legacy_refs: &'a BTreeMap<String, Oid>,
+    local: &'a [Envelope],
 }
 pub(crate) fn mirror_suffix(rest: &str) -> Result<Option<&str>, Error> {
     let (remote, suffix) = rest
@@ -58,15 +221,91 @@ pub(crate) fn mirror_suffix(rest: &str) -> Result<Option<&str>, Error> {
             .any(|p| suffix.starts_with(p)))
     .then_some(suffix))
 }
-/// Event ref tips, the legacy mirrors, and the HEAD the same listing observed (when attached).
-type ListedTips = (Vec<Tip>, BTreeMap<String, Oid>, Option<HeadFact>);
+/// The machine segment of an event ref or its mirror; empty when it has none.
+fn ref_machine(name: &str) -> &str {
+    let rest = name.strip_prefix("refs/fgos/").unwrap_or(name);
+    let rest = match rest.strip_prefix("remotes/") {
+        Some(mirror) => mirror.split_once('/').map_or("", |(_, suffix)| suffix),
+        None => rest,
+    };
+    rest.split('/').nth(1).unwrap_or("")
+}
+/// What one listing observed.
+struct Listed {
+    tips: Vec<Tip>,
+    legacy: BTreeMap<String, Oid>,
+    /// The HEAD the same listing observed (when attached).
+    head: Option<HeadFact>,
+    skipped: Vec<SkippedMirror>,
+}
+impl Listed {
+    /// A peer's mirror that fails is skipped and named; a ref outside
+    /// `refs/fgos/remotes/`, the mirror of `own` (this machine), or a mirror
+    /// that names no machine fails the read.
+    fn skip(&mut self, own: &str, name: &str, error: Error) -> Result<(), Error> {
+        let machine = ref_machine(name);
+        if !name.starts_with("refs/fgos/remotes/") || machine.is_empty() || machine == own {
+            return Err(error);
+        }
+        self.skipped.push(SkippedMirror {
+            ref_name: name.into(),
+            machine: machine.into(),
+            code: error.code.as_str().into(),
+            detail: error.detail,
+        });
+        Ok(())
+    }
+}
+enum Listing {
+    Tip(Tip),
+    Legacy(Oid),
+}
+/// One listed ref as a tip, a legacy mirror, or nothing this query reads.
+fn listing(name: &str, value: &RefValue, streams: &[StreamId]) -> Result<Option<Listing>, Error> {
+    let (rest, mirror) = match name.strip_prefix("refs/fgos/remotes/") {
+        Some(r) => match mirror_suffix(r)? {
+            Some(suffix) => (suffix, true),
+            None => return Ok(None),
+        },
+        None => (name.strip_prefix("refs/fgos/").unwrap_or(name), false),
+    };
+    let oid = || match value {
+        RefValue::Direct(oid) => Ok(oid.clone()),
+        _ => Err(Error::new(
+            ErrorCode::EventStoreRefTampered,
+            "symbolic event ref",
+        )),
+    };
+    if rest == "legacy" {
+        return Ok(Some(Listing::Legacy(oid()?)));
+    }
+    let Some((kind, suffix)) = rest.split_once('/') else {
+        return Ok(None);
+    };
+    let scope = match kind {
+        "events" => Scope::Project,
+        "branch-events" => Scope::Branch,
+        "local-events" => Scope::Local,
+        _ => return Ok(None),
+    };
+    let oid = oid()?;
+    let machine = suffix.split('/').next().unwrap();
+    if !fgos_identity::machine::valid_machine_id(machine) {
+        return Err(invalid("invalid machine in ref"));
+    }
+    Ok(streams.iter().any(|s| s.scope() == scope).then(|| {
+        Listing::Tip(Tip {
+            name: name.into(),
+            oid,
+            machine: machine.into(),
+            scope,
+            mirror,
+        })
+    }))
+}
 /// The listing that reads the event refs also lists `refs/heads/`, so the branch HEAD names, with
 /// its own listed value, comes with it (see `refs::list_with_head`).
-fn tips(
-    port: &dyn Inspect,
-    repo: &RepoHandle,
-    streams: &[StreamId],
-) -> Result<ListedTips, Error> {
+fn tips(port: &dyn Inspect, repo: &RepoHandle, req: &ReadRequest<'_>) -> Result<Listed, Error> {
     let prefixes = [
         "refs/fgos/events/",
         "refs/fgos/branch-events/",
@@ -77,65 +316,24 @@ fn tips(
     .iter()
     .map(|p| RefPrefix::parse(p).map_err(|e| invalid(e.to_string())))
     .collect::<Result<Vec<_>, _>>()?;
-    let mut tips = Vec::new();
-    let mut legacy = BTreeMap::new();
-    let (listed, head) = crate::refs::list_with_head(port, repo, &prefixes)?;
-    for e in listed {
-        let name = e.name.as_str();
-        let (rest, mirror) = if let Some(r) = name.strip_prefix("refs/fgos/remotes/") {
-            (
-                match mirror_suffix(r)? {
-                    Some(suffix) => suffix,
-                    None => continue,
-                },
-                true,
-            )
-        } else {
-            (name.strip_prefix("refs/fgos/").unwrap(), false)
-        };
-        let relevant = rest == "legacy"
-            || ["events/", "branch-events/", "local-events/"]
-                .iter()
-                .any(|p| rest.starts_with(p));
-        if !relevant {
-            continue;
-        }
-        let oid = match e.value {
-            RefValue::Direct(o) => o,
-            _ => {
-                return Err(Error::new(
-                    ErrorCode::EventStoreRefTampered,
-                    "symbolic event ref",
-                ))
+    let (entries, head) = crate::refs::list_with_head(port, repo, &prefixes)?;
+    let mut listed = Listed {
+        tips: Vec::new(),
+        legacy: BTreeMap::new(),
+        head,
+        skipped: Vec::new(),
+    };
+    for e in &entries {
+        match listing(e.name.as_str(), &e.value, req.streams) {
+            Ok(Some(Listing::Tip(tip))) => listed.tips.push(tip),
+            Ok(Some(Listing::Legacy(oid))) => {
+                listed.legacy.insert(e.name.as_str().into(), oid);
             }
-        };
-        if rest == "legacy" {
-            legacy.insert(name.into(), oid);
-            continue;
+            Ok(None) => {}
+            Err(error) => listed.skip(req.machine, e.name.as_str(), error)?,
         }
-        let (kind, suffix) = rest.split_once('/').unwrap();
-        let machine = suffix.split('/').next().unwrap();
-        if !fgos_identity::machine::valid_machine_id(machine) {
-            return Err(invalid("invalid machine in ref"));
-        }
-        let scope = match kind {
-            "events" => Scope::Project,
-            "branch-events" => Scope::Branch,
-            "local-events" => Scope::Local,
-            _ => unreachable!(),
-        };
-        if !streams.iter().any(|s| s.scope() == scope) {
-            continue;
-        }
-        tips.push(Tip {
-            name: name.into(),
-            oid,
-            machine: machine.into(),
-            scope,
-            mirror,
-        });
     }
-    Ok((tips, legacy, head))
+    Ok(listed)
 }
 fn legacy_files(
     port: &dyn Inspect,
@@ -143,7 +341,7 @@ fn legacy_files(
     oid: &Oid,
     streams: &[StreamId],
 ) -> Result<Vec<LegacyEvent>, Error> {
-    let mut events = Vec::new();
+    let mut selected = Vec::new();
     for entry in crate::legacy_import::all_entries(port, repo, oid)? {
         let file =
             std::str::from_utf8(&entry.path).map_err(|_| invalid("legacy provenance UTF8"))?;
@@ -160,8 +358,15 @@ fn legacy_files(
         if entry.kind != ObjectType::Blob || entry.mode != 0o100644 {
             return Err(invalid("unsafe legacy event entry"));
         }
-        let bytes = blob(port, repo, oid, &entry.path)?
-            .ok_or_else(|| invalid("listed legacy path missing"))?;
+        selected.push((entry.path.clone(), work));
+    }
+    // One Git process reads every legacy file of the commit, however many.
+    let paths: Vec<Vec<u8>> = selected.iter().map(|(path, _)| path.clone()).collect();
+    let contents = blobs(port, repo, oid, &paths)?;
+    let mut events = Vec::new();
+    for ((path, work), bytes) in selected.into_iter().zip(contents) {
+        let file = std::str::from_utf8(&path).map_err(|_| invalid("legacy provenance UTF8"))?;
+        let bytes = bytes.ok_or_else(|| invalid("listed legacy path missing"))?;
         let tag = if file == "events.jsonl" {
             ""
         } else if work {
@@ -183,17 +388,12 @@ fn legacy_files(
 fn read_legacy(
     port: &dyn Inspect,
     repo: &RepoHandle,
+    authority: &RepoHandle,
+    head: &HeadFact,
     refs: &BTreeMap<String, Oid>,
     streams: &[StreamId],
-    listed_head: Option<HeadFact>,
 ) -> Result<Vec<LegacyEvent>, Error> {
-    let authority = crate::fence::authority(port, repo)?;
-    // The listing observed `repo`'s HEAD; it answers for the authority only when both are one checkout.
-    let head = match listed_head {
-        Some(head) if authority.git_dir() == repo.git_dir() => head,
-        _ => port.resolve_head(&authority).map_err(git_error)?,
-    };
-    let pin = crate::fence::pinned_at_head(port, &authority, &head).map_err(|error| {
+    let pin = crate::fence::pinned_at_head(port, authority, head).map_err(|error| {
         if refs.is_empty() && error.code == ErrorCode::EventStoreIo {
             Error::new(
                 ErrorCode::EventStoreRefspecMissing,
@@ -218,11 +418,59 @@ fn read_legacy(
         }
         crate::legacy_import::read_consumer_at(
             port,
-            &authority,
+            authority,
             streams,
-            &head,
+            head,
             refs.get("refs/fgos/legacy"),
         )
+    }
+}
+/// The tracked legacy files of one commit never change, so one process parses
+/// them, orders them and digests them once per commit, legacy refs and query.
+/// HEAD is observed anew on every call: a moved HEAD names another commit.
+static LEGACY_VIEWS: CommitMemo<Arc<LegacyView>> = CommitMemo::new();
+
+fn legacy_view(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    refs: &BTreeMap<String, Oid>,
+    streams: &[StreamId],
+    listed_head: Option<HeadFact>,
+) -> Result<Arc<LegacyView>, Error> {
+    let authority = crate::fence::authority(port, repo)?;
+    // The listing observed `repo`'s HEAD; it answers for the authority only when both are one checkout.
+    let head = match listed_head {
+        Some(head) if authority.git_dir() == repo.git_dir() => head,
+        _ => port.resolve_head(&authority).map_err(git_error)?,
+    };
+    let compute = || {
+        let (work, porting): (Vec<_>, Vec<_>) =
+            read_legacy(port, repo, &authority, &head, refs, streams)?
+                .into_iter()
+                .partition(|e| !e.provenance.file.starts_with("porting/"));
+        let mut events = legacy::order(work);
+        events.extend(porting);
+        let digest = if events.is_empty() {
+            None
+        } else {
+            Some(crate::envelope::sha256(&crate::envelope::line(
+                &events.iter().map(LegacyEvent::identity).collect::<Vec<_>>(),
+            )?))
+        };
+        Ok(Arc::new(LegacyView { events, digest }))
+    };
+    match &head {
+        HeadFact::Attached { commit, .. } | HeadFact::Detached { commit } => {
+            let mut question = Vec::new();
+            for (name, oid) in refs {
+                question.extend_from_slice(format!("{name}\0{}\0", oid.as_str()).as_bytes());
+            }
+            for stream in streams {
+                question.extend_from_slice(format!("\n{}", stream.as_str()).as_bytes());
+            }
+            LEGACY_VIEWS.get_or_compute(&authority, commit, &question, compute)
+        }
+        HeadFact::Unborn { .. } => compute(),
     }
 }
 /// Must be called outside state rank 60. Local reads precede ref observations.
@@ -231,7 +479,7 @@ pub fn read(
     repo: &RepoHandle,
     req: ReadRequest<'_>,
 ) -> Result<ReadResult, Error> {
-    read_with_view(port, repo, req, None)
+    read_with_view(port, repo, req, None, None)
 }
 /// Reuse only exact envelopes from a previously verified consumer view.
 /// Changed input still undergoes ordinary validation; Git facts never reuse.
@@ -240,109 +488,88 @@ pub fn read_with_view(
     repo: &RepoHandle,
     req: ReadRequest<'_>,
     view: Option<&VerifiedView>,
+    memo: Option<Memoized<'_>>,
 ) -> Result<ReadResult, Error> {
-    let mut local = Vec::new();
-    for stream in req.streams {
-        local.extend(read_own(req.layout, req.origin, stream)?.events);
-    }
-    let (tips, legacy_refs, listed_head) = tips(port, repo, req.streams)?;
-    for (name, old) in &req.cursor.mirror_tips {
-        let tip = tips
-            .iter()
-            .find(|t| &t.name == name)
-            .ok_or_else(|| Error::new(ErrorCode::EventStoreMirrorRewound, "mirror disappeared"))?;
-        if !descends(port, repo, &tip.oid, old)? {
-            return Err(Error::new(
-                ErrorCode::EventStoreMirrorRewound,
-                "mirror no longer descends from previous tip",
-            ));
-        }
-    }
+    read_from(port, repo, &req, view, None, memo)
+}
 
-    // A replay source is retained by the consumer, not hidden inside the cursor.
+/// A read that continues from the checkpoint file when the caller holds no
+/// retained history of its own, and replaces the file when the read certified
+/// commits it did not. A file that does not match the store is ignored (the
+/// report says why) and the read walks from zero, so the answer never depends
+/// on the file. `Checkpoint::reuse == false` always walks from zero.
+pub fn read_checkpointed(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    req: ReadRequest<'_>,
+    view: Option<&VerifiedView>,
+    checkpoint: &Checkpoint,
+    memo: Option<Memoized<'_>>,
+) -> Result<ReadResult, Error> {
     let query: BTreeSet<String> = req.streams.iter().map(|s| s.as_str().into()).collect();
-    let have_history = (req.cursor.cover.is_empty() || !req.folded.is_empty())
-        && req.cursor.streams == query
-        && req.cursor.project_order == req.project;
-    let base = if have_history {
-        req.cursor.cover.clone()
-    } else {
-        Positions::new()
-    };
-    let certificates = if have_history {
-        req.cursor.certified.clone()
-    } else {
-        BTreeSet::new()
-    };
-    let oids: Vec<_> = tips.iter().map(|t| t.oid.clone()).collect();
-    let mut walked = walk::Walked::default();
-    let mut own_published = Positions::new();
-    // A certified object is reusable only under the exact namespace binding
-    // that was verified with the retained view. Re-observe every ref first;
-    // a new name, moved ref, lost view or deferred history runs the verifier.
-    let unchanged = |tip: &Tip| {
-        have_history
-            && certificates.contains(tip.oid.as_str())
-            && req.cursor.verified_tips.get(&tip.name).map(String::as_str) == Some(tip.oid.as_str())
-    };
-    for tip in &tips {
-        if unchanged(tip) {
-            continue;
+    let caller_has_history = holds_history(&req, &query);
+    let mut report = CheckpointReport::default();
+    let mut retained = None;
+    if checkpoint.reuse && !caller_has_history {
+        match checkpoint::load(&checkpoint.path, req.origin, &query, req.project) {
+            Ok(found) => retained = found,
+            Err(reason) => report.ignored = Some(reason),
         }
-        let part = walk::walk_verified(
-            port,
-            repo,
-            &tip.oid,
-            &base,
-            &certificates,
-            &tip.machine,
-            tip.scope,
-        )?;
-        if !tip.mirror {
-            for (key, seq) in &part.published {
-                own_published
-                    .entry(key.clone())
-                    .and_modify(|n| *n = (*n).max(*seq))
-                    .or_insert(*seq);
+    }
+    let mut result = None;
+    if let Some(found) = &retained {
+        match read_from(port, repo, &req, view, Some(found), memo) {
+            Ok(read) => {
+                report.continued = true;
+                result = Some(read);
             }
+            // Whatever the file got wrong, the store decides: walk from zero.
+            Err(error) => report.ignored = Some(error.to_string()),
         }
-        walked.events.extend(part.events);
-        walked.visited.extend(part.visited);
     }
-    // Mirror ancestry can include the own stream, but cannot invent own events
-    // beyond the locally verified durable receipt.
-    let mut bounds = crate::receipt::own_bounds(req.layout, req.origin)?;
-    for (key, seq) in own_published.iter().chain(base.iter()) {
-        bounds
-            .entry(key.clone())
-            .and_modify(|n| *n = (*n).max(*seq))
-            .or_insert(*seq);
+    let mut result = match result {
+        Some(read) => read,
+        None => read_from(port, repo, &req, view, None, memo)?,
+    };
+    // A checkpoint is worth writing when this read certified commits that the
+    // history it started from did not; local-only changes are re-read cheaply.
+    let started: &BTreeMap<String, String> = match (&retained, report.continued, caller_has_history)
+    {
+        (Some(found), true, _) => &found.cursor.verified_tips,
+        (_, _, true) => &req.cursor.verified_tips,
+        _ => &BTreeMap::new(),
+    };
+    if result.deferred.is_empty()
+        && !result.cursor.verified_tips.is_empty()
+        && result.cursor.verified_tips != *started
+    {
+        match checkpoint::store(
+            &checkpoint.path,
+            req.origin,
+            &result.cursor,
+            &result.sequence,
+        ) {
+            Ok(()) => report.written = true,
+            Err(error) => report.write_error = Some(error),
+        }
     }
-    for tip in tips.iter().filter(|t| t.mirror && !unchanged(t)) {
-        let mirror_stops = if req.cursor.mirror_tips.contains_key(&tip.name) {
-            certificates.clone()
-        } else {
-            BTreeSet::new()
-        };
-        let mirror = walk::walk_verified(
-            port,
-            repo,
-            &tip.oid,
-            &base,
-            &mirror_stops,
-            &tip.machine,
-            tip.scope,
-        )?;
-        walk::own_origin_bounded(&mirror.published, req.origin, &bounds)?;
-    }
-    let mut union = req.folded.to_vec();
-    union.extend(local);
-    union.extend(walked.events.iter().cloned());
+    result.checkpoint = report;
+    Ok(result)
+}
+
+/// The ordered history of everything a read (or a seal extending a checkpoint)
+/// holds: events of the query's streams, plus any other stream's events up to
+/// what a `store.promote` claims, contiguous and causally ordered.
+pub(crate) fn fold_history(
+    mut union: Vec<Envelope>,
+    query: &BTreeSet<String>,
+    project: bool,
+    view: Option<&VerifiedView>,
+) -> Result<crate::order::Ordered, Error> {
     let mut promoted: BTreeMap<String, u64> = BTreeMap::new();
-    if req.project {
+    if project {
         for e in &union {
-            if req.streams.iter().any(|s| s.as_str() == e.stream) && e.event_type == "store.promote"
-            {
+            if query.contains(&e.stream) && e.event_type == "store.promote" {
                 if let (Some(stream), Some(high)) = (
                     e.payload["stream"].as_str(),
                     e.payload["throughSeq"].as_u64(),
@@ -356,13 +583,229 @@ pub fn read_with_view(
         }
     }
     union.retain(|e| {
-        req.streams.iter().any(|s| s.as_str() == e.stream)
+        query.contains(&e.stream)
             || promoted
                 .get(&stream_key(e))
                 .is_some_and(|high| e.seq <= *high)
     });
     walk::check_contiguous(&union, &Positions::new())?;
-    let ordered = order_retained(&union, &Positions::new(), req.project, view)?;
+    order_retained(&union, &Positions::new(), project, view)
+}
+
+fn holds_history(req: &ReadRequest<'_>, query: &BTreeSet<String>) -> bool {
+    (req.cursor.cover.is_empty() || !req.folded.is_empty())
+        && req.cursor.streams == *query
+        && req.cursor.project_order == req.project
+}
+
+/// What a checkpoint read must still prove against the live store before it
+/// may stand in for the history it records.
+fn verify_retained(
+    retained: &Retained,
+    tips: &[Tip],
+    local: &[Envelope],
+    req: &ReadRequest<'_>,
+) -> Result<(), Error> {
+    let refused = |detail: &str| Error::new(ErrorCode::EventStoreRefMoved, detail);
+    // A ref the checkpoint certified must still exist; a moved one is checked
+    // against its walk.
+    if retained
+        .cursor
+        .verified_tips
+        .keys()
+        .any(|name| !tips.iter().any(|t| &t.name == name))
+    {
+        return Err(refused("a certified ref no longer exists"));
+    }
+    // An own event the checkpoint folded is either published (at or below the
+    // receipt) or still in the local files; one that is neither was lost.
+    let receipts = crate::receipt::own_bounds(req.layout, req.origin)?;
+    let local: BTreeSet<(&str, u64, &str)> = local
+        .iter()
+        .map(|e| (e.stream.as_str(), e.seq, e.h.as_str()))
+        .collect();
+    for e in retained.folded.iter().filter(|e| e.origin == req.origin) {
+        let published = receipts.get(&stream_key(e)).copied().unwrap_or(0);
+        if e.seq > published && !local.contains(&(e.stream.as_str(), e.seq, e.h.as_str())) {
+            return Err(refused("a folded own event is neither published nor local"));
+        }
+    }
+    Ok(())
+}
+
+fn read_from(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    req: &ReadRequest<'_>,
+    view: Option<&VerifiedView>,
+    retained: Option<&Retained>,
+    memo: Option<Memoized<'_>>,
+) -> Result<ReadResult, Error> {
+    let mut local = Vec::new();
+    for stream in req.streams {
+        local.extend(read_own(req.layout, req.origin, stream)?.events);
+    }
+    let mut listed = tips(port, repo, req)?;
+    let observed_tips = listed.tips.clone();
+    let legacy_refs = std::mem::take(&mut listed.legacy);
+    let mut listed_head = listed.head.take();
+    // A replay source is retained by the consumer, not hidden inside the cursor.
+    let query: BTreeSet<String> = req.streams.iter().map(|s| s.as_str().into()).collect();
+    let caller_has_history = holds_history(req, &query);
+    // A repeat read of a caller that holds the last answer: the inputs were
+    // just observed above and the legacy files of the current HEAD are read
+    // here; when all of them are the remembered ones nothing else can differ.
+    let mut early_legacy = None;
+    if let Some(Memoized { memo, legacy_held }) =
+        memo.filter(|_| retained.is_none() && caller_has_history)
+    {
+        let legacy = legacy_view(port, repo, &legacy_refs, req.streams, listed_head.take())?;
+        let observed = Observed {
+            tips: &observed_tips,
+            legacy_refs: &legacy_refs,
+            local: &local,
+        };
+        if let Some(answer) = memo.answer(req, &observed, &legacy, legacy_held) {
+            return Ok(answer);
+        }
+        early_legacy = Some(legacy);
+    }
+    // The history this read continues from: the checkpoint's when one was
+    // loaded (and then checked below), else the caller's own.
+    let (retained_cursor, retained_events, have_history) = match retained {
+        Some(found) => (&found.cursor, found.folded.as_slice(), true),
+        None => (req.cursor, req.folded, caller_has_history),
+    };
+    // A rewound or vanished peer mirror keeps the tip this history already
+    // authenticated, the baseline sync keeps too; the own machine's refuses.
+    for (name, old) in &retained_cursor.mirror_tips {
+        let at = listed.tips.iter().position(|t| &t.name == name);
+        let checked = match at {
+            None => Err(Error::new(
+                ErrorCode::EventStoreMirrorRewound,
+                "mirror disappeared",
+            )),
+            Some(i) => descends(port, repo, &listed.tips[i].oid, old).and_then(|kept| {
+                kept.then_some(()).ok_or_else(|| {
+                    Error::new(
+                        ErrorCode::EventStoreMirrorRewound,
+                        "mirror no longer descends from previous tip",
+                    )
+                })
+            }),
+        };
+        let Err(error) = checked else { continue };
+        listed.skip(req.machine, name, error)?;
+        let baseline = Oid::parse(old, repo.object_format()).map_err(|e| invalid(e.to_string()))?;
+        match at {
+            Some(i) => listed.tips[i].oid = baseline,
+            None => {
+                if let Some(Listing::Tip(tip)) =
+                    listing(name, &RefValue::Direct(baseline), req.streams)?
+                {
+                    listed.tips.push(tip);
+                }
+            }
+        }
+    }
+    if let Some(found) = retained {
+        verify_retained(found, &listed.tips, &local, req)?;
+    }
+
+    let base = if have_history {
+        retained_cursor.cover.clone()
+    } else {
+        Positions::new()
+    };
+    let certificates = if have_history {
+        retained_cursor.certified.clone()
+    } else {
+        BTreeSet::new()
+    };
+    let mut walked = walk::Walked::default();
+    let mut own_published = Positions::new();
+    // A certified object is reusable only under the exact namespace binding
+    // that was verified with the retained view. Re-observe every ref first;
+    // a new name, moved ref, lost view or deferred history runs the verifier.
+    let unchanged = |tip: &Tip| {
+        have_history
+            && certificates.contains(tip.oid.as_str())
+            && retained_cursor
+                .verified_tips
+                .get(&tip.name)
+                .map(String::as_str)
+                == Some(tip.oid.as_str())
+    };
+    let verify = |tip: &Tip, stops: &BTreeSet<String>| -> Result<walk::Walked, Error> {
+        let part =
+            walk::walk_verified(port, repo, &tip.oid, &base, stops, &tip.machine, tip.scope)?;
+        // A checkpoint's certified commit stands in for its whole history only
+        // while the ref still descends from it: the walk must have met it.
+        if let Some(previous) = retained.and_then(|_| retained_cursor.verified_tips.get(&tip.name))
+        {
+            if !part.stops_reached.contains(previous) {
+                return Err(Error::new(
+                    ErrorCode::EventStoreRefMoved,
+                    "a ref no longer descends from its certified commit",
+                ));
+            }
+        }
+        Ok(part)
+    };
+    // Own refs first: what they published bounds the own origin in every mirror.
+    for tip in listed.tips.iter().filter(|t| !t.mirror && !unchanged(t)) {
+        let part = verify(tip, &certificates)?;
+        for (key, seq) in &part.published {
+            own_published
+                .entry(key.clone())
+                .and_modify(|n| *n = (*n).max(*seq))
+                .or_insert(*seq);
+        }
+        walked.events.extend(part.events);
+        walked.visited.extend(part.visited);
+    }
+    // Mirror ancestry can include the own stream, but cannot invent own events
+    // beyond the locally verified durable receipt.
+    let mut bounds = crate::receipt::own_bounds(req.layout, req.origin)?;
+    for (key, seq) in own_published.iter().chain(base.iter()) {
+        bounds
+            .entry(key.clone())
+            .and_modify(|n| *n = (*n).max(*seq))
+            .or_insert(*seq);
+    }
+    // Each mirror is verified on its own (spec section 14).
+    let mut rejected = Vec::new();
+    let no_stops = BTreeSet::new();
+    for tip in listed.tips.iter().filter(|t| t.mirror && !unchanged(t)) {
+        // A mirror this history has not seen is walked from its roots, so its
+        // whole claim on the own origin is bounded; one walk serves both.
+        let stops = if retained_cursor.mirror_tips.contains_key(&tip.name) {
+            &certificates
+        } else {
+            &no_stops
+        };
+        let checked = verify(tip, stops).and_then(|part| {
+            walk::own_origin_bounded(&part.published, req.origin, &bounds)?;
+            Ok(part)
+        });
+        match checked {
+            Ok(part) => {
+                walked.events.extend(part.events);
+                walked.visited.extend(part.visited);
+            }
+            Err(error) => rejected.push((tip.name.clone(), error)),
+        }
+    }
+    for (name, error) in rejected {
+        listed.tips.retain(|t| t.name != name);
+        listed.skip(req.machine, &name, error)?;
+    }
+    let tips = &listed.tips;
+    let oids: Vec<_> = tips.iter().map(|t| t.oid.clone()).collect();
+    let mut union = retained_events.to_vec();
+    union.extend(local.iter().cloned());
+    union.extend(walked.events.iter().cloned());
+    let ordered = fold_history(union, &query, req.project, view)?;
     let mut cursor = Cursor {
         certified: certificates,
         streams: query,
@@ -397,20 +840,13 @@ pub fn read_with_view(
         .iter()
         .map(|(n, o)| (n.clone(), o.as_str().into()))
         .collect();
-    let raw_legacy = read_legacy(port, repo, &legacy_refs, req.streams, listed_head)?;
-    let (work, porting): (Vec<_>, Vec<_>) = raw_legacy
-        .into_iter()
-        .partition(|e| !e.provenance.file.starts_with("porting/"));
-    let mut legacy = legacy::order(work);
-    legacy.extend(porting);
-    cursor.legacy_digest = if legacy.is_empty() {
-        None
-    } else {
-        Some(crate::envelope::sha256(&crate::envelope::line(
-            &legacy.iter().map(LegacyEvent::identity).collect::<Vec<_>>(),
-        )?))
+    let legacy_view = match early_legacy {
+        Some(view) => view,
+        None => legacy_view(port, repo, &legacy_refs, req.streams, listed_head.take())?,
     };
-    let full_order: Vec<_> = legacy
+    cursor.legacy_digest = legacy_view.digest.clone();
+    let full_order: Vec<_> = legacy_view
+        .events
         .iter()
         .map(LegacyEvent::identity)
         .chain(ordered.events.iter().map(|e| e.h.clone()))
@@ -424,7 +860,7 @@ pub fn read_with_view(
         .collect();
     // Coverage cannot stand in for a lost consumer view. The full sequence was
     // recovered above, but the coverage-relative delta cannot rebuild that view.
-    let fold = if have_history {
+    let fold = if caller_has_history {
         fold_answer(
             req.cursor,
             &cursor,
@@ -442,20 +878,32 @@ pub fn read_with_view(
             first_difference: 0,
         }
     };
-    Ok(ReadResult {
+    let answer = ReadResult {
         events: delta,
         verified_view: VerifiedView {
             events: ordered.events.clone(),
         },
         sequence: ordered.events,
-        legacy,
+        legacy: legacy_view.events.clone(),
         deferred: ordered.deferred,
         missing: ordered.missing,
         concurrent: ordered.concurrent,
         cursor,
         fold,
         full_order,
-    })
+        checkpoint: CheckpointReport::default(),
+        memoized: false,
+        skipped_mirrors: listed.skipped,
+    };
+    if let Some(Memoized { memo, .. }) = memo.filter(|_| answer.deferred.is_empty()) {
+        let observed = Observed {
+            tips: &observed_tips,
+            legacy_refs: &legacy_refs,
+            local: &local,
+        };
+        memo.remember(req, &observed, &legacy_view, &answer);
+    }
+    Ok(answer)
 }
 
 /// Pre-gate hook: rebuild the local durable-history receipt from the own ref.

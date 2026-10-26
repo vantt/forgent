@@ -7,4 +7,3 @@ properties:
   ceiling:
     description: Most work items that may run at once; a claim past it is refused, and null leaves the ceiling unarmed so no claim is refused.
     type: [integer, "null"]
-    minimum: 1

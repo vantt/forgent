@@ -38,6 +38,14 @@
  "differences": [
   {
    "path": [
+    "terminal",
+    "layout",
+    "policy"
+   ],
+   "reason": "the standard is terminal-control's default placement policy (even-split, packages/terminal-control/contracts/placement-policy.v1.json); the pinned authoring source predates that and names measured-split"
+  },
+  {
+   "path": [
     "herdrOrchestrator",
     "autoDiscover"
    ],
@@ -139,6 +147,116 @@
     "commands"
    ],
    "reason": "this repository's own choice for a setting the standard fixes at the code default"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "gitnexus"
+   ],
+   "reason": "a tool executor is a project's own choice, not a standard value (a project that declares none reports its tool registry inactive); this repository declares gitnexus for impact analysis"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "herdr"
+   ],
+   "reason": "a tool executor is a project's own choice, not a standard value; this repository declares the herdr pane label writer"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "impact-analysis",
+    "prefer"
+   ],
+   "reason": "names the gitnexus tool executor this repository declares; the standard's impact-analysis capability has no pool, so a project with no tool provider resolves it to none"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "advise",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "code:implement",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "code:refactor",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "code:test",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "coding:implement",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "execute",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "fgos-coding-implement",
+    "prefer"
+   ],
+   "reason": "the standard ends this list with openai so a machine holding only Codex can serve it; this repository keeps its own list, which never falls back to Codex"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "code:*",
+    "roles",
+    "red-team",
+    "prefer"
+   ],
+   "reason": "the standard appends families to this checker pool so a machine without its preferred family can still seat a red-team checker that differs from the producer; this repository keeps its own list"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "marketing:*",
+    "roles",
+    "red-team",
+    "prefer"
+   ],
+   "reason": "the standard appends families to this checker pool so a machine without its preferred family can still seat a red-team checker that differs from the producer; this repository keeps its own list"
   }
  ],
  "standard-only": [
@@ -153,6 +271,9 @@
   [
    "eventStore",
    "rebuild"
+  ],
+  [
+   "mailbox"
   ],
   [
    "secrets"

@@ -55,7 +55,6 @@ test('CLI adapter creates the checkout and emits the public JSON envelope', {ski
 test('worktree create runs the project setup commands after the port returns, with the main checkout in FGOS_REPO_ROOT', {skip:process.platform==='win32'},()=>{
   const f=fixture('files',true);
   const ctx={cwd:f.repoPath,repoRoot:f.repoPath,stateRoot:f.temp,writer:'fixture'};
-  const configPath=path.join(f.repoPath,'.fgos','config.json');
   try {
     writeProjectConfig(f.repoPath, {worktreeSetup:{commands:['pwd > setup-marker && printf %s "$FGOS_REPO_ROOT" >> setup-marker']}});
     const made=createWorktreeUseCase(ctx,{path:'../provisioned',detach:true,base:f.tip},f.loader);

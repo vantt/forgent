@@ -57,9 +57,6 @@ impl Default for ClaudeTranscriptsSource {
     }
 }
 
-fn parse_iso_secs(s: &str) -> Option<i64> {
-    parse_iso_prefix_secs(s)
-}
 /// Helper to get valid project and worktree paths from git.
 fn get_valid_cwds(root: &Path) -> Vec<PathBuf> {
     let mut cwds = Vec::new();
@@ -133,12 +130,11 @@ impl ObservationSource for ClaudeTranscriptsSource {
     }
 
     fn observations(&self, root: &Path, w: &Window) -> Result<Vec<Observation>, SourceError> {
-        let claude_dir = match std::env::var("CLAUDE_CONFIG_DIR") {
-            Ok(dir) => PathBuf::from(dir),
-            Err(_) => match std::env::var("HOME") {
-                Ok(home) => PathBuf::from(home).join(".claude"),
-                Err(_) => return Ok(Vec::new()),
-            },
+        let Some(claude_dir) = fgos_identity::cli_dirs::claude_config_dir(
+            std::env::var_os("HOME").as_deref(),
+            std::env::var_os("CLAUDE_CONFIG_DIR").as_deref(),
+        ) else {
+            return Ok(Vec::new());
         };
 
         let projects_dir = claude_dir.join("projects");
@@ -202,7 +198,7 @@ impl ObservationSource for ClaudeTranscriptsSource {
                         if let Ok(mtime) = meta.modified() {
                             if let Ok(dur) = mtime.duration_since(std::time::UNIX_EPOCH) {
                                 let mtime_secs = dur.as_secs() as i64;
-                                if let Some(since_secs) = parse_iso_secs(since) {
+                                if let Some(since_secs) = parse_iso_prefix_secs(since) {
                                     // Give 1 day buffer for timezone / clock skew
                                     if mtime_secs < since_secs - 86400 {
                                         continue;

@@ -1,10 +1,9 @@
 //! Historical work.friction and settlement reader for lazy migration into Observe (Lane B - Phase F5).
 
 use fgos_observe::contract::{LegacyFrictionRecord, LegacyFrictionSource, SourceError};
-use serde_json::Value;
 use std::collections::HashMap;
+#[cfg(test)]
 use std::fs;
-use std::io::{BufRead, BufReader};
 use std::path::Path;
 
 #[derive(Debug, Default, Clone)]
@@ -47,181 +46,127 @@ impl LegacyFrictionSource for WorkStateLegacyFrictionSource {
         root: &Path,
         since_cursor: Option<(&str, u64)>,
     ) -> Result<Vec<LegacyFrictionRecord>, SourceError> {
-        let fgos_dir = root.join(".fgos");
-        if !fgos_dir.exists() {
-            return Ok(Vec::new());
-        }
-
-        // Discover files: events.jsonl and events/*.jsonl
-        let mut files: Vec<(String, std::path::PathBuf)> = Vec::new();
-        let baseline = fgos_dir.join("events.jsonl");
-        if baseline.is_file() {
-            files.push(("events.jsonl".to_string(), baseline));
-        }
-
-        let events_dir = fgos_dir.join("events");
-        if events_dir.is_dir() {
-            if let Ok(entries) = fs::read_dir(&events_dir) {
-                let mut shard_files = Vec::new();
-                for entry in entries.flatten() {
-                    let p = entry.path();
-                    if p.is_file() && p.extension().and_then(|s| s.to_str()) == Some("jsonl") {
-                        if let Some(name) = p.file_name().and_then(|n| n.to_str()) {
-                            shard_files.push((format!("events/{}", name), p));
-                        }
-                    }
-                }
-                shard_files.sort_by(|a, b| a.0.cmp(&b.0));
-                files.extend(shard_files);
-            }
-        }
-
         let mut raw_frictions: Vec<RawFriction> = Vec::new();
         let mut settlements: HashMap<String, Vec<Settlement>> = HashMap::new();
         let mut discovery_verdicts: HashMap<String, Vec<bool>> = HashMap::new();
+        for (src, val) in crate::event_reader::events(root)? {
+            let event_type = val.get("type").and_then(|t| t.as_str()).unwrap_or("");
+            let ts = val
+                .get("ts")
+                .and_then(|t| t.as_str())
+                .unwrap_or("")
+                .to_string();
+            let seq = val.get("seq").and_then(|s| s.as_u64()).unwrap_or(0);
+            let payload = val.get("payload").and_then(|p| p.as_object());
 
-        // Read all events
-        for (src, path) in files {
-            let file = match fs::File::open(&path) {
-                Ok(f) => f,
-                Err(_) => continue,
-            };
-            let reader = BufReader::new(file);
+            let id = payload
+                .and_then(|p| p.get("id"))
+                .and_then(|id_val| id_val.as_str())
+                .unwrap_or("")
+                .to_string();
 
-            for line in reader.lines() {
-                let line = match line {
-                    Ok(l) => l,
-                    Err(_) => continue,
-                };
-                let trimmed = line.trim();
-                if trimmed.is_empty() {
-                    continue;
+            if id.is_empty() {
+                continue;
+            }
+
+            match event_type {
+                "work.discovery" => {
+                    let clear = payload
+                        .and_then(|p| p.get("clear"))
+                        .and_then(|c| c.as_bool())
+                        .unwrap_or(true);
+                    discovery_verdicts.entry(id).or_default().push(clear);
                 }
+                "work.friction" => {
+                    let layer = payload
+                        .and_then(|p| p.get("layer"))
+                        .and_then(|l| l.as_str())
+                        .unwrap_or("state")
+                        .to_string();
+                    let error_class = payload
+                        .and_then(|p| p.get("errorClass"))
+                        .and_then(|e| e.as_str())
+                        .unwrap_or("unknown")
+                        .to_string();
+                    let disposition = payload
+                        .and_then(|p| p.get("disposition"))
+                        .and_then(|d| d.as_str())
+                        .unwrap_or("advisory")
+                        .to_string();
+                    let detail = payload
+                        .and_then(|p| p.get("detail"))
+                        .and_then(|d| d.as_str())
+                        .unwrap_or("")
+                        .to_string();
+                    let attempts = payload
+                        .and_then(|p| p.get("attempts"))
+                        .and_then(|a| a.as_u64())
+                        .map(|a| a as u32);
+                    let doc_type = payload
+                        .and_then(|p| p.get("docType"))
+                        .and_then(|dt| dt.as_str())
+                        .map(|s| s.to_string());
+                    let producer = payload
+                        .and_then(|p| p.get("producer"))
+                        .and_then(|pr| pr.as_str())
+                        .map(|s| s.to_string());
 
-                let val: Value = match serde_json::from_str(trimmed) {
-                    Ok(v) => v,
-                    Err(_) => continue,
-                };
-
-                let event_type = val.get("type").and_then(|t| t.as_str()).unwrap_or("");
-                let ts = val
-                    .get("ts")
-                    .and_then(|t| t.as_str())
-                    .unwrap_or("")
-                    .to_string();
-                let seq = val.get("seq").and_then(|s| s.as_u64()).unwrap_or(0);
-                let payload = val.get("payload").and_then(|p| p.as_object());
-
-                let id = payload
-                    .and_then(|p| p.get("id"))
-                    .and_then(|id_val| id_val.as_str())
-                    .unwrap_or("")
-                    .to_string();
-
-                if id.is_empty() {
-                    continue;
+                    raw_frictions.push(RawFriction {
+                        src: src.clone(),
+                        seq,
+                        ts,
+                        subject_id: id,
+                        layer,
+                        error_class,
+                        disposition,
+                        detail,
+                        attempts,
+                        doc_type,
+                        producer,
+                    });
                 }
+                "work.move" => {
+                    let answer = payload
+                        .and_then(|p| p.get("answer"))
+                        .and_then(|a| a.as_str());
+                    let to = payload
+                        .and_then(|p| p.get("to"))
+                        .and_then(|t| t.as_str())
+                        .unwrap_or("");
 
-                match event_type {
-                    "work.discovery" => {
-                        let clear = payload
-                            .and_then(|p| p.get("clear"))
-                            .and_then(|c| c.as_bool())
-                            .unwrap_or(true);
-                        discovery_verdicts.entry(id).or_default().push(clear);
-                    }
-                    "work.friction" => {
-                        let layer = payload
-                            .and_then(|p| p.get("layer"))
-                            .and_then(|l| l.as_str())
-                            .unwrap_or("state")
-                            .to_string();
-                        let error_class = payload
-                            .and_then(|p| p.get("errorClass"))
-                            .and_then(|e| e.as_str())
-                            .unwrap_or("unknown")
-                            .to_string();
-                        let disposition = payload
-                            .and_then(|p| p.get("disposition"))
-                            .and_then(|d| d.as_str())
-                            .unwrap_or("advisory")
-                            .to_string();
-                        let detail = payload
-                            .and_then(|p| p.get("detail"))
-                            .and_then(|d| d.as_str())
-                            .unwrap_or("")
-                            .to_string();
-                        let attempts = payload
-                            .and_then(|p| p.get("attempts"))
-                            .and_then(|a| a.as_u64())
-                            .map(|a| a as u32);
-                        let doc_type = payload
-                            .and_then(|p| p.get("docType"))
-                            .and_then(|dt| dt.as_str())
-                            .map(|s| s.to_string());
-                        let producer = payload
-                            .and_then(|p| p.get("producer"))
-                            .and_then(|pr| pr.as_str())
-                            .map(|s| s.to_string());
+                    let kind = if answer.is_some() {
+                        Some("answer")
+                    } else if to == "done" {
+                        Some("done")
+                    } else if to == "wontfix" {
+                        Some("wontfix")
+                    } else {
+                        None
+                    };
 
-                        raw_frictions.push(RawFriction {
-                            src: src.clone(),
-                            seq,
+                    if let Some(k) = kind {
+                        settlements.entry(id).or_default().push(Settlement {
                             ts,
-                            subject_id: id,
-                            layer,
-                            error_class,
-                            disposition,
-                            detail,
-                            attempts,
-                            doc_type,
-                            producer,
+                            kind: k.to_string(),
                         });
                     }
-                    "work.move" => {
-                        let answer = payload
-                            .and_then(|p| p.get("answer"))
-                            .and_then(|a| a.as_str());
-                        let to = payload
-                            .and_then(|p| p.get("to"))
-                            .and_then(|t| t.as_str())
-                            .unwrap_or("");
-
-                        let kind = if answer.is_some() {
-                            Some("answer")
-                        } else if to == "done" {
-                            Some("done")
-                        } else if to == "wontfix" {
-                            Some("wontfix")
-                        } else {
-                            None
-                        };
-
-                        if let Some(k) = kind {
-                            settlements.entry(id).or_default().push(Settlement {
-                                ts,
-                                kind: k.to_string(),
-                            });
-                        }
-                    }
-                    // `work.stage` is the name a binary from before the rename still writes.
-                    "work.step" | "work.stage" => {
-                        let from = payload
-                            .and_then(|p| p.get("from"))
-                            .and_then(|f| f.as_str())
-                            .unwrap_or("");
-                        let last_verdict =
-                            discovery_verdicts.get(&id).and_then(|v| v.last()).copied();
-
-                        if from == "discovery" && last_verdict != Some(false) {
-                            settlements.entry(id).or_default().push(Settlement {
-                                ts,
-                                kind: "clarify-pass".to_string(),
-                            });
-                        }
-                    }
-                    _ => {}
                 }
+                // `work.stage` is the name a binary from before the rename still writes.
+                "work.step" | "work.stage" => {
+                    let from = payload
+                        .and_then(|p| p.get("from"))
+                        .and_then(|f| f.as_str())
+                        .unwrap_or("");
+                    let last_verdict = discovery_verdicts.get(&id).and_then(|v| v.last()).copied();
+
+                    if from == "discovery" && last_verdict != Some(false) {
+                        settlements.entry(id).or_default().push(Settlement {
+                            ts,
+                            kind: "clarify-pass".to_string(),
+                        });
+                    }
+                }
+                _ => {}
             }
         }
 
@@ -293,15 +238,13 @@ mod tests {
         let fgos = tmp.join(".fgos");
         fs::create_dir_all(&fgos).unwrap();
 
-        let events_jsonl = fgos.join("events.jsonl");
-        fs::write(
-            &events_jsonl,
+        crate::event_reader::import_fixture(
+            &tmp,
             r#"{"seq":1,"ts":"2026-07-01T10:00:00Z","type":"work.friction","payload":{"id":"tsk-1","layer":"verification","errorClass":"verify-miss","disposition":"blocked","detail":"failed"}}
 {"seq":2,"ts":"2026-07-01T10:05:00Z","type":"work.move","payload":{"id":"tsk-1","to":"done"}}
 {"seq":3,"ts":"2026-07-01T10:10:00Z","type":"work.friction","payload":{"id":"tsk-2","layer":"state","errorClass":"merge-conflict","disposition":"blocked","detail":"conflict"}}
 "#,
-        )
-        .unwrap();
+        );
 
         let source = WorkStateLegacyFrictionSource::new();
         let records = source.read_legacy_frictions(&tmp, None).unwrap();

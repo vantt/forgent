@@ -9,15 +9,14 @@
 //! through it, mirroring the CLI's own closed error taxonomy
 //! (`src/state/store.mjs`'s `EXIT_CODES`) instead of inventing a new one.
 //!
-//! D4/D5: one auth token per machine, read from `~/.fgos/config.json`'s
-//! `gateway.token` field (the global config file `docs/specs/distribution.md`
-//! row 5b already establishes — this module only ever READS it; per that same
-//! row ("not created by anything except fgos setup") it never writes or
-//! creates the file itself, so a missing token is a startup refusal, not a
-//! self-provisioned default).
+//! D4/D5: one auth token per machine, read from `~/.fgos/private/gateway-token`
+//! (`docs/platform/config/spec.md` section 8); port, bind and the Cloudflare
+//! Access pair come from the machine view of `fgos-config`. This module only
+//! ever READS them; a missing token file is a startup refusal, never a
+//! self-provisioned default and never a fallback to an old config key.
 
 use std::io::Read;
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::net::{IpAddr, SocketAddr};
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::sync::Arc;
@@ -37,38 +36,9 @@ use serde_json::{json, Value};
 
 use crate::ports::VerbGateway;
 
-/// Default listening port — same default `docs/contracts/fgos-gateway-api-v1.yaml`'s
-/// `servers.variables.port` documents.
-const DEFAULT_PORT: u16 = 4170;
-
-/// D7 of `docs/history/herdr-web-dashboard/CONTEXT.md`: bind mặc định
-/// `0.0.0.0` (reachable from other machines on a LAN/Tailscale), cấu hình
-/// được, cảnh báo khi không phải loopback (see `run`, below).
-const DEFAULT_BIND: IpAddr = IpAddr::V4(Ipv4Addr::UNSPECIFIED);
-
 // ---------------------------------------------------------------------------
 // Config (D4/D5)
 // ---------------------------------------------------------------------------
-
-#[derive(Debug, Deserialize, Default)]
-struct GlobalConfigFile {
-    #[serde(default)]
-    gateway: Option<GatewaySection>,
-}
-
-#[derive(Debug, Deserialize, Default)]
-struct GatewaySection {
-    token: Option<String>,
-    port: Option<u16>,
-    bind: Option<String>,
-    // tsk-6arn (D8): both must be present together for cf-access to be
-    // considered configured -- see `load_gateway_config`'s own partial-
-    // config guard.
-    #[serde(rename = "cfAccessTeamDomain")]
-    cf_access_team_domain: Option<String>,
-    #[serde(rename = "cfAccessAud")]
-    cf_access_aud: Option<String>,
-}
 
 #[derive(Debug, Clone)]
 pub struct GatewayConfig {
@@ -86,12 +56,12 @@ pub struct GatewayConfig {
 #[derive(Debug)]
 pub enum GatewayConfigError {
     NoHomeDir,
-    NotFound(PathBuf),
-    Io(PathBuf, std::io::Error),
-    Parse(PathBuf, serde_json::Error),
-    MissingToken(PathBuf),
-    InvalidBind(PathBuf, String),
-    PartialCfAccess(PathBuf),
+    /// The effective config was refused or unreadable: the refusal ids, never a value.
+    Config(String),
+    /// The token file is missing or invalid: its path and the cause (`missing`, `mode`, `shape`, `symlink`).
+    Token(PathBuf, String),
+    InvalidBind(String),
+    PartialCfAccess,
 }
 
 impl std::error::Error for GatewayConfigError {}
@@ -99,83 +69,78 @@ impl std::error::Error for GatewayConfigError {}
 impl std::fmt::Display for GatewayConfigError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            GatewayConfigError::NoHomeDir => write!(f, "could not resolve $HOME to locate ~/.fgos/config.json"),
-            GatewayConfigError::NotFound(p) => write!(
+            GatewayConfigError::NoHomeDir => write!(f, "could not resolve $HOME to locate ~/.fgos"),
+            GatewayConfigError::Config(why) => write!(f, "the gateway config was refused: {why} — run \"fgos config check\"."),
+            GatewayConfigError::Token(p, why) => write!(
                 f,
-                "{} not found — the gateway needs a per-machine auth token (D4). Run \"fgos setup\" to create it, then \"fgos doctor --fix\" to generate and write a real token (tsk-4r1: both are now registered in the setup/doctor gate).",
+                "{} is not usable ({why}) — the gateway needs a per-machine auth token (D4). Run \"fgos doctor --fix\" to create it or repair its mode.",
                 p.display()
             ),
-            GatewayConfigError::Io(p, err) => write!(f, "could not read {}: {err}", p.display()),
-            GatewayConfigError::Parse(p, err) => write!(f, "could not parse {} as JSON: {err}", p.display()),
-            GatewayConfigError::MissingToken(p) => write!(
+            GatewayConfigError::InvalidBind(raw) => write!(
                 f,
-                "{} has no \"gateway.token\" field — the gateway needs a per-machine auth token (D4). Run \"fgos doctor --fix\" to generate and write one (tsk-4r1).",
-                p.display()
+                "\"gateway.bind\" ({raw:?}) is not a valid IP address — expected e.g. \"0.0.0.0\" or \"127.0.0.1\"."
             ),
-            GatewayConfigError::InvalidBind(p, raw) => write!(
+            GatewayConfigError::PartialCfAccess => write!(
                 f,
-                "{} has a \"gateway.bind\" value ({raw:?}) that is not a valid IP address — expected e.g. \"0.0.0.0\" or \"127.0.0.1\".",
-                p.display()
-            ),
-            GatewayConfigError::PartialCfAccess(p) => write!(
-                f,
-                "{} has only one of \"gateway.cfAccessTeamDomain\"/\"gateway.cfAccessAud\" set (tsk-6arn, D8) — both are required together for cf-access to be configured, or neither.",
-                p.display()
+                "only one of \"gateway.cfAccessTeamDomain\"/\"gateway.cfAccessAud\" is set (tsk-6arn, D8) — both are required together for cf-access to be configured, or neither."
             ),
         }
     }
 }
 
-/// D4/D5: read the per-machine gateway token + optional port override from
-/// `~/.fgos/config.json`. Never creates or writes this file — per
-/// `docs/specs/distribution.md` row 5b it is only ever created by
-/// `fgos setup`; a missing file or missing token is a refusal to start, not
-/// a self-provisioned default (that would also defeat D4's whole point: an
-/// auto-generated, never-persisted-anywhere-a-client-can-read-it token
-/// would lock every caller out immediately).
+/// What a refused or failed config read says: each refusal's id, file and position (never a value).
+fn describe(error: fgos_config::snapshot::SnapshotError) -> String {
+    use fgos_config::snapshot::SnapshotError::{Io, Refused};
+    match error {
+        Refused(all) => all.iter().map(|r| r.to_string()).collect::<Vec<_>>().join("; "),
+        Io(error) => error.to_string(),
+    }
+}
+
+/// D4/D5: the gateway's settings from the machine view of `fgos-config` (global file, then the
+/// bundled standard; a project file is never read) and the token from
+/// `~/.fgos/private/gateway-token`. Never creates or writes either: setup and `fgos doctor --fix`
+/// do; a missing token file is a refusal to start, not a self-provisioned default (that would also
+/// defeat D4's point) and never a fallback to a `gateway.token` key in a config file.
 pub fn load_gateway_config(home_dir: Option<&Path>) -> Result<GatewayConfig, GatewayConfigError> {
+    use fgos_config::{detect::NoDetectors, machine, snapshot::SessionClass};
     let home = match home_dir {
         Some(p) => p.to_path_buf(),
         None => std::env::var_os("HOME")
             .map(PathBuf::from)
             .ok_or(GatewayConfigError::NoHomeDir)?,
     };
-    let config_path = home.join(".fgos").join("config.json");
-    if !config_path.exists() {
-        return Err(GatewayConfigError::NotFound(config_path));
-    }
-    let raw = std::fs::read_to_string(&config_path)
-        .map_err(|err| GatewayConfigError::Io(config_path.clone(), err))?;
-    let parsed: GlobalConfigFile =
-        serde_json::from_str(&raw).map_err(|err| GatewayConfigError::Parse(config_path.clone(), err))?;
-    let section = parsed.gateway.unwrap_or_default();
-    let token = section.token.ok_or_else(|| GatewayConfigError::MissingToken(config_path.clone()))?;
-    if token.trim().is_empty() {
-        return Err(GatewayConfigError::MissingToken(config_path));
-    }
-    let bind = match section.bind {
-        Some(raw) => raw
-            .parse::<IpAddr>()
-            .map_err(|_| GatewayConfigError::InvalidBind(config_path.clone(), raw))?,
-        None => DEFAULT_BIND,
+    let global = home.join(".fgos");
+    let ctx = machine::context(&NoDetectors).map_err(|r| GatewayConfigError::Config(r.to_string()))?;
+    let snapshot = machine::snapshot(&ctx, &global, SessionClass::Unconfined)
+        .map_err(|e| GatewayConfigError::Config(describe(e)))?;
+    let token_file = global.join("private").join("gateway-token");
+    let token = match machine::token::read(&global) {
+        Ok(Some(token)) => token.expose().to_string(),
+        Ok(None) => return Err(GatewayConfigError::Token(token_file, "missing".into())),
+        Err(e) => return Err(GatewayConfigError::Token(token_file, describe(e))),
     };
+    // Every key has a standard value, so a read through the machine view always finds a port and a bind.
+    let section = &snapshot.value["gateway"];
+    let port = section["port"]
+        .as_u64()
+        .and_then(|p| u16::try_from(p).ok())
+        .ok_or_else(|| GatewayConfigError::Config("gateway.port is not a port".into()))?;
+    let bind = section["bind"].as_str().unwrap_or_default();
+    let bind = bind.parse::<IpAddr>().map_err(|_| GatewayConfigError::InvalidBind(bind.into()))?;
     // tsk-6arn (D8): additive layer-2 credential, configured only when
     // BOTH fields are present -- exactly one set is a real misconfiguration
     // (a person who set one almost certainly meant both), not silently
     // treated as "cf-access off".
-    let cf_access = match (section.cf_access_team_domain, section.cf_access_aud) {
+    let text = |key: &str| section[key].as_str().map(str::to_string);
+    let cf_access = match (text("cfAccessTeamDomain"), text("cfAccessAud")) {
         (Some(team_domain), Some(aud)) => {
             Some(crate::cf_access::CfAccessVerifier::new(reqwest::Client::new(), team_domain, aud))
         }
         (None, None) => None,
-        (Some(_), None) | (None, Some(_)) => return Err(GatewayConfigError::PartialCfAccess(config_path)),
+        (Some(_), None) | (None, Some(_)) => return Err(GatewayConfigError::PartialCfAccess),
     };
-    Ok(GatewayConfig {
-        port: section.port.unwrap_or(DEFAULT_PORT),
-        token,
-        bind,
-        cf_access: Arc::new(cf_access),
-    })
+    Ok(GatewayConfig { port, token, bind, cf_access: Arc::new(cf_access) })
 }
 
 // ---------------------------------------------------------------------------
@@ -518,7 +483,7 @@ async fn require_token(
     // session design (tsk-k4v) that never shipped (tsk-6arn RESEARCH.md).
     GatewayError {
         category: ErrorCategory::Validation,
-        message: "missing or invalid Authorization: Bearer <token> (D4: one token per machine, see ~/.fgos/config.json's \"gateway.token\") -- or a valid Cf-Access-Jwt-Assertion, when cf-access is configured (D8)".to_string(),
+        message: "missing or invalid Authorization: Bearer <token> (D4: one token per machine, see ~/.fgos/private/gateway-token) -- or a valid Cf-Access-Jwt-Assertion, when cf-access is configured (D8)".to_string(),
         exit_code: None,
     }
     .into_response_with_status(StatusCode::UNAUTHORIZED)
@@ -1347,10 +1312,9 @@ pub fn run(root: PathBuf) -> std::io::Result<()> {
     }
     let addr: SocketAddr = (config.bind, config.port).into();
     let gateway: Arc<dyn VerbGateway> = Arc::new(FgosCliGateway { root: root.clone() });
-    // tsk-48w (D14): static-serving toggle read from the SAME shared
-    // config file `load_gateway_config` already reads (`~/.fgos/
-    // config.json`'s sibling section `herdrWebDashboard`), fail-open
-    // default per `settings::WebDashboardSettings`'s own doc comment.
+    // tsk-48w (D14): static-serving toggle read from the effective config
+    // (`herdrWebDashboard` section), fail-open default per
+    // `settings::WebDashboardSettings`'s own doc comment.
     let web_settings = herdr_fgos_common::settings::read_web_dashboard_settings(&root);
     let router = build_router(gateway, config, root);
     let router = with_static_serving(router, web_settings.static_serving, Path::new("static"));
@@ -1366,6 +1330,7 @@ pub fn run(root: PathBuf) -> std::io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::net::Ipv4Addr;
 
     #[test]
     fn build_fgos_command_runs_in_root_not_the_ambient_process_cwd() {
@@ -1803,16 +1768,73 @@ mod tests {
         );
     }
 
-    fn write_test_home_config(home: &Path, extra_json: &str) {
+    /// A home whose global config carries `gateway: {<gateway_body>}` and whose token file holds
+    /// `test-token` with mode 0600.
+    fn write_test_home_config(home: &Path, gateway_body: &str) {
         std::fs::create_dir_all(home.join(".fgos")).unwrap();
         std::fs::write(
             home.join(".fgos").join("config.json"),
-            format!(r#"{{"gateway":{{"token":"test-token"{extra_json}}}}}"#),
+            format!(r#"{{"gateway":{{{gateway_body}}}}}"#),
         )
         .unwrap();
+        write_test_token(home, 0o600);
     }
 
-    /// tsk-54y (D7): a `~/.fgos/config.json` with no `gateway.bind` field
+    fn write_test_token(home: &Path, mode: u32) {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = home.join(".fgos").join("private");
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let file = dir.join("gateway-token");
+        std::fs::write(&file, "test-token\n").unwrap();
+        std::fs::set_permissions(&file, std::fs::Permissions::from_mode(mode)).unwrap();
+    }
+
+    fn test_home(tag: &str) -> PathBuf {
+        let home = std::env::temp_dir().join(format!("fgos-gateway-{tag}-{}", std::process::id()));
+        std::fs::remove_dir_all(&home).ok();
+        home
+    }
+
+    /// The token comes from the token file; the gateway section of the global config carries none.
+    #[test]
+    fn load_gateway_config_reads_the_token_from_the_token_file() {
+        let home = test_home("token-file");
+        write_test_home_config(&home, "");
+        let config = load_gateway_config(Some(&home)).expect("a token file and no gateway keys must load");
+        assert_eq!(config.token, "test-token");
+        assert_eq!(config.port, 4170);
+        std::fs::remove_dir_all(&home).ok();
+    }
+
+    /// A missing token file is a named refusal; a `gateway.token` key left in the config file is no fallback.
+    #[test]
+    fn load_gateway_config_refuses_a_missing_token_file_even_with_an_old_config_key() {
+        let home = test_home("token-missing");
+        write_test_home_config(&home, r#""token":"old-key""#);
+        std::fs::remove_file(home.join(".fgos/private/gateway-token")).unwrap();
+        let err = load_gateway_config(Some(&home)).expect_err("the old key must not be a token");
+        assert!(!err.to_string().contains("old-key"), "{err}");
+        // With the file back, the file wins over the stray key.
+        write_test_token(&home, 0o600);
+        let config = load_gateway_config(Some(&home)).expect("the token file wins");
+        assert_eq!(config.token, "test-token");
+        std::fs::remove_dir_all(&home).ok();
+    }
+
+    #[test]
+    fn load_gateway_config_names_the_token_file_when_it_is_absent_or_too_open() {
+        let home = test_home("token-mode");
+        std::fs::create_dir_all(home.join(".fgos")).unwrap();
+        let err = load_gateway_config(Some(&home)).expect_err("no token file");
+        assert!(matches!(&err, GatewayConfigError::Token(p, why) if p.ends_with("private/gateway-token") && why == "missing"), "{err}");
+        write_test_token(&home, 0o644);
+        let err = load_gateway_config(Some(&home)).expect_err("a world-readable token file");
+        assert!(matches!(&err, GatewayConfigError::Token(_, why) if why.contains("mode")), "{err}");
+        std::fs::remove_dir_all(&home).ok();
+    }
+
+    /// tsk-54y (D7): a global config with no `gateway.bind` field
     /// must resolve to the locked default (`0.0.0.0`, reachable from other
     /// machines), not the old hardcoded loopback-only behavior.
     #[test]
@@ -1828,7 +1850,7 @@ mod tests {
     #[test]
     fn load_gateway_config_resolves_explicit_bind_override() {
         let home = std::env::temp_dir().join(format!("fgos-gateway-bind-override-{}", std::process::id()));
-        write_test_home_config(&home, r#","bind":"127.0.0.1""#);
+        write_test_home_config(&home, r#""bind":"127.0.0.1""#);
         let config = load_gateway_config(Some(&home)).expect("a valid bind override must load");
         assert_eq!(config.bind, IpAddr::V4(Ipv4Addr::LOCALHOST));
         std::fs::remove_dir_all(&home).ok();
@@ -1839,9 +1861,9 @@ mod tests {
     #[test]
     fn load_gateway_config_rejects_invalid_bind() {
         let home = std::env::temp_dir().join(format!("fgos-gateway-bind-invalid-{}", std::process::id()));
-        write_test_home_config(&home, r#","bind":"not-an-ip""#);
+        write_test_home_config(&home, r#""bind":"not-an-ip""#);
         let err = load_gateway_config(Some(&home)).expect_err("a malformed bind value must not silently resolve");
-        assert!(matches!(err, GatewayConfigError::InvalidBind(_, ref raw) if raw == "not-an-ip"));
+        assert!(matches!(err, GatewayConfigError::InvalidBind(ref raw) if raw == "not-an-ip"));
         std::fs::remove_dir_all(&home).ok();
     }
 
@@ -1863,7 +1885,7 @@ mod tests {
         let home = std::env::temp_dir().join(format!("fgos-gateway-cfaccess-full-{}", std::process::id()));
         write_test_home_config(
             &home,
-            r#","cfAccessTeamDomain":"https://team.cloudflareaccess.com","cfAccessAud":"aud-tag-123""#,
+            r#""cfAccessTeamDomain":"https://team.cloudflareaccess.com","cfAccessAud":"aud-tag-123""#,
         );
         let config = load_gateway_config(Some(&home)).expect("a full cf-access config must load");
         assert!(config.cf_access.is_some());
@@ -1875,18 +1897,18 @@ mod tests {
     #[test]
     fn load_gateway_config_rejects_partial_cf_access_team_domain_only() {
         let home = std::env::temp_dir().join(format!("fgos-gateway-cfaccess-partial-a-{}", std::process::id()));
-        write_test_home_config(&home, r#","cfAccessTeamDomain":"https://team.cloudflareaccess.com""#);
+        write_test_home_config(&home, r#""cfAccessTeamDomain":"https://team.cloudflareaccess.com""#);
         let err = load_gateway_config(Some(&home)).expect_err("team_domain without aud must not silently resolve to None");
-        assert!(matches!(err, GatewayConfigError::PartialCfAccess(_)));
+        assert!(matches!(err, GatewayConfigError::PartialCfAccess));
         std::fs::remove_dir_all(&home).ok();
     }
 
     #[test]
     fn load_gateway_config_rejects_partial_cf_access_aud_only() {
         let home = std::env::temp_dir().join(format!("fgos-gateway-cfaccess-partial-b-{}", std::process::id()));
-        write_test_home_config(&home, r#","cfAccessAud":"aud-tag-123""#);
+        write_test_home_config(&home, r#""cfAccessAud":"aud-tag-123""#);
         let err = load_gateway_config(Some(&home)).expect_err("aud without team_domain must not silently resolve to None");
-        assert!(matches!(err, GatewayConfigError::PartialCfAccess(_)));
+        assert!(matches!(err, GatewayConfigError::PartialCfAccess));
         std::fs::remove_dir_all(&home).ok();
     }
 

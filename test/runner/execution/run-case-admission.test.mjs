@@ -88,8 +88,10 @@ function setup(families = ['okay']) {
       timeoutMs: 40000,
       defaults: { tier: 'standard' },
       modelPolicies: Object.fromEntries(families.map((f) => [f, { nano: 'fake', mini: 'fake', standard: 'fake', advanced: 'fake', flagship: 'fake', frontier: 'fake' }])),
+      // The walk after a failure follows the families listed here, so the fixture lists the families it serves.
+      tierFallback: Object.fromEntries(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier'].map((tier) => [tier, families])),
       executors,
-      capabilities: { 'docs:write': { prefer, rigor: 'standard' } },
+      capabilities: { 'docs:write': { prefer, rigor: 'standard', tier: 'standard' } },
       patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' }, reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } } },
     },
   });

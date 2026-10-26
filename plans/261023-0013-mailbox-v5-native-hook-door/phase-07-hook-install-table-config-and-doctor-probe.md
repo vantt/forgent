@@ -104,3 +104,11 @@ The command above, plus `node --test test/setup/` in full (it is still small eno
 - [ ] Mailbox rows, `commandIsKind`, probe (commit 2)
 - [ ] Config registration from the contract, and the drift proof (commit 3)
 - [ ] Run the gate; regenerate the census; sync and push
+
+## Notes
+
+- Plan owner decision 2 (2026-10-23): the Codex rows use the plain `shimCommand` form. Codex runs a hook command through the user's `$SHELL -c`; a guarded form keeps that shell (the user's login shell, the program the tools run in) at the head position, while zsh execs the plain form into the direct topology. Consequence for owner question 2: on a release older than the native kind, an unguarded Codex row shows "Unknown hook kind" (exit 1) on every hook call.
+- Commits: `fd473def5` (one table; the existing 22 installer tests green unchanged), `4bc78a9d2` (mailbox rows, ownership by the shim running exactly the row's kind and arguments, the wrong-shape report, the mailbox probe), `cc30b2c63` (config registration and the shared fixture), and the commit after it (the full-config fixtures of `config-not-stale` and the non-git copy of `setup` know the mailbox section).
+- Gate: `test/setup/` 931 passed, 1 failed: `active-release-drift-check.test.mjs` "real builder selection and staged production dependency payload agree with doctor" (`fgos.node: file too short` from the fixture's fake addon); it fails the same with this phase's change set aside, so it is checked against clean main in phase 9.
+- Mutants: 10 killed.
+- Deviations: the plain-form Codex rows (plan owner decision 2); Claude Code's PostToolUse matcher is `*`, the form the V3/V4 recordings used; both CLIs' mailbox rows carry `timeout` 10 (the recorded hook objects carried one); the shared fixture is `packages/mailbox/contracts/fixtures/config/mailbox-section.v1.json`; `package.json` ships `packages/mailbox/contracts/limits.v1.json`.

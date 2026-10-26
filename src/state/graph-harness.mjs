@@ -1,6 +1,6 @@
 // graph-harness.mjs — merge-order ranking (tsk-4j9-2, docs/history/
 // merge-standardization/). PURE: takes a work-state view (as returned by
-// store.mjs's listWork/rebuildView) and returns which `proposed` items are
+// store.mjs's listWork) and returns which `proposed` items are
 // actually ready to merge right now, in the order they should merge, plus
 // which ones are waiting or conflicting. No fs, no Date.now(), no event
 // append, no mutation — same read-only discipline as impact.mjs/

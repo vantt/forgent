@@ -90,7 +90,7 @@ import {
 
 // tsk-4fu-2: requiresExistingStore guard (command-registry.mjs) — a
 // state-write verb no longer silently auto-vivifies `.fgos/` via
-// appendEventCore's own mkdirSync when it's missing; it refuses instead.
+// creating a store itself when it's missing; it refuses instead.
 
 // --- `fgos ask`/`fgos answer` (async-human-gate-3): the human-gate round-trip ---
 //
@@ -284,7 +284,8 @@ test('move to done via the real CLI stamps role "human" on the event payload and
   const cwd = tmpCwdFromTemplate();
   toProposed(cwd, 'close-actor-item');
 
-  const result = toDoneViaChain(cwd, 'close-actor-item');
+  for (const to of ['delivered', 'retrospective', 'cleanup']) assert.equal(run(cwd, ['move', 'close-actor-item', '--to', to]).status, 0);
+  const result = run(cwd, ['move', 'close-actor-item', '--to', 'done']);
   assert.equal(result.status, 0);
 
   const lines = eventLines(cwd);

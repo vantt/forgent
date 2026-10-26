@@ -1,9 +1,10 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/gate-bypass.test.mjs — docs/history/gate-bypass/plan.md Piece 1.
 // Covers the two cases the plan's risk map flagged as needing explicit proof:
 // the completeness scan must never false-negative on an incomplete artifact,
 // and the D4 hard-gate floor must hold even at the highest level.
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -24,18 +25,22 @@ import {
 import { addWork } from '../../src/state/store.mjs';
 import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
+// The config facade layers the machine's own global file under the project file; a test never reads the real one.
+process.env.HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-home-'));
+
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-')));
 }
 
 // The shared-config-file read path (docs/history/doctor-fix-gate-bypass/
 // CONTEXT.md D1/D3, tsk-2qz-2) needs `dir` nested under a real repo root
 // (`readGateBypassLevel`'s own `dir` param is the `.fgos` directory;
-// `readSharedConfig` internally resolves `path.dirname(dir)` as the repo
+// `the facade resolves `path.dirname(dir)` as the repo
 // root) -- unlike the flat `tmpDir()` above, whose `path.dirname` would
 // otherwise land on the shared, uncontrolled `os.tmpdir()` itself.
 function tmpFgosDir() {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-repo-'));
+  initializeWorkRepository(repoRoot);
   const fgosDir = path.join(repoRoot, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
   return fgosDir;
@@ -138,16 +143,23 @@ test('readGateBypassLevel: reads config.gateBypass.level from the shared config 
 
 test('readGateBypassLevel: falls back to the legacy standalone file when the shared file exists but has no gateBypass key', () => {
   const fgosDir = tmpFgosDir();
-  writeProjectConfig(path.dirname(fgosDir), { runner: { timeoutMs: 5000 } });
+  writeProjectConfig(path.dirname(fgosDir), { workerSlots: { ceiling: 3 } });
   fs.writeFileSync(path.join(fgosDir, 'gate-bypass.json'), JSON.stringify({ level: 'light' }), 'utf8');
   assert.equal(readGateBypassLevel(fgosDir), 'light');
 });
 
-test('readGateBypassLevel: falls back to the legacy standalone file when the shared file has an unrecognized gateBypass.level', () => {
+test('readGateBypassLevel: a level set in the project file wins over the legacy standalone file', () => {
+  const fgosDir = tmpFgosDir();
+  writeProjectConfig(path.dirname(fgosDir), { gateBypass: { level: 'light' } });
+  fs.writeFileSync(path.join(fgosDir, 'gate-bypass.json'), JSON.stringify({ level: 'heavy' }), 'utf8');
+  assert.equal(readGateBypassLevel(fgosDir), 'light');
+});
+
+test('readGateBypassLevel: an unrecognized gateBypass.level refuses the config and fails closed to off, never to the legacy file', () => {
   const fgosDir = tmpFgosDir();
   writeProjectConfig(path.dirname(fgosDir), { gateBypass: { level: 'total' } });
   fs.writeFileSync(path.join(fgosDir, 'gate-bypass.json'), JSON.stringify({ level: 'standard' }), 'utf8');
-  assert.equal(readGateBypassLevel(fgosDir), 'standard');
+  assert.equal(readGateBypassLevel(fgosDir), 'off');
 });
 
 test('readGateBypassLevel: fails closed to off when neither the shared file nor the legacy file has a valid level', () => {
@@ -155,11 +167,11 @@ test('readGateBypassLevel: fails closed to off when neither the shared file nor 
   assert.equal(readGateBypassLevel(fgosDir), 'off');
 });
 
-test('readGateBypassLevel: never throws when the shared config file is malformed JSON, falls back to legacy', () => {
+test('readGateBypassLevel: never throws when the shared config file is malformed, fails closed to off and ignores the legacy file', () => {
   const fgosDir = tmpFgosDir();
   writeRawProjectConfig(path.dirname(fgosDir), '{ not json');
   fs.writeFileSync(path.join(fgosDir, 'gate-bypass.json'), JSON.stringify({ level: 'standard' }), 'utf8');
-  assert.equal(readGateBypassLevel(fgosDir), 'standard');
+  assert.equal(readGateBypassLevel(fgosDir), 'off');
 });
 
 test('isTierCovered: off covers nothing', () => {
@@ -434,7 +446,7 @@ const FGOS_BIN = path.join(REPO_ROOT, 'bin/fgos.mjs');
 
 function tmpGateCheckFixture() {
   const fgosRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-check-cli-'));
-  const fgosDir = path.join(fgosRoot, '.fgos');
+  const fgosDir = initializeWorkRepository(fgosRoot);
   fs.mkdirSync(fgosDir, { recursive: true });
   addWork(fgosDir, { id: 'gate-check-fixture', title: 'Fixture item', description: 'fixture, not real work', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', size: 'light' });
   fs.writeFileSync(path.join(fgosDir, 'gate-bypass.json'), JSON.stringify({ level: 'standard' }));

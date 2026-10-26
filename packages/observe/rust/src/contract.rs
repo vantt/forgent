@@ -13,6 +13,18 @@ pub enum SubjectKind {
     Work,
 }
 
+impl SubjectKind {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            SubjectKind::Run => "run",
+            SubjectKind::Session => "session",
+            SubjectKind::Executor => "executor",
+            SubjectKind::Case => "case",
+            SubjectKind::Work => "work",
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Subject {
     pub kind: SubjectKind,
@@ -37,14 +49,7 @@ impl Subject {
     }
 
     pub fn to_string_repr(&self) -> String {
-        let k = match self.kind {
-            SubjectKind::Run => "run",
-            SubjectKind::Session => "session",
-            SubjectKind::Executor => "executor",
-            SubjectKind::Case => "case",
-            SubjectKind::Work => "work",
-        };
-        format!("{}:{}", k, self.id)
+        format!("{}:{}", self.kind.as_str(), self.id)
     }
 }
 

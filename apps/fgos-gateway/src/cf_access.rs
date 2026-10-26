@@ -13,7 +13,7 @@
 //! reference's own (older) `Cargo.toml`.
 //!
 //! When an operator configures `gateway.cfAccessTeamDomain` +
-//! `gateway.cfAccessAud` (`~/.fgos/config.json`), a request that arrives
+//! `gateway.cfAccessAud` (the machine's global config), a request that arrives
 //! already authenticated by Cloudflare Access at the edge carries a
 //! `Cf-Access-Jwt-Assertion` header. This module turns that header into a
 //! verified identity, or an error — never a partial pass.

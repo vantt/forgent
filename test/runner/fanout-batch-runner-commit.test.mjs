@@ -11,7 +11,7 @@ import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { confinedRunnerConfig } from './loop-worker-fixture.helper.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { capabilityServedBy, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // The fan-out batch picks an item, runs its worker as one Unit run (runUnit) in
 // the item's worktree and then `fgos return`s it. The worker runs confined and
@@ -36,9 +36,9 @@ function mkRepo() {
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
   const fgosDir = path.join(repoRoot, '.fgos');
-  fs.mkdirSync(fgosDir);
-  initStore(fgosDir);
   activateGitFixture(repoRoot);
+  fs.mkdirSync(fgosDir, { recursive: true });
+  initStore(fgosDir);
   return { repoRoot, fgosDir };
 }
 
@@ -109,8 +109,8 @@ test('fanout batch: a Work item\'s rigor and risk never raise the tier its Unit 
   const record = JSON.parse(fs.readFileSync(path.join(fgosDir, 'assignments', fired.unitRunId, 'unit.json'), 'utf8'));
   assert.equal(record.unit.rigor, 'critical', 'the demand reaches the unit');
   const { binding } = record.bindings['producer/1'][0];
-  assert.equal(binding.tier, 'standard', 'and moves no tier: the config declares none, so the default stands');
-  assert.equal(binding.provenance.tier.source, 'defaults.tier');
+  assert.equal(binding.tier, 'standard', 'and moves no tier: the capability declares standard, whatever the unit demands');
+  assert.equal(binding.provenance.tier.source, 'capabilities."code:implement".tier');
 });
 
 test('fanout batch: a worker cannot commit itself (its git dir is read-only), so the round fails and the item returns blocked', async () => {
@@ -194,7 +194,7 @@ function setupExecutors(executors, items) {
   writeProjectConfig(repoRoot, {
       runner: confinedRunnerConfig({
         executors,
-        capabilities: { 'code:implement': { prefer: Object.keys(executors).map((executor) => ({ executor })) } },
+        capabilities: { 'code:implement': capabilityServedBy(Object.keys(executors), 'code:implement') },
         modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
         timeoutMs: 60000,
       }),

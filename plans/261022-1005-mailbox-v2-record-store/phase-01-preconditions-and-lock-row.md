@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Preconditions and the mailbox lock row"
-status: pending
+status: completed
 depends_on: [V3 closed]
 ---
 
@@ -67,6 +67,17 @@ The row is on the branch, its Node contract test and the existing holder-lock su
 
 - Risk: a HARDEN commit changes the registry in parallel. Merge, keep both rows, rerun the contract test. Rollback: revert the commit; nothing else reads the row yet.
 
+## Base
+
+Branch `mailbox/v1-v3` at `b48330080` after merging main `978fa28e7` (2026-10-22, start of phase 1). V3 reads `status: completed` on `origin/main`; the worktree was clean.
+
 ## API drift
 
-(fill at phase start)
+None. `git log --oneline 2f2c17a5e..origin/main -- packages/holder-lock packages/durable-file packages/process src/holder-lock src/runner/dispatch/confinement` is empty at `978fa28e7`. The registry's last change on main is `266b46b0f`; no other lane holds it.
+
+## Deviations
+
+- The rank-80 `note` and the holder-lock spec's kinds and ranks tables also name `repo-config`, which the GIT lane added as a rank-80 leaf without listing it there; the same lines gain `mailbox`.
+- The new hook key lands in `HookLimits` as `hook: LockWaitLimits { lock_wait_ms }`, the nested shape the dotted key `mailbox.hook.lockWaitMs` folds into; the type is exported from `hook`.
+- Convention gate: the owner's form `fgos convention check --dir . -- <files>` replaces the plan's `--all` form (the explicit-path form without `--dir` is item `tsk-5n3`).
+- Node gate: `test/setup/holder-lock-checks.test.mjs` and `test/holder-lock/fences-rust-locks.test.mjs` need the host the test runner stages (`FGOS_HOST_BIN`, the door manifest), and `scripts/run-tests.mjs` forwards extra arguments as `node --test` flags, so it cannot select files. The proof is therefore the whole `npm test`: 8853 tests, 8737 passed, 20 failed. All three registry and holder-lock files pass. The failures are in `fgctl-upgrade` (15), `fgctl-init-download-sources` (2), `dispatch` (1), the V3 closing report's known set, plus `check-decision-citation-drift` (1, item `tsk-2mo`) and one load-timed case of `run-provider-failover` ("two checkers whose leases conflict", 4.98 s under the full suite). None of them reads the lock registry.

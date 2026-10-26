@@ -1,31 +1,26 @@
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { resolveHolderLiveness } from '../runner/dispatch/process-identity.mjs';
-import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixLandRecovery } from './git-checks.mjs';
+import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixGitOperationRecovery } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
-// registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
-// D1/D2, docs/history/setup-doctor-config-registry/): the one place a module
-// declares a doctor check and/or a config-default shape. `checks.mjs` never
-// needs editing again to pick up a new entry — it only re-exports
-// `DOCTOR_CHECKS` from here (D1). A new module registers by importing
-// `registerCheck`/`registerConfigDefault` from this file and calling them at
-// its own module-load time, or — for the handful of checks fgOS ships with —
-// by being registered directly below, next to the built-ins.
+// registrations.mjs — the doctor-check / fix registry (CONTEXT.md D1/D2,
+// docs/history/setup-doctor-config-registry/): the one place a module declares
+// a doctor check and/or a fix. `checks.mjs` never needs editing again to pick
+// up a new entry — it only re-exports `DOCTOR_CHECKS` from here (D1). A new
+// module registers by importing `registerCheck`/`registerFix` from this file
+// and calling them at its own module-load time, or — for the handful of
+// checks fgOS ships with — by being registered directly below.
 //
-// `check` and `configDefault` registrations are independent (D2): a module
-// may register only a check, only a config-default, or both — never a
-// forced pairing. 4 of the 5 built-in checks below have no config-default at
-// all, which is exactly why D2 rejected a mandatory pair.
+// `check` and `fix` registrations are independent (D2): a module may register
+// only a check, only a fix, or both — never a forced pairing. Config is not
+// registered here: the standard (core/config-standard) holds every default and
+// the schemas (core/config-schema) every shape rule, both read through the
+// config door. A check below reads the effective value through the facade only
+// when it enforces a rule a schema cannot state; the rows over the config files
+// themselves are config-checks.mjs's.
 //
-// `fix` is a third, equally independent registration capability
-// (docs/history/doctor-fix-gate-bypass/CONTEXT.md D3, tsk-2qz): a module may
-// register a `fix` function alongside its `check`/`configDefault`, or none
-// of the above three together — same "independent, not forced pairing"
-// style D2 already established. `fgos doctor --fix` (bin/fgos.mjs) runs
-// every registered fix via `runFixes` below; `doctor` without `--fix` stays
-// exactly as before (D2 of the gate-bypass item — no default-behavior
-// change).
+// `fgos doctor --fix` (bin/fgos.mjs) runs every registered fix via `runFixes`
+// below; `doctor` without `--fix` writes nothing.
 
-import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -34,13 +29,12 @@ import { fileURLToPath } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 
 import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
-import { mergeConfigDefaults } from './config-merge.mjs';
 import { releaseBinaryPath } from '../util/release-binary-path.mjs';
 import { RELEASE_TARGETS, releaseTargetForHost } from '../util/release-targets.mjs';
 import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
 import { compileDomain } from '../../scripts/build-domain-registry.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
-import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { agentShapeProblem, findAgentDuplicates, readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
 import { agentRenderWarnings, listAgents } from '../runner/agent-listing.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -57,6 +51,7 @@ import {
   installPiHook,
 } from './agent-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
+import { mailboxOptIn, refusedConfigName } from './mailbox-limits.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import {
   readWorkflowDefinitionFiles,
@@ -87,13 +82,11 @@ import {
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
 import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
-import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, SEAT_BINDING_SCHEMA_VERSION, validateCapabilityServesShape, validateGeneratedPathsShape, RunnerConfigError, VALID_CHECKER_SEATS } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPathsShape, validateRunnerPatternsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { capabilityEntriesOf, hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
-import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
@@ -107,7 +100,8 @@ import { stepById } from '../workflow/steps.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
-import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
+import { readConfig, readMachineConfig } from '../config/facade.mjs';
+import { CONFIG_CHECKS, CONFIG_FIXES, isConfigDoorFailure } from './config-checks.mjs';
 import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
@@ -115,22 +109,12 @@ import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { createTerminalControl } from '../terminal-control/client.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
-import {
-  sharedConfigFilePath,
-  readSharedConfig,
-  writeSharedConfig,
-  readInvariantCheckCommands,
-  DEFAULT_INVARIANT_CHECK_COMMANDS,
-  readWorktreeSetupCommands,
-  DEFAULT_WORKTREE_SETUP_COMMANDS,
-} from '../config/shared-config-file.mjs';
-import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
-import { advanceEventsJsonlTruncationGuard, DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../state/events-jsonl-truncation-guard.mjs';
-import { verifyCompactionCandidate } from '../state/events-compaction.mjs';
-import { readMainCheckoutGuardWarnings } from '../state/main-checkout-guard-warnings.mjs';
 import { computeKnowledgeProjection } from '../report/knowledge-projection.mjs';
-import { rebuild } from '../state/store.mjs';
+import { prepareWorkStore } from '../state/work-event-store.mjs';
+import { eventStoreDoctor } from './event-store-checks.mjs';
+import { fixEventStoreLockDirs } from './event-store-fixes.mjs';
+import { foldEvents } from '../state/replay.mjs';
 import { resolveDocPath } from '../report/knowledge-resolver.mjs';
 import { isLiveDocLifecycle } from '../state/knowledge-registry.mjs';
 import { findDuplicateAuthoritativeClaims } from '../report/authoritative-match.mjs';
@@ -141,14 +125,13 @@ import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding/client.mjs';
-import { checkSeatBindingConfig, checkSeatBindingDryBind } from './seat-binding-checks.mjs';
-import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
+import { checkSeatBindingDryBind } from './seat-binding-checks.mjs';
+import { listAssignmentRuns, scanAssignmentLayout } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
-import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
+import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
-import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
 import { checkDocumentationCutoverLeaseDoctor } from '../runner/documentation-cutover-lease.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
@@ -164,12 +147,26 @@ const DEAD_LINE_SAMPLE_SIZE = 3;
 // Live, mutated-in-place arrays (never reassigned) so a registration added
 // after this module first evaluates — e.g. from a test, or from another
 // module imported later in the same process — is visible through every
-// existing import of `DOCTOR_CHECKS`/`CONFIG_DEFAULT_REGISTRATIONS`,
+// existing import of `DOCTOR_CHECKS`,
 // including `checks.mjs`'s own re-export (ESM re-exports are live bindings
 // to the same array object, not a snapshot).
 export const DOCTOR_CHECKS = [];
-export const CONFIG_DEFAULT_REGISTRATIONS = [];
 export const FIX_REGISTRATIONS = [];
+
+/**
+ * The effective value of one config section for the project at `cwd` (project over global over the standard),
+ * as ordinary objects: the facade's results have no prototype, which the check code below does not expect. A
+ * refused file throws a ConfigDoorError, which `registerCheck` turns into a failed row.
+ */
+export function effectiveSection(cwd, section) {
+  const value = readConfig({ projectRoot: cwd, sections: [section] }).value[section];
+  return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+}
+
+/** The effective `runner` section of the machine alone (global file, accounts, standard). */
+function machineRunner() {
+  return JSON.parse(JSON.stringify(readMachineConfig({ sections: ['runner'] }).value.runner ?? {}));
+}
 
 /**
  * Register a doctor check (D1/D2). `id` must be unique among registered
@@ -186,31 +183,51 @@ export function registerCheck({ id, description, check }) {
   if (typeof check !== 'function') {
     throw new Error(`registerCheck("${id}") requires a check function`);
   }
-  DOCTOR_CHECKS.push({ id, description, check });
+  // A check that throws (an unreadable store, a refused clone) fails its own row; it never stops the rest of the run.
+  DOCTOR_CHECKS.push({ id, description, check(cwd, run) {
+    const failed = error => ({ passed: false, message: error.message });
+    try {
+      const result = check(cwd, run);
+      return result && typeof result.then === 'function' ? result.catch(failed) : result;
+    } catch (error) { return failed(error); }
+  } });
 }
 
 /**
- * Register a config-default shape (D2/D3): `key` is this module's own
- * top-level section name in the eventual shared config file (D3 — "one file,
- * each module its own entry"); `shape` is the default object merged into
- * that section via the existing, unmodified `mergeConfigDefaults`. Config-
- * default registration is independent of check registration (D2) — a module
- * may call only this, only `registerCheck`, or both.
+ * One doctor run. Rows that need the same expensive fact (the Work view) ask the run for it: the first row
+ * computes it, the rest reuse it, and a failure is remembered too, so a store that cannot be read is tried once.
+ * A row called without a run (a test, a one-off) gets a private one and shares nothing.
  */
-export function registerConfigDefault({ id, key, shape }) {
-  if (typeof id !== 'string' || !id.trim()) {
-    throw new Error('registerConfigDefault requires a non-empty id');
-  }
-  if (typeof key !== 'string' || !key.trim()) {
-    throw new Error(`registerConfigDefault("${id}") requires a non-empty key`);
-  }
-  if (CONFIG_DEFAULT_REGISTRATIONS.some((entry) => entry.id === id)) {
-    throw new Error(`registerConfigDefault: "${id}" is already registered`);
-  }
-  if (shape === null || typeof shape !== 'object' || Array.isArray(shape)) {
-    throw new Error(`registerConfigDefault("${id}") requires a plain-object shape`);
-  }
-  CONFIG_DEFAULT_REGISTRATIONS.push({ id, key, shape });
+export function createDoctorRun() {
+  const facts = new Map();
+  return {
+    once(key, compute) {
+      if (!facts.has(key)) {
+        try { facts.set(key, { value: compute() }); } catch (error) { facts.set(key, { error }); }
+      }
+      const fact = facts.get(key);
+      if (fact.error) throw fact.error;
+      return fact.value;
+    },
+  };
+}
+
+/**
+ * The Work view a doctor row judges, read through the Event Store facade once per run, or null when this project
+ * has no Work store to read (no `.fgos`, or not a Git repository). Any other failure (a refused clone, damaged
+ * history) throws and fails the rows that asked.
+ */
+function doctorWorkView(root, run = createDoctorRun()) {
+  return run.once(`work-view:${root}`, () => {
+    const fgosDir = path.join(root, '.fgos');
+    if (!fs.existsSync(fgosDir)) return null;
+    try {
+      return listWork(fgosDir);
+    } catch (error) {
+      if (error.code === 'event-store-no-repository') return null;
+      throw error;
+    }
+  });
 }
 
 /**
@@ -244,51 +261,11 @@ export function registerFix({ id, fix }) {
  */
 export function runFixes(cwd) {
   return FIX_REGISTRATIONS.map(({ id, fix }) => {
-    const { changed, message } = fix(cwd);
-    return { id, changed, message };
+    try {
+      const { changed, message } = fix(cwd);
+      return { id, changed, message };
+    } catch (error) { return { id, changed: false, message: error.message }; }
   });
-}
-
-/**
- * Assemble the shared config file's DEFAULT shape from every registered
- * entry (tsk-5vf D4): `{ [entry.key]: entry.shape, ... }`. Registry-driven
- * -- a new `registerConfigDefault` call is automatically picked up here,
- * never requiring an edit to this function.
- */
-function assembleRegistryDefaults() {
-  const defaults = {};
-  for (const { key, shape } of CONFIG_DEFAULT_REGISTRATIONS) {
-    defaults[key] = shape;
-  }
-  return defaults;
-}
-
-/**
- * Registry-driven bootstrap for the shared config file (tsk-5vf D4): reads
- * whatever is currently at `dir` (`readSharedConfig`), fills in any key any
- * registered entry's default shape has that the current content is
- * missing, at any depth, and writes back only when a key was actually
- * added or the shared file did not exist yet. This is the write path
- * `fgos setup` calls (RUL9: doctor checks stay read-only; `setup` is the
- * one write verb). `layer` is `project` (the default) or `global`.
- */
-export function ensureSharedConfigDefaults(dir, { layer = 'project' } = {}) {
-  const existing = readSharedConfig(dir);
-  const registered = assembleRegistryDefaults();
-  // A project's own runner section starts in the seat-binding schema, so its loader accepts what setup
-  // wrote. A runner section that is already there is the setup conversion's, never marked here, and the
-  // global file takes no seat-binding key (every older release on the machine reads it).
-  const freshProjectRunner = layer === 'project' && registered.runner && Object.keys(existing.runner ?? {}).length === 0;
-  const defaults = freshProjectRunner
-    ? { ...registered, runner: { ...registered.runner, patterns: { ...registered.runner.patterns, seatBinding: { schema: SEAT_BINDING_SCHEMA_VERSION } } } }
-    : registered;
-  const { merged, addedKeys } = mergeConfigDefaults(existing, defaults);
-  const sharedExisted = fs.existsSync(sharedConfigFilePath(dir));
-  if (sharedExisted && addedKeys.length === 0) {
-    return { config: existing, addedKeys: [] };
-  }
-  writeSharedConfig(dir, merged);
-  return { config: merged, addedKeys };
 }
 
 /**
@@ -485,128 +462,29 @@ function checkShellIntegrationSourced(cwd) {
   return { passed: true, message: `sourced in: ${rcFiles.join(', ')}${harnessProbeNote}` };
 }
 
-// config-not-stale is READ-ONLY by construction: `readSharedConfig` only
-// calls fs.existsSync/readFileSync, never `ensureSharedConfigDefaults` or
-// `ensureRunnerConfig` — doctor never writes.
-//
-// Targeted at the shared config file (`.fgos/config.json`) alone (tsk-5hv
-// D1: the legacy runner config file was retired, no fallback), made generic over every
-// registered entry (tsk-5vf D4/D5) — the `registerConfigDefault` follow-up
-// `docs/history/setup-doctor-config-registry/plan.md`'s "Real blast radius"
-// note deferred to once the shared file was real.
-function checkConfigNotStale(cwd) {
-  const sharedPath = sharedConfigFilePath(cwd);
-  if (!fs.existsSync(sharedPath)) {
-    return { passed: false, message: 'not yet configured -- run fgos setup' };
-  }
-  const existingConfig = readSharedConfig(cwd);
-  const defaults = assembleRegistryDefaults();
-  const { addedKeys } = mergeConfigDefaults(existingConfig, defaults);
-  if (addedKeys.length > 0) {
-    return { passed: false, message: `stale config — missing keys: ${addedKeys.join(', ')} — run fgos setup` };
-  }
-  return { passed: true, message: `config up to date at ${sharedPath}` };
-}
-
+// The schema states each entry's keys and types; the owner's validator keeps the rule that a source scope opens with a
+// literal directory, and the cumulative rule over the checkers of each rigor.
 export function checkRunnerGeneratedPathsConfig(cwd) {
-  const projectRunner = readSharedConfig(cwd)?.runner;
-  const globalRunner = loadGlobalConfig()?.runner;
-  const [level, runner] = projectRunner ? ['project', projectRunner] : globalRunner ? ['global', globalRunner] : [];
-  if (!runner || runner.generatedPaths === undefined) {
-    return { passed: true, message: 'warning: runner.generatedPaths missing -- write scopes are not widened to generated trees; run fgos setup' };
-  }
+  const generatedPaths = effectiveSection(cwd, 'runner').generatedPaths ?? [];
   try {
-    validateGeneratedPathsShape(runner.generatedPaths, `${level} runner`);
+    validateGeneratedPathsShape(generatedPaths, 'runner');
   } catch (err) {
-    return { passed: false, message: `${level} ${err.message}` };
+    return { passed: false, message: err.message };
   }
-  return { passed: true, message: `${level} runner.generatedPaths is valid (${runner.generatedPaths.length} mapping(s))` };
+  return { passed: true, message: `runner.generatedPaths is valid (${generatedPaths.length} mapping(s))` };
 }
 
 export function checkRunnerPatternsConfig(cwd) {
-  const projectRunner = readSharedConfig(cwd)?.runner;
-  const globalRunner = loadGlobalConfig()?.runner;
-  const levels = [];
-  if (projectRunner) {
-    levels.push(['project', projectRunner]);
-  } else if (globalRunner) {
-    levels.push(['global', globalRunner]);
+  try {
+    validateRunnerPatternsShape(effectiveSection(cwd, 'runner').patterns ?? {}, 'runner.patterns');
+  } catch (err) {
+    return { passed: false, message: err.message };
   }
-  if (levels.length === 0) {
-    return { passed: true, message: 'warning: runner.patterns missing -- falling back to setup defaults; run fgos setup' };
-  }
-  const problems = [];
-  const warnings = [];
-  for (const [level, runner] of levels) {
-    if (!runner) continue;
-    const patterns = runner.patterns;
-    if (patterns === undefined) {
-      warnings.push(`${level} runner.patterns missing -- falling back to setup defaults; run fgos setup`);
-      continue;
-    }
-    if (!patterns || typeof patterns !== 'object' || Array.isArray(patterns)) {
-      problems.push(`${level} runner.patterns must be an object`);
-      continue;
-    }
-    if (patterns.defaultRule !== undefined) {
-      if (!patterns.defaultRule || typeof patterns.defaultRule !== 'object' || Array.isArray(patterns.defaultRule)) {
-        problems.push(`${level} runner.patterns.defaultRule must be an object`);
-      } else if (patterns.defaultRule.mutatingMinRigor !== undefined && !RIGOR_VALUES.includes(patterns.defaultRule.mutatingMinRigor)) {
-        problems.push(`${level} runner.patterns.defaultRule.mutatingMinRigor must be one of ${RIGOR_VALUES.join('/')}`);
-      }
-    }
-    if (patterns.reviewed !== undefined) {
-      if (!patterns.reviewed || typeof patterns.reviewed !== 'object' || Array.isArray(patterns.reviewed)) {
-        problems.push(`${level} runner.patterns.reviewed must be an object`);
-      } else {
-        if (patterns.reviewed.maxRounds !== undefined && (!Number.isInteger(patterns.reviewed.maxRounds) || patterns.reviewed.maxRounds <= 0)) {
-          problems.push(`${level} runner.patterns.reviewed.maxRounds must be a positive integer`);
-        }
-        if (patterns.reviewed.checkersByRigor !== undefined) {
-          const cbr = patterns.reviewed.checkersByRigor;
-          if (!cbr || typeof cbr !== 'object' || Array.isArray(cbr)) {
-            problems.push(`${level} runner.patterns.reviewed.checkersByRigor must be an object`);
-          } else {
-            for (const [rigor, checkers] of Object.entries(cbr)) {
-              if (!RIGOR_VALUES.includes(rigor)) {
-                problems.push(`${level} runner.patterns.reviewed.checkersByRigor has unknown rigor "${rigor}"`);
-              }
-              if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKER_SEATS.has(c))) {
-                problems.push(`${level} runner.patterns.reviewed.checkersByRigor.${rigor} must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}]`);
-              }
-            }
-            const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);
-            for (let i = 1; i < orderedRigors.length; i += 1) {
-              const weaker = orderedRigors[i - 1];
-              const stronger = orderedRigors[i];
-              const weakerSet = new Set(cbr[weaker]);
-              const strongerSet = new Set(cbr[stronger]);
-              for (const checker of weakerSet) {
-                if (!strongerSet.has(checker)) {
-                  problems.push(`${level} runner.patterns.reviewed.checkersByRigor is not cumulative: "${stronger}" missing "${checker}" from "${weaker}"`);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  if (problems.length > 0) {
-    return { passed: false, message: problems.join('; ') };
-  }
-  if (warnings.length > 0) {
-    return { passed: true, message: `warning: ${warnings.join('; ')}` };
-  }
-  return { passed: true, message: 'runner patterns configuration is valid at every configured level' };
+  return { passed: true, message: 'runner patterns configuration is valid and cumulative' };
 }
 
 export function checkTierVocabularyDeadKeys(cwd) {
-  const levels = [
-    ['project', readSharedConfig(cwd)?.runner],
-    ['global', loadGlobalConfig()?.runner],
-  ];
+  const levels = [['effective', effectiveSection(cwd, 'runner')]];
   const problems = [];
   for (const [level, runner] of levels) {
     if (!runner || typeof runner !== 'object') continue;
@@ -666,7 +544,7 @@ export function checkTierVocabularyDeadKeys(cwd) {
   }
   return problems.length > 0
     ? { passed: false, message: problems.join('; ') }
-    : { passed: true, message: 'no retired tier vocabulary keys in project or global config' };
+    : { passed: true, message: 'no retired tier vocabulary keys in the effective config' };
 }
 
 export function checkCoordinationProtocolDeadVocabulary(cwd) {
@@ -956,10 +834,8 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
     for (const s of skillsSet) allProvidedSkills.add(s);
   }
 
-  const sharedConfig = readSharedConfig(cwd);
   const knownExecutors = new Set([
-    ...Object.keys(sharedConfig?.runner?.executors || {}),
-    ...Object.keys(DEFAULT_RUNNER_CONFIG?.executors || {}),
+    ...Object.keys(effectiveSection(cwd, 'runner')?.executors || {}),
     // executor-provider-naming (2026-09-17): executors are now named by
     // provider, not bin -- 'agy'/'codex'/'pi'/'pi-grok'/'codex-pi' no
     // longer exist as separate ids ('agy' merged into 'gemini'; 'codex'
@@ -1201,8 +1077,7 @@ function checkDispatchDecideHookWired(cwd) {
 // (e.g. "impact-analysis") — the registry itself never names one.
 //
 // tsk-in1-1 D1: tools are no longer event-sourced (`view.tools`) — reads
-// `runner.executors` straight from `.fgos/config.json` (via `readSharedConfig`,
-// the same raw-read every other doctor check in this file already uses),
+// `runner.executors` from the effective runner section (the config door),
 // same as `fgos tool check/query` (bin/fgos.mjs) now does.
 function checkToolRegistryConfigured(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
@@ -1210,12 +1085,12 @@ function checkToolRegistryConfigured(cwd) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
   const fgosDir = path.join(mainCheckout, '.fgos');
-  const executors = readSharedConfig(mainCheckout)?.runner?.executors;
+  const executors = effectiveSection(mainCheckout, 'runner')?.executors;
   const tools = toolsFromExecutors(executors);
   const localStatus = readLocalStatus(fgosDir);
   const { posture, registeredCount, presentCount, missingCount, unknownCount } = classifyRegistryPosture(tools, localStatus);
   if (posture === 'inactive') {
-    return { passed: true, message: 'inactive — no tool-capable executors declared (add one to runner.executors in .fgos/config.json)' };
+    return { passed: true, message: 'inactive — no tool-capable executors declared (declare one under runner.executors with fgos config set)' };
   }
   if (posture === 'full') {
     return { passed: true, message: `full — ${presentCount}/${registeredCount} registered tool(s) present` };
@@ -1297,12 +1172,6 @@ registerFix({
 });
 
 registerCheck({
-  id: 'config-not-stale',
-  description: '.fgos/config.json exists and has every current registered default key',
-  check: (cwd) => checkConfigNotStale(cwd),
-});
-
-registerCheck({
   id: 'runner-generated-paths',
   description: 'runner.generatedPaths maps generated sources to render targets with well-formed write-scope entries',
   check: (cwd) => checkRunnerGeneratedPathsConfig(cwd),
@@ -1358,7 +1227,7 @@ registerCheck({
 
 registerCheck({
   id: 'global-model-policies-portable',
-  description: 'runner.modelPolicies in ~/.fgos/config.json uses plain model names only, since every fgOS release on the machine reads it',
+  description: 'runner.modelPolicies in the global config uses plain model names only, since every fgOS release on the machine reads it',
   check: () => checkGlobalModelPoliciesPortable(),
 });
 
@@ -1448,7 +1317,7 @@ registerFix({
   id: 'dispatch-decide-hook-wired',
   fix: (cwd) => {
     const res = installClaudeHook(cwd);
-    return { fixed: res.wired, message: res.wired ? 'wired Claude Code hooks in .claude/settings.json' : `skipped: ${res.skippedExisting}` };
+    return { fixed: res.wired, message: res.wired ? `wired Claude Code hooks in .claude/settings.json${res.mailbox ? `; ${res.mailbox}` : ''}` : `skipped: ${res.skippedExisting}` };
   },
 });
 
@@ -1462,7 +1331,7 @@ registerFix({
   id: 'codex-hook-wired',
   fix: (cwd) => {
     const res = installCodexHook(cwd);
-    return { fixed: res.wired, message: res.wired ? 'wired Codex CLI hooks in .codex/hooks.json' : `skipped: ${res.skippedExisting}` };
+    return { fixed: res.wired, message: res.wired ? `wired Codex CLI hooks in .codex/hooks.json${res.mailbox ? `; ${res.mailbox}` : ''}` : `skipped: ${res.skippedExisting}` };
   },
 });
 
@@ -1490,7 +1359,7 @@ registerFix({
   id: 'omp-hook-wired',
   fix: (cwd) => {
     const res = installOmpHook(cwd);
-    return { fixed: res.wired, message: res.wired ? 'wired OMP extension hook in .omp/extensions/fgos-hooks.ts' : `skipped: ${res.skippedExisting}` };
+    return { fixed: res.wired, message: res.wired ? `wired OMP extension hook in .omp/extensions/fgos-hooks.ts${res.mailbox ? `; ${res.mailbox}` : ''}` : `skipped: ${res.skippedExisting}` };
   },
 });
 
@@ -1504,7 +1373,7 @@ registerFix({
   id: 'pi-hook-wired',
   fix: (cwd) => {
     const res = installPiHook(cwd);
-    return { fixed: res.wired, message: res.wired ? 'wired Pi extension hook in .pi/extensions/fgos-hooks.ts' : `skipped: ${res.skippedExisting}` };
+    return { fixed: res.wired, message: res.wired ? `wired Pi extension hook in .pi/extensions/fgos-hooks.ts${res.mailbox ? `; ${res.mailbox}` : ''}` : `skipped: ${res.skippedExisting}` };
   },
 });
 
@@ -1532,7 +1401,7 @@ registerCheck({
   // the global one, and a confined invocation runs as one of those accounts.
   check: (cwd) => {
     let config = null;
-    try { config = { runner: loadRunnerConfigFromDir(cwd) }; } catch { /* fall back to the project file */ }
+    try { config = { runner: loadRunnerConfigForDir(cwd) }; } catch { /* fall back to the project file */ }
     return checkAgySubHomesConfigured(cwd, { config });
   },
 });
@@ -1624,12 +1493,12 @@ registerCheck({
 // for one caller.
 const COMPLETED_ROOT_STATUSES = new Set(['delivered', 'retrospective', 'cleanup', 'done']);
 
-function checkRootDrift(cwd) {
+function checkRootDrift(cwd, run) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const view = doctorWorkView(mainCheckout, run) ?? foldEvents([]);
   const drift = driftStatus(mainCheckout, view, { trunk: detectTrunk(mainCheckout) });
 
   const describe = ([id, status]) =>
@@ -1675,12 +1544,12 @@ function checkRootDrift(cwd) {
   };
 }
 
-function checkLeafNotifyDrift(cwd) {
+function checkLeafNotifyDrift(cwd, run) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const view = doctorWorkView(mainCheckout, run) ?? foldEvents([]);
   const drift = postLandDrift(mainCheckout, view, { trunk: detectTrunk(mainCheckout) });
   const entries = Object.entries(drift);
   if (entries.length === 0) {
@@ -1707,12 +1576,12 @@ function checkLeafNotifyDrift(cwd) {
 // closed definition frontier.mjs already exports) — a resolved item's
 // stale classification no longer feeds any live gate or formula, so
 // flagging it here would just be noise.
-function checkWorkClassificationVocabulary(cwd) {
+function checkWorkClassificationVocabulary(cwd, run) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const view = doctorWorkView(mainCheckout, run) ?? foldEvents([]);
   const violations = [];
   for (const item of Object.values(view.work)) {
     if (isResolvedStatus(item)) continue;
@@ -1737,7 +1606,7 @@ function checkWorkClassificationVocabulary(cwd) {
 registerCheck({
   id: 'work-classification-vocabulary',
   description: "every open item's risk/kind matches its domain's declared classification vocabulary (tsk-6ax)",
-  check: (cwd) => checkWorkClassificationVocabulary(cwd),
+  check: (cwd, run) => checkWorkClassificationVocabulary(cwd, run),
 });
 
 // tsk-64h: the step-axis sibling of the risk/kind check above, and the
@@ -1755,12 +1624,12 @@ registerCheck({
 // out-of-vocabulary for being absent. OPEN items only (`!isResolvedStatus`,
 // the one shared open/closed definition), same reasoning as the check
 // above: a resolved item's step no longer routes anything.
-function checkWorkStepVocabulary(cwd) {
+function checkWorkStepVocabulary(cwd, run) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const view = doctorWorkView(mainCheckout, run) ?? foldEvents([]);
   const violations = [];
   for (const item of Object.values(view.work)) {
     if (isResolvedStatus(item)) continue;
@@ -1783,7 +1652,30 @@ function checkWorkStepVocabulary(cwd) {
 registerCheck({
   id: 'work-step-vocabulary',
   description: "every open item sits at a step its own domain's Workflow still registers — no item stranded on a retired step (tsk-64h)",
-  check: (cwd) => checkWorkStepVocabulary(cwd),
+  check: (cwd, run) => checkWorkStepVocabulary(cwd, run),
+});
+
+// Events acknowledged on one machine whose precondition a concurrent event from another machine made false are
+// recorded as conflicts and never applied. Nothing resolves them yet, so this row is how a person finds out; it
+// warns and never fails, because a recorded conflict is a finished fold and not a broken store.
+function checkWorkRecordedConflicts(cwd, run) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const conflicts = (doctorWorkView(mainCheckout, run) ?? foldEvents([])).conflicts ?? [];
+  if (conflicts.length === 0) return { passed: true, message: 'no recorded cross-machine conflicts in the Work view' };
+  const ids = [...new Set(conflicts.map((conflict) => conflict.id))].sort();
+  return {
+    passed: true,
+    message: `warning: ${conflicts.length} recorded cross-machine conflict(s) on ${ids.length} item(s): ${ids.join(', ')} — each is an acknowledged change that another machine's concurrent change kept from applying; \`fgos show <id>\` lists them`,
+  };
+}
+
+registerCheck({
+  id: 'work-recorded-conflicts',
+  description: 'the Work view holds no recorded cross-machine conflicts: acknowledged changes a concurrent change from another machine kept from applying (warns, never fails)',
+  check: (cwd, run) => checkWorkRecordedConflicts(cwd, run),
 });
 
 export function checkDomainWorkflowOperationsCoverage(cwd, root = FGOS_INSTALL_ROOT) {
@@ -1809,13 +1701,13 @@ registerCheck({
 registerCheck({
   id: 'root-drift',
   description: 'every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge (tsk-3bn)',
-  check: (cwd) => checkRootDrift(cwd),
+  check: (cwd, run) => checkRootDrift(cwd, run),
 });
 
 registerCheck({
   id: 'leaf-notify-drift',
   description: 'every live session branch has no post-land drift against its target (tsk-1el)',
-  check: (cwd) => checkLeafNotifyDrift(cwd),
+  check: (cwd, run) => checkLeafNotifyDrift(cwd, run),
 });
 
 // tsk-1l9: the LEAF-inclusive sibling of root-drift above. `root-drift` only
@@ -1835,12 +1727,12 @@ registerCheck({
 // flagged, since the branch is often cleaned up after a genuine merge; so is
 // a branch whose every commit already has a patch-equivalent on trunk, which
 // carried its content in by some other route and is only a stale ref.
-function checkDeliveredNotOnTrunk(cwd) {
+function checkDeliveredNotOnTrunk(cwd, run) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const view = doctorWorkView(mainCheckout, run) ?? foldEvents([]);
   const stranded = unmergedDeliveries(mainCheckout, view, { trunk: detectTrunk(mainCheckout) });
   const entries = Object.entries(stranded);
   if (entries.length === 0) {
@@ -1873,233 +1765,13 @@ function checkDeliveredNotOnTrunk(cwd) {
 registerCheck({
   id: 'delivered-not-on-trunk',
   description: "every item whose status says its work was handed over has its fgw/<id> branch reachable from the trunk (tsk-1l9)",
-  check: (cwd) => checkDeliveredNotOnTrunk(cwd),
-});
-
-// events-jsonl-not-truncated (tsk-cgg, docs/history/events-jsonl-git-
-// tracked-truncation/CONTEXT.md D1): catches a stash/checkout/reset/clean-
-// style silent truncation of the shared, git-tracked .fgos/events.jsonl --
-// a failure class a seq-contiguity check is structurally blind to, since
-// a truncate-then-reappend renumbers forward and stays perfectly
-// contiguous. See src/state/events-jsonl-truncation-guard.mjs's own
-// header for the full detection mechanism. No matching registerFix: a
-// break here means real data is already gone -- auto-repairing would
-// erase the loud signal before a human ever saw it, defeating the
-// reason this check exists. The
-// re-baseline-after-acknowledgment step is a deliberate, documented
-// manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not
-// a blanket `doctor --fix` sweep.
-// Tầng A/T5 (TA-D10): checks baseline-0 AND every per-writer file under
-// .fgos/events/, each against its OWN entry in the shared guard sidecar
-// (the same `events/<name>` fileKey scheme `runOpportunisticMainCheckout
-// Checks` uses, so the two never disagree about which mark belongs to
-// which file). Per-session files stay git-tracked (TA-D2 only removes the
-// NEED for merge=union, not git tracking itself), so they carry the exact
-// same git reset/checkout/stash truncation risk baseline-0 always has
-// (tsk-cgg) — leaving this check baseline-only would be Tầng A quietly
-// opening a new observability gap.
-function checkEventsJsonlNotTruncated(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  if (mainCheckout === null) {
-    return { passed: true, message: 'not inside a git checkout — nothing to check' };
-  }
-  const fgosDir = path.join(mainCheckout, '.fgos');
-  const guardPath = resolveFgosFile(fgosDir, FGOS_FILE.GUARD_MARK);
-  const filesToCheck = [{ fileKey: 'events.jsonl', logPath: path.join(fgosDir, 'events.jsonl') }];
-  const eventsDirPath = path.join(fgosDir, 'events');
-  try {
-    const names = fs
-      .readdirSync(eventsDirPath, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
-      .map((entry) => entry.name);
-    for (const name of names) filesToCheck.push({ fileKey: `events/${name}`, logPath: path.join(eventsDirPath, name) });
-  } catch {
-    // .fgos/events/ doesn't exist yet -- baseline-0 alone is still checked below
-  }
-
-  const existingFiles = filesToCheck.filter(({ logPath }) => fs.existsSync(logPath));
-  if (existingFiles.length === 0) {
-    return { passed: true, message: 'no .fgos/events.jsonl yet — nothing to check' };
-  }
-
-  const broken = [];
-  for (const { fileKey, logPath } of existingFiles) {
-    const report = advanceEventsJsonlTruncationGuard(logPath, guardPath, fileKey);
-    if (!report.ok) broken.push({ fileKey, message: report.message });
-  }
-
-  if (broken.length === 0) {
-    return {
-      passed: true,
-      message: `truncation guard holds across events.jsonl${existingFiles.length > 1 ? ` + ${existingFiles.length - 1} per-writer file(s)` : ''}`,
-    };
-  }
-  return {
-    passed: false,
-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,
-  };
-}
-
-registerCheck({
-  id: 'events-jsonl-not-truncated',
-  description: 'shared .fgos/events.jsonl has not been silently reverted by a git stash/checkout/reset/clean (tsk-cgg)',
-  check: (cwd) => checkEventsJsonlNotTruncated(cwd),
-});
-
-// events-compaction-verified (Tầng A/T6, TA-D6): retroactively re-proves
-// every past compaction recorded in .fgos/events/archive/*.manifest.json
-// still holds -- re-reads the manifest's own `baseline` (still a live file
-// under .fgos/events/) and its `originals` (now under archive/) and re-runs
-// the SAME verify gate compactColdWriterFiles ran before archiving anything
-// (deep-equal view + count + hash-set, src/state/events-compaction.mjs).
-// No matching registerFix, same posture as events-jsonl-not-truncated above:
-// a break here means the compacted baseline and its own archived originals
-// have drifted apart after the fact (tampering, partial restore, a bug) --
-// real data may be at stake, so this only ever surfaces the finding for a
-// human to investigate (docs/how-to/... none yet; the manifest + both file
-// sets are still on disk for manual inspection), never auto-repairs.
-function checkEventsCompactionVerified(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  if (mainCheckout === null) {
-    return { passed: true, message: 'not inside a git checkout — nothing to check' };
-  }
-  const eventsDirPath = path.join(mainCheckout, '.fgos', 'events');
-  const archiveDirPath = path.join(eventsDirPath, 'archive');
-  let manifestNames = [];
-  try {
-    manifestNames = fs
-      .readdirSync(archiveDirPath, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith('.manifest.json'))
-      .map((entry) => entry.name);
-  } catch {
-    return { passed: true, message: 'no compactions recorded yet — nothing to verify' };
-  }
-  if (manifestNames.length === 0) {
-    return { passed: true, message: 'no compactions recorded yet — nothing to verify' };
-  }
-
-  // Never throws (same contract events-jsonl-not-truncated above already
-  // keeps): a corrupt line in an archived original
-  // or the baseline itself is exactly the "tampering, partial restore, a
-  // bug" shape this check exists to catch, per its own doc comment above --
-  // it must surface as a normal `broken` finding, never crash the rest of
-  // `fgos doctor` (bin/fgos.mjs's doctor handler runs every check in one
-  // .map(), with no per-check try/catch of its own).
-  const broken = [];
-  for (const manifestName of manifestNames) {
-    try {
-      const manifest = JSON.parse(fs.readFileSync(path.join(archiveDirPath, manifestName), 'utf8'));
-      const baselinePath = path.join(eventsDirPath, manifest.baseline);
-      if (!fs.existsSync(baselinePath)) {
-        broken.push({ manifest: manifestName, reason: `baseline "${manifest.baseline}" is missing` });
-        continue;
-      }
-      const originalEntries = [];
-      let missingOriginal = null;
-      for (const name of manifest.originals ?? []) {
-        const originalPath = path.join(archiveDirPath, name);
-        if (!fs.existsSync(originalPath)) {
-          missingOriginal = name;
-          break;
-        }
-        originalEntries.push({ name, events: readEventsJsonLines(originalPath) });
-      }
-      if (missingOriginal) {
-        broken.push({ manifest: manifestName, reason: `archived original "${missingOriginal}" is missing` });
-        continue;
-      }
-      const candidateEvents = readEventsJsonLines(baselinePath);
-      const verify = verifyCompactionCandidate(originalEntries, candidateEvents);
-      if (!verify.ok) {
-        broken.push({ manifest: manifestName, reason: verify.reason });
-      }
-    } catch (err) {
-      broken.push({ manifest: manifestName, reason: `could not verify: ${err.message}` });
-    }
-  }
-
-  if (broken.length === 0) {
-    return { passed: true, message: `${manifestNames.length} past compaction(s) verified — baseline still matches its archived originals` };
-  }
-  return {
-    passed: false,
-    message: `compaction verify gate no longer holds for ${broken.map((b) => `${b.manifest} (${b.reason})`).join(', ')}`,
-  };
-}
-
-function readEventsJsonLines(filePath) {
-  return fs
-    .readFileSync(filePath, 'utf8')
-    .split('\n')
-    .filter((line) => line !== '')
-    .map((line) => JSON.parse(line));
-}
-
-registerCheck({
-  id: 'events-compaction-verified',
-  description: 'every past .fgos/events/ compaction (archive/*.manifest.json) still deep-equal/count/hash-set matches its archived originals (Tầng A/T6)',
-  check: (cwd) => checkEventsCompactionVerified(cwd),
-});
-
-// main-checkout-guard-warnings (tsk-1vc-3 D6, docs/history/tsk-1vc-silent-eventlog-loss-detection/CONTEXT.md):
-// surfaces recordMainCheckoutGuardWarning's write-only output (main-checkout-guard-warnings.jsonl)
-// to fgos doctor.
-function checkMainCheckoutGuardWarnings(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  if (mainCheckout === null) {
-    return { passed: true, message: 'not inside a git checkout — nothing to check' };
-  }
-  const warnings = readMainCheckoutGuardWarnings(mainCheckout);
-  if (warnings.length === 0) {
-    return { passed: true, message: 'no main checkout guard warnings recorded' };
-  }
-  const latest = warnings[warnings.length - 1];
-  return {
-    passed: false,
-    message: `${warnings.length} main checkout guard warning(s) recorded — latest: [${latest.ts}] ${latest.reason}: ${latest.message}`,
-  };
-}
-
-registerCheck({
-  id: 'main-checkout-guard-warnings',
-  description: 'main checkout eventlog guard warnings log has no recorded regression or truncation warnings (D6)',
-  check: (cwd) => checkMainCheckoutGuardWarnings(cwd),
-});
-
-
-// docs/history/global-project-config-awareness/CONTEXT.md D1: reports which
-// config level is currently active (project always wins when present) and
-// whether the other level is also on disk, so "aware" means visible in
-// `fgos doctor` output, not just correct-but-silent precedence at runtime.
-// READ-ONLY by construction (same as every other check here) —
-// describeConfigAwareness only calls fs.existsSync, never writes.
-function checkGlobalProjectAwareness(cwd) {
-  const { active, globalPresent, projectPresent, globalConfigPath, projectConfigPath } =
-    describeConfigAwareness(cwd);
-  if (active === 'none') {
-    return {
-      passed: true,
-      message: `no config at either level yet — project: ${projectConfigPath}, global: ${globalConfigPath}`,
-    };
-  }
-  const other = active === 'project' ? 'global' : 'project';
-  const otherPresent = active === 'project' ? globalPresent : projectPresent;
-  return {
-    passed: true,
-    message: `active: ${active} (${active === 'project' ? projectConfigPath : globalConfigPath}) — ${other} config ${otherPresent ? 'also present' : 'not present'}`,
-  };
-}
-
-registerCheck({
-  id: 'config-awareness',
-  description: 'which config level (global/project) is active, and whether the other is also present (tsk-2ta-2)',
-  check: (cwd) => checkGlobalProjectAwareness(cwd),
+  check: (cwd, run) => checkDeliveredNotOnTrunk(cwd, run),
 });
 
 function checkProviderCapacityState() {
   let report;
   try {
-    report = inspectProviderCapacity({ runnerConfig: loadGlobalConfig() });
+    report = inspectProviderCapacity({ runnerConfig: machineRunner() });
   } catch (err) {
     return { passed: false, message: `provider-capacity state unreadable: ${err.message}` };
   }
@@ -2205,30 +1877,15 @@ registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });
 registerFix({ id: 'run-attempts-stuck', fix: (cwd) => fixRunAttemptsStuck(cwd) });
 registerFix({ id: 'legacy-attempts-stuck', fix: (cwd) => fixLegacyAttemptsStuck(cwd, { door: { observe: recoverObserveUseCase, apply: recoverApplyUseCase } }) });
 
-// tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/
-// CONTEXT.md D2): the two role-by-intelligence capability slots --
-// `advise` (value comes from disagreement, never changes state, one
-// question/one answer) and `execute` (value comes from compliance,
-// changes files, must pass verify). `decide --for <purpose>` already
-// validates a `--for` name against `runner.capabilities` (dispatch.mjs's
-// `validateCapabilitiesShape`/`resolveExecutorAndOverrides`), but the
-// shared config's `capabilities` map shipped with neither name declared,
-// so neither purpose could ever resolve. Layered onto the SAME `runner`
-// config-default below (never a second, colliding `key: 'runner'`
-// registration -- `assembleRegistryDefaults` combines registrations by
-// flat per-key assignment, not a deep merge across entries sharing a
-// key) so `DEFAULT_RUNNER_CONFIG` itself (src/runner/dispatch.mjs,
-// tsk-2uf-1's own footprint) stays untouched -- this only ADDS a
-// `capabilities` key that constant has never declared. Deliberately no
-// `prefer`/`aliases`/`overrides`: naming which executor serves a purpose
-// is a dispatch-mechanism decision, and tsk-5tm-3 D5 forbids `execute`
-// (or, by the same reasoning, this registration) re-deciding that.
+// The curated capability slots. The standard (core/config-standard/runner.yaml) holds the same entries and is
+// what a run reads; this list stays as the reference the doctrine-table tests and the plan lint's registered
+// set pin against. Deliberately no `prefer`/`aliases`/`overrides`: naming which executor serves a purpose is a
+// dispatch-mechanism decision (tsk-5tm-3 D5).
 // Capabilities the shipped Workflow units
 // name. Without a `runner.capabilities` entry bind() has no candidate pool for
 // the unit and refuses it, so a fresh project could not run these Workflows.
 // Description-only on purpose (no `prefer`): which executors serve a
-// capability is that project's own taste, and `mergeConfigDefaults` only adds
-// a missing slot, never overwrites one the project already tuned.
+// capability is that project's own taste.
 function workflowCapabilitySlots(verbsByDomain) {
   const slots = {};
   for (const [domain, verbs] of Object.entries(verbsByDomain)) {
@@ -2314,113 +1971,57 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
   }),
 });
 
-// tsk-47r: `pi` as a second `agent`-kind executor, layered onto this SAME
-// `runner` config-default for the same reason `capabilities` above is (a
-// second `key: 'runner'` registration would silently overwrite this one,
-// never merge with it). `mergeConfigDefaults`'s fill-missing-only
-// recursion (`config-merge.mjs`) adds `runner.executors.openai` and
-// `runner.modelPolicies.openai` on the next `fgos setup` run without
-// touching the live `executors.gemini`/`modelPolicies.claude`/
-// `modelPolicies.gemini` entries. `--provider openai-codex` in `args`
-// stays a literal string -- that is pi's OWN real `--provider` value
-// (confirmed via `pi --list-models`), independent of what this config
-// internally calls the provider (`openai`, executor-provider-naming
-// 2026-09-17 -- "openai-codex" was conflating the provider with "Codex",
-// which is just OpenAI's own CLI product name, not a distinct provider).
-// `--model gpt-5.5` and the `read,write,edit,bash,grep,find,ls` allowlist
-// are the EXACT invocation a live D4 proof-test dispatch ran and
-// confirmed GREEN (worker contract followed: layered skill-pointer chain
-// read natively, footprint honored, correct `[BLOCKED]`/`[DONE]`
-// two-token reporting) — see
-// docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4.
-// Exported (mirrors `DEFAULT_CAPABILITY_SLOTS` below it) so the ripple
-// tests assert this exact shape instead of duplicating the literal.
-export const PI_EXECUTOR_DEFAULT = Object.freeze({
-  kind: 'agent',
-  description: 'pi coding agent (openai/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)',
-  allowCrossProvider: true,
-  invocations: [
-    {
-      via: 'cli',
-      adapter: 'cli-spawn',
-      command: 'pi',
-      args: [
-        '--provider',
-        'openai-codex',
-        '--model',
-        '{model}',
-        '--tools',
-        'read,write,edit,bash,grep,find,ls',
-        '--mode',
-        'json',
-        '--approve',
-        '-p',
-        '{prompt}',
-      ],
-    },
-  ],
-  providerModel: 'openai',
-});
-
-registerConfigDefault({
-  id: 'runner',
-  key: 'runner',
-  shape: {
-    ...DEFAULT_RUNNER_CONFIG,
-    capabilities: DEFAULT_CAPABILITY_SLOTS,
-    modelPolicies: {
-      ...DEFAULT_RUNNER_CONFIG.modelPolicies,
-      openai: { nano: 'gpt-5.5' },
-    },
-    executors: { openai: PI_EXECUTOR_DEFAULT },
-  },
-});
-
-// `checkConfigNotStale` above already catches `runner.capabilities` (or
-// either slot inside it) being wholly ABSENT, generically, via
-// `assembleRegistryDefaults`'s merge -- same "generic scan covers missing,
-// a dedicated check covers present-but-malformed" split every other
-// present-but-unusable check in this file already follows (gateway/
-// workerSlots/invariantChecks above). What slips past the generic scan is
-// a slot present as the wrong shape (a string, an array, `null`) -- never
-// "missing", so `mergeConfigDefaults` has nothing to add, and `decide
-// --for advise`/`--for execute` would still fail validateCapabilitiesShape
-// with no doctor signal pointing at why.
-// Checked names are every curated slot `DEFAULT_CAPABILITY_SLOTS` declares
-// (D1, docs/history/agent-coordination-foundation/plan.md's P2-runtime) --
-// generalized from the original fixed ['advise', 'execute', 'code:implement']
-// list so a future curated addition is covered by this SAME check without a
-// second, drifting hardcoded list.
-const CURATED_CAPABILITY_NAMES = Object.keys(DEFAULT_CAPABILITY_SLOTS);
-
-function checkAdviseExecuteCapabilitiesConfigured(cwd) {
-  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
-  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
-    return {
-      passed: false,
-      message: 'runner.capabilities section missing -- run fgos setup (decide --for advise/execute/code:implement cannot resolve until it exists)',
-    };
+// The record's verdict as the host's `fgos mailbox status --json` reports it: the record's
+// rules (its directory checks, its snapshot version and caps) stay in Rust, and status
+// reads without the lock and creates nothing. Run from the main checkout without
+// CLAUDE_PROJECT_DIR, which the verbs would otherwise read as the project. `null` with a
+// reason when no host can answer (none resolved, or a release without `mailbox status`).
+function mailboxRecordVerdict(cwd) {
+  const hostBin = resolveHostBin(cwd);
+  if (!hostBin) return { data: null, why: 'no host binary (FGOS_HOST_BIN unset and no active installation manifest)' };
+  const { CLAUDE_PROJECT_DIR: _projectDir, ...env } = process.env;
+  let stdout;
+  try {
+    stdout = execFileSync(hostBin, ['mailbox', 'status', '--json'], {
+      cwd: resolveMainCheckoutRoot(cwd) ?? cwd, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 10000,
+    });
+  } catch (err) {
+    // Exit 1 still prints the envelope when the record failed; anything else names why.
+    stdout = err.stdout ? String(err.stdout) : '';
+    if (!stdout.trim()) return { data: null, why: (err.stderr ? String(err.stderr).trim().split('\n')[0] : '') || err.message };
   }
-  const missing = CURATED_CAPABILITY_NAMES.filter(
-    (name) => !capabilities[name] || typeof capabilities[name] !== 'object' || Array.isArray(capabilities[name]),
-  );
-  if (missing.length > 0) {
-    return {
-      passed: false,
-      message: `runner.capabilities is missing or has a malformed slot for: ${missing.join(', ')} -- run fgos setup`,
-    };
+  try {
+    return { data: JSON.parse(stdout).data, why: null };
+  } catch {
+    return { data: null, why: 'the host answered `mailbox status` with no JSON envelope' };
   }
-  const extras = CURATED_CAPABILITY_NAMES.filter((name) => !['advise', 'execute', 'code:implement'].includes(name));
-  return {
-    passed: true,
-    message: `runner.capabilities declares "advise", "execute", and "code:implement" (plus ${extras.join(', ')})`,
-  };
+}
+
+function checkMailboxHook(cwd) {
+  const optIn = mailboxOptIn(cwd);
+  // The config rows already fail and name a refused config; this row only says why it cannot tell.
+  if (optIn.state === 'refused') {
+    return { passed: true, message: `opt-in unknown: ${refusedConfigName(optIn)} is refused (${optIn.reason}${optIn.file ? ` in ${optIn.file}` : ''}); the config rows name it, and fgos setup leaves the mailbox hook rows as they are` };
+  }
+  if (optIn.state === 'off') {
+    return { passed: true, message: 'not enabled: set mailbox.enabled: true in the project config (fgos config set), then run fgos doctor --fix, to install the mailbox hook rows (provisional opt-in, spec §16 item 23)' };
+  }
+  const enabled = 'enabled: the Claude Code and Codex hook checks require the mailbox rows; limits: fgos config show --path mailbox (the standard is fgos config standard --path mailbox)';
+  const { data, why } = mailboxRecordVerdict(cwd);
+  if (!data) return { passed: true, message: `${enabled}; record not checked: ${why}` };
+  // No record field: the verb found no record directory to read here (not a repository,
+  // no .fgos), and says so in its text.
+  if (!data.record) return { passed: true, message: `${enabled}; record not checked: ${data.text ?? 'no answer'}` };
+  if (data.record === 'none') return { passed: true, message: `${enabled}; record: none yet (no hook has run in this project)` };
+  if (data.record !== 'ok') return { passed: false, message: `enabled, but the mailbox record cannot be read: ${data.record} (fgos mailbox status names it)` };
+  const outcome = data.hookOutcome?.reason ? `, last hook outcome ${data.hookOutcome.reason}` : '';
+  return { passed: true, message: `${enabled}; record: ok (${data.heads} head(s), ${data.signals?.queue?.pending ?? 0} pending${outcome})` };
 }
 
 registerCheck({
-  id: 'advise-execute-capabilities-configured',
-  description: 'runner.capabilities declares the "advise" and "execute" purpose slots decide --for resolves against (tsk-2uf-3)',
-  check: (cwd) => checkAdviseExecuteCapabilitiesConfigured(cwd),
+  id: 'mailbox-hook',
+  description: 'agent mailbox: whether this project opted in to the mailbox hook rows (mailbox.enabled), and when it did, the record verdict from fgos mailbox status',
+  check: (cwd) => checkMailboxHook(cwd),
 });
 
 // Every capability a core/domain Workflow unit names must resolve the way
@@ -2475,8 +2076,7 @@ function checkWorkflowCapabilitiesConfigured(cwd) {
 }
 
 function evaluateWorkflowCapabilities(cwd, uses) {
-  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
-  const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};
+  const declared = effectiveSection(cwd, 'runner').capabilities ?? {};
   const entriesOf = (capability) => capabilityEntriesOf({ capabilities: declared }, capability);
   const missing = [...uses].filter(([capability]) => entriesOf(capability).length === 0);
   if (missing.length > 0) {
@@ -2516,21 +2116,13 @@ registerCheck({
 // identical attribute set (permanently tied, capability-matching.md's
 // "Ties and misses" rule), silently degrades Q1 steering with no error
 // anywhere else. `review`'s presence is already covered generically by
-// `advise-execute-capabilities-configured` above (CURATED_CAPABILITY_NAMES
-// derives from DEFAULT_CAPABILITY_SLOTS, which now includes it) -- checked
-// again here too since it is this doctrine's own explicit requirement.
+// the standard (which always supplies it).
 function normalizeServesForComparison(serves) {
   return JSON.stringify(Object.fromEntries(Object.entries(serves).sort(([a], [b]) => a.localeCompare(b))));
 }
 
 function checkCapabilityServesValid(cwd) {
-  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
-  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
-    return {
-      passed: false,
-      message: 'runner.capabilities section missing -- run fgos setup ("serves" cannot be validated until it exists)',
-    };
-  }
+  const capabilities = effectiveSection(cwd, 'runner').capabilities ?? {};
   const invalid = [];
   const servesByName = new Map();
   for (const [name, entry] of Object.entries(capabilities)) {
@@ -2557,18 +2149,15 @@ function checkCapabilityServesValid(cwd) {
     }
     seenBySignature.set(signature, name);
   }
-  if (!capabilities.review || typeof capabilities.review !== 'object' || Array.isArray(capabilities.review)) {
-    return { passed: false, message: 'runner.capabilities is missing the "review" slot -- run fgos setup' };
-  }
   return {
     passed: true,
-    message: `${servesByName.size} capability entr${servesByName.size === 1 ? 'y declares' : 'ies declare'} a valid "serves" attribute set, none identical, and "review" is present`,
+    message: `${servesByName.size} capability entr${servesByName.size === 1 ? 'y declares' : 'ies declare'} a valid "serves" attribute set, none identical`,
   };
 }
 
 registerCheck({
   id: 'capability-serves-valid',
-  description: 'runner.capabilities\' "serves" attribute sets are well-formed, mutually distinct, and include the "review" slot (I19)',
+  description: 'runner.capabilities\' "serves" attribute sets are well-formed and mutually distinct (I19)',
   check: (cwd) => checkCapabilityServesValid(cwd),
 });
 
@@ -2583,18 +2172,14 @@ registerCheck({
 // surfaced before it happens for real. Also reports the count of distinct
 // provider families reachable across every resolved capability (design
 // record §12 item 3: "Doctor báo số họ provider cấu hình").
-function checkOperationCapabilitiesResolve(cwd) {
-  const runnerConfig = readSharedConfig(cwd)?.runner;
-  if (!runnerConfig) {
-    return { passed: false, message: 'runner config section missing -- run fgos setup' };
-  }
+function checkOperationCapabilitiesResolve() {
   return { passed: true, message: 'no coordination protocols active (retired in favor of workflows)' };
 }
 
 registerCheck({
   id: 'operation-capability-resolves',
   description: 'every discoverable CoordinationProtocol operation\'s declared policy.capability resolves against the live runner config, and reports reachable provider-family diversity (Unit I21)',
-  check: (cwd) => checkOperationCapabilitiesResolve(cwd),
+  check: () => checkOperationCapabilitiesResolve(),
 });
 
 // tsk-slq D6 (AGENTS.md's install/setup/doctor gate — a new infra
@@ -2633,134 +2218,15 @@ registerCheck({
   check: (cwd) => checkDependenciesInstalled(cwd),
 });
 
-// gate-bypass.json's real registry entry (docs/history/doctor-fix-gate-bypass/
-// CONTEXT.md D1/D3, tsk-2qz-2) -- the registry's first consumer to register
-// all three independent capabilities (check + configDefault + fix), per
-// tsk-2cs's own D5 ("gate-bypass is the registry's first real consumer").
-// `checkConfigNotStale` above already detects a MISSING `gateBypass` key
-// generically via `assembleRegistryDefaults()` once the configDefault below
-// is registered; this dedicated check adds the one thing that generic
-// staleness check cannot: whether a PRESENT `level` value is actually one of
-// `LEVELS`, since a malformed-but-present value is never "missing" from
-// `mergeConfigDefaults`' point of view.
-function checkGateBypassConfigured(cwd) {
-  const shared = readSharedConfig(cwd);
-  const level = shared?.gateBypass?.level;
-  if (typeof level !== 'string' || !LEVELS.includes(level)) {
-    return {
-      passed: false,
-      message: `gateBypass.level missing or not a recognized level (${LEVELS.join('/')}) -- run fgos doctor --fix`,
-    };
-  }
-  return { passed: true, message: `gateBypass.level = "${level}"` };
-}
-
-// Idempotent (D3 of the parent CONTEXT.md's pinned "fix" term): a
-// already-valid level is left untouched and reported unchanged, mirroring
-// `ensureSharedConfigDefaults`'s own "only write when something was actually
-// added" discipline.
-function fixGateBypassConfigured(cwd) {
-  const shared = readSharedConfig(cwd);
-  const currentLevel = shared?.gateBypass?.level;
-  if (typeof currentLevel === 'string' && LEVELS.includes(currentLevel)) {
-    return { changed: false, message: `gateBypass.level already "${currentLevel}"` };
-  }
-  const existingGateBypass =
-    shared.gateBypass && typeof shared.gateBypass === 'object' && !Array.isArray(shared.gateBypass)
-      ? shared.gateBypass
-      : {};
-  const merged = { ...shared, gateBypass: { ...existingGateBypass, level: DEFAULT_LEVEL } };
-  writeSharedConfig(cwd, merged);
-  return { changed: true, message: `wrote gateBypass.level = "${DEFAULT_LEVEL}" to ${sharedConfigFilePath(cwd)}` };
-}
-
-registerConfigDefault({
-  id: 'gateBypass',
-  key: 'gateBypass',
-  shape: { level: DEFAULT_LEVEL },
-});
-
-// work-item-status-delivered-retrospective-cleanup D7: the cleanup-stage
-// TTL is global config, not per-item/per-domain (YAGNI — no demonstrated
-// need yet). cleanup-harness.mjs's checkCleanupTTLElapsed reads this via
-// readSharedConfig; the value here is only the doctor/setup-visible
-// default, same shape as gateBypass's own registration immediately above.
-export const DEFAULT_CLEANUP_TTL_DAYS = 7;
-
-// tsk-59x D1: supersedes D7's global-only premise for the leaf/root axis
-// specifically, now that the demonstrated need D7 flagged as missing
-// exists (25% of open list is children, 0/99 cleanup-pool items ever
-// elapse the 7-day TTL). A leaf's own content already lives on its
-// still-alive root branch the moment it merges, so reclaiming its
-// worktree/branch immediately loses nothing. Root items are unaffected —
-// they keep DEFAULT_CLEANUP_TTL_DAYS above.
-export const DEFAULT_CLEANUP_LEAF_TTL_DAYS = 0;
-
-registerConfigDefault({
-  id: 'cleanup',
-  key: 'cleanup',
-  shape: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
-});
-
-// docs/history/orchestrator-worker-slots/plan.md §Shape T1: the worker-slot
-// ceiling is project config, not a runner constant -- registered here so
-// `fgos setup` writes the section and `fgos doctor` can see it at all, per
-// AGENTS.md's install/setup/doctor gate.
-//
-// `ceiling` ships as `null` -- present but unarmed -- and that is the whole
-// point of this entry (tsk-1oz). Shipping the recommended NUMBER here would
-// arm the gate the moment anyone runs `fgos setup`, and `fgos doctor` asks
-// every project to run exactly that ("stale config — missing keys ... — run
-// fgos setup") as routine maintenance, never as an opt-in. A repo already
-// running more items than the recommended number would then have its very
-// next `take`/`pick` refused, freezing the whole backlog until a person
-// parked enough work by hand. `worker-slots.mjs` already refuses to treat
-// silence as a reason to start refusing work; writing a live number here
-// would have re-introduced that same trap one command away from the nag
-// that points at it. A person arms the gate by replacing `null` with a real
-// count (see DEFAULT_WORKER_SLOT_CEILING for the recommended starting
-// value), which is the only moment the intent is unambiguous.
-//
-// `adminReservation` is deliberately NOT a key here. The admin lane
-// (merge/retro/cleanup loops plus one spare) is a FIXED reservation whose
-// size is constant by definition, not a project knob -- it never claims a
-// work item, so nothing counts it and nothing could enforce a different
-// number. It lives as `ADMIN_LANE_RESERVATION` in `worker-slots.mjs` and is
-// reported by `fgos slots`; offering it as config would have been a dial
-// wired to nothing.
-registerConfigDefault({
-  id: 'workerSlots',
-  key: 'workerSlots',
-  shape: { ceiling: null },
-});
-
 // A present-but-unusable `ceiling` is the misconfiguration that actually
 // bites, and it fails SILENTLY: `hasWorkerSlotRoom` treats anything that is
 // not a positive integer as "no ceiling configured" and allows every claim,
-// so a project that believes it is capped runs uncapped. `"8"` (a string,
-// the easiest hand-edit slip), `8.5`, `0` and `-1` all land there. The
-// generic `checkConfigNotStale` above only catches a wholly-missing section,
-// exactly the same blind spot `checkCommandListSection` covers for the
-// command-list sections. `null` is the one non-number that is not a
-// mistake: it is what `fgos setup` writes to mean "deliberately unarmed".
+// so a project that believes it is capped runs uncapped. The schema refuses a
+// string or `8.5`; `0` and `-1` are integers it admits and land there.
+// `null` is the one non-positive value that is not a mistake: the standard's
+// own value, meaning "deliberately unarmed".
 function checkWorkerSlotsCeiling(cwd) {
-  // Deliberately NOT the fail-soft reader the claim paths use: those want an
-  // unreadable file to read as "no ceiling", but naming a broken config is
-  // this check's entire job, and degrading to `{}` would report the file as
-  // merely unconfigured while every claim silently ran uncapped.
-  let section;
-  try {
-    section = readSharedConfig(cwd).workerSlots;
-  } catch (err) {
-    return { passed: false, message: `shared config cannot be parsed, so no worker-slot ceiling can be read: ${err.message}` };
-  }
-  if (section === undefined) {
-    return {
-      passed: false,
-      message: 'workerSlots section missing -- run fgos setup (no worker-slot ceiling is enforced until it exists)',
-    };
-  }
-  const { ceiling } = section;
+  const { ceiling } = effectiveSection(cwd, 'workerSlots');
   if (ceiling === null || ceiling === undefined) {
     return {
       passed: true,
@@ -2782,218 +2248,16 @@ registerCheck({
   check: (cwd) => checkWorkerSlotsCeiling(cwd),
 });
 
-// docs/history/tsk-516-approve-reverify-scope/CONTEXT.md D6: the invariant
-// check commands are project config, not a hardcoded runner constant --
-// registered here so `fgos setup`'s config-merge writes the default and
-// `fgos doctor` can see the section at all, the same registry every other
-// module's config already goes through.
-registerConfigDefault({
-  id: 'invariantChecks',
-  key: 'invariantChecks',
-  shape: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
-});
-
-registerConfigDefault({
-  id: 'checkpoint',
-  key: 'checkpoint',
-  shape: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
-});
-
-// Doctor check for a `{ commands: [...] }` section. Deliberately does NOT
-// execute the configured commands: `doctor` is a cheap, side-effect-free
-// diagnosis (RUL9's doctor-never-writes discipline), and these are arbitrary
-// project-supplied shell strings. An absent section and an empty list are
-// both valid (nothing runs); what bites is a present but malformed section,
-// which reads as zero commands and silently skips its gate while looking
-// configured.
-function checkCommandListSection(cwd, key, readCommands, emptyNote) {
-  const section = readSharedConfig(cwd)[key];
-  if (section === undefined) {
-    return { passed: true, message: `${key} section absent -- ${emptyNote}` };
-  }
-  const commands = readCommands(cwd);
-  const declared = section && typeof section === 'object' && Array.isArray(section.commands) ? section.commands.length : null;
-  if (declared === null || declared !== commands.length) {
-    return {
-      passed: false,
-      message: `${key} is present but malformed -- expected { "commands": ["<shell command>", ...] } with only non-empty strings`,
-    };
-  }
-  if (commands.length === 0) {
-    return { passed: true, message: `${key}.commands is empty -- ${emptyNote}` };
-  }
-  return { passed: true, message: `${key}.commands = ${commands.length} command(s): ${commands.join(' && ')}` };
-}
-
-registerCheck({
-  id: 'invariant-checks-configured',
-  description: 'invariantChecks.commands in the shared config file is absent, empty or a list of non-empty shell commands (malformed silently skips the invariant gate)',
-  check: (cwd) => checkCommandListSection(cwd, 'invariantChecks', readInvariantCheckCommands, 'no invariant check runs at return/merge'),
-});
-
-// worktreeSetup: project commands every runner-created worktree runs after
-// its dependency install (e.g. building a binary the test suite needs).
-// Registered so `fgos setup` writes the (empty) default and `fgos doctor`
-// sees the section; like invariantChecks, doctor never executes them.
-registerConfigDefault({
-  id: 'worktreeSetup',
-  key: 'worktreeSetup',
-  shape: { commands: DEFAULT_WORKTREE_SETUP_COMMANDS },
-});
-
-// An empty list is a valid choice (nothing beyond the dependency install),
-// so only a present-but-malformed section fails: it reads as zero commands
-// and silently skips setup while looking configured. The wholly-missing
-// case is already covered generically by checkConfigNotStale.
-registerCheck({
-  id: 'worktree-setup-configured',
-  description: 'worktreeSetup.commands in the shared config file is a list of non-empty shell commands (malformed silently skips worktree setup)',
-  check: (cwd) => checkCommandListSection(cwd, 'worktreeSetup', readWorktreeSetupCommands, 'worktrees get only their dependency install'),
-});
-
-registerCheck({
-  id: 'gate-bypass-configured',
-  description: 'gateBypass.level in the shared config file is present and a recognized level',
-  check: (cwd) => checkGateBypassConfigured(cwd),
-});
-
-registerFix({
-  id: 'gate-bypass-configured',
-  fix: (cwd) => fixGateBypassConfigured(cwd),
-});
-
-// ironLaw.level (docs/history/iron-law-gate-human-ux/CONTEXT.md D3/D7) — its
-// OWN key, modeled on gateBypass's three registrations immediately above but
-// deliberately never folded into that section: gateBypass's floor is
-// documented as never touching Iron Law (docs/explanation/gate-bypass-
-// design.md), and reusing its level vocabulary here would erase that line.
-//
-// `ask` is both the default this fix writes and what every unreadable value
-// degrades to at the gate itself (src/verbs/merge/iron-law-level.mjs's
-// readIronLawLevel), so a project that never runs `fgos setup` gets the
-// refusing behavior, not the permissive one.
+// The levels of ironLaw.level and the one an unreadable value degrades to at the gate itself
+// (src/verbs/merge/iron-law-level.mjs): a project that never sets it gets the refusing behavior, not the
+// permissive one. The schema (core/config-schema/ironLaw.schema.yaml) holds the same enum.
 export const IRON_LAW_LEVELS = Object.freeze(['ask', 'warn']);
 export const DEFAULT_IRON_LAW_LEVEL = 'ask';
 
-function checkIronLawConfigured(cwd) {
-  const level = readSharedConfig(cwd)?.ironLaw?.level;
-  if (typeof level !== 'string' || !IRON_LAW_LEVELS.includes(level)) {
-    return {
-      passed: false,
-      message: `ironLaw.level missing or not a recognized level (${IRON_LAW_LEVELS.join('/')}) -- run fgos doctor --fix`,
-    };
-  }
-  return { passed: true, message: `ironLaw.level = "${level}"` };
-}
-
-function fixIronLawConfigured(cwd) {
-  const shared = readSharedConfig(cwd);
-  const currentLevel = shared?.ironLaw?.level;
-  if (typeof currentLevel === 'string' && IRON_LAW_LEVELS.includes(currentLevel)) {
-    return { changed: false, message: `ironLaw.level already "${currentLevel}"` };
-  }
-  const existingIronLaw =
-    shared.ironLaw && typeof shared.ironLaw === 'object' && !Array.isArray(shared.ironLaw)
-      ? shared.ironLaw
-      : {};
-  const merged = { ...shared, ironLaw: { ...existingIronLaw, level: DEFAULT_IRON_LAW_LEVEL } };
-  writeSharedConfig(cwd, merged);
-  return { changed: true, message: `wrote ironLaw.level = "${DEFAULT_IRON_LAW_LEVEL}" to ${sharedConfigFilePath(cwd)}` };
-}
-
-registerConfigDefault({
-  id: 'ironLaw',
-  key: 'ironLaw',
-  shape: { level: DEFAULT_IRON_LAW_LEVEL },
-});
-
-registerCheck({
-  id: 'iron-law-configured',
-  description: 'ironLaw.level in the shared config file is present and a recognized level',
-  check: (cwd) => checkIronLawConfigured(cwd),
-});
-
-registerFix({
-  id: 'iron-law-configured',
-  fix: (cwd) => fixIronLawConfigured(cwd),
-});
-
-// tsk-4r1 (found by the gateway audit, plans/reports/gateway-audit-
-// 260814-2110-fable-hidden-bugs-report.md Finding 9): `gateway.token`/
-// `gateway.port` (apps/fgos-gateway/src/gateway.rs's `load_gateway_config`,
-// D4/D5) lived nowhere in this registry -- a fresh machine's `fgos setup`
-// never provisioned the section, and `fgos doctor` had no way to notice,
-// violating AGENTS.md's own install/setup/doctor gate.
-//
-// This reads/writes `os.homedir()` explicitly, NOT the `cwd` every other
-// check/fix in this file receives -- `load_gateway_config` reads
-// `~/.fgos/config.json` specifically (a machine-level secret, not a
-// per-project one), so checking/fixing `cwd`'s own `.fgos/config.json`
-// would silently target the wrong file entirely.
-const GATEWAY_HOME_CONFIG_DIR = () => os.homedir();
-
-// Matches apps/fgos-gateway/src/gateway.rs's own `DEFAULT_PORT`.
-const DEFAULT_GATEWAY_PORT = 4170;
-
-function checkGatewayTokenConfigured() {
-  const home = GATEWAY_HOME_CONFIG_DIR();
-  const shared = readSharedConfig(home);
-  const token = shared?.gateway?.token;
-  if (typeof token !== 'string' || token.trim() === '') {
-    return {
-      passed: false,
-      message: `gateway.token missing from ${sharedConfigFilePath(home)} -- run fgos doctor --fix`,
-    };
-  }
-  return { passed: true, message: 'gateway.token present' };
-}
-
-// Idempotent (same discipline fixGateBypassConfigured above already uses):
-// an already-present token is left untouched and reported unchanged, never
-// rotated out from under a client that already has it.
-function fixGatewayTokenConfigured() {
-  const home = GATEWAY_HOME_CONFIG_DIR();
-  const shared = readSharedConfig(home);
-  const existingToken = shared?.gateway?.token;
-  if (typeof existingToken === 'string' && existingToken.trim() !== '') {
-    return { changed: false, message: 'gateway.token already present' };
-  }
-  const existingGateway =
-    shared.gateway && typeof shared.gateway === 'object' && !Array.isArray(shared.gateway) ? shared.gateway : {};
-  // 256 bits, not crypto.randomUUID()'s 122 -- this is a bearer secret,
-  // not a non-secret session id (session.mjs's own use of randomUUID is a
-  // different kind of value).
-  const token = crypto.randomBytes(32).toString('hex');
-  const merged = {
-    ...shared,
-    gateway: { port: existingGateway.port ?? DEFAULT_GATEWAY_PORT, ...existingGateway, token },
-  };
-  writeSharedConfig(home, merged);
-  return { changed: true, message: `wrote a new gateway.token to ${sharedConfigFilePath(home)}` };
-}
-
-registerConfigDefault({
-  id: 'gateway',
-  key: 'gateway',
-  // `token: null` -- present but unarmed, the same shape `workerSlots`'s
-  // own `ceiling: null` registration already uses below: shipping a real
-  // value here would mean every fresh install gets the SAME shared,
-  // predictable secret, defeating D4's whole point. A real token only
-  // ever comes from fixGatewayTokenConfigured's own crypto.randomBytes
-  // call, run explicitly via `fgos doctor --fix`.
-  shape: { port: DEFAULT_GATEWAY_PORT, token: null },
-});
-
-registerCheck({
-  id: 'gateway-token-configured',
-  description: 'gateway.token in ~/.fgos/config.json (home, not project) is present and non-empty',
-  check: () => checkGatewayTokenConfigured(),
-});
-
-registerFix({
-  id: 'gateway-token-configured',
-  fix: () => fixGatewayTokenConfigured(),
-});
+// The rows over the config files themselves, from the config crate's contract (spec section 11), and their
+// repairs; the gateway token row is the contract's machine-files row.
+for (const entry of CONFIG_CHECKS) registerCheck(entry);
+for (const entry of CONFIG_FIXES) registerFix(entry);
 
 // tsk-4xg (docs/history/tsk-4xg-plugin-marketplace-doctor-check/): a new
 // project set up via `fgos setup` never got the fgOS Claude Code plugin
@@ -3330,97 +2594,6 @@ registerCheck({
   check: (cwd) => checkReadmeInstallTagExists(cwd),
 });
 
-// tsk-2m5 (docs/history/stage-status-driving-coordination/): the
-// herdr-launcher's own auto-launch toggles, read fail-closed from Rust
-// (packages/herdr-fgos-common/rust/src/settings.rs). Mirrors gateBypass's own shape exactly
-// (config-default + a dedicated check for a present-but-malformed value --
-// `checkConfigNotStale` above already catches the section being entirely
-// MISSING via `assembleRegistryDefaults()`, same as it does for
-// `gateBypass`). No `fix` registration: unlike `gateBypass.level` (a
-// single enum value with one obvious correct default), a malformed
-// individual boolean here has no demonstrated real-world incident yet
-// (YAGNI) -- `ensureSharedConfigDefaults` already fills in a full
-// safe-OFF section the first time a project adopts it.
-export const DEFAULT_HERDR_ORCHESTRATOR_SETTINGS = {
-  autoDiscover: false,
-  autoMerge: false,
-  autoRetro: false,
-  autoCleanup: false,
-};
-
-function checkHerdrOrchestratorConfigured(cwd) {
-  const shared = readSharedConfig(cwd);
-  const settings = shared?.herdrOrchestrator;
-  if (settings === undefined) {
-    return { passed: false, message: 'herdrOrchestrator section missing -- run fgos setup' };
-  }
-  const badKeys = Object.keys(DEFAULT_HERDR_ORCHESTRATOR_SETTINGS).filter(
-    (key) => typeof settings[key] !== 'boolean',
-  );
-  if (badKeys.length > 0) {
-    return {
-      passed: false,
-      message: `herdrOrchestrator has non-boolean value(s) for: ${badKeys.join(', ')}`,
-    };
-  }
-  return {
-    passed: true,
-    message: `herdrOrchestrator: ${Object.keys(DEFAULT_HERDR_ORCHESTRATOR_SETTINGS)
-      .map((key) => `${key}=${settings[key]}`)
-      .join(', ')}`,
-  };
-}
-
-registerConfigDefault({
-  id: 'herdrOrchestrator',
-  key: 'herdrOrchestrator',
-  shape: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
-});
-
-registerCheck({
-  id: 'herdr-launcher-configured',
-  description: 'herdrOrchestrator toggles in the shared config file are present and boolean (tsk-2m5)',
-  check: (cwd) => checkHerdrOrchestratorConfigured(cwd),
-});
-
-// tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/
-// CONTEXT.md, carrying forward D10 of the original cluster's own
-// CONTEXT.md): the web dashboard's static-serving toggle, read fail-OPEN
-// from Rust (packages/herdr-fgos-common/rust/src/settings.rs's `WebDashboardSettings` --
-// `static_serving: true` when the section/file is missing). Same
-// registerConfigDefault + registerCheck shape as `herdrOrchestrator`
-// immediately above, deliberately with the opposite default value -- this
-// toggle exists to gate the "máy được chọn" (D2) serving the bundle it
-// already carries, out of the box, not an auto-launch toggle needing an
-// opt-in.
-export const DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS = {
-  staticServing: true,
-};
-
-function checkHerdrWebDashboardConfigured(cwd) {
-  const shared = readSharedConfig(cwd);
-  const settings = shared?.herdrWebDashboard;
-  if (settings === undefined) {
-    return { passed: false, message: 'herdrWebDashboard section missing -- run fgos setup' };
-  }
-  if (typeof settings.staticServing !== 'boolean') {
-    return { passed: false, message: 'herdrWebDashboard.staticServing is not a boolean' };
-  }
-  return { passed: true, message: `herdrWebDashboard: staticServing=${settings.staticServing}` };
-}
-
-registerConfigDefault({
-  id: 'herdrWebDashboard',
-  key: 'herdrWebDashboard',
-  shape: DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
-});
-
-registerCheck({
-  id: 'herdr-web-dashboard-configured',
-  description: 'herdrWebDashboard.staticServing in the shared config file is present and boolean (tsk-48w)',
-  check: (cwd) => checkHerdrWebDashboardConfigured(cwd),
-});
-
 // tsk-1m0 (docs/history/doctor-check-enduser-docs-index-stale/CONTEXT.md):
 // the fgos-indexing skill's whole job is regenerating
 // docs/enduser-docs-index.json after every compound-learn doc write, but
@@ -3682,34 +2855,6 @@ registerFix({
   fix: (cwd) => fixInstructionProjectionsStale(cwd),
 });
 
-export const DEFAULT_DOC_REGISTRY_SETTINGS = Object.freeze({
-  enforce: false,
-});
-
-function checkDocRegistryEnforce(cwd) {
-  const shared = readSharedConfig(cwd);
-  const settings = shared.docRegistry;
-  if (settings === undefined) {
-    return { passed: false, message: 'docRegistry section missing -- run fgos setup' };
-  }
-  if (typeof settings.enforce !== 'boolean') {
-    return { passed: false, message: 'docRegistry.enforce is not a boolean' };
-  }
-  return { passed: true, message: `docRegistry: enforce=${settings.enforce}` };
-}
-
-registerConfigDefault({
-  id: 'docRegistry',
-  key: 'docRegistry',
-  shape: DEFAULT_DOC_REGISTRY_SETTINGS,
-});
-
-registerCheck({
-  id: 'doc-registry-enforce',
-  description: 'docRegistry.enforce in the shared config file is present and boolean',
-  check: (cwd) => checkDocRegistryEnforce(cwd),
-});
-
 // Same marker the release drift check uses to recognise the fgOS source repo.
 function isFgosSourceCheckout(root) {
   return fs.existsSync(path.join(root, 'apps/fgos/Cargo.toml'));
@@ -3720,17 +2865,15 @@ function docRegistryAdopted(root) {
   return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));
 }
 
-function checkDocRegistryStale(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  const root = mainCheckout ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {
-    return { passed: true, message: 'knowledge registry check skipped -- no events log' };
-  }
+function checkDocRegistryStale(cwd, run) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
   if (!docRegistryAdopted(root)) {
     return { passed: true, message: 'not applicable -- no doc registry in this project (run fgos doc-registry to adopt)' };
   }
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) {
+    return { passed: true, message: 'knowledge registry check skipped -- no Work store' };
+  }
   const { jsonContent, mdContent } = computeKnowledgeProjection(view);
   const mdPath = path.join(root, 'docs/doc-registry.md');
   const jsonPath = path.join(root, 'docs/doc-registry.json');
@@ -3746,21 +2889,13 @@ function checkDocRegistryStale(cwd) {
 function fixDocRegistryStale(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   const root = mainCheckout ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {
-    return { changed: false, message: 'skipped -- no events log' };
-  }
   if (!docRegistryAdopted(root)) {
     return { changed: false, message: 'skipped -- no doc registry in this project (run fgos doc-registry to adopt)' };
   }
-  let view;
-  try {
-    view = rebuild(fgosDir);
-  } catch (err) {
-    if (err instanceof StoreError || err.code === 'ENOENT') {
-      return { changed: false, message: `skipped -- ${err.message}` };
-    }
-    throw err;
+  // A fix reads the store itself: it must not act on a view an earlier row of this run read before the fixes ran.
+  const view = doctorWorkView(root);
+  if (view === null) {
+    return { changed: false, message: 'skipped -- no Work store' };
   }
   const { jsonContent, mdContent } = computeKnowledgeProjection(view);
   const mdPath = path.join(root, 'docs/doc-registry.md');
@@ -3782,11 +2917,10 @@ function fixDocRegistryStale(cwd) {
 // same file's own resolver) is an alias that resolves AMBIGUOUSLY: two or
 // more non-retired docs claiming the identical alias string, or an alias
 // that collides with a DIFFERENT doc's own currentPath.
-function checkDocAliasBroken(cwd) {
+function checkDocAliasBroken(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   const docs = Object.values(view.docs || {}).filter((d) => d.docLifecycle !== 'retired');
   const aliasOwners = new Map();
   for (const doc of docs) {
@@ -3808,11 +2942,10 @@ function checkDocAliasBroken(cwd) {
   return { passed: false, message: `found ${broken.length} broken doc aliases: ${broken.join('; ')}` };
 }
 
-function checkDocActiveDuplicate(cwd) {
+function checkDocActiveDuplicate(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   const counts = {};
   for (const doc of Object.values(view.docs || {})) {
     if (doc.docLifecycle === 'active') {
@@ -3855,11 +2988,10 @@ function checkDocNearDuplicate(cwd) {
   return { passed: false, message: `found ${groups.length} near-duplicate claim groups: ${groups.map((g) => g.map((c) => c.path).join(' ~ ')).join('; ')}` };
 }
 
-function checkDocProvisionalAged(cwd) {
+function checkDocProvisionalAged(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   const now = Date.now();
   const maxAgeMs = 7 * 24 * 60 * 60 * 1000;
   const aged = [];
@@ -3872,13 +3004,11 @@ function checkDocProvisionalAged(cwd) {
   return { passed: false, message: `provisional docs aged >7 days: ${aged.join(', ')}` };
 }
 
-function checkDocTopicOversized(cwd) {
+function checkDocTopicOversized(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
-  const shared = readSharedConfig(cwd);
-  const maxDocs = shared.docRegistry?.topicMaxDocs ?? 10;
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
+  const maxDocs = effectiveSection(cwd, 'docRegistry')?.topicMaxDocs ?? 10;
   const oversized = [];
   for (const topic of Object.values(view.topics || {})) {
     const count = Object.values(view.docs || {}).filter((d) => d.topicId === topic.topicId).length;
@@ -3888,11 +3018,10 @@ function checkDocTopicOversized(cwd) {
   return { passed: false, message: `oversized topics: ${oversized.join(', ')}` };
 }
 
-function checkDocRoleUnderused(cwd) {
+function checkDocRoleUnderused(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   const roleCounts = {};
   for (const doc of Object.values(view.docs || {})) {
     roleCounts[doc.role] = (roleCounts[doc.role] || 0) + 1;
@@ -3907,12 +3036,11 @@ function checkDocRoleUnderused(cwd) {
 // (resolver, migration, doc-alias-broken) treats as ground truth; if the
 // file isn't actually committed there, every one of those checks is
 // silently trusting a path that doesn't exist.
-function checkDocCurrentPathMissing(cwd) {
+function checkDocCurrentPathMissing(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   if (!fs.existsSync(path.join(root, '.git'))) return { passed: true, message: 'skipped (not a git checkout)' };
-  const view = rebuild(fgosDir);
   const missing = [];
   let head = null;
   try { head = commitAt(root, 'HEAD'); } catch { /* no commit: every live path is missing at HEAD */ }
@@ -3939,11 +3067,10 @@ function looksLikeDocPath(value) {
   return typeof value === 'string' && value.startsWith('docs/') && value.endsWith('.md');
 }
 
-function checkDocSourceUnreachable(cwd) {
+function checkDocSourceUnreachable(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   const unreachable = [];
   for (const doc of Object.values(view.docs || {})) {
     if (!isLiveDocLifecycle(doc.docLifecycle)) continue;
@@ -3977,11 +3104,10 @@ function checkDocSourceUnreachable(cwd) {
 //      on disk at its original oldPath (not migrated yet), or reachable
 //      through the live registry (properly migrated with an alias) -- never
 //      neither, which would mean a source was physically lost mid-migration.
-function checkDocSourceConservation(cwd) {
+function checkDocSourceConservation(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   const problems = [];
 
   const outcomes = view.outcomes || {};
@@ -4461,14 +3587,13 @@ registerCheck({
   description: 'terminal slots past allocationGraceMs that never launched and retained panes past their time; reports only, closes nothing',
   check: (cwd) => checkTerminalAllocations(cwd),
 });
-registerConfigDefault({ id: 'terminal', key: TERMINAL_CONFIG_KEY, shape: DEFAULT_TERMINAL_CONFIG });
 
 registerCheck({
   id: 'herdr-executor-kinds',
   description: 'every executor dispatched through a herdr pane names an agent kind herdr can start, and none depends on an outdated herdr integration hook',
   check: (cwd) => {
     try {
-      return checkHerdrExecutorKinds(loadRunnerConfigFromDir(cwd));
+      return checkHerdrExecutorKinds(loadRunnerConfigForDir(cwd));
     } catch (err) {
       return { passed: true, message: `runner config not loadable here, herdr executor kinds not evaluated: ${err.message}` };
     }
@@ -4480,7 +3605,7 @@ registerCheck({
   description: 'Phase 06 (executor-policy-dispatch-seams): legacy executor entries hardcoding policy-shaped flags or account-pool-like env, each named with its documented migration target',
   check: (cwd) => {
     try {
-      return checkExecutorProfileWarnings(cwd, loadRunnerConfigFromDir(cwd));
+      return checkExecutorProfileWarnings(cwd, loadRunnerConfigForDir(cwd));
     } catch (err) {
       return { passed: true, message: `runner config not loadable here, executor-profile warnings not evaluated: ${err.message}` };
     }
@@ -4497,16 +3622,16 @@ registerCheck({
   id: 'confined-pane-accounts',
   description: 'every confined invocation that reads a login store has an account in the global provider inventory with at least one of that store\'s credential files, so its agent starts logged in',
   check: (cwd) => {
-    // The account inventory lives only in the global config, so it is read from there whatever the cwd.
-    // Executors come from the project config merged with the global one; with no usable project config the
-    // global config's own executors are judged.
+    // The account inventory is the machine's (global config and accounts file), so it is read from there whatever
+    // the cwd. Executors come from the project config merged with the machine's; with no usable project config
+    // the machine's own executors are judged.
     const providerInventory = readDoctorProviderInventory();
     let runnerCfg;
     try {
-      runnerCfg = loadRunnerConfigFromDir(cwd);
+      runnerCfg = loadRunnerConfigForDir(cwd);
     } catch (err) {
       let globalRunner = {};
-      try { globalRunner = loadGlobalConfig().runner ?? {}; } catch { /* the inventory read reports an unreadable global config */ }
+      try { globalRunner = machineRunner(); } catch { /* the inventory read reports an unreadable global config */ }
       if (!globalRunner.executors || typeof globalRunner.executors !== 'object') {
         if (providerInventory.inventoryUnreadable) return checkConfinedPaneAccounts({}, providerInventory);
         return { passed: true, message: `runner config not loadable here, confined pane accounts not evaluated: ${err.message}` };
@@ -4522,7 +3647,7 @@ registerCheck({
   description: 'every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, the same read a live dispatch will do',
   check: (cwd) => {
     try {
-      return checkTrustStoresReadable(cwd, loadRunnerConfigFromDir(cwd));
+      return checkTrustStoresReadable(cwd, loadRunnerConfigForDir(cwd));
     } catch (err) {
       return { passed: true, message: `runner config not loadable here, non-claude trust stores not evaluated: ${err.message}` };
     }
@@ -4532,7 +3657,7 @@ registerCheck({
 registerCheck({
   id: 'agent-cli-project-trusted',
   description: 'the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a "Trust this folder?" prompt',
-  check: (cwd) => checkAgentCliProjectTrusted(cwd, { loadRunnerConfig: loadRunnerConfigFromDir }),
+  check: (cwd) => checkAgentCliProjectTrusted(cwd, { loadRunnerConfig: loadRunnerConfigForDir }),
 });
 
 // Async: the check drives the runner's own pattern code, which is promise-based. `fgos doctor`
@@ -4542,7 +3667,7 @@ registerCheck({
   description: 'every seat of every Workflow unit binds under the committed config in a fixed headless session (no lease, nothing started); a policy refusal fails, no pool, account state, tier caps and shared families are information',
   check: (cwd) => checkSeatBindingDryBind(cwd, {
     packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
-    loadRunnerConfig: loadRunnerConfigFromDir,
+    loadRunnerConfig: loadRunnerConfigForDir,
   }),
 });
 
@@ -4551,7 +3676,7 @@ registerCheck({
   description: 'every blind Workflow unit can only bind executors whose provider family and transport were proven to keep a worker blind (read-only, no model call)',
   check: (cwd) => checkBlindStepsUseProvenPools(cwd, {
     packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
-    loadRunnerConfig: loadRunnerConfigFromDir,
+    loadRunnerConfig: loadRunnerConfigForDir,
   }),
 });
 
@@ -4559,7 +3684,7 @@ registerCheck({
   id: 'executor-posture-coverage',
   description: 'core capabilities (execute, code:implement, and capabilities declaring a pool) have at least one candidate executor capable of applying read-only and workspace-write postures',
   check: (cwd) => checkExecutorPostureCoverage(cwd, {
-    loadRunnerConfig: loadRunnerConfigFromDir,
+    loadRunnerConfig: loadRunnerConfigForDir,
   }),
 });
 
@@ -4568,7 +3693,7 @@ registerCheck({
   description: 'no executor declares "permissionMode": "bypass" without privateHome, isolatedSession and ownWorktree all true',
   check: (cwd) => {
     try {
-      return checkExecutorConfinement(loadRunnerConfigFromDir(cwd));
+      return checkExecutorConfinement(loadRunnerConfigForDir(cwd));
     } catch (err) {
       // A directory with no loadable runner config is not a confinement problem;
       // saying otherwise would make doctor cry wolf everywhere fgOS is not set up.
@@ -4582,7 +3707,7 @@ registerCheck({
   description: 'warns when an executor or invocation still grants git add/git commit to a worker through --allowedTools (the runner commits; workers hold no git write grant)',
   check: (cwd) => {
     try {
-      return checkInvocationGitWriteGrants(loadRunnerConfigFromDir(cwd));
+      return checkInvocationGitWriteGrants(loadRunnerConfigForDir(cwd));
     } catch (err) {
       return { passed: true, message: `runner config not loadable here, git write grants not evaluated: ${err.message}` };
     }
@@ -5058,7 +4183,7 @@ registerCheck({
 export function checkConfinementPoliciesDeclared(cwd) {
   let runner;
   try {
-    runner = readSharedConfig(cwd)?.runner;
+    runner = effectiveSection(cwd, 'runner');
   } catch (err) {
     return { passed: false, message: `runner config not readable: ${err.message}` };
   }
@@ -5414,19 +4539,19 @@ function strandedByStore(copies, what) {
  * `{ inventoryUnreadable }` with the reason when the global config cannot be read or is invalid. The
  * inventory lives only in the global config, so this never depends on the directory doctor runs in.
  */
-export function readDoctorProviderInventory(globalConfigPath = path.join(os.homedir(), '.fgos', 'config.json')) {
-  // The reason names only an error code or class and the config path, never the error message: a parse
-  // message can quote part of the file.
-  let config;
+export function readDoctorProviderInventory() {
+  // The reason is the door's own message (file, position, path, never a value) or only an error code or class: a parse
+  // or validator message of another origin could quote part of a file.
+  let runner;
   try {
-    config = loadGlobalConfig(globalConfigPath);
+    runner = machineRunner();
   } catch (err) {
-    return { inventoryUnreadable: `global config unreadable (${err?.code ?? 'not valid JSON or not readable'}) at ${globalConfigPath}` };
+    return { inventoryUnreadable: `machine config unreadable (${isConfigDoorFailure(err) ? err.message : err?.code ?? err?.name ?? 'error'})` };
   }
   try {
-    return { inventory: providerAccountInventory(config?.runner ?? {}) };
+    return { inventory: providerAccountInventory(runner) };
   } catch (err) {
-    return { inventoryUnreadable: `global config refused by the provider inventory validator (${err?.code ?? err?.name ?? 'error'}) at ${globalConfigPath}` };
+    return { inventoryUnreadable: `machine config refused by the provider inventory validator (${err?.code ?? err?.name ?? 'error'})` };
   }
 }
 
@@ -5618,7 +4743,7 @@ registerCheck({
 export function checkConfinementStrictReadiness(cwd) {
   let runner;
   try {
-    runner = readSharedConfig(cwd)?.runner;
+    runner = effectiveSection(cwd, 'runner');
   } catch (err) {
     return { passed: false, message: `runner config not readable: ${err.message}` };
   }
@@ -5698,7 +4823,7 @@ registerCheck({
 export function checkConfinementHerdrMaturity(cwd) {
   let runner;
   try {
-    runner = readSharedConfig(cwd)?.runner;
+    runner = effectiveSection(cwd, 'runner');
   } catch (err) {
     return { passed: true, message: `runner config not readable, herdr maturity check skipped: ${err.message}` };
   }
@@ -5752,58 +4877,6 @@ registerCheck({
   id: 'confinement-herdr-maturity',
   description: 'herdr confinement convergence maturity status (partial: pre-adapter checks under Authority, session/home lifecycle adapter-managed)',
   check: (cwd) => checkConfinementHerdrMaturity(cwd),
-});
-
-// --- runner.coordination shape check ---
-registerCheck({
-  id: 'runner-coordination-orgPolicy-shape',
-  description: 'runner.coordination.orgPolicy.dischargeOn is a valid array of strings if present',
-  check: (cwd) => {
-    const configPath = path.join(cwd, '.fgos', 'config.json');
-    if (!fs.existsSync(configPath)) return { passed: true };
-
-    let config;
-    try {
-      config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    } catch {
-      return { passed: true }; // Handled by other checks
-    }
-
-    const orgPolicy = config.runner?.coordination?.orgPolicy;
-    if (orgPolicy && 'dischargeOn' in orgPolicy) {
-      const orgDischargeOn = orgPolicy.dischargeOn;
-      if (!Array.isArray(orgDischargeOn) || !orgDischargeOn.every(d => typeof d === 'string' && d.length > 0)) {
-        return { passed: false, message: `runner.coordination.orgPolicy.dischargeOn must be an array of non-empty strings. Run fgos doctor --fix to reset to ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}.` };
-      }
-    }
-    return { passed: true };
-  }
-});
-
-registerFix({
-  id: 'runner-coordination-orgPolicy-shape',
-  fix: (cwd) => {
-    const configPath = path.join(cwd, '.fgos', 'config.json');
-    if (!fs.existsSync(configPath)) return { changed: false };
-
-    let config;
-    try {
-      config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    } catch {
-      return { changed: false };
-    }
-
-    const orgPolicy = config.runner?.coordination?.orgPolicy;
-    if (orgPolicy && 'dischargeOn' in orgPolicy) {
-      const orgDischargeOn = orgPolicy.dischargeOn;
-      if (!Array.isArray(orgDischargeOn) || !orgDischargeOn.every(d => typeof d === 'string' && d.length > 0)) {
-        config.runner.coordination.orgPolicy.dischargeOn = [...DEFAULT_COORDINATION_ORG_DISCHARGE_ON];
-        fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n');
-        return { changed: true, message: `Reset runner.coordination.orgPolicy.dischargeOn to default ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}` };
-      }
-    }
-    return { changed: false };
-  }
 });
 
 // dispatch-engine-liveness-hardening Phase 7 (C1): shadow binder
@@ -5876,41 +4949,17 @@ export function checkObserveFrictionMigrated(cwd) {
     return { passed: true, message: 'no .fgos directory present' };
   }
 
-  // 1. Scan legacy work.friction records in .fgos/events.jsonl and .fgos/events/*.jsonl
-  const legacyFrictions = [];
-  const filesToScan = [];
-  const baselineEvents = path.join(fgosDir, 'events.jsonl');
-  if (fs.existsSync(baselineEvents)) {
-    filesToScan.push({ src: 'events.jsonl', path: baselineEvents });
-  }
-  const eventsDir = path.join(fgosDir, 'events');
-  if (fs.existsSync(eventsDir) && fs.statSync(eventsDir).isDirectory()) {
-    try {
-      const entries = fs.readdirSync(eventsDir);
-      for (const entry of entries) {
-        if (entry.endsWith('.jsonl')) {
-          filesToScan.push({ src: `events/${entry}`, path: path.join(eventsDir, entry) });
-        }
-      }
-    } catch {}
-  }
-
-  for (const { src, path: filePath } of filesToScan) {
-    try {
-      const content = fs.readFileSync(filePath, 'utf8');
-      const lines = content.split('\n');
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        try {
-          const ev = JSON.parse(trimmed);
-          if (ev.type === 'work.friction') {
-            const seq = typeof ev.seq === 'number' ? ev.seq : 0;
-            legacyFrictions.push({ src, seq });
-          }
-        } catch {}
-      }
-    } catch {}
+  // 1. Legacy work.friction records: the Event Store reader keeps every legacy record with the file it came from,
+  // so records written by the current store are never mistaken for historical migration candidates.
+  let legacyFrictions;
+  try {
+    legacyFrictions = prepareWorkStore(fgosDir, fgosDir).store.read({ streams: ['project'] }, []).legacy
+      .filter(record => record.event.type === 'work.friction')
+      // The migration cursor names the file relative to .fgos, as the Rust migrator records it.
+      .map(record => ({ src: record.provenance.file.replace(/^\.fgos\//, ''), seq: record.event.seq ?? 0 }));
+  } catch (error) {
+    if (error.code !== 'event-store-no-repository') throw error;
+    legacyFrictions = [];
   }
 
   if (legacyFrictions.length === 0) {
@@ -5983,28 +5032,18 @@ export function checkObserveHostResolvable(cwd) {
     };
   }
 
-  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  // A real read of the friction store, so a store the host refuses (a symlinked
+  // directory or shard, an I/O error) fails the row instead of passing on a ping.
   try {
-    const stdout = execFileSync(hostBin, ['friction', 'ping', '--dir', root], {
-      stdio: ['pipe', 'pipe', 'pipe'],
-      encoding: 'utf8',
-    });
-    const parsed = JSON.parse(stdout);
-    if (parsed && (parsed.ok || parsed.data?.ok)) {
-      return {
-        passed: true,
-        message: `host binary at ${hostBin} resolved and verified (friction supported)`,
-      };
-    }
+    invokeHost(['friction', 'rank', '--limit', '1'], { dir: cwd });
     return {
       passed: true,
-      message: `host binary at ${hostBin} resolved`,
+      message: `host binary at ${hostBin} resolved and verified (friction store readable)`,
     };
   } catch (err) {
-    const stderr = err.stderr ? err.stderr.toString('utf8').trim() : err.message;
     return {
       passed: false,
-      message: `host binary at ${hostBin} failed version check: ${stderr || err.message}`,
+      message: `host binary at ${hostBin} failed the friction read probe: ${err.message}`,
     };
   }
 }
@@ -6175,7 +5214,6 @@ export function checkObserveRunCoverage(cwd, { hostRunner = invokeHost, scan = s
   } catch (err) {
     return { passed: false, message: `cannot enumerate run directories for ${location}: ${err.message}` };
   }
-  const eligible = projectRunEligibility(layout);
   let recent = 0;
   for (const run of layout.runs) {
     try {
@@ -6184,13 +5222,12 @@ export function checkObserveRunCoverage(cwd, { hostRunner = invokeHost, scan = s
     } catch {}
   }
   const directoryDifference = layout.runDirsSeen - coverage.runDirsSeen;
-  const admissionDifference = eligible.observed - coverage.observed;
   const tolerance = Math.max(recent, coverage.recentRuns);
-  if (Math.abs(directoryDifference) > tolerance || Math.abs(admissionDifference) > tolerance) {
+  if (Math.abs(directoryDifference) > tolerance) {
     const examples = layout.runs.slice(0, 3).map((run) => path.relative(root, run.runDir)).join(', ');
-    return { passed: false, message: `run coverage differs: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen} (difference ${directoryDifference}); eligible Node ${eligible.observed}, observed host ${coverage.observed} (difference ${admissionDifference}); recent tolerance ${tolerance}; ${location}; sample candidates (not confirmed missing): ${examples || '(none)'}` };
+    return { passed: false, message: `run coverage differs: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen} (difference ${directoryDifference}); recent tolerance ${tolerance}; ${location}; sample candidates (not confirmed missing): ${examples || '(none)'}` };
   }
-  return { passed: true, message: `run coverage matches: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen}; eligible Node ${eligible.observed}, observed host ${coverage.observed}; recent tolerance ${tolerance}; ${location}` };
+  return { passed: true, message: `run coverage matches: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen}; recent tolerance ${tolerance}; ${location}` };
 }
 
 registerCheck({
@@ -6207,7 +5244,7 @@ registerCheck({
 
 registerCheck({
   id: 'observe-host-resolvable',
-  description: 'Rust host binary resolves and supports observe commands (friction ping)',
+  description: 'Rust host binary resolves and reads the friction store (friction rank)',
   check: (cwd) => checkObserveHostResolvable(cwd),
 });
 
@@ -6274,7 +5311,7 @@ registerCheck({
 
 registerCheck({
   id: 'identity-pinned-machines',
-  description: 'lists the machine keys this machine pinned the first time it saw each machine (informational, for the one-time fingerprint comparison across machines); `fgos identity pins --forget <machine-id>` accepts a re-key',
+  description: 'lists the machine keys this machine pinned the first time it saw each machine (informational, for the one-time fingerprint comparison across machines; names the pins still `seen`, not yet confirmed with `fgos identity pins --confirm <machine-id> --fingerprint <fp>`); `fgos identity pins --forget <machine-id>` accepts a re-key',
   check: (cwd) => checkIdentityPinnedMachines(cwd),
 });
 
@@ -6282,6 +5319,12 @@ registerCheck({
   id: 'identity-project-id',
   description: 'this repository carries one project id in the tracked file .fgos/project.json, the same in every clone; absent only warns, and there is no fix: run `fgos identity project --init` once on one machine, commit, pull elsewhere',
   check: (cwd) => checkIdentityProjectId(cwd),
+});
+
+registerCheck({
+  id: 'identity-shared-directory',
+  description: 'the shared directory of other machines\' sessions, read from its cache (.fgos/cache/identity-directory.json): passes with the counts; warns on entries dropped for a bad signature or a changed key (naming the machine id), on entries of another project than this clone\'s, and on a machine handle two machines share; no fix, the owner decides',
+  check: (cwd) => checkIdentitySharedDirectory(cwd),
 });
 
 registerCheck({
@@ -6323,18 +5366,18 @@ registerCheck({
 });
 
 registerCheck({
-  id: 'seat-binding-config',
-  description: 'the project runner config\'s tier ladder comment, when it has one, matches the tier ladder',
-  check: (cwd) => checkSeatBindingConfig(cwd),
-});
-
-registerCheck({
   id: 'observe-run-coverage',
-  description: 'Observe directory totals and admitted runs match the independent Node layout and eligibility projections',
+  description: 'Observe run accounting is consistent and its directory totals match the Node layout scan',
   check: (cwd) => checkObserveRunCoverage(cwd),
 });
 
-registerConfigDefault({ id: 'event-store', key: 'eventStore', shape: { remote: 'origin' } });
+// Event Store: one setup fix and eight doctor rows. A doctor run builds one `eventStoreDoctor`
+// (its lazy store snapshot is read at most once) and every row asks it; a row called without a run gets a private one.
+registerFix({ id: 'event-store-lock-dirs', fix: cwd => fixEventStoreLockDirs(cwd) });
+for (const name of ['open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout']) {
+  const id = `event-store-${name}`;
+  registerCheck({ id, description: `Event Store ${name}`, check: (cwd, run = createDoctorRun()) => run.once(`event-store-doctor:${cwd}`, () => eventStoreDoctor(cwd))(id) });
+}
 
 // Git and Event Store share one addon ABI admission row.
 for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-repository-config', 'git-operation-journal', 'git-native-locks']) {
@@ -6366,5 +5409,5 @@ registerCheck({
 registerFix({ id: 'workflow-case-bindings', fix: (cwd) => fixWorkflowCaseBindings(cwd) });
 registerFix({ id: 'git-driver-directories', fix: fixGitDriverDirectories });
 registerFix({ id: 'git-wal-dir', fix: fixGitWal });
-registerFix({ id: 'git-land-recovery', fix: (cwd) => fixLandRecovery(cwd) });
+registerFix({ id: 'git-land-recovery', fix: (cwd) => fixGitOperationRecovery(cwd) });
 registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping });

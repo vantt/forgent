@@ -16,14 +16,16 @@ use fgos_yaml_doc::path::format_path;
 use fgos_yaml_doc::{Profile, Segment};
 use serde_json::Value;
 
-use crate::files::{read_beneath, LoadedFile, JSON_NAME, PRIVATE_DIR_MODE, PRIVATE_FILE_MODE};
+use crate::files::{
+    is_tombstone, read_beneath, LoadedFile, JSON_NAME, PRIVATE_DIR_MODE, PRIVATE_FILE_MODE,
+};
 use crate::locks::{hold, GLOBAL_CONFIG};
 use crate::machine::{beneath, refused, token};
 use crate::schema::{descend, json_at, load};
 use crate::scope::SourceKind;
 use crate::snapshot::{accounts_source, carries, split_global, Context, SnapshotError};
 use crate::snapshot::{SessionClass, SnapshotRequest};
-use crate::write::{commit_observed, Edit, WriteRequest};
+use crate::write::{commit_observed, without_project, Edit, WriteRequest};
 use crate::ConfigRefusal;
 
 const REASON: &str = "[migrate] carried over from ~/.fgos/config.json, reason never recorded";
@@ -82,7 +84,10 @@ struct Dest {
 fn open_source(global_dir: &Path) -> Result<Option<(LoadedFile, Value)>, SnapshotError> {
     let (parent, dir) = split_global(global_dir)?;
     let max = Profile::StrictConfig.limits().input_bytes;
-    let Some(file) = read_beneath(parent, &dir.join(JSON_NAME), max)? else {
+    // A converted global file leaves the tombstone: it holds no key to move.
+    let Some(file) =
+        read_beneath(parent, &dir.join(JSON_NAME), max)?.filter(|f| !is_tombstone(&f.bytes))
+    else {
         return Ok(None);
     };
     let json = serde_json::from_slice(&file.bytes).map_err(|e| {
@@ -234,7 +239,8 @@ fn confined(req: &MoveRequest) -> Result<(), SnapshotError> {
 
 /// Stage 1: write the account pools through the write transaction and the token through the
 /// create-only install, then verify both by reading them back. The source is not touched. A
-/// destination that holds different data for a key is refused before anything is written.
+/// destination that holds different data for a key is refused before anything is written. The
+/// write reads the machine files alone, so a project file cannot refuse the copy half-way.
 pub fn copy(
     ctx: &Context,
     req: &MoveRequest,
@@ -264,7 +270,7 @@ pub fn copy(
     }
     if !edits.is_empty() {
         let write = WriteRequest {
-            roots: req.roots.clone(),
+            roots: without_project(&req.roots),
             lock_root: req.lock_root.clone(),
             target: SourceKind::Accounts,
             expected: dest.revision,

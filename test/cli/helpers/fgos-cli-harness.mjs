@@ -1,3 +1,6 @@
+import { initializeWorkRepository } from '../../helpers/work-store-release.mjs';
+import { appendWorkEvent } from '../../helpers/work-event-fixture.mjs';
+import { leaveOpenWorkEvent } from '../../helpers/open-work-event.mjs';
 // fgos-cli-harness.mjs -- bộ đồ nghề dùng chung của các file test CLI, tách
 // nguyên văn ra khỏi test/cli/fgos.test.mjs khi file đó được chẻ nhỏ (tsk-3um).
 // Không có test nào ở đây: chỉ import, hằng số và helper mà các file test bên
@@ -16,15 +19,16 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addOutcome, recordFriction, addDiscovery, moveWork, moveStep, addWork, editWork, listWork, StoreError, resolveWriterLogPath, rebuild, initStore } from '../../../src/state/store.mjs';
-import { appendEvent } from '../../../src/state/events.mjs';
+import { addOutcome, recordFriction, addDiscovery, moveWork, moveStep, addWork, editWork, listWork, readRawEvents, StoreError, EXIT_CODES, rebuild, initStore } from '../../../src/state/store.mjs';
+import { appendEvent } from '../../helpers/legacy-event-fixture.mjs';
 import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
+import { moveUseCase } from '../../../src/verbs/state/move.mjs';
 import { createSession, endSession } from '../../../src/runner/session.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
 import { writeCoexistenceManifest } from '../../../src/install/coexist.mjs';
 import { invokeHost } from '../../../src/util/host-bin.mjs';
 import { initFixtureRepo, activateGitFixture } from '../../helpers/git-fixture.mjs';
-import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
+import { projectConfigPath, writeProjectConfig } from '../../helpers/config-fixture.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -37,8 +41,8 @@ const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 // child spawned via run() below always agreed with every OTHER run()-spawned
 // child in the same test (they all inherit the same process.env), but
 // whether a spawned child agreed with a fixture that writes IN-PROCESS (e.g.
-// moveToDurableDoingForTest below, which calls resolveWriterLogPath/
-// appendEvent directly, no subprocess involved) depended on the invoking
+// moveToDurableDoingForTest below, which appends through the Work gate
+// directly, no subprocess involved) depended on the invoking
 // shell: under an agent session, both sides read the identical
 // CLAUDE_CODE_SESSION_ID string and collapsed onto ONE shared writer log
 // (an in-process write landing in the same per-writer sequence a later
@@ -76,13 +80,24 @@ function rawTmpCwd() {
 // explicitly afterward are unaffected — a harmless no-op second call.
 function tmpCwd() {
   const cwd = rawTmpCwd();
+  initializeWorkRepository(cwd);
   assert.equal(run(cwd, ['init']).status, 0, 'tmpCwd(): "fgos init" failed to bootstrap .fgos/');
+  configureLocalOnlyStore(cwd);
   return cwd;
 }
 
+// A fixture repository has no remote to publish Work events to, so it says so the way a real local-only project
+// does: `eventStore.sync.intervalSec: 0` turns the publish timer off. Without it every fresh fixture's first command
+// starts a detached `fgos events sync` child whose fetch has nowhere to go. The trigger itself is proven in
+// test/event-store/triggers.test.mjs; a test that wants publishing writes its own project config.
+function configureLocalOnlyStore(cwd) {
+  if (!fs.existsSync(projectConfigPath(cwd))) writeProjectConfig(cwd, { eventStore: { sync: { intervalSec: 0 } } });
+}
+
 function initFgosFixtureInProcess(cwd) {
-  const dir = path.join(cwd, '.fgos');
+  const dir = initializeWorkRepository(cwd);
   initStore(dir);
+  configureLocalOnlyStore(cwd);
   try {
     writeCoexistenceManifest(cwd, dir);
   } catch {
@@ -110,6 +125,7 @@ function fgosTemplateSourceDir() {
 
 function tmpCwdFromTemplate() {
   const cwd = rawTmpCwd();
+  initializeWorkRepository(cwd);
   fs.cpSync(fgosTemplateSourceDir(), path.join(cwd, '.fgos'), { recursive: true });
   return cwd;
 }
@@ -148,30 +164,22 @@ function envelopeData(stdout) {
   return envelope.data;
 }
 
-// Tầng A/T2: new events land under `.fgos/events/<writer>-<ts>.jsonl`, not
-// the frozen baseline `logPath(cwd)` (TA-D12) -- this counts/exposes every
-// raw line across BOTH, so every existing caller's "N more events since
-// before" or "find the event with type X" check keeps working unchanged
-// regardless of which physical file the CLI actually wrote to.
+// Damages the open Event Store file the way bit rot or a hand edit would: one recorded event no longer matches its hash.
+// A command seals what it left open when it ends and publishes once per interval, so the file may already be sealed:
+// leave one fresh event open, and keep the commands that follow from sealing it (publishing is explicit-only, and a
+// fresh event is not due), so the damaged file is what they find.
+function corruptEventStore(cwd) {
+  configureLocalOnlyStore(cwd);
+  leaveOpenWorkEvent(cwd, { ageSec: 0 });
+  const active = path.join(cwd, '.git', 'fgos', 'events', 'project', 'active.jsonl');
+  fs.writeFileSync(active, fs.readFileSync(active, 'utf8').replace('"payload":{', '"payload":{"tampered":true,'));
+  return active;
+}
+
+// Every raw event of the Event Store, so a "N more events since before" or "find the event with type X" check
+// does not depend on where the store keeps them.
 function eventLines(cwd) {
-  const lines = [];
-  if (fs.existsSync(logPath(cwd))) {
-    lines.push(...fs.readFileSync(logPath(cwd), 'utf8').split('\n').filter(Boolean));
-  }
-  const eventsDir = path.join(cwd, '.fgos', 'events');
-  let names = [];
-  try {
-    names = fs
-      .readdirSync(eventsDir, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
-      .map((entry) => entry.name);
-  } catch {
-    names = [];
-  }
-  for (const name of names) {
-    lines.push(...fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean));
-  }
-  return lines;
+  return readRawEvents(path.join(cwd, '.fgos')).map(event => JSON.stringify(event));
 }
 
 // Effective view (durable status overlaid with any active runtime claim,
@@ -211,7 +219,7 @@ function stateView(cwd) {
 // test/state/store.test.mjs's own moveToDurableDoingForTest uses.
 function moveToDurableDoingForTest(cwd, id, from = 'todo', extra = {}) {
   const dir = path.join(cwd, '.fgos');
-  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing', ...extra } }, dir);
+  appendWorkEvent(dir, { type: 'work.move', payload: { id, from, to: 'doing', ...extra } }, dir);
   rebuild(dir);
 }
 
@@ -236,7 +244,43 @@ function rawPersistedView(cwd) {
   return JSON.parse(fs.readFileSync(viewPath(cwd), 'utf8'));
 }
 
+// Setup that is not the behaviour under test runs in this process, through the same store door the verb writes
+// through, and answers the way `run()` does: a refused write is a non-zero status and its message, not a throw.
+function inProcess(write) {
+  try {
+    write();
+    return { status: 0, stdout: '', stderr: '' };
+  } catch (err) {
+    if (!(err instanceof StoreError)) throw err;
+    return { status: EXIT_CODES[err.category] ?? 1, stdout: '', stderr: err.message };
+  }
+}
+
+// The item `add` would write for these flags, written in this process: no CLI child (and its detached seal child)
+// for a fixture step. A test that proves the `add` verb itself uses addViaCli below.
 function addOk(cwd, id, extra = {}) {
+  return inProcess(() => addWork(path.join(cwd, '.fgos'), {
+    id,
+    title: extra.title ?? `Title ${id}`,
+    kind: extra.kind ?? 'task',
+    status: 'todo',
+    deps: [],
+    risk: extra.risk ?? 'light',
+    refs: [],
+    verify: extra.verify ?? 'npm test',
+    description: 'tsk-535 fixture description.',
+    workflowStep: extra.workflowStep ?? 'executing',
+    ...(extra.footprint !== undefined ? { footprint: extra.footprint.split(',').map((entry) => entry.trim()).filter(Boolean) } : {}),
+  }));
+}
+
+// A move a fixture needs, through the use case `fgos move` calls.
+function moveOk(cwd, id, to, options = {}) {
+  return inProcess(() => moveUseCase({ dir: path.join(cwd, '.fgos'), repoRoot: cwd }, { id, to, ...options }));
+}
+
+// The same item through the real `fgos add` child, for the tests that prove that verb's flags and defaults.
+function addViaCli(cwd, id, extra = {}) {
   // add-stage-default-gap D1/D2: add now stamps an entry stage by default
   // (same door submit has always had — 'discovery' as of tsk-qod D1/D2,
   // 'clarify' before it), instead of the old implicit 'executing'. Every
@@ -452,7 +496,7 @@ function toProposed(cwd, id) {
   // never written at all anymore. This fixture never wanted a real claim
   // (no branch, no headAtTake) -- it goes straight `todo -> awaiting-
   // approval` via the direct edge the redesign added for exactly this shape.
-  return run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  return moveOk(cwd, id, 'awaiting-approval');
 }
 
 // Walk awaiting-approval -> delivered -> retrospective -> cleanup -> done via
@@ -460,10 +504,10 @@ function toProposed(cwd, id) {
 // — done's one remaining door in. Assumes `id` is already at status
 // awaiting-approval (e.g. via toProposed). Returns the final move's result.
 function toDoneViaChain(cwd, id) {
-  run(cwd, ['move', id, '--to', 'delivered']);
-  run(cwd, ['move', id, '--to', 'retrospective']);
-  run(cwd, ['move', id, '--to', 'cleanup']);
-  return run(cwd, ['move', id, '--to', 'done']);
+  moveOk(cwd, id, 'delivered');
+  moveOk(cwd, id, 'retrospective');
+  moveOk(cwd, id, 'cleanup');
+  return moveOk(cwd, id, 'done');
 }
 
 // --- stage `clarify` wiring (stage-clarify-3): submit tags the stage, add
@@ -539,10 +583,7 @@ function advanceThroughDiscoveryToPlanning(cwd, id, verify = 'npm test -- proven
 // config timeout below, so a fallback that fires kills it and a real
 // --no-timeout override does not.
 function writeShortRunnerConfig(cwd, timeoutMs) {
-  // Every DEFAULT_RUNNER_CONFIG key present (dispatch.mjs) so
-  // ensureRunnerConfigForDir's mergeConfigDefaults finds nothing missing to
-  // rewrite -- an in-call rewrite would dirty the working tree and trip
-  // return's own clean-tree check, unrelated to what this test proves.
+  // The keys this test reads, with the short timeout under test; the standard supplies the rest.
   const cfg = {
     executor: { command: process.execPath, args: ['{prompt}'] },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
@@ -605,6 +646,8 @@ function mkLocalDependency() {
 // bookkeeping alongside code.
 function commitPending(cwd, message) {
   execFileSync('git', ['add', '-A'], { cwd });
+  // Events live in the Event Store, so a verb may leave nothing to commit.
+  if (!execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' }).trim()) return;
   execFileSync('git', ['commit', '-q', '-m', message], { cwd });
 }
 
@@ -652,7 +695,7 @@ function makeRunnerProposedItem(cwd, id, extra = {}) {
   // item's real durable status behind an effective 'doing' overlay forever
   // -- release it explicitly right after, same as every other fixture here
   // that settles via a raw move instead of the real return/reject door.
-  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
+  moveOk(cwd, id, 'awaiting-approval', { skipReturnGuard: "test fixture setup, not exercising return's own guard" });
   releaseClaimFor(cwd, id);
   commitPending(cwd, `state: propose ${id}`);
 }
@@ -720,7 +763,7 @@ function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
   // The raw move below never goes through settleClaim -- release the
   // runtime claim explicitly right after, or it leaks and keeps masking
   // the item's real durable status behind an effective 'doing' overlay.
-  run(cwd, ['move', leafId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
+  moveOk(cwd, leafId, 'awaiting-approval', { skipReturnGuard: "test fixture setup, not exercising return's own guard" });
   releaseClaimFor(cwd, leafId);
   commitPending(cwd, `state: propose ${leafId}`);
 }
@@ -757,7 +800,7 @@ function makeRunnerProposedItemTouching(cwd, id, relPath, extra = {}) {
   // The raw move below never goes through settleClaim -- release the
   // runtime claim explicitly right after, same reasoning as
   // makeRunnerProposedItem/makeRunnerProposedLeafItem above.
-  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
+  moveOk(cwd, id, 'awaiting-approval', { skipReturnGuard: "test fixture setup, not exercising return's own guard" });
   releaseClaimFor(cwd, id);
   commitPending(cwd, `state: propose ${id}`);
 }
@@ -853,7 +896,7 @@ function makeMilestone(cwd, id, targets) {
   addWork(dir, { id, title: `Title ${id}`, kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', targets });
   // tsk-40m: no real claim needed here (no branch) -- straight
   // `todo -> awaiting-approval` via the direct edge, same as toProposed.
-  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  moveOk(cwd, id, 'awaiting-approval');
   commitPending(cwd, `state: propose ${id}`);
 }
 
@@ -941,7 +984,7 @@ function makeLegacyProposedItem(cwd, id) {
   addOk(cwd, id);
   // tsk-40m: never claimed at all (no branch, no headAtTake) -- straight
   // `todo -> awaiting-approval` via the direct edge, same as toProposed above.
-  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  moveOk(cwd, id, 'awaiting-approval');
 }
 
 // --- catchup (D6/D7/D11: unified catch-up-by-merge for a merge-related park) ---
@@ -953,7 +996,7 @@ function makeLegacyProposedItem(cwd, id) {
 // genuine, not synthesized.
 function makeBlockedRunnerItem(cwd, id, reason, extra = {}) {
   makeRunnerProposedItem(cwd, id, extra);
-  run(cwd, ['move', id, '--to', 'blocked', '--reason', reason]);
+  moveOk(cwd, id, 'blocked', { reason });
   commitPending(cwd, `state: park ${id} (${reason})`);
 }
 
@@ -961,7 +1004,7 @@ function makeBlockedRunnerItem(cwd, id, reason, extra = {}) {
 // makeRunnerProposedLeafItem above).
 function makeBlockedLeafItem(cwd, rootId, leafId, reason, extra = {}) {
   makeRunnerProposedLeafItem(cwd, rootId, leafId, extra);
-  run(cwd, ['move', leafId, '--to', 'blocked', '--reason', reason]);
+  moveOk(cwd, leafId, 'blocked', { reason });
   commitPending(cwd, `state: park ${leafId} (${reason})`);
 }
 
@@ -1012,7 +1055,7 @@ function makeBlockedBranchItem(cwd, id, extra = {}) {
   gitAtCwd(cwd, ['add', '-A']);
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker attempt for ${id}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
-  run(cwd, ['move', id, '--to', 'blocked']);
+  moveOk(cwd, id, 'blocked');
   commitPending(cwd, `state: park ${id}`);
 }
 
@@ -1090,7 +1133,7 @@ function makeSessionSafeRunnerItem(cwd, id, extra = {}) {
   // The raw move below never goes through settleClaim -- release the
   // runtime claim explicitly right after, same reasoning as
   // makeRunnerProposedItem above.
-  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
+  moveOk(cwd, id, 'awaiting-approval', { skipReturnGuard: "test fixture setup, not exercising return's own guard" });
   releaseClaimFor(cwd, id);
 }
 
@@ -1145,6 +1188,8 @@ export {
   recordFriction,
   addGoalItem,
   addOk,
+  addViaCli,
+  moveOk,
   addOutcome,
   addWork,
   advanceThroughDiscoveryToPlanning,
@@ -1161,6 +1206,7 @@ export {
   endSession,
   envelopeData,
   eventLines,
+  corruptEventStore,
   execFileSync,
   fileURLToPath,
   fs,

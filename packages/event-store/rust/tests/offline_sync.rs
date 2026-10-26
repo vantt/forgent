@@ -1,3 +1,4 @@
+#![cfg(target_os = "linux")]
 mod sync_support;
 use fgos_event_store::{errors::ErrorCode, sync::SyncRecord};
 use sync_support::*;
@@ -93,4 +94,38 @@ fn no_push_sync_leaves_the_remote_alone_and_records_the_tail_as_unpublished() {
         .unwrap()
         .unpublished_since
         .is_none());
+}
+
+#[test]
+fn an_opportunistic_sync_skips_a_held_seal_lock_instead_of_waiting_for_it() {
+    use fgos_holder_lock::{acquire, Acquire, Mode, Resource, Wait};
+    let w = World::new();
+    let a = w.clone("a", "machine-aa");
+    a.setup();
+    a.append(1);
+    let held = match acquire(
+        &Resource::new("event-seal", a.layout.seal_lock()),
+        Mode::Ex,
+        Wait::Ms(5_000),
+        2000,
+    ) {
+        Acquire::Acquired(handle) => handle,
+        other => panic!("{other:?}"),
+    };
+    let started = std::time::Instant::now();
+    let skipped = a.sync_opportunistic().unwrap();
+    assert!(skipped.busy, "the held lock is reported, not waited for");
+    assert!(
+        started.elapsed() < std::time::Duration::from_secs(2),
+        "a try-lock never queues: {:?}",
+        started.elapsed()
+    );
+    assert!(
+        !a.layout.root.join("sync.json").exists(),
+        "a skipped sync is not a push attempt: the interval does not restart"
+    );
+    drop(held);
+    let ran = a.sync_opportunistic().unwrap();
+    assert!(!ran.busy);
+    assert!(a.layout.root.join("sync.json").exists());
 }

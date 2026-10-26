@@ -70,7 +70,7 @@ function setup({ mainFiles = { 'base.txt': 'from main\n' }, branchFiles = { 'min
           invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
         },
       },
-      capabilities: { 'docs:write': { prefer: [{ executor: 'alpha' }], rigor: 'standard' } },
+      capabilities: { 'docs:write': { prefer: [{ executor: 'alpha' }], rigor: 'standard', tier: 'standard' } },
       patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' } },
     },
   });

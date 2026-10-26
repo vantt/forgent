@@ -2,7 +2,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use fgos_agent_protocol::direct::{adapter_for, newest_result};
-use fgos_agent_protocol::{Activity, BlockedReason, ExitInfo, Outcome, StdinPolicy};
+use fgos_agent_protocol::{Activity, BlockedReason, ExitInfo, Outcome};
 use serde_json::Value;
 
 const CLIS: [&str; 5] = ["claude", "codex", "agy", "pi", "omp"];
@@ -40,7 +40,6 @@ fn every_cli_vector_classifies_as_recorded() {
         .unwrap();
         let adapter = adapter_for(cli);
         assert_eq!(adapter.cli(), cli);
-        assert_eq!(adapter.stdin_policy(), StdinPolicy::NullDevice, "{cli}");
         let vectors = doc["vectors"].as_array().unwrap();
         assert!(vectors.len() >= 5, "{cli} has too few vectors");
         for vector in vectors {
@@ -61,11 +60,6 @@ fn every_cli_vector_classifies_as_recorded() {
             );
         }
     }
-}
-
-#[test]
-fn codex_stdin_is_the_null_device() {
-    assert_eq!(adapter_for("codex").stdin_policy(), StdinPolicy::NullDevice);
 }
 
 #[test]
@@ -100,25 +94,25 @@ fn newest_result_takes_the_highest_number() {
         "result-x.json",
         "agent-1.json",
         "result-3.json.tmp",
+        "result-+99.json",
     ];
     assert_eq!(
         newest_result(outbox, names),
         Some(outbox.join("result-10.json"))
     );
     assert_eq!(newest_result(outbox, ["agent-1.json"]), None);
+    assert_eq!(newest_result(outbox, ["result-007.json", "result-00.json"]), None, "leading zeros are not issued names");
+    assert_eq!(newest_result(outbox, ["result-0.json"]), Some(outbox.join("result-0.json")));
 }
 
 #[test]
-fn activity_counts_growth_and_events() {
+fn activity_counts_growth() {
     let adapter = adapter_for("pi");
     assert_eq!(adapter.activity_from(""), Activity::Quiet);
     assert_eq!(adapter.activity_from("  \n\n"), Activity::Quiet);
     assert_eq!(adapter.activity_from("compiling...\n"), Activity::Output);
-    assert_eq!(
-        adapter.activity_from("{\"type\":\"message_end\"}\n"),
-        Activity::Event
-    );
-    assert!(Activity::Event.is_active() && !Activity::Quiet.is_active());
+    assert_eq!(adapter.activity_from("{\"type\":\"message_end\"}\n"), Activity::Output);
+    assert!(Activity::Output.is_active() && !Activity::Quiet.is_active());
 }
 
 #[test]

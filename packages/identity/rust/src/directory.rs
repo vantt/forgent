@@ -15,7 +15,8 @@
 use crate::current::{current_session, machine_info, os_record, read_head, session_for, CurrentSession};
 use crate::proc_tree::{os_process_tree, ProcessTree};
 use crate::project;
-use crate::refusal::{Candidate, Liveness, Refusal};
+use crate::refusal::{Candidate, Liveness, Refusal, Remote};
+use crate::shared::SharedView;
 use crate::resolve::{terminal_head, HeadRef, WriterKey};
 use crate::text::{base32_prefix, iso_utc_now};
 use fgos_durable_file::{install_once_with_mode, replace_durably_with_mode, Installed};
@@ -100,8 +101,11 @@ pub struct Listed {
     pub clone: Option<String>,
     pub registered_at: String,
     pub roles: Vec<String>,
-    /// `alive`, or `unknown` when nothing can prove it dead.
+    /// `alive`, `unknown` when nothing can prove it dead, or `remote`.
     pub liveness: Liveness,
+    /// Set only for a session of another machine (flattened into the object).
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    pub remote: Option<Remote>,
 }
 
 impl Listed {
@@ -115,6 +119,7 @@ impl Listed {
             registered_at: entry.registered_at.clone(),
             roles: entry.roles.clone(),
             liveness: liveness_of(verdict),
+            remote: None,
         }
     }
 }
@@ -132,6 +137,7 @@ fn candidate_of(row: &Row) -> Candidate {
         id: row.entry.id.clone(),
         handle: row.entry.handle.clone(),
         liveness: liveness_of(row.verdict),
+        remote: None,
     }
 }
 
@@ -551,13 +557,14 @@ pub fn drop_current_role(
 /// The live session `query` names: a handle, a role alias `lead:<LANE>`, or a
 /// full id `<machine-id>/<local id>`. Exactly one, else `ambiguous` or
 /// `not-found` with the candidates in the detail and in `Refusal::candidates`
-/// (Identity's own codes; the mailbox maps them to its names). A full id of
-/// another machine is `not-found`: only this machine's directory is read until
-/// the shared directory exists.
-pub fn resolve(root: &Path, query: &str, judge: Judge) -> Result<Listed, Refusal> {
+/// (Identity's own codes; the mailbox maps them to its names). Local first:
+/// only when this machine's directory has no answer does `shared` (the
+/// sessions other machines published) get asked; a full id of another machine
+/// resolves through it, and is `not-found` without it.
+pub fn resolve(root: &Path, query: &str, judge: Judge, shared: Option<&SharedView>) -> Result<Listed, Refusal> {
     let query = query.trim();
     if let Some((machine_id, _)) = query.split_once('/') {
-        return resolve_full_id(root, machine_id, query, judge);
+        return resolve_full_id(root, machine_id, query, judge, shared);
     }
     let live = scan(root, judge)?
         .rows
@@ -589,7 +596,7 @@ pub fn resolve(root: &Path, query: &str, judge: Judge) -> Result<Listed, Refusal
                 })
                 .filter(|name| !query.is_empty() && name.contains(query))
                 .collect();
-            Err(Refusal {
+            let mut missing = Refusal {
                 reason: "not-found",
                 detail: format!("no live session is named {query:?}; candidates: {}", join(&names)),
                 candidates: live
@@ -604,7 +611,16 @@ pub fn resolve(root: &Path, query: &str, judge: Judge) -> Result<Listed, Refusal
                     })
                     .map(candidate_of)
                     .collect(),
-            })
+            };
+            match shared.map(|view| view.resolve(query)) {
+                Some(Ok(listed)) => Ok(listed),
+                Some(Err(refusal)) if refusal.reason == "ambiguous" => Err(refusal),
+                Some(Err(refusal)) => {
+                    missing.candidates.extend(refusal.candidates);
+                    Err(missing)
+                }
+                None => Err(missing),
+            }
         }
         many => {
             let ids: Vec<String> = many.iter().map(|row| format!("{} ({})", row.entry.handle, row.entry.id)).collect();
@@ -618,12 +634,15 @@ pub fn resolve(root: &Path, query: &str, judge: Judge) -> Result<Listed, Refusal
     }
 }
 
-fn resolve_full_id(root: &Path, machine_id: &str, id: &str, judge: Judge) -> Result<Listed, Refusal> {
+fn resolve_full_id(root: &Path, machine_id: &str, id: &str, judge: Judge, shared: Option<&SharedView>) -> Result<Listed, Refusal> {
     let not_found = |detail: String| Refusal { reason: "not-found", detail, candidates: Vec::new() };
     if machine_info(root)?.id != machine_id {
-        return Err(not_found(format!(
-            "{id:?} names a session of machine {machine_id:?}, not this one; cross-machine resolution arrives with the shared directory"
-        )));
+        return match shared {
+            Some(view) => view.resolve(id),
+            None => Err(not_found(format!(
+                "{id:?} names a session of machine {machine_id:?}, not this one, and no shared directory is available here (a project id and `fgos events sync` bring other machines' sessions)"
+            ))),
+        };
     }
     scan(root, judge)?
         .rows
@@ -645,7 +664,15 @@ fn join(names: &[String]) -> String {
 /// first; only those of `project_id` when given. With `prune`, entries
 /// proven dead are removed first, the rule of the prune on every write; an
 /// entry of unknown liveness may be a live session and is never removed.
-pub fn list(root: &Path, project_id: Option<&str>, prune: bool, judge: Judge) -> Result<Sessions, Refusal> {
+/// The sessions of `shared` follow the local ones, without a role a live
+/// local session holds.
+pub fn list(
+    root: &Path,
+    project_id: Option<&str>,
+    prune: bool,
+    judge: Judge,
+    shared: Option<&SharedView>,
+) -> Result<Sessions, Refusal> {
     let Scan { rows, .. } = scan(root, judge)?;
     let (rows, pruned) = sweep(root, rows, |row| {
         if prune {
@@ -661,5 +688,9 @@ pub fn list(root: &Path, project_id: Option<&str>, prune: bool, judge: Judge) ->
         .map(|row| Listed::of(&row.entry, row.verdict))
         .collect();
     sessions.sort_by(|a, b| (&a.registered_at, &a.handle).cmp(&(&b.registered_at, &b.handle)));
+    if let Some(view) = shared {
+        let taken: Vec<String> = sessions.iter().flat_map(|session| session.roles.clone()).collect();
+        sessions.extend(view.list(project_id, &taken));
+    }
     Ok(Sessions { sessions, pruned })
 }

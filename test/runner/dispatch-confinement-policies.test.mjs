@@ -7,7 +7,7 @@ import os from 'node:os';
 import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture.mjs';
 import {
   loadRunnerConfig,
-  loadRunnerConfigFromDir,
+  loadRunnerConfigForDir,
   RunnerConfigError,
 } from '../../src/runner/dispatch/config.mjs';
 import {

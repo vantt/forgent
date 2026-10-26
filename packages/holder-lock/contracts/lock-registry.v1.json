@@ -12,7 +12,7 @@
     "58": { "kinds": ["mutex"], "note": "event-seal" },
     "60": { "kinds": ["hot-mutex"], "note": "hot state (events + claims)" },
     "70": { "kinds": ["mutex"], "note": "event-append" },
-    "80": { "kinds": ["mutex", "lease"], "note": "leaves: sessions, advance, reconcile, recovery, observe, provider account, activation, install, full-suite" }
+    "80": { "kinds": ["mutex", "lease"], "note": "leaves: sessions, advance, reconcile, recovery, observe, provider account, activation, install, full-suite, repo-config, mailbox" }
   },
   "locks": [
     {
@@ -104,6 +104,15 @@
       "v3Path": "<lockRoot>/provider-state.lock",
       "owner": "4.2",
       "note": "v1 source: src/runner/dispatch/provider-capacity.mjs state lock"
+    },
+    {
+      "name": "identity-pins",
+      "kind": "mutex",
+      "scope": "machine",
+      "rank": 80,
+      "v3Path": "<lockRoot>/identity-pins.lock",
+      "owner": "identity",
+      "note": "serialises pins confirm against forget (packages/identity/rust/src/pins.rs)"
     },
     {
       "name": "dispatch-cwd",
@@ -218,6 +227,14 @@
       "rank": 80,
       "v3Path": "<fgosDir>/locks/repo-config.lock",
       "owner": "git"
+    },
+    {
+      "name": "mailbox",
+      "kind": "mutex",
+      "scope": "repo",
+      "rank": 80,
+      "v3Path": "<fgosDir>/locks/mailbox.lock",
+      "owner": "mailbox"
     },
     {
       "name": "project-config",

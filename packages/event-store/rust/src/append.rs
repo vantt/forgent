@@ -232,8 +232,12 @@ pub fn append_with_fs(
             h: String::new(),
         };
         event.h = event.compute_hash()?;
-        bytes.extend(event.canonical_line()?);
-        events.push(event);
+        let line = event.canonical_line()?;
+        // Hand back the stored bytes, not the caller's payload: a payload map keeps the caller's key order when
+        // serde_json's preserve_order is unified into the build, and a fold of that order would get a different
+        // view revision than a cold read of the same event.
+        events.push(Envelope::parse(&line)?);
+        bytes.extend(line);
     }
     let marker = BatchCommit {
         v: 4,

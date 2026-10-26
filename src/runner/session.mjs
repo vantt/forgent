@@ -39,6 +39,7 @@ import { fgosDirFromRoot, resolveMainCheckoutRoot } from './paths.mjs';
 import { resolveHolderLiveness, selfRecord } from './dispatch/process-identity.mjs';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 import { addWorktreeSync } from './repo-locks.mjs';
+import { maintainEventStore } from '../event-store/maintenance.mjs';
 
 const SESSIONS_FILE = 'sessions.json';
 
@@ -129,7 +130,7 @@ function unlinkFgosSymlink(worktreePath) {
 }
 
 /** After the `.fgos` symlink is unlinked, git still holds this worktree's
- * committed `.fgos` content (events.jsonl et al. — git-tracked in this repo per
+ * committed `.fgos` content (the tracked files of this repo per
  * D10) as DELETED on disk, since createSession removed the checked-out copy at
  * creation time. That deleted-tracked state makes a PLAIN `git worktree remove`
  * refuse ("contains modified or untracked files"), blocking every non-diverged
@@ -310,8 +311,8 @@ export function createSession(repoRoot, opts = {}) {
       });
     }
 
-    // When `.fgos/` is git-tracked (this repo's own convention — events.jsonl
-    // et al. are committed, D10), `git worktree add --detach` checks a real
+    // When `.fgos/` is git-tracked (this repo's own convention — its tracked
+    // files are committed, D10), `git worktree add --detach` checks a real
     // `.fgos/` copy out into the fresh worktree, so symlinkSync would hit
     // EEXIST. Remove that redundant checked-out copy first — it must never be
     // read (only the symlinked shared store is truth, D10). Scoped strictly to
@@ -412,6 +413,8 @@ export function endSession(repoRoot, sessionId, { force = false } = {}) {
     return { ...entry, ...(retained ? { ...retained, warnings } : {}) };
   } finally {
     lock.release();
+    // A clean writer exit seals what this session left open (spec §16), outside the `sessions` lock.
+    maintainEventStore(repoRoot, { trustedMain: resolveMainCheckoutRoot(repoRoot) ?? repoRoot, shutdown: true });
   }
 }
 

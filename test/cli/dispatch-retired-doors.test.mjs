@@ -23,8 +23,8 @@ function mkStore() {
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: root });
   const fgosDir = path.join(root, '.fgos');
   fs.mkdirSync(fgosDir);
-  initStore(fgosDir);
   activateGitFixture(root);
+  initStore(fgosDir);
   addWork(fgosDir, {
     id: 'cand1', title: 'x', kind: 'task', status: 'todo', domain: 'coding',
     workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'true',
@@ -142,6 +142,19 @@ for (const sub of ['execute', 'log', 'fanout-batch']) {
     assert.equal(eventLines(fgosDir), before);
   });
 }
+
+test('the legacy payload answers hook mailbox quietly with exit 0', () => {
+  const { root } = mkStore();
+  // boundary: the quiet answer is the legacy payload's own exit status and stdout, seen by the CLI that runs the hook line
+  const out = spawnSync(process.execPath, [FGOS, 'hook', 'mailbox', '--cli', 'claude', '--event', 'stop'], {
+    cwd: root,
+    encoding: 'utf8',
+    input: JSON.stringify({ hook_event_name: 'Stop', session_id: 'x' }),
+  });
+  assert.equal(out.status, 0, out.stderr);
+  assert.equal(out.stdout, '');
+  assert.equal(out.stderr, '');
+});
 
 test('fgos hook dispatch-decide (agy payload) denies an out-of-process subagent call and points at a door fgos run accepts, not dispatch execute', () => {
   const { root, fgosDir } = mkStore();

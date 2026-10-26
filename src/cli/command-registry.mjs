@@ -555,7 +555,6 @@ export const COMMAND_REGISTRY = [
       properties: {
         worktree: { type: 'string', description: "Worktree path when resuming an existing discovery run." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
-        config: { type: 'string', description: 'Path to the runner config (default .fgos/config.json in cwd).' },
         verdict: { type: 'string', description: 'Optional caller-supplied verdict: "clear" or "unclear". Omit it only when the item already carries a committed, non-empty CONTEXT.md under its docsRef -- that readLockedContext trust signal advances the item without a verdict. With neither, the call refuses: no subprocess judge stands behind this verb anymore.' },
         verify: { type: 'string', description: 'Required with --verdict clear: the real, runnable verify command for this item.' },
         question: { type: 'string', description: 'Required with --verdict unclear: the question to park the item on in awaiting-human.' },
@@ -585,7 +584,6 @@ export const COMMAND_REGISTRY = [
       properties: {
         worktree: { type: 'string', description: "Worktree path when resuming an existing planning run." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
-        config: { type: 'string', description: 'Path to the runner config (default .fgos/config.json in cwd).' },
         verdict: { type: 'string', description: 'Optional caller-supplied verdict: "pass-through", "need-human", or "decompose" (this value name is unchanged, tsk-403 D11 -- it names an outcome, not a stage). Omit it only when the item\'s plan.md declares tiny/small mode -- that skip-and-advance trust signal passes the item through without a verdict. With neither, the call refuses: no subprocess judge stands behind this verb anymore.' },
         reason: { type: 'string', description: 'Required with --verdict need-human or --verdict decompose (optional with pass-through): why this call is verdicting the way it is.' },
         children: { type: 'string', description: 'Required with --verdict decompose: JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?}).', multiValueFormat: 'json-array' },
@@ -849,13 +847,13 @@ export const COMMAND_REGISTRY = [
   {
     name: 'hook',
     invoke: 'fgos hook <kind>',
-    description: 'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi). Bypasses CLI envelope and store admission to preserve hook exit codes and stdio protocols.',
+    description: 'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi). Bypasses CLI envelope and store admission to preserve hook exit codes and stdio protocols. `mailbox` is the agent mailbox\'s checkpoint (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host: it registers the calling head, prints pending mail in the shape the CLI injects, and always exits 0, printing nothing on any failure.',
     parameters: {
       type: 'object',
       properties: {
         kind: {
           type: 'string',
-          enum: ['dispatch-decide', 'decision-question'],
+          enum: ['dispatch-decide', 'decision-question', 'mailbox'],
           description: 'The specific hook guard to execute.',
         },
         format: {
@@ -863,11 +861,21 @@ export const COMMAND_REGISTRY = [
           enum: ['standard', 'agy'],
           description: 'Output protocol format (standard exit codes or AGY stdout JSON).',
         },
+        cli: {
+          type: 'string',
+          enum: ['claude', 'codex'],
+          description: 'mailbox only: the CLI whose hook calls the entry.',
+        },
+        event: {
+          type: 'string',
+          enum: ['stop', 'post-tool-use'],
+          description: 'mailbox only: the hook event the CLI fires.',
+        },
       },
       positional: ['kind'],
       required: ['kind'],
     },
-    examples: ['fgos hook dispatch-decide', 'fgos hook decision-question', 'fgos hook dispatch-decide --format=agy'],
+    examples: ['fgos hook dispatch-decide', 'fgos hook decision-question', 'fgos hook dispatch-decide --format=agy', 'fgos hook mailbox --cli claude --event post-tool-use'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,
@@ -1041,7 +1049,7 @@ export const COMMAND_REGISTRY = [
   withSubcommands({
     name: 'identity',
     invoke: 'fgos identity [writer|machine|session|project|resolve|list|mint|pins]',
-    description: 'Read-only unless --alias, --init, --new, --register, --role, --drop-role, --forget, `list --prune` or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, PI_SESSION_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle, its alias and the fingerprint of its signing key; `pins` lists the machine keys this machine pinned the first time it saw them; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `session --register` puts this session in the local directory of this machine, `resolve <handle|lead:LANE>` names exactly one live session of it and `list` shows them; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
+    description: 'Read-only unless --alias, --init, --new, --register, --role, --drop-role, --forget, --confirm, `list --prune` or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, PI_SESSION_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle, its alias and the fingerprint of its signing key; `pins` lists the machine keys this machine pinned the first time it saw them, each `seen` or `confirmed`; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `session --register` puts this session in the local directory of this machine, `resolve <handle|lead:LANE>` names exactly one live session of it and `list` shows them; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
     subcommands: {
       writer: {
         description: 'Which writer the calling process is, as {id, source}. Same as bare `fgos identity`; the hook path reads it.',
@@ -1095,16 +1103,17 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos identity resolve claude-4f2a@fg-server --json', 'fgos identity resolve lead:MAIL'],
       },
       list: {
-        description: 'The sessions registered on this machine that are not dead: {sessions, pruned}, oldest registration first. `--project` keeps the sessions of this repository\'s project id. `--prune` first removes the entries proven dead (the rule of every write); an entry whose liveness is `unknown` (no terminal ancestor) may be a live session and is kept, shown with its liveness.',
+        description: 'The sessions registered on this machine that are not dead: {sessions, pruned}, oldest registration first. `--project` keeps the sessions of this repository\'s project id. `--machine <handle|id>` keeps one machine\'s sessions; the sessions other machines published for this project follow the local ones with `liveness: remote`. `--prune` first removes the entries proven dead (the rule of every write); an entry whose liveness is `unknown` (no terminal ancestor) may be a live session and is kept, shown with its liveness.',
         parameters: {
           type: 'object',
           properties: {
             project: { type: 'boolean', description: 'Only the sessions of this repository\'s project id.' },
+            machine: { type: 'string', description: 'Only the sessions of the machine with this handle or id.' },
             prune: { type: 'boolean', description: 'Remove the entries proven dead before listing (the rule of every write); an entry of unknown liveness is kept and shown.' },
           },
           required: [],
         },
-        examples: ['fgos identity list --json', 'fgos identity list --project', 'fgos identity list --prune'],
+        examples: ['fgos identity list --json', 'fgos identity list --project', 'fgos identity list --machine fg-server2', 'fgos identity list --prune'],
       },
       project: {
         description: 'This project: {id, handle, createdAt} read from the tracked file .fgos/project.json of the main checkout, so every clone, machine and linked worktree prints the same id. `--init` mints it once (main checkout only; refused when the file exists or the remote default branch already tracks it) and prints the commit command; nothing mints it automatically. `--new` mints a different id on purpose, to split a fork. Exit 65 [project-id-missing] when no id was minted yet.',
@@ -1133,19 +1142,81 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos identity mint work --json', 'fgos identity mint d-adr --json', 'fgos identity mint d-adr --release 73'],
       },
       pins: {
-        description: 'The machine keys this machine pinned, as {pins: [{v, machineId, publicKey, fingerprint, firstSeen}]}: the first key seen for a machine id is remembered in user state (like SSH known_hosts) and a different key claimed for it is refused `machine-key-changed`. Compare the fingerprints across machines once. `--forget <machine-id>` removes one pin after a legitimate re-key and answers {forgotten: pin}; exit 65 [pin-not-found] or [invalid-machine-id].',
+        description: 'The machine keys this machine pinned, as {pins: [{v, machineId, publicKey, fingerprint, firstSeen, state, confirmedAt?}]} (`state` is `seen` or `confirmed`; `confirmedAt` only when confirmed): the first key seen for a machine id is remembered in user state (like SSH known_hosts) and a different key claimed for it is refused `machine-key-changed`. Compare the fingerprints across machines once, then `--confirm <machine-id> --fingerprint <SHA256:...>` marks the pin `confirmed` only when the pinned fingerprint equals the one given and answers {confirmed: pin} (confirming a confirmed pin is a no-op); exit 65 [pin-missing] or [fingerprint-mismatch]; consumers can require a confirmed pin. `--forget <machine-id>` removes one pin after a legitimate re-key and answers {forgotten: pin}; exit 65 [pin-not-found] or [invalid-machine-id].',
         parameters: {
           type: 'object',
           properties: {
             forget: { type: 'string', description: 'The machine id whose pin to remove.' },
+            confirm: { type: 'string', description: 'The machine id whose pin to mark confirmed; needs --fingerprint.' },
+            fingerprint: { type: 'string', description: 'The SHA256:... fingerprint you compared, required with --confirm.' },
           },
           required: [],
         },
-        examples: ['fgos identity pins --json', 'fgos identity pins --forget fg-server-abc234'],
+        examples: ['fgos identity pins --json', 'fgos identity pins --forget fg-server-abc234', 'fgos identity pins --confirm fg-server-abc234 --fingerprint SHA256:abc...'],
       },
     },
     examples: ['fgos identity', 'fgos identity machine --json', 'fgos identity session --json', 'fgos identity project --json', 'fgos identity list --json', 'fgos identity mint work --json'],
     touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+    nativeOnly: true,
+  }),
+  withSubcommands({
+    name: 'mailbox',
+    invoke: 'fgos mailbox <send|inbox|list|status>',
+    description: 'The agent mailbox (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host from the main checkout\'s .fgos (also from a linked worktree; `--dir` is accepted and ignored). `send` records a message for another agent head of this project and answers with the delivery report or why it was refused (exit 0 recorded, 1 refused or the record failed). `inbox` lists this session\'s pending mail and changes nothing; `inbox --claim` consumes it: it prints the frames and marks them offered only after the print. `list` names the project\'s heads and `status` reports the record\'s health signals; both change nothing. A body that starts with `--` goes after `--`, and a body that is exactly `--help` or `-h` is read as a help request.',
+    subcommands: {
+      send: {
+        description: 'Record a message for the head named --to: a short name or an unambiguous prefix, or an Identity handle, full session id or lead:<LANE> role that names a head of this project. Consuming: it writes the record. Answers `recorded <id> for <name>` plus when the recipient will see it, or the refusal.',
+        parameters: {
+          type: 'object',
+          properties: {
+            to: { type: 'string', description: 'The recipient: its short name or an unambiguous prefix, or an Identity handle (`claude-5v7u@fg-server`), full session id or `lead:<LANE>` role naming a head of this project.' },
+            wake: { type: 'boolean', description: 'Ask to wake the recipient at the end of its turn; the mailbox may drop the wake (its quota), and the answer says so.' },
+            'reply-to': { type: 'string', description: 'The id of the message this one answers (from the reply line under that message).' },
+            body: { type: 'string', description: 'The message text (positional; quote it).' },
+          },
+          positional: ['body'],
+          required: ['to', 'body'],
+        },
+        examples: ['fgos mailbox send --to forgent-claude-2b "the build is green"', 'fgos mailbox send --to forgent-codex-9c --reply-to 0a1b2c "yes" --json', 'fgos mailbox send --to forgent-claude-2b -- "--looks like a flag"'],
+      },
+      inbox: {
+        description: 'Read-only unless --claim: list this session\'s pending mail with each item\'s state. `--claim` consumes it instead: it prints every pending frame and finishes the claim only after a successful write, exactly as a hook drain does.',
+        parameters: {
+          type: 'object',
+          properties: {
+            claim: { type: 'boolean', description: 'Consume: print the pending frames and mark them offered.' },
+          },
+          required: [],
+        },
+        examples: ['fgos mailbox inbox', 'fgos mailbox inbox --claim', 'fgos mailbox inbox --json'],
+      },
+      list: {
+        description: 'Read-only: one line per head of this project\'s mailbox that is not known dead, with its short name, Identity handle, CLI, tier and liveness; `--long` adds its key. Creates nothing.',
+        parameters: {
+          type: 'object',
+          properties: {
+            long: { type: 'boolean', description: 'Also show each head\'s key.' },
+          },
+          required: [],
+        },
+        examples: ['fgos mailbox list', 'fgos mailbox list --long --json'],
+      },
+      status: {
+        description: 'Read-only report of the record: its verdict (ok, none yet, or the record error) and the health signals of spec §9 (recorded-to-offered latency, refusals per reason, offers per message, queue depth and oldest age, record size, heads with mail and no drain since, offered and never answered, the last hook outcome). No signal has a threshold yet; exit 1 only when the record cannot be read. Creates nothing.',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+        examples: ['fgos mailbox status', 'fgos mailbox status --json'],
+      },
+    },
+    examples: ['fgos mailbox send --to forgent-claude-2b "hello"', 'fgos mailbox inbox', 'fgos mailbox inbox --claim'],
+    touchesState: true,
     requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
@@ -1164,7 +1235,7 @@ export const COMMAND_REGISTRY = [
       set: { description: 'Set one key in the file its schema names (accounts file, global file for a global-only key, otherwise the project file). The value is one YAML scalar or flow value. The change needs --reason unless it only repeats the standard; the file records `@fgos:why [<writer>] <reason>`.', parameters: { type: 'object', properties: { path: { type: 'string', description: 'The config path (positional).' }, value: { type: 'string', description: 'A YAML scalar or flow value (positional): true, 3, [a, b], null.' }, reason: { type: 'string', description: 'Why the value changes (one line, not a single generic word).' }, global: { type: 'boolean', description: 'Write the global file for a key that may live in either file; refused for a project-only key.' } }, positional: ['path', 'value'], required: ['path', 'value'] }, examples: ['fgos config set gateBypass.level light --reason "light gates while the audit runs"'] },
       unset: { description: 'Remove one key from its file so the standard applies again. A key carrying a note needs --acknowledge-comment-loss.', parameters: { type: 'object', properties: { path: { type: 'string', description: 'The config path (positional).' }, reason: { type: 'string', description: 'Why the key is removed.' }, global: { type: 'boolean', description: 'Remove it from the global file.' }, 'acknowledge-comment-loss': { type: 'boolean', description: 'Let the removal drop a note written on the key.' } }, positional: ['path'], required: ['path'] }, examples: ['fgos config unset gateBypass.level --reason "back to the standard"'] },
       patch: { description: 'Apply a YAML or JSON list of {set: <path>, value: <any>} and {unset: <path>} items to one file in one transaction (at most 1 MiB); the items must all belong to the same file.', parameters: { type: 'object', properties: { file: { type: 'string', description: 'The patch file (positional).' }, reason: { type: 'string', description: 'Why the values change.' }, global: { type: 'boolean', description: 'Write the global file for keys that may live in either file.' } }, positional: ['file'], required: ['file'] }, examples: ['fgos config patch changes.yaml --reason "tune the cleanup window"'] },
-      migrate: { description: 'Project: convert .fgos/config.json to .fgos/config.yaml (doc lines, a [migrate] reason per value, values equal to the standard dropped, a backup, a tombstone left in the JSON file); run again after an interruption it finishes. --global: stage 1 copies the account pools and the gateway token to ~/.fgos/private and keeps the source; --finish removes the source keys and needs --machine-checked. Reports list paths and counts, never values.', parameters: { type: 'object', properties: { 'dry-run': { type: 'boolean', description: 'Do everything except the writes and print the report.' }, global: { type: 'boolean', description: 'Move the machine keys of ~/.fgos/config.json instead of converting the project file.' }, finish: { type: 'boolean', description: 'With --global: remove the source keys (stage 2).' }, 'machine-checked': { type: 'boolean', description: 'With --finish: no release on this machine reads those keys from the global file.' }, 'accept-machine-overrides': { type: 'boolean', description: 'Project migration: accept dropping values equal to the standard where this machine\'s global file differs.' } }, required: [] }, examples: ['fgos config migrate --dry-run', 'fgos config migrate --global', 'fgos config migrate --global --finish --machine-checked'] },
+      migrate: { description: 'Project: convert .fgos/config.json to .fgos/config.yaml (doc lines, a [migrate] reason per value, values equal to the standard dropped, a backup, a tombstone left in the JSON file); run again after an interruption it finishes. --global: stage 1 copies the account pools and the gateway token to ~/.fgos/private and keeps the source; --finish removes the source keys and needs --machine-checked. --global --convert converts ~/.fgos/config.json to ~/.fgos/config.yaml the same way as the project file (backup under ~/.fgos/private/config-migrate), after both key stages and with --machine-checked; the effective value must stay exactly the same. Reports list paths and counts, never values.', parameters: { type: 'object', properties: { 'dry-run': { type: 'boolean', description: 'Do everything except the writes and print the report.' }, global: { type: 'boolean', description: 'Move the machine keys of ~/.fgos/config.json instead of converting the project file.' }, finish: { type: 'boolean', description: 'With --global: remove the source keys (stage 2).' }, convert: { type: 'boolean', description: 'With --global: convert the global JSON file to YAML, after both key stages.' }, 'machine-checked': { type: 'boolean', description: 'With --finish or --convert: no release on this machine reads those keys, or the JSON file, from the global directory.' }, 'accept-machine-overrides': { type: 'boolean', description: 'Project migration: accept dropping values equal to the standard where this machine\'s global file differs.' } }, required: [] }, examples: ['fgos config migrate --dry-run', 'fgos config migrate --global', 'fgos config migrate --global --finish --machine-checked', 'fgos config migrate --global --convert --machine-checked'] },
       'refresh-docs': { description: 'Rewrite the @fgos:doc lines that differ from what the schema and standard render, in the project file (or, with --global, the machine files); values and @fgos:why lines stay. A second run prints nothing to do.', parameters: { type: 'object', properties: { global: { type: 'boolean', description: 'Refresh the global and accounts files instead of the project file.' } }, required: [] }, examples: ['fgos config refresh-docs'] },
     },
     examples: ['fgos config show --json', 'fgos config check', 'fgos config set gateBypass.level light --reason "light gates while the audit runs"', 'fgos config migrate --dry-run'],
@@ -1437,7 +1508,7 @@ export const COMMAND_REGISTRY = [
             cwd: { type: 'string', description: '"plan" only: the working directory whose per-cwd dispatch lock clear-cwd-lock reports on (default: the current directory).' },
             plan: { type: 'string', description: '"apply" only: JSON-encoded plan returned by `dispatch reconcile plan`.' },
             provider: { type: 'string', description: 'provider-capacity: provider id as `inspect --provider-capacity` lists it, e.g. openai-codex.' },
-            account: { type: 'string', description: 'provider-capacity: account id from ~/.fgos/config.json.' },
+            account: { type: 'string', description: 'provider-capacity: account id from ~/.fgos/private/accounts.yaml.' },
             reason: { type: 'string', description: 'provider-capacity: operator reason, e.g. token refreshed or quota exhausted.' },
             until: { type: 'string', description: 'quarantine only: ISO date-time (in the future) when the account is selectable again.' },
             force: { type: 'boolean', description: 'clear-quarantine only: permit clearing an account that is not currently quarantined.' },
@@ -1495,7 +1566,7 @@ export const COMMAND_REGISTRY = [
           type: 'object',
           properties: {
             provider: { type: 'string', description: 'Provider id, e.g. openai.' },
-            account: { type: 'string', description: 'Account id from ~/.fgos/config.json.' },
+            account: { type: 'string', description: 'Account id from ~/.fgos/private/accounts.yaml.' },
             executor: { type: 'string', description: 'Limit the probe to one executor id (default: every executor of the provider).' },
             invocation: { type: 'string', description: 'Comma-separated invocation ids to limit the probe to (default: every invocation that runs as the account).' },
             'timeout-ms': { type: 'string', description: 'Per-call timeout in milliseconds.' },
@@ -1525,7 +1596,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'run',
     invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] [--input <a>,<b>] [--verify "<cmd>"] [--sync <ref>] | --sync <ref> --writes <a>,<b> | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--timeout <dur>] [--account <pool/account>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
-    description: 'Door for one task: `fgos run "<prompt>"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel, debate); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`. Also "record" for inline producer turns.',
+    description: 'Door for one task: `fgos run "<prompt>"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel, debate); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`.',
     parameters: {
       type: 'object',
       positional: ['prompt'],
@@ -1545,7 +1616,7 @@ export const COMMAND_REGISTRY = [
         override: { type: 'string', description: 'JSON-encoded array or object of overrides.' },
         effort: { type: 'string', description: 'Reasoning effort for this run (low, medium, high, max), rendered into the provider CLI\'s own flag; a level the bound executor does not declare refuses the binding.' },
         timeout: { type: 'string', description: 'Time each seat of this run may take instead of runner.timeoutMs: a whole number and a unit (ms, s, m, h), e.g. 90m or 5400s, from 1m to 4h (same as "timeoutMs" in --override, or a Unit\'s own timeoutMs, which it overrides). Kept in unit.json for resume; not with --resume.' },
-        account: { type: 'string', description: 'Pin an account, written pool/account (for example openai/work; pools and accounts are in runner.llmAccounts of ~/.fgos/config.json; same as "account" in --override). It pins each seat whose chosen model entry is served by that pool (a checker on another family binds unpinned) and does not choose the executor: pair it with --provider. A bare account id is refused. Refused before the unit run exists when no seat takes it or it is quarantined; the lease still takes it, and a provider limit on it ends the seat instead of rotating or failing over. Not with --resume.' },
+        account: { type: 'string', description: 'Pin an account, written pool/account (for example openai/work; pools and accounts are in runner.llmAccounts of ~/.fgos/private/accounts.yaml; same as "account" in --override). It pins each seat whose chosen model entry is served by that pool (a checker on another family binds unpinned) and does not choose the executor: pair it with --provider. A bare account id is refused. Refused before the unit run exists when no seat takes it or it is quarantined; the lease still takes it, and a provider limit on it ends the seat instead of rotating or failing over. Not with --resume.' },
         resume: { type: 'string', description: 'Unit run ID to resume.' },
         case: { type: 'string', description: 'Admit this run into a Workflow case (its id) as an activity of its guide, before anything exists: entry milestones, the guide\'s MUST rules, write overlap with the case\'s live reservations and its frame are all checked, and a refusal names the condition. A Playbook case admits through its own proposer only. Needs --activity. Without --case a read-only run is standalone and uncounted, and a writing run needs a worktree no case owns.' },
         activity: { type: 'string', description: 'With --case: the activity of the case\'s guide this run is.' },
@@ -1554,13 +1625,6 @@ export const COMMAND_REGISTRY = [
         dir: { type: 'string', description: 'Main repository root directory. Storage follows it; workers start in the current directory, so run from inside that project or pass --worktree (a different project than the current directory is warned about as dir-differs-from-cwd).' },
         worktree: { type: 'string', description: 'Target worktree directory.' },
         json: { type: 'boolean', description: 'Emit machine-readable JSON output.' },
-        sub: { type: 'string', description: 'Sub-verb (e.g. "record").' },
-        'unit-run': { type: 'string', description: '"record" only: unit run ID.' },
-        role: { type: 'string', description: '"record" only: role name (producer).' },
-        round: { type: 'number', description: '"record" only: round number.' },
-        nonce: { type: 'string', description: '"record" only: issued once-nonce.' },
-        evidence: { type: 'string', description: '"record" only: comma-separated evidence file references.' },
-        result: { type: 'string', description: '"record" only: JSON-encoded result object.' },
       },
       required: [],
     },
@@ -1583,7 +1647,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'rebuild',
     invoke: 'fgos rebuild',
-    description: 'Rebuild the derived view (.fgos/state.json) from the event log.',
+    description: 'Rebuild every registered consumer view (Work, porting) from the Event Store. Prints a per-consumer summary (counts, revision, cover), never the views.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos rebuild'],
     touchesState: true,
@@ -1592,18 +1656,25 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
-    name: 'repair',
-    invoke: 'fgos repair',
-    description: 'Repair a truncated final line in .fgos/events.jsonl (the common crash-mid-append shape); backs up the original log first.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos repair'],
+  withSubcommands({
+    name: 'events',
+    invoke: 'fgos events <sync|status|seal|export|migrate|import-legacy>',
+    description: 'Synchronize, inspect, export or migrate the repository Event Store. `sync` and `migrate` write (sync pushes event refs to the remote); `status` and `export` only read.',
+    subcommands: {
+      sync: { description: 'Fetch event refs and publish this clone\'s own, unless --no-push.', examples: ['fgos events sync', 'fgos events sync --no-push'], parameters: { type: 'object', properties: { remote: { type: 'string', description: 'Remote name (default: eventStore.remote).' }, 'no-push': { type: 'boolean', description: 'Fetch only; publish nothing.' }, opportunistic: { type: 'boolean', description: 'Try the seal lock and skip when another process holds it (the detached publish child of a command uses this).' } }, required: [] } },
+      status: { description: 'Inspect integrity and publication state: refs, streams, unsealed events, deferred and missing predecessors.', examples: ['fgos events status'], parameters: { type: 'object', properties: { remote: { type: 'string', description: 'Remote name (default: eventStore.remote).' } }, required: [] } },
+      seal: { description: 'Certify the open events of one stream now, waiting for the seal lock; the detached child every Work command hands its seal to.', examples: ['fgos events seal --stream project'], parameters: { type: 'object', properties: { stream: { type: 'string', description: 'Stream to seal (for Work: project).' }, history: { type: 'string', description: 'History checkpoint file under .fgos/cache that the seal extends.' } }, required: ['stream'] } },
+      export: { description: 'Write event history to a new directory, as canonical JSONL or the legacy file layout.', examples: ['fgos events export --out ./export', 'fgos events export --out ./legacy --format legacy-layout'], parameters: { type: 'object', properties: { out: { type: 'string', description: 'Directory to create; refused when it exists.' }, format: { type: 'string', enum: ['jsonl', 'legacy-layout'] }, stream: { type: 'string' }, since: { type: 'string', description: 'A cursor, as JSON.' } }, required: ['out'] } },
+      migrate: { description: 'Import the tracked legacy event files into the store and install the fence that retires them.', examples: ['fgos events migrate --check', 'fgos events migrate'], parameters: { type: 'object', properties: { check: { type: 'boolean', description: 'Plan and report parity; change nothing.' }, baseline: { type: 'string', description: 'A recorded view to compare parity against.' } }, required: [] } },
+      'import-legacy': { description: 'Replay one legacy event file that never reached a commit into the Work stream, keeping each event\'s type, payload and time; lines already in history are skipped; --check writes nothing.', examples: ['fgos events import-legacy --file .fgos/runtime/tmp/landing-es-cutover-261024/untracked-events/<shard>.jsonl --check'], parameters: { type: 'object', properties: { file: { type: 'string', description: 'Legacy event file (JSONL) to replay.' }, check: { type: 'boolean', description: 'Report what would be imported and skipped without writing.' } }, required: ['file'] } },
+    },
+    examples: ['fgos events status', 'fgos events sync --no-push', 'fgos events export --out ./export', 'fgos events migrate --check'],
     touchesState: true,
-    requiresExistingStore: true,
-    externalEffect: false,
+    requiresExistingStore: false,
+    externalEffect: true,
     paginated: false,
     deprecated: null,
-  },
+  }),
   {
     name: 'rollup',
     invoke: 'fgos rollup',
@@ -1626,7 +1697,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'show',
     invoke: 'fgos show',
-    description: 'Full detail of one work item, scoped to its own id: the work record plus every per-item log (discovery, decisions, gates, outcome, friction, settlement, learning). Unlike "list --id", which only scopes the work map and leaves those logs global, "show" filters all of them to just this item. Output is always JSON.stringify(data, null, 2) -- --json is accepted but a no-op, since only "setup"/"doctor" --pretty ever render differently.',
+    description: 'Full detail of one work item, scoped to its own id: the work record plus every per-item log (discovery, decisions, gates, outcome, friction, settlement, learning) and the conflicts recorded against it (acknowledged on one machine, never applied here). Unlike "list --id", which only scopes the work map and leaves those logs global, "show" filters all of them to just this item. Output is always JSON.stringify(data, null, 2) -- --json is accepted but a no-op, since only "setup"/"doctor" --pretty ever render differently.',
     parameters: {
       type: 'object',
       properties: {
@@ -2139,7 +2210,6 @@ export const COMMAND_REGISTRY = [
           type: 'object',
           properties: {
             name: { type: 'string', description: 'Optional filter: a declared tool\'s executor id; omitted checks every tool-capable executor.' },
-            config: { type: 'string', description: 'Read executors from this runner config file instead of the project\'s.' },
           },
           required: [],
         },
@@ -2152,7 +2222,6 @@ export const COMMAND_REGISTRY = [
           properties: {
             capability: { type: 'string', description: 'Optional filter: free-text capability label, normalized to kebab-case.' },
             status: { type: 'string', description: 'Optional filter: one of present/missing/unknown/stale ("stale" is mcp/skill-only: the tool is installed but its own on-disk metadata records a commit behind the repo\'s current HEAD, tsk-j7y).' },
-            config: { type: 'string', description: 'Read executors from this runner config file instead of the project\'s.' },
           },
           required: [],
         },

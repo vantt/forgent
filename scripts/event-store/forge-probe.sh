@@ -13,14 +13,15 @@ P=$(mktemp -d); trap 'rm -rf "$P"' EXIT
 # The two clones are sandbox repositories under $P: they go through the sandbox door.
 SANDBOX_GIT=(node "$CHECKOUT/scripts/lib/sandbox-git.mjs" --root "$P" --)
 # Fresh repositories with the forge as origin, not clones: a clone of a repository that still
-# tracks legacy .fgos/events files would ask for `fgos events migrate` first, which is the Work
+# tracks the legacy tracked event files would ask for `fgos events migrate` first, which is the Work
 # cutover, not what this probe proves (one event ref through the real forge).
 for r in a b; do "${SANDBOX_GIT[@]}" init -q "$P/$r"; "${SANDBOX_GIT[@]}" -C "$P/$r" remote add origin "$FORGE"; done
 cd "$CHECKOUT" && node --input-type=module - "$P" <<'EOF'
 import fs from 'node:fs'; import path from 'node:path';
 import { sandboxGit } from './scripts/lib/sandbox-git.mjs';
 import { loadNativeAddon } from './src/git/native.mjs';
-import { openStore, ensureEventStoreRefspecs } from './src/event-store/index.mjs';
+import { openStore } from './src/event-store/index.mjs';
+import { fixGitFetchMapping } from './src/setup/git-checks.mjs';
 import { gitAddonDirectory } from './scripts/lib/git-addon-stage.mjs';
 const P = process.argv[2];
 const git = sandboxGit(P);
@@ -36,7 +37,9 @@ function clone(name, machine) {
   fs.mkdirSync(path.join(repo, '.git/fgos/events/locks'), { recursive: true, mode: 0o700 });
   fs.mkdirSync(path.join(repo, '.fgos/locks/activation.lock'), { recursive: true });
   fs.writeFileSync(path.join(repo, '.fgos/locks/activation.lock/TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'forge-probe' }));
-  ensureEventStoreRefspecs(repo, { stateRoot: state, trustedMain: repo, loaderOptions });
+  process.env.FGOS_STATE_ROOT = state;
+  const mapping = fixGitFetchMapping(repo, loaderOptions);
+  if (!mapping.changed) throw new Error(mapping.message);
   const resolved = addon.resolveEventStore(repo, state, repo);
   return openStore(resolved, resolved.machineId, [contract], loaderOptions);
 }

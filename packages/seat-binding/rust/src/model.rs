@@ -367,18 +367,6 @@ pub struct Ask {
     /// every filter applies to both alike, and a bare executor id covers every entry of that executor.
     #[serde(default)]
     pub unit_prefer: Vec<Prefer>,
-    /// The session lead that may run this seat inline: present only when the seat's posture allows it
-    /// and a lead is in the session. `rank` falls back to it when the seat has no candidate configured.
-    #[serde(default)]
-    pub inline_lead: Option<InlineLead>,
-}
-
-/// The lead that runs a seat inline: its executor id and provider family.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct InlineLead {
-    pub executor: String,
-    pub family: String,
 }
 
 // ------------------------------------------------------------- machine facts
@@ -395,8 +383,6 @@ pub enum ExecutorKind {
 pub enum Mechanism {
     OutOfProcess,
     InProcess,
-    /// The session lead runs the seat itself; only the unconfigured-seat fallback of `rank` yields it.
-    Inline,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

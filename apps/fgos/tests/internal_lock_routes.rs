@@ -9,6 +9,7 @@
 use std::fs::{self, File, OpenOptions};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
+use std::os::unix::process::CommandExt;
 use std::time::Duration;
 
 use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowSpec, BorrowStdio, Mode, Probe, Release, Resource, Wait};
@@ -26,6 +27,12 @@ fn serial() -> std::sync::MutexGuard<'static, ()> {
 
 fn fgos() -> PathBuf {
     PathBuf::from(env!("CARGO_BIN_EXE_fgos"))
+}
+
+/// Kill a child that leads its own process group, with everything it started, and reap it.
+fn end_group(child: &mut std::process::Child) {
+    unsafe { libc::kill(-(child.id() as i32), libc::SIGKILL) };
+    let _ = child.wait();
 }
 
 fn temp_dir(tag: &str) -> PathBuf {
@@ -193,7 +200,11 @@ fn protocol_and_usage_errors_fail_closed() {
 fn quiesce_scan_lists_a_process_working_in_the_workspace() {
     let _serial = serial();
     let dir = temp_dir("quiesce");
-    let mut sleeper = Command::new("sleep").arg("30").current_dir(&dir).stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null()).spawn().unwrap();
+    // A cwd in the workspace counts only for a process that could be fgOS (the
+    // scan reads argv[0]'s basename): a shell named `fgos` that does not exec away.
+    // `spawn` returns after the child's exec, so the scan reads the exec'd argv. Each child leads its own
+    // process group, so ending the group also ends the `sleep` it started.
+    let mut sleeper = Command::new("bash").arg0("fgos").args(["-c", "sleep 30; :"]).current_dir(&dir).process_group(0).stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null()).spawn().unwrap();
     let root = dir.to_string_lossy().into_owned();
     let out = route(&["quiesce-scan", "--protocol", "1", "--root", &root]);
     assert_eq!(out.status.code(), Some(10));
@@ -202,31 +213,75 @@ fn quiesce_scan_lists_a_process_working_in_the_workspace() {
     let mine: Vec<&Value> = v["processes"].as_array().unwrap().iter().filter(|p| p["pid"] == sleeper.id()).collect();
     assert_eq!(mine.len(), 1, "{v}");
     assert_eq!(mine[0]["matched"], "cwd");
+    assert_eq!(mine[0]["argv"], serde_json::json!(["fgos", "-c", "sleep 30; :"]), "the exact argv rides beside the joined cmdline");
     let pid = sleeper.id().to_string();
     let out = route(&["quiesce-scan", "--protocol", "1", "--root", &root, "--exclude-pid", &pid]);
     let v = json_line(&out);
     assert!(v["processes"].as_array().unwrap().iter().all(|p| p["pid"] != sleeper.id()), "{v}");
-    let _ = sleeper.kill();
-    let _ = sleeper.wait();
-    // A process elsewhere whose argv points into the workspace.
+    end_group(&mut sleeper);
+    // A process elsewhere whose argv carries a path in the workspace as a
+    // prompt or positional argument works elsewhere: argument text never makes
+    // a process a writer of the workspace.
     let file_in_root = dir.join("payload.mjs");
     let mut runner = Command::new("sh")
         .args(["-c", "sleep 30; :", "runner"])
         .arg(&file_in_root)
         .current_dir("/")
+        .process_group(0)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()
         .unwrap();
-    std::thread::sleep(Duration::from_millis(50));
     let v = json_line(&route(&["quiesce-scan", "--protocol", "1", "--root", &root]));
-    let hit: Vec<&Value> = v["processes"].as_array().unwrap().iter().filter(|p| p["pid"] == runner.id()).collect();
+    assert!(v["processes"].as_array().unwrap().iter().all(|p| p["pid"] != runner.id()), "{v}");
+    end_group(&mut runner);
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn quiesce_scan_counts_a_process_by_its_own_workspace_and_its_typed_execution_root() {
+    let _serial = serial();
+    let dir = temp_dir("quiesce-scoped");
+    let (mine, other) = (dir.join("mine"), dir.join("other"));
+    fs::create_dir_all(&mine).unwrap();
+    fs::create_dir_all(&other).unwrap();
+    let root = mine.to_string_lossy().into_owned();
+    // An fgOS process (argv[0] named fgos, state root pinned) working in a
+    // different workspace is that workspace's writer, not this one's.
+    let mut elsewhere = Command::new("bash")
+        .arg0("fgos")
+        .args(["-c", "sleep 30; :"])
+        .current_dir(&other)
+        .env("FGOS_STATE_ROOT", &other)
+        .process_group(0)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
+    // An fgOS process started elsewhere but directed into this workspace by a
+    // typed execution root is still its writer.
+    let mut directed = Command::new("bash")
+        .arg0("fgos")
+        .args(["-c", "sleep 30; :", "run", "--worktree"])
+        .arg(&mine)
+        .current_dir("/")
+        .process_group(0)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
+    let v = json_line(&route(&["quiesce-scan", "--protocol", "1", "--root", &root]));
+    let pids: Vec<&Value> = v["processes"].as_array().unwrap().iter().map(|p| &p["pid"]).collect();
+    assert!(!pids.contains(&&Value::from(elsewhere.id())), "a process of another workspace is not reported: {v}");
+    let hit: Vec<&Value> = v["processes"].as_array().unwrap().iter().filter(|p| p["pid"] == directed.id()).collect();
     assert_eq!(hit.len(), 1, "{v}");
     assert_eq!(hit[0]["matched"], "cmdline");
     assert_eq!(hit[0]["root"], root.as_str());
-    let _ = runner.kill();
-    let _ = runner.wait();
+    end_group(&mut elsewhere);
+    end_group(&mut directed);
     let _ = fs::remove_dir_all(&dir);
 }
 

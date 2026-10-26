@@ -14,6 +14,7 @@ import {
 import { acquireSync, createLockScope, runBorrowed } from '../../src/holder-lock/index.mjs';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { landRunnerItem } from '../../src/runner/merge.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 
 const stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-hooks-state-'));
 process.env.FGOS_STATE_ROOT = stateRoot;
@@ -67,9 +68,8 @@ function fixture(t, { cloned = false } = {}) {
     git(['config', 'user.email', 'lease-hooks@example.invalid']);
   }
 
-  const fence = path.join(repo, '.fgos/locks/activation.lock');
-  fs.mkdirSync(fence, { recursive: true });
-  fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
+  // Activation fence plus the machine id a Land needs to seal the Work store.
+  activateGitFixture(repo);
 
   // Copy hooks to hook-host
   const preCommitDest = path.join(host, '.githooks/pre-commit');

@@ -81,11 +81,6 @@ test('an account with no store, a store that is not a path, and unknown keys are
   assert.deepEqual(Object.keys(result.pools.openai.accounts), ['extra']);
 });
 
-test('an inventory in the project config is reported, the same rule as the old inventory', () => {
-  const result = readLlmAccounts(families, { projectConfig: { runner: { llmAccounts: {} } } });
-  assert.deepEqual(codes(result), ['project-llm-accounts']);
-});
-
 test('the old state key of a pool is its normalized family', () => {
   assert.equal(legacyStateKey('openai'), 'openai-codex');
   assert.equal(legacyStateKey('gemini'), 'gemini');

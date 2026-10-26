@@ -42,7 +42,7 @@ const MATERIAL_FIELDS = ['title', 'status'];
  * must stay distinguishable by the key's presence, never by an
  * empty-but-present array standing in for "no baseline."
  *
- * @param {object} view - a folded view (replay.mjs's rebuildView/foldEvents shape)
+ * @param {object} view - a folded view (replay.mjs's foldEvents shape, as `listWork` returns it)
  * @param {string} id - the work item id to compute context for
  * @returns {{ parent: { id: string, title: string, status: string }, changedSinceAsk?: Array<{ field: string, from: unknown, to: unknown }>, ask?: string, askSource?: string, rationale?: string, alternatives?: string, source?: string } | null}
  */

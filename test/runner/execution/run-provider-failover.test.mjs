@@ -435,9 +435,9 @@ test('a resume takes a new baseline: work a person kept after a partial-writes s
   );
   const first = await run(fx, writer('u-partial-resume'));
   assert.equal(first.results[0].fallbackExhausted?.reason, 'partial-writes');
-  // The person keeps the half-done work (the files stay as they are) and resumes. The binding the first
-  // run recorded names partial1, now quarantined, so the lease cannot take it: the seat is bound again and
-  // takes spent2, whose quota stop writes nothing: that seat rotates.
+  // The person keeps the half-done work (the files stay as they are) and resumes. The seat did not pass, so it
+  // is bound again as a new attempt: partial1 is quarantined now, so the lease takes spent2, whose quota stop
+  // writes nothing: that seat rotates.
   fs.writeFileSync(path.join(fx.worktreeDir, 'notes.txt'), 'kept');
   const resumed = await runUnit({
     resumeUnitRunId: first.unitRunId,
@@ -448,8 +448,8 @@ test('a resume takes a new baseline: work a person kept after a partial-writes s
     providerCapacityRuntimeDir: fx.runtimeDir,
   });
   const attempts = attemptsOf(fx.repoRoot, resumed);
-  assert.deepEqual(attempts.slice(1).map((a) => a.fallbackFrom?.kind), ['lease-conflict', 'account-rotation'], JSON.stringify(resumed.results[0].fallbackExhausted));
-  assert.equal(attempts[0].leaseConflict, true, 'the lease refused the quarantined account and nothing ran');
+  assert.deepEqual(attempts.slice(1).map((a) => a.fallbackFrom?.kind ?? null), [null, 'account-rotation'], JSON.stringify(resumed.results[0].fallbackExhausted));
+  assert.equal(attempts[0].leaseConflict, undefined, 'the first attempt ran and stays as it was');
   assert.equal(selectedAccount(fx.repoRoot, resumed, '1-fb1'), 'spent2');
   assert.equal(selectedAccount(fx.repoRoot, resumed, '1-fb2'), 'live3');
 });

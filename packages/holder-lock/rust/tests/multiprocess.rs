@@ -9,9 +9,13 @@ use std::fs;
 use std::time::{Duration, Instant};
 
 use common::*;
-use fgos_holder_lock::predecessor::{declare, record_path};
+#[cfg(target_os = "linux")]
+use fgos_holder_lock::predecessor::declare;
+use fgos_holder_lock::predecessor::record_path;
 use fgos_holder_lock::{acquire, probe, release, Acquire, HeldReason, Mode, Probe, Wait};
-use fgos_process::facts::{identity_of, observe, Observed};
+use fgos_process::facts::identity_of;
+#[cfg(target_os = "linux")]
+use fgos_process::facts::{observe, Observed};
 use fgos_process::{Domain, ProcId};
 
 #[test]

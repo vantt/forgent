@@ -5,13 +5,13 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for how an fgOS event becomes durable, how it is sealed into git objects on per-machine refs, how it is shared across machines, and how it is read back
 Design status: Signed by the owner on 2026-10-17 (D-ADR0055). It is the contract for starting implementation under the gates of section 23; it does not claim the design is proven.
-Implementation status: Dormant on main: crate, Node facade and combined addon present, consumer registry empty. Store layer proven by the store part of the section 23.2 gate on 2026-10-20 (plans/reports/verification-261020-2012-event-store-store-proof-gate.md); the Work consumer, its cutover and the gate items that need it are pending in the WORK lane
+Implementation status: Store layer proven by the store part of the section 23.2 gate on 2026-10-20 (plans/reports/verification-261020-2012-event-store-store-proof-gate.md). Work and porting are registered consumers on the Work cutover branch (`work/es-cutover`): the readers, triggers, Land policy, verbs and doctor rows are implemented, parity is exact on copies of all three workspace repositories and the retired families are gone from the tree (plans/reports/verification-261023-1630-work-cutover-parity-and-docs.md). Still open before acceptance: the candidate-release runs of section 23.2 items 1-4, 5 (real forge), 6-8 and 10-11, and the repository's own `fgos events migrate` (the report's matrix lists each)
 Canonical: Yes (D-ADR0055, 2026-10-17)
 
 Owner: Event Store component
 Source (planned): packages/event-store/rust (crate fgos-event-store); Node facade src/event-store/ over the one combined N-API addon that links fgos-event-store and fgos-git (section 17)
 Contracts (planned): packages/event-store/contracts/
-Last reviewed: 2026-10-20
+Last reviewed: 2026-10-23
 Supersedes: L3 clauses 1 and 4 in docs/platform-foundations.md (D-ID ae461c8b, superseded by D-ADR0055); D-ADR0003 data layout
 Related:
 - docs/platform-foundations.md (L3, L7, L10)
@@ -39,7 +39,7 @@ Run `wf-run-1792220971594-ec5449e2` wrote version 2 from the draft that council 
 
 ## 1. Purpose
 
-Event Store owns one decision: how an event of any fgOS domain becomes durable on the machine that wrote it, how it is sealed into immutable git objects on that machine's own ref, how those refs are shared between machines, and how the union of all of it is read back in one deterministic order. Work is the first consumer; porting, observe and decisions follow.
+Event Store owns one decision: how an event of any fgOS domain becomes durable on the machine that wrote it, how it is sealed into immutable git objects on that machine's own ref, how those refs are shared between machines, and how the union of all of it is read back in one deterministic order. Work is the first consumer; porting, observe and decisions follow, and identity (the shared directory of agent sessions across machines, stream `project:identity`, docs/platform/identity/spec.md section 5) is a registered consumer in `packages/event-store/contracts/consumers.v1.json`, whose rebuild only drops its cache because its fold lives in the Rust identity crate.
 
 Event truth stops being files in the git work tree. An event is appended to an open log outside the work tree and acknowledged after `fsync`; it is then sealed, on a cadence, into a commit on `refs/fgos/events/<machine-id>` through git plumbing that touches no index, no work tree, no HEAD and no hook-running porcelain. Machines exchange events by pushing their own ref and fetching the others; the read side is the union by event hash. Views are caches owned by consumers and are rebuildable.
 
@@ -72,7 +72,7 @@ Agent defaults that the owner accepted on 2026-10-17 15:13. An agent chose them 
 
 | Default |
 |---|
-| Seal cadence: on lifecycle events, else after 300 s (`eventStore.seal.intervalSec`), else at clean writer exit (section 16) |
+| Seal cadence: on lifecycle events (the runner batches them within `eventStore.seal.coalesceSec`, owner decision 2026-10-23 17:57), else after 300 s (`eventStore.seal.intervalSec`), else at clean writer exit (section 16) |
 | Doctor thresholds for unsealed events: warn above twice the interval, fail above 3600 s (sections 16, 21) |
 
 The spec also takes the following decisions inside that frame. They are agent decisions, reported here, and are not owner decisions:
@@ -115,7 +115,7 @@ Readiness: once section 26 is signed, this spec is the contract for starting imp
 | Sealing: rotation, git object layout, compare-and-swap ref update (through the Git component's Publication port), receipt, recovery | Locks as a mechanism (holder-lock); Event Store only declares its two lock rows |
 | Reading: the reader protocol, verification, dedupe, deterministic order, cursors | Claims, leases, worker slots (runtime) |
 | Sharing: fetch refspec, push of the own ref, reconciliation of the own ref, mirrors (fetch and push run through the Publication port) | Work-tree commits, merges and land (Git component; today the 4.3-R main door); git plumbing and the publication of `refs/fgos/*` (the Git component's Publication port) |
-| The verbs `fgos events sync|status|export`, the store part of `fgos rebuild`, the doctor checks of section 21, the migration | Scheduling any process; there is no daemon |
+| The verbs `fgos events sync|status|seal|export`, the store part of `fgos rebuild`, the doctor checks of section 21, the migration | Scheduling any process; there is no daemon |
 
 There is one implementation of the core: the Rust crate `fgos-event-store`. The Node facade `src/event-store/` decides nothing. Rust consumers (observe, `fgos-work-state`) link the crate. Git access for `refs/fgos/*` goes through the Git component's Publication port (`docs/platform/git/spec.md` section 4: write objects, compare-and-swap a ref, read and walk a chain, fetch, push). Event Store is the only production writer of event refs and calls that port for every one of them; the crate has no git driver of its own. Event Store still decides everything the protocol decides: it supplies the seal and merge manifests and the parent order, and Git never computes an event union, coverage or a business conflict outcome. The protocol of sections 10 and 14 is unchanged by this placement (section 20).
 
@@ -198,7 +198,7 @@ A consumer registers each type once in a versioned contract file of its own pack
 | `branch` | `refs/fgos/branch-events/<machine-id>/<branch-key>` | never | that branch's consumers; the project after promotion |
 | `local` | `refs/fgos/local-events/<machine-id>` | never | this clone only |
 
-Branch key: a slug of the worktree's branch name at the stream's first append, recorded in the stream; it survives a worktree move; a branch rename is not followed (known limit). Promotion at land is a `project` event `store.promote {stream, throughSeq, tip}` appended by the land operation (a consumer policy of the Git component, like the Iron Law gate); the seal commit that carries it has the branch tip as a second parent, so the branch objects travel with the project ref. Promoted branch events are ordered at the position of their promote event. Abandon deletes the branch ref and the branch open log; nothing in the project ever references them. A branch stream whose worktree is gone without land or abandon is an orphan: `fgos events status` and doctor list it, and nothing promotes it automatically. No consumer registers a `branch` type today; the contract is fixed now so the first one does not invent another path.
+Branch key: a slug of the worktree's branch name at the stream's first append, recorded in the stream; it survives a worktree move; a branch rename is not followed (known limit). Promotion at land is a `project` event `store.promote {stream, throughSeq, tip}` appended by the land operation (a consumer policy of the Git component, like the Iron Law gate); the seal commit that carries it has the branch tip as a second parent, so the branch objects travel with the project ref. Promoted branch events are ordered at the position of their promote event. The store has no abandon operation (it had no caller and was removed); nothing in the project references an unpromoted branch's ref or open log. A branch stream whose worktree is gone without land is an orphan: `fgos events status` and doctor list it, and nothing promotes it automatically. No consumer registers a `branch` type today; the contract is fixed now so the first one does not invent another path.
 
 ## 8. Open root (storage-location port)
 
@@ -217,6 +217,8 @@ Layout:
 ```
 
 Topologies: a plain repository, a linked worktree (also on another filesystem, because the open root is in the common dir), `--separate-git-dir`, and a bare repository with worktrees resolve to one valid root (measured by experiment 1, `N-2`). Implementation result (2026-10-20, `test/event-store/topologies.test.mjs`): a plain repository, a linked worktree on another filesystem, a bare repository with a worktree (the bare repository is the trusted main) and a submodule with its own git directory resolve as stated. `--separate-git-dir` and an absorbed submodule (a `.git` file pointing into the superproject's `modules/`) are refused before any store exists with Git's `trusted-main-gitfile-unsupported` (Git spec sections 3 and 17), because Git's resolver does not trust a gitfile main checkout; support for them follows Git. A submodule has its own common dir and therefore its own store; that is correct and documented. A directory that is not a git repository is refused with `event-store-no-repository`; fgOS Work already depends on git worktrees and merges, so this spec does not add a second, non-git storage form. The open root must be on a local filesystem with atomic `rename` and directory `fsync`; holder-lock's `guarantee(path)` is asked for `<eventOpenRoot>/locks`, and `none` (NFS, SMB, CIFS) refuses with `event-store-unsupported-filesystem`. Decision (coordinator, 2026-10-20, within the approved frame): these two layouts are unsupported for now; Git's trusted-main model is revisited only if a workspace on the owner's machine list uses a gitfile layout.
+
+Moving a clone (`mv`) keeps its store id: `store.json` travels with the common directory and is accepted while the recorded machine id equals the current one and the common directory still has the recorded device and inode. The recorded path is where the store was created and is not checked. A copy, or a move to another filesystem, has a new inode and is refused by name, so it can never reuse the store id; a changed `fgos.machineId` is refused by name too.
 
 Deleting a clone deletes its unsealed events. That is the price of keeping open logs with the repository they belong to; the seal cadence bounds it (section 16).
 
@@ -370,7 +372,7 @@ Contract:
   The reader checks the condition. Each new event's `seen` must cover the cursor's position in every other stream; if it does not, the new event was decided on another view and the claim does not hold. Work's single cache, read and written under the gate (section 13), meets the condition. Outside this case the store does not claim it.
 - **The cursor is coverage, not an offset.** A cursor records which events a view has folded: per-stream positions, coverage and certified commits (section 15). It is not a position in an immutable global order. Event Store does not promise that the sequence of one event set is a prefix of the sequence of a larger set, because a late concurrent event can sort before events already folded. In model check C6, `[x(ts=2)]` became `[y(ts=1), x(ts=2)]`, and both views are causally closed. When the set grows in any way other than the proven case, the consumer replays the suffix from the first position where the new sequence differs from the folded one, or rebuilds (section 15). A global append-only prefix would need a publication watermark or a consensus protocol, and this spec has neither.
 - On one clone, every acknowledged precondition holds again at replay, because the Work gate makes each writer's view current for its own stream.
-- Across clones and machines, a success is final against every event its writer had seen and provisional against concurrent events it had not seen (owner decision 2026-10-17 15:13; no online coordinator). When a later sync brings a concurrent event that makes a replayed precondition false, the consumer's reducer must record a conflict instead of applying the event. Work must implement that reducer rule before a second store's `project` events are folded into its view (acceptance item in section 23). Event Store reports the concurrency; it never picks a business winner.
+- Across clones and machines, a success is final against every event its writer had seen and provisional against concurrent events it had not seen (owner decision 2026-10-17 15:13; no online coordinator). When a later sync brings a concurrent event that makes a replayed precondition false, the consumer's reducer must record a conflict instead of applying the event. Work must implement that reducer rule before a second store's `project` events are folded into its view (acceptance item in section 23). Event Store reports the concurrency; it never picks a business winner. The reducer stops with `work-replay-precondition` when the event's writer had seen every event that precedes it in the order (for each other stream, the highest earlier `seq` is covered by the event's `seen`; legacy events count as seen). Seen events always sort before the event, so the prefix then equals the writer's own view, and a failed precondition is a local bug. When an earlier event was not seen, a late concurrent event can reorder which of two writes applies, so the failure is a recorded conflict even when its writer had seen the event it fails against (2026-10-22: this replaces the earlier rule that threw only while the history held a single clone's events, which made the throw unreachable once a second clone had synced).
 
 ## 13. Work gate: the read-check-append serialization (C1)
 
@@ -397,7 +399,7 @@ This spec keeps that serialization and moves only the append target. The gate is
 3. Release the gate, ack to the caller.
 4. After the gate: if any appended type is `sealOnWrite`, `seal(project)` with `try`.
 
-No commit-DAG walk, no git call and no process spawn runs inside the gate. A foreign event fetched after step 1 is not folded by this mutation. Its `seen` then names exactly the foreign coverage of the view, so section 12 treats that event as concurrent and loses nothing. A rebuild computed outside the gate is installed under the gate only when the own-stream positions it was computed from are still current; otherwise it is computed again, at most `eventStore.rebuild.maxAttempts` times (agent default 5). After the last mismatch the consumer stops with `event-store-rebuild-busy`: the current cache stays valid, no stale snapshot is installed, and the result is never reported as a successful rebuild. Retrying alone cannot promise progress under sustained writes (the corrected model check found that livelock, N1); a handoff that guarantees installation is a later item that needs its own proof.
+No commit-DAG walk, no git call and no process spawn runs inside the gate. A foreign event fetched after step 1 is not folded by this mutation. Its `seen` then names exactly the foreign coverage of the view, so section 12 treats that event as concurrent and loses nothing. A rebuild computed outside the gate is installed under the gate only when the own-stream positions it was computed from are still current; otherwise it is computed again, at most `eventStore.rebuild.maxAttempts` times (agent default 5). After the last mismatch the consumer stops with `event-store-rebuild-busy`: the current cache stays valid, no stale snapshot is installed, and the result is never reported as a successful rebuild. An ordinary mutation that keeps losing the catch-up race has its own budget of 5 attempts and stops with `event-store-catch-up-busy`; it never borrows the rebuild budget. Once the append is acknowledged, a failing staged effect or cache write is reported as `event-store-acked-effects-incomplete`, which carries the acknowledged events and the original error: the batch is durable, so a caller never retries it. Retrying alone cannot promise progress under sustained writes (the corrected model check found that livelock, N1); a handoff that guarantees installation is a later item that needs its own proof.
 
 The per-stream `event-append` lock protects only the bytes and the sequence of one open log; it never replaces the gate. The draft's lines "Per-writer lock; writers never contend" (draft section 11) and "P01 and P02/P04 are re-cut around claims only" (draft section 15) are withdrawn. Porting keeps its own gate (`porting-events`, rank 60, `src/state/porting-store.mjs:89`) the same way.
 
@@ -438,10 +440,13 @@ Settled with the phase 05 review (2026-10-18):
 
 - **Reconciliation is authenticated, never inferred from the graph.** Before the compare-and-swap of step 3, sync durably records the exact verified prior own tip and the computed candidate (merge or fast-forward target) as authorized; only that pair is accepted as the store's own later. A merge commit on the own ref that no such authorization names is refused (`event-store-ref-tampered`), even when its shape is valid. The authorization survives failures before and after the CAS, so a crash after the CAS recovers and publishes.
 - **Each mirror is verified on its own.** A foreign mirror that is rewound, forged or otherwise fails verification keeps its last authenticated tip and position and is recorded as a typed warning in the sync status; own publication continues. A failure of the mirror of the own machine id refuses the sync.
+- **The reader verifies each mirror on its own too (2026-10-25, owner-approved edge rule).** A peer's mirror that the read cannot use (an invalid machine name, a symbolic ref, a header that names another machine or scope, a blob over the reader's cap, a forged own-origin claim, any other verification failure) is left out of the answer and named in the read result's `skippedMirrors` (`refName`, `machine`, `code`, `detail`); it is never dropped silently. A peer's mirror that rewound or vanished keeps the tip the caller's cursor or the checkpoint already authenticated, so the events it vouched for stay in the answer, the cursor keeps that baseline for the next read, and the mirror is named with `event-store-mirror-rewound`. When the reader must walk that baseline (no certified checkpoint covers it) and its objects are gone from the clone (for example after `git gc`), the walk fails: the mirror is named a second time with that error and its events leave the answer. The machine's own history stays fail-closed: a failure on any event ref outside `refs/fgos/remotes/`, or on the mirror of the reading machine's id (named in the read request), refuses the read, even in a fresh clone with no own ref yet, because its first sync seals onto that history. `fgos events status` carries the same `skippedMirrors`, and the `event-store-integrity` doctor row fails naming each one and each mirror warning the last sync kept. A clone with no open root yet (`fgos/events` in the Git common directory, made by the first write or `fgos setup`) reads as empty history; a write there refuses with `event-store-lock-dir-invalid`, naming the directory and `fgos setup`.
 - **Certified sync positions.** Sync persists each mirror's authenticated position next to its tip and uses it as a certified stop, so a steady sync walks only new commits; a status file written before positions existed is verified in full once.
 - **One tracked-fence authority per clone.** The tracked legacy fence is read at the HEAD of the trusted main checkout of the clone, so every linked worktree of one clone shares it, whatever commit the worktree is on. Every fence mismatch, in read and in sync, reports `event-store-legacy-mismatch`.
 
 Triggers: the explicit verb; and the opportunistic check of section 16 when the last successful push is older than `eventStore.sync.intervalSec` (default 300; 0 means explicit only). Network calls never run inside the Work gate.
+
+Update, 2026-10-25: the opportunistic publish of a command's end trigger no longer runs in the command's own process. The end trigger decides that a push is due from the maintenance facts, starts one detached `fgos events sync --opportunistic` child through the same door as the seal child (`src/cli/detached-child.mjs`) and exits; the command's result never waits on the network or on the seal lock a sync holds. Publication of a command's events therefore lags by at most the child's runtime: a few seconds on a healthy remote and up to about 120 s on a slow one (the longest network call), as before but off the reader's path. No event is at risk in that window, because events are durable and readable locally before any sync. The child tries the seal lock and skips when another process holds it; once it holds the lock it writes its attempt time to `sync.json` before any network work, so commands that end while it runs see the push as attempted and start no second child (a short start-up race remains until the first child holds the lock, bounded by one process start per command); runs no start or end trigger, returns no status, and answers a failed attempt it has recorded itself (`sync.json`, shown by `event-store-sync`) as `{ error }`. A dispatched worker never starts it, and a child that cannot be started is the trigger's error.
 
 Offline: append, seal and read work fully; fetch and push fail, the failure is recorded, `status` shows "unpublished since", the next trigger retries; Work is never blocked by the network. A clone with no remote keeps everything local.
 
@@ -472,14 +477,27 @@ A consumer that reads with its cursor gets one of two answers:
 
 Keying by tips bounds what is new. It does not make a walk cheap: a range walk `A..B` still traverses the reachable part it needs. In V-REF-01, on a DAG of 100,011 commits, the full `rev-list` took 224 ms and the range walk took 190 ms for 90,011 commits. Pruning at certified commits (section 11) limits a catch-up walk to what was added since the last complete walk, and a rebuild walks everything. Snapshot and compaction of the ref chain stay the follow-up for when a rebuild exceeds the budget (section 22).
 
+**Checkpoint (2026-10-23).** A consumer may name a checkpoint file for its outside-gate reads (Work: `.fgos/cache/event-history.json`, beside the view). It is a cache like the view: never tracked, never truth, rebuildable from zero, and nothing depends on it for correctness. It holds the cursor of the last complete read that deferred nothing, and the ordered events that cursor covers, so a process that starts with no retained history continues from it instead of walking the whole ref DAG: it reads the sealed commits added since, plus the header of the certified commit they sit on (section 11).
+
+A read accepts the file only when all of these hold; otherwise it ignores the file, walks from zero and replaces it, and reports why:
+
+- it parses, has the current version, belongs to this store id, and answers the same streams and order flag as the request;
+- it holds no deferred event, its certified commits are exactly the commits of the refs it verified, and its coverage equals the highest `seq` of its own events per stream;
+- every ref it verified still exists, and the walk from that ref's current tip meets the certified commit as a parent (the ref descends from it; a rewound, replaced or foreign history never does);
+- every event of this clone's own origin it holds is published (at or below the receipt) or still in the local files, so a lost local file is never papered over;
+- the mirror checks of section 14 pass, and the order, hash and contiguity checks of the read itself find nothing wrong: any error found while continuing from the file repeats the read from zero, so the answer is the one a read without a file gives.
+
+The file is written when the read certified commits that the history it started from did not, never for a read with a deferred event, and never fails the read when it cannot be written. A rebuild (`fgos rebuild`) never uses it and always replaces it. Writers replace the file atomically through the durable-file helper, so concurrent processes leave the old file or a new one; an older file is still valid, because acceptance depends on the refs and never on which writer was last. What it does not do: it does not authenticate the file against a local writer, with the same trust the view cache and the local segments have. Legacy history is not part of it (it is read from its pinned commit on every read).
+
 The usual verbs (`fgos list`, `show`, `ready` and the others) read the consumer's view after one `read(cursor)` catch-up. Commands:
 
 | Verb | Does |
 |---|---|
-| `fgos events sync` | Section 14 |
+| `fgos events sync [--opportunistic]` | Section 14; `--opportunistic` is the detached publish child's mode (try the seal lock, no status) |
 | `fgos events status [--json]` | Store id, machine id, every ref and tip, per stream unsealed count and oldest unsealed age, closed segments pending, last receipt, last fetch and push with result, own ref ahead/behind its mirror, a missing fetch refspec, orphan branch streams, deferred events and their missing predecessors (section 12), the guarantee level of the open root |
+| `fgos events seal --stream <s> [--history <file>]` | Certify the open events of one stream now, waiting at most 5 s for the seal lock (busy after that: exits 0); `--history` names the consumer's history checkpoint under `.fgos/cache` that the seal extends. The detached child of a CLI Work command runs it (section 16) |
 | `fgos events export [--stream <s>] [--since <cursor>] [--format jsonl|legacy-layout] --out <dir>` | Canonical-order JSONL, or the legacy file layout with a parity report (section 18) |
-| `fgos rebuild` | The existing rebuild verb (`src/cli/command-registry.mjs:1427`) stays the one rebuild door: it drops every registered consumer cache and refolds from the store |
+| `fgos rebuild` | The existing rebuild verb (`src/cli/command-registry.mjs:1510`) stays the one rebuild door: it drops every registered consumer cache and refolds from the store |
 
 ## 16. Seal cadence and loss budget
 
@@ -487,12 +505,19 @@ Agent default, accepted by the owner on 2026-10-17 15:13 (M3), configurable by `
 
 | Trigger | Action | Who |
 |---|---|---|
-| A `sealOnWrite` type was appended (Work: status move, answer, decision, approval, land result) | `seal(project)` right after the gate is released | the appending process |
-| The oldest unsealed event is older than the interval | seal every stream | the opportunistic check at the start and end of every fgOS command that opens the store, and in the loop of long-lived gateway and runner processes |
+| A `sealOnWrite` type was appended (Work: status move, answer, decision, approval, land result) by a CLI command | mark the seal pending; after the gate is released and the command's answer is printed, start one short detached `fgos events seal --stream <s>` child (the same CLI entry, `src/cli/detached-child.mjs`) and exit without waiting; the child waits for the seal lock (bounded, 5 s) and certifies every open event of the stream, then exits | the CLI process (hand-off) and its seal child |
+| A `sealOnWrite` type was appended by the runner (`runOnce`, hence `--once` and `--watch`) | mark the seal pending; seal once when a dispatched wave settles, when `runOnce` returns, and at the latest `eventStore.seal.coalesceSec` (default 30) after the first pending event | the runner process, which declares itself long-lived through `processSealCoalescer.scope` (`src/event-store/seal-coalescing.mjs`) |
+| The oldest unsealed event is older than the interval | seal every stream | the opportunistic check at the start and end of every fgOS command that opens the store, and in the poll loop of the long-lived runner process (the only long-lived seal-on-poll loop) |
 | Clean writer exit | seal every stream | session end (session deregistration) and shutdown of gateway and runner |
 | A crashed process left an uncommitted batch or closed segments | repair and seal | the next fgOS command on the clone, through the same triggers |
 
-No daemon and no timer exist only for sealing. When no fgOS process runs, unsealed events wait until the next command; that window is not bounded by wall clock and the contract says so. Sealing runs only git plumbing on refs, so the council's objection to sealing on every lifecycle event (one work-tree commit and `index.lock` each) does not apply.
+Clarification, 2026-10-22: the long-lived gateway has no seal loop and seals on stop. Its Work writes go through `fgos` CLI invocations, and each of those seals in its own end-of-command trigger. No daemon and no timer exist only for sealing. When no fgOS process runs, unsealed events wait until the next command; that window is not bounded by wall clock and the contract says so. Sealing runs only git plumbing on refs, so the council's objection to sealing on every lifecycle event (one work-tree commit and `index.lock` each) does not apply.
+
+Update, 2026-10-23 17:57 (owner decision, supersedes M3 for long-running processes only): the runner coalesces the seals of its own `sealOnWrite` appends as the table says. The CLI keeps sealing at once, and nothing else changes: append durability, `fsync`, crash repair and the clean-exit row stand. Appends are durable and readable before the seal, so a runner killed with a pending seal loses nothing beyond the rule that already covered a crash between an append and its seal: the events sit in the open batch and the next trigger certifies them: any later `sealOnWrite`, a clean writer exit, or a command's opportunistic seal once they are older than `eventStore.seal.intervalSec`. The gateway has nothing to coalesce: its Work writes are `fgos` CLI invocations, each sealing in its own process. Children the runner spawns (settle, finalize) are CLI processes and seal once per command.
+
+Update, 2026-10-24 (owner decision, option c, supersedes the 2026-10-23 sentence "The CLI keeps sealing at once" for CLI commands): a CLI command no longer waits for the seal. It appends and fsyncs its event as before, releases the gate, prints its answer, then hands the seal to a short detached child and exits. The child is not a daemon: no timer, no loop; it takes the seal lock with the bounded wait of the inline seal, seals everything open in the stream (its own event and any earlier unsealed one), writes the receipt and the history checkpoint like the inline seal, and exits. Nothing open: it returns at once. If the lock is still held after the wait the child exits 0, because the holder, or the next seal, covers the backlog. A burst of commands starts one child per command; they serialize on the seal lock and the later ones find nothing to do. The loss window of a sealed-at-once CLI event becomes seconds (the child's start plus its seal), like the runner's coalescing, and nothing else changes: append durability, `fsync`, crash repair, the clean-exit row and the runner's in-process coalescing stand. Why: a CLI `move` on ext4 spent about 26 git children and 63 `fsync` calls in its own seal, 944 ms against 225 ms on main (`plans/reports/phase-lead-261023-2250-work-cli-move-overhead.md`).
+
+When no child runs, nothing is lost. A child that cannot be started (the spawn is refused, the host forbids a detached process) or that dies before it seals (killed, machine off) leaves the event durable in the open batch and readable, exactly the state a crash between an append and its seal always left: the next fgOS command's seal trigger, any later `sealOnWrite`, a clean writer exit, or the opportunistic seal once the event is older than `eventStore.seal.intervalSec` certifies it, and doctor `event-store-unsealed` reports a tail that stays. A dispatched worker (`FGOS_DISPATCH_DEPTH` above 0, the fact the end trigger already uses) never hands off: its CLI commands seal inline as before, so no detached child leaves the attempt's process domain on any platform (proof: `test/event-store/background-seal.test.mjs`, dispatched worker). In a bwrap domain the sandbox also leaves the project store read-only, so a Work command there is refused before it appends (proof: `test/event-store/background-seal-confined.test.mjs`). A seal child that keeps failing (the lock never free, the spawn refused every time) shows up as doctor `event-store-unsealed`, and every failure of the seal child, of the publish child (before its sync could record its own attempt) or of an end trigger also leaves a record in the invocation-fault log (`event-store-child`, `event-store-end-trigger`), the one existing trace door for a failure with no caller to read it. The seal child runs no start or end trigger: no second seal sweep and no publish around it. A CLI command outside a dispatched worker runs only the end trigger, not a start trigger: it hands its seals to the child and the end trigger applies the same seal-if-due policy, so a start trigger would repeat that on the print path (a stale batch a crashed predecessor left is sealed by this end trigger or the child; proof: `test/event-store/triggers.test.mjs`). The runner process keeps its in-process coalescing and never hands off; the children it spawns (settle, finalize) are CLI commands and hand off like any other.
 
 Doctor (`event-store-unsealed`): passes when nothing unsealed is older than twice the interval; warns above that; fails when the oldest unsealed event is older than 3600 s. There is no event-count cap, because lifecycle events already seal at once. These thresholds are agent defaults that the owner accepted as spec v2 on 2026-10-17 15:13.
 
@@ -536,13 +561,15 @@ Today's tracked truth: `.fgos/events.jsonl` (frozen baseline) and 90 shards `.fg
 
 Stop-everything cutover, one change, on all three machines and every workspace (holder-lock section 12 pattern):
 
-1. Stop every fgOS writer (quiesce scan) on every machine. Each machine commits and pushes its tracked event changes to main (they still merge by `merge=union`).
+1. Stop every fgOS writer on every machine: a procedure the operator carries out on all three machines, not something one scan can see. `fgos events migrate` runs the quiesce scan only for the workspace it migrates; it finds that workspace's writers (cwd in its root or a listed worktree, or a typed `--dir`/`--worktree`/`--cwd`/`-C` root) and is blind to every other machine and to processes of other workspaces on this one, which do not block it. A launcher that serves the workspace from another directory (`fgos-gateway`, a run supervisor) is not found either: its children run inside the workspace and are found while they run, and one started after the scan meets write admission and the fence, but the operator stops such launchers as part of this step. Each machine commits and pushes its tracked event changes to main (they still merge by `merge=union`).
 2. On one machine, pull main. Record the pre-cutover Work view (view and `revision`; the `snapshot` anchor is excluded because the cursor replaces it).
 3. Import once: one commit on `refs/fgos/legacy` whose tree holds the tracked files byte for byte under their current names (`events.jsonl`, `events/<name>.jsonl`), plus `porting/events.jsonl` of any workspace that has one, and `seal.json {kind: "legacy", fromCommit, treeOfFgosEvents}`. Keeping names keeps the legacy order `(ts, file, seq)` of `src/state/replay.mjs:876-880` identical.
 4. Rebuild the Work view through the new reader and compare with step 2 byte for byte. Any difference stops the cutover.
 5. In the same commit on main: delete the tracked event files, `state.json` and both backups; delete the `merge=union` line (`.gitattributes:15`); delete the code of section 19. Push main and `refs/fgos/legacy`.
 6. On the other machines: pull main, run setup (refspec, machine id), fetch, rebuild, compare the view.
 7. Doctor green on every workspace; resume writers. Old binaries are fenced by activation (plain `fgos` runs the activated release) and by `event-store-legacy-layout`, which fails if `.fgos/events/` or a tracked event file reappears.
+
+A legacy event file a machine wrote but never committed (an untracked shard left in `.fgos/events/` at its cutover) is not in `refs/fgos/legacy`. The cutover parks it unchanged, and `fgos events import-legacy --file <shard>` replays it later through the ordinary Work write door, in one transaction. The replay keeps each event's type, payload and original time. A line already in the imported history, and a `work.add` of an item that already exists, is skipped and named. A receipt `<shard>.imported.json` beside the file records the result and refuses a second import of that file. `--check` reports without writing. The verb leaves with the import path at the fence release.
 
 Rollback is not "point the facade back": an old release reads files in `(ts, file, seq)` order and cannot read refs, and v4 events written after the cutover sort differently under that rule. Rollback is `fgos events export --format legacy-layout`: it writes the legacy files byte for byte from `refs/fgos/legacy`, writes v4 events as one file per stream with legacy field names (batch commit markers are dropped), runs a port of the legacy fold (`src/state/replay.mjs:870-889`) on the result, and reports every entity whose view differs from the v4 view. A person decides with that report; then writers stop, the files are committed, and the previous release is activated. Before step 5 is pushed, rollback is reverting the commit; a later migrate owns replacement of the resulting unfenced stale import under event-seal, using CAS from the observed OID. For a local-only stale import, no manual ref deletion is required. Before any local ref write, migration checks local and mirror legacy refs under the same event-seal guard. A disagreeing mirror, or a local import also observed on a mirror, refuses with `EventStoreLegacyMismatch`: pull the fenced main. If main has no fence because cutover was reverted after the ref was pushed, the remote legacy ref needs an owner decision. `--check` reports the same disagreement. For rollback files, copy Work `events.jsonl` and `events/` into `.fgos/`, remove the tracked `.fgos/events` fence first, and map `porting/<original tracked path>` back to `<original tracked path>`. When one historical porting log exists, new porting lines append to that exact exported log; with none, restore `porting/events.jsonl` directly. Review the parity report before committing the restored layout and activating the previous release.
 
@@ -586,6 +613,7 @@ Config defaults merged by `fgos setup` (added only when missing, global then pro
 | Key | Default |
 |---|---|
 | `eventStore.seal.intervalSec` | 300 |
+| `eventStore.seal.coalesceSec` | 30 (runner only: longest a `sealOnWrite` seal may stay pending; at least 1) |
 | `eventStore.sync.intervalSec` | 300 (0 = explicit sync only) |
 | `eventStore.rebuild.maxAttempts` | 5 (rebuild-install attempts before `event-store-rebuild-busy`) |
 | `eventStore.remote` | `origin` |
@@ -594,28 +622,28 @@ Config defaults merged by `fgos setup` (added only when missing, global then pro
 
 Repository-local git config, never tracked: the fetch refspecs of section 14 (`+refs/fgos/events/*:refs/fgos/remotes/<remote>/events/*` and the legacy one), and the optional `fgos.machineId`.
 
-Setup fixes: `event-store-refspec` (add the fetch refspecs when the remote exists and they are missing; never a push refspec); `event-store-lock-dirs` (create `<eventOpenRoot>/locks` with mode 0700). The machine id is minted by the Identity component (setup fix `identity-machine-id`, N-API `sessionIdentity.mintMachineId`), never by Event Store; `events migrate` calls the same mint when the id is missing.
+Setup fix: `event-store-lock-dirs` (create `<eventOpenRoot>/locks` with mode 0700). The machine id is minted by the Identity component (setup fix `identity-machine-id`, N-API `sessionIdentity.mintMachineId`) and the fetch refspecs are installed by the Git component (setup fix `git-publication-refspecs`, through RepositoryConfig; never a push refspec); Event Store has no fix for either. `events migrate` calls the same two doors when the id or the mappings are missing.
 
 Doctor checks, registered in `src/setup/registrations.mjs`:
 
 | Check | Fails when |
 |---|---|
-| `event-store-git-version` | Git's floor verdict is unsupported or a required probe failed. The floor is Git's (`packages/git/contracts/git-floor.v1.json`, Git phase 01 req 3), read through `gitFloorVerdict`; this spec keeps no version number of its own |
 | `event-store-open-root` | root does not resolve, not a git repository, or guarantee `none`; prints the guarantee level |
 | `event-store-machine-id` | missing or malformed; warns `event-store-machine-ref-shared` (section 14) |
 | `event-store-refspec` | remote configured but fetch refspec missing; a positive push refspec whose source can match `refs/fgos/`; a positive fetch refspec matching `refs/fgos/local-events` or `refs/fgos/branch-events` (negative exclusions are safe) |
-| `event-store-unsealed` | section 16 thresholds |
+| `event-store-unsealed` | section 16 thresholds; warns per orphan branch stream (a branch stream whose worktree is gone), listing them in the same message |
 | `event-store-integrity` | a seal blob whose hash differs from `seal.json`, an event `h` that does not verify, a batch commit marker that does not verify inside a closed segment or a sealed blob, a sequence gap in an own stream, `event-store-seq-conflict`, `event-store-seq-recovery-conflict` that a seal did not resolve, `event-store-order-cycle`, `event-store-ref-moved` or `seal-mismatch` recorded |
 | `event-store-sync` | warns when the last push failed or is older than 24 h with unpublished events and a remote configured; reports ahead/behind |
-| `event-store-native-addon` | the combined N-API addon of section 17 (linking `fgos-event-store` and `fgos-git`) is missing from the active payload, fails to load, or was built for another Node ABI or platform. Git spec section 4 requires one ABI row for the combined addon, so the Git plan merges this check's ABI evidence with Git's `git-component-compatible` rather than adding a second ABI row |
+| `event-store-native-addon` | (kept as its own row: the Event Store facade exports are checked here and the contract version only in `git-component-compatible`, so merging would lose the export check) the combined N-API addon of section 17 (linking `fgos-event-store` and `fgos-git`) is missing from the active payload, fails to load, or was built for another Node ABI or platform. Git spec section 4 requires one ABI row for the combined addon, so the Git plan merges this check's ABI evidence with Git's `git-component-compatible` rather than adding a second ABI row |
 | `event-store-legacy-layout` | after cutover: tracked event files, `.fgos/events/`, tracked `state.json` or backups, or a `merge=union` line for events exist; `refs/fgos/legacy` missing or its tree differs from `seal.json.treeOfFgosEvents` |
-| `event-store-orphan-branches` | warns per orphan branch stream |
+
+Clarification, 2026-10-22: only the automatic triggers are gated by the dispatched-worker rule. A dispatched worker may run `fgos events sync` explicitly, because that is a request; the end-of-command push and the Land candidate release never run in one. A shared config file that exists but does not parse never lends its defaults to a publish decision: the `events` verbs and doctor refuse with `event-store-config`, and the write path and the triggers use a config that never pushes (`sync.intervalSec` 0), so a trigger still seals.
 
 `CHANGELOG.md` gets an `[Unreleased]` entry for the verbs, the config keys, the refspec setup and the removal of tracked event files.
 
 ## 22. Support matrix and known limits
 
-- Linux first. macOS follows holder-lock's `flock` driver once the seal crash matrix runs there. Windows has a holder-lock driver now, but the seal crash matrix has not run there, so Windows stays out of this store. Network filesystems are refused.
+- Linux only. Every other platform, macOS and Windows included, is refused with `event-store-unsupported-platform`: holder-lock has drivers there, but the seal crash matrix has not run there and macOS needs its own fsync and lock semantics (backlog `p-zsy3fmbcpd`). Network filesystems are refused.
 - One user; lock directories are mode 0700; multi-user permissions are out of scope.
 - Unsealed events are lost with the disk or the clone; the window is the seal cadence while fgOS runs, unbounded while nothing runs.
 - Cross-machine success is provisional against concurrent events of other stores (section 12); the owner accepted this, and there is no online coordinator.
@@ -625,7 +653,7 @@ Doctor checks, registered in `src/setup/registrations.mjs`:
 - SIGKILL tests do not prove power-loss safety; the guarantee rests on `fsync` semantics of the filesystem, reported by doctor.
 - A branch rename is not followed by the branch stream key.
 - Deleting a machine ref on the remote removes it from other clones at their next pruning fetch; the history then lives only on that machine.
-- Erasing a secret that reached a pushed ref needs a history rewrite on every clone; there is no tombstone protocol.
+- A secret that reached a pushed event cannot be erased. There is no tombstone protocol, and the store refuses a rewritten history: a rewound peer mirror keeps its earlier tip and is named `event-store-mirror-rewound` (section 14), and a rewound own ref refuses. The remedy is to treat the secret as leaked: revoke or rotate it at its issuer, and stop writing it into Work text. Events are not masked at append today (decision of 2026-10-25; backlog `p-nykfevjxqf`): worker secrets reach workers only through the environment, and `executor.dispatch` records the configured command unexpanded, so the exposure is text a person types into an item, note or reason.
 - The chain grows with history, and a range walk does not make that free. In V-REF-01, on a DAG of 100,011 commits, a full `rev-list` took 224 ms and a range `A..B` took 190 ms for 90,011 commits (section 15). Ref-chain snapshot and compaction are a later item, opened when a full rebuild exceeds the budget V-SPAWN-01 fixes for reads. Owner threshold (2026-10-17): open that item when a full rebuild exceeds 2 s on the slowest of the owner's machines.
 
 ## 23. Proof gates
@@ -719,7 +747,7 @@ The two pre-signature proofs (section 23.1) are evidence about a finite Python m
 
 ## 25. Out of scope
 
-SQLite WAL and multi-process SQLite semantics: the view is a consumer cache, so whichever engine a consumer picks is that consumer's concern. Red-team round 2 proposed adding this expertise, and it does not apply to the store. This stays a dissent (see "Unresolved dissent"). It becomes required when a consumer folds into SQLite inside the Work gate. Also out: a dedicated scheduler or daemon, Windows, network filesystems, multi-user permissions, hard deletion, ref-chain compaction, removing the `.fgos` strip, and an online cross-machine coordinator.
+SQLite WAL and multi-process SQLite semantics: the view is a consumer cache, so whichever engine a consumer picks is that consumer's concern. Red-team round 2 proposed adding this expertise, and it does not apply to the store. This stays a dissent (see "Unresolved dissent"). It becomes required when a consumer folds into SQLite inside the Work gate. Also out: a dedicated scheduler or daemon, platforms other than Linux, network filesystems, multi-user permissions, hard deletion, ref-chain compaction, removing the `.fgos` strip, and an online cross-machine coordinator.
 
 Outside expertise: the owner engages none (decision of 2026-10-17 15:13). The six gaps the councils named are covered as follows:
 
@@ -854,9 +882,7 @@ paths and ids must each be unique.
 The shared exec guard and `hotLockDepth` now live in
 `src/holder-lock/hot-guard.mjs`; `src/state/hot-lock.mjs` re-exports the depth and
 error for existing consumers. Entering a hot section returns a one-shot release
-that cannot decrement the depth twice. Unpublished summary validates repository
-and layout before taking `event-seal`; this read-only operation waits behind an
-active seal or sync. The strace gate proof covers ordinary append/readInGate and recovery of a lost
+that cannot decrement the depth twice. The strace gate proof covers ordinary append/readInGate and recovery of a lost
 high-water mark plus a torn active tail. Holder reclaim additionally relies on
 the Rust structural no-port boundary and existing crate regression tests.
 
@@ -926,12 +952,12 @@ Export stream discovery uses the configured remote and skips status entirely
 when `--stream` is explicit. Only warning-capable checks emit
 `warning:`; sync passes when no unpublished events and no push error exist.
 
-The machine-id setup fix uses the crate's atomic durable-file install-once door;
+The machine id is minted by Identity's mint, which uses the atomic durable-file install-once door;
 concurrent mints expose exactly one complete identity. The state root is
 canonicalized so symlinked ancestors are supported; the machine-id leaf remains
-protected by the atomic installer. Refspec setup calls the
-crate's existing `ensure_refspecs`, hence Git's journaled `ensure_fetch_mapping`.
-It never writes push mappings. Doctor additionally refuses fetch wildcards that
+protected by the atomic installer. Git's `fixGitFetchMapping` owns the fetch
+mappings, through Git's journaled `ensure_fetch_mapping`, and never writes push
+mappings. Doctor additionally refuses fetch wildcards that
 could include local/branch event namespaces. Lock-directory setup refuses symlink
 ancestors and ensures mode 0700.
 
@@ -970,8 +996,13 @@ historical log, and measures parity from the exported restorable bytes.
 `--check` computes the inventory, reader order, parity and commit plan without
 writing objects or refs. It reports the computed legacy commit OID and whether
 the observed ref will be created, reused or replaced as an unfenced stale import;
-its three setup repairs can create local identity/lock
-state and Git mapping provenance. Publication validates the expected HEAD,
+its setup repairs (the Identity mint, the lock directories and Git's fetch mappings) can create local identity/lock
+state and Git mapping provenance. It refuses `event-store-migration-fence-ignored`
+when the checkout's ignore rules exclude `.fgos/events`, since the cutover commit
+could not track the fence. An untracked legacy file that is empty holds no history:
+it counts as absent, the plan names it under `emptyLegacy`, and the real run
+removes it before the commit. When the cutover commit fails, the error carries
+Git's stderr as text. Publication validates the expected HEAD,
 regular-file paths, event records and clean inputs again under `event-seal`.
 It writes a deterministic parentless legacy commit and CASes an absent ref;
 an identical existing commit is reused. Without a tracked fence, a stale direct
@@ -1001,7 +1032,7 @@ Preparation records write admission before any hot gate: tracked legacy data
 without a fence refuses `event-store-migration-required`; a pinned clone without
 the matching legacy ref or configured publication-remote mapping refuses
 `event-store-refspec-missing`. Prepared admission is valid for that process
-lifetime: stop-everything migration requires ending old writer processes.
+lifetime: stop-everything migration requires ending old writer processes of the workspace, on every machine; the scan proves only this workspace on this machine.
 
 A normal cutover failure restores tracked input bytes only for explicit Git
 pre-attempt refusal codes or `commit-rejected` after Git's snapshot restoration,
@@ -1137,6 +1168,49 @@ Dated clarifications with no protocol change, made with the store part of the se
 
 - Section 5 names `project:<name>` consumer streams (plan D9: porting uses `project:porting`, Work keeps `project`). The crate already accepted them and seals them onto the machine's `events` ref with their own `seq` (`seal_publication.rs`, `project_consumer_streams_share_one_ref_without_false_move_or_sequence_reuse`).
 - Section 10 step 2.3 now names Git's Publication port instead of `gix` or `git -c core.fsync=...`: Git fsyncs directories itself and treats `core.fsync` only as a backend input (Git spec section 10). The store's own barriers (step 1, step 2.4 and 2.5) are unchanged.
-- Section 21 `event-store-git-version` points to Git's floor (`git-floor.v1.json` through `gitFloorVerdict`, 2.53.0 with four required probes today) instead of 2.31 and 2.36; section 8's "git 2.31 or newer" likewise. The check body already read Git's verdict.
+- Section 21: the Git floor is judged by Git's own row `git-component-compatible` (the old `event-store-git-version` row is gone; Git guarantees a supported verdict only when every required probe passed), and it points to Git's floor (`git-floor.v1.json` through `gitFloorVerdict`, 2.53.0 with four required probes today) instead of 2.31 and 2.36; section 8's "git 2.31 or newer" likewise. The check body already read Git's verdict.
 - Section 8 records the measured topology result: `--separate-git-dir` and absorbed submodules are refused by Git's resolver (`trusted-main-gitfile-unsupported`), not resolved as experiment 1 suggested.
 - Sections 15 and 19 cite current source lines; the `events.lock` row says its read-check-append role already moved to the `state` hot mutex.
+
+## Work cutover clarifications (2026-10-22)
+
+Dated clarifications with no protocol change, made with the Work triggers and the Land policy:
+
+- Section 21 (the lifecycle triggers of sections 14 and 16): the opportunistic sync runs at the end of a command that opens the store, after its result is written, and only when the process is not a dispatched worker (`FGOS_DISPATCH_DEPTH` is 0). Plan decision D13 said "sessions of the main checkout's own user"; it is narrowed to "not a dispatched worker", because on the two writer machines only the owner's user runs fgOS sessions, so an owner-user check would add code with no case. Reverse this if another user ever runs sessions on a writer machine. Sealing is not gated: any process seals what is due. A push attempt, failed ones included, counts against `eventStore.sync.intervalSec`, so an offline machine tries once per interval, not once per command.
+- Section 16: every trigger (command start and end, each runner poll, session end, gateway and runner stop) reads `store.maintenance` facts and never `status`. A poll seals only streams whose oldest unsealed event is older than `eventStore.seal.intervalSec`; a session end, a gateway stop and a runner stop seal every open stream; the runner loop never publishes. The main checkout is resolved only by a verb that opens the store.
+- Land policy (Work's, per section 5 and the Git spec's "seal before land"): Work seals `project` before the Git Land, and a store that cannot seal refuses the land before anything is published. After publication Work promotes the landed branch's stream under the crate's branch key (`branch:<branchKey(branch)>`, through the facade). A promote that fails then is a recorded, retryable result on the `merged` outcome (`promotion: { stream, error, retryable: true }`), never a throw that turns a landed merge into an error; promoting again is safe because a stream the project already names is left alone.
+- Section 12 (conflicts are not durable records): an event the fold recorded as a conflict never took effect. The Land idempotence lookup and the Land release sweep read only events that applied, so a delivery that became a conflict is not returned as a prior success on a retried approve and releases no candidate. `fgos show <id>` lists the conflicts recorded against an item and the doctor row `work-recorded-conflicts` warns when the view holds any; resolving one is not part of this change.
+- Section 5 and the setup fixes of section 21: `fgos init` mints the machine id through the Identity mint and runs the `event-store-lock-dirs` fix before it opens the store. `fgctl`'s runtime tail runs `fgos init` before `fgos doctor --fix`, and the store cannot open without a machine id and its locks directory, so a machine that never ran setup would otherwise fail its first `fgctl init`. Both fixes are idempotent and a clone's own `fgos.machineId` still wins; the fetch mappings stay with setup and doctor (`git-publication-refspecs`), since they change the repository's remote configuration.
+
+## Store read batching (2026-10-23)
+
+Dated clarification with no protocol change: the cold read costs a constant number of Git processes per walk page, not two per sealed commit.
+
+- Section 10 (walk): the walk reads the blobs of the commits one page returns through the Git port's `read_paths_at_many`, in groups of 64 (one `cat-file --batch -Z` process per group), and holds one group of segments in memory at a time. Verification of each commit is unchanged and runs in the same order.
+- Section 11 (the tracked fence authority and the unfenced consumer read): the fence a HEAD commit carries, and the legacy file inventory it holds, are immutable, so each verified answer is kept for the life of the process under the repository, the HEAD commit and the question asked (the inventory also under its root set). A moved HEAD is another key, and a failed read is never kept, so a later command or a Land that moves HEAD reads the new fence.
+
+## Verified checkpoint and trigger costs (2026-10-23)
+
+Dated clarification; section 15 gains the checkpoint above, and the rest changes no rule:
+
+- Section 11 (coverage walk): `certified` now also lives in the checkpoint across processes; the walk, its pruning rule and the proof that a certified commit stands for its ancestors are unchanged. A ref that does not descend from the commit the checkpoint certified for it voids the checkpoint.
+- Section 17 (no spawn in the gate): the legacy-migration admission of writes (`write_readiness`) is asked of Git once per prepared store, by the first write or by the consumer's pre-gate `admitWrites`, and never by a read. A write that reaches the gate (rank 60) before admission was settled is refused with `event-store-admission-required`; it is never answered with a process spawn. A read-only command therefore no longer pays the admission (HEAD, refs and the legacy inventory).
+- Section 14 and 16 (triggers): a sync that ran counts as the attempt of its interval whether it failed before its push (an offline fetch, a remote that is not configured) or after it, so the end-of-command trigger tries once per `eventStore.sync.intervalSec` and a failing fetch never delays every command. The start and end triggers take the `event-seal` lock with `try` (section 4) for sealing and for sync alike, and skip when another process holds it; a skipped sync is not an attempt and the interval does not restart. `store.maintenance` therefore returns `lastAttempt` (`{time, remote}`) beside `lastPush`.
+- Section 10 (seal): a tip the receipt certified is not walked again before the segment is published, because a walk from a certified commit finds nothing; the read-back of the published bytes is one Git process; the walk after publication is unchanged.
+- Sections 11 and 18 (legacy reads): the legacy files of one commit, whether the pinned legacy ref's or the consumer inventory at HEAD, are read through one Git process however many files it holds, not one process per file.
+
+
+## Repeat reads in one process (2026-10-23)
+
+Dated clarification with no protocol change: a process that reads the same store again pays for what changed, not for the history it already holds.
+
+- Section 11 (repeat read): each prepared store keeps the answer of its last complete read (one that deferred nothing) together with the inputs it came from: the ordered tips of every event ref and mirror, the legacy refs, the own local files and the legacy files of the current HEAD. A later read observes all of those again from the real store, on every call, and returns the remembered answer only when each of them is identical and the caller holds exactly the history that answer covers (same cursor, same events). Any difference, a moved or replaced ref, a changed local file, another HEAD commit with other legacy files, or a caller holding another history, reads normally and replaces the memo. There is no time or call-count rule and nothing is skipped that could differ: the cost of a repeat read is the real observations (one ref listing and the HEAD reads) and no walk, certification, ordering or fold.
+- Section 11 (legacy history): the legacy events one HEAD commit, one set of legacy refs and one query give are parsed, ordered and digested once per process (the answer is content-addressed, like the fence and the inventory above). A caller that names the digest of the legacy history it already holds is not sent it again; the Node facade keeps the raw records of its last read and still returns each caller events parsed for that read alone.
+- The read answer no longer carries `fullOrder` across the Node boundary: nothing in Node used it, and it grew with the legacy history.
+
+## Work cutover proof gate (2026-10-23)
+
+Dated clarification with no protocol change, made with the Work part of the section 23.2 gate ([report](../../../plans/reports/verification-261023-1630-work-cutover-parity-and-docs.md)):
+
+- Section 23.2 item 9 asks for the addon "in both the npm package and the legacy-node payload". The npm install channel is retired (owner decision, plan refresh Q-W1 superseded 2026-10-22) and ships no addon: on it Work verbs and `fgos events` refuse with `git-addon-unavailable`, naming the missing addon. Item 9 is therefore met by the legacy-node payload alone: the addon loads from the staged release, activation refuses a linux-x64 payload without `components.nativeAddon`, and `event-store-native-addon` has setup and doctor vectors. Work verbs also refuse on every platform other than Linux, macOS included (`event-store-unsupported-platform`).
+- Section 19 describes the code the cutover deletes. On the Work cutover branch every row is gone from the tree; the cited lines belong to the pre-cutover tree. The standing proof is the reader census in `test/event-store/door.test.mjs`: no product file reads the retired event files or imports a reader of them. The tracked event files and the `.gitattributes` `merge=union` line of a repository leave in that repository's own `fgos events migrate` commit.

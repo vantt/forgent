@@ -40,7 +40,6 @@ test('Observe contracts exist and have standard schemas', () => {
     'packages/observe/contracts/observe.case.v1.json',
     'packages/observe/contracts/observe.snapshot.v1.json',
     'packages/run-result/contracts/run-result.read.v1.json',
-    'packages/observe/contracts/coordination-session.read.v1.json',
     'packages/work-state/contracts/work-events.read.v1.json',
   ];
 
@@ -155,28 +154,12 @@ test('Owner stores match their read contracts', () => {
   assert.ok(result.settledAt);
   assert.ok(result.classification);
 
-  // 2. Historic coordination sessions (engine retired; Observe still reads what it wrote)
-  const coordRead = readJson('packages/observe/contracts/coordination-session.read.v1.json');
-  assert.ok(coordRead.properties.sessionEvents);
-  assert.ok(coordRead.properties.sessionJson);
-
-  const session = readJson('test/fixtures/observe/.fgos/coordination/sessions/coord-golden-01/session.json');
-  assert.equal(session.status, 'completed');
-  assert.ok(session.completedAt);
-
-  const sessionEvents = readJsonl('test/fixtures/observe/.fgos/coordination/sessions/coord-golden-01/events.jsonl');
-  const allowedTypes = new Set(coordRead.properties.sessionEvents.properties.type.enum);
-  for (const ev of sessionEvents) {
-    assert.ok(allowedTypes.has(ev.type), `Session event type ${ev.type} must be allowed in read contract`);
-    assert.ok(typeof ev.ts === 'string');
-  }
-
-  // 3. Work owner store
+  // 2. Work owner store
   const workRead = readJson('packages/work-state/contracts/work-events.read.v1.json');
   assert.ok(workRead.properties.type);
   assert.ok(workRead.properties.payload);
 
-  const workEvents = readJsonl('test/fixtures/observe/.fgos/events.jsonl');
+  const workEvents = readJsonl('test/fixtures/observe/work-events.jsonl');
   const allowedWorkTypes = new Set(workRead.properties.type.enum);
   for (const ev of workEvents) {
     assert.ok(allowedWorkTypes.has(ev.type), `Work event type ${ev.type} must be allowed in read contract`);

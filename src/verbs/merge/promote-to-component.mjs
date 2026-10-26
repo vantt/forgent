@@ -14,7 +14,7 @@ import { listWork, addWork, editWork, addDecision, StoreError } from '../../stat
 import { mintWorkId } from '../../util/identity-mint.mjs';
 import { isMainWorktree } from '../../runner/worktree.mjs';
 import { resolveIntegrationBranch, retargetMember } from '../../runner/promote-engine.mjs';
-import { acknowledgeLand } from '../../runner/merge.mjs';
+import { acknowledgeLand, landAcknowledgement } from '../../runner/merge.mjs';
 
 /**
  * @param {{dir: string, repoRoot: string, cwd?: string}} ctx `cwd` is the caller checkout, distinct from the Land repository
@@ -127,6 +127,7 @@ export async function promoteToComponentUseCase({ dir, repoRoot, cwd = repoRoot 
     }
   }
 
+  const landOperationIds = results.flatMap((result) => (result.landSettlement ? [result.landSettlement.operationId] : []));
   const merged = results.filter((r) => r.outcome === 'merged').map((r) => r.id);
   const notMerged = results.filter((r) => r.outcome !== 'merged' && r.outcome !== 'skipped');
   const { event } = addDecision(dir, {
@@ -137,6 +138,8 @@ export async function promoteToComponentUseCase({ dir, repoRoot, cwd = repoRoot 
     // siblings into a component is machinery, so this must not read as
     // reflection at the retrospective gate.
     kind: 'engine',
+    // The Land operations of the members above: this decision is the record that releases their candidates.
+    ...(landOperationIds.length ? { landOperationIds } : {}),
   });
 
   // The decision is Work's durable record of every member's outcome: only now
@@ -146,7 +149,7 @@ export async function promoteToComponentUseCase({ dir, repoRoot, cwd = repoRoot 
   for (const { landSettlement, ...result } of results) {
     report.push(result);
     if (!landSettlement) continue;
-    for (const warning of acknowledgeLand(repoRoot, landSettlement.operationId, `work-decision:${rootId}:${event.seq}`)) {
+    for (const warning of acknowledgeLand(repoRoot, landSettlement.operationId, landAcknowledgement(event))) {
       process.stderr.write(`fgos: warning: "${result.id}" promote result is recorded; its Land candidate was retained (${warning}).\n`);
     }
   }

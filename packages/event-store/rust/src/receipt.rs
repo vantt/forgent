@@ -88,19 +88,9 @@ pub(crate) fn authorize_reconcile(
 /// Load each stream receipt once, independent of history length.
 pub(crate) fn own_bounds(layout: &crate::layout::Layout, origin: &str) -> Result<Positions, Error> {
     let mut bounds = Positions::new();
-    for entry in std::fs::read_dir(&layout.root).map_err(crate::errors::io)? {
-        let entry = entry.map_err(crate::errors::io)?;
-        let name = entry.file_name();
-        if let Some(name) = name.to_str() {
-            if crate::layout::StreamId::parse(name).is_ok()
-                && entry.file_type().map_err(crate::errors::io)?.is_dir()
-            {
-                bounds.insert(
-                    format!("{origin}:{name}"),
-                    crate::append::read_last_seq(&entry.path().join("sealed.json"))?.unwrap_or(0),
-                );
-            }
-        }
+    for stream in layout.streams()? {
+        let last = crate::append::read_last_seq(&layout.stream(&stream).sealed())?;
+        bounds.insert(format!("{origin}:{}", stream.as_str()), last.unwrap_or(0));
     }
     Ok(bounds)
 }

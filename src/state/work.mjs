@@ -205,7 +205,7 @@ export const GOAL_TIERS = Object.freeze(['mvp', 'milestone']);
 
 /**
  * Current schema/event version (per D7c): every event appended from Phase 2
- * onward carries this as `v` (see src/state/events.mjs). Events committed
+ * onward carries this as `v` (see src/state/event-log.mjs). Events committed
  * before Phase 2 carry no `v` at all — absence of the field, not a lower
  * number, is how a pre-Phase-2 event is recognized; backward-compatible
  * replay for those events is cell phase-2-routing-2's concern, not this

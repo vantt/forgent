@@ -69,3 +69,58 @@ fn standard_cases() {
         }
     }
 }
+
+/// A project that configures nothing must work on a machine that holds only Claude or only Codex.
+/// A `prefer` list narrows the seat walk and never widens it (seat binding §6.3), so every producer
+/// pool of agent executors in the standard names both `claude` and `openai`, and every
+/// `tierFallback` tier names both families. Checker role pools (`roles.<role>.prefer`) are held to
+/// the same rule: at standard rigor a checker only has to differ from the producer, so a machine
+/// holding Claude and Codex seats one on each side.
+#[test]
+fn every_standard_agent_pool_names_both_claude_and_openai() {
+    let (schemas, _) = Schemas::bundled().unwrap();
+    let standard = Standard::bundled(&schemas).unwrap();
+    let runner = &standard.value()["runner"];
+    let names = |list: &Value| -> Vec<String> {
+        list.as_array()
+            .unwrap()
+            .iter()
+            .map(|entry| match entry {
+                Value::String(name) => name.clone(),
+                other => other["executor"].as_str().unwrap().to_string(),
+            })
+            .collect()
+    };
+    let mut gaps = Vec::new();
+    let mut need_both = |path: String, names: Vec<String>| {
+        for family in ["claude", "openai"] {
+            if !names.iter().any(|name| name == family) {
+                gaps.push(format!("{path} lacks {family}"));
+            }
+        }
+    };
+    let mut pools = 0;
+    for (capability, entry) in runner["capabilities"].as_object().unwrap() {
+        let mut lists = vec![(format!("{capability}.prefer"), &entry["prefer"])];
+        for group in ["seats", "personas", "roles"] {
+            for (key, scope) in entry[group].as_object().into_iter().flatten() {
+                lists.push((format!("{capability}.{group}.{key}.prefer"), &scope["prefer"]));
+            }
+        }
+        for (path, list) in lists {
+            if !list.is_array() {
+                continue;
+            }
+            let listed = names(list);
+            if listed.iter().all(|name| runner["executors"][name]["kind"] == "agent") {
+                pools += 1;
+                need_both(format!("capabilities.{path}"), listed);
+            }
+        }
+    }
+    for (tier, list) in runner["tierFallback"].as_object().unwrap() {
+        need_both(format!("tierFallback.{tier}"), names(list));
+    }
+    assert!(pools > 30, "the standard's agent pools were not found ({pools})");
+    assert!(gaps.is_empty(), "{gaps:#?}");
+}

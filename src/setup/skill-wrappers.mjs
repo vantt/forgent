@@ -18,6 +18,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
+import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
 
 const FRONTMATTER_PATTERN = /^---\r?\n[\s\S]*?\r?\n---\r?\n/;
 
@@ -159,9 +161,11 @@ function isGeneratedWrapper(wrapperDirPath) {
  * routes any `_shared` reference inside the source file to
  * `agentsSkillsRoot`'s own `_shared/`, so `.claude/skills/_shared` is not
  * needed once every `.claude/skills/*` entry is a redirect). Returns the
- * list of wrapper paths written.
+ * list of wrapper paths written. An optional `keep(targetPath, incoming)`
+ * (see `createProjectSkillGuard`) names a target file to leave untouched;
+ * a kept wrapper is not listed as written.
  */
-export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {
+export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { keep } = {}) {
   const written = [];
   const validWrapperNames = new Set();
   if (fs.existsSync(agentsSkillsRoot)) {
@@ -177,9 +181,12 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {
       const wrapperDir = path.join(claudeSkillsRoot, entry.name);
       const wrapperPath = path.join(wrapperDir, 'SKILL.md');
       const sourceRelativePath = path.relative(wrapperDir, sourcePath).replaceAll('\\', '/');
-      fs.mkdirSync(wrapperDir, { recursive: true });
-      fs.writeFileSync(wrapperPath, generateWrapperContent(sourceContent, sourceRelativePath));
-      written.push(wrapperPath);
+      const wrapperContent = generateWrapperContent(sourceContent, sourceRelativePath);
+      if (!keep?.(wrapperPath, wrapperContent)) {
+        fs.mkdirSync(wrapperDir, { recursive: true });
+        fs.writeFileSync(wrapperPath, wrapperContent);
+        written.push(wrapperPath);
+      }
 
       const skillDir = path.join(agentsSkillsRoot, entry.name);
       for (const subEntry of fs.readdirSync(skillDir, { withFileTypes: true })) {
@@ -188,9 +195,9 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {
         const subSource = path.join(skillDir, subEntry.name);
         const subTarget = path.join(wrapperDir, subEntry.name);
         if (subEntry.isDirectory()) {
-          copyDirRecursive(subSource, subTarget);
+          copyDirRecursive(subSource, subTarget, keptCopy(keep));
         } else {
-          atomicCopyFileSync(subSource, subTarget);
+          keptCopy(keep)(subSource, subTarget);
         }
       }
     }
@@ -206,6 +213,93 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {
   }
 
   return written;
+}
+
+/** `atomicCopyFileSync` that leaves a target file `keep` names untouched. */
+function keptCopy(keep) {
+  if (!keep) return atomicCopyFileSync;
+  return (sourcePath, targetPath) => {
+    if (!keep(targetPath, fs.readFileSync(sourcePath))) atomicCopyFileSync(sourcePath, targetPath);
+  };
+}
+
+function skillVersion(content) {
+  const match = /^\s*version:\s*["']?(\d+(?:\.\d+)*)["']?\s*$/m.exec(extractFrontmatter(content));
+  return match ? match[1].split('.').map(Number) : null;
+}
+
+function isNewerVersion(candidate, baseline) {
+  if (!candidate || !baseline) return false;
+  for (let i = 0; i < Math.max(candidate.length, baseline.length); i += 1) {
+    const diff = (candidate[i] ?? 0) - (baseline[i] ?? 0);
+    if (diff !== 0) return diff > 0;
+  }
+  return false;
+}
+
+function readIfFile(file) {
+  try {
+    return fs.readFileSync(file);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The files of a project's own skill folders that setup must not overwrite
+ * with the release copy: a tracked file with uncommitted changes since HEAD
+ * (its content would be lost), and every file of a skill whose `SKILL.md`
+ * declares a newer `version` than the copy being written (the project's
+ * version is ahead of the release). Anything else -- untracked, or tracked
+ * and clean, or identical content -- is refreshed as before.
+ *
+ * `guard.forRoots(sourceSkillsRoot, targetSkillsRoot)` returns
+ * `keep(targetPath, incoming)`; each call that returns true records the
+ * target's project-relative path in `guard.skipped`. Outside a git
+ * repository only the version rule applies.
+ */
+export function createProjectSkillGuard(projectRoot) {
+  const skipped = [];
+  let dirty;
+  const dirtyPaths = () => {
+    if (dirty) return dirty;
+    dirty = new Set();
+    try {
+      const inspect = createGitInspect(gitPortOptions(projectRoot));
+      const facts = inspect.resolveRepo();
+      if (!facts.notARepository) {
+        for (const entry of inspectEntries((page) => inspect.status({ ...page, untracked: 'none' }))) {
+          dirty.add(path.join(facts.worktreeRoot, inspectPath(entry.path)));
+        }
+      }
+    } catch {
+      // Any Git refusal or absence (not installed, untrusted-worktree, ...)
+      // falls back to the version rule alone.
+    }
+    return dirty;
+  };
+  return {
+    skipped,
+    forRoots(sourceSkillsRoot, targetSkillsRoot) {
+      const versionAhead = new Map();
+      return (targetPath, incoming) => {
+        const current = readIfFile(targetPath);
+        if (!current || current.equals(Buffer.from(incoming))) return false;
+        const name = path.relative(targetSkillsRoot, targetPath).split(path.sep)[0];
+        if (!versionAhead.has(name)) {
+          // Decided on the first file of the skill, before any of its files is rewritten.
+          const targetMd = readIfFile(path.join(targetSkillsRoot, name, 'SKILL.md'));
+          const sourceMd = readIfFile(path.join(sourceSkillsRoot, name, 'SKILL.md'));
+          versionAhead.set(name, Boolean(targetMd && sourceMd
+            && isNewerVersion(skillVersion(targetMd.toString('utf8')), skillVersion(sourceMd.toString('utf8')))));
+        }
+        // worktreeRoot is canonical; the project may be reached through a symlink.
+        if (!versionAhead.get(name) && !dirtyPaths().has(fs.realpathSync(targetPath))) return false;
+        skipped.push(path.relative(projectRoot, targetPath).split(path.sep).join('/'));
+        return true;
+      };
+    },
+  };
 }
 
 /** Recursively copy every file under `sourceDir` into `targetDir`,
@@ -1240,7 +1334,7 @@ export function materializeSkillsIntoProject(packageRoot, targetRoot) {
   }
   const sourceAgentsSkills = path.join(packageRoot, '.agents', 'skills');
   if (!fs.existsSync(sourceAgentsSkills)) {
-    return { copied: false, wrappersWritten: [] };
+    return { copied: false, wrappersWritten: [], skipped: [] };
   }
   const targetAgentsSkills = path.join(targetRoot, '.agents', 'skills');
   const targetClaudeSkills = path.join(targetRoot, '.claude', 'skills');
@@ -1250,8 +1344,9 @@ export function materializeSkillsIntoProject(packageRoot, targetRoot) {
   // target. Skip straight to wrapper (re)generation, the same thing
   // `npm run build:skills` already does on its own.
   const copied = path.resolve(packageRoot) !== path.resolve(targetRoot);
+  const guard = copied ? createProjectSkillGuard(targetRoot) : null;
   if (copied) {
-    copyDirRecursive(sourceAgentsSkills, targetAgentsSkills);
+    copyDirRecursive(sourceAgentsSkills, targetAgentsSkills, keptCopy(guard.forRoots(sourceAgentsSkills, targetAgentsSkills)));
     // prune: false -- this call only layers targetRoot's own domain skills
     // on top of the packageRoot base skills just copied above; the base
     // skills are never derivable from targetRoot's own core/skills+domains,
@@ -1260,6 +1355,8 @@ export function materializeSkillsIntoProject(packageRoot, targetRoot) {
     // own comment on its `prune` parameter).
     assembleSkills(targetRoot, undefined, { prune: false });
   }
-  const wrappersWritten = generateAllSkillWrappers(targetAgentsSkills, targetClaudeSkills);
-  return { copied, wrappersWritten };
+  const wrappersWritten = generateAllSkillWrappers(targetAgentsSkills, targetClaudeSkills, {
+    keep: guard?.forRoots(targetAgentsSkills, targetClaudeSkills),
+  });
+  return { copied, wrappersWritten, skipped: guard?.skipped ?? [] };
 }

@@ -1,8 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
-import { ensureRunnerConfigForDir } from './dispatch/config.mjs';
-import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
+import { loadRunnerConfigForDir } from './dispatch/config.mjs';
+import { readConfig } from '../config/facade.mjs';
 import { listWork } from '../state/store.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { compileDispatchPlan } from './dispatch/plan.mjs';
@@ -48,9 +48,9 @@ export async function fanoutBatchExecutorCli(
 
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const fgosDir = fgosDirFromRoot(root);
-  const cfg = ensureRunnerConfigForDir(root);
+  const cfg = loadRunnerConfigForDir(root);
 
-  const ceiling = readSharedConfigOrEmpty(root)?.workerSlots?.ceiling;
+  const ceiling = readConfig({ projectRoot: root, sections: ['workerSlots'] }).value.workerSlots.ceiling;
   const slotsView = listWork(fgosDir);
   const room = hasWorkerSlotRoom(slotsView, { ceiling, batchSize: candidateIds.length });
 

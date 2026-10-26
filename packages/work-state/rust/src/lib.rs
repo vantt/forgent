@@ -2,6 +2,7 @@
 //!
 //! Native read providers for work/state-owned operations.
 
+mod event_reader;
 pub mod legacy_friction;
 pub mod work_source;
 pub use work_source::{
@@ -68,19 +69,21 @@ fn valid_level(value: &str) -> bool {
     LEVELS.contains(&value)
 }
 
-fn read_shared_level(root: &Path) -> Option<String> {
-    let config_path = root.join(".fgos").join("config.json");
-    let raw = std::fs::read_to_string(config_path).ok()?;
-    let parsed: serde_json::Value = serde_json::from_str(&raw).ok()?;
-    let level = parsed
-        .get("gateBypass")
-        .and_then(|v| v.get("level"))
-        .and_then(|v| v.as_str())?;
-    if valid_level(level) {
-        Some(level.to_string())
-    } else {
-        None
-    }
+/// The level the effective config holds, with whether any file (not the bundled standard) set it.
+/// A refusal or an environment without `HOME` is `None`: the caller answers `off`.
+fn read_shared_level(
+    root: &Path,
+    lookup: impl Fn(&str) -> Option<String>,
+) -> Option<(String, bool)> {
+    use fgos_config::Segment::Key;
+    let snapshot = fgos_config::machine::project_snapshot(root, lookup).ok()?;
+    let level = snapshot.value["gateBypass"]["level"].as_str()?.to_string();
+    let path = [Key("gateBypass".into()), Key("level".into())];
+    let from_file = snapshot
+        .origins
+        .iter()
+        .any(|o| o.path == path && o.provenance.layer != "standard");
+    Some((level, from_file))
 }
 
 fn read_legacy_level(root: &Path) -> Option<String> {
@@ -96,12 +99,19 @@ fn read_legacy_level(root: &Path) -> Option<String> {
 }
 
 /// Reads the configured gate-bypass level with the same fail-closed posture as
-/// `src/state/gate-bypass.mjs`: shared config first, legacy standalone file
-/// second, and `off` for missing, malformed, or unknown values.
+/// `src/state/gate-bypass.mjs`: the effective config first (project, then the machine's global
+/// file); when only the bundled standard supplies the level, the legacy standalone file; `off`
+/// for a refused config or an unknown value.
 pub fn read_gate_bypass_level(root: &Path) -> String {
-    read_shared_level(root)
-        .or_else(|| read_legacy_level(root))
-        .unwrap_or_else(|| DEFAULT_LEVEL.to_string())
+    gate_bypass_level(root, |name| std::env::var(name).ok())
+}
+
+fn gate_bypass_level(root: &Path, lookup: impl Fn(&str) -> Option<String>) -> String {
+    match read_shared_level(root, lookup) {
+        Some((level, true)) => level,
+        Some((level, false)) => read_legacy_level(root).unwrap_or(level),
+        None => DEFAULT_LEVEL.to_string(),
+    }
 }
 
 pub fn resolve_gate_bypass_show() -> GateBypassShowOutcome {
@@ -180,36 +190,70 @@ mod tests {
         );
     }
 
-    #[test]
-    fn test_gate_bypass_level_fails_closed() {
-        let tmp = std::env::temp_dir().join(format!(
-            "fgos-work-state-gate-bypass-{}",
+    /// A project at `<dir>/project` and an empty home at `<dir>/home`; `files` are written under `project/.fgos`.
+    fn level(tag: &str, files: &[(&str, &str)], home: bool) -> String {
+        let dir = std::env::temp_dir().join(format!(
+            "fgos-work-state-gate-bypass-{tag}-{}",
             std::process::id()
         ));
-        let _ = std::fs::remove_dir_all(&tmp);
-        std::fs::create_dir_all(tmp.join(".fgos")).unwrap();
-        assert_eq!(read_gate_bypass_level(&tmp), "off");
+        let _ = std::fs::remove_dir_all(&dir);
+        let root = dir.join("project");
+        std::fs::create_dir_all(root.join(".fgos")).unwrap();
+        std::fs::create_dir_all(dir.join("home")).unwrap();
+        for (name, text) in files {
+            std::fs::write(root.join(".fgos").join(name), text).unwrap();
+        }
+        let home_dir = dir.join("home").to_string_lossy().into_owned();
+        let got = gate_bypass_level(&root, |k| (home && k == "HOME").then(|| home_dir.clone()));
+        let _ = std::fs::remove_dir_all(&dir);
+        got
+    }
 
-        std::fs::write(
-            tmp.join(".fgos").join("config.json"),
-            r#"{"gateBypass":{"level":"standard"}}"#,
-        )
-        .unwrap();
-        assert_eq!(read_gate_bypass_level(&tmp), "standard");
+    #[test]
+    fn test_gate_bypass_level_fails_closed() {
+        assert_eq!(level("none", &[], true), "off");
+        assert_eq!(
+            level(
+                "set",
+                &[("config.yaml", "gateBypass:\n  level: standard\n")],
+                true
+            ),
+            "standard"
+        );
+        // A refused config is `off`, and the legacy file does not override the refusal.
+        let legacy = ("gate-bypass.json", r#"{"level":"light"}"#);
+        assert_eq!(
+            level(
+                "bogus",
+                &[("config.yaml", "gateBypass:\n  level: bogus\n"), legacy],
+                true
+            ),
+            "off"
+        );
+        assert_eq!(
+            level(
+                "broken",
+                &[("config.yaml", "gateBypass: [unclosed\n"), legacy],
+                true
+            ),
+            "off"
+        );
+        assert_eq!(
+            level(
+                "nohome",
+                &[("config.yaml", "gateBypass:\n  level: heavy\n")],
+                false
+            ),
+            "off"
+        );
+    }
 
-        std::fs::write(
-            tmp.join(".fgos").join("config.json"),
-            r#"{"gateBypass":{"level":"bogus"}}"#,
-        )
-        .unwrap();
-        std::fs::write(
-            tmp.join(".fgos").join("gate-bypass.json"),
-            r#"{"level":"light"}"#,
-        )
-        .unwrap();
-        assert_eq!(read_gate_bypass_level(&tmp), "light");
-
-        let _ = std::fs::remove_dir_all(&tmp);
+    #[test]
+    fn test_gate_bypass_level_falls_back_to_the_legacy_file_only_when_no_config_sets_it() {
+        let legacy = ("gate-bypass.json", r#"{"level":"light"}"#);
+        assert_eq!(level("legacy", &[legacy], true), "light");
+        let set = ("config.yaml", "gateBypass:\n  level: heavy\n");
+        assert_eq!(level("config-wins", &[set, legacy], true), "heavy");
     }
 
     #[tokio::test]

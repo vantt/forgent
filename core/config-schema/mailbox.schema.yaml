@@ -1,0 +1,272 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:mailbox:v1
+$comment: "owner: agent-mailbox"
+description: "Limits of the agent mailbox, and whether a project opts in to its hooks."
+type: object
+properties:
+  maxBodyBytes:
+    description: "Size cap of a message body; a larger body is refused and the sender is told to send a path or link. In bytes. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+    type: integer
+    minimum: 0
+    x-fgos-scope: both
+    x-fgos-file: config
+  chain:
+    description: "Reply chain limits."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      maxDepth:
+        description: "Chain depth cap, counted on the derived reply chain only. In messages. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config
+  session:
+    description: "Send limits of one sender session."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      budget:
+        description: "Agent-origin send attempts by one sender inside the rolling window; refused attempts count too. In send attempts. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config
+      lifetimeCap:
+        description: "Send attempts by one sender generation over its whole life, never reset. In send attempts. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config
+  human:
+    description: "The window of the session budget."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      fallbackWindowSec:
+        description: "The rolling window of the session budget, used on every CLI instead of a human-input signal. In seconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        x-fgos-scope: both
+        x-fgos-file: config
+  loop:
+    description: "The loop guard between two heads."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      maxPerWindow:
+        description: "Messages between one ordered pair inside the loop window before the loop guard refuses. In messages. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config
+      windowSec:
+        description: "Length of the loop guard window. In seconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        x-fgos-scope: both
+        x-fgos-file: config
+  queue:
+    description: "Pending-message limits per recipient."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      cap:
+        description: "Pending messages per recipient; the newest is refused when full. In messages. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config
+      perSender:
+        description: "Pending messages one sender may hold in one recipient's queue. In messages. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config
+  counters:
+    description: "Size bound of the refusal and notice counters."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      maxKeys:
+        description: "Size bound of the per-party refusal and notice counters in a snapshot; the least recently bumped entry is evicted. In entries. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config
+  record:
+    description: "Message age limits of the mailbox record."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      ttlSec:
+        description: "A message still recorded after this age is refused with a notice. In seconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        x-fgos-scope: both
+        x-fgos-file: config
+      bodyRetentionSec:
+        description: "The body of an offered or refused message is dropped this long after its last state change. In seconds. The owner set it equal to mailbox.record.ttlSec, so a settled header is kept one day instead of seven."
+        type: integer
+        minimum: 0
+        x-fgos-scope: both
+        x-fgos-file: config
+  inFlightTtlSec:
+    description: "Time an unfinished claim hides a message; must exceed the adapters' measured latency. In seconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+    type: integer
+    minimum: 0
+    x-fgos-scope: both
+    x-fgos-file: config
+  maxOffers:
+    description: "Offers per message before it is refused with a notice. In offers. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+    type: integer
+    minimum: 0
+    maximum: 4294967295
+    x-fgos-scope: both
+    x-fgos-file: config
+  wake:
+    description: "Limits on waking a recipient."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      exchangeGapSec:
+        description: "A silence of at least this long between two heads starts a new exchange. In seconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        x-fgos-scope: both
+        x-fgos-file: config
+      maxPerExchange:
+        description: "Wake sends that take effect within one exchange, both directions together. In wakes. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config
+      lifetimeCap:
+        description: "Wake sends that took effect by one sender generation to one recipient, never reset. In wakes. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config
+  notices:
+    description: "Notice limits per address."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      cap:
+        description: "Notices held per address; the oldest is dropped on overflow. In notices. Borrowed from mailbox.queue.perSender, not yet measured."
+        type: integer
+        minimum: 0
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config
+      windowSec:
+        description: "At most one notice per (sender, reason) inside this window. In seconds. Borrowed from mailbox.loop.windowSec, not yet measured."
+        type: integer
+        minimum: 0
+        x-fgos-scope: both
+        x-fgos-file: config
+  frame:
+    description: "Limits of a frame header."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      maxHeaderChars:
+        description: "Length bound of a frame header value, and so of a short name, of a writer key and of a binding's handle the core accepts. In characters. Borrowed from the longest session id Identity accepts, not yet measured."
+        type: integer
+        minimum: 0
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config
+  stopBlock:
+    description: "Limits on blocking a Stop hook."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      max:
+        description: "Consecutive Stop blocks that were written and finished for one head generation; the count returns to zero when a Stop passes without blocking or a new turn starts. In blocks. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config
+  hook:
+    description: "Limits of one hook call."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      lockWaitMs:
+        description: "Longest wait for the mailbox lock before a hook skips its drain. In milliseconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        x-fgos-scope: both
+        x-fgos-file: config
+      budgetMs:
+        description: "Whole-hook failure ceiling, not a target: a hook call still running when it passes exits 0 without printing, unless its stdout write has started. In milliseconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. It cannot be raised: setup gives each CLI a hook timeout of this standard value plus two seconds, and a larger value would let the CLI cut the hook before its own watchdog does."
+        type: integer
+        minimum: 0
+        maximum: 8000
+        x-fgos-scope: both
+        x-fgos-file: config
+      maxReadBytes:
+        description: "Largest foreign JSON document the hook reads: its stdin payload and the CLI's own session file; a larger one is refused (stdin: the drain is skipped with the quiet reason OverReadCap, which the entry records in runtime/mailbox/hook-outcome.json, and the mail stays pending; session file: no head). In bytes. Borrowed from the repository's two bounds on a foreign input read, both 1 MiB (terminal control's stdin and observe's file reads), not yet measured."
+        type: integer
+        minimum: 0
+        x-fgos-scope: both
+        x-fgos-file: config
+      breaker:
+        description: "The circuit breaker of the hook."
+        type: object
+        x-fgos-scope: both
+        x-fgos-file: config
+        properties:
+          failures:
+            description: "Consecutive counted hook failures (a record error other than lock contention, or a caught panic) after which the circuit breaker opens and hook calls skip the drain. In failures. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+            type: integer
+            minimum: 0
+            maximum: 4294967295
+            x-fgos-scope: both
+            x-fgos-file: config
+          pauseSec:
+            description: "How long an open circuit breaker keeps hook calls quiet before the next call drains again. In seconds. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS."
+            type: integer
+            minimum: 0
+            x-fgos-scope: both
+            x-fgos-file: config
+  verbs:
+    description: "Limits of the mailbox verbs."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      lockWaitMs:
+        description: "Longest wait of fgos mailbox send, inbox and inbox --claim for the mailbox lock, polling with backoff, before they answer lock-busy; a person or agent waits on these verbs, so they outwait a hook call holding the lock (a registering call writes and fsyncs) instead of refusing at the hook's skip budget. In milliseconds. About 15 times the longest measured hold: a registering hook call held the lock up to 135 ms at p95 on ext4 under load."
+        type: integer
+        minimum: 0
+        x-fgos-scope: both
+        x-fgos-file: config
+  enabled:
+    description: "Whether fgos setup and doctor --fix install the mailbox hook rows into this project's Claude Code and Codex hook files; false removes the rows they installed. Off by default: the mailbox is opt-in until the owner decides spec section 16 item 23."
+    type: boolean
+    x-fgos-scope: project-only
+    x-fgos-file: config

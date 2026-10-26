@@ -1123,7 +1123,7 @@ fn native_discussions_reports_owner_voters_and_root_wide_summary_diagnostics() {
         "unitRunId": "unit-run-research", "workflow": null,
         "pattern": "research-fan-out", "capability": "analysis", "outcome": "pass",
         "startedAt": "2026-10-05T12:00:00Z", "settledAt": "2026-10-05T12:01:00Z",
-        "inline": false, "stanceOptions": ["a", "b"],
+        "stanceOptions": ["a", "b"],
         "seats": [
             {"role": "researcher-1", "kind": "panelist", "round": 1, "final": final_attempt, "attempts": [attempt]},
             {"role": "researcher-2", "kind": "panelist", "round": 1, "final": final_attempt, "attempts": [attempt]},
@@ -1198,6 +1198,10 @@ fn identity_command(args: &[&str]) -> Command {
     let mut cmd = Command::new(fgos_bin());
     cmd.arg("identity").args(args);
     cmd.env("FGOS_STATE_ROOT", identity_state_root());
+    // An empty home, so the machine's real global config never decides a case.
+    let home = identity_state_root().with_extension("home");
+    fs::create_dir_all(&home).unwrap();
+    cmd.env("HOME", home).env_remove("XDG_CONFIG_HOME");
     for key in [
         "FGOS_SESSION_ID",
         "CODEX_THREAD_ID",
@@ -1412,6 +1416,181 @@ fn identity_directory_registers_only_on_request_and_resolves_by_handle_and_role(
     let _ = fs::remove_dir_all(&state);
 }
 
+/// The wiring of the shared directory over real clones: `--register` appends
+/// one `identity.session-published` to the clone's Event Store, and `resolve`
+/// answers a session another machine published after one sync. The signature,
+/// fold and role rules are owned by the identity crate's shared tests.
+#[test]
+fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine() {
+    use fgos_event_store::{
+        append::{append, AppendRequest, EventInput},
+        layout::{Layout, StreamId},
+        registry::{ConsumerContract, Registry},
+        sync::{sync, SyncRequest},
+    };
+    use fgos_git::{GitDriver, ResolveRepo};
+    use fgos_identity::shared::{published_payload, MachineRef};
+    use std::os::unix::fs::PermissionsExt;
+
+    let world = std::env::temp_dir().join(format!("fgos_test_identity_shared_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&world);
+    fs::create_dir_all(&world).unwrap();
+    fs::set_permissions(&world, fs::Permissions::from_mode(0o700)).unwrap();
+    let git = |dir: &std::path::Path, args: &[&str]| {
+        let out = Command::new("git").arg("-C").arg(dir).args(args).output().unwrap();
+        assert!(out.status.success(), "git {args:?}: {}", String::from_utf8_lossy(&out.stderr));
+    };
+    let remote = world.join("remote.git");
+    git(&world, &["init", "--bare", "-q", remote.to_str().unwrap()]);
+    let machine_state = |name: &str, machine_id: &str| {
+        let state = world.join(format!("state-{name}"));
+        fs::create_dir_all(&state).unwrap();
+        fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+        fs::write(state.join("machine-id"), format!("{machine_id}\n")).unwrap();
+        fgos_identity::signing::mint_key(&state).unwrap();
+        state
+    };
+    let project_id = "0123456789abcdef0123456789abcdef";
+    let driver = GitDriver::new(&world).unwrap();
+    // A clone of a migrated project: the `.fgos/events` fence is there, but this clone never appended,
+    // so it has no store yet; its first identity publish creates it.
+    let clone = |name: &str| {
+        let root = world.join(name);
+        git(&world, &["clone", "-q", remote.to_str().unwrap(), root.to_str().unwrap()]);
+        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        fs::create_dir_all(root.join(".fgos")).unwrap();
+        fs::write(
+            root.join(".fgos/project.json"),
+            format!(r#"{{"v":1,"projectId":"{project_id}","handle":"demo","createdAt":"2026-10-24T00:00:00.000Z"}}"#),
+        )
+        .unwrap();
+        let fence = root.join(".fgos/locks/activation.lock");
+        fs::create_dir_all(&fence).unwrap();
+        fs::write(fence.join("TOMBSTONE"), "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n").unwrap();
+        let repo = match driver.resolve_repo(&root, &root).unwrap() {
+            ResolveRepo::Repository(repo) => repo,
+            _ => panic!("a clone is a repository"),
+        };
+        let layout = Layout::from_common_dir(Some(repo.common_dir())).unwrap();
+        fs::create_dir_all(layout.root.join("locks")).unwrap();
+        for dir in [layout.common_dir.join("fgos"), layout.root.join("locks")] {
+            fs::set_permissions(dir, fs::Permissions::from_mode(0o700)).unwrap();
+        }
+        fgos_git::RepositoryConfig::ensure_fetch_mapping(
+            &driver,
+            &repo,
+            "origin",
+            &fgos_git::publication_fetch_mappings("origin").unwrap(),
+            "test-mapping-setup",
+        )
+        .unwrap();
+        fs::write(root.join(".fgos/events"), "fence\n").unwrap();
+        (root, repo, layout)
+    };
+    let sync_clone = |repo: &fgos_git::RepoHandle, layout: &Layout, machine: &str| {
+        sync(
+            &driver,
+            repo,
+            SyncRequest { layout, machine, remote: "origin", no_push: false, opportunistic: false, held_ranks: &[], hot_lock_depth: 0 },
+        )
+        .unwrap();
+    };
+    let (alpha_state, bravo_state) = (machine_state("alpha", "alpha-aaaaaa"), machine_state("bravo", "bravo-bbbbbb"));
+    let (alpha_root, alpha_repo, alpha_layout) = clone("alpha");
+    let (bravo_root, bravo_repo, bravo_layout) = clone("bravo");
+    let _ = bravo_root;
+
+    let run = |args: &[&str]| {
+        identity_command(args)
+            .env("FGOS_STATE_ROOT", &alpha_state)
+            .env("FGOS_SESSION_ID", "alpha-session")
+            .current_dir(&alpha_root)
+            .output()
+            .unwrap()
+    };
+    let published_in_alpha = || {
+        let active = alpha_layout.stream(&StreamId::parse("project:identity").unwrap()).active();
+        fs::read_to_string(active).map_or(0, |text| text.matches("identity.session-published").count())
+    };
+    assert!(!alpha_layout.store().exists(), "the clone has never appended");
+    identity_data(&run(&["session", "--register", "--role", "lead:WORK", "--json"]));
+    assert_eq!(published_in_alpha(), 1, "a new registration in a migrated clone without a store creates it and publishes once");
+    identity_data(&run(&["session", "--register", "--role", "lead:WORK", "--json"]));
+    assert_eq!(published_in_alpha(), 1, "an unchanged registration publishes nothing");
+
+    // Bravo publishes a session with its own key into its clone and pushes it.
+    let listed = fgos_identity::directory::Listed {
+        id: "bravo-bbbbbb/sess".into(),
+        handle: "claude-sess@bravo".into(),
+        cli: "claude".into(),
+        project_id: Some(project_id.into()),
+        clone: None,
+        registered_at: "2026-10-24T01:00:00.000Z".into(),
+        roles: vec!["lead:MAIL".into()],
+        liveness: fgos_identity::refusal::Liveness::Alive,
+        remote: None,
+    };
+    let payload = published_payload(&bravo_state, &listed, &MachineRef { id: "bravo-bbbbbb".into(), handle: "bravo".into() }).unwrap();
+    let mut registry = Registry::default();
+    let contract = include_str!("../../../packages/identity/contracts/identity-event-streams.v1.json");
+    let sealed: Vec<bool> = serde_json::from_str::<serde_json::Value>(contract).unwrap()["types"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|t| t["sealOnWrite"].as_bool().unwrap())
+        .collect();
+    assert_eq!(sealed, [false, false], "the host appends and never seals, so the contract says so");
+    registry.register(serde_json::from_str::<ConsumerContract>(contract).unwrap()).unwrap();
+    append(
+        &bravo_layout,
+        &registry,
+        AppendRequest {
+            stream: &StreamId::parse("project:identity").unwrap(),
+            events: &[EventInput { event_type: "identity.session-published".into(), schema_version: 1, payload, ts: "2026-10-24T01:00:00.000Z".into() }],
+            cursor: &Default::default(),
+            writer: "bravo-writer",
+            machine: "bravo-bbbbbb",
+            held_ranks: &[],
+        },
+    )
+    .unwrap();
+    sync_clone(&bravo_repo, &bravo_layout, "bravo-bbbbbb");
+    sync_clone(&alpha_repo, &alpha_layout, "alpha-aaaaaa");
+
+    let remote_session = identity_data(&run(&["resolve", "lead:MAIL", "--json"]));
+    assert_eq!(remote_session["id"], "bravo-bbbbbb/sess");
+    assert_eq!(remote_session["liveness"], "remote");
+    assert_eq!(remote_session["machine"], serde_json::json!({ "id": "bravo-bbbbbb", "handle": "bravo" }));
+    assert_eq!(remote_session["pin"], "seen");
+    assert!(remote_session["fetchedAt"].is_string());
+    assert_eq!(identity_data(&run(&["resolve", "bravo-bbbbbb/sess", "--json"]))["handle"], "claude-sess@bravo");
+    assert_eq!(identity_data(&run(&["resolve", "lead:WORK", "--json"]))["id"], "alpha-aaaaaa/alpha-session", "the local session is asked first");
+    let cache: serde_json::Value = serde_json::from_slice(&fs::read(alpha_root.join(".fgos/cache/identity-directory.json")).unwrap()).unwrap();
+    assert_eq!(cache["entries"][0]["machine"]["id"], "bravo-bbbbbb", "a read keeps the verified view in the cache");
+    let by_machine = identity_data(&run(&["list", "--machine", "bravo", "--json"]));
+    let ids: Vec<&str> = by_machine["sessions"].as_array().unwrap().iter().map(|s| s["id"].as_str().unwrap()).collect();
+    assert_eq!(ids, ["bravo-bbbbbb/sess"], "--machine keeps one machine's sessions");
+
+    // A clone that still tracks a retired event file is refused by the Event Store's write admission:
+    // the local registration succeeds, the refusal is one stderr line, and nothing is appended.
+    let (legacy_root, _, legacy_layout) = clone("legacy");
+    fs::write(legacy_root.join(".fgos/events.jsonl"), "").unwrap();
+    git(&legacy_root, &["add", "-f", ".fgos/events.jsonl"]);
+    git(&legacy_root, &["-c", "user.name=t", "-c", "user.email=t@example.test", "commit", "-qm", "legacy events"]);
+    let refused = identity_command(&["session", "--register", "--role", "lead:OTHER", "--json"])
+        .env("FGOS_STATE_ROOT", &alpha_state)
+        .env("FGOS_SESSION_ID", "alpha-session")
+        .current_dir(&legacy_root)
+        .output()
+        .unwrap();
+    identity_data(&refused);
+    let stderr = String::from_utf8_lossy(&refused.stderr);
+    assert!(stderr.contains("identity-publish-failed: event-store-write-refused"), "{stderr}");
+    let active = legacy_layout.stream(&StreamId::parse("project:identity").unwrap()).active();
+    assert!(!active.exists(), "a refused admission appends nothing");
+    let _ = fs::remove_dir_all(&world);
+}
+
 /// `fgos identity machine` over a scratch state root: the wiring of the verb
 /// (route, operation per flag, exit code of a refusal). The id, handle and
 /// alias rules are owned by the identity crate's own tests.
@@ -1456,11 +1635,11 @@ fn identity_machine_reads_refuses_and_sets_the_alias_through_the_state_root() {
     let _ = fs::remove_dir_all(&state);
 }
 
-/// `fgos identity pins`: the wiring of the read and of `--forget` (read versus
+/// `fgos identity pins`: the wiring of the read, `--confirm` and `--forget` (read versus
 /// write operation, flag validation, exit code of a refusal). What a pin is and
 /// when it is made is owned by the identity crate's signing tests.
 #[test]
-fn identity_pins_lists_the_pinned_machines_and_forgets_one_by_id() {
+fn identity_pins_lists_confirms_and_forgets_a_pin_by_machine_id() {
     let state = std::env::temp_dir().join(format!("fgos_test_identity_pins_{}", std::process::id()));
     let _ = fs::remove_dir_all(&state);
     fs::create_dir_all(state.join("identity/pins")).unwrap();
@@ -1473,7 +1652,32 @@ fn identity_pins_lists_the_pinned_machines_and_forgets_one_by_id() {
         identity_command(&[&["pins"], args].concat()).env("FGOS_STATE_ROOT", &state).output().unwrap()
     };
 
-    assert_eq!(identity_data(&pins(&["--json"])), serde_json::json!({ "pins": [pin] }));
+    // A pin file written without `state` lists as `seen`.
+    let seen = serde_json::json!({
+        "v": 1, "machineId": pin["machineId"], "publicKey": pin["publicKey"], "fingerprint": pin["fingerprint"],
+        "firstSeen": pin["firstSeen"], "state": "seen"
+    });
+    assert_eq!(identity_data(&pins(&["--json"])), serde_json::json!({ "pins": [seen] }));
+    let fingerprint = pin["fingerprint"].as_str().unwrap();
+    for refused in [
+        pins(&["--confirm", "peer-abc234"]),
+        pins(&["--fingerprint", fingerprint]),
+        pins(&["--confirm", "peer-abc234", "--fingerprint", fingerprint, "--forget", "peer-abc234"]),
+    ] {
+        assert_ne!(refused.status.code(), Some(0), "--confirm needs --fingerprint and excludes --forget");
+    }
+    let absent = pins(&["--confirm", "other-abc234", "--fingerprint", fingerprint]);
+    assert_eq!(absent.status.code(), Some(65));
+    assert!(String::from_utf8_lossy(&absent.stderr).contains("[pin-missing]"));
+    let wrong = pins(&["--confirm", "peer-abc234", "--fingerprint", "SHA256:other"]);
+    assert_eq!(wrong.status.code(), Some(65));
+    let stderr = String::from_utf8_lossy(&wrong.stderr);
+    assert!(stderr.contains("[fingerprint-mismatch]") && stderr.contains(fingerprint) && stderr.contains("SHA256:other"), "{stderr}");
+    let confirmed = identity_data(&pins(&["--confirm", "peer-abc234", "--fingerprint", fingerprint]));
+    assert_eq!(confirmed["confirmed"]["state"], "confirmed");
+    assert!(confirmed["confirmed"]["confirmedAt"].is_string());
+    assert_eq!(identity_data(&pins(&["--json"]))["pins"][0], confirmed["confirmed"]);
+    let pin = confirmed["confirmed"].clone();
     let missing = pins(&["--forget", "other-abc234"]);
     assert_eq!(missing.status.code(), Some(65));
     assert!(String::from_utf8_lossy(&missing.stderr).contains("[pin-not-found]"));
@@ -1793,11 +1997,11 @@ fn config_migrate_converts_a_legacy_project_file_and_leaves_the_tombstone() {
 }
 
 #[test]
-fn config_migrate_global_copies_first_and_refuses_the_removal_without_the_machine_check() {
+fn config_migrate_global_copies_first_refuses_the_removal_without_the_machine_check_then_converts() {
     let sandbox = config_sandbox("global");
     fs::create_dir_all(sandbox.join("home/.fgos")).unwrap();
     let global = sandbox.join("home/.fgos/config.json");
-    let legacy = "{\"runner\":{\"llmAccounts\":{\"claude\":{\"work\":{\"login\":\"~/.claude-work\"}}}}}\n";
+    let legacy = "{\"gateBypass\":{\"level\":\"light\"},\"runner\":{\"llmAccounts\":{\"claude\":{\"work\":{\"login\":\"~/.claude-work\"}}}}}\n";
     fs::write(&global, legacy).unwrap();
     let copied = config_data(&config_run(&sandbox, &["migrate", "--global"], false));
     assert_eq!(copied["stage"], "copy");
@@ -1807,6 +2011,10 @@ fn config_migrate_global_copies_first_and_refuses_the_removal_without_the_machin
     assert!(config_refusal(&refused).contains("config-machine-check-required"));
     let finished = config_data(&config_run(&sandbox, &["migrate", "--global", "--finish", "--machine-checked"], false));
     assert_eq!(finished["stage"], "finish");
+    let converted = config_data(&config_run(&sandbox, &["migrate", "--global", "--convert", "--machine-checked"], false));
+    assert_eq!(converted["kept"][0], "gateBypass.level");
+    assert!(sandbox.join("home/.fgos/config.yaml").exists());
+    assert!(fs::read_to_string(&global).unwrap().starts_with("moved to .fgos/config.yaml"));
     let _ = fs::remove_dir_all(&sandbox);
 }
 

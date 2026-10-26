@@ -122,27 +122,16 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     });
     assert.equal(shimReadyRes.status, 0, `shim ready --json must exit 0: ${shimReadyRes.stderr}`);
 
+    // The checkout's own `node bin/fgos.mjs` is the npm channel: it ships no native addon, and Work reads the Event
+    // Store through it, so it refuses by name and points at fgctl. Only the shim (the activated release) answers.
     const nodeReadyRes = spawnSync('node', [path.resolve(REPO_ROOT, 'bin/fgos.mjs'), 'ready', '--json'], {
       cwd: tempProj,
       env: { ...withoutActiveRelease(process.env), FGOS_STATE_HOME: tempState, HOME: tempHome },
       encoding: 'utf8',
     });
-    assert.equal(nodeReadyRes.status, 0, `node ready --json must exit 0: ${nodeReadyRes.stderr}`);
-
-    const parsedShim = JSON.parse(shimReadyRes.stdout.trim());
-    const parsedNode = JSON.parse(nodeReadyRes.stdout.trim());
-
-    assert.equal(parsedShim.contract, parsedNode.contract);
-    assert.equal(parsedShim.data_hash, parsedNode.data_hash);
-    assert.deepEqual(parsedShim.data, parsedNode.data);
-
-    // Byte-for-byte match with timestamp normalized
-    const normalizeTimestamp = (str) => str.replace(/"generated_at":\s*"[^"]+"/, '"generated_at": "NORMALIZED"');
-    assert.equal(
-      normalizeTimestamp(shimReadyRes.stdout.trim()),
-      normalizeTimestamp(nodeReadyRes.stdout.trim()),
-      'ready --json through shim must match node bin/fgos.mjs byte-for-byte (modulo timestamp)'
-    );
+    assert.notEqual(nodeReadyRes.status, 0, 'a Work read through the addon-less npm channel must refuse');
+    assert.match(nodeReadyRes.stderr, /git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`/);
+    assert.equal(JSON.parse(shimReadyRes.stdout.trim()).contract, 'fgos.v1');
 
     // 10. Re-running init at the same digest is idempotent (R9)
     const rerunRes = runFgctl(['init', '--from', fixture.releaseDir], {

@@ -18,7 +18,7 @@ seedFileLocalBwrapRegistry();
 
 // Confined runs mount a private tmpfs over /tmp, so fixtures live outside it.
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
-import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
 
 const fixtureDirs = [];
 const fixtureDir = (prefix) => {
@@ -109,8 +109,8 @@ function setupProbeRepo(executorNames) {
       modelPolicies: Object.fromEntries(executorNames.map((name) => [name, { nano: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' }])),
       executors,
       capabilities: {
-        'docs:write': { prefer, rigor: 'standard' },
-        'docs:review': { prefer, persona: 'code-reviewer', rigor: 'standard' },
+        'docs:write': { prefer, rigor: 'standard', tier: 'standard' },
+        'docs:review': { prefer, persona: 'code-reviewer', rigor: 'standard', tier: 'standard' },
       },
       patterns: { seatBinding: { schema: 1 },
         defaultRule: { mutatingMinRigor: 'standard' },
@@ -171,8 +171,7 @@ test('workspace-write producer writes in its worktree only; the reviewer is read
 
 test('a run uses the confined invocation that was approved, not the executor first cli invocation', { skip: SKIP }, async () => {
   const { repoRoot, worktreeDir } = setupProbeRepo(['alpha']);
-  const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(repoRoot);
   const failScript = path.join(repoRoot, 'unconfined-must-not-run.mjs');
   fs.writeFileSync(failScript, "process.stderr.write('the unconfined invocation must not run\\n'); process.exit(7);\n");
   const alpha = cfg.runner.executors.alpha;

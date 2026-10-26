@@ -1,7 +1,7 @@
 ---
 title: "Mailbox V2: the record adapter in crate fgos-mailbox"
 description: "Build rung V2 of the Agent Mailbox ladder: the metadata snapshot under the holder-lock `mailbox` mutex written with durable-file, immutable body files with garbage collection, a kill matrix at every write step, two-process contention with the wait cap, the Q2 pruning of dead bindings, and the size ceiling and costs measured against S0, proven by cargo test -p fgos-mailbox on branch mailbox/v1-v3 only."
-status: pending
+status: completed
 priority: P2
 effort: ~3.5d (8 phases, strictly sequential)
 branch: main (plan only); all code on branch mailbox/v1-v3 in linked worktree /home/vantt/projects/forgent-mailbox, never merged to main until the owner says feasibility is proven
@@ -47,14 +47,14 @@ V2 does **not** prove: any hook payload or CLI (V3/V4), the shell's write-then-f
 
 | # | Phase | Proof | Status |
 |---|---|---|---|
-| 1 | [Preconditions and the `mailbox` lock row](phase-01-preconditions-and-lock-row.md) | Node registry contract test pins the row; `cargo test -p fgos-holder-lock` | pending |
-| 2 | [Paths, id source and the snapshot hold](phase-02-paths-ids-and-snapshot-hold.md) | `tests/record_snapshot.rs`: hold, no-write when unchanged, versions, frozen v1 fixture, refused send persisted | pending |
-| 3 | [Immutable bodies, safe reads and garbage collection](phase-03-bodies-and-garbage-collection.md) | `tests/record_bodies.rs` | pending |
-| 4 | [Kill matrix at every write step](phase-04-kill-matrix.md) | `tests/record_crash.rs` (SIGKILL per step) | pending |
-| 5 | [Two processes contending, with the wait cap](phase-05-two-process-contention.md) | `tests/record_contention.rs` | pending |
-| 6 | [Q2 pruning, the dead-binding consequence and the handle bound](phase-06-q2-pruning-and-handle-bound.md) | `tests/record_prune.rs`; core `tests/registry.rs` | pending |
-| 7 | [Size ceiling and costs against S0](phase-07-size-ceiling-and-costs.md) | `tests/record_ceiling.rs`; cost report from `examples/mailbox-record-cost.rs` | pending |
-| 8 | [Branch docs, full gates, review, hand-off](phase-08-branch-docs-gates-and-handoff.md) | workspace cargo gates and `npm test` green on the branch | pending |
+| 1 | [Preconditions and the `mailbox` lock row](phase-01-preconditions-and-lock-row.md) | Node registry contract test pins the row; `cargo test -p fgos-holder-lock` | done |
+| 2 | [Paths, id source and the snapshot hold](phase-02-paths-ids-and-snapshot-hold.md) | `tests/record_snapshot.rs`: hold, no-write when unchanged, versions, frozen v1 fixture, refused send persisted | done |
+| 3 | [Immutable bodies, safe reads and garbage collection](phase-03-bodies-and-garbage-collection.md) | `tests/record_bodies.rs` | done |
+| 4 | [Kill matrix at every write step](phase-04-kill-matrix.md) | `tests/record_crash.rs` (SIGKILL per step) | done |
+| 5 | [Two processes contending, with the wait cap](phase-05-two-process-contention.md) | `tests/record_contention.rs` | done |
+| 6 | [Q2 pruning, the dead-binding consequence and the handle bound](phase-06-q2-pruning-and-handle-bound.md) | `tests/record_prune.rs`; core `tests/registry.rs` | done |
+| 7 | [Size ceiling and costs against S0](phase-07-size-ceiling-and-costs.md) | `tests/record_ceiling.rs`; cost report from `examples/mailbox-record-cost.rs` | done |
+| 8 | [Branch docs, full gates, review, hand-off](phase-08-branch-docs-gates-and-handoff.md) | workspace cargo gates and `npm test` green on the branch | done |
 
 Strictly sequential: every phase adds to `src/record/` and to the shared test support.
 
@@ -118,7 +118,7 @@ Phase 8 records these in the branch spec §17, attributed to the planning lead (
 
 1. **Store input is the `.fgos` directory, not the record directory.** The lock row lives at `<fgosDir>/locks/mailbox.lock` like every repo leaf (`sessions`, `observe`, `repo-config`), so the store needs `<fgosDir>`; the record directory is derived from it in `paths.rs`. Spec §6.4 says "the mailbox crates take the resolved directory as a parameter": the resolved directory is the main checkout's `.fgos`.
 2. **Lock row:** `{name: "mailbox", kind: "mutex", scope: "repo", rank: 80, v3Path: "<fgosDir>/locks/mailbox.lock", v1Shape: null, v1Path: null, fence: "none", owner: "mailbox"}`; the schema's owner enum gains `"mailbox"` (precedent: `event-store`, `git`). Fence `none` needs no `fenceNote` (that rule binds only owner `4.2` rows). The rank-80 note in the registry and the holder-lock spec list it among the leaves.
-3. **No write when nothing changed**, decided by byte equality of the re-serialized snapshot with the bytes read (V3 decision: no `changed` flag in the core). Pruning and garbage collection run only in holds that already write, so they never turn a no-mail hook into a write.
+3. **No write when nothing changed**, decided by byte equality of the re-serialized snapshot with the bytes read (V3 decision: no `changed` flag in the core). Pruning and garbage collection run only in holds that already write, so they never turn a no-mail hook into a write. **Reversed 2026-10-22 by the plan owner (agent) after phase 7:** the hold now writes exactly when the core's own answer reports a change (`ReportsChange`), with no encode and no comparison on an unchanged hold; the re-encode was about half of a no-mail hold at a week of headers. See phase 7.
 4. **Body before snapshot.** In a send hold the body is installed (`install_once`, which syncs `bodies/`) before the snapshot that references it. A kill between the two leaves an unreferenced body, which is garbage; never a reference to a missing body.
 5. **Garbage collection in two parts, inside `record/` only.** The snapshot and the bodies live in `runtime/mailbox/record/`, which only a holder of the mutex writes; `runtime/mailbox/` itself is left for files written without the lock (V5's breaker file, spec §4.1, which must work exactly when the lock is busy), and the sweep never lists it. (a) Every installing hold deletes, after the install, the bodies that the previous snapshot referenced (`body_kept`) and the new one does not: no directory listing. (b) Every send hold lists `record_dir` and `bodies_dir` (through the checked directory descriptors) and deletes every regular file that `paths.is_known` does not name and the installed snapshot does not reference. Before any listing or deletion the hold checks, with `symlink_metadata` (never following), that `record_dir` and `bodies_dir` are real directories owned by the current user and not symlinks, and it deletes only entries whose own `file_type()` (not followed) is a regular file; anything else aborts the sweep with `RecordError::RecordDirUntrusted` and deletes nothing. <!-- Red Team: a symlinked directory must never steer deletion --> This removes bodies left by a killed send and `durable-file` temporaries (`.durable-file-<pid>-<seq>.tmp`) left by a killed writer: under the mailbox mutex no other mailbox writer can be between its temp and its rename, so the store needs no knowledge of durable-file's private temp format.
 6. **Safe reads.** The snapshot and every body are opened with `O_NOFOLLOW|O_NONBLOCK` and `fstat`ed as regular files before any read (a planted FIFO never blocks a hold); a body is read with a cap of `mailbox.maxBodyBytes` and must match its header's `body_bytes`. A planted symlink to a secret therefore never reaches a frame (spec §8 item 6: an unconfined worker can write the record directory).
@@ -160,6 +160,21 @@ Both questions let the plan continue on the provisional default; only the owner'
 - **Recommendation.** (a) for V2: measure and report; decide at V5 with the real hook numbers. If phase 7 already shows the steady state for one sender over 50 ms, (b) is the smallest change.
 - **Scope of the answer.** Header retention and snapshot size only; it does not change any send policy.
 - **Provisional default.** (a): V2 measures and reports; no core change.
+- **Measured at phase 7 (2026-10-22, [`research-261022-1145-mailbox-v2-record-costs.md`](../reports/research-261022-1145-mailbox-v2-record-costs.md), record alone, release build, ext4 on NVMe).**
+  - The one-sender steady week (20,140 headers, 7.0 MB): no-mail claim hold p50 30.0 ms, p95 42.5 ms.
+  - Plus 10 registered heads at their lifetime cap: p95 49.5 ms.
+  - Plus 100 such heads (39,940 headers, 13.8 MB): p50 58.0 ms, p95 64.2 ms. That is over 50 ms.
+  - The cost is the read and parse (about 14 ms at 7 MB) plus the re-encode for the no-write comparison (about 15 ms). Both grow linearly with the snapshot.
+  - The host's own cost per call comes on top of these record-only numbers.
+  - `mailbox.hook.lockWaitMs` bounds only the poll for the lock, not the hook's wall time (read, parse, re-encode, release).
+  - The default (a) is kept; no lever was picked. The answer is due now.
+- **Re-measured after decision 3 was reversed (the hold no longer re-encodes; same report, re-run section).**
+  - No-mail p50 / p95: one-sender week 22.6 / 36.8 ms; plus 10 heads 17.2 / 36.0 ms; plus 100 heads 44.1 / 49.7 ms.
+  - Measured only: with `record.bodyRetentionSec` set to the `record.ttlSec` value (86,400 s), the steady week holds 2,880 headers (1.0 MB) and the no-mail hold is 2.2 ms.
+  - The contract value is unchanged pending the owner's answer.
+- **Applied on the branch (owner answer above, option B) and measured at the new default (third run of the same report).**
+  - `limits.v1.json`: 86400.
+  - No-mail p50 / p95: one sender 2.5 / 2.6 ms (2,880 headers); plus 10 heads 3.7 / 3.7 ms; plus 100 heads 29.5 / 44.3 ms (22,680 headers).
 
 ### Q2. Dead bindings stay addressable until pruned, which can take up to the header retention. Keep that?
 

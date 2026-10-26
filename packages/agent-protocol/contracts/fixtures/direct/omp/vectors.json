@@ -1,6 +1,5 @@
 {
   "cli": "omp",
-  "stdinPolicy": "null-device",
   "source": "pi-family wording; the logged-out vector is the real tail of `omp -p` run with an empty HOME (2026-10-18)",
   "vectors": [
     {

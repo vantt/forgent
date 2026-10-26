@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Q2 pruning, the dead-binding consequence and the handle bound"
-status: pending
+status: completed
 depends_on: [5]
 ---
 
@@ -56,3 +56,39 @@ All seven tests are green on a fresh main merge.
 ## Risk and rollback
 
 - Pruning judges every binding on writing holds: phase 7 measures its cost with many dead bindings. If it is large, record it for the owner; do not add a cadence key (a new number).
+
+## API drift
+
+None (main `636df9d87`, unchanged since phase 4).
+
+## Owner decision Q2 option B (2026-10-22), applied here
+
+It replaces the provisional default (a) and planned test 7 ("a dead binding stays addressable while a header names it"):
+
+- Core: `SendRequest` gains `dead_keys: BTreeSet<WriterKey>`. Name resolution at `send` (the recipient and the label a refusal is counted under) skips those bindings, both as matches and as candidates. `MailboxState::resolve(query)` stays and delegates to the same implementation with an empty set.
+- Store: `Record::send` replaces `dead_keys` with its own judgement, made inside the hold: every binding judged through `head::stored_liveness`.
+- Owning proof (core): `tests/names.rs` :: `a_name_whose_only_binding_is_judged_dead_is_unknown_and_a_shared_prefix_resolves_to_the_live_head`.
+- Wiring proof (store): `tests/record_prune.rs` :: `a_send_never_resolves_a_name_to_a_binding_the_store_judges_dead`, which replaces planned test 7.
+- Recorded in branch spec §17.
+
+## Deviations
+
+- `hold` and `hold_observed` now take `now` and `limits` (deferred from phase 2 as recorded there): `hold(wait, now, limits, mutate)`. All 25 test call sites pass the time and limits their closure uses.
+- `SendRequest` gained a field rather than `send` a parameter: four test constructors change instead of about 40 call sites, and the core stays pure.
+- `head::stored_liveness` and the registering judgement share one private `liveness_of`. V3's `tests/head.rs` passes unchanged.
+- The idle rule takes `max(last_seen, last_drain_at)`, and "named" means any retained header (`from`, `to`) or notice (`to`, `about_to`).
+- The prune runs after the closure, only when the bytes already differ, and the snapshot is re-encoded only when something was forgotten.
+- Order of work: `prune.rs` was written before `tests/record_prune.rs`, so those tests were green on their first run. Their proof that they bite is the mutants below. The two core tests (handle bound, Q2(b)) went red first.
+- The dead head is a real `sleep` process, killed and reaped (`dead_head_record`, from phase 5).
+
+## Proof
+
+- `cargo test -p fgos-mailbox -p fgos-mailbox-core`: 184 passed. `tests/record_prune.rs` has 6 tests; the core gained 2.
+- Mutants: 12 tried, 11 killed.
+  - Killed (`record_prune`): no prune; the "named" rule ignored; the idle rule ignored or off by one; the liveness ignored; prune run before the no-write comparison; no dead keys passed to `send`.
+  - Killed (core): the dead keys not skipped in resolution; the handle bound off by one in either direction.
+  - Survived: ignoring notices in the "named" rule. It is equivalent under the contract values: a notice is about a refused message whose header names the same two keys and is kept 7 days, longer than any notice lives (at most `record.ttlSec`). The check stays because the owner's rule names notices.
+
+## Later change
+
+Review fixes H1, L1, L2, L3 (2026-10-22): exact names of dead heads are refused, not passed on; the prune's notice clause is removed and its last-drain clause proven; pruning keeps other heads' wake counts; a send judges liveness once. See phase 8, "Review fixes".

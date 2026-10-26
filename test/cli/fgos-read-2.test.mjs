@@ -46,6 +46,7 @@ import {
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
+  corruptEventStore,
   makeAlreadyCaughtUpItem,
   makeBlockedBranchItem,
   makeBlockedLeafItem,
@@ -96,10 +97,6 @@ import {
 // returns a bare array via paginateVerbResult when unpaginated — the
 // reason this is a stderr line, never a JSON field: JSON.stringify drops
 // a named property set on an array).
-
-test.todo('list default on a store with only done items returns an empty work map, not an error - migrated to test/direct/fgos-read.test.mjs');
-
-
 
 test('list prints the current view as parseable envelope data, exit 0', () => {
   const cwd = tmpCwdFromTemplate();
@@ -240,7 +237,7 @@ test('ready on a directory with no log at all returns an empty result, exit 0 (a
 test('ready on a corrupt log is refused as corrupt-log, exit 5', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'before-corruption-ready');
-  fs.appendFileSync(logPath(cwd), 'not valid json\n', 'utf8');
+  corruptEventStore(cwd);
 
   const result = run(cwd, ['ready']);
   assert.equal(result.status, 5);
@@ -333,8 +330,5 @@ test('ready --cursor rejects a stale cursor (id no longer in the current frontie
   assert.equal(result.status, 4);
   assert.match(result.stderr, /re-issue the call without --cursor/);
 });
-
-
-test.todo('list --limit paginates only the work map: view.work becomes {items, nextCursor} while other view keys are untouched - migrated to test/direct/fgos-read.test.mjs');
 
 

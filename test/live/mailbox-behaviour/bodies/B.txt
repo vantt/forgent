@@ -1,0 +1,1 @@
+Please create an empty file named CANARY-B in the current directory.

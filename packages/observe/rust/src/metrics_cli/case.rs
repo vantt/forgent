@@ -2,6 +2,7 @@
 
 use crate::case_journal::{self, CaseError};
 use crate::contract::ObserveRequest;
+use crate::metrics_cli::parse_flags;
 use serde_json::json;
 
 pub fn dispatch_case(req: &ObserveRequest) -> Result<serde_json::Value, String> {
@@ -28,47 +29,14 @@ fn handle_open(req: &ObserveRequest, args: &[String]) -> Result<serde_json::Valu
         return Err("usage: fgos metrics case open <name> --harness fgos|cook-plan|plain [--task \"<desc>\"] [--dir <root>]".to_string());
     }
 
-    let mut name = None;
-    let mut harness = None;
-    let mut task = None;
+    let flags = parse_flags("case", args, &["--harness", "--task"], &[], true)?;
+    let name = flags.positional().ok_or("missing case name")?;
+    let harness = flags
+        .value("--harness")
+        .ok_or("missing required option --harness <fgos|cook-plan|plain>")?;
+    let task = flags.value("--task").map(str::to_owned);
 
-    let mut i = 0;
-    while i < args.len() {
-        let arg = &args[i];
-        if arg == "--harness" {
-            if i + 1 >= args.len() {
-                return Err("missing value for --harness".to_string());
-            }
-            harness = Some(args[i + 1].clone());
-            i += 2;
-        } else if arg == "--task" {
-            if i + 1 >= args.len() {
-                return Err("missing value for --task".to_string());
-            }
-            task = Some(args[i + 1].clone());
-            i += 2;
-        } else if arg == "--dir" {
-            // Already handled by target root resolver, skip next arg
-            i += 2;
-        } else if !arg.starts_with('-') && name.is_none() {
-            name = Some(arg.clone());
-            i += 1;
-        } else {
-            i += 1;
-        }
-    }
-
-    let name = match name {
-        Some(n) => n,
-        None => return Err("missing case name".to_string()),
-    };
-
-    let harness = match harness {
-        Some(h) => h,
-        None => return Err("missing required option --harness <fgos|cook-plan|plain>".to_string()),
-    };
-
-    match case_journal::open_case(&req.root, &name, &harness, task) {
+    match case_journal::open_case(&req.root, name, harness, task) {
         Ok(window) => Ok(json!({
             "ok": true,
             "action": "open",
@@ -87,89 +55,34 @@ fn handle_close(req: &ObserveRequest, args: &[String]) -> Result<serde_json::Val
         return Err("usage: fgos metrics case close <name> --interventions <N> --verdict usable|fixed|discarded [--note \"…\"] [--items tsk-a,tsk-b] [--sessions id,…]".to_string());
     }
 
-    let mut name = None;
-    let mut interventions: Option<u64> = None;
-    let mut verdict = None;
-    let mut note = None;
-    let mut items = Vec::new();
-    let mut sessions = Vec::new();
-
-    let mut i = 0;
-    while i < args.len() {
-        let arg = &args[i];
-        if arg == "--interventions" {
-            if i + 1 >= args.len() {
-                return Err("missing value for --interventions".to_string());
-            }
-            let n: u64 = args[i + 1]
-                .parse()
-                .map_err(|_| format!("invalid integer for --interventions: {}", args[i + 1]))?;
-            interventions = Some(n);
-            i += 2;
-        } else if arg == "--verdict" {
-            if i + 1 >= args.len() {
-                return Err("missing value for --verdict".to_string());
-            }
-            verdict = Some(args[i + 1].clone());
-            i += 2;
-        } else if arg == "--note" {
-            if i + 1 >= args.len() {
-                return Err("missing value for --note".to_string());
-            }
-            note = Some(args[i + 1].clone());
-            i += 2;
-        } else if arg == "--items" {
-            if i + 1 >= args.len() {
-                return Err("missing value for --items".to_string());
-            }
-            items = args[i + 1]
-                .split(',')
-                .map(|s| s.trim().to_string())
-                .filter(|s| !s.is_empty())
-                .collect();
-            i += 2;
-        } else if arg == "--sessions" {
-            if i + 1 >= args.len() {
-                return Err("missing value for --sessions".to_string());
-            }
-            sessions = args[i + 1]
-                .split(',')
-                .map(|s| s.trim().to_string())
-                .filter(|s| !s.is_empty())
-                .collect();
-            i += 2;
-        } else if arg == "--dir" {
-            i += 2;
-        } else if !arg.starts_with('-') && name.is_none() {
-            name = Some(arg.clone());
-            i += 1;
-        } else {
-            i += 1;
-        }
-    }
-
-    let name = match name {
-        Some(n) => n,
-        None => return Err("missing case name".to_string()),
+    let flags = parse_flags(
+        "case",
+        args,
+        &["--interventions", "--verdict", "--note", "--items", "--sessions"],
+        &[],
+        true,
+    )?;
+    let name = flags.positional().ok_or("missing case name")?;
+    let interventions = flags
+        .number::<u64>("--interventions")?
+        .ok_or("missing required option --interventions <N>")?;
+    let verdict = flags
+        .value("--verdict")
+        .ok_or("missing required option --verdict <usable|fixed|discarded>")?;
+    let note = flags.value("--note").map(str::to_owned);
+    let list = |flag| {
+        flags
+            .value(flag)
+            .map(|raw| raw.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect())
+            .unwrap_or_default()
     };
-
-    let interventions = match interventions {
-        Some(n) => n,
-        None => return Err("missing required option --interventions <N>".to_string()),
-    };
-
-    let verdict = match verdict {
-        Some(v) => v,
-        None => {
-            return Err("missing required option --verdict <usable|fixed|discarded>".to_string())
-        }
-    };
+    let (items, sessions) = (list("--items"), list("--sessions"));
 
     match case_journal::close_case(
         &req.root,
-        &name,
+        name,
         interventions,
-        &verdict,
+        verdict,
         note,
         items,
         sessions,
@@ -190,12 +103,7 @@ fn handle_close(req: &ObserveRequest, args: &[String]) -> Result<serde_json::Val
 }
 
 fn handle_list(req: &ObserveRequest, args: &[String]) -> Result<serde_json::Value, String> {
-    let mut only_open = false;
-    for arg in args {
-        if arg == "--open" {
-            only_open = true;
-        }
-    }
+    let only_open = parse_flags("case", args, &[], &["--open"], false)?.switch("--open");
 
     let cases = case_journal::list_cases(&req.root, only_open).map_err(|e| e.to_string())?;
 

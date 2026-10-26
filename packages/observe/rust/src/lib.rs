@@ -6,6 +6,7 @@
 pub mod case_journal;
 pub mod contract;
 pub mod eval_journal;
+pub mod flags;
 pub mod friction;
 pub mod friction_cli;
 pub mod metrics_cli;
@@ -17,9 +18,6 @@ pub mod store_lock;
 pub mod time;
 
 pub use contract::*;
-pub use provider::{
-    ObserveFrictionProvider, ObserveMetricsProvider, OBSERVE_FRICTION_DESCRIPTOR,
-    OBSERVE_METRICS_DESCRIPTOR,
-};
-pub use shard::{read_all_json, shard_path, writer_shard_name};
+pub use provider::{ObserveProvider, ObserveWiring, OBSERVE_FRICTION_DESCRIPTOR, OBSERVE_METRICS_DESCRIPTOR};
+pub use shard::{shard_path, writer_shard_name};
 pub use store_lock::{acquire_store_lock, acquire_store_lock_within, ObserveLockError, StoreLockGuard};

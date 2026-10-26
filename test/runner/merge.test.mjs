@@ -20,7 +20,6 @@ import {
   performCatchUp,
   MergeError,
 } from '../../src/runner/merge.mjs';
-import { DEFAULT_INVARIANT_CHECK_COMMANDS, writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 // detectTrunk moved to runner/worktree.mjs (tsk-49i D1) — its cases stay in
 // this file, next to the merge behavior that resolves a target through it.
 import { branchNameFor, detectTrunk } from '../../src/runner/worktree.mjs';
@@ -389,41 +388,6 @@ test('landRunnerItem merges cleanly, verify passes, and commits — outcome "mer
   const result = await landItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(result.outcome, 'merged');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')));
-  assert.equal(isWorkingTreeClean(repoRoot), true);
-});
-
-// Event files due for a checkpoint are Work's to commit, through its declared
-// checkpoint before Land starts: Land publishes exactly the verified
-// candidate, and nothing is swept into the merge commit (Git spec §8 store
-// exclusion; the legacy event adapter's "no implicit sweep").
-test('landRunnerItem commits due .fgos event files through the checkpoint before Land, never inside the merge commit', async () => {
-  const repoRoot = initRepo();
-  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-
-  const fgosDir = path.join(repoRoot, '.fgos');
-  fs.mkdirSync(path.join(fgosDir, 'events'), { recursive: true });
-  writeProjectConfig(repoRoot, { checkpoint: { fallbackIntervalSec: 0 } });
-  fs.writeFileSync(path.join(fgosDir, 'events.jsonl'), '{"seq":1}\n');
-  const shardRel = '.fgos/events/writer-a-20260101T000000Z.jsonl';
-  fs.writeFileSync(path.join(repoRoot, shardRel), '{"id":"e1"}\n');
-
-  const headBefore = headOf(repoRoot);
-  const saved = process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
-  delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
-  let result;
-  try {
-    result = await landItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
-  } finally {
-    if (saved !== undefined) process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS = saved;
-  }
-  assert.equal(result.outcome, 'merged', JSON.stringify(result));
-
-  const newCommitSubjects = git(repoRoot, ['log', '--first-parent', '--format=%s', `${headBefore}..HEAD`]).trim().split('\n');
-  assert.equal(newCommitSubjects.length, 2, 'the checkpoint commit, then the merge commit');
-  assert.match(newCommitSubjects[1], /fallback events checkpoint/);
-  assert.match(newCommitSubjects[0], /^merge fgw\/demo-item into main$/);
-  assert.match(git(repoRoot, ['ls-tree', '-r', '--name-only', 'HEAD^1', '--', shardRel]), /writer-a-20260101T000000Z\.jsonl/, 'the shard is committed by the checkpoint before the land');
-  assert.doesNotMatch(git(repoRoot, ['diff', '--name-only', 'HEAD^1', 'HEAD']), /\.fgos\//, 'the merge commit itself carries no event file');
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
@@ -1237,86 +1201,6 @@ test('landRunnerItem still refuses a non-union .fgos/ path that auto-merges clea
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean: nothing was published');
 });
 
-// tsk-tr9: a worker branch (`fgw/<id>`) that at some point in its history
-// recorded a DELETION of a merge=union-covered `.fgos/` shard (e.g. a
-// prior manual `git rm --cached` recovery after some earlier, unrelated
-// conflict) raises a REAL git conflict — modify/delete, never auto-
-// resolved by the `merge=union` driver, which only ever resolves
-// modify/modify text conflicts — the moment the SAME session's own
-// subsequent event-append (an ordinary return/approve/catchup elsewhere)
-// grows that exact shard on the other side. Confirmed empirically before
-// this fix: `performCatchUp` returned `outcome: 'conflict'` and
-// the old merge returned `outcome: 'conflict'` for byte-identical
-// repo states — a false conflict manufactured entirely by the calling
-// session's own writes to its own shard, not a real content dispute
-// (neither side has any legitimate claim over the OTHER's `.fgos/`
-// state — ADR0020). `resolveFgosOnlyConflict` (merge.mjs) now resolves it
-// automatically for both merge directions, so a stale branch like this
-// self-heals on its very next catch-up/approve instead of staying stuck
-// in the same manual-recovery loop every cycle.
-function seedStaleDeletedFgosBranch(repoRoot, shardRelPath) {
-  fs.mkdirSync(path.join(repoRoot, '.fgos', 'events'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, shardRelPath), '{"seq":1}\n');
-  const repoGitattributes = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.gitattributes'));
-  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), repoGitattributes);
-  git(repoRoot, ['add', '.gitattributes', shardRelPath]);
-  git(repoRoot, ['commit', '-q', '-m', 'seed .gitattributes and event shard']);
-
-  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-  git(repoRoot, ['checkout', 'fgw/demo-item']);
-
-  // An earlier merge/catch-up already pulled main's `.fgos/` state onto
-  // this branch (mirrored directly here as the end-state a prior cycle
-  // would have produced, rather than re-driving that whole cycle).
-  fs.appendFileSync(path.join(repoRoot, shardRelPath), '{"seq":2}\n');
-  git(repoRoot, ['add', shardRelPath]);
-  git(repoRoot, ['commit', '-q', '-m', 'earlier merge landed main state onto the branch']);
-
-  // The established manual workaround: a session hits some unrelated
-  // fgos-write-rejected/conflict and "fixes" it by stripping `.fgos` back
-  // out of the branch, then commits that deletion.
-  git(repoRoot, ['rm', '-r', '--cached', '--ignore-unmatch', '--', '.fgos']);
-  fs.rmSync(path.join(repoRoot, '.fgos'), { recursive: true, force: true });
-  git(repoRoot, ['commit', '-q', '-m', 'manual workaround: strip stray .fgos from worker branch']);
-
-  git(repoRoot, ['checkout', 'main']);
-
-  // The calling session's own subsequent event-append grows the SAME
-  // shard on main — the write that reopens the divergence.
-  fs.appendFileSync(path.join(repoRoot, shardRelPath), '{"seq":3}\n');
-  git(repoRoot, ['add', shardRelPath]);
-  git(repoRoot, ['commit', '-q', '-m', 'main grows its own shard further']);
-}
-
-test('performCatchUp resolves a stale deleted-.fgos-shard branch cleanly instead of a false modify/delete conflict (tsk-tr9 regression)', async () => {
-  const repoRoot = initRepo();
-  const shardRelPath = path.join('.fgos', 'events', 'writer-a-1000.jsonl');
-  seedStaleDeletedFgosBranch(repoRoot, shardRelPath);
-  const item = makeItem({ id: 'demo-item', verify: 'test -f produced.txt' });
-
-  activateGitFixture(repoRoot);
-  const result = await performCatchUp(repoRoot, 'demo-item', item, 'main', null);
-  assert.equal(result.outcome, 'merged', 'catch-up must resolve the false .fgos conflict, not report a real one');
-});
-
-test('landRunnerItem resolves a stale deleted-.fgos-shard branch cleanly instead of a false modify/delete conflict (tsk-tr9 regression)', async () => {
-  const repoRoot = initRepo();
-  const shardRelPath = path.join('.fgos', 'events', 'writer-a-1000.jsonl');
-  seedStaleDeletedFgosBranch(repoRoot, shardRelPath);
-  const item = makeItem({ id: 'demo-item', verify: 'test -f produced.txt' });
-  const mainShardBefore = fs.readFileSync(path.join(repoRoot, shardRelPath), 'utf8');
-
-  const result = await landItem(repoRoot, item);
-  assert.equal(result.outcome, 'merged', 'approve must resolve the false .fgos conflict, not report a real one');
-  assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
-  assert.equal(
-    fs.readFileSync(path.join(repoRoot, shardRelPath), 'utf8').replaceAll('\r\n', '\n'),
-    mainShardBefore.replaceAll('\r\n', '\n'),
-    'main\'s own .fgos state must land completely unaffected by the stale branch',
-  );
-  assert.equal(isWorkingTreeClean(repoRoot), true);
-});
-
 // --- cleanupMergedBranch -------------------------------------------------
 
 test('cleanupMergedBranch deletes the now-fully-merged branch and never throws', async () => {
@@ -1410,7 +1294,7 @@ test('detectTrunk resolves the origin/HEAD target branch, not the local main/mas
 // commands that fail).
 
 function configureInvariantChecks(repoRoot, commands) {
-  writeSharedConfig(repoRoot, { invariantChecks: { commands } });
+  writeProjectConfig(repoRoot, { invariantChecks: { commands } });
 }
 
 function tipOf(repoRoot, branch) {
@@ -1449,7 +1333,7 @@ test('no invariant command, absent or the setup default, means no invariant chec
   for (const setupDefault of [false, true]) {
     const repoRoot = initRepo();
     makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-    if (setupDefault) configureInvariantChecks(repoRoot, DEFAULT_INVARIANT_CHECK_COMMANDS);
+    if (setupDefault) configureInvariantChecks(repoRoot, []);
 
     const result = await landItem(repoRoot, makeItem({ verify: 'true' }));
 

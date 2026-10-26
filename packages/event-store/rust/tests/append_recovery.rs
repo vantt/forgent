@@ -1,3 +1,4 @@
+#![cfg(target_os = "linux")]
 mod common;
 use common::{batch, inputs, Repo};
 use fgos_event_store::{
@@ -39,6 +40,47 @@ fn append_ack_hashes_seen_and_cursor_are_verified() {
             .len(),
         5
     );
+}
+#[test]
+fn append_returns_each_event_as_it_is_stored_whatever_the_payload_key_order() {
+    // This test binary is built with serde_json's preserve_order (unified from a dev-dependency), as the
+    // native addon is, so a payload map keeps the caller's key order unless append hands back the stored line.
+    // Without preserve_order every map is sorted and the asserts below pass with or without the fix.
+    assert_eq!(
+        serde_json::to_string(&json!({"z":1,"a":2})).unwrap(),
+        r#"{"z":1,"a":2}"#,
+        "this test needs serde_json's preserve_order"
+    );
+    let r = Repo::new();
+    let events = [fgos_event_store::append::EventInput {
+        event_type: "work.add".into(),
+        schema_version: 1,
+        payload: json!({"title":"t","id":"a","kind":{"z":1,"b":2}}),
+        ts: "2026-10-18T05:00:00.000Z".into(),
+    }];
+    let a = fgos_event_store::append::append(
+        &r.layout,
+        &r.registry,
+        AppendRequest {
+            stream: &r.stream,
+            events: &events,
+            cursor: &Positions::new(),
+            writer: "writer-one",
+            machine: "test-aa2345",
+            held_ranks: &[60],
+        },
+    )
+    .unwrap();
+    let stored = read_own(&r.layout, &a.ack.origin, &r.stream)
+        .unwrap()
+        .events;
+    assert_eq!(
+        serde_json::to_string(&a.events).unwrap(),
+        serde_json::to_string(&stored).unwrap()
+    );
+    assert!(serde_json::to_string(&a.events[0].payload)
+        .unwrap()
+        .starts_with(r#"{"id":"a","kind":{"b":2,"z":1}"#));
 }
 #[test]
 fn high_water_recovers_receipt_closed_active_and_stale_hint() {
@@ -297,10 +339,14 @@ fn missing_wide_and_symlink_lock_dirs_refuse() {
         "event-store-lock-dir-invalid",
     );
     fs::remove_dir(&dir).unwrap();
-    code(
-        r.append_cursor(1, &Positions::new()).unwrap_err(),
-        "event-store-lock-dir-invalid",
+    let missing = r.append_cursor(1, &Positions::new()).unwrap_err();
+    assert!(
+        missing
+            .detail
+            .ends_with("locks must be an existing 0700 directory; run fgos setup"),
+        "the refusal names the directory and the next step: {missing}"
     );
+    code(missing, "event-store-lock-dir-invalid");
     let other = r.root.join("other");
     fs::create_dir(&other).unwrap();
     fs::set_permissions(&other, fs::Permissions::from_mode(0o700)).unwrap();

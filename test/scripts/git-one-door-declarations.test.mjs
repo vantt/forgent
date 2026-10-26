@@ -203,12 +203,13 @@ test('configured declarations refuse escaping program parameters even with a kno
 });
 
 // This is the indexed-config shape behind the five retiring configured declarations. No other
-// declaration test proves their provenance independently of an owner-supplied class label.
+// declaration test proves their provenance independently of an owner-supplied class label. The
+// reader is not named `readConfig`: that name is the config door, which the scan trusts by name.
 test('indexed returned configuration proves the program without trusting an escaping outer caller', (t) => {
   const f = fixture(t);
   const source = `import { execFileSync } from 'node:child_process';
-function readConfig() { return JSON.parse(process.env.CONFIG); }
-function commands(key) { const section = readConfig()[key]; return section.commands; }
+function parseConfig() { return JSON.parse(process.env.CONFIG); }
+function commands(key) { const section = parseConfig()[key]; return section.commands; }
 function verify(root) { for (const command of commands('checks')) execFileSync(command, { shell: true, cwd: root }); }
 verify('.');
 verify.call(null, '.');

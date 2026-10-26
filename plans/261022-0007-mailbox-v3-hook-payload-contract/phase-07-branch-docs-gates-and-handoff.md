@@ -105,6 +105,38 @@ Nothing merges to main.
 
    The controller updates board row `MAIL` and the plan status on main.
 
+## Deviations (implementation lead, 2026-10-22)
+
+- **§6.4** says the schema stays at version 1 (phase 3 deviation), not version 2.
+- **§7** gains a subsection 7.3 with the V3 recordings instead of rewriting the measured table of 2026-10-19, which stays the record of that probe.
+- **§16** is unchanged: Q1 was resolved by the plan owner (option C for agy), recorded in §17 and §7.3.
+- **Review step skipped** at the plan owner's instruction; the plan owner runs an independent review.
+- **`npm test`** runs because the branch changed a Node file (`scripts/record-mailbox-hook-fixtures.mjs`).
+- **Convention (plan owner, 2026-10-22).** The closing report and the journal take their paths from `fgos convention path`, and `fgos convention check` runs on the added files. The test paths of `fgos-mailbox` were repeated literals in four test files; they now live once in `tests/common/mod.rs` (`contracts_dir`, `hook_fixtures_dir`, `ADAPTERS_CONTRACT`, module `files`), and every test derives from them. Production code names the adapters contract once (`src/adapters/mod.rs`, embedded) and the frame and limits contracts once each in the core. The recorder names its raw base and fixture directory once each. The drain takes no directory and reads no file; `.fgos` resolution stays with the storage-root owner (`resolve_workspace_root`), which the shell calls.
+
+## Review fixes (plan owner decisions, 2026-10-22; plan owner (agent))
+
+From the independent review `reports/code-review-v3.md` (1 High, 4 Medium, 6 Low):
+
+- **H1.** The drain is quiet (`WriterMismatch`) when the payload's `session_id` is not the writer key the caller supplies; Claude Code and Codex record them equal. The takeover rule otherwise stays. V5 note in spec §14: the caller check compares against the head's process record from process facts, not the parent pid alone (`bash -c` execs its last command). Test: a second key with the head's payload changes nothing and the head keeps its name and mail.
+- **M1.** One recorder run, `claude --agent mbx-head -p` (custom agent from `--agents`), same guards: the head's own `Stop` and `PostToolUse` carry `agent_type` and no `agent_id`. Claude Code now marks a subagent by `agent_id` alone; fixtures `stop-agent-head.json` and `post-tool-use-agent-head.json`; a drain test registers and drains such a head. Codex keeps either key (a Codex head with `agent_type` was not measured).
+- **M2.** The tested list is a parameter of `begin` (`TestedClis`, from the embedded contract or a given one); its owning test removes each tested CLI from a contract and asserts `Untested` with no change. Retired: `a_cli_that_is_not_tested_is_never_drained`, whose agy cases stopped at `Subordinate`; agy's quietness is owned by its parse vectors.
+- **M3.** The PostToolUse delivery test asserts the Stop-block count stays 0.
+- **M4.** The fixture guard is an allowlist: every string value is a placeholder, `<redacted>`, `{{TEXT}}`, empty, a path under `/run-dir`, `/repo` or `/home/user`, a per-key literal, or (in `vectors.json`) a kebab word; the recorder's prose is searched for the user and host names, account names and stems, foreign, macOS and root homes, UUIDs, credential prefixes, JWTs, long runs and e-mail. A test plants `/Users/…`, `/root/…`, a real-name phrase, a host name and a long `_-` token.
+- **L1.** A new binding's name is allocated before the sweep, so `NameDoesNotFit` changes nothing; core test added.
+- **L2.** `Begun::Quiet` carries `state_changed`, from the registration outcome, `note_stop` and the core's new `Claim::changed`. The payload harness checks the flag against the snapshot on every hook call; one test names the hot path.
+- **L3.** The doc says the drain reads the process table when it judges a different stored head. The same-head comparison normalises the registering record through its text form; test with an empty and an `unknown-boot` boot id.
+- **L4.** Before a run the recorder refuses when Claude Code managed settings declare hooks or the agy account home holds hook files; after an agy run its log must name exactly one hooks file.
+- **L5.** How Codex rewrites `auth.json` (in place or by rename) could not be observed: no token refresh happened during the recordings (the account file's time stayed at the owner's login). The guard is safe for both: a replaced link is moved aside as `auth.json.rotated` (0600), never deleted, and `clean` refuses while one exists (`scripts/lib/codex-auth-guard.mjs`, tested in `test/scripts/codex-auth-guard.test.mjs`).
+- **L6.** No change; V5 owns the runner-head case.
+
+## Plan owner decisions (2026-10-22, after phase 3; plan owner (agent))
+
+1. **M4, one binding per head.** A second key from the same head replaces the old binding like a dead-head takeover: a new generation, its own name, `stop_blocks` 0, and mail queued for the old key is never shown to the new context. Implemented in phase 5 with its owning test.
+2. **agy drain deferred in V3, for every event.** An agy subagent carries no marker and fires its own Stop; under decision 1 a subagent's first hook would replace the head's binding and take its mail, which is worse than missing mail. The agy fixtures stay as contract evidence (parse tests only); agy stays under `deferred` in `adapters.v1.json` (no subagent marker; 1.4.4 refuses `additionalContext`). `overwriteResult` is rejected as a delivery channel: it rewrites a tool's real output with peer text and mixes trust levels. Q1 resolves as option C for agy. What would unblock agy: a payload field naming the parent conversation, or a hook scope that fires for the head conversation only.
+3. **Codex deferred** until the owner logs the `tetnu` account in again; Codex is not run. Its parse and render are built only where a report already recorded the real shape; everything else stays deferred.
+4. **Phases 4 to 7 continue** with Claude Code as the only live-proven adapter. Phase 7 runs the branch docs and the crate and workspace gates; `npm test` only if a Node file changes; no code-review step (the plan owner runs an independent review).
+
 ## Acceptance criteria
 
 - `cargo test --locked -p fgos-mailbox` and `cargo test --locked -p fgos-mailbox-core` are green on a main merged within this phase. The step 4 gates are green, or fail in the same way on main.

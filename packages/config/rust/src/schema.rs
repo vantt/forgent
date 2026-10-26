@@ -123,8 +123,9 @@ pub(crate) fn unescape_pointer(token: &str) -> String {
 
 pub struct Schemas {
     pub(crate) sections: Vec<Section>,
-    /// The composite validator, compiled on first use (`validate.rs`).
-    pub(crate) checker: OnceLock<Result<Checker, ConfigRefusal>>,
+    /// One validator per section, each compiled on first use and kept for the life of these schemas
+    /// (`validate.rs`), in the order of `sections`.
+    pub(crate) checkers: Vec<OnceLock<Result<Checker, ConfigRefusal>>>,
 }
 
 /// A schema node with where it sits: the section and its YAML location in that file.
@@ -206,8 +207,8 @@ impl Schemas {
             });
         }
         Ok(Schemas {
+            checkers: sections.iter().map(|_| OnceLock::new()).collect(),
             sections,
-            checker: OnceLock::new(),
         })
     }
 

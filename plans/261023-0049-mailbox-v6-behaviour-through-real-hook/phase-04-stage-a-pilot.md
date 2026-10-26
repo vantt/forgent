@@ -47,3 +47,7 @@ No stop rule fired, and the owner's answer to question 1 covers phase 5 (A or B)
 ## Sync
 
 Start and end: merge `origin/main` on the branch (the pinned worktree is not touched). Commit `results.jsonl`, the stage summary and the sample file under `plans/261023-0049-mailbox-v6-behaviour-through-real-hook/reports/` on the branch.
+
+## Plan-owner go (2026-10-23)
+
+Go for stage A from the pinned worktree under the pre-registered stop rules: sequential runs, `free -g` at least 8 and no quiet window on the board before each batch, no retries beyond the top-ups. No stop rule: continue into stage B (owner answer A).

@@ -7,6 +7,8 @@
 // compounding/SKILL.md had zero real callers without it.
 
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import { readRawEvents } from '../../src/state/store.mjs';
 import { test } from 'node:test';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
@@ -21,7 +23,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
 function tmpRepoRoot() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-authoritative-match-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-authoritative-match-'));
+  initializeWorkRepository(dir);
+  return dir;
 }
 
 function run(cwd, args) {
@@ -260,16 +264,16 @@ test('CLI: authoritative-match ignores docs with no authoritative_for frontmatte
   assert.equal(data.candidateCount, 2);
 });
 
-test('CLI: authoritative-match never mutates state: events.jsonl and state.json are byte-identical before/after', () => {
+test('CLI: authoritative-match never mutates state: the Work history and state.json are identical before/after', () => {
   const cwd = initCwd();
   writeDoc(cwd, 'docs/how-to', 'pick.md', 'claiming a work item');
-  const logPath = path.join(cwd, '.fgos', 'events.jsonl');
-  const viewPath = resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE);
-  const logBefore = fs.readFileSync(logPath, 'utf8');
+  const fgosDir = path.join(cwd, '.fgos');
+  const viewPath = resolveFgosFile(fgosDir, FGOS_FILE.STATE);
+  const historyBefore = readRawEvents(fgosDir);
   const viewBefore = fs.readFileSync(viewPath, 'utf8');
 
   const result = run(cwd, ['authoritative-match', '--quadrant', 'docs/how-to', '--topic', 'claiming a work item']);
   assert.equal(result.status, 0);
-  assert.equal(fs.readFileSync(logPath, 'utf8'), logBefore, 'events.jsonl must be untouched');
+  assert.deepEqual(readRawEvents(fgosDir), historyBefore, 'the Work history must be untouched');
   assert.equal(fs.readFileSync(viewPath, 'utf8'), viewBefore, 'state.json must be untouched');
 });

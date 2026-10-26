@@ -620,8 +620,8 @@ test('P05 regression: no FULL_TRIGGERS prefix shadows a src/state/** leaf module
 test('P05 regression: a src/state/ file with NO manifest rule still escalates via the unknown-path default-deny (not a named full-trigger, but same safe outcome)', async () => {
   const { MANIFEST, FULL_TRIGGERS } = await import('../../test/test-ownership.mjs');
   const idx = buildManifestIndex(MANIFEST);
-  const unmapped = 'src/state/events.mjs'; // shared core, deliberately not manifest-mapped
-  assert.equal(idx.get(unmapped), undefined, 'sanity: events.mjs must not be in the manifest');
+  const unmapped = 'src/state/event-log.mjs'; // shared core, deliberately not manifest-mapped
+  assert.equal(idx.get(unmapped), undefined, 'sanity: event-log.mjs must not be in the manifest');
   assert.equal(matchFullTrigger(unmapped, FULL_TRIGGERS), null);
   // selectTests must still escalate it -- via 'unknown', proven end to end:
   const result = selectTests({ changes: [{ path: unmapped, status: 'M', source: 'unstaged' }], manifest: MANIFEST, fullTriggers: FULL_TRIGGERS, fileExists: () => true });

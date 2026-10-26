@@ -58,14 +58,13 @@ function acceptsBytes(accept, actual) {
  *
  * Settlement lists a report only when it was substantive, with the sha256 of its bytes; that file
  * is handed over after checking it still has those bytes. Without a report the role's claim is the
- * only artifact settlement kept. An inline producer has no settlement: its evidence refs are
- * relative to the Unit run's worktree.
+ * only artifact settlement kept.
  *
  * @param {{seat: string, round: number, runResult?: object}} record seat result as returned by runRole / history
- * @param {{mainRoot: string, worktree?: string}} where repo-relative artifact paths are relative to `mainRoot`
+ * @param {{mainRoot: string}} where repo-relative artifact paths are relative to `mainRoot`
  * @returns {string}
  */
-export function reportRefOf(record, { mainRoot, worktree = mainRoot, accept }) {
+export function reportRefOf(record, { mainRoot, accept }) {
   const subject = `seat "${seatKeyOf(record)}" round ${record?.round}`;
   const runResult = record?.runResult ?? {};
 
@@ -84,9 +83,6 @@ export function reportRefOf(record, { mainRoot, worktree = mainRoot, accept }) {
 
   const artifact = (runResult.evidence?.artifacts ?? []).find((a) => typeof a === 'string' && a !== '');
   if (artifact) return path.resolve(mainRoot, artifact);
-
-  const inline = (Array.isArray(runResult.evidenceRefs) ? runResult.evidenceRefs : []).find((a) => typeof a === 'string' && a !== '');
-  if (inline) return path.resolve(worktree, inline);
 
   throw new HandoffRefError(subject, 'no-report');
 }
@@ -139,14 +135,8 @@ function resolveUnitRunRef(input, mainRoot, seat, accept) {
   if (rounds.length === 0) throw fail('no-such-role');
   const latest = rounds.reduce((a, b) => (b.round > a.round ? b : a));
 
-  let worktree = mainRoot;
   try {
-    worktree = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8')).worktree ?? mainRoot;
-  } catch {
-    // an inline record's refs fall back to the main checkout
-  }
-  try {
-    return reportRefOf(latest, { mainRoot, worktree, accept });
+    return reportRefOf(latest, { mainRoot, accept });
   } catch (err) {
     if (err instanceof HandoffRefError) throw fail(err.reason);
     throw err;

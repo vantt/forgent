@@ -7,6 +7,7 @@
 // growing the already-large fgos.test.mjs, the same topic-scoped split
 // fgos-manifest.test.mjs/fgos-help.test.mjs already use in this directory.
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -14,7 +15,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -25,6 +26,7 @@ function run(cwd, args) {
 
 function tmpCwd() {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-tool-cli-'));
+  initializeWorkRepository(cwd);
   assert.equal(run(cwd, ['init']).status, 0, 'tmpCwd(): "fgos init" failed to bootstrap .fgos/');
   return cwd;
 }
@@ -66,8 +68,7 @@ function eventLines(cwd) {
 // — the real, config-edited way a tool provider is declared post-D1, same
 // as this project's own `.fgos/config.json` declares `gitnexus`/`herdr`.
 function declareExecutor(cwd, id, fields) {
-  const configPath = path.join(cwd, '.fgos', 'config.json');
-  const cfg = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+  const cfg = readProjectConfig(cwd);
   cfg.runner ??= {};
   // A project config in the seat-binding schema: the loader refuses one that has no marker.
   cfg.runner.patterns = { ...cfg.runner.patterns, seatBinding: { schema: 1 } };

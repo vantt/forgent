@@ -472,6 +472,7 @@ class JsFile {
     const narrowed = /^([\s\S]+?)\s*\.\s*(?:filter|slice|concat|reverse|sort)\s*\(/.exec(shape);
     if (narrowed && splitArgs(shape, narrowed[0].length - 1).close === shape.trimEnd().length - 1) return this.elements(expr.slice(0, narrowed[1].length), index, depth + 1);
     if (/^process\.argv\b/.test(expr)) return [{ external: 'command-line arguments' }];
+    if (/^readConfig\s*\(/.test(shape)) return [{ external: `config door value (${expr})` }];
     // `table[key]` and `table[key].list`: the elements of what any element holds there.
     const indexed = /^([A-Za-z_$][\w$]*(?:\??\.[A-Za-z_$][\w$]*)*)\s*(?:\?\.)?\[[^\[\]]+\]((?:\??\.[A-Za-z_$][\w$]*)*)$/.exec(shape);
     if (indexed) return this.property(expr.slice(0, indexed[1].length), ['*', ...indexed[2].split(/\??\./).filter(Boolean), '*'], index, depth + 1);
@@ -569,6 +570,8 @@ class JsFile {
     }
     if (/^(fileURLToPath|url\.fileURLToPath)$/.test(callee) || callee === 'new URL') return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     if (callee === 'JSON.parse') return [{ external: 'configuration file data' }];
+    // The config door's result is configured data, like a parsed config file: never the door's own marshalling code.
+    if (callee === 'readConfig') return [{ external: `config door value (${expr})` }];
     if (/^(fs\.realpathSync|path\.basename|String)$/.test(callee)) return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     if (callee === 'Object.freeze') return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     // `registry.get(key)` on a module-private Map: any value the module stores in it.
@@ -1814,9 +1817,18 @@ function rustTestRanges(code) {
   return ranges;
 }
 
-function rustModel(name, source) {
+// A Rust file that is test code by where it sits: anything under a `tests/` directory, and the
+// `benches/` and `examples/` targets of a crate, a directory beside the crate's Cargo.toml. A product
+// directory that happens to be called `examples` (under `src/`, say) stays product.
+function rustTestFile(name, root) {
+  if (/(^|\/)tests\//.test(name)) return true;
+  const target = /^(.*?\/)?(?:benches|examples)\//.exec(name);
+  return Boolean(target) && fs.existsSync(path.join(root, target[1] ?? '', 'Cargo.toml'));
+}
+
+function rustModel(name, source, root) {
   const code = lexRust(source);
-  const testFile = /(^|\/)tests\//.test(name) || /(^|\/)benches\//.test(name);
+  const testFile = rustTestFile(name, root);
   const tests = rustTestRanges(code);
   const block = (open) => { let depth = 0; let end = open; for (; end < code.length; end++) { if (code[end] === '{') depth++; else if (code[end] === '}' && --depth === 0) break; } return end; };
   // Generic parameters may nest one level (`fn run<S: AsRef<OsStr>>(..)`).
@@ -2636,7 +2648,7 @@ export function scan({ root = REPO, files, openInspect } = {}) {
   for (const full of list) {
     const name = rel(root, full);
     if (path.extname(name) !== '.rs') continue;
-    try { const m = rustModel(name, fs.readFileSync(full, 'utf8')); m.ctx = ctx; ctx.rust.set(name, m); } catch { /* unreadable: skipped below too */ }
+    try { const m = rustModel(name, fs.readFileSync(full, 'utf8'), root); m.ctx = ctx; ctx.rust.set(name, m); } catch { /* unreadable: skipped below too */ }
   }
   for (const full of list) {
     const name = rel(root, full);
@@ -2647,7 +2659,7 @@ export function scan({ root = REPO, files, openInspect } = {}) {
     if (!kind) continue;
     digests[name] = sha256(source);
     if (kind === 'js') scanJs(name, source, ctx);
-    else if (kind === 'rust') scanRust(ctx.rust.get(name) ?? rustModel(name, source), ctx);
+    else if (kind === 'rust') scanRust(ctx.rust.get(name) ?? rustModel(name, source, root), ctx);
     else if (kind === 'shell') scanShell(name, source, ctx);
     else if (kind === 'skill') scanSkill(name, source, ctx);
   }

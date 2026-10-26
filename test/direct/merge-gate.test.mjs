@@ -12,6 +12,13 @@ import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const execGit = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8' });
 
+// Work events need the store's machine id before the first addWork. The activation fence stays untracked, as in
+// production, so the fixture's `git add .fgos` never commits it.
+function activateWorkFixture(cwd) {
+  prepareActivatedGitFixture(cwd);
+  fs.appendFileSync(path.join(cwd, '.git', 'info', 'exclude'), '.fgos/locks/\n');
+}
+
 function addTestWork(dir, id, extra = {}) {
   return addWork(dir, {
     id,
@@ -37,6 +44,7 @@ test('approve gate: aborts cleanly on test failure without modifying main', asyn
   
   const fgosDir = path.join(cwd, '.fgos');
   fs.mkdirSync(fgosDir);
+  activateWorkFixture(cwd);
   
   addTestWork(fgosDir, 'tsk-test', { status: 'awaiting-approval' });
   execGit(cwd, ['add', '.fgos']);
@@ -324,6 +332,7 @@ async function approvableRootRepo(id, { verify = 'true' } = {}) {
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   const fgosDir = path.join(cwd, '.fgos');
   fs.mkdirSync(fgosDir);
+  activateWorkFixture(cwd);
   addTestWork(fgosDir, id, { status: 'awaiting-approval', verify });
   execGit(cwd, ['add', '.fgos']);
   execGit(cwd, ['commit', '-m', 'add work']);
@@ -429,7 +438,7 @@ test('a failing post-land drift detection is reported beside a landed merge, nev
 
 test('an unclassified failure while publishing claims no abandoned result: the land reports its effect unknown and doctor --fix settles it through Land recovery', async () => {
   const { landRunnerItem } = await import('../../src/runner/merge.mjs');
-  const { fixLandRecovery } = await import('../../src/setup/git-checks.mjs');
+  const { fixGitOperationRecovery } = await import('../../src/setup/git-checks.mjs');
   const { cwd } = await approvableRootRepo('tsk-publish-unknown');
   const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
   // The verify edits a tracked file of the candidate, so publication refuses.
@@ -438,9 +447,9 @@ test('an unclassified failure while publishing claims no abandoned result: the l
   assert.equal(err?.code, 'land-effect-unknown', String(err?.stack ?? err));
   assert.match(err.message, /fgos doctor --fix/);
   assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore);
-  const fixed = fixLandRecovery(cwd);
+  const fixed = fixGitOperationRecovery(cwd);
   assert.equal(fixed.changed, true, fixed.message);
-  assert.match(fixed.message, new RegExp(`recovered interrupted Land operations: ${err.operationId}`));
+  assert.match(fixed.message, new RegExp(`recovered interrupted Git operations: ${err.operationId}`));
 });
 
 test('approve releases the published Land candidate once Work has recorded the delivery', async () => {
@@ -465,6 +474,7 @@ test('approve lands a leaf on its root branch through Land, with the delivery se
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   const fgosDir = path.join(cwd, '.fgos');
   fs.mkdirSync(fgosDir);
+  activateWorkFixture(cwd);
   addTestWork(fgosDir, 'tsk-root', { status: 'todo', verify: 'true' });
   addTestWork(fgosDir, 'tsk-leaf', { status: 'awaiting-approval', verify: 'test -f leaf.txt', parent: 'tsk-root' });
   execGit(cwd, ['add', '.fgos']);
@@ -535,6 +545,7 @@ test('promote-to-component releases every member\'s Land candidate, merged or re
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   const fgosDir = path.join(cwd, '.fgos');
   fs.mkdirSync(fgosDir);
+  activateWorkFixture(cwd);
   addTestWork(fgosDir, 'ptc-green', { status: 'awaiting-approval', verify: 'true' });
   addTestWork(fgosDir, 'ptc-red', { status: 'awaiting-approval', verify: 'false', deps: ['ptc-green'] });
   execGit(cwd, ['add', '.fgos']);
@@ -552,4 +563,75 @@ test('promote-to-component releases every member\'s Land candidate, merged or re
   assert.deepEqual(result.results.map((r) => [r.id, r.outcome]), [['ptc-green', 'merged'], ['ptc-red', 'blocked']]);
   assert.ok(result.results.every((r) => !('landSettlement' in r)), 'settlement identities stay internal to the verb');
   assertNoLandCandidate(cwd);
+});
+
+// A candidate Land kept because its release never ran (busy slot, or a command that died after recording the
+// result): the land is driven directly, so nothing acknowledges it and Work's record is made by hand.
+async function landLeavingCandidate(id, { verify = 'true' } = {}) {
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
+  const repo = await approvableRootRepo(id, { verify });
+  const result = await landRunnerItem(repo.cwd, { id, verify }, { branch: `fgw/${id}`, timeoutMs: 60000 });
+  assert.ok(result.landSettlement, JSON.stringify(result));
+  const candidates = path.join(repo.cwd, '.fgos/runtime/git-candidates');
+  assert.equal(fs.readdirSync(candidates).length, 1, 'the unacknowledged land keeps its candidate');
+  return { ...repo, result, candidates };
+}
+
+const RECORDS_OF_A_LAND_RESULT = {
+  'a delivery': async ({ fgosDir, result }, id) => {
+    const { moveWork } = await import('../../src/state/store.mjs');
+    moveWork(fgosDir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha: result.receipt.localEffect.publishedOid, mergedInto: 'main', landSettlement: result.landSettlement });
+  },
+  'a block': async ({ fgosDir, result }, id) => {
+    const { moveWork } = await import('../../src/state/store.mjs');
+    moveWork(fgosDir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system', landOperationIds: [result.landSettlement.operationId] });
+  },
+  'an engine decision': async ({ fgosDir, result }, id) => {
+    const { addDecision } = await import('../../src/state/store.mjs');
+    addDecision(fgosDir, { id, kind: 'engine', text: 'sync-root: merged', rationale: 'records the land result', landOperationIds: [result.landSettlement.operationId] });
+  },
+};
+
+for (const [kind, record] of Object.entries(RECORDS_OF_A_LAND_RESULT)) {
+  test(`the release sweep releases a retained Land candidate once Work has recorded its result as ${kind}`, async () => {
+    const { releaseRecordedLand } = await import('../../src/runner/merge.mjs');
+    const id = `tsk-sweep-${kind.split(' ').pop()}`;
+    const landed = await landLeavingCandidate(id);
+    await record(landed, id);
+    assert.deepEqual(releaseRecordedLand(landed.cwd), { released: [landed.result.landSettlement.operationId], warnings: [] });
+    assertNoLandCandidate(landed.cwd);
+    assert.deepEqual(releaseRecordedLand(landed.cwd), { released: [], warnings: [] }, 'nothing is left for a second sweep');
+  });
+}
+
+test('the release sweep leaves a retained Land candidate alone when Work recorded no result for its operation, a prepared operation included', async () => {
+  const { releaseRecordedLand } = await import('../../src/runner/merge.mjs');
+  const { addDecision } = await import('../../src/state/store.mjs');
+  const landed = await landLeavingCandidate('tsk-sweep-unrecorded');
+  // Approve records the operation before Land starts; that is a plan, not a result.
+  addDecision(landed.fgosDir, { id: 'tsk-sweep-unrecorded', kind: 'engine', text: 'approve: prepare Land operation', rationale: 'retain the identity',
+    landOperation: { operationId: landed.result.landSettlement.operationId, source: 's', destination: 'refs/heads/main' } });
+  assert.deepEqual(releaseRecordedLand(landed.cwd), { released: [], warnings: [] });
+  assert.equal(fs.readdirSync(landed.candidates).length, 1, 'the candidate stays');
+});
+
+test('the Land acknowledgement is the recording event\'s hash, so two origins recording the same item and sequence differ', async () => {
+  const { landAcknowledgement } = await import('../../src/runner/merge.mjs');
+  const here = landAcknowledgement({ seq: 7, origin: 'machine-a', h: 'a'.repeat(64) });
+  const there = landAcknowledgement({ seq: 7, origin: 'machine-b', h: 'b'.repeat(64) });
+  assert.notEqual(here, there);
+  assert.match(here, /^work-event:a{64}$/);
+  assert.equal(landAcknowledgement({ seq: 7 }), '', 'an event with no hash names nothing durable, and Land refuses an empty acknowledgement');
+});
+
+test('a Land command releases the candidates Work already recorded as it ends, and a command that cannot land does not look', async () => {
+  const landed = await landLeavingCandidate('tsk-sweep-bin');
+  const { moveWork } = await import('../../src/state/store.mjs');
+  moveWork(landed.fgosDir, { id: 'tsk-sweep-bin', to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha: landed.result.receipt.localEffect.publishedOid, mergedInto: 'main', landSettlement: landed.result.landSettlement });
+  const bin = path.resolve(import.meta.dirname, '../../bin/fgos.mjs');
+  const run = (...args) => execFileSync(process.execPath, [bin, ...args], { cwd: landed.cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  run('list');
+  assert.equal(fs.readdirSync(landed.candidates).length, 1, 'a read-only command leaves the sweep to the commands that can land');
+  assert.throws(() => run('approve', 'tsk-missing'), /tsk-missing/);
+  assertNoLandCandidate(landed.cwd);
 });

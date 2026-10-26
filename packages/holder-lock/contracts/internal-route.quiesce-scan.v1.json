@@ -2,7 +2,7 @@
   "contract": { "id": "internal-route-quiesce-scan", "version": 1 },
   "command": "fgos internal quiesce-scan",
   "protocolNote": "quiesce-scan keeps protocol 1 when the other holder-lock routes moved to 2 (2026-10-20): its callers (the cutover fence, fgctl activation) pin it separately and it is read-only, so a stale payload gains nothing by being refused here",
-  "description": "Read-only scan that tells the stop-everything cutover whether any other fgOS process of a workspace is still running. It never signals or modifies anything.",
+  "description": "Read-only scan that tells a cutover whether any other fgOS process of the given workspace is still running. It finds that workspace's writers only; stopping every writer on every machine is the operator's procedure. It never signals or modifies anything.",
   "argv": {
     "required": ["--protocol 1"],
     "optional": [
@@ -13,9 +13,8 @@
   },
   "scan": {
     "linux": [
-      "/proc/*/environ carrying FGOS_STATE_ROOT or a path under a given root",
-      "/proc/*/cwd inside the root or inside any --dir the caller listed; the route never runs Git",
-      "/proc/*/cmdline naming a fgOS payload (a staged release, bin/fgos.mjs, fgos-runner, fgos-gateway) or --cwd of a given root"
+      "/proc/*/cwd inside the root or inside any --dir the caller listed, counted only when the process could be fgOS (node, bun, deno, fgos, fgos-runner, fgos-gateway, or an argv that cannot be read), so an idle shell or agent session is not a writer; with --workspace-only every such cwd counts and the caller filters; the route never runs Git",
+      "/proc/*/cmdline carrying a typed --dir, --worktree or --cwd value (or the value after -C) that resolves inside the root or a listed --dir, relative values resolved at the process's cwd, with the same could-be-fgOS rule. No other argument counts: a prompt or positional path is text, and a fgOS binary name, a release path or a pinned FGOS_STATE_ROOT of another workspace never counts"
     ],
     "otherPlatforms": "result unavailable: a person confirms that no fgOS process is left",
     "unreadableEntries": "an entry of the caller's own uid that cannot be read (permission, vanished) is counted in unreadable, never treated as clean, unless its readable argv rules it out: argv[0] names neither node (node, nodejs, node<version>), bun, deno nor a fgOS binary (fgos, fgos-runner, fgos-gateway); an unreadable argv always counts"
@@ -24,7 +23,7 @@
     "v": 1,
     "protocol": 1,
     "result": { "enum": ["clean", "processes", "unavailable"] },
-    "processes": [{ "pid": "integer", "startTime": "string|null", "cwd": "string|null", "cmdline": "string", "matched": { "enum": ["environ", "cwd", "cmdline"] } }],
+    "processes": [{ "pid": "integer", "startTime": "string|null", "cwd": "string|null", "cmdline": "string (argv joined by spaces, for people)", "argv": ["string"], "matched": { "enum": ["cwd", "cmdline"] }, "root": "string" }],
     "unreadable": "integer >= 0",
     "detail": "string, only for unavailable"
   },

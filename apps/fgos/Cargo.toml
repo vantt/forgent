@@ -10,20 +10,26 @@ fgos-work-state = { path = "../../packages/work-state/rust" }
 fgos-observe = { path = "../../packages/observe/rust" }
 fgos-convention = { path = "../../packages/convention/rust" }
 fgos-identity = { path = "../../packages/identity/rust" }
+fgos-event-store = { path = "../../packages/event-store/rust" }
+fgos-git = { path = "../../packages/git/rust" }
 fgos-config = { path = "../../packages/config/rust", features = ["host-provider"] }
 fgos-run-result = { path = "../../packages/run-result/rust" }
 fgos-holder-lock = { path = "../../packages/holder-lock/rust" }
 fgos-run-supervisor = { path = "../../packages/run-supervisor/rust" }
 fgos-terminal-control = { path = "../../packages/terminal-control/rust" }
 fgos-seat-binding = { path = "../../packages/seat-binding/rust" }
+fgos-mailbox = { path = "../../packages/mailbox/rust/store" }
+fgos-mailbox-core = { path = "../../packages/mailbox/rust/core" }
 tokio = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order", "arbitrary_precision"] }
 thiserror = { workspace = true }
 sha2 = { workspace = true }
+# Process facts: the liveness judge the mailbox wiring hands Identity's
+# directory reads.
+fgos-process = { path = "../../packages/process/rust" }
 
 [dev-dependencies]
-fgos-process = { path = "../../packages/process/rust" }
 
 [target.'cfg(unix)'.dev-dependencies]
 libc = { workspace = true }

@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -5,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { openStore } from '../../src/event-store/index.mjs';
+import { fixGitFetchMapping } from '../../src/setup/git-checks.mjs';
 const built = ensureGitAddon();
 export const loaderOptions = { descriptor: { manifest: JSON.parse(fs.readFileSync(built.manifest)), releaseRoot: root } };
 export const addon = loadNativeAddon(loaderOptions);
@@ -26,10 +28,33 @@ export function fixture(t, { remote = false, machine = true } = {}) {
     ...['local', 'branch'].map(scope => ({ type: `private.${scope}`, domain: 'private', schemaVersion: 1, scope, sealOnWrite: false })),
   ] }));
   if (remote) { execFileSync('git', ['init', '--bare', '-q', path.join(temp, 'remote')]); git('remote', 'add', 'origin', path.join(temp, 'remote')); }
-  const ctx = { cwd: repo, stateRoot, loaderOptions, globalConfigPath: path.join(temp, 'global.json') };
+  // The config door reads the global file as `config.json` of this directory, so the path keeps that name.
+  fs.mkdirSync(path.join(temp, 'global'));
+  const ctx = { cwd: repo, stateRoot, loaderOptions, globalConfigPath: path.join(temp, 'global', 'config.json') };
   const store = machine ? openStore(addon.resolveEventStore(repo, stateRoot, repo), 'phase-seven', [contracts], loaderOptions) : null;
   return { temp, repo, git, stateRoot, locks, store, ctx };
 }
 export function append(store, events) {
   return store.append('project', events.map(e => ({ eventType: e.type ?? 'work.add', schemaVersion: 1, payload: e.payload ?? { id: 'one', title: 'one' }, ts: e.ts ?? new Date().toISOString() })), {}, 'fixture', []);
+}
+
+/** The Work events of a legacy-layout directory (`events.jsonl` plus `events/*.jsonl`) in the crate's legacy order. */
+export function legacyOrderOf(dir) {
+  const files = {};
+  const baseline = path.join(dir, 'events.jsonl');
+  if (fs.existsSync(baseline)) files[''] = fs.readFileSync(baseline, 'utf8');
+  const shards = path.join(dir, 'events');
+  if (fs.existsSync(shards)) for (const entry of fs.readdirSync(shards, { withFileTypes: true })) {
+    if (entry.isFile() && entry.name.endsWith('.jsonl')) files[entry.name] = fs.readFileSync(path.join(shards, entry.name), 'utf8');
+  }
+  return addon.decodeLegacyFiles(files).map(record => JSON.parse(record.raw));
+}
+
+/** Install the fetch mappings through Git's own setup fix, the one door that writes them. */
+export function installFetchMapping({ repo, stateRoot }) {
+  const prior = process.env.FGOS_STATE_ROOT; process.env.FGOS_STATE_ROOT = stateRoot;
+  try {
+    const result = fixGitFetchMapping(repo, loaderOptions);
+    assert.ok(result.changed || /no fetch mapping change needed/.test(result.message), result.message);
+  } finally { if (prior === undefined) delete process.env.FGOS_STATE_ROOT; else process.env.FGOS_STATE_ROOT = prior; }
 }

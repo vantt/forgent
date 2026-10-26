@@ -326,23 +326,37 @@ test('findCloneGroups reports a body shared by two files, whatever the titles, a
   assert.match(groups[0].hash, /^[0-9a-f]{16}$/);
 });
 
-test('suiteReport prints the size line against the baseline, fails only on a clone the baseline does not list, notes baselined clones that are gone, and survives a checkout git cannot diff', () => {
+test('suiteReport prints the size and cost line against the baseline, warns when CPU per test rose past the tolerance, fails only on a clone the baseline does not list, notes baselined clones that are gone, and survives a checkout git cannot diff', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-suite-report-'));
   const write = (rel, text) => { fs.mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true }); fs.writeFileSync(path.join(dir, rel), text); };
   write('test/a.test.mjs', "test('a', () => { known(); });\ntest('b', () => { fresh(); });\n");
   write('test/b.test.mjs', "test('a', () => { known(); });\n");
   const files = ['test/a.test.mjs', 'test/b.test.mjs'];
   const baselinePath = path.join(dir, 'test', 'suite-baseline.json');
-  const baseline = buildSuiteBaseline({ files, cwd: dir, sha: '0123456789abcdef', wallSeconds: 10 });
+  write('crates/x/src/lib.rs', '#[test]\nfn a() {}\n#[tokio::test]\nasync fn b() {}\n// #[test] in a comment\n');
+  write('target/debug/build/gen.rs', '#[test]\nfn built() {}\n');
+  const run = { wallSeconds: 10.2, cpuSeconds: 30, fileCpu: { 'test/b.test.mjs': 10.04, 'test/a.test.mjs': 20 } };
+  const baseline = buildSuiteBaseline({ files, cwd: dir, sha: '0123456789abcdef', run });
   assert.equal(baseline.tests, 3);
+  assert.equal(baseline.rustTests, 2, 'test attributes in source count; build output does not');
+  assert.equal(baseline.wallSeconds, 10);
+  assert.equal(baseline.cpuSeconds, 30);
+  assert.deepEqual(baseline.fileCpu, { 'test/a.test.mjs': 20, 'test/b.test.mjs': 10 });
   baseline.knownClones.push({ hash: 'ffffffffffffffff', files: ['test/gone.test.mjs', 'test/b.test.mjs'] });
   fs.writeFileSync(baselinePath, JSON.stringify(baseline));
   const admission = () => [{ file: 'test/a.test.mjs', line: 2, ruleId: 'new-real-provider-network-without-marker', message: 'm' }];
 
   const change = () => ({ base: '89abcdef0123', added: 4, removed: 6, spawns: 1, unexplained: 1 });
-  const clean = suiteReport({ files, wallSeconds: 12.4, cwd: dir, baselinePath, admission, change });
+  // 34.5 s CPU for 3 tests is exactly the 15% tolerance over 30 s: no warning yet.
+  const clean = suiteReport({ files, wallSeconds: 12.4, cpuSeconds: 34.5, fileCpu: run.fileCpu, cwd: dir, baselinePath, admission, change });
   assert.equal(clean.status, 0);
-  assert.equal(clean.lines[0], 'suite: 2 files, 3 test() calls, 12 s wall (baseline 2 / 3 / 10 s at 012345678)');
+  assert.equal(clean.lines[0], 'suite: 2 files, 3 test() calls, 2 Rust tests, 12 s wall, 35 s CPU (baseline 2 / 3 / 2 Rust / 10 s / 30 s CPU at 012345678)');
+  assert.equal(clean.lines.some((l) => /CPU per test/.test(l)), false);
+  const costly = suiteReport({ files, cpuSeconds: 45, fileCpu: { 'test/a.test.mjs': 22, 'test/b.test.mjs': 23 }, cwd: dir, baselinePath, admission, change });
+  assert.equal(costly.status, 0, 'CPU growth warns, never fails');
+  const at = costly.lines.findIndex((l) => l.startsWith('suite: warning: CPU per test() call is 15000 ms, +50% over the baseline\'s 10000 ms'));
+  assert.ok(at > 0, costly.lines.join('\n'));
+  assert.deepEqual(costly.lines.slice(at + 1, at + 3), ['  test/b.test.mjs: 10.0 s -> 23.0 s CPU', '  test/a.test.mjs: 20.0 s -> 22.0 s CPU']);
   assert.ok(clean.lines.some((l) => /1 known cross-file clone/.test(l)));
   assert.ok(clean.lines.some((l) => /1 baselined clone\(s\) are gone/.test(l)));
   assert.ok(clean.lines.some((l) => /warning: test\/a\.test\.mjs:2 \[new-real-provider-network-without-marker\]/.test(l)));

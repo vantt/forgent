@@ -31,7 +31,7 @@ import readline from 'node:readline';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
-import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, OUTCOME_EXIT_CODES, categoryOf, exitCodeForOutcome, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, OUTCOME_EXIT_CODES, categoryOf, exitCodeForOutcome, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
@@ -43,12 +43,12 @@ import { findAuthoritativeMatch, findDuplicateAuthoritativeClaims } from '../src
 import { checkVerifyForC4 } from '../src/intake/verify-pattern-check.mjs';
 import { parseFrontmatter } from '../src/report/frontmatter.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
-import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
-import { rebuildViewFromDir } from '../src/state/replay.mjs';
+import { EventLogError } from '../src/state/event-log.mjs';
+import { foldEvents, conflictsFor } from '../src/state/replay.mjs';
 import { deriveTitle, classify } from '../src/intake/classify.mjs';
-import { mintWorkId } from '../src/util/identity-mint.mjs';
+import { mintMachineId, mintWorkId } from '../src/util/identity-mint.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
-import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, RunnerConfigError, runDispatchCli, runDoorHint, DispatchError } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfigForDir, RunnerConfigError, runDispatchCli, runDoorHint, DispatchError } from '../src/runner/dispatch.mjs';
 import { resolveWorkForDispatch } from '../src/runner/work-dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
@@ -76,13 +76,17 @@ import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.m
 import { rankImpact } from '../src/state/impact.mjs';
 import { FINAL_STATUSES } from '../src/state/work.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
-import { readClaim, releaseClaim } from '../src/state/runtime-coordination.mjs';
+import { readClaim, releaseClaim, getMainFgosDir } from '../src/state/runtime-coordination.mjs';
+import { maintainEventStore } from '../src/event-store/maintenance.mjs';
+import { processSealCoalescer } from '../src/event-store/seal-coalescing.mjs';
+import { spawnDetachedCli } from '../src/cli/detached-child.mjs';
+import { currentDispatchDepth } from '../src/runner/dispatch/transport.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
 import { normalizePath } from '../src/util/normalize-path.mjs';
 import { collectOutcomeEntry } from '../src/report/item-trace.mjs';
-import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, buildOwnFileSet } from '../src/runner/merge.mjs';
+import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, buildOwnFileSet, readInvariantCheckCommands, releaseRecordedLand } from '../src/runner/merge.mjs';
 import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { rejectUseCase } from '../src/verbs/merge/reject.mjs';
@@ -104,7 +108,7 @@ import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
 import { unreleasedHasEntries, pathExistsAt, commitAt } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, gitWorktrees, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
-import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
+import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
 import { withMainCheckout } from '../src/runner/repo-locks.mjs';
@@ -135,13 +139,11 @@ import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
-import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
-import { refreshTierLadderComment, ladderCommentLines } from '../src/setup/tier-ladder-comment.mjs';
-import { createSeatBindingClient } from '../src/seat-binding/client.mjs';
-import { sharedConfigFilePath, readSharedConfig, readSharedConfigOrEmpty, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
+import { DOCTOR_CHECKS, createDoctorRun, integrationScriptPath, runFixes } from '../src/setup/checks.mjs';
+import { readConfig, initConfigFile } from '../src/config/facade.mjs';
+import { fixEventStoreLockDirs } from '../src/setup/event-store-fixes.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
-import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
 import { installClaudeCodeHook } from '../src/setup/claude-code-hooks.mjs';
 import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
@@ -291,29 +293,17 @@ function excludeIronLawEvidence(files, id) {
 // `events.jsonl` (plus its own timestamped backups) and
 // `entropy-history.jsonl` -- never a policy or generated file.
 //
-// Tầng A/T2 (TA-D2/TA-D11): the same append-only stream now also lands in
-// per-writer files under `.fgos/events/<writer-id>-<openTs>.jsonl` instead
-// of always landing in baseline-0 -- same noise, same reasoning, just a
-// different physical path; a compacted baseline under `.fgos/events/`
-// (`baseline-<ts>.jsonl`, T6) and its own manifest sidecar under
-// `.fgos/events/archive/` are equally append-only lifecycle output, never
-// an item's own declared footprint.
-//
-// tsk-3tp-1 (D2, sweep-into-merge-commit redesign): the truncation guard's
-// own mark sidecar (`events-jsonl.truncation-guard.json`) and the warnings
-// log it appends to (`main-checkout-guard-warnings.jsonl`) are the same
-// kind of append-only, no-item-owns-it output -- a fallback checkpoint (or
-// the merge-time sweep) can legitimately touch either one, never an item's
-// own declared footprint. The wildcard extension on
-// `events-jsonl.truncation-guard\..*` also subsumes tsk-vim's own narrower
-// exact-`.json` fix (independently landed on main) -- one regex alternative
-// covers both.
+// Legacy tracked event files (the single `events.jsonl` and its per-writer and
+// archive siblings) stay exempt for as long as a checkout still carries them
+// before `fgos events migrate`: they are the same append-only lifecycle output,
+// never an item's own declared footprint. New events live in the Event Store's
+// refs and never appear in a diff.
 // `.fgos/logs/` (phase-01, plans/260825-0842-fgos-logs-dir-bucketing):
-// entropy/changelog-nag/approve-fault/invocation-fault/guard-warnings all
-// moved under this gitignored bucket -- kept here too since this regex is
-// evaluated against whatever path list a caller hands it, not only
-// `git diff --name-only` (which would never surface an ignored path).
-const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|locks\/.*|observe\/.*|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
+// entropy, changelog-nag, approve-fault and invocation-fault logs live under
+// this gitignored bucket -- kept here too since this regex is evaluated against
+// whatever path list a caller hands it, not only `git diff --name-only` (which
+// would never surface an ignored path).
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|locks\/.*|observe\/.*)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }
@@ -441,9 +431,8 @@ function parseWaitFlags(flags, verbName) {
 // `resolveTimeoutMs` and `resolveWaitFlags` are thunks, not resolved
 // values, and that is load-bearing. Both of the parsers behind them can
 // refuse, and `resolveVerifyTimeoutMs` additionally falls through to
-// `ensureRunnerConfigForDir`, which WRITES a default runner config (and
-// warns on stderr) when none exists yet. Resolving either while building
-// the options would move that refusal — and that write — ahead of every
+// `loadRunnerConfigForDir`, which can refuse a broken config file.
+// Resolving either while building the options would move that refusal ahead of every
 // guard the use case runs:
 //
 //   - `sync-root` used to parse both only AFTER its item/worktree/branch/
@@ -466,11 +455,6 @@ function parseMergeClusterOptions(verb, flags, dir, extra = {}) {
     acknowledgeDrift: flags['acknowledge-drift'] === true,
     github: Boolean(flags.github),
     prNumber: flags.pr,
-    // Test-only failure seam (tsk-480 D3), same shape as FGOS_GH_COMMAND:
-    // an env var read only in the adapter, scoped to an exact item id so it
-    // can never affect any other item in the same process, inert unless a
-    // test explicitly sets it. Production code never sets this variable.
-    testForceLockTimeoutId: process.env.FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT ?? null,
     ...ghCommandOpts(),
     ...extra,
   };
@@ -495,7 +479,8 @@ function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
     }
     return timeoutMs;
   }
-  return ensureRunnerConfigForDir(repoRoot).timeoutMs;
+  // The config is the main checkout's; a session worktree reaches it only through a `.fgos` link, which the door refuses.
+  return loadRunnerConfigForDir(resolveMainCheckoutRoot(repoRoot) ?? repoRoot).timeoutMs;
 }
 
 /**
@@ -529,7 +514,7 @@ async function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }
   }
   const prefer = parseListFlag(flags.provider);
   if (flags.provider !== undefined) {
-    const executors = ensureRunnerConfigForDir(mainRoot).executors ?? {};
+    const executors = loadRunnerConfigForDir(mainRoot).executors ?? {};
     const valid = Object.keys(executors).filter((id) => (executors[id]?.kind ?? 'agent') === 'agent');
     const unknown = prefer.find((id) => !valid.includes(id));
     if (prefer.length === 0 || unknown !== undefined) {
@@ -1065,6 +1050,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     case 'init': {
+      // `init` is the first step of setup, and the store cannot open without a machine id and its locks directory,
+      // which setup creates. Create them here through the Identity mint and the lock-dirs fix (idempotent: an existing id is kept, and a
+      // clone's own `fgos.machineId` still wins).
+      mintMachineId(worktreeStateRoot().stateRoot);
+      fixEventStoreLockDirs(path.dirname(dir));
       initStore(dir);
       // D4: detection/manifest writing must never fail init — a permissions
       // quirk or unexpected error here still leaves `.fgos/` initialized.
@@ -1076,9 +1066,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // Swallowed by design (D4 fail-safe) — see comment above.
       }
       // D4 fail-safe, same discipline as the coexistence manifest above: a
-      // missing git binary, a non-repo cwd, and a repo with zero commits all
-      // land in the same catch — this is a plain non-fatal notice, not a
-      // distinction worth making.
+      // failed HEAD lookup (a repo with zero commits, an unreadable ref) lands
+      // in the same catch — a plain non-fatal notice, not a distinction worth
+      // making. A cwd that is no repository never gets here: the two fixes
+      // above resolve the repository and refuse it.
       let gitHeadless = false;
       try {
         gitHeadless = typeof inspectGit(path.dirname(dir)).resolveCommit({ name: 'HEAD' }) !== 'string';
@@ -1267,10 +1258,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // The runner config (executor + tier models) is loaded the same way
     // bin/fgos-runner.mjs loads it.
     case 'discover': {
-      const id = requireField(positional[0] ?? flags.id, 'discover requires an id: fgos discover <id> [--config <path>]');
-      // An explicit --config path stays a loud, unmodified failure on ENOENT
-      // (loadRunnerConfig); only the default, unflagged path bootstraps a
-      // missing config (D1/D3, ensureRunnerConfigForDir — tsk-5vf D1/D2).
+      const id = requireField(positional[0] ?? flags.id, 'discover requires an id: fgos discover <id>');
       // `path.dirname(dir)`, not `process.cwd()` (tsk-5hv, found by
       // fgos-coding-implement): `dir` already reflects `--dir` when given
       // (every skill's own hard rule: resolve the main checkout and pass
@@ -1280,9 +1268,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // worktree-resident session, since `.fgos/config.json` is
       // unconditionally wiped from every freshly-created worktree
       // (ADR0020) and a bare cwd would silently resolve to nothing there.
-      const cfg = flags.config
-        ? loadRunnerConfig(flags.config)
-        : ensureRunnerConfigForDir(path.dirname(dir));
+      const cfg = loadRunnerConfigForDir(resolveMainCheckoutRoot(path.dirname(dir)) ?? path.dirname(dir));
       const callerVerdict = parseDiscoverCallerVerdict(flags);
       const repoRoot = path.dirname(dir);
       const list = listWork(dir).work;
@@ -1314,12 +1300,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // `executing`, splits it into children, or parks it in
     // `awaiting-human` (D3).
     case 'plan': {
-      const id = requireField(positional[0] ?? flags.id, 'plan requires an id: fgos plan <id> [--config <path>]');
+      const id = requireField(positional[0] ?? flags.id, 'plan requires an id: fgos plan <id>');
       // path.dirname(dir), not process.cwd() -- see the discover case above
       // for why (tsk-5hv, found by fgos-coding-implement).
-      const cfg = flags.config
-        ? loadRunnerConfig(flags.config)
-        : ensureRunnerConfigForDir(path.dirname(dir));
+      const cfg = loadRunnerConfigForDir(resolveMainCheckoutRoot(path.dirname(dir)) ?? path.dirname(dir));
       const callerVerdict = parsePlanCallerVerdict(flags);
       const repoRoot = path.dirname(dir);
       const list = listWork(dir).work;
@@ -1455,11 +1439,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const domain = getDomain(item.domain);
       const rawEvents = readRawEvents(dir);
       const repoRoot = process.cwd();
-      const sharedConfig = readSharedConfig(repoRoot);
-      const ttlDays = sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS;
-      // tsk-59x D1: a leaf gets this shorter/zero TTL instead of ttlDays --
+      // The standard supplies both values (7 and 0); a leaf gets leafTtlDays instead of ttlDays,
       // resolved per-item inside assessCleanupReadiness (resolveTtlDaysForItem).
-      const leafTtlDays = sharedConfig?.cleanup?.leafTtlDays ?? DEFAULT_CLEANUP_LEAF_TTL_DAYS;
+      const { ttlDays, leafTtlDays } = readConfig({ projectRoot: repoRoot, sections: ['cleanup'] }).value.cleanup;
 
       const assessment = assessCleanupReadiness({
         view,
@@ -1605,7 +1587,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const role = positional[2] ?? flags.role;
         const docPath = flags['doc-path'];
 
-        const view = rebuild(dir);
+        const view = listWork(dir);
 
         let targetDoc = null;
         if (topicId && role) {
@@ -1689,7 +1671,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         throw new StoreError('validation', 'knowledge requires a subcommand (status, attest).');
       }
       if (sub === 'status') {
-        const view = rebuild(dir);
+        const view = listWork(dir);
         const topics = view.topics ?? {};
         const docs = view.docs ?? {};
         const activeTopics = Object.values(topics).filter((t) => t.status === 'active').length;
@@ -1715,7 +1697,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         };
       } else if (sub === 'attest') {
         const docPath = requireField(flags['doc-path'] ?? positional[1], 'knowledge attest requires --doc-path');
-        const view = rebuild(dir);
+        const view = listWork(dir);
         const resolved = resolveDocPath(view, docPath);
 
         const repoRoot = path.dirname(dir);
@@ -1731,8 +1713,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // finishes (see that file's own "Risks & rollback"). Only the git-HEAD
         // check above (condition 1, pre-existing before this gate was added)
         // always applies regardless of the flag.
-        const sharedConfig = readSharedConfigOrEmpty(repoRoot);
-        const enforceRegistry = sharedConfig?.docRegistry?.enforce === true;
+        const enforceRegistry = readConfig({ projectRoot: repoRoot, sections: ['docRegistry'] }).value.docRegistry.enforce === true;
 
         const captureId = requireField(flags['capture-id'], 'knowledge attest requires --capture-id');
 
@@ -1771,7 +1752,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     case 'doc-registry': {
-      const view = rebuild(dir);
+      const view = listWork(dir);
       const { jsonContent, mdContent } = computeKnowledgeProjection(view);
       const root = path.dirname(dir);
       const mdPath = path.join(root, 'docs/doc-registry.md');
@@ -1826,9 +1807,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // registry-membership rule here (when the operator has turned
         // enforcement on) closes the gap that let it keep tagging a path
         // the registry never heard of.
-        const sharedConfig = readSharedConfigOrEmpty(repoRoot);
-        if (sharedConfig?.docRegistry?.enforce === true) {
-          const registryView = rebuild(dir);
+        if (readConfig({ projectRoot: repoRoot, sections: ['docRegistry'] }).value.docRegistry.enforce === true) {
+          const registryView = listWork(dir);
           const resolved = resolveDocPath(registryView, docPath);
           if (Array.isArray(resolved)) {
             throw new StoreError('validation', `compound: --doc-path "${docPath}" resolves ambiguously to ${resolved.length} docs (${resolved.map((d) => d.docId).join(', ')}) (docRegistry.enforce is on) — fail-closed rather than guess which one to tag.`);
@@ -2240,6 +2220,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         friction: null,
         settlement: collectSettlementData(rawView, id),
         learning: collectLearningData(rawView, id),
+        // Events recorded as conflicts: acknowledged on their machine, never applied to this view.
+        conflicts: conflictsFor(rawView, id),
       };
     }
 
@@ -2321,7 +2303,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           // --effort <level>: every unit of the run asks for this reasoning effort (kept for resume).
           effort: flags.effort === undefined ? undefined : requireField(flags.effort, '--effort requires a level (low, medium, high, max)'),
           timeout: flags.timeout === undefined ? undefined : requireField(flags.timeout, '--timeout requires a duration, e.g. 90m or 5400s'),
-          account: flags.account === undefined ? undefined : requireField(flags.account, '--account requires pool/account (an account of a pool in runner.llmAccounts of ~/.fgos/config.json, for example openai/work)'),
+          account: flags.account === undefined ? undefined : requireField(flags.account, '--account requires pool/account (an account of a pool in ~/.fgos/private/accounts.yaml, for example openai/work)'),
           request: typeof flags.request === 'string' ? flags.request : undefined,
           stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
           contextRefs: flags['context-ref'],
@@ -2434,8 +2416,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // item's own scope note. ttlDays resolution mirrors `case 'cleanup'`
       // above exactly (shared-config value, never guessed).
       const repoRoot = process.cwd();
-      const sharedConfig = readSharedConfig(repoRoot);
-      const ttlDays = sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS;
+      const { ttlDays } = readConfig({ projectRoot: repoRoot, sections: ['cleanup'] }).value.cleanup;
       return staleUseCase({ dir, repoRoot, cleanupTtlDays: ttlDays }, { reconcile: Boolean(flags.reconcile) });
     }
 
@@ -2452,7 +2433,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // ceiling comes from the same config resolution claimWork's own gate uses.
     case 'slots': {
       const slotsView = listWork(dir);
-      const ceiling = readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling;
+      const ceiling = readWorkerSlotCeiling(dir);
       const counts = countWorkerSlots(slotsView);
       const room = hasWorkerSlotRoom(slotsView, { ceiling });
       return {
@@ -2535,8 +2516,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // capability-plan-lint.mjs): a plan author's own static check, never
     // wired into `doctor` or any automatic gate. `registered` is always
     // `Object.keys(runner.capabilities)` from THIS repo's own live config,
-    // read via `loadRunnerConfigFromDir` -- unlike `ensureRunnerConfigForDir`,
-    // that never bootstraps or rewrites `.fgos/config.json`, so a read-only
+    // read via `loadRunnerConfigForDir`, which never writes, so a read-only
     // lint never mutates state as a side effect of being run.
     case 'plan-lint': {
       const rawPath = optionalField(positional[0], 'plan-lint requires a <path> to a plan directory, plan.md, or phase file, e.g. `fgos plan-lint plans/<track>`.');
@@ -2559,7 +2539,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const repoRoot = path.dirname(dir);
       let cfg;
       try {
-        cfg = loadRunnerConfigFromDir(repoRoot);
+        cfg = loadRunnerConfigForDir(repoRoot);
       } catch (err) {
         if (err instanceof RunnerConfigError) {
           throw new StoreError('precondition', `plan-lint: ${err.message}`);
@@ -2698,11 +2678,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // Read-only: the config is loaded without filling in defaults, and nothing is leased or spawned.
         const { explainCapability } = await import('../src/runner/execution/explain.mjs');
         const { detectHerdrPresent } = await import('../src/runner/execution/run.mjs');
-        return explainCapability(loadRunnerConfigFromDir(repoRootForDispatch), {
+        return explainCapability(loadRunnerConfigForDir(repoRootForDispatch), {
           capability: requireField(flags.for, 'dispatch explain requires --for <capability>'),
           rigor: flags.rigor,
           session: { headless: true, herdrPresent: detectHerdrPresent() },
-          projectConfig: readSharedConfigOrEmpty(repoRootForDispatch),
         });
       }
       if (sub === 'inspect') {
@@ -2812,37 +2791,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
     }
     case 'run': {
-      const sub = positional[0];
-      if (sub === 'record') {
-        const { recordInlineRun } = await import('../src/runner/execution/run.mjs');
-        const unitRunId = requireField(flags['unit-run'], '--unit-run is required for fgos run record');
-        const role = flags.role || 'producer';
-        const roundStr = requireField(flags.round, '--round is required for fgos run record');
-        const round = Number.parseInt(roundStr, 10);
-        const nonce = requireField(flags.nonce, '--nonce is required for fgos run record');
-        const evidenceStr = requireField(flags.evidence, '--evidence is required for fgos run record');
-        const evidenceRefs = evidenceStr.split(',').map((s) => s.trim()).filter(Boolean);
-        const repoRoot = flags.dir;
-        let resultObj = {};
-        const resultJson = flags.result;
-        if (resultJson) {
-          try {
-            resultObj = JSON.parse(resultJson);
-          } catch (e) {
-            throw new StoreError('validation', `invalid JSON for --result: ${e.message}`);
-          }
-        }
-        return recordInlineRun({
-          unitRunId,
-          role,
-          round,
-          nonce,
-          evidenceRefs,
-          result: resultObj,
-          repoRoot,
-        });
-      }
-
       const { runUnit, resolveGitRoots, admitDocumentationExecution } = await import('../src/runner/execution/run.mjs');
       const { parseRunTimeout } = await import('../src/runner/dispatch/config.mjs');
       const unitPath = flags.unit;
@@ -2909,7 +2857,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // run exists; a resumed run keeps the account its bindings already carry.
       if (flags.account !== undefined) {
         if (resumeUnitRunId) throw new StoreError('validation', '--account cannot change a resumed unit run: it keeps the account its seats were bound to');
-        const account = requireField(flags.account, '--account requires pool/account (an account of a pool in runner.llmAccounts of ~/.fgos/config.json, for example openai/work)');
+        const account = requireField(flags.account, '--account requires pool/account (an account of a pool in ~/.fgos/private/accounts.yaml, for example openai/work)');
         if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({});
         for (const ov of overrides) {
           if (ov.account === undefined) ov.account = account;
@@ -2978,20 +2926,41 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
 
 
-    case 'rebuild': {
-      const view = rebuild(dir);
-      return { workCount: Object.keys(view.work).length, decisionCount: view.decisions.length };
+    // `events sync|status|export|migrate|import-legacy` and `rebuild` are the Event Store's verbs; each use case owns its
+    // own validation and refusals. The Event Store is Linux-only, so every one of them refuses elsewhere.
+    case 'events': {
+      const sub = positional[0];
+      const ctx = { cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) };
+      if (sub === 'sync') {
+        const { syncUseCase } = await import('../src/verbs/events/sync.mjs');
+        return syncUseCase(ctx, { remote: flags.remote, noPush: flags['no-push'], opportunistic: flags.opportunistic });
+      }
+      if (sub === 'status') {
+        const { statusUseCase } = await import('../src/verbs/events/status.mjs');
+        return statusUseCase(ctx, { remote: flags.remote });
+      }
+      if (sub === 'seal') {
+        const { sealUseCase } = await import('../src/verbs/events/seal.mjs');
+        return sealUseCase(ctx, { stream: flags.stream, history: flags.history });
+      }
+      if (sub === 'export') {
+        const { exportUseCase } = await import('../src/verbs/events/export.mjs');
+        return exportUseCase(ctx, { out: flags.out, format: flags.format, stream: flags.stream, since: flags.since });
+      }
+      if (sub === 'migrate') {
+        const { migrateUseCase } = await import('../src/verbs/events/migrate.mjs');
+        return migrateUseCase({ ...ctx, writer: String(resolveWriterIdentity(dir).id) }, { baseline: flags.baseline, check: flags.check });
+      }
+      if (sub === 'import-legacy') {
+        const { importLegacyUseCase } = await import('../src/verbs/events/import-legacy.mjs');
+        return importLegacyUseCase(ctx, { file: flags.file, check: flags.check });
+      }
+      throw new StoreError('validation', 'events requires sync|status|seal|export|migrate|import-legacy');
     }
 
-    // Operator-invoked repair (per readEvents' fail-closed 'corrupt-log'
-    // halt, events.mjs): scoped ONLY to the common crash-mid-append shape —
-    // a truncated final line, every other line already parses. Any other
-    // corruption shape still refuses (events.mjs's own guarantee, unchanged
-    // here). Backs up the original log before truncating, then re-validates.
-    case 'repair': {
-      const logPath = path.join(dir, 'events.jsonl');
-      const { backupPath, droppedLine, eventCount } = repairTruncatedLastLine(logPath);
-      return { logPath, backupPath, eventCount, droppedLine };
+    case 'rebuild': {
+      const { rebuildStoreUseCase } = await import('../src/verbs/events/rebuild.mjs');
+      return rebuildStoreUseCase({ cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) });
     }
 
     // Rollup view theo bộ (P24, request-class per D1: a pure read — never
@@ -3022,13 +2991,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // guarantee).
     //
     // Uses `listWork(dir)` — NOT `rebuild(dir)` — to fold the outcomes view:
-    // both replay the SAME event log through the SAME fold logic
-    // (rebuildView), but `rebuild(dir)` additionally overwrites
-    // `.fgos/state.json` as a side effect, which would contradict this
-    // verb's own `access: 'read'` declaration and the generator's read-only
-    // prohibition (must_haves). `listWork` is store.mjs's dedicated
-    // read-only facade for exactly this "current view, rebuilt fresh from
-    // the log" need, with no write.
+    // `rebuild(dir)` additionally installs the Work cache as a side effect,
+    // which would contradict this verb's own `access: 'read'` declaration
+    // and the generator's read-only prohibition (must_haves). `listWork` is
+    // store.mjs's dedicated read-only facade for exactly this "current view
+    // from the Event Store" need, with no write.
     //
     // Idempotent by construction: every run re-enumerates the doc tree from
     // scratch and re-derives the manifest from the current event log, then
@@ -3229,12 +3196,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // Delegate to claim-port.mjs — single choke-point for all claim flows
       // (tsk-53f D1). take uses isolate:false (no worktree creation).
       const { noWait, waitMs } = parseWaitFlags(flags, 'take');
-      const doTake = (wait) => claimWork(dir, {
+      const doTake = () => claimWork(dir, {
         id,
         actor: role,
         isolate: false,
         repoRoot,
-        waitMs: wait?.waitMs,
       });
       try {
         return noWait ? await doTake() : await withLockRetry(doTake, { waitMs });
@@ -3301,14 +3267,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // default) fails that check past the first switch — pick is the only
       // caller that needs the harness-chainable location; runner/
       // merge-ephemeral callers are untouched.
-      const doPick = (wait) => claimWork(dir, {
+      const doPick = () => claimWork(dir, {
         id,
         actor: 'session',
         isolate: true,
         claimTrigger,
         repoRoot,
         worktreeDir: path.join(repoRoot, '.claude', 'worktrees'),
-        waitMs: wait?.waitMs,
       });
       try {
         return noWait ? await doPick() : await withLockRetry(doPick, { waitMs });
@@ -3345,7 +3310,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // never `process.cwd()`: a session returning from inside a worktree
       // would otherwise read that branch's own possibly-stale copy of
       // config.json instead of the project's real one.
-      const invariantCheckCommands = readInvariantCheckCommands(path.dirname(dir));
+      const invariantCheckCommands = readInvariantCheckCommands(resolveMainCheckoutRoot(path.dirname(dir)) ?? path.dirname(dir));
 
       const view = listWork(dir);
       const item = view.work[id];
@@ -4023,7 +3988,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     case 'tool': {
       const sub = requireField(positional[0], 'tool requires a sub-verb: fgos tool <check|query> ...');
       const repoRoot = path.dirname(dir);
-      const cfg = flags.config ? loadRunnerConfig(flags.config) : ensureRunnerConfigForDir(repoRoot);
+      const cfg = loadRunnerConfigForDir(repoRoot);
       const tools = toolsFromExecutors(cfg.executors);
       if (sub === 'check') {
         const name = optionalField(flags.name, 'tool check --name requires a non-empty value.');
@@ -4060,16 +4025,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // D6, retargeted per tsk-2ta D1 amended / tsk-5vf D2/D4): inserts the
     // shell-integration source line into every DETECTED rc file (bash/zsh,
     // D4) — never creates a new rc file (shell-rc.mjs's own refusal) — then
-    // ensures the shared config file (`.fgos/config.json`) exists and has
-    // every current default key from EVERY registered `registerConfigDefault`
-    // entry, via `ensureSharedConfigDefaults` (the one write path allowed
-    // here; `doctor`, unlike `setup`, never calls it). tsk-1ri: also ensures
-    // the GLOBAL config file (`~/.fgos/config.json`) the same way —
-    // `ensureSharedConfigDefaults` is already generic over its `dir`
-    // argument (`sharedConfigFilePath(os.homedir())` resolves to the exact
-    // same path `src/config/global-config.mjs`'s `defaultGlobalConfigPath()`
-    // uses), so this reuses it as-is rather than adding a parallel
-    // global-specific writer.
+    // ensures the project's and the machine's header-only config file
+    // (`.fgos/config.yaml`, `~/.fgos/config.yaml`) exist, through the config
+    // door's `init` (the one write path allowed here; `doctor`, unlike
+    // `setup`, never calls it).
     case 'setup': {
       // tsk-2xj: same --dir resolution as `doctor`/`uninstall` below and
       // `resync-worktree` (:4939) — setup's writes are unconditional (tsk-5hi),
@@ -4097,15 +4056,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           }
         }
       }
-      const tierLadderComment = refreshTierLadderComment(repoRoot, {
-        ladder: () => ladderCommentLines(createSeatBindingClient({ cwd: repoRoot, fgosDir: path.join(repoRoot, '.fgos') }).tierLadder().definitions),
-      });
-      const configPath = sharedConfigFilePath(repoRoot);
-      const configExisted = fs.existsSync(configPath);
-      const { addedKeys } = ensureSharedConfigDefaults(repoRoot);
-      const globalConfigPath = sharedConfigFilePath(os.homedir());
-      const globalConfigExisted = fs.existsSync(globalConfigPath);
-      const { addedKeys: globalAddedKeys } = ensureSharedConfigDefaults(os.homedir(), { layer: 'global' });
+      // Each scope gets its header-only config file when it has none (a legacy config.json counts as
+      // present: it is migrated, never shadowed). Nothing else is written; the standard supplies every value.
+      const { created: configCreated, file: configFile } = initConfigFile({ projectRoot: repoRoot, target: 'project' });
+      const configPath = path.join(repoRoot, '.fgos', configFile);
+      const { created: globalConfigCreated, file: globalConfigFile } = initConfigFile({ projectRoot: repoRoot, target: 'global' });
+      const globalConfigPath = path.join(os.homedir(), '.fgos', globalConfigFile);
       // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`
       // does — a second, non-npm-lifecycle-dependent activation path for the
       // main-checkout lock hook, since pnpm 10+ blocks `prepare` for a
@@ -4133,7 +4089,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // different (external) project, or just regenerating wrappers
       // in-place for forgentX's own dev-checkout self-hosting run (see
       // materializeSkillsIntoProject's own self-hosting no-copy branch).
-      const { copied: skillsSourceCopied, wrappersWritten: skillWrappersGenerated } = materializeSkillsIntoProject(PACKAGE_ROOT, repoRoot);
+      const { copied: skillsSourceCopied, wrappersWritten: skillWrappersGenerated, skipped: skillFilesKept } = materializeSkillsIntoProject(PACKAGE_ROOT, repoRoot);
       const deprecation = COMMAND_REGISTRY.find((entry) => entry.name === 'setup')?.deprecated ?? null;
       const deprecationText = formatDeprecation(deprecation);
       return {
@@ -4144,13 +4100,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         rcFilesInserted,
         rcFilesAlreadyConfigured,
         ...(rcWriteDeclinedReason !== null && { rcWriteDeclinedReason }),
-        tierLadderComment,
         configPath,
-        configCreated: !configExisted,
-        configAddedKeys: configExisted ? addedKeys : [],
+        configCreated,
         globalConfigPath,
-        globalConfigCreated: !globalConfigExisted,
-        globalConfigAddedKeys: globalConfigExisted ? globalAddedKeys : [],
+        globalConfigCreated,
         hooksWired,
         hooksSkippedExisting,
         dispatchDecideHookWired,
@@ -4158,6 +4111,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         fixed,
         skillsSourceCopied,
         skillWrappersGenerated: skillWrappersGenerated.length,
+        skillFilesKept,
       };
     }
 
@@ -4179,7 +4133,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     //     act" — this item does not carve out an exception to that).
     // Never touches `.fgos/` data or `.fgos/config.json` (pinned constraint,
     // CONTEXT.md) — structurally true: this case never imports or calls any
-    // config-writing function (`ensureSharedConfigDefaults`/`writeSharedConfig`).
+    // config-writing function (`initConfigFile`/`writeConfig`).
     //
     // Package removal (D1, tsk-4iv-2 SPIKE): opt-in via `--remove-package`,
     // additive on top of tsk-4iv-1's already-shipped, already-documented
@@ -4269,7 +4223,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // registered `fix` (`runFixes`, `src/setup/registrations.mjs`) BEFORE
     // re-running the checks, so the returned `checks` array reflects
     // post-fix state — the same "report what changed" shape
-    // `ensureRunnerConfig`/`ensureSharedConfigDefaults` already use. Without
+    // `setup` already uses. Without
     // `--fix`, behavior is byte-identical to before this flag existed.
     case 'doctor': {
       // tsk-2xj: resolve the real main checkout the same way `resync-worktree`
@@ -4282,8 +4236,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const fixed = flags.fix ? runFixes(repoRoot) : undefined;
       // A check may return its result directly or as a promise (one drives promise-based runner code).
       const checks = [];
+      // Rows of one run share what they read once (the Work view).
+      const run = createDoctorRun();
       for (const { id, description, check } of DOCTOR_CHECKS) {
-        const { passed, message, detail } = await check(repoRoot);
+        const { passed, message, detail } = await check(repoRoot, run);
         checks.push({ id, description, passed, message, ...(detail !== undefined && { detail }) });
       }
       return fixed === undefined ? { checks } : { fixed, checks };
@@ -4294,7 +4250,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
       const claim = readClaim(dir, id);
       if (!claim) return { released: false, reason: 'no-claim' };
-      const durableView = rebuildViewFromDir(dir);
+      const durableView = foldEvents(readRawEvents(dir));
       const durableStatus = durableView.work[id]?.status;
       // Operator recovery: the claim may belong to another (often dead)
       // session, so both release paths name their reason through the admin
@@ -4554,7 +4510,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|events|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|main-checkout-reset> ...`);
   }
 }
 
@@ -4763,19 +4719,8 @@ function renderPretty(verb, data) {
     if (data.rcWriteDeclinedReason) {
       lines.push(formatCheck(false, 'skipped shell-profile line', data.rcWriteDeclinedReason));
     }
-    if (data.tierLadderComment?.status === 'refreshed') {
-      lines.push(formatCheck(true, 'refreshed the tier ladder comment in the project runner config', data.configPath));
-    }
     lines.push(
-      formatCheck(
-        true,
-        data.configCreated
-          ? 'created .fgos/config.json with current defaults'
-          : data.configAddedKeys.length > 0
-            ? `added missing config keys: ${data.configAddedKeys.join(', ')}`
-            : 'config already up to date',
-        data.configPath,
-      ),
+      formatCheck(true, data.configCreated ? 'created .fgos/config.yaml' : 'config already present', data.configPath),
     );
     lines.push(
       formatCheck(
@@ -4798,6 +4743,9 @@ function renderPretty(verb, data) {
           '.agents/skills is the canonical source',
         ),
       );
+    }
+    for (const kept of data.skillFilesKept ?? []) {
+      lines.push(formatCheck(false, 'kept project skill file (newer version or uncommitted changes), not overwritten', kept));
     }
   }
   return `${lines.join('\n')}\n`;
@@ -4852,6 +4800,38 @@ const STORE_MISSING_WARNING_VERBS = new Set([
   'gate-bypass', 'doc-sources', 'lock-status', 'recheck-blocked',
 ]);
 
+// Verbs that open the Event Store without being `requiresExistingStore` or a store-missing-warning read: they carry
+// the opportunistic seal and publish triggers of spec §16 at their start and end.
+const EVENT_STORE_LIFECYCLE_VERBS = new Set(['init', 'doctor', 'setup', 'rebuild', 'events', 'decision-index', 'docs-index', 'knowledge']);
+// The verbs that run Land (a `merge` sub-verb only when it lands), and so the only ones that can leave a retained
+// candidate behind. Their end trigger releases the candidates whose result Work has recorded: the sweep reads
+// Land's whole operation journal, a cost a land already dwarfs and every other command would pay for nothing.
+function landsWork(verb, positional) {
+  return verb === 'approve' || verb === 'sync-root' || verb === 'promote-to-component' || (verb === 'merge' && positional[0] === 'next');
+}
+// A Work command's seal is not waited for: the answer is already printed, so the pending seals go to one short detached
+// `fgos events seal` child that certifies everything open and exits. No child (spawn failed, or killed first) loses
+// nothing: the events are durable and the next command or doctor `event-store-unsealed` covers them (spec §16).
+function handSealsToChild() {
+  for (const { root, stream, checkpointPath } of processSealCoalescer.takeHandedOff()) {
+    spawnDetachedCli({ cwd: root, args: ['events', 'seal', '--stream', stream, ...(checkpointPath ? ['--history', checkpointPath] : []), '--dir', root] });
+  }
+}
+// The detached children (the seal child and the publish child) have no caller to read their error, so a child that
+// fails leaves a record whatever the verb's own classification is.
+function isEventStoreChild(verb, positional, flags) {
+  return verb === 'events' && (positional[0] === 'seal' || (positional[0] === 'sync' && flags.opportunistic === true));
+}
+function opensEventStore(entry, verb, positional, flags) {
+  // `events migrate` imports the tracked history under its own quiesce check: no trigger may open the store around it.
+  if (verb === 'events' && positional[0] === 'migrate') return false;
+  // The seal child does exactly one seal: no start or end trigger (no second seal sweep, no publish) around it.
+  if (verb === 'events' && positional[0] === 'seal') return false;
+  // The publish child does one opportunistic sync and nothing around it, or its own end trigger would start another child.
+  if (verb === 'events' && positional[0] === 'sync' && flags.opportunistic) return false;
+  return !!(entry?.requiresExistingStore || STORE_MISSING_WARNING_VERBS.has(verb) || EVENT_STORE_LIFECYCLE_VERBS.has(verb));
+}
+
 // State/root-resolution investigation (docs/history/agent-coordination-state-root):
 // a worktree made OUTSIDE fgOS's own lifecycle (a plain `git worktree add`,
 // or an external harness's own worktree tool -- never `fgos pick`/`take`'s
@@ -4884,6 +4864,8 @@ const STORE_MISSING_WARNING_VERBS = new Set([
 //        `status` only reads it.
 //      - `knowledge`: `attest` mutates, `status` only reads (`rebuild` +
 //        filtering, no write call).
+//      - `events`: `sync` and `migrate` mutate, `status` and `export` read.
+//      - `rebuild`: every invocation replaces the consumer caches.
 //      - `coordination`: `run`/`launch-master-loop` dispatch and can close
 //        a session; `show`/`chain` are explicitly commented "never appends
 //        an event" in their own case block.
@@ -4907,10 +4889,9 @@ const STORE_MISSING_WARNING_VERBS = new Set([
 //    `uninstall`.
 // 4. Deliberately NOT guarded, not the shared-truth hazard this guard
 //    exists for -- each writes only a local, per-checkout, gitignored
-//    artifact by design, never a shared event: `rebuild` (regenerates the
-//    local `state.json` cache FROM the local event log -- no new event),
-//    `tool` (both `check`, which writes only `.fgos/`'s local status
-//    overlay per its own case-block comment, and `query`, pure read).
+//    artifact by design, never a shared event: `tool` (both `check`, which
+//    writes only `.fgos/`'s local status overlay per its own case-block
+//    comment, and `query`, pure read).
 // 5. Deliberately NOT guarded, not an `.fgos` event-log operation at all --
 //    `preflight` resolves its own root independently via `git rev-parse
 //    --show-toplevel` against `--dir`-or-cwd, never through `dir`/`state.json`.
@@ -4937,7 +4918,7 @@ const STORE_MISSING_WARNING_VERBS = new Set([
 const MUTATING_ONLY_VERBS = new Set([
   'submit', 'take', 'pick', 'move', 'edit', 'ask', 'answer', 'gate-approve', 'reject',
   'add', 'discover', 'plan', 'retrospective', 'cleanup', 'compound', 'resolve-park-reason',
-  'handoff', 'handoff-return', 'decision', 'report', 'topic', 'doc', 'repair',
+  'handoff', 'handoff-return', 'decision', 'report', 'topic', 'doc',
 ]);
 
 const MUTATING_SUBCOMMAND_PREDICATES = {
@@ -4946,6 +4927,11 @@ const MUTATING_SUBCOMMAND_PREDICATES = {
   gateway: (positional) => ['start', 'stop'].includes(positional[0]),
   lock: (positional) => positional[0] === 'fence',
   knowledge: (positional) => positional[0] === 'attest',
+  // `events sync` publishes the checkout's event refs and `events migrate` imports and fences the tracked history;
+  // `events status` and `events export` only read.
+  events: (positional) => ['sync', 'migrate'].includes(positional[0]),
+  // Rebuild replaces every consumer's cache in the shared store root, so a disconnected snapshot must not run it.
+  rebuild: () => true,
   coordination: (positional, flags) => [
     'run', 'close', 'launch-master-loop', 'start', 'operation', 'authorize-and-dispatch',
     'fan-out', 'contribution', 'human-turn', 'disposition', 'specialist-authorize',
@@ -4968,22 +4954,27 @@ function isMutatingInvocation(verb, positional, flags) {
   return predicate ? predicate(positional, flags) : false;
 }
 
-const ALLOWED_HOOK_KINDS = new Set(['dispatch-decide', 'decision-question']);
+const ALLOWED_HOOK_KINDS = new Set(['dispatch-decide', 'decision-question', 'mailbox']);
 
 async function handleHook(rest) {
   const [kind, ...flags] = rest;
   if (!kind || kind === '--help' || kind === '-h') {
     process.stdout.write(
-      'Usage: fgos hook <dispatch-decide|decision-question> [--format=standard|agy]\n\n' +
+      'Usage: fgos hook <dispatch-decide|decision-question|mailbox> [--format=standard|agy] [--cli <claude|codex> --event <stop|post-tool-use>]\n\n' +
         'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi).\n',
     );
     process.exit(0);
   }
 
   if (!ALLOWED_HOOK_KINDS.has(kind)) {
-    process.stderr.write(`Error: Unknown hook kind "${kind}". Allowed kinds: dispatch-decide, decision-question\n`);
+    process.stderr.write(`Error: Unknown hook kind "${kind}". Allowed kinds: ${[...ALLOWED_HOOK_KINDS].join(', ')}\n`);
     process.exit(1);
   }
+
+  // The native Rust host serves `hook mailbox` before this payload runs.
+  // This channel (npm bin, `node bin/fgos.mjs`) has no mailbox, so the hook
+  // stays quiet and never blocks or fails the CLI that called it.
+  if (kind === 'mailbox') process.exit(0);
 
   let rawStdin = '';
   try {
@@ -5133,8 +5124,15 @@ async function main() {
   // arg-parse fault never reached this catch at all and could not be recorded.
   let faultClass = 'arg-parse';
   let dir;
+  let parsed = null;
+  // Set once the verb is known to open the Event Store: the facts both lifecycle triggers need (spec §16).
+  let eventStoreLifecycle = null;
+  let sweepsLand = false;
+  // A dispatched worker seals inline: a detached child would leave the attempt's process domain.
+  if (currentDispatchDepth() === 0) processSealCoalescer.handOff();
   try {
     const { flags, positional } = parseArgs(rest);
+    parsed = { flags, positional };
 
     // Same rule as the Rust host: any exact `--help`/`-h` token asks for help,
     // even where the parser took it as the previous flag's value.
@@ -5152,12 +5150,12 @@ async function main() {
     // tsk-4fu-2: a verb registered `requiresExistingStore: true`
     // (command-registry.mjs) reads/writes through this `dir` — refuse
     // before ever reaching its handler when `.fgos/` isn't there yet,
-    // instead of letting `appendEventCore`'s own `mkdirSync` silently
-    // create a fresh, empty one (the worktree phantom-store hazard this
-    // item closes). `init` is deliberately never in that set — it is the
-    // one legitimate door that creates `.fgos/` — but gets the opposite
-    // check: refuse when `cwd` is a linked worktree, the one remaining
-    // path that could recreate a live `.fgos/` there and defeat ADR0020.
+    // instead of letting a write create a fresh, empty one (the worktree
+    // phantom-store hazard this item closes). `init` is deliberately never
+    // in that set — it is the one legitimate door that creates `.fgos/` —
+    // but gets the opposite check: refuse when `cwd` is a linked worktree,
+    // the one remaining path that could recreate a live `.fgos/` there and
+    // defeat ADR0020.
     const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
     if (entry?.nativeOnly) {
       process.stderr.write(`fgos: "${verb}" chỉ có ở Rust host.\n`);
@@ -5236,6 +5234,15 @@ async function main() {
     // above already answers it without new machinery. The error itself still
     // comes from `runVerb` unchanged.
     faultClass = entry ? null : 'unknown-verb';
+    // The main checkout is resolved (it runs git) only for a verb that opens the store; the other verbs never pay for it.
+    if (opensEventStore(entry, verb, positional, flags)) {
+      eventStoreLifecycle = { trustedMain: path.dirname(getMainFgosDir(dir)), dispatched: currentDispatchDepth() > 0 };
+      sweepsLand = landsWork(verb, positional);
+      // `init` creates the store, so only its end trigger has anything to maintain. A command outside a dispatched worker
+      // hands its seals to a child and runs the same seal-if-due policy in its end trigger, so a start trigger would only
+      // repeat that work on the print path; a stale or crashed batch is sealed by that end trigger or the child.
+      if (verb !== 'init' && eventStoreLifecycle.dispatched) maintainEventStore(path.dirname(dir), eventStoreLifecycle);
+    }
     const data = await runVerb(verb, flags, positional, dir, rest);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
       process.stdout.write(renderPretty(verb, data));
@@ -5281,7 +5288,7 @@ async function main() {
       fgosDir: dir,
       cwd: process.cwd(),
       verb,
-      faultClass,
+      faultClass: faultClass ?? (parsed && isEventStoreChild(verb, parsed.positional, parsed.flags) ? 'event-store-child' : null),
       message: err.message,
       argv: process.argv.slice(2),
     });
@@ -5293,6 +5300,21 @@ async function main() {
       process.exitCode = 1;
     } else {
       process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;
+    }
+  } finally {
+    // The end trigger runs after the verb's answer is written, on success and on refusal alike. Only a session that is
+    // not a dispatched worker publishes (D13); sealing is always safe.
+    handSealsToChild();
+    if (eventStoreLifecycle) {
+      const maintained = maintainEventStore(path.dirname(dir), { ...eventStoreLifecycle, end: true });
+      // The command's answer is already out and a trigger never fails it, so a trigger that could not finish leaves its record.
+      if (maintained.error) {
+        recordInvocationFault({ fgosDir: dir, cwd: process.cwd(), verb, faultClass: 'event-store-end-trigger', message: maintained.error, argv: process.argv.slice(2) });
+      }
+      // A dispatched worker never releases: only the clone owner's own session does (D13).
+      if (sweepsLand && !eventStoreLifecycle.dispatched) {
+        for (const warning of releaseRecordedLand(eventStoreLifecycle.trustedMain).warnings) process.stderr.write(`fgos: warning: Land candidate release: ${warning}\n`);
+      }
     }
   }
 }

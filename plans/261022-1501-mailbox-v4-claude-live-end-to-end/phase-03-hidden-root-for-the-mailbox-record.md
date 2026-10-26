@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Mailbox root in the hidden roots"
-status: pending
+status: done
 depends_on: [1]
 live_calls: 0
 ---
@@ -46,3 +46,13 @@ The whole `runtime/mailbox` directory is hidden, not only `record/`: it also hol
 
 - A worker that legitimately needed to read the mailbox record: none exists (spec §8 item 6). Reversal: remove the entry and the create step.
 - The directory is created by the dispatcher's user in the project's `.fgos/runtime`, the place the record itself would create it; no other path is written.
+
+## Done on the branch (implementation lead, 2026-10-22)
+
+- `node --test test/runner/dispatch-confinement-blind.test.mjs`: red on exactly the two owning tests first, then 15 passed.
+- Sibling files through `scripts/run-tests.mjs` (which stages the host binary; it ran the whole suite, ignoring the file list): `dispatch-confinement-blind`, `execution/handoff-refs`, `provider-per-cli-credential-sources`, `provider-credential-renewal`, `dispatch-confinement-backend-p03`, `dispatch-confinement-credential-hygiene` all passed. The whole run: 8832 tests, 8694 passed, 42 failed, none in confinement or hand-off files (`rust-host/fgctl-*`, `setup/*`, one `dispatch.test.mjs` codex placeholder case); phase 10 compares them with clean main. Under plain `node --test` those four sibling files fail the same counts with or without this change (no host binary).
+
+### Deviations
+
+- The mailbox root is created only when the `.fgos` directory itself exists: `refIsHiddenFromBlind` (`handoff-refs.mjs`) resolves the roots for any project, and a read-only check must not create a `.fgos` in a project without one. The record requires `.fgos` to exist anyway.
+- The board line `'{fgosDir}/mailbox'` was imprecise; the root is `'{fgosDir}/runtime/mailbox'` (`record/paths.rs`).

@@ -266,3 +266,12 @@ test('Git repo-config is a rank 80 leaf', () => {
   const row = registry.locks.find(row => row.name === 'repo-config');
   assert.deepEqual({ kind: row.kind, rank: row.rank, owner: row.owner }, { kind: 'mutex', rank: 80, owner: 'git' });
 });
+
+test('the mailbox mutex is a repo leaf at rank 80 owned by the mailbox', () => {
+  const row = registry.locks.find((lock) => lock.name === 'mailbox');
+  assert.deepEqual(row, { name: 'mailbox', kind: 'mutex', scope: 'repo', rank: 80,
+    v3Path: '<fgosDir>/locks/mailbox.lock', owner: 'mailbox' });
+  assert.deepEqual(validate(row, schema.$defs.lock, schema), []);
+  assert.notDeepEqual(validate({ ...row, owner: 'unknown' }, schema.$defs.lock, schema), []);
+  assert.match(registry.ranks['80'].note, /\bmailbox\b/);
+});

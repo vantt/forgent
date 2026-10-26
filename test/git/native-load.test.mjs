@@ -22,7 +22,7 @@ const options = { descriptor };
 const addon = loadNativeAddon(options);
 
 test('one combined load reports both crate versions and Node-API line', () => {
-  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, process: 1, durableFile: '0.2.0', canonicalJson: 1, holderLock: 1, sessionIdentity: 1, yaml: 1, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
+  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, process: 1, durableFile: '0.2.0', canonicalJson: 1, holderLock: 1, sessionIdentity: 1, yaml: 1, config: 3, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
   assert.equal(loadNativeAddon(options), addon);
 });
 test('ports.v1.json names only operations the loaded addon answers, and each port refuses an unlisted name by name', { skip: process.platform === 'win32' }, () => {
@@ -161,6 +161,7 @@ test('real append and read run in a hot section without a child process; Git ref
   const hot = path.join(temp, '.fgos');
   fs.mkdirSync(hot);
   try {
+    store.admitWrites([]);
     withStateTx(hot, () => {
       assert.throws(() => execFileSync(process.execPath, ['-e', '']), { code: 'exec-under-hot-lock' });
       assert.throws(() => createGitPublication({}, options), /exec-under-hot-lock/);
@@ -389,7 +390,8 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     const fence = path.join(repo, '.fgos/locks/activation.lock');
     fs.mkdirSync(fence, {recursive:true});
     fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({at:'fixture',v:1,lock:'activation',by:'fgos git'}));
-    fs.writeFileSync(path.join(repo, '.fgos/config.json'), JSON.stringify({eventStore:{remote:'upstream'}}));
+    const { writeProjectConfig } = await import(${JSON.stringify(new URL('../helpers/config-fixture.mjs', import.meta.url).href)});
+    writeProjectConfig(repo, {eventStore:{remote:'upstream'}});
     const obsolete = addon.gitFetchMappings('upstream').find(r => r.includes('legacy*')).replaceAll('*', '');
     git('config', '--add', 'remote.upstream.fetch', obsolete);
     assert.equal(checkGit(repo, 'git-repository-config', options).passed, false);
