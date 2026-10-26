@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7e79e83a57ab39619d03a414555a9d3db26899c19ecca705b5963ec65c8341a6",
+  "payloadDigest": "b5ef6c98daaa3275bb10e50e7e7ee2e3f04f9b50fd1a868ec067517d55e142f4",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -347,7 +347,7 @@
     "packages/event-store/rust/tests/support/driver.rs": "531d3acdb8c5ca85339b913238efce2114f42b1c9017d2410f622af140d55cee",
     "packages/event-store/rust/tests/sync_review.rs": "02dde7f2851185698ac6ab13d0155d3682383cda512605c06cca982379d3eba9",
     "packages/event-store/rust/tests/sync_support/mod.rs": "7eda97cf1ff20a7b5eb45be7707b940efba6dcaadc3b2b21954b150c2034d495",
-    "packages/event-store/rust/tests/sync_unchanged_mirror.rs": "26c1a8b9435e433827d8d8a84ea98ab25ab4101fa993074c412481673a7e945f",
+    "packages/event-store/rust/tests/sync_unchanged_mirror.rs": "6ae4726ea3de3df2e3e497d39261b66c7ddc36e45289493b35aafb30f6d6ca3a",
     "packages/event-store/rust/tests/three_clones.rs": "9de1a5e8838dd73f173f0d218b27bc197d4472b7d4ddca3bb97c84d8d8c446d0",
     "packages/event-store/rust/tests/v_event.rs": "8c9722beb4118579e6348f750f0e6e6da3032c6624d8619bae31bdfa35bb7c8a",
     "packages/event-store/rust/tests/vectors.rs": "aaa5d2f5828aad45706d1bf0ef1a8747d44065d85dd3c22437a7e7d8eb07dd67",
@@ -2329,13 +2329,6 @@
       "line": 22,
       "spawn": "Command::new",
       "binary": "git",
-      "class": "rust-test"
-    },
-    {
-      "path": "packages/event-store/rust/tests/sync_unchanged_mirror.rs",
-      "line": 12,
-      "spawn": "Command::new",
-      "binary": "sh",
       "class": "rust-test"
     },
     {

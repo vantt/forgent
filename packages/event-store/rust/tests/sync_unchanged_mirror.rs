@@ -8,14 +8,11 @@ use sync_support::*;
 
 /// Puts a `git` that records every invocation ahead of the real one and returns the log path.
 fn install_recording_git(dir: &Path) -> std::path::PathBuf {
-    let real = String::from_utf8(
-        std::process::Command::new("sh")
-            .args(["-c", "command -v git"])
-            .output()
-            .unwrap()
-            .stdout,
-    )
-    .unwrap();
+    let path = std::env::var_os("PATH").unwrap_or_default();
+    let real = std::env::split_paths(&path)
+        .map(|d| d.join("git"))
+        .find(|g| g.is_file())
+        .expect("git on PATH");
     let log = dir.join("git-calls.log");
     let bin = dir.join("bin");
     fs::create_dir(&bin).unwrap();
@@ -25,12 +22,11 @@ fn install_recording_git(dir: &Path) -> std::path::PathBuf {
         format!(
             "#!/bin/sh\necho \"$PWD $GIT_DIR $*\" >> '{}'\nexec '{}' \"$@\"\n",
             log.display(),
-            real.trim()
+            real.display()
         ),
     )
     .unwrap();
     fs::set_permissions(&script, fs::Permissions::from_mode(0o755)).unwrap();
-    let path = std::env::var_os("PATH").unwrap_or_default();
     let mut dirs = vec![bin];
     dirs.extend(std::env::split_paths(&path));
     std::env::set_var("PATH", std::env::join_paths(dirs).unwrap());
