@@ -162,6 +162,11 @@ fn verify_mirrors(
         let Some(machine) = name.strip_prefix(&prefix) else {
             continue;
         };
+        // An unchanged tip with recorded positions was already verified, so walking it
+        // again proves nothing new. An older status file without positions is verified in full once.
+        if state.tips.get(name) == Some(value) && state.positions.contains_key(name) {
+            continue;
+        }
         let result = (|| {
             let oid =
                 Oid::parse(value, repo.object_format()).map_err(|e| invalid(e.to_string()))?;

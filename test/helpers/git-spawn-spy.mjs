@@ -16,6 +16,9 @@
 //
 // Children inherit the spy through NODE_OPTIONS, so a CLI a test runs (`node bin/fgos.mjs ...`) is
 // watched too; a test that hands its child an env without NODE_OPTIONS opts that child out.
+//
+// Being the one preload every test file process runs, it also records that file's CPU at exit for the
+// suite's cost report (scripts/lib/test-file-cpu.mjs).
 
 import childProcess from 'node:child_process';
 import fs from 'node:fs';
@@ -23,6 +26,7 @@ import module from 'node:module';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
+import { recordTestFileCpuAtExit } from '../../scripts/lib/test-file-cpu.mjs';
 import { CONSUMER_COMMAND, SANDBOX_DOOR, STANDALONE_SKILL_CLASS, sandboxNamedPaths, shellRunsGit, standaloneSkillOf } from '../../scripts/lib/git-spawn-match.mjs';
 
 export const SPY_LOG_ENV = 'FGOS_GIT_SPAWN_SPY_LOG';
@@ -146,6 +150,7 @@ export const SPY_IMPORT = `--import=${pathToFileURL(SELF).href}`;
 
 installGitSpawnSpy(childProcess);
 module.syncBuiltinESMExports();
+recordTestFileCpuAtExit();
 // Children started with the inherited env carry the spy too.
 if (!String(process.env.NODE_OPTIONS ?? '').includes(SPY_IMPORT)) {
   process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS ? `${process.env.NODE_OPTIONS} ` : ''}${SPY_IMPORT}`;

@@ -153,11 +153,11 @@ test('runTests refuses with a non-zero status and an actionable message when zer
   assert.match(result.message, new RegExp(emptyRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });
 
-test('runTests spawns node --test with the discovered files as argv elements and the caller env passed through, preserving other env vars (R2/R3)', () => {
+test('runTests spawns node --test with the discovered files as argv elements and the suite env built from the caller env', () => {
   const root = tmpFixtureRoot();
   const f = write(root, 'x.test.mjs');
   let captured = null;
-  const fakeEnv = { PATH: '/usr/bin', UNRELATED: 'kept' };
+  const fakeEnv = { PATH: '/usr/bin', UNRELATED: 'dropped' };
 
   const result = runTests({
     root,
@@ -174,7 +174,7 @@ test('runTests spawns node --test with the discovered files as argv elements and
   assert.equal(captured.execPath, '/fake/node');
   assert.deepEqual(captured.argv, ['--test', GUARD_ARG, SPY_ARG, path.relative(root, f)]);
   assert.equal(captured.opts.env.PATH, '/usr/bin');
-  assert.equal(captured.opts.env.UNRELATED, 'kept');
+  assert.equal('UNRELATED' in captured.opts.env, false);
 });
 
 test('chosen test files run alone in the staged environment, and a path that is not a file fails by name before anything spawns', () => {
@@ -253,6 +253,28 @@ test('the script itself, spawned as a real process against a tiny fixture tree w
   assert.equal(result.status, 0);
 });
 
+test('a real run measures its CPU and each test file\'s, counting the children a file waited for', { skip: process.platform !== 'linux' }, () => {
+  const root = tmpFixtureRoot();
+  // The file itself is idle; a fixed amount of work (not a wall-clock wait, which load would shorten) runs in a child it waits for.
+  write(root, 'busy.test.mjs', "import { test } from 'node:test';\nimport { spawnSync } from 'node:child_process';\ntest('busy', () => { spawnSync(process.execPath, ['-e', 'let x = 0; for (let i = 0; i < 5e7; i++) x += i; console.log(x)']); });\n");
+  write(root, 'idle.test.mjs', "import { test } from 'node:test';\ntest('idle', () => {});\n");
+  const scriptUrl = new URL('../../scripts/run-tests.mjs', import.meta.url).href;
+  const driver = path.join(root, 'drive.mjs');
+  fs.writeFileSync(
+    driver,
+    `import { runTests } from ${JSON.stringify(scriptUrl)};\n` +
+      `const { status, cpuSeconds, fileCpu } = runTests({ root: ${JSON.stringify(root)}, cwd: ${JSON.stringify(root)}, stdio: 'ignore' });\n` +
+      'console.log(JSON.stringify({ status, cpuSeconds, fileCpu }));\n',
+  );
+
+  const result = spawnSyncNode(driver);
+  const { status, cpuSeconds, fileCpu } = JSON.parse(result.stdout.trim().split('\n').at(-1));
+  assert.equal(status, 0);
+  assert.deepEqual(Object.keys(fileCpu).sort(), ['busy.test.mjs', 'idle.test.mjs']);
+  assert.ok(fileCpu['busy.test.mjs'] > fileCpu['idle.test.mjs'] + 0.1, JSON.stringify(fileCpu));
+  assert.ok(cpuSeconds >= fileCpu['busy.test.mjs'] + fileCpu['idle.test.mjs']);
+});
+
 test('the script itself, spawned for real, refuses (non-zero, no crash) over an empty tree', () => {
   const root = tmpFixtureRoot();
   const scriptUrl = new URL('../../scripts/run-tests.mjs', import.meta.url).href;
@@ -303,7 +325,7 @@ function mirroredRepoRoot(prefix) {
   fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
   fs.copyFileSync(realQueueLibPath, path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs'));
   // ...and the libraries run-tests.mjs and the distribution builder (its one-door census step) import.
-  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/git-addon-stage.mjs', 'lib/git-dir-layout.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'git-one-door-scan.mjs']) {
+  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/test-file-cpu.mjs', 'lib/git-addon-stage.mjs', 'lib/git-dir-layout.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'git-one-door-scan.mjs']) {
     fs.copyFileSync(fileURLToPath(new URL(`../../scripts/${rel}`, import.meta.url)), path.join(root, 'scripts', rel));
   }
   // run-tests.mjs builds the native addon record through the distribution builder's helpers.
@@ -345,27 +367,20 @@ test('the real entrypoint still fires when invoked through a symlink pointing at
   assert.match(result.stderr, /discovered 0 test files/);
 });
 
-test('buildTestEnv drops an inherited NODE_TEST_CONTEXT so a nested node --test really runs its files', () => {
-  const env = buildTestEnv({ PATH: '/usr/bin', NODE_TEST_CONTEXT: 'child-v8', KEEP: 'yes' });
-  assert.equal('NODE_TEST_CONTEXT' in env, false);
-  assert.equal(env.KEEP, 'yes');
-});
-
-test('buildTestEnv drops the herdr session of the pane that started the suite, so no test drives the real herdr server', () => {
-  const env = buildTestEnv({ PATH: '/usr/bin', HERDR_ENV: '1', HERDR_SOCKET_PATH: '/run/herdr.sock', HERDR_PANE_ID: 'w1:p1', FGOS_HERDR_BIN: '/usr/bin/herdr', KEEP: 'yes' });
-  assert.deepEqual(Object.keys(env).filter((key) => key.includes('HERDR')), []);
-  assert.equal(env.KEEP, 'yes');
+test('buildTestEnv passes on only the OS, toolchain and suite variables of the shell that started the run', () => {
+  const env = buildTestEnv({
+    PATH: '/usr/bin', HOME: '/home/u', LC_ALL: 'C', CARGO_TARGET_DIR: '/t', RUSTUP_HOME: '/r', FGOS_TEST_KEEP_TMP: '1', SystemRoot: 'C:\\Windows',
+    // An enclosing node --test, the host's pinned state root, a herdr pane and an agent CLI's session.
+    NODE_TEST_CONTEXT: 'child-v8', FGOS_STATE_ROOT: '/real/state/fgos', FGOS_STATE_HOME: '/real/state',
+    HERDR_ENV: '1', HERDR_SOCKET_PATH: '/run/herdr.sock', FGOS_HERDR_BIN: '/usr/bin/herdr', CLAUDE_CODE_SESSION_ID: 's1', CODEX_THREAD_ID: 't1',
+  });
+  for (const key of ['PATH', 'HOME', 'LC_ALL', 'CARGO_TARGET_DIR', 'RUSTUP_HOME', 'FGOS_TEST_KEEP_TMP', 'SystemRoot']) assert.ok(key in env, key);
+  for (const key of ['NODE_TEST_CONTEXT', 'FGOS_STATE_ROOT', 'FGOS_STATE_HOME', 'HERDR_ENV', 'HERDR_SOCKET_PATH', 'FGOS_HERDR_BIN', 'CLAUDE_CODE_SESSION_ID', 'CODEX_THREAD_ID']) assert.equal(key in env, false, key);
 });
 
 test('buildTestEnv points the claude CLI at a missing binary unless the caller names one, so no test reaches the real claude', () => {
   assert.equal(buildTestEnv({ PATH: '/usr/bin' }).FGOS_CLAUDE_COMMAND, '/nonexistent/fgos-test-claude-binary');
   assert.equal(buildTestEnv({ PATH: '/usr/bin', FGOS_CLAUDE_COMMAND: '/fixture/claude' }).FGOS_CLAUDE_COMMAND, '/fixture/claude');
-});
-
-test('buildTestEnv drops an inherited FGOS_STATE_ROOT so fixtures that set FGOS_STATE_HOME stay in their own state root', () => {
-  const env = buildTestEnv({ PATH: '/usr/bin', FGOS_STATE_ROOT: '/real/state/fgos', FGOS_STATE_HOME: '/fixture/state' });
-  assert.equal('FGOS_STATE_ROOT' in env, false);
-  assert.equal(env.FGOS_STATE_HOME, '/fixture/state');
 });
 
 // --- per-run temp dir: every fixture the suite mkdtemps lands under one
