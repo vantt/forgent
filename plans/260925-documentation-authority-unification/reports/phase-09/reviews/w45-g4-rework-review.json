@@ -1,0 +1,75 @@
+{
+  "review": "w45-g4-rework-review",
+  "worktree": "/home/vantt/projects/forgentX-p9-w1-d3",
+  "head": "44685f942",
+  "commits": ["fbcb8e016", "2fa7fe921", "cb7342614"],
+  "previous": "w42-g4-fixes-review",
+  "verdict": "REWORK",
+  "items": [
+    {
+      "id": "W45-1",
+      "severity": "high",
+      "verdict": "REWORK",
+      "area": "src/runner/documentation-cutover-lease-hook.mjs guardReferenceTransaction (rewind admission)",
+      "evidence": "Git 2.55.0 passes a zero old OID to the reference-transaction hook (preparing/prepared/committed) for `git update-ref refs/heads/main <oid>` with no expected old value and for `git branch -f main <oid>` from a checkout where main is not checked out. A scratch probe hook logged `prepared 0000... <new> refs/heads/main` for both. `git reset --hard` and `git push -f . X:main` pass the real old OID. The forward-only clause `/^0+$/.test(oldOid) || isAncestor(git, oldOid, nextOid)` reads a zero old OID as 'main is being created', so the rewind check is skipped. Repro in a scratch repo: c1 baseline, c2 commits a held sidecar, origin/main=c1. Calling the current guard with a real git adapter: a rewind with real old c2->c1 is refused, a rewind with zero old ->c1 returns null (admitted), and a forward published c2->c3 returns null. End to end with core.hooksPath=<worktree>/.githooks: `git reset --hard c1` was refused ('update aborted by the reference-transaction hook'), but `git update-ref refs/heads/main c1` exited 0 and main lost plans/documentation-cutover-lease.json. The w42 finding (a) is therefore closed only for callers that pass an old value. The unit mock never sends a zero old OID while main exists.",
+      "fix": "When oldOid is all zeros, read the current main with `rev-parse --verify --quiet refs/heads/main` (status 1 = truly absent; any other failure throws, so it fails closed). Use that OID as the old value in both the forward-only check and the diff-tree base. Use the empty tree and the 'created' branch only when main is proven absent. Add one unit case, zero-old with main present rewinding onto an ancestor of published, which must be refused, and one real-git case for `git update-ref refs/heads/main <older>` in the e2e hook file. This also stops held-lease code-only `update-ref` moves from being diffed against the empty tree, which currently over-refuses them."
+    },
+    {
+      "id": "W45-2",
+      "severity": "high",
+      "verdict": "REWORK",
+      "area": "scripts/git-one-door-scan.mjs named re-export follower (added in 2fa7fe921)",
+      "evidence": "Barrel `export { g as default } from './read.mjs';` with caller `import h from './barrel.mjs'; h(['reset', '--hard']);`: the declared wrapper g in scripts/read.mjs still PASSES. Result: sites=[], class declared-tooling-exemption, callers=['scripts/read.mjs:3'], so the reset caller is invisible. The new loop pushes the item under the alias 'default', and the default-import caller is never resolved. Local equivalents refuse: `export { g as default };` gives 'exported under an alias', `export default g` gives 'exported as default', and `export { default } from` a default-exporting module gives 'exported as default'. The same hole exists at 129cbb127, but this rework added the named re-export follower and spec §17 states that `export { fn as default }` refuses, so the code and spec disagree for the re-export form. A namespace access to the same barrel (`import * as b ...; b.default(...)`) is caught (the stale declaration fails closed).",
+      "fix": "In the named re-export loop, if `alias === 'default'`, set aliasedExport and escape(other, m.index, 'exported as default') instead of pushing. Add the shape to the 'star and namespace re-exports' test matrix: barrel `export { g as default } from './read.mjs';` with caller `import h from './barrel.mjs'`."
+    },
+    {
+      "id": "W45-3",
+      "severity": "medium",
+      "verdict": "REWORK",
+      "area": "docs/platform/git/spec.md §7 + CHANGELOG.md:27",
+      "evidence": "§7 says 'unpublished updates and rewinds still use the local policy below' and CHANGELOG:27 says '(a rewind stays refused)'. Both are false for zero-old raw routes (W45-1): `git update-ref` and `git branch -f`. §17 in cb7342614 says 'or a namespace import passed on as a value' refuses. The code refuses only a namespace holder that is exported (item.namespace plus the module export regex). A namespace passed into a local function (`use(m)` with `x.g(...)`) is followed as a caller, and the test 'a namespace import without a re-export remains declarable' asserts that non-exported namespace use stays declarable. §17's `export { fn as default }` refusal does not hold for the `... from` form (W45-2).",
+      "fix": "Once W45-1 and W45-2 are fixed, the §7 and CHANGELOG rewind claims become true; keep them. Reword the §17 phrase to 'or a namespace import exported again as a value (`export const ns = r`, `export { r }`)'."
+    },
+    {
+      "id": "W45-4",
+      "severity": "info",
+      "verdict": "APPROVE",
+      "area": "hook forward-only admission (real-old callers), fail-closed reads, red proof",
+      "evidence": "isAncestor maps status 1 to false and rethrows anything else. A rev-parse error other than status 1 throws, and the outer catch refuses. Real-git checks: a rewind with real old is refused, the forward published move c2->c3 is admitted, and `git reset --hard <pre-acquire>` is refused end to end. The 'rewind' scenario in 'published main admission distinguishes ancestry...' was run against the dc15c5030 hook, copied to scratch with its imports resolved: 0 pass, 1 fail ('AssertionError: rewind'). It passes now. Creating absent main (zero old, no main) is admitted only when the new OID is an ancestor of published; otherwise the empty-tree policy applies (unit test 'creating absent main...' passes).",
+      "fix": "None beyond W45-1."
+    },
+    {
+      "id": "W45-5",
+      "severity": "info",
+      "verdict": "APPROVE",
+      "area": "scanner star / star-as / exported-namespace refusal; red/green; full-repo parity",
+      "evidence": "The new test file was run against the 129cbb127 scanner (copied to scratch with its imports resolved). For 'declared wrappers refuse star and namespace re-exports...': all 12 subtests (3 shapes x 2 argv x direct/forwarded) fail; tests 17, pass 4, fail 13. The positive 'configured function adapter stays classified beside an unrelated named re-export' fails on the 2fa7fe921 scanner (pass 0 / fail 1). On the worktree, that scanner reports 'unresolved-binary src/runner/dispatch/transport.mjs:408 ... no caller found for cliSpawnAdapter' and configured-binary 89. It passes at HEAD. `node scripts/git-one-door-scan.mjs --root .` at HEAD and the 129cbb127 (= fbcb8e016) scanner both report 0 undeclared with identical classes: standalone-skill-script 3, hook-read-context 23, configured-binary 92, rust-test 112, argv-runner 13, production-sandbox-probe 4, uncalled-wrapper 20, git-driver 1, declared-tooling-exemption 19, sandbox-door 2. Also newly caught (it passed at 129cbb127): `import * as r ...; export default r`.",
+      "fix": "None."
+    },
+    {
+      "id": "W45-6",
+      "severity": "info",
+      "verdict": "APPROVE",
+      "area": "cliSpawnAdapter fix: adversarial registered-by-value shapes",
+      "evidence": "Harness: the test's transport/registry/config fixture, with a caller that passes {command:'git', args:['reset','--hard']}. At HEAD every hidden route now surfaces a site: star re-export of transport, `export * as ns`, namespace import with .execute, namespace import of registry, star re-export of registry, `export * as R` of registry, and an exported namespace holder X.cliAdapter.execute. At 129cbb127, star of transport/registry, export * as, registry namespace import and the exported holder all returned sites=[], which were silent holes. The baseline adapter stays configured-binary 1 with no sites. One shape is still silent at both: `export { cliAdapter as default } from` with a default import. It has the same root cause as W45-2. The namespace-flag narrowing (`namespace &&= path.length > 0`) did not open a new route among the shapes tried.",
+      "fix": "Covered by W45-2."
+    },
+    {
+      "id": "W45-7",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "area": "scanner dynamic-import caller gaps (pre-existing, out of scope)",
+      "evidence": "Pre-existing at 129cbb127 and still present: `import('./read.mjs').then((m) => m.g(['reset','--hard']))` and `let m; m = await import('./read.mjs'); m.g(...)` leave a declared wrapper's reset caller invisible (PASSES). Only `const x = await import(...)` is followed. These are not re-exports, so they are outside the w42 finding.",
+      "fix": "Open a separate item: treat an unbound `import(...)` of a module that holds a declared wrapper as a wrapper escape."
+    },
+    {
+      "id": "W45-8",
+      "severity": "info",
+      "verdict": "APPROVE",
+      "area": "census + tests",
+      "evidence": "git status was clean before `node scripts/git-one-door-scan.mjs --root . --write-census` and still clean after it. Runs with FGOS_HOST_BIN set to the activated release and CLAUDE_CODE_SESSION_ID unset: test/scripts/git-one-door-declarations.test.mjs 62/0, test/runner/documentation-cutover-lease.test.mjs 17/0, test/githooks/census-drift.test.mjs 3/0. The e2e lease hook file was not run, per the brief.",
+      "fix": "None."
+    }
+  ],
+  "counts": { "critical": 0, "high": 2, "medium": 1, "low": 1, "info": 4, "rework": 3, "approve": 5 }
+}
