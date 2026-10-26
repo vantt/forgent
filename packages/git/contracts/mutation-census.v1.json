@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "dcfa7d417371f37c4ba8f468217d800e227bf7c45dabd06fff578f30ceb6a7be",
+  "payloadDigest": "54bac56d8c4dffda0dff8214fea291930e8f04d33ee1c7aefc603dacb5a228fd",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -378,7 +378,7 @@
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
     "packages/git/node-addon/src/yaml.rs": "cdb0ecd0b330966e5fd3c8e41e2069bf87722f1ac16df8363e514e9441d4432c",
     "packages/git/node-addon/tests/yaml_parts.rs": "835efdf2a4183cd1197385f318bfb370db8804ae9f4e8e500548c75fd6a3462f",
-    "packages/git/rust/src/driver.rs": "204de4b9986da0f17ef431a41e296ff2631deb75cbbf9d57e228a3bb16b7e584",
+    "packages/git/rust/src/driver.rs": "09b32a4b5cfd96800e190b6b58b26a599337a50e7089eb012876ef4b3044c3fa",
     "packages/git/rust/src/grant.rs": "9702b8f72ada4502857b9ac9d151ea98d9d9a71773a2802278364476851d68d7",
     "packages/git/rust/src/inspect.rs": "6ab5154bc6ead447863198f01de88c16a31703f8839b642bf1d6bf2bb372895a",
     "packages/git/rust/src/land.rs": "9205c084d08ef414a0122b8893b981bf9723d363ff1d4bddc3e293dc09f6ad1e",
@@ -2339,21 +2339,21 @@
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 1196,
+      "line": 1218,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:179",
       "binary": "? path.to_str() .map(str::to_owned) .ok_or_else(|| failure(\"non-utf8-authority-pat",
       "class": "git-driver"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 2829,
+      "line": 2843,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 3036,
+      "line": 3050,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
