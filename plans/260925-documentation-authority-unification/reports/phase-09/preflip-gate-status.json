@@ -2,19 +2,19 @@
   "version": 1,
   "authority": "L12-137",
   "asOf": {
-    "commit": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
+    "commit": "6ba3a13e18018fdfc7c79f08cd7f290865537bde",
     "date": "2026-10-25",
     "finalPinF": null,
     "followUpCommit": "a808bc676c74b1dfafa4dffda4f6d7a31b6d86d6",
     "followUpRuling": "L13-17 (W18 corrections)",
-    "basis": "Historical snapshots and fingerprints are retained separately; current status uses committed inputs at 0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f. W23–W38 reviews and L13-16–30 are reconciled at exact scopes; current command proofs do not invent independent approval or F.",
+    "basis": "Historical snapshots and fingerprints are retained separately; current status uses committed inputs at 6ba3a13e18018fdfc7c79f08cd7f290865537bde. W23–W39 reviews and L13-16–31 are reconciled at exact scopes; current command proofs do not invent independent approval or F.",
     "evidencePathBase": "plans/260925-documentation-authority-unification/reports/phase-09",
     "reconciliation": "gate-reconcile/receipt.json",
     "reviewFollowUpCommit": "98d9201f1905e433a40b94d8d8b0fb9fefda1452",
     "catchUpCommit": "cf13e2bd22ce390344837560b35b41adf7da1238",
     "correctionCommit": "608a4ada5f195b0d0b9d3568a71b8dde4954aacb",
     "originalSnapshotCommit": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
-    "currentCommit": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f"
+    "currentCommit": "6ba3a13e18018fdfc7c79f08cd7f290865537bde"
   },
   "gates": [
     {
@@ -81,7 +81,7 @@
         "reviews/w30-g0-verdicts-b11.json",
         "reviews/w30-g0-verdicts-b11.md"
       ],
-      "commit": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
+      "commit": "6ba3a13e18018fdfc7c79f08cd7f290865537bde",
       "pin": null,
       "note": "Current committed join exits 0: 1,929/1,929 effective rows approved, with no missing, mismatched, stale, open REWORK, invalid bindings or unresolved rows. W24–W30 per-row reviews replace the historical verdict-record gaps, including decision-field freshness under L13-25. 134 w8/w9 overlay approvals remain conditional on atomic placement at F, not approval of the unapplied final body. Rebind records 0–148 (594fe4194) were reviewed in reviews/w26-g0-rework-verdicts.md; records 149–154 in reviews/w33-ownership-audit-review.json (5 APPROVE / 0 REWORK).",
       "remaining": "",
@@ -610,7 +610,7 @@
       ],
       "commit": "f67e0f676",
       "pin": "d3efc70c5",
-      "note": "W8/W14 approve retention and cold timing; W20 C independently approves f67e0f676: contradictory sandbox fields remain verbatim in historicalSandboxAttempt, current values match verified Lead measurements. W21 A approves the additional 25e8842d3 postMeasurementEdits custody entry. Under L13-18 and L13-19.2 no before-F item remains: create the create-only LOCAL ref from the F rebuild with custody evidence before G10, not from a partition that F will replace. L13-30 option A covers publication permission; actual publication remains an F duty, conditional on lead:LAND confirmation before the lease; archive/design.md now documents recovery of retained JSON path strings through the approved archive ref and partition checks (W14/W22); the committed recovery procedure is retained; no archive ref or publication is created by this catch-up.",
+      "note": "W8/W14 approve retention and cold timing; W20 C independently approves f67e0f676: contradictory sandbox fields remain verbatim in historicalSandboxAttempt, current values match verified Lead measurements. W21 A approves the additional 25e8842d3 postMeasurementEdits custody entry. Under L13-18 and L13-19.2 no before-F item remains: create the create-only LOCAL ref from the F rebuild with custody evidence before G10, not from a partition that F will replace. L13-30 option A covers publication permission; lead:LAND confirmation before any option-A step is done (w40); actual publication remains an F duty; archive/design.md now documents recovery of retained JSON path strings through the approved archive ref and partition checks (W14/W22); the committed recovery procedure is retained; no archive ref or publication is created by this catch-up.",
       "remaining": "",
       "blockers": [],
       "cleared": [
@@ -784,28 +784,14 @@
       ],
       "external": [
         "SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11).",
-        "L13-30 approves option A only, conditional on lead:LAND confirmation before the lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh."
+        "L13-30 approves option A only; lead:LAND confirmation before any option-A step, starting with the board notice, is done (w40). L13-31 requires HARDEN answers, F, staging-only release R, G11 and G10 before the real lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh."
       ],
       "ownerItems": []
     }
   ],
   "cutoverReadiness": {
-    "summary": "Local preparation is met-local: G0 1,929/1,929 approved, G2 judgments reviewed, G6 787 premises settled and G9 158 decisions settled. The owner packet was sent (6586bbc46); L13-30 records owner approval of option A on 2026-10-26, conditional on lead:LAND confirming before the lease. G8 publication permission is covered by A; G5 owner acceptance, G9 backlog intent and G4/G10/G11 external dependencies remain open. W38 independently reviewed e7e6c129c (11 APPROVE / 0 REWORK), including the Lead duplicate-id fix. This L13-29.2 refresh needs light review before the lease; no lease, F, release, publication execution or Land approval is claimed.",
+    "summary": "Local preparation is met-local: G0 1,929/1,929 approved, G2 judgments reviewed, G6 787 premises settled and G9 158 decisions settled. The owner packet was sent (6586bbc46); L13-30 approves option A. lead:LAND confirms before any option-A step, starting with the board notice; confirmation and the board notice/HARDEN request are done on 2026-10-26 (origin/main e99966b37; w40 brief). L13-31 requires HARDEN answers before F, then staging-only release R, G11, G10 and the real lease. From F until Land docs/ is frozen; until the real lease it is held by convention only. G8 publication permission is covered by A; G5 owner acceptance, G9 backlog intent and G4/G10/G11 external dependencies remain open. W39 independently reviewed 45da92781 (11 APPROVE / 0 REWORK); its order and condition notes are resolved here. No lease, F, release, publication execution or Land approval is claimed.",
     "order": [
-      {
-        "step": "Complete and independently review local work to met-local",
-        "status": "done"
-      },
-      {
-        "step": "Send owner cutover packet at met-local (L13-6)",
-        "status": "done",
-        "evidence": [
-          "cutover-approval-packet.md",
-          "owner-answers.md"
-        ],
-        "packetCommit": "6586bbc468f2b3e230d5ef7c4abfbc484b39f768",
-        "ruling": "L13-30"
-      },
       {
         "step": "Owner cutover approval within the stated scope and budget",
         "status": "done",
@@ -817,11 +803,42 @@
         "ruling": "L13-30"
       },
       {
-        "step": "Acquire documentation write lease; freeze starts",
+        "step": "lead:LAND confirms and posts the DOC freeze notice and HARDEN request on the board",
+        "status": "done",
+        "date": "2026-10-26",
+        "evidence": [
+          "owner-answers.md",
+          "w40-register-order-brief.md"
+        ],
+        "ruling": "L13-31",
+        "boardCommit": "e99966b37f68caccbe669a05fefc5a08bac24097",
+        "boardPath": "plans/261017-1313-fgos-platform-program-board/log.md",
+        "boardDiffSha256": "87653d1f114dd7b34f2a02abc576bd36ddb6f6a0050087f86757e5d229908174",
+        "note": "DOC notice and HARDEN request posted on origin/main. Freeze docs/ from F until Land; convention only until the real lease."
+      },
+      {
+        "step": "HARDEN/Git owner answers: G4 review of the 25 declarations and git spec §7 consent",
         "status": "pending"
       },
       {
         "step": "Final main import with accounting; record F",
+        "status": "pending",
+        "note": "Import only after HARDEN answers. Freeze docs/ from F until Land; convention only until the real lease."
+      },
+      {
+        "step": "SEAT/LAND stages release R from the F code commit; staged only, not activated",
+        "status": "pending"
+      },
+      {
+        "step": "G11: Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone",
+        "status": "pending"
+      },
+      {
+        "step": "G10: holder Land rehearsal on the G8 shrunk clone with release R",
+        "status": "pending"
+      },
+      {
+        "step": "Acquire the real documentation write lease",
         "status": "pending"
       },
       {
@@ -838,7 +855,7 @@
       }
     ],
     "fWindowSize": {
-      "sourcePin": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
+      "sourcePin": "6ba3a13e18018fdfc7c79f08cd7f290865537bde",
       "meaning": "Source-derived sizing witnesses, not sums of independent populations or a wall-time estimate. Re-enumerate after F import; stop instead of widening the approved lease budget.",
       "g6UnboundRows": {
         "count": 137,
@@ -929,7 +946,7 @@
     "ownerItems": [
       "G5: Owner acceptance of exactly 8 restatements (legacy map lines 3–9 and 34, with exact old/new text in g5/check-b57e79625.json /ownerAcceptance) is required in the cutover approval packet under L13-10; includes the banner and the full Truth-correction line, not just its suffix.",
       "G9: Backlog owner must decide the intended current STR70a/STR62 claims for batch-126.jsonl:2 and generators-skills-and-support.jsonl:66, edit docs/backlog.md directly and return exact row identities; these 2 G9 parks are not generic Lead-review debt (g9/receipt.md; W16 B-pass).",
-      "Land still needs separate owner approval after final ledger review; L13-30 option A is conditional on lead:LAND confirmation before the lease and retains the packet scope/budget and stop conditions."
+      "Land still needs separate owner approval after final ledger review; L13-30 option A retains the packet scope/budget and stop conditions. lead:LAND confirmation before any option-A step, starting with the board notice, is done (w40); follow L13-31 start order."
     ],
     "localCorrectionReview": [
       {
@@ -1044,7 +1061,22 @@
         ],
         "reworkResolutions": {},
         "openRework": [],
-        "note": "11 APPROVE / 0 REWORK; five low notes applied by this L13-29.2 refresh, which needs light review before the lease."
+        "note": "11 APPROVE / 0 REWORK; five low notes independently checked in W39."
+      },
+      {
+        "commits": [
+          "45da92781"
+        ],
+        "review": "reviews/w39-register-refresh-review.json",
+        "verdictCounts": {
+          "APPROVE": 11
+        },
+        "affectedGates": [
+          "cutoverReadiness"
+        ],
+        "reworkResolutions": {},
+        "openRework": [],
+        "note": "11 APPROVE / 0 REWORK. Medium order note w39-10 resolved: HARDEN answers before F, staging-only R then G11 and G10 before the real lease (L13-31, execution plan §3 W4). Low condition note w39-11 resolved: lead:LAND confirms before any option-A step, starting with the board notice; confirmation and board notice are done per w40 and origin/main e99966b37."
       }
     ],
     "beforeFinalPin": [],
@@ -1087,7 +1119,7 @@
       "G9: WORK and registry owners supply the bounded knowledge/registry exports still required by inherited phase-08 parked records. All 158 local Phase-9 dependencies are decided; original external exports stay in their owning records (L13-21/24; g9/phase9-decisions.json).",
       "G10: Git owner section 7 consent is not recorded; after that consent and G11 release, Lead runs holder Land publish/ref verification, non-holder refusal and rollback on the G8 shrunk F-code clone, and commits the owning receipt (execution plan §2 G10).",
       "G11: SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11).",
-      "G11: L13-30 approves option A only, conditional on lead:LAND confirmation before the lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh."
+      "G11: L13-30 approves option A only; lead:LAND confirmation before any option-A step, starting with the board notice, is done (w40). L13-31 requires HARDEN answers, F, staging-only release R, G11 and G10 before the real lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh."
     ],
     "ownerDecision": {
       "source": "owner-answers.md",
@@ -1101,9 +1133,14 @@
       "ownerText": "đồng ý A, khi nào lead LAND báo ổn thì em làm.",
       "condition": {
         "owner": "lead:LAND",
-        "requiredBefore": "Acquire documentation write lease; freeze starts",
-        "status": "pending",
-        "action": "Confirm lease/freeze, F import and F-window heavy IO are OK before starting."
+        "requiredBefore": "lead:LAND confirms and posts the DOC freeze notice and HARDEN request on the board",
+        "status": "done",
+        "action": "lead:LAND confirms before any option-A step, starting with the board notice",
+        "date": "2026-10-26",
+        "evidence": [
+          "owner-answers.md",
+          "w40-register-order-brief.md"
+        ]
       },
       "allowed": [
         "Documentation lease",

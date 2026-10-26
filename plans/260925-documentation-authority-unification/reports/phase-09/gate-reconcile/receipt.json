@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "authority": "L12-137; w17-gate-register-reconcile-brief; w21-register-catchup-brief; w23-register-corrections-brief; w32-register-catchup-brief; w35-register-update-brief; w39-register-refresh-brief; L13-16–30",
-  "asOf": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
+  "authority": "L12-137; w17-gate-register-reconcile-brief; w21-register-catchup-brief; w23-register-corrections-brief; w32-register-catchup-brief; w35-register-update-brief; w39-register-refresh-brief; w40-register-order-brief; L13-16–31",
+  "asOf": "6ba3a13e18018fdfc7c79f08cd7f290865537bde",
   "originalSnapshotCommit": "53de2207e1ea8a9417ac131f785704d6ab72ba2c",
   "status": "reconciled-not-cutover-approval",
   "followUp": {
@@ -2401,7 +2401,7 @@
       "sourcePointer": "/gates/8/blockers/3",
       "item": "Publication (S2) needs owner cutover approval",
       "decision": "cleared",
-      "resolution": "L13-30 option A approves archive ref publication permission; actual F custody and publication remain pending, after lead:LAND confirmation before the lease.",
+      "resolution": "L13-30 option A approves archive ref publication permission; actual F custody and publication remain pending. lead:LAND confirmation before any option-A step is done per w40; follow L13-31 start order.",
       "gates": [
         "G8"
       ],
@@ -2930,7 +2930,7 @@
       "sourcePointer": "/gates/11/blockers/0",
       "item": "SEAT release not staged",
       "decision": "still open",
-      "resolution": "Still open with corrected scope/owner: SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11). L13-30 approves option A only, conditional on lead:LAND confirmation before the lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh.",
+      "resolution": "Still open with corrected scope/owner: SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11). L13-30 approves option A only; lead:LAND confirmation before any option-A step, starting with the board notice, is done (w40). L13-31 requires HARDEN answers, F, staging-only release R, G11 and G10 before the real lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh.",
       "gates": [
         "G11"
       ],
@@ -2956,7 +2956,7 @@
       "sourcePointer": "/gates/11/blockers/2",
       "item": "WORK cutover stop: DOC launches no fgos run, pull or push until \"cutover xong\" (L13-9)",
       "decision": "still open",
-      "resolution": "Still open with corrected scope/owner: SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11). L13-30 approves option A only, conditional on lead:LAND confirmation before the lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh.",
+      "resolution": "Still open with corrected scope/owner: SEAT stages release R from F code (manifest sourcePin provenance); Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone without global activation (execution plan §2 G11). L13-30 approves option A only; lead:LAND confirmation before any option-A step, starting with the board notice, is done (w40). L13-31 requires HARDEN answers, F, staging-only release R, G11 and G10 before the real lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh.",
       "gates": [
         "G11"
       ],
@@ -2996,7 +2996,7 @@
         },
         {
           "decision": "still open",
-          "item": "L13-30 approves option A only, conditional on lead:LAND confirmation before the lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh.",
+          "item": "L13-30 approves option A only; lead:LAND confirmation before any option-A step, starting with the board notice, is done (w40). L13-31 requires HARDEN answers, F, staging-only release R, G11 and G10 before the real lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh.",
           "evidence": [
             "owner-answers.md",
             "preflip-execution-plan.md"
@@ -4917,7 +4917,7 @@
       "sourcePointer": "/cutoverReadiness/external/4",
       "item": "Owner decides S2, the archive ref push and main manifest merge (G8 publication)",
       "decision": "still open",
-      "resolution": "L13-30 option A approves archive publication permission, conditional on lead:LAND confirmation before the lease; actual F custody/publication and separate Land approval for the main manifest merge stay pending.",
+      "resolution": "L13-30 option A approves archive publication permission; lead:LAND confirmation before any option-A step is done per w40. Actual F custody/publication and separate Land approval for the main manifest merge stay pending; follow L13-31 start order.",
       "gates": [
         "G8"
       ],
@@ -5074,7 +5074,7 @@
     "scope": "Historical W22/L13-20 layer only; its then-authored G6/G9 packets were not independent approvals. Generated evidence is preserved from committed d7126c5b9, not from current working-tree files."
   },
   "currentCatchUp": {
-    "sourceCommit": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
+    "sourceCommit": "6ba3a13e18018fdfc7c79f08cd7f290865537bde",
     "generatedHistoricalPin": "d7126c5b9",
     "inputs": [
       {
@@ -5831,11 +5831,15 @@
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md",
-        "sha256": "d3a956429693268fb7d32fef8e4a06db7b9634bc1c7f23e2729bf991d1b7a2ef"
+        "sha256": "acba6b579cbdc0ebe23ff03e9594fe301c2944a99be92c9d5997e1e97bdf9e8d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/preflip-execution-plan.md",
+        "sha256": "936258450b95d78b0815442040ec7b29e8a6571ed47fdce733a6c90d4271327c"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/preflip-gate-status.json",
-        "sha256": "e99b3ec351b6fc10002317ac336b663c314825cbcb6bbdd7dd1f2e2e96d78b9d"
+        "sha256": "132cce9ee586bbde21119263cb6c6a6073189cc2bdf00efd0530bd2423a40249"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/judgments.json",
@@ -5875,7 +5879,7 @@
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/g0-rework-rebindings.json",
-        "sha256": "1576bcdf1d31fbc02a1ebfa788852f551a71e42dfbbd78f6738ca044f8f6cea5"
+        "sha256": "80472e3dfa6de7fbd54947fbb4d65aff1b6d7029e56895ef7951be3d11ebfcc9"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/g0-b1-review.json",
@@ -6238,6 +6242,14 @@
         "sha256": "e720810a9584fac5c6af9482698e57cd8711a6bbd12630f2c96463f801c82f59"
       },
       {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w39-register-refresh-review.json",
+        "sha256": "cc789f9ce57af26fc5551cae1d3ded614456a30ab7c9808174b73caf1e2aa9ba"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w39-register-refresh-review.md",
+        "sha256": "c05cfb3b2a7540a2bff0148cbb97e4da643fd81f13d7032eda3e614f88cf63b9"
+      },
+      {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w4-g4-declare-review.json",
         "sha256": "64970be3264f68e4d267dadfdbee81a8013206c4582bbefa6030a18850ee1096"
       },
@@ -6320,6 +6332,10 @@
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/w39-register-refresh-brief.md",
         "sha256": "f7ece375226be1bb8419d8b9379a5ee89a99ede68f0c9d0671a9563fb0a88d71"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w40-register-order-brief.md",
+        "sha256": "37223c890e3b27b6013528fef146c3f3074cff5cbc08f75eb39dfcf6642d7864"
       }
     ],
     "reviewInventory": [
@@ -7293,6 +7309,18 @@
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w38-register-update-review.md",
         "sha256": "e720810a9584fac5c6af9482698e57cd8711a6bbd12630f2c96463f801c82f59"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w39-register-refresh-review.json",
+        "sha256": "cc789f9ce57af26fc5551cae1d3ded614456a30ab7c9808174b73caf1e2aa9ba",
+        "verdictCounts": {
+          "APPROVE": 11
+        },
+        "nonApproveRows": []
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w39-register-refresh-review.md",
+        "sha256": "c05cfb3b2a7540a2bff0148cbb97e4da643fd81f13d7032eda3e614f88cf63b9"
       }
     ],
     "proofs": "gate-reconcile/current-proofs.json",
@@ -7358,7 +7386,7 @@
         "after": "external"
       }
     ],
-    "scope": "Committed W23–W38 reviews and L13-16–30. Historical occurrence accounting remains at its original pin; this separate table compares current turn-start register statuses."
+    "scope": "Committed W23–W39 reviews and L13-16–31. Historical occurrence accounting remains at its original pin; this separate table compares current turn-start register statuses."
   },
   "newlyVisibleOpenItems": [],
   "scopeLimits": [

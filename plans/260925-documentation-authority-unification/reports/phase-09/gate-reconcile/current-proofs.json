@@ -1,5 +1,5 @@
 {
-  "sourceCommit": "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
+  "sourceCommit": "6ba3a13e18018fdfc7c79f08cd7f290865537bde",
   "commands": [
     {
       "argv": [
@@ -7,13 +7,13 @@
         "-B",
         "plans/260925-documentation-authority-unification/reports/phase-09/g0join/join.py",
         "--pin",
-        "0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f"
+        "6ba3a13e18018fdfc7c79f08cd7f290865537bde"
       ],
       "exit": 0,
-      "stdoutSha256": "4316c2bd306a1d50b903987a9f2e67c1d103a151968e8e79d90127e6584f5a08",
+      "stdoutSha256": "a2fb45817f94bbd942bcae4c11cf0e07d66b008b34df02b8f7d3e01933e612ad",
       "stderr": "",
       "counts": {
-        "aggregateOnly": 62,
+        "aggregateOnly": 63,
         "approved": 1929,
         "effectiveRows": 1929,
         "frozenChangedBindings": 257,
@@ -23,14 +23,14 @@
         "obligations": 2187,
         "openRework": 0,
         "perRowVerdicts": 2695,
-        "reviewFiles": 84,
+        "reviewFiles": 85,
         "stale": 0,
         "unresolved": 0
       },
       "method": "Committed blobs only; changedBindings plus all explicit supersessions/bindingRefresh/rebindReason rows and in-place payload changes since frozen source; exact lineage; decision changes include disposition, rationale/reason, changedClauses, reviewStatus, supersedes links and bindings (including enclosing claim decisions). Verdicts require descendant review-file commit or matching rowFingerprint (SHA256 of compact sorted UTF-8 decision context JSON plus LF); no author reviewStatus inheritance or prose-to-verdict expansion. The obligation population is unchanged; freshness rejects stale verdicts rather than inventing obligations for previously unreviewed rows. Matching two stored digests is not a live target-content audit."
     },
     {
-      "command": "python3 -B fchain/check.py --pin 0e5925d3834ddc2dee691eb3c30b2dffcbc44b0f",
+      "command": "python3 -B fchain/check.py --pin 6ba3a13e18018fdfc7c79f08cd7f290865537bde",
       "invocation": "Committed check.py compose(pin) API; identical engine, output kept inside gate-reconcile instead of fchain/check.json.",
       "exit": 0,
       "counts": {},
@@ -9073,7 +9073,7 @@
           }
         ]
       },
-      "reportSha256": "fa97d6a544314bed2c13500e2dcb8e91f5ecbde03594303a3fccff16bc2f2e73"
+      "reportSha256": "a730c38216d813528f2e492c9670edb1365e39b95fa0f838a5f2ada8e4420a4c"
     },
     {
       "command": "fchain.compose(pin), duplicate-id probe through load seam",

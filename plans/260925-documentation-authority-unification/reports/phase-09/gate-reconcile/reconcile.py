@@ -519,7 +519,8 @@ for path in git('diff', '--name-only', GENERATED_PIN, CURRENT_PIN, '--', str(BAS
 for rel in ['owner-answers.md', 'w32-register-catchup-brief.md', 'g0rework/final-pin-duties.json',
             'fchain/check.py', 'fchain/links.py', 'fchain/manifest.json', 'fchain/link-retargets.json',
             'fchain/rebased-patches.json', 'g0rework/ownership-reader-proof.json',
-            'w35-register-update-brief.md', 'w39-register-refresh-brief.md', 'cutover-approval-packet.md',
+            'w35-register-update-brief.md', 'w39-register-refresh-brief.md', 'w40-register-order-brief.md',
+            'preflip-execution-plan.md', 'cutover-approval-packet.md',
             'fchain/receipt.md', 'fchain/check.json', 'rebind/g0-rework-rebindings.json']:
     current_source(BASE / rel)
 
@@ -599,7 +600,7 @@ dump(OUT / 'current-proofs.json', dict(sourceCommit=CURRENT_PIN, commands=curren
 register['asOf']['originalSnapshotCommit'] = PIN
 register['asOf']['commit'] = register['asOf']['currentCommit'] = CURRENT_PIN
 register['asOf']['basis'] = ('Historical snapshots and fingerprints are retained separately; current status uses committed inputs at '
-    + CURRENT_PIN + '. W23–W38 reviews and L13-16–30 are reconciled at exact scopes; current command proofs do not invent independent approval or F.')
+    + CURRENT_PIN + '. W23–W39 reviews and L13-16–31 are reconciled at exact scopes; current command proofs do not invent independent approval or F.')
 g(0)['commit'] = CURRENT_PIN
 for number in (0, 6, 9):
     g(number).update(status='met-local', blockers=[], remaining='')
@@ -679,12 +680,13 @@ f_window['fComposition'] = dict(source='fchain/check.py composed replay (gate-re
     rule='Counts are witnesses, not additive populations; replay once through the single door at F.')
 readiness = register['cutoverReadiness']
 readiness['summary'] = ('Local preparation is met-local: G0 1,929/1,929 approved, G2 judgments reviewed, G6 787 premises settled and G9 158 decisions settled. '
-    'The owner packet was sent (6586bbc46); L13-30 records owner approval of option A on 2026-10-26, conditional on lead:LAND confirming before the lease. '
+    'The owner packet was sent (6586bbc46); L13-30 approves option A. lead:LAND confirms before any option-A step, starting with the board notice; confirmation and the board notice/HARDEN request are done on 2026-10-26 (origin/main e99966b37; w40 brief). '
+    'L13-31 requires HARDEN answers before F, then staging-only release R, G11, G10 and the real lease. From F until Land docs/ is frozen; until the real lease it is held by convention only. '
     'G8 publication permission is covered by A; G5 owner acceptance, G9 backlog intent and G4/G10/G11 external dependencies remain open. '
-    'W38 independently reviewed e7e6c129c (11 APPROVE / 0 REWORK), including the Lead duplicate-id fix. This L13-29.2 refresh needs light review before the lease; no lease, F, release, publication execution or Land approval is claimed.')
+    'W39 independently reviewed 45da92781 (11 APPROVE / 0 REWORK); its order and condition notes are resolved here. No lease, F, release, publication execution or Land approval is claimed.')
 readiness['beforeFinalPin'] = []
 # Every REWORK stays visible with its exact closure, not converted to a blanket
-# APPROVE. W38 reviewed the prior register; this refresh still needs light review.
+# APPROVE. W39 reviewed the prior register; this refresh resolves its order notes.
 readiness['localCorrectionReview'] = [
     dict(commits=['a319902ab'], review='reviews/w33-link-retargets-review.json',
         verdictCounts={'APPROVE': 4, 'REWORK': 1, 'NOTE': 3}, affectedGates=['G6'],
@@ -708,7 +710,11 @@ readiness['localCorrectionReview'] = [
         openRework=[], note='W32 reviews the prior catch-up; reviews/w38-register-update-review.json items w38-2 and w38-5 independently approve the correction inventory and resolutions.'),
     dict(commits=['e7e6c129c'], review='reviews/w38-register-update-review.json',
         verdictCounts={'APPROVE': 11}, affectedGates=['G0', 'G6', 'G7', 'G9', 'cutoverReadiness'],
-        reworkResolutions={}, openRework=[], note='11 APPROVE / 0 REWORK; five low notes applied by this L13-29.2 refresh, which needs light review before the lease.'),
+        reworkResolutions={}, openRework=[], note='11 APPROVE / 0 REWORK; five low notes independently checked in W39.'),
+    dict(commits=['45da92781'], review='reviews/w39-register-refresh-review.json',
+        verdictCounts={'APPROVE': 11}, affectedGates=['cutoverReadiness'],
+        reworkResolutions={}, openRework=[],
+        note='11 APPROVE / 0 REWORK. Medium order note w39-10 resolved: HARDEN answers before F, staging-only R then G11 and G10 before the real lease (L13-31, execution plan §3 W4). Low condition note w39-11 resolved: lead:LAND confirms before any option-A step, starting with the board notice; confirmation and board notice are done per w40 and origin/main e99966b37.'),
 ]
 for correction in readiness['localCorrectionReview']:
     if correction['openRework']:
@@ -726,21 +732,40 @@ readiness['ownerDecision'] = dict(
     source='owner-answers.md', ruling='L13-30', date='2026-10-26', time='09:57', option='A', status='approved',
     packet='cutover-approval-packet.md', packetCommit=git('rev-parse', '6586bbc46').decode().strip(),
     ownerText='đồng ý A, khi nào lead LAND báo ổn thì em làm.',
-    condition=dict(owner='lead:LAND', requiredBefore='Acquire documentation write lease; freeze starts', status='pending',
-                   action='Confirm lease/freeze, F import and F-window heavy IO are OK before starting.'),
+    condition=dict(owner='lead:LAND', requiredBefore='lead:LAND confirms and posts the DOC freeze notice and HARDEN request on the board', status='done',
+                   action='lead:LAND confirms before any option-A step, starting with the board notice',
+                   date='2026-10-26', evidence=['owner-answers.md', 'w40-register-order-brief.md']),
     allowed=['Documentation lease', 'One main import as F with accounting', 'F duties on plan branch and clones',
              'Archive ref publication', 'Write and independently review final ledger'],
     notAllowed=['Land on main without separate approval after final ledger review', 'Delete files on main',
                 'Push .fgos/events*', 'Widen the frame when F exceeds counts; stop and ask again'])
-readiness['order'] = [dict(step=step, status='done' if i < 3 else 'pending',
-    **({'evidence': ['cutover-approval-packet.md', 'owner-answers.md'],
-        'packetCommit': readiness['ownerDecision']['packetCommit'], 'ruling': 'L13-30'} if i in (1, 2) else {}))
-    for i, step in enumerate(readiness['order'])]
+board_commit = git('rev-parse', 'e99966b37').decode().strip()
+board_path = 'plans/261017-1313-fgos-platform-program-board/log.md'
+board_bytes = git('show', '--format=', '--unified=0', board_commit, '--', board_path)
+readiness['order'] = [
+    dict(step='Owner cutover approval within the stated scope and budget', status='done',
+        evidence=['cutover-approval-packet.md', 'owner-answers.md'],
+        packetCommit=readiness['ownerDecision']['packetCommit'], ruling='L13-30'),
+    dict(step=readiness['ownerDecision']['condition']['requiredBefore'], status='done',
+        date='2026-10-26', evidence=['owner-answers.md', 'w40-register-order-brief.md'], ruling='L13-31',
+        boardCommit=board_commit, boardPath=board_path, boardDiffSha256=hashlib.sha256(board_bytes).hexdigest(),
+        note='DOC notice and HARDEN request posted on origin/main. Freeze docs/ from F until Land; convention only until the real lease.'),
+    dict(step='HARDEN/Git owner answers: G4 review of the 25 declarations and git spec §7 consent', status='pending'),
+    dict(step='Final main import with accounting; record F', status='pending',
+        note='Import only after HARDEN answers. Freeze docs/ from F until Land; convention only until the real lease.'),
+    dict(step='SEAT/LAND stages release R from the F code commit; staged only, not activated', status='pending'),
+    dict(step='G11: Lead proves installed-host docs-lease acquire/status/release/abandon in a disposable clone', status='pending'),
+    dict(step='G10: holder Land rehearsal on the G8 shrunk clone with release R', status='pending'),
+    dict(step='Acquire the real documentation write lease', status='pending'),
+    dict(step='Execute F duties and delta reviews; stop if any fails', status='pending'),
+    dict(step='Write and independently review the final status ledger', status='pending'),
+    dict(step='Land within the separately approved frame', status='pending'),
+]
 g(8)['ownerItems'] = []
-g(8)['note'] = g(8)['note'].replace('Publication remains owner-gated;', 'L13-30 option A covers publication permission; actual publication remains an F duty, conditional on lead:LAND confirmation before the lease;')
+g(8)['note'] = g(8)['note'].replace('Publication remains owner-gated;', 'L13-30 option A covers publication permission; lead:LAND confirmation before any option-A step is done (w40); actual publication remains an F duty;')
 g(8)['atFinalPinUnderLease'].append('Publish the archive ref within option A scope (L13-30) after lead:LAND confirms and F custody/rebuild proofs pass; permission is approved, publication is not executed.')
-g(11)['external'][1] = 'L13-30 approves option A only, conditional on lead:LAND confirmation before the lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh.'
-readiness['ownerItems'] = [f"{gate['g']}: {item}" for gate in register['gates'] for item in gate['ownerItems']] + ['Land still needs separate owner approval after final ledger review; L13-30 option A is conditional on lead:LAND confirmation before the lease and retains the packet scope/budget and stop conditions.']
+g(11)['external'][1] = 'L13-30 approves option A only; lead:LAND confirmation before any option-A step, starting with the board notice, is done (w40). L13-31 requires HARDEN answers, F, staging-only release R, G11 and G10 before the real lease. Land requires separate owner approval after final ledger review; no release is staged by this records refresh.'
+readiness['ownerItems'] = [f"{gate['g']}: {item}" for gate in register['gates'] for item in gate['ownerItems']] + ['Land still needs separate owner approval after final ledger review; L13-30 option A retains the packet scope/budget and stop conditions. lead:LAND confirmation before any option-A step, starting with the board notice, is done (w40); follow L13-31 start order.']
 readiness['external'] = [f"{gate['g']}: {item}" for gate in register['gates'] for item in gate['external']]
 # Reproject from owning gate duties, retaining the common duties and L13-6 order.
 readiness['atFinalPinUnderLease'] = [s for s in readiness['atFinalPinUnderLease'] if not re.match(r'^G\d+:', s)]
@@ -805,7 +830,7 @@ for i, old in enumerate(original['gates']):
             explanation = 'Still open with corrected scope/owner: ' + ' '.join(g(i)['blockers'] + g(i)['external'])
         parts = None
         if i == 8 and j == 3:
-            explanation = 'L13-30 option A approves archive ref publication permission; actual F custody and publication remain pending, after lead:LAND confirmation before the lease.'
+            explanation = 'L13-30 option A approves archive ref publication permission; actual F custody and publication remain pending. lead:LAND confirmation before any option-A step is done per w40; follow L13-31 start order.'
         if i == 9 and j == 1:
             parts = [cleared_part(c13)]
             explanation = 'Interim re-judgment/review is cleared; final source-delta review is not cleared and remains in G9 atFinalPinUnderLease/0 and the original final-pin occurrence.'
@@ -877,7 +902,7 @@ for j, item in enumerate(original['cutoverReadiness']['atFinalPinUnderLease']):
 for j, item in enumerate(original['cutoverReadiness']['external']):
     numbers = [[4], [10], [11], [10], [8], []][j]
     decide(f'/cutoverReadiness/external/{j}', item, 'still open',
-           ('L13-30 option A approves archive publication permission, conditional on lead:LAND confirmation before the lease; actual F custody/publication and separate Land approval for the main manifest merge stay pending.' if j == 4 else
+           ('L13-30 option A approves archive publication permission; lead:LAND confirmation before any option-A step is done per w40. Actual F custody/publication and separate Land approval for the main manifest merge stay pending; follow L13-31 start order.' if j == 4 else
             'Retain the external execution dependency; L13-30 approves option A, not Land or release execution. Apply L13-12 A\' to review-branch ancestry and host-specific stop constraints, rather than the superseded L13-9 blanket wording.'),
            numbers, ['owner-answers.md', 'preflip-execution-plan.md'],
            parts=[{'decision': 'cleared', 'item': 'Archive ref publication permission under L13-30 option A; execution remains pending.', 'evidence': ['owner-answers.md', 'cutover-approval-packet.md']},
@@ -913,7 +938,7 @@ for old, new in zip(original['gates'], register['gates']):
     }, 'originalDecisions': dict(collections.Counter(d['decision'] for d in decisions if d['sourcePointer'].startswith('/gates/' + str(register['gates'].index(new)) + '/')))})
 
 receipt = {
-    'version': 1, 'authority': 'L12-137; w17-gate-register-reconcile-brief; w21-register-catchup-brief; w23-register-corrections-brief; w32-register-catchup-brief; w35-register-update-brief; w39-register-refresh-brief; L13-16–30',
+    'version': 1, 'authority': 'L12-137; w17-gate-register-reconcile-brief; w21-register-catchup-brief; w23-register-corrections-brief; w32-register-catchup-brief; w35-register-update-brief; w39-register-refresh-brief; w40-register-order-brief; L13-16–31',
     'asOf': CURRENT_PIN, 'originalSnapshotCommit': PIN, 'status': 'reconciled-not-cutover-approval',
     'followUp': {'sourceCommit': FOLLOWUP, 'ruling': 'owner-answers.md L13-17',
                  'inputs': FOLLOWUP_READ, 'settlementReceipt': 'census-join/receipt.md',
@@ -940,7 +965,7 @@ receipt = {
         'reviewInventory': current_reviews, 'proofs': 'gate-reconcile/current-proofs.json',
         'countsPerGate': [dict(g=new['g'], before=old['status'], after=new['status'])
                           for old, new in zip(current_before['gates'], register['gates'])],
-        'scope': 'Committed W23–W38 reviews and L13-16–30. Historical occurrence accounting remains at its original pin; this separate table compares current turn-start register statuses.'},
+        'scope': 'Committed W23–W39 reviews and L13-16–31. Historical occurrence accounting remains at its original pin; this separate table compares current turn-start register statuses.'},
     'newlyVisibleOpenItems': register['cutoverReadiness']['beforeFinalPin'],
     'scopeLimits': [
         'No parallel uncommitted carries/g0rework content read; original inputs come from git show at asOf, W18 and W19 from their separately fingerprinted committed layers.',
@@ -983,26 +1008,31 @@ lines += ['', '## Evidence decisions', '',
     '- G6: W23 reviews all 787; W28 approves the 85 fixes and confirms prior approvals unchanged. The w33 (4 APPROVE / 1 REWORK), w35 (7/3) and w37 (10/1) chain covers link retargets and the whole-population L13-28 guard. Row 125 is approved in w35; w35 rework is approved in w37; its duplicate-id REWORK is a Lead mechanical fix in edf816838, verified by owning compose exit 0 and a rejecting duplicate-id probe (exit 1). No open review REWORK is hidden as met-local. The 137 current-passage-unbound rows and changed shard-2 patch delta reviews remain at F.',
     '- G9: all 158 decisions, not 33. W25 is 158 APPROVE / 12 REWORK across entry and cross-cutting scopes, not blanket approval. L13-23/24 plus W28 settle the proposals/overlaps with unchanged decisions. WORK and registry exports remain external; two backlog-intent choices remain owner-owned.',
     '- F composition: every prepared source is in fchain/manifest.json, including rebased-patches.json and link-retargets.json. Current replay exits 0, whole-population linkGuard=0, Related included. Guard 3 must agree at F (including 398 literal-code occurrences and 44 Related #anchor operands that the current product reader misreads); both must report 0. This is preparation only, not a separate retarget pass.',
-    '- Ownership: rebind records 0–148 cite W26 (594fe4194); records 149–154 cite w33-ownership-audit (5 APPROVE / 0 REWORK). Only status changed; all edge bytes are conserved. L13-29.1 and packet 6586bbc46 report the latest accounting at 23e3c34b7: 0 unaccounted pairs, B ok, reproduction 8/8, 58 allowed-path exceptions dropped. Audit inputs are pinned and equal HEAD; the audit was not rerun and no pair accounting was performed.',
-    '- Owner decision: L13-30 approves option A on 2026-10-26, conditional on lead:LAND confirmation before the lease. Sending the packet and owner approval are done; lease and every later step are pending. G8 publication permission is covered, not executed. Land needs separate approval after final ledger review; G5 and G9 owner items remain open. No frame widening, deletion on main or events push is authorized.',
-    '- Review/citations: e7e6c129c now has its w38 entry (11 APPROVE / 0 REWORK); w38 also independently checked edf816838. W35/W37 include G9, W32 includes cutoverReadiness, and G7 cites reviews/w33-link-retargets-review.json item work-state-rebase. The obsolete constant field/control is retired; whole-population linkGuard is retained and the register reads it from fchain/check.json.',
+    '- Ownership: rebind records 0–148 cite W26 (594fe4194); records 149–154 cite w33-ownership-audit (5 APPROVE / 0 REWORK). The prior refresh changed only status; this turn does not write the rebind file and all edge bytes are conserved. L13-29.1 and packet 6586bbc46 report the latest accounting at 23e3c34b7: 0 unaccounted pairs, B ok, reproduction 8/8, 58 allowed-path exceptions dropped. Audit inputs are pinned and equal HEAD; the audit was not rerun and no pair accounting was performed.',
+    '- Owner decision: L13-30 approves option A on 2026-10-26. lead:LAND confirms before any option-A step, starting with the board notice; confirmation and the board notice/HARDEN request are done (origin/main e99966b37; w40). L13-31 start order: HARDEN answer → F → staged-only R → G11 → G10 → real lease → F duties → final ledger/review → separately approved Land. From F until Land docs/ is frozen, by convention only until the real lease. Every step after the notice remains pending. G8 publication permission is covered, not executed. Land needs separate approval after final ledger review; G5 and G9 owner items remain open. No frame widening, deletion on main or events push is authorized.',
+    '- Review/citations: 45da92781 now has its w39 entry (11 APPROVE / 0 REWORK), with order note w39-10 and condition note w39-11 resolved by this refresh. e7e6c129c retains its w38 entry (11 APPROVE / 0 REWORK); w38 also independently checked edf816838. W35/W37 include G9, W32 includes cutoverReadiness, and G7 cites reviews/w33-link-retargets-review.json item work-state-rebase. The obsolete constant field/control is retired; whole-population linkGuard is retained and the register reads it from fchain/check.json.',
     '- G4 is external: local repairs are complete, but Git/HARDEN review is not accepted. G5 still needs owner acceptance of exactly 8 restatements. G8 creates the local archive ref only at F before G10. G10/G11 remain external. No component-boundary change.', '',
+    '## This refresh and proof ownership', '',
+    '- Reused reconcile.py as the sole register writer and verify.py check() as the owning record-integrity proof. History (-S on the lease step and order failure) shows the obsolete lease-before-F order was introduced in d7126c5b9 and retained by 45da92781; L13-31 intentionally changes that schedule, not the underlying lease safety contract.',
+    '- The 11-step order replaces the old eight-step list. Owner approval and LAND confirmation/board notice are done; HARDEN answers and all subsequent execution remain pending. The notice is fingerprinted from the e99966b37 commit diff, not by loading the whole board log. LAND confirmation is supplied by the w40 brief, not inferred from the relay notice.',
+    '- controls.py now rejects F-before-HARDEN, lease-before-G11, and lease-between-G11-and-G10 independently: 39 rejecting controls, up from 36. The confirmation control now rejects stale pending (confirmation is done); the lease-execution control points to the new real-lease index; the reverse-order control retains the same behaviour under its corrected title. All other checks and controls are retained.',
+    '- Current pin/review/input fields changed substantively; checkedAtHead is not an isolated volatile-only rerun change. No unrelated volatile fields changed. No final acceptance, lease operation, release activation, F import or Land was performed.', '',
     '## F-window size', '', '```json', json.dumps(f_window, ensure_ascii=False, indent=2), '```', '',
     '## Outside-plan follow-ups', '']
 for followup in register['followUps']:
     lines.append('- ' + followup['item'] + ' Source: `' + followup['sourceReview'] + '`. Owner: ' + followup['owner'] + '; destination: ' + followup['destination'] + '.')
 lines += ['', '## Commands and exits', '',
-    'Read-only inventory commands (`git status --short`, `git rev-parse`, `git log` including -S history, `git diff` including --name-only/--stat, `git show`, `git ls-tree`, `git for-each-ref`, and Python JSON inspection) exited 0; none mutated Git. The three changed Python scripts passed ast.parse in a python3 -B inline preflight (exit 0). Source reads and full JSON review parsing/fingerprinting are recorded by currentCatchUp.inputs/reviewInventory. No product tests, CLI, native addons, pair accounting, lease/ref or other records were written.', '',
+    'Read-only inventory commands (`git status --short`, `git rev-parse`, `git log` including -S history, `git diff` including --name-only/--stat, `git show`, `git ls-tree`, `git for-each-ref`) exited 0; none mutated Git. The three changed Python scripts passed ast.parse in a python3 -B inline preflight (exit 0). Source reads and full JSON review parsing/fingerprinting are recorded by currentCatchUp.inputs/reviewInventory. An initial inline final-inspection command exited 1: its log selector mistook git diff --check for rebind.py --check and tried to JSON-parse empty stdout. The corrected selector names rebind/rebind.py; final inspection exits 0. This was reporting code only, not a failing owning proof; no production check changed. Both inspection outcomes are recorded in order-update-proof.json. No product tests, CLI, native addons, pair accounting, lease/ref or other records were written.', '',
     '| Command | Exit | Evidence |', '|---|---:|---|',
     '| python3 -B P/g0join/join.py --pin ' + CURRENT_PIN + ' | 0 | current-proofs.json: argv, counts, stdout hash, stderr |',
     '| python3 -B P/fchain/check.py --pin ' + CURRENT_PIN + ' (compose API, output-only adapter) | 0 | current-proofs.json: full engine, sources, counts, report hash; no out-of-scope check.json write |',
     '| python3 -B P/gate-reconcile/reconcile.py (twice) | 0 / 0 | deterministic generated register/receipts/sources/current-proofs |',
     '| python3 -B P/gate-reconcile/verify.py | 0 | verification.json |',
-    '| python3 -B P/gate-reconcile/controls.py | 0 | controls.json: obsolete constant-field control retired; linkGuard control owns the measured link regression, plus decision/provenance regressions |',
-    '| python3 -B P/rebind/rebind.py --check | 0 | register-update-proof.json; drift 0, 7 superseded origins, 16 groups |',
+    '| python3 -B P/gate-reconcile/controls.py | 0 | controls.json: 39 rejecting controls; new F/HARDEN and both lease/G11/G10 order regressions; prior linkGuard and decision/provenance regressions retained |',
+    '| python3 -B P/rebind/rebind.py --check | 0 | order-update-proof.json; drift 0, 7 superseded origins, 16 groups |',
     '| fchain.compose(pin), duplicate-id probe through load seam | 1 (expected) | current-proofs.json; rejects duplicate L13-28:related:86 after Lead fix edf816838 |',
     '| git diff --check | 0 | no whitespace errors |', '',
-    'Exact current argv, exits, stdout/stderr and deterministic hashes: `register-update-proof.json`. Historical execution-proof.json remains unchanged. The owning duplicate-id probe still rejects (exit 1, expected). Rebind status alone now cites W26 for records 0–148 and w33 for 149–154; every other byte is conserved. Current status table compares turn-start HEAD, not final acceptance. The obsolete moved-path constant control is retired because linkGuard owns that measured behaviour; its existing whole-population regression control remains. No evidence or validation predicate was bypassed.', '',
+    'Exact current argv, exits, stdout/stderr and deterministic hashes: `order-update-proof.json`. Prior register-update-proof.json is historical. Historical execution-proof.json remains unchanged. The owning duplicate-id probe still rejects (exit 1, expected). The rebind file was not written; its prior reviewed status and all edge bytes are conserved. Current status table compares turn-start HEAD, not final acceptance. The obsolete moved-path constant control is retired because linkGuard owns that measured behaviour; its existing whole-population regression control remains. No evidence or validation predicate was bypassed.', '',
     'P = plans/260925-documentation-authority-unification/reports/phase-09. The current proofs retain production checks; only the F replay output sink uses the owning compose API to respect the exact write grant. Frozen historical/generated hashes are checked against their committed pins, not today’s live files. Only verification.json checkedAtHead is volatile and restored when it is the only rerun change. Scratch: exit-cleaned tempfile directories under /tmp/fgos-work/. No preview service under this scope. needsWrites: [].', '']
 (OUT / 'receipt.md').write_text('\n'.join(lines))
 print(json.dumps({'gates': len(register['gates']), 'originalOccurrences': len(decisions),
