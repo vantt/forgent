@@ -367,3 +367,15 @@ Scope, as the packet set it:
 7. Land only after HARDEN's re-review and a separate owner Land approval.
 
 Board lines go through lead:LAND unless the owner allows DOC to push them itself.
+
+## L13-33 — G5 accepted; G9 proposal corrected (owner decision + Lead correction)
+
+**Owner text:** 2026-10-26 12:2x: «chấp nhận G5».
+
+**G5 accepted.** The owner accepts exactly the 8 restatements of `docs/specs/reading-map.md`. Lines 3–9 (the transition banner) are carried by `docs/reading-map.md` lines 89–108. Line 34 (the workflow truth correction) is carried by line 156. The exact old and new bytes are in `g5/check-b57e79625.json` /ownerAcceptance. G5 is closed for the owner.
+
+**G9 proposal corrected (Lead).** When the owner asked for an explanation, the Lead re-read both backlog rows and the current spec. The packet's proposal was wrong on both claims:
+- **STR70a** cites `docs/specs/work-state.md:647-675` as the precedent for non-transitioning verbs (`decision`/`outcome`). Those legacy lines now hold the verb manifest text. The current holder is `docs/platform/work-state/spec.md`, "Decision Verb" and "Outcome Recording". It is not "Add Verb".
+- **STR62** cites `:864` for the data model that has only `parent`/`deps`/`blocks`. That line now holds the add surface. The current holder is §3 "Work Item Data Dictionary", rows 5 (`deps`) and 13 (`parent`, the typed-edge model). It is not §6 "Domain Model", which is about the per-item domain and its stage set.
+
+The corrected proposal goes back to the owner for confirmation. The claims themselves are unchanged; only their citations are repointed.
