@@ -379,3 +379,15 @@ Board lines go through lead:LAND unless the owner allows DOC to push them itself
 - **STR62** cites `:864` for the data model that has only `parent`/`deps`/`blocks`. That line now holds the add surface. The current holder is §3 "Work Item Data Dictionary", rows 5 (`deps`) and 13 (`parent`, the typed-edge model). It is not §6 "Domain Model", which is about the per-item domain and its stage set.
 
 The corrected proposal goes back to the owner for confirmation. The claims themselves are unchanged; only their citations are repointed.
+
+**G9 owner answer:** 2026-10-26, «G9 đồng ý». The owner confirms the corrected proposal:
+- **STR70a** → `docs/platform/work-state/spec.md`, "Decision Verb" and "Outcome Recording".
+- **STR62** → the same spec, §3 "Work Item Data Dictionary", rows 5 (`deps`) and 13 (`parent`).
+
+The claim text is unchanged. At F, the Lead edits `docs/backlog.md` directly, because the backlog is not generated. The edit:
+- repoints both citations;
+- retires the removed js-yaml advisory binding;
+- carries the same STR70a correction into `generators-skills-and-support.jsonl:66`;
+- records the resulting row identities in the G9 records.
+
+G9's owner items are closed.
