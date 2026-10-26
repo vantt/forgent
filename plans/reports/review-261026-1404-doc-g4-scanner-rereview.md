@@ -56,3 +56,15 @@ No product file defines another `readConfig`; the 18 product importers all impor
 ## Unresolved questions
 
 None.
+
+## Follow-up 2026-10-26 14:48: `a28e77e88`, verdict PASS
+
+DOC's fix makes any `import('<spec naming the file>')` that is not bound as `const|let|var X = await import(...)` or as a destructuring of it an export escape. It also changes `scripts/git/e3-bench.mjs` to the destructured form.
+
+Verification on `a28e77e88`:
+
+- The owning tests pass 90/0 through `runChosenTests`. They cover one case per form, and the `const`, `let`, `var` and destructured bindings stay declarable.
+- The full-tree scan reports 0 undeclared sites, and the class counts are unchanged.
+- HARDEN's two negative controls are now refused.
+
+Low, not blocking: the regex matches only `'` or `"` specs. `` (await import(`./w.mjs`)).runGit(['push']) `` is still neither followed nor treated as an escape; HARDEN's probe shows a read-only declaration still accepted. In this repo, template-literal imports exist only under `docs/`, which is outside the declared product, and they use absolute `${REPO}` paths. The fix is to add the backtick to the spec character class. It goes as an item with the `readConfig` Low above (owner: OPC).
