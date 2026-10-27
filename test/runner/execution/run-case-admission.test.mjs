@@ -7,6 +7,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 
 import { runUnit } from '../../../src/runner/execution/run.mjs';
@@ -22,7 +23,7 @@ const { makeFixtureDir } = await import('../../helpers/fixture-dir.mjs');
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
 import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
-import { openCase, eventsOf } from '../../helpers/workflow-case-fixture.mjs';
+const { openCase, eventsOf } = await import('../../helpers/workflow-case-fixture.mjs');
 
 seedFileLocalBwrapRegistry();
 
@@ -484,4 +485,24 @@ test('case request reason reaches admission proposal and route event', async () 
   const reqRouteEvents = eventsOf(caseRun).filter((e) => e.type === 'route');
   assert.equal(reqRouteEvents.at(-1).payload.reason, 'diverging via request reason');
   assert.equal(reqAdmitCall[1].caseRef.reason, 'diverging via request reason');
+
+  const portOpt = recordingPort();
+  await runUnit({
+    unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
+    caseAdmission: portOpt,
+    caseRef: { caseId: 'case-test', activity: 'scout' },
+    reason: 'diverging via options reason',
+    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  });
+  const optAdmitCall = portOpt.calls.find((c) => c[0] === 'admit');
+  assert.ok(optAdmitCall);
+  assert.equal(optAdmitCall[1].reason, 'diverging via options reason');
+  assert.equal(optAdmitCall[1].caseRef.reason, 'diverging via options reason');
+  const optAnswer = realPort.admit({
+    ...optAdmitCall[1],
+    caseRef: { ...optAdmitCall[1].caseRef, caseId: caseRun.caseId },
+  });
+  assert.equal(optAnswer.admitted, true);
+  const optRouteEvents = eventsOf(caseRun).filter((e) => e.type === 'route');
+  assert.equal(optRouteEvents.at(-1).payload.reason, 'diverging via options reason');
 });

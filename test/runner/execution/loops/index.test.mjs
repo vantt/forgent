@@ -82,6 +82,33 @@ test('runLoop dispatches effective parameters and custom seats', async () => {
   assert.equal(calls[0].seat.seat, 'advisor');
   assert.equal(calls[0].seat.role, 'producer');
 });
+test('runLoop uses pin effective seats over recomputed config', async () => {
+  const calls = [];
+  const runRole = async (opts) => {
+    calls.push(opts.seat.seat);
+    return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
+  };
+  const effective = {
+    loop: 'reviewed',
+    params: { maxRounds: 1 },
+    seats: [
+      { seat: 'producer', role: 'producer', posture: { writer: true } },
+      { seat: 'reviewer', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+      { seat: 'red-team', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+    ],
+  };
+  const cfg = {
+    loops: {
+      reviewed: {
+        checkersByRigor: { standard: ['reviewer'] },
+      },
+    },
+  };
+  const res = await runLoop(effective, { id: 'u-pinned-roster', capability: 'docs:write' }, cfg, { runRole });
+  assert.equal(res.outcome, 'pass');
+  assert.deepEqual(calls, ['producer', 'reviewer', 'red-team']);
+});
+
 
 test('runLoop rejects unknown loop names', async () => {
   await assert.rejects(

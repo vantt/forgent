@@ -1294,10 +1294,21 @@ test('a reviewed execution error publishes its summary only after the dispatched
 });
 
 test('a failed settlement write never replaces the execution error that caused it', async (t) => {
-  const fixture = recordedUnitFixture(t, 'nonexistent-pattern');
+  const fixture = recordedUnitFixture(t, 'solo');
+  reviewedConfig(fixture.repoRoot, ['alpha']);
+  fixture.record.unit.capability = 'docs:write';
+  fixture.record.configSnapshot = snapshotRunnerConfig(fixture.repoRoot);
+  fs.writeFileSync(path.join(fixture.unitDir, 'unit.json'), JSON.stringify(fixture.record));
   const unitFile = path.join(fixture.unitDir, 'unit.json');
   const rename = fs.renameSync;
   const read = fs.readFileSync;
+  const failure = new Error('the producer attempt could not be prepared');
+  const producerDir = path.join(fixture.unitDir, 'producer');
+  const mkdir = fs.mkdirSync;
+  t.mock.method(fs, 'mkdirSync', (dir, ...args) => {
+    if (typeof dir === 'string' && (dir === producerDir || dir.startsWith(producerDir + path.sep))) throw failure;
+    return mkdir(dir, ...args);
+  });
   t.mock.method(fs, 'renameSync', (from, to) => {
     // Only the settlement record fails to land; the earlier running-state writes succeed.
     if (to === unitFile && JSON.parse(read(from, 'utf8')).execution?.status === 'settled') {
@@ -1308,7 +1319,7 @@ test('a failed settlement write never replaces the execution error that caused i
   const warning = t.mock.method(console, 'warn', () => {});
   await assert.rejects(runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
     resumeUnitRunId: fixture.unitRunId }),
-  (error) => /Unknown collaboration (loop|pattern): "nonexistent-pattern"/.test(error.message));
+  (error) => error === failure);
   assert.equal(warning.mock.callCount(), 1);
   assert.match(warning.mock.calls[0].arguments[0], /could not record the failed settlement.*unit record storage unavailable/);
   assert.equal(fixture.readRecord().execution.status, 'running', 'the record keeps the last state that was written');
@@ -2129,6 +2140,70 @@ test('a pinned unit keeps its effective meaning after a catalog and a config edi
   assert.equal(stored.collaboration.effective.params.maxRounds, 1);
   assert.equal(stored.collaboration.effective.loop, 'reviewed');
 });
+test('a pinned unit keeps its effective seats on resume after a snapshot refresh changes live checker config', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', 'unit-run-pinned-roster');
+  fs.mkdirSync(unitDir, { recursive: true });
+  const record = {
+    unit: { id: 'u-pinned-roster', capability: 'code:implement', writes: [], pattern: 'reviewed', objective: 'Do review' },
+    pattern: 'reviewed',
+    seatSchema: 2,
+    collaboration: {
+      baseline: { source: 'unit', selector: 'reviewed' },
+      pattern: { name: 'reviewed', layer: 'shipped', digest: 'abc123' },
+      effective: {
+        loop: 'reviewed',
+        params: { maxRounds: 1 },
+        seats: [
+          { seat: 'producer', role: 'producer', posture: { writer: true } },
+          { seat: 'reviewer', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+          { seat: 'red-team', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+        ],
+      },
+      provenance: { params: {}, checkers: {} },
+    },
+    seats: [
+      { seat: 'producer', role: 'producer', posture: { writer: true } },
+      { seat: 'reviewer', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+      { seat: 'red-team', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+    ],
+    resolvedInputs: [],
+    configSnapshot: snapshotRunnerConfig(repoRoot),
+    worktree: fs.realpathSync(worktreeDir),
+    createdAt: '2026-10-05T01:00:00Z',
+    settlement: { outcome: 'pass', settledAt: '2026-10-05T01:01:00Z' },
+  };
+  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
+  settleSeat(repoRoot, unitDir, 'producer');
+  settleSeat(repoRoot, unitDir, 'reviewer');
+  settleSeat(repoRoot, unitDir, 'red-team');
+
+  const cfg = readProjectConfig(repoRoot);
+  cfg.runner.loops = { reviewed: { checkersByRigor: { standard: ['reviewer'] } } };
+  writeProjectConfig(repoRoot, cfg);
+
+  const firstRes = await coreRunUnit({
+    resumeUnitRunId: 'unit-run-pinned-roster',
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+  });
+  assert.equal(firstRes.outcome, 'pass');
+  const firstStored = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
+  assert.deepEqual(firstStored.collaboration.effective.seats.map((s) => s.seat), ['producer', 'reviewer', 'red-team']);
+
+  const secondRes = await coreRunUnit({
+    resumeUnitRunId: 'unit-run-pinned-roster',
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+  });
+  assert.equal(secondRes.outcome, 'pass');
+  const secondStored = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
+  assert.deepEqual(secondStored.collaboration.effective.seats.map((s) => s.seat), ['producer', 'reviewer', 'red-team']);
+});
+
 
 test('an unreadable pin refuses collaboration-pin-unusable', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();

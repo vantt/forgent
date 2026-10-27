@@ -13,7 +13,8 @@ import { translateUnitsToWorkflow } from '../../src/workflow/units-source.mjs';
 import { expandWorkflowSeats } from '../../src/workflow/seats.mjs';
 import { simulateUnitBindings } from '../../src/runner/execution/dry-bind.mjs';
 import { resolveSeats } from '../../src/runner/execution/seat-resolver.mjs';
-import { resolvePattern } from '../../src/runner/execution/patterns/presets.mjs';
+import { loopOf } from '../../src/runner/execution/patterns/catalog.mjs';
+import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 
 const dir = new URL('../../core/workflows/', import.meta.url);
 const workflows = fs.readdirSync(dir).filter((name) => name.endsWith('.yaml')).map((name) => {
@@ -32,7 +33,10 @@ function runnerConfigFor(capabilities) {
 }
 
 const unitsOf = (workflow) => workflow.steps.flatMap((step) => step.units.map((u) => ({ step, u })));
-const isMultiSeat = (u) => ['panel', 'debate'].includes(resolvePattern(u.template.pattern).patternName);
+const isMultiSeat = (u) => {
+  const loop = loopOf(u.template.pattern, shippedCatalog()) ?? u.template.pattern;
+  return ['panel', 'debate'].includes(loop);
+};
 
 test('every panel and debate unit of every core workflow declares explicit seats', () => {
   let seen = 0;

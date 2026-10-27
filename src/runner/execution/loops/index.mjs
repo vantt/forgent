@@ -72,7 +72,11 @@ export const VALID_OUTCOMES = Object.freeze([
  */
 export async function runLoop(effective, unit, cfg, hooks = {}) {
   const loop = typeof effective === 'string' ? effective : (effective?.loop ?? effective?.pattern ?? effective?.patternName);
-  const params = typeof effective === 'object' && effective !== null ? (effective.params ?? {}) : {};
+  const rawParams = typeof effective === 'object' && effective !== null ? (effective.params ?? {}) : {};
+  const params = {
+    ...rawParams,
+    ...(effective?.seats ? { seats: effective.seats } : {}),
+  };
 
   switch (loop) {
     case 'solo':

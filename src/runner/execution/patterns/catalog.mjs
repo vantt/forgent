@@ -138,23 +138,23 @@ export function resolveCollaboration(options = {}) {
   }
 
   const isSwap = Boolean(inCase && activityPattern && explicit.length > 0 && explicit[0].name !== activityPattern);
-  const chosenPattern = explicit.length > 0 ? explicit[0].name : baseline.name;
+  const selectedName = explicit.length > 0 ? explicit[0].name : baseline.name;
 
   if (isSwap) {
     baseline = { name: activityPattern, source: 'activity', selector: selectors.activityUnit?.pattern ?? selectors.activityUnit };
     if (!reason || typeof reason !== 'string' || !reason.trim()) {
-      throw new CollaborationError('request-reason-required', `an explicit pattern swap from "${activityPattern}" to "${chosenPattern}" in a case requires a reason`);
+      throw new CollaborationError('request-reason-required', `an explicit pattern swap from "${activityPattern}" to "${selectedName}" in a case requires a reason`);
     }
   }
 
-  if (!Object.hasOwn(entries, chosenPattern)) {
-    throw new CollaborationError('unknown-pattern', `pattern "${chosenPattern}" is not in the catalog`);
+  if (!Object.hasOwn(entries, selectedName)) {
+    throw new CollaborationError('unknown-pattern', `pattern "${selectedName}" is not in the catalog`);
   }
-  const entry = entries[chosenPattern];
+  const entry = entries[selectedName];
   const loop = entry.loop;
   const paramTable = paramTableOf(loop);
   if (!paramTable) {
-    throw new CollaborationError('unknown-pattern', `loop "${loop}" for pattern "${chosenPattern}" is not supported`);
+    throw new CollaborationError('unknown-pattern', `loop "${loop}" for pattern "${selectedName}" is not supported`);
   }
 
   let activityEntry = null;
@@ -421,7 +421,7 @@ export function resolveCollaboration(options = {}) {
 
   if (entry.invariants?.minCheckers?.atLeast) {
     for (const c of entry.invariants.minCheckers.atLeast) {
-      floorCheckers.push({ name: c, source: `pattern-invariant:${chosenPattern}` });
+      floorCheckers.push({ name: c, source: `pattern-invariant:${selectedName}` });
       floorCheckerNames.add(c);
     }
   }
@@ -446,7 +446,7 @@ export function resolveCollaboration(options = {}) {
       if (inv.fixed !== undefined) {
         if (effectiveParams[param] !== undefined && !deepEqual(effectiveParams[param], inv.fixed)) {
           if (provenanceParams[param] === 'request' || provenanceParams[param] === 'selector' || provenanceParams[param] === 'unit' || provenanceParams[param] === 'activity') {
-            throw new CollaborationError('pattern-invariant-weakened', `parameter "${param}" violates fixed invariant on pattern "${chosenPattern}"`);
+            throw new CollaborationError('pattern-invariant-weakened', `parameter "${param}" violates fixed invariant on pattern "${selectedName}"`);
           }
         }
         effectiveParams[param] = deepClone(inv.fixed);
@@ -524,16 +524,16 @@ export function resolveCollaboration(options = {}) {
   }
 
   let layerName = null;
-  if (layers) layerName = resolveLayer(layers, chosenPattern);
+  if (layers) layerName = resolveLayer(layers, selectedName);
   if (!layerName) {
-    const shippedEntry = shipped?.patterns?.[chosenPattern] ?? shipped?.[chosenPattern];
+    const shippedEntry = shipped?.patterns?.[selectedName] ?? shipped?.[selectedName];
     layerName = (shippedEntry && deepEqual(entry, shippedEntry)) ? 'shipped' : 'project';
   }
 
   const hasRequest = Boolean(isSwap || hasRequestParams);
   const pin = {
     requested: hasRequest ? {
-      pattern: isSwap ? chosenPattern : null,
+      pattern: isSwap ? selectedName : null,
       params: normalizedRequestParams,
       reason: reason ? String(reason).trim() : null,
     } : null,
@@ -542,7 +542,7 @@ export function resolveCollaboration(options = {}) {
       selector: baseline.selector,
     },
     pattern: {
-      name: chosenPattern,
+      name: selectedName,
       layer: layerName,
     },
     effective: {

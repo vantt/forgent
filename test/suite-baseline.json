@@ -310,7 +310,6 @@
     "test/runner/execution/patterns/debate.test.mjs": 0.1,
     "test/runner/execution/patterns/index.test.mjs": 0.1,
     "test/runner/execution/patterns/panel.test.mjs": 0.1,
-    "test/runner/execution/patterns/presets.test.mjs": 0.1,
     "test/runner/execution/patterns/reviewed.test.mjs": 0.1,
     "test/runner/execution/patterns/role-tasks.test.mjs": 0.1,
     "test/runner/execution/patterns/solo.test.mjs": 0.1,

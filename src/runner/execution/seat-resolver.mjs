@@ -257,6 +257,9 @@ export function checkDeclaredSeats(raw, label = 'seats', { tiers } = {}) {
 /** The seats a unit's pattern params declare. Null when none are declared. */
 function declaredSeatsOf(unit, params) {
   const raw = params?.seats;
+  if (Array.isArray(raw) && raw.length > 0 && raw.every((d) => d && typeof d === 'object' && d.posture)) {
+    return raw;
+  }
   return raw === undefined ? null : checkDeclaredSeats(raw, 'params.seats');
 }
 
@@ -307,6 +310,9 @@ export function resolveSeats(options = {}) {
     params.seats = unit.seats;
   }
   const declared = declaredSeatsOf(unit, params);
+  if (declared && declared.length > 0 && declared.every((d) => d.posture)) {
+    return declared;
+  }
   const readOnly = noWrites(unit);
   switch (patternName) {
     case 'solo': {
