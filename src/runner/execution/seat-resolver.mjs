@@ -286,7 +286,12 @@ function requireRoles(patternName, declared, expected) {
  * - panel: the declared seats; producers are the members, one synthesizer.
  * - debate: the declared seats; two producer sides, then one judge.
  *
- * @param {string|object} pattern pattern name or preset, as `unit.pattern`
+ * @param {object} options
+ * @param {string} [options.loop] loop name; when absent the loop comes from `options.pattern` (a pattern name or preset, as `unit.pattern`)
+ * @param {object} [options.params] expanded loop params (declared seats, `minCheckers`)
+ * @param {{ minCheckers?: Array<{ name: string, source: string }> }} [options.floors] checker floors with their source
+ * @param {object} [options.unit]
+ * @param {object} [options.runnerConfig]
  * @returns {Array<{ seat: string, role: string, posture: object, persona?: string, tier?: string }>}
  */
 export function resolveSeats(options = {}) {
