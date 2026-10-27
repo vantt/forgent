@@ -507,7 +507,7 @@ test('invariant form validation requires form fitting the parameter and rejects 
   assert.ok(resExtraKeys.problems.some((p) => p.code === 'param-invalid'));
 });
 
-test('declared seats in reviewed allow custom seat ids and reject invalid roles', () => {
+test('declared seats in reviewed allow custom seat ids', () => {
   const shipped = shippedCatalog();
 
   const effectiveOk = {
@@ -525,6 +525,10 @@ test('declared seats in reviewed allow custom seat ids and reject invalid roles'
   };
   const resOk = checkCatalog({ shipped, effective: effectiveOk });
   assert.deepEqual(resOk.problems, []);
+});
+
+test('reviewed pattern rejects declared seats with non-checker roles', () => {
+  const shipped = shippedCatalog();
 
   const effectiveWrongRole = {
     'custom-reviewed': {
@@ -540,9 +544,13 @@ test('declared seats in reviewed allow custom seat ids and reject invalid roles'
   };
   const resWrongRole = checkCatalog({ shipped, effective: effectiveWrongRole });
   assert.ok(resWrongRole.problems.some((p) => p.code === 'seat-multiplicity'));
+});
 
-  const effectiveNoCheckers = {
-    'custom-reviewed-no-checkers': {
+test('reviewed pattern declaring only a producer seat passes catalog validation', () => {
+  const shipped = shippedCatalog();
+
+  const effectiveProducerOnly = {
+    'custom-reviewed-producer-only': {
       promise: 'Reviewed pattern declaring only producer.',
       loop: 'reviewed',
       defaults: {
@@ -552,8 +560,8 @@ test('declared seats in reviewed allow custom seat ids and reject invalid roles'
       },
     },
   };
-  const resNoCheckers = checkCatalog({ shipped, effective: effectiveNoCheckers });
-  assert.ok(resNoCheckers.problems.some((p) => p.code === 'seat-multiplicity'));
+  const resProducerOnly = checkCatalog({ shipped, effective: effectiveProducerOnly });
+  assert.deepEqual(resProducerOnly.problems, []);
 });
 
 test('loop seat cardinality checks enforce role multiplicities for panel and debate', () => {
@@ -684,6 +692,10 @@ test('roleTasks target validation accepts loop kinds and declared seats', () => 
   };
   const resReviewed = checkCatalog({ shipped, effective: effectiveReviewed });
   assert.deepEqual(resReviewed.problems, []);
+});
+
+test('roleTasks rejects targets not present in the loop or declared seats', () => {
+  const shipped = shippedCatalog();
 
   const effectiveInvented = {
     'custom-invented-reviewed': {
@@ -726,4 +738,109 @@ test('roleTasks target validation accepts loop kinds and declared seats', () => 
   const resInvented = checkCatalog({ shipped, effective: effectiveInvented });
   assert.equal(resInvented.problems.length, 3);
   assert.ok(resInvented.problems.every((p) => p.code === 'param-invalid' && /does not exist for loop/.test(p.message)));
+});
+
+test('reviewed pattern with declared custom checker seats rejects built-in checker task targets', () => {
+  const shipped = shippedCatalog();
+
+  const effectiveWithCustomCheckers = {
+    'custom-reviewed-critics': {
+      promise: 'Reviewed pattern with custom critic seat.',
+      loop: 'reviewed',
+      defaults: {
+        seats: [
+          { seat: 'author', role: 'producer' },
+          { seat: 'critic', role: 'reviewer' },
+        ],
+        roleTasks: {
+          reviewer: 'Built-in checker target not in declared roster.',
+        },
+      },
+    },
+  };
+  const res = checkCatalog({ shipped, effective: effectiveWithCustomCheckers });
+  assert.ok(res.problems.some((p) => p.code === 'param-invalid' && p.message.includes('target "reviewer" does not exist for loop "reviewed"')));
+
+  const effectiveWithValidTargets = {
+    'custom-reviewed-critics': {
+      promise: 'Reviewed pattern with custom critic seat.',
+      loop: 'reviewed',
+      defaults: {
+        seats: [
+          { seat: 'author', role: 'producer' },
+          { seat: 'critic', role: 'reviewer' },
+        ],
+        roleTasks: {
+          author: 'Draft initial implementation.',
+          producer: 'Produce implementation.',
+          critic: 'Perform code review.',
+        },
+      },
+    },
+  };
+  const resValid = checkCatalog({ shipped, effective: effectiveWithValidTargets });
+  assert.deepEqual(resValid.problems, []);
+});
+
+test('malformed shipped pattern overrides are rejected with source layer attribution', () => {
+  const shipped = shippedCatalog();
+
+  const testCases = [
+    { override: null, expectedCode: 'param-invalid', expectedSnippet: 'must be an object' },
+    { override: false, expectedCode: 'param-invalid', expectedSnippet: 'must be an object' },
+    { override: { defaults: null }, expectedCode: 'param-invalid', expectedSnippet: 'defaults must be an object' },
+    { override: { defaults: [] }, expectedCode: 'param-invalid', expectedSnippet: 'defaults must be an object' },
+    { override: { invariants: null }, expectedCode: 'param-invalid', expectedSnippet: 'invariants must be an object' },
+    { override: { invariants: [] }, expectedCode: 'param-invalid', expectedSnippet: 'invariants must be an object' },
+  ];
+
+  for (const { override, expectedCode, expectedSnippet } of testCases) {
+    const res = checkCatalog({
+      shipped,
+      effective: { reviewed: override },
+      layers: { 'runner.patterns.reviewed': 'project' },
+    });
+    assert.ok(res.problems.length > 0, `Expected problem for override ${JSON.stringify(override)}`);
+    const problem = res.problems.find((p) => p.code === expectedCode && p.message.includes(expectedSnippet));
+    assert.ok(problem, `Expected problem with code "${expectedCode}" matching "${expectedSnippet}", got: ${JSON.stringify(res.problems)}`);
+    assert.equal(problem.source, 'project');
+    assert.ok(problem.message.includes('(source layer: project)'));
+  }
+});
+
+test('checker name validation rejects inherited object properties as checker names', () => {
+  const shipped = shippedCatalog();
+
+  const resDefaults = checkCatalog({
+    shipped,
+    effective: {
+      'custom-pattern': {
+        promise: 'Custom pattern with inherited property checker name.',
+        loop: 'reviewed',
+        defaults: {
+          minCheckers: ['toString', 'constructor'],
+        },
+      },
+    },
+    layers: 'project',
+  });
+  assert.ok(resDefaults.problems.some((p) => p.code === 'param-invalid' && p.message.includes('unknown checker seat "toString"')));
+  assert.ok(resDefaults.problems.some((p) => p.code === 'param-invalid' && p.message.includes('unknown checker seat "constructor"')));
+
+  const resInvariants = checkCatalog({
+    shipped,
+    effective: {
+      'custom-pattern-inv': {
+        promise: 'Custom pattern with prototype property invariant checker.',
+        loop: 'reviewed',
+        invariants: {
+          minCheckers: {
+            atLeast: ['__proto__'],
+          },
+        },
+      },
+    },
+    layers: 'project',
+  });
+  assert.ok(resInvariants.problems.some((p) => p.code === 'param-invalid' && p.message.includes('not a valid checker seat')));
 });

@@ -116,13 +116,18 @@ function resolveLayer(layers, patternName, fieldPath) {
 function allowedRoleTaskTargets(loop, entry) {
   const declaredDefaults = Array.isArray(entry?.defaults?.seats) ? entry.defaults.seats : [];
   const declaredInvariants = Array.isArray(entry?.invariants?.seats?.fixed) ? entry.invariants.seats.fixed : [];
+  const allDeclared = [...declaredDefaults, ...declaredInvariants];
   const targets = new Set();
   const declaredProducers = [];
-  for (const s of [...declaredDefaults, ...declaredInvariants]) {
+  const declaredCheckers = [];
+
+  for (const s of allDeclared) {
     if (s?.seat) {
       targets.add(s.seat);
       if (s.role === 'producer') {
         declaredProducers.push(s.seat);
+      } else {
+        declaredCheckers.push(s.seat);
       }
     }
   }
@@ -130,8 +135,10 @@ function allowedRoleTaskTargets(loop, entry) {
   switch (loop) {
     case 'reviewed':
       targets.add('producer');
-      for (const checkerName of Object.keys(CHECKER_SEATS)) {
-        targets.add(checkerName);
+      if (declaredCheckers.length === 0) {
+        for (const checkerName of Object.keys(CHECKER_SEATS)) {
+          targets.add(checkerName);
+        }
       }
       break;
     case 'panel':
@@ -168,13 +175,6 @@ function checkLoopSeatCardinality(loop, declaredSeats, label) {
       if (producers.length !== 1) {
         throw new SeatResolutionError(
           `${label}: a reviewed pattern declares exactly one seat with role "producer", has ${producers.length}`,
-          'seat-multiplicity',
-        );
-      }
-      const checkers = declaredSeats.filter((d) => d.role !== 'producer');
-      if (checkers.length < 1) {
-        throw new SeatResolutionError(
-          `${label}: a reviewed pattern needs at least one checker seat, has 0`,
           'seat-multiplicity',
         );
       }
@@ -265,7 +265,7 @@ function checkParamDomain(patternName, loop, param, val, section, src, problems,
         ));
       } else {
         for (const chk of val) {
-          if (!CHECKER_SEATS[chk]) {
+          if (!Object.hasOwn(CHECKER_SEATS, chk)) {
             problems.push(new CollaborationError(
               'param-invalid',
               `${at} contains unknown checker seat "${chk}"; valid: [${Object.keys(CHECKER_SEATS).join(', ')}]${suffix}`,
@@ -414,35 +414,65 @@ export function checkCatalog(options = {}) {
       ));
     }
 
-    if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
-      const hasTuning = 'maxRounds' in entry || 'checkersByRigor' in entry;
-      const hasCatalog = 'loop' in entry || 'defaults' in entry || 'promise' in entry || 'invariants' in entry;
-      if (hasTuning && hasCatalog) {
-        const src = resolveLayer(layers, name);
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      const src = resolveLayer(layers, name);
+      problems.push(new CollaborationError(
+        'param-invalid',
+        `pattern "${name}" must be an object${src ? ` (source layer: ${src})` : ''}`,
+        { source: src },
+      ));
+      continue;
+    }
+
+    const hasTuning = 'maxRounds' in entry || 'checkersByRigor' in entry;
+    const hasCatalog = 'loop' in entry || 'defaults' in entry || 'promise' in entry || 'invariants' in entry;
+    if (hasTuning && hasCatalog) {
+      const src = resolveLayer(layers, name);
+      problems.push(new CollaborationError(
+        'config-error',
+        `pattern "${name}" cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.${name}${src ? ` (source layer: ${src})` : ''}`,
+        { source: src },
+      ));
+    } else if (hasTuning && !hasCatalog) {
+      const src = resolveLayer(layers, name);
+      problems.push(new CollaborationError(
+        'config-key-retired',
+        `runner.patterns.${name} was retired; use runner.loops.${name} instead${src ? ` (source layer: ${src})` : ''}`,
+        { source: src },
+      ));
+    }
+
+    for (const key of Object.keys(entry)) {
+      if (key === 'maxRounds' || key === 'checkersByRigor') continue;
+      if (!ALLOWED_PATTERN_ENTRY_KEYS.has(key)) {
+        const src = resolveLayer(layers, name, key) ?? resolveLayer(layers, name);
         problems.push(new CollaborationError(
-          'config-error',
-          `pattern "${name}" cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.${name}${src ? ` (source layer: ${src})` : ''}`,
-          { source: src },
-        ));
-      } else if (hasTuning && !hasCatalog) {
-        const src = resolveLayer(layers, name);
-        problems.push(new CollaborationError(
-          'config-key-retired',
-          `runner.patterns.${name} was retired; use runner.loops.${name} instead${src ? ` (source layer: ${src})` : ''}`,
+          'param-unknown',
+          `pattern "${name}" has unknown key "${key}"${src ? ` (source layer: ${src})` : ''}`,
           { source: src },
         ));
       }
+    }
 
-      for (const key of Object.keys(entry)) {
-        if (key === 'maxRounds' || key === 'checkersByRigor') continue;
-        if (!ALLOWED_PATTERN_ENTRY_KEYS.has(key)) {
-          const src = resolveLayer(layers, name, key) ?? resolveLayer(layers, name);
-          problems.push(new CollaborationError(
-            'param-unknown',
-            `pattern "${name}" has unknown key "${key}"${src ? ` (source layer: ${src})` : ''}`,
-            { source: src },
-          ));
-        }
+    if (entry.defaults !== undefined) {
+      if (!entry.defaults || typeof entry.defaults !== 'object' || Array.isArray(entry.defaults)) {
+        const src = resolveLayer(layers, name, 'defaults') ?? resolveLayer(layers, name);
+        problems.push(new CollaborationError(
+          'param-invalid',
+          `pattern "${name}" defaults must be an object${src ? ` (source layer: ${src})` : ''}`,
+          { source: src },
+        ));
+      }
+    }
+
+    if (entry.invariants !== undefined) {
+      if (!entry.invariants || typeof entry.invariants !== 'object' || Array.isArray(entry.invariants)) {
+        const src = resolveLayer(layers, name, 'invariants') ?? resolveLayer(layers, name);
+        problems.push(new CollaborationError(
+          'param-invalid',
+          `pattern "${name}" invariants must be an object${src ? ` (source layer: ${src})` : ''}`,
+          { source: src },
+        ));
       }
     }
   }
@@ -460,44 +490,33 @@ export function checkCatalog(options = {}) {
 
   for (const name of allNames) {
     const shippedEntry = shippedPatterns[name];
+    const hasEffective = Object.hasOwn(effectivePatterns, name) && effectivePatterns[name] !== undefined;
     const effectiveEntry = effectivePatterns[name];
 
-    let mergedEntry;
-    if (shippedEntry && !effectiveEntry) {
-      mergedEntry = deepClone(shippedEntry);
-    } else if (!shippedEntry && effectiveEntry) {
-      if (typeof effectiveEntry !== 'object' || effectiveEntry === null || Array.isArray(effectiveEntry)) {
-        const src = resolveLayer(layers, name);
-        problems.push(new CollaborationError(
-          'param-invalid',
-          `pattern "${name}" must be an object${src ? ` (source layer: ${src})` : ''}`,
-          { source: src },
-        ));
-        continue;
+    if (hasEffective && (!effectiveEntry || typeof effectiveEntry !== 'object' || Array.isArray(effectiveEntry))) {
+      if (shippedEntry) {
+        mergedEntries[name] = Object.freeze(deepClone(shippedEntry));
       }
+      continue;
+    }
+
+    let mergedEntry;
+    if (shippedEntry && !hasEffective) {
+      mergedEntry = deepClone(shippedEntry);
+    } else if (!shippedEntry && hasEffective) {
       mergedEntry = deepClone(effectiveEntry);
     } else {
-      if (typeof effectiveEntry !== 'object' || effectiveEntry === null || Array.isArray(effectiveEntry)) {
-        const src = resolveLayer(layers, name);
-        problems.push(new CollaborationError(
-          'param-invalid',
-          `pattern "${name}" must be an object${src ? ` (source layer: ${src})` : ''}`,
-          { source: src },
-        ));
-        continue;
-      }
-
       mergedEntry = deepClone(shippedEntry);
       if (effectiveEntry.promise !== undefined) mergedEntry.promise = effectiveEntry.promise;
       if (effectiveEntry.loop !== undefined) mergedEntry.loop = effectiveEntry.loop;
 
-      if (effectiveEntry.defaults) {
+      if (effectiveEntry.defaults && typeof effectiveEntry.defaults === 'object' && !Array.isArray(effectiveEntry.defaults)) {
         mergedEntry.defaults = {
           ...(mergedEntry.defaults ?? {}),
           ...deepClone(effectiveEntry.defaults),
         };
       }
-      if (effectiveEntry.invariants) {
+      if (effectiveEntry.invariants && typeof effectiveEntry.invariants === 'object' && !Array.isArray(effectiveEntry.invariants)) {
         mergedEntry.invariants = {
           ...(mergedEntry.invariants ?? {}),
           ...deepClone(effectiveEntry.invariants),
@@ -506,85 +525,68 @@ export function checkCatalog(options = {}) {
     }
 
     // Shipped entry override weakening checks
-    if (shippedEntry) {
-      if (effectiveEntry && typeof effectiveEntry === 'object' && !Array.isArray(effectiveEntry)) {
-        if (effectiveEntry.loop !== undefined && effectiveEntry.loop !== shippedEntry.loop) {
-          const src = resolveLayer(layers, name, 'loop') ?? resolveLayer(layers, name);
-          problems.push(new CollaborationError(
-            'pattern-invariant-weakened',
-            `pattern "${name}" cannot change shipped loop "${shippedEntry.loop}" to "${effectiveEntry.loop}"${src ? ` (source layer: ${src})` : ''}`,
-            { source: src },
-          ));
-        }
-
-        if (effectiveEntry.promise !== undefined && effectiveEntry.promise !== shippedEntry.promise) {
-          const src = resolveLayer(layers, name, 'promise') ?? resolveLayer(layers, name);
-          problems.push(new CollaborationError(
-            'pattern-invariant-weakened',
-            `pattern "${name}" cannot change shipped promise${src ? ` (source layer: ${src})` : ''}`,
-            { source: src },
-          ));
-        }
+    if (shippedEntry && hasEffective) {
+      if (effectiveEntry.loop !== undefined && effectiveEntry.loop !== shippedEntry.loop) {
+        const src = resolveLayer(layers, name, 'loop') ?? resolveLayer(layers, name);
+        problems.push(new CollaborationError(
+          'pattern-invariant-weakened',
+          `pattern "${name}" cannot change shipped loop "${shippedEntry.loop}" to "${effectiveEntry.loop}"${src ? ` (source layer: ${src})` : ''}`,
+          { source: src },
+        ));
       }
 
-      if (shippedEntry.invariants) {
+      if (effectiveEntry.promise !== undefined && effectiveEntry.promise !== shippedEntry.promise) {
+        const src = resolveLayer(layers, name, 'promise') ?? resolveLayer(layers, name);
+        problems.push(new CollaborationError(
+          'pattern-invariant-weakened',
+          `pattern "${name}" cannot change shipped promise${src ? ` (source layer: ${src})` : ''}`,
+          { source: src },
+        ));
+      }
+
+      if (shippedEntry.invariants && typeof effectiveEntry.invariants === 'object' && effectiveEntry.invariants !== null && !Array.isArray(effectiveEntry.invariants)) {
         for (const [param, shippedInv] of Object.entries(shippedEntry.invariants)) {
-          const effInvariants = effectiveEntry?.invariants;
-          if (effInvariants !== undefined) {
-            const src = resolveLayer(layers, name, `invariants.${param}`) ?? resolveLayer(layers, name);
+          const src = resolveLayer(layers, name, `invariants.${param}`) ?? resolveLayer(layers, name, 'invariants') ?? resolveLayer(layers, name);
 
-            if (typeof effInvariants === 'object' && effInvariants !== null && !Array.isArray(effInvariants) && Object.keys(effInvariants).length === 0) {
-              const msg = shippedInv.atLeast !== undefined
-                ? `pattern "${name}" invariant for "${param}" must keep atLeast list from shipped entry${src ? ` (source layer: ${src})` : ''}`
-                : `pattern "${name}" changed or removed fixed invariant for "${param}"${src ? ` (source layer: ${src})` : ''}`;
-              problems.push(new CollaborationError('pattern-invariant-weakened', msg, { source: src }));
-              continue;
-            }
+          if (Object.keys(effectiveEntry.invariants).length === 0) {
+            const msg = shippedInv.atLeast !== undefined
+              ? `pattern "${name}" invariant for "${param}" must keep atLeast list from shipped entry${src ? ` (source layer: ${src})` : ''}`
+              : `pattern "${name}" changed or removed fixed invariant for "${param}"${src ? ` (source layer: ${src})` : ''}`;
+            problems.push(new CollaborationError('pattern-invariant-weakened', msg, { source: src }));
+            continue;
+          }
 
-            const effInv = effInvariants[param];
-            if (effInv !== undefined) {
-              if (shippedInv.atLeast !== undefined) {
-                if (!effInv || !Array.isArray(effInv.atLeast)) {
-                  problems.push(new CollaborationError(
-                    'pattern-invariant-weakened',
-                    `pattern "${name}" invariant for "${param}" must keep atLeast list from shipped entry${src ? ` (source layer: ${src})` : ''}`,
-                    { source: src },
-                  ));
-                } else {
-                  const effSet = new Set(effInv.atLeast);
-                  for (const required of shippedInv.atLeast) {
-                    if (!effSet.has(required)) {
-                      problems.push(new CollaborationError(
-                        'pattern-invariant-weakened',
-                        `pattern "${name}" dropped invariant atLeast element "${required}" for "${param}"${src ? ` (source layer: ${src})` : ''}`,
-                        { source: src },
-                      ));
-                    }
+          const effInv = effectiveEntry.invariants[param];
+          if (effInv !== undefined) {
+            if (shippedInv.atLeast !== undefined) {
+              if (!effInv || typeof effInv !== 'object' || !Array.isArray(effInv.atLeast)) {
+                problems.push(new CollaborationError(
+                  'pattern-invariant-weakened',
+                  `pattern "${name}" invariant for "${param}" must keep atLeast list from shipped entry${src ? ` (source layer: ${src})` : ''}`,
+                  { source: src },
+                ));
+              } else {
+                const effSet = new Set(effInv.atLeast);
+                for (const required of shippedInv.atLeast) {
+                  if (!effSet.has(required)) {
+                    problems.push(new CollaborationError(
+                      'pattern-invariant-weakened',
+                      `pattern "${name}" dropped invariant atLeast element "${required}" for "${param}"${src ? ` (source layer: ${src})` : ''}`,
+                      { source: src },
+                    ));
                   }
                 }
               }
-
-              if (shippedInv.fixed !== undefined) {
-                if (!effInv || !deepEqual(effInv.fixed, shippedInv.fixed)) {
-                  problems.push(new CollaborationError(
-                    'pattern-invariant-weakened',
-                    `pattern "${name}" changed or removed fixed invariant for "${param}"${src ? ` (source layer: ${src})` : ''}`,
-                    { source: src },
-                  ));
-                }
-              }
             }
-          }
 
-          if (effectiveEntry && effectiveEntry.invariants !== undefined && Object.keys(effectiveEntry.invariants).length > 0) {
-            const mergedInv = mergedEntry.invariants?.[param];
-            if (mergedInv === undefined) {
-              const src = resolveLayer(layers, name, `invariants.${param}`) ?? resolveLayer(layers, name);
-              problems.push(new CollaborationError(
-                'pattern-invariant-weakened',
-                `pattern "${name}" changed or removed fixed invariant for "${param}"${src ? ` (source layer: ${src})` : ''}`,
-                { source: src },
-              ));
+            if (shippedInv.fixed !== undefined) {
+              if (!effInv || typeof effInv !== 'object' || !deepEqual(effInv.fixed, shippedInv.fixed)) {
+                problems.push(new CollaborationError(
+                  'pattern-invariant-weakened',
+                  `pattern "${name}" changed or removed fixed invariant for "${param}"${src ? ` (source layer: ${src})` : ''}`,
+                  { source: src },
+                ));
+              }
             }
           }
         }
@@ -699,7 +701,7 @@ export function checkCatalog(options = {}) {
                   ));
                 } else {
                   for (const chk of inv.atLeast) {
-                    if (!CHECKER_SEATS[chk]) {
+                    if (!Object.hasOwn(CHECKER_SEATS, chk)) {
                       problems.push(new CollaborationError(
                         'param-invalid',
                         `pattern "${name}" invariant atLeast "${chk}" is not a valid checker seat [${Object.keys(CHECKER_SEATS).join(', ')}]${src ? ` (source layer: ${src})` : ''}`,
