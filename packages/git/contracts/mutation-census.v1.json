@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "43a9acdf560f1ec4d77c2aecb877a32991df624faa4fa012da96acafcab16f9d",
+  "payloadDigest": "ab296c538cee24d759b133112210b1c07fa6debed637fd26b4bbf2001e329b24",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1045,12 +1045,13 @@
     "src/runner/execution/loops/role-tasks.mjs": "6df89972192146084a969ed83d56acdd25969f9eff8fa4f1a71c1a4f103bf3e9",
     "src/runner/execution/loops/solo.mjs": "cca99675caed01e86f1df2f8010e80e3fbf519b242b3bb1eab360cfdd1abaa6f",
     "src/runner/execution/partial-writes.mjs": "9c7ab4a2f57852b93283b819ed8c4adcac2b71c9241cdd4c760e73960bc1c027",
-    "src/runner/execution/patterns/catalog.mjs": "cf7c0923098af68b103af4ac7b7ffc5e3a520e90a1ca860c5baceb08a8ad58d4",
+    "src/runner/execution/patterns/catalog-entries.mjs": "b8dc9eef06591328b38d8a95be5df22f4e01a501545dee71a848f6c48cb54a78",
+    "src/runner/execution/patterns/catalog.mjs": "f076a0f3ba3ae6ace23084295139e416fdd8a1abc453fea4ae027bae33fce8c5",
     "src/runner/execution/patterns/presets.mjs": "c9c6eb29e86a070072c1f6458cc4cb87d232aa16f549200889f30385efa37c10",
     "src/runner/execution/run.mjs": "542f37e5407c09b4a9b391a1d1439135e7466bd45209d5ee5960df31f15247bf",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "6a0b9671a9ceb020be1e74d306ea2e277cb324244faf391e85feff10ee7d2eaf",
-    "src/runner/execution/seat-resolver.mjs": "789074adbe6c3f0c2ad5f8b2d1013aeac80b29ecf823c54a5d11eebd0770f9bb",
+    "src/runner/execution/seat-resolver.mjs": "e4e2260fdfe9d74a63eb5074ece7fd0c914afd6407c4d9209a2649b40881ca09",
     "src/runner/execution/unit-control.mjs": "7758226c1321bda3cd53e5018c7030b714adf138ba8e3fccbeb8a4f5337f9022",
     "src/runner/execution/unit-run-history.mjs": "245c8bf2fd2221fdd3e801d426e0ee466b75ee408394cac3b104381160691ac7",
     "src/runner/execution/unit-state.mjs": "fa446821758bdebae8ed5d4858c37780796e98352c14641f6a59abf904157e90",

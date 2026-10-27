@@ -244,6 +244,26 @@ test('non-request winner of minCheckers records param slot provenance', () => {
   ]);
 });
 
+test('checker plan resolves slot provenance from options provenance or slot when requested from params', () => {
+  const plan = checkerPlanOf({ capability: 'docs:write' }, {}, {
+    params: { minCheckers: ['tester'] },
+    slot: 'pattern-default',
+  });
+  assert.deepEqual(plan.find((c) => c.seat === 'tester'), {
+    seat: 'tester',
+    contributions: ['param:pattern-default'],
+  });
+
+  const planFromProv = checkerPlanOf({ capability: 'docs:write' }, {}, {
+    params: { minCheckers: ['tester'] },
+    provenance: { params: { minCheckers: 'activity' } },
+  });
+  assert.deepEqual(planFromProv.find((c) => c.seat === 'tester'), {
+    seat: 'tester',
+    contributions: ['param:activity'],
+  });
+});
+
 test('declared roster omitting a checker required by pattern invariant refuses with pattern-invariant-weakened', () => {
   assert.throws(
     () => resolveSeats({

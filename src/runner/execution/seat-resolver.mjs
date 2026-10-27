@@ -184,18 +184,19 @@ export function checkerPlanOf(unit, runnerConfig, options = {}) {
 
   // 4. Requested / params
   let req = options.requested ?? options.minCheckers ?? options.params?.minCheckers;
+  const resolvedSlot = options.slot ?? options.minCheckersSlot ?? options.provenance?.params?.minCheckers;
   if (req) {
     const reqList = Array.isArray(req) ? req : [req];
     for (const item of reqList) {
       if (typeof item === 'string') {
-        const slot = options.slot;
+        const slot = resolvedSlot;
         const contrib = (!slot || slot === 'request') ? 'request' : (slot.startsWith('param:') ? slot : `param:${slot}`);
         addContribution(item, contrib);
       } else if (item && typeof item === 'object') {
         const seat = item.name || item.seat;
         let contrib = item.source;
         if (!contrib) {
-          const slot = item.slot || options.slot;
+          const slot = item.slot || resolvedSlot;
           contrib = (!slot || slot === 'request') ? 'request' : (slot.startsWith('param:') ? slot : `param:${slot}`);
         }
         addContribution(seat, contrib);
@@ -256,8 +257,8 @@ export function checkDeclaredSeats(raw, label = 'seats', { tiers } = {}) {
 
 /** The seats a unit or its pattern params declare; the unit's own win. Null when none are declared. */
 function declaredSeatsOf(unit, params) {
-  const raw = unit?.seats ?? params?.seats;
-  return raw === undefined ? null : checkDeclaredSeats(raw, unit?.seats !== undefined ? 'unit.seats' : 'params.seats');
+  const raw = params?.seats ?? unit?.seats;
+  return raw === undefined ? null : checkDeclaredSeats(raw, params?.seats !== undefined ? 'params.seats' : 'unit.seats');
 }
 
 const withDeclared = (declared, base) => Object.freeze({ ...base, ...(declared.persona ? { persona: declared.persona } : {}), ...(declared.tier ? { tier: declared.tier } : {}) });
@@ -313,7 +314,8 @@ export function resolveSeats(options = {}) {
       return [Object.freeze({ seat: 'producer', role: 'producer', posture: posture({ readOnly, writer: true }) })];
     }
     case 'reviewed': {
-      const plan = checkerPlanOf(unit, runnerConfig, { requested: params?.minCheckers, floors });
+      const slot = options.slot ?? options.minCheckersSlot ?? options.provenance?.params?.minCheckers;
+      const plan = checkerPlanOf(unit, runnerConfig, { requested: params?.minCheckers, floors, slot });
       const required = plan.map((p) => p.seat);
       const checkerPosture = (name) => posture({ readOnly: true, forceOutOfProcess: true, verdict: CHECKER_SEATS[name].verdict });
       const producerPosture = posture({ readOnly, writer: true });
