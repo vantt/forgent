@@ -76,7 +76,9 @@ export function resolveCollaboration(options = {}) {
     layers = null,
   } = options;
 
-  const { entries } = checkCatalog({ shipped, effective: runnerConfig, layers, throwOnError: true });
+  // A runner config without a patterns section declares no patterns of its own; it must never be read as the map itself.
+  const effectivePatterns = runnerConfig?.runner?.patterns ?? runnerConfig?.patterns ?? {};
+  const { entries } = checkCatalog({ shipped, effective: { patterns: effectivePatterns }, layers, throwOnError: true });
 
   const callerObjPattern = typeof selectors?.callerObject === 'string'
     ? selectors.callerObject

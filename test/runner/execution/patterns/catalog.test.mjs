@@ -2027,3 +2027,15 @@ test('malformed scalars in request refuse with param-invalid without escaping as
     (err) => err instanceof CollaborationError && err.code === 'request-reason-required',
   );
 });
+
+test('a runner config with no patterns section resolves against the shipped catalog and never reads its own keys as pattern names', () => {
+  const runnerConfig = { executors: { claude: { command: 'claude' } }, defaults: { tier: 'standard' } };
+  const resolved = resolveCollaboration({
+    unit: { id: 'u', prompt: 'p' },
+    selectors: { callerString: 'reviewed' },
+    runnerConfig,
+    shipped: shippedCatalog(),
+  });
+  assert.equal(resolved.loop, 'reviewed');
+  assert.equal(resolved.pin.pattern.name, 'reviewed');
+});

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8c11a954d273ccb92ee3712044fd8b5b5d851e335761131a72c764bb8068efe8",
+  "payloadDigest": "48c9712888b3589e8f0b56adf22fa1693bb659fdc23069c3a81e8555b1e8bf74",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1048,7 +1048,7 @@
     "src/runner/execution/loops/solo.mjs": "e026d28daf61abb726a7681e0dae1cc3e71554961971177a691c806db012f915",
     "src/runner/execution/partial-writes.mjs": "9c7ab4a2f57852b93283b819ed8c4adcac2b71c9241cdd4c760e73960bc1c027",
     "src/runner/execution/patterns/catalog-entries.mjs": "165c3942afcaeecaee4b6ebafcf11e29bd461f0fca7e12c133b1f1bba05aea1a",
-    "src/runner/execution/patterns/catalog.mjs": "004beb591560846d3ea748e1a54cef1c35cb83b114a412c386e6f5e81b2df063",
+    "src/runner/execution/patterns/catalog.mjs": "3c7b86a9640a339cbcd62583ac3ff11077687a700534ac63f4b692c0d4eed308",
     "src/runner/execution/run.mjs": "2ed61715f4a67cbce1a8e167c694abc321a82484854bdb5873761a1c59a5a874",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "6a0b9671a9ceb020be1e74d306ea2e277cb324244faf391e85feff10ee7d2eaf",
