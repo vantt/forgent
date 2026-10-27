@@ -37,17 +37,20 @@ export function loopOf(name, options = {}) {
 }
 
 function checkCarrierDomainValue(key, val, loop, carrierName) {
+  const formatVal = (v) => {
+    try { return JSON.stringify(v); } catch { return String(v); }
+  };
   if (key === 'maxRounds') {
     if (typeof val !== 'number' || !Number.isInteger(val) || val < 1) {
-      throw new CollaborationError('param-invalid', `parameter "maxRounds" on ${carrierName} must be an integer >= 1, got ${JSON.stringify(val)}`);
+      throw new CollaborationError('param-invalid', `parameter "maxRounds" on ${carrierName} must be an integer >= 1, got ${formatVal(val)}`);
     }
   } else if (key === 'minCheckers') {
     if (!Array.isArray(val) || val.some((s) => typeof s !== 'string' || !Object.hasOwn(CHECKER_SEATS, s))) {
-      throw new CollaborationError('param-invalid', `parameter "minCheckers" on ${carrierName} must be a list of CHECKER_SEATS names, got ${JSON.stringify(val)}`);
+      throw new CollaborationError('param-invalid', `parameter "minCheckers" on ${carrierName} must be a list of CHECKER_SEATS names, got ${formatVal(val)}`);
     }
   } else if (key === 'rebuttal') {
     if (typeof val !== 'boolean') {
-      throw new CollaborationError('param-invalid', `parameter "rebuttal" on ${carrierName} must be a boolean, got ${JSON.stringify(val)}`);
+      throw new CollaborationError('param-invalid', `parameter "rebuttal" on ${carrierName} must be a boolean, got ${formatVal(val)}`);
     }
   } else if (key === 'seats') {
     checkDeclaredSeats(val, `${carrierName}.seats`);
@@ -81,7 +84,6 @@ export function resolveCollaboration(options = {}) {
   const unitPattern = typeof unit?.pattern === 'string' && unit.pattern
     ? unit.pattern
     : (unit?.pattern?.pattern && typeof unit.pattern.pattern === 'string' ? unit.pattern.pattern : null);
-  const unitParamsObj = unit?.params ?? (typeof unit?.pattern === 'object' && unit?.pattern?.params ? unit.pattern.params : undefined);
   if (unit?.params !== undefined && (typeof unit.params !== 'object' || unit.params === null || Array.isArray(unit.params))) {
     throw new CollaborationError('param-invalid', 'unit params must be an object');
   }
@@ -91,16 +93,21 @@ export function resolveCollaboration(options = {}) {
     }
   }
   const unitDeclaredParams = Object.create(null);
-  if (unitParamsObj && typeof unitParamsObj === 'object' && !Array.isArray(unitParamsObj)) {
-    for (const [k, v] of Object.entries(unitParamsObj)) {
+  if (typeof unit?.pattern === 'object' && unit?.pattern !== null && typeof unit.pattern.params === 'object' && unit.pattern.params !== null && !Array.isArray(unit.pattern.params)) {
+    for (const [k, v] of Object.entries(unit.pattern.params)) {
+      unitDeclaredParams[k] = v;
+    }
+  }
+  if (unit?.params && typeof unit.params === 'object' && !Array.isArray(unit.params)) {
+    for (const [k, v] of Object.entries(unit.params)) {
       unitDeclaredParams[k] = v;
     }
   }
   if (unit && typeof unit === 'object') {
-    if (unit.seats !== undefined && !Object.hasOwn(unitDeclaredParams, 'seats')) {
+    if (unit.seats !== undefined) {
       unitDeclaredParams.seats = unit.seats;
     }
-    if (unit.roleTasks !== undefined && !Object.hasOwn(unitDeclaredParams, 'roleTasks')) {
+    if (unit.roleTasks !== undefined) {
       unitDeclaredParams.roleTasks = unit.roleTasks;
     }
   }
@@ -184,9 +191,20 @@ export function resolveCollaboration(options = {}) {
           if (eq < 0) throw new CollaborationError('param-invalid', `scalar parameter "${item}" missing "=" delimiter`);
           scalarEntries.push([item.slice(0, eq), item.slice(eq + 1)]);
         } else if (item && typeof item === 'object') {
-          if (Array.isArray(item)) scalarEntries.push([item[0], item[1]]);
-          else if (item.key !== undefined) scalarEntries.push([item.key, item.value]);
-          else for (const [k, v] of Object.entries(item)) scalarEntries.push([k, v]);
+          if (Array.isArray(item)) {
+            if (item.length === 0 || item.length > 2) {
+              throw new CollaborationError('param-invalid', 'scalar array entry must be [key, value]');
+            }
+            scalarEntries.push([item[0], item[1]]);
+          } else if (item.key !== undefined) {
+            scalarEntries.push([item.key, item.value]);
+          } else {
+            const entries = Object.entries(item);
+            if (entries.length === 0) {
+              throw new CollaborationError('param-invalid', 'scalar object entry cannot be empty');
+            }
+            for (const [k, v] of entries) scalarEntries.push([k, v]);
+          }
         } else {
           throw new CollaborationError('param-invalid', 'scalar item must be a string or object');
         }
@@ -196,12 +214,14 @@ export function resolveCollaboration(options = {}) {
     }
 
     for (const [rawKey, rawVal] of scalarEntries) {
-      const key = String(rawKey);
-      if (!key) throw new CollaborationError('param-invalid', 'scalar parameter key cannot be empty');
+      if (typeof rawKey !== 'string' || !rawKey) {
+        throw new CollaborationError('param-invalid', 'scalar parameter key must be a non-empty string');
+      }
+      const key = rawKey;
       if (seenScalarKeys.has(key)) throw new CollaborationError('param-request-conflict', `scalar parameter "${key}" was specified more than once`);
       seenScalarKeys.add(key);
 
-      if (request?.params && Object.hasOwn(request.params, key)) {
+      if (request?.params && typeof request.params === 'object' && Object.hasOwn(request.params, key)) {
         throw new CollaborationError('param-request-conflict', `parameter "${key}" was specified in both params and scalars`);
       }
       if (!Object.hasOwn(paramTable, key)) {
@@ -214,21 +234,43 @@ export function resolveCollaboration(options = {}) {
       if (rawVal === undefined || rawVal === null || rawVal === '') {
         throw new CollaborationError('param-invalid', `scalar parameter "${key}" requires a non-empty value`);
       }
+      if (typeof rawVal === 'object' || typeof rawVal === 'symbol' || typeof rawVal === 'function') {
+        throw new CollaborationError('param-invalid', `scalar parameter "${key}" value must be a scalar, got ${Array.isArray(rawVal) ? 'array' : typeof rawVal}`);
+      }
 
-      const strVal = String(rawVal);
       if (paramDef.type === 'integer') {
-        if (!/^-?[0-9]+$/.test(strVal)) throw new CollaborationError('param-invalid', `invalid integer scalar "${strVal}" for parameter "${key}"`);
-        const num = Number(strVal);
-        if (!Number.isInteger(num)) throw new CollaborationError('param-invalid', `invalid integer scalar "${strVal}" for parameter "${key}"`);
-        if (num < 1) throw new CollaborationError('param-invalid', `parameter "${key}" must be an integer >= 1, got ${num}`);
-        parsedScalars[key] = num;
-      } else if (paramDef.type === 'boolean') {
-        if (strVal !== 'true' && strVal !== 'false') {
-          throw new CollaborationError('param-invalid', `invalid boolean scalar "${strVal}" for parameter "${key}"; must be "true" or "false"`);
+        if (typeof rawVal === 'boolean') {
+          throw new CollaborationError('param-invalid', `invalid integer scalar "${rawVal}" for parameter "${key}"`);
         }
-        parsedScalars[key] = (strVal === 'true');
+        if (typeof rawVal === 'number') {
+          if (!Number.isInteger(rawVal) || rawVal < 1) {
+            throw new CollaborationError('param-invalid', `parameter "${key}" must be an integer >= 1, got ${rawVal}`);
+          }
+          parsedScalars[key] = rawVal;
+        } else {
+          const strVal = String(rawVal);
+          if (!/^-?[0-9]+$/.test(strVal)) throw new CollaborationError('param-invalid', `invalid integer scalar "${strVal}" for parameter "${key}"`);
+          const num = Number(strVal);
+          if (!Number.isInteger(num)) throw new CollaborationError('param-invalid', `invalid integer scalar "${strVal}" for parameter "${key}"`);
+          if (num < 1) throw new CollaborationError('param-invalid', `parameter "${key}" must be an integer >= 1, got ${num}`);
+          parsedScalars[key] = num;
+        }
+      } else if (paramDef.type === 'boolean') {
+        if (typeof rawVal === 'boolean') {
+          parsedScalars[key] = rawVal;
+        } else if (typeof rawVal === 'string') {
+          if (rawVal !== 'true' && rawVal !== 'false') {
+            throw new CollaborationError('param-invalid', `invalid boolean scalar "${rawVal}" for parameter "${key}"; must be "true" or "false"`);
+          }
+          parsedScalars[key] = (rawVal === 'true');
+        } else {
+          throw new CollaborationError('param-invalid', `invalid boolean scalar "${rawVal}" for parameter "${key}"; must be "true" or "false"`);
+        }
       } else {
-        parsedScalars[key] = strVal;
+        if (typeof rawVal === 'boolean') {
+          throw new CollaborationError('param-invalid', `parameter "${key}" expects a string literal, got boolean`);
+        }
+        parsedScalars[key] = String(rawVal);
       }
     }
   }
@@ -268,9 +310,29 @@ export function resolveCollaboration(options = {}) {
     }
   }
 
-  for (const [key, val] of Object.entries(unitDeclaredParams)) {
-    if (!Object.hasOwn(paramTable, key)) throw new CollaborationError('param-unknown', `unknown parameter "${key}" in unit for loop "${loop}"`);
-    checkCarrierDomainValue(key, val, loop, 'unit');
+  if (typeof unit?.pattern === 'object' && unit?.pattern !== null && unit.pattern.params !== undefined && typeof unit.pattern.params === 'object' && unit.pattern.params !== null && !Array.isArray(unit.pattern.params)) {
+    for (const [key, val] of Object.entries(unit.pattern.params)) {
+      if (!Object.hasOwn(paramTable, key)) throw new CollaborationError('param-unknown', `unknown parameter "${key}" in unit pattern for loop "${loop}"`);
+      checkCarrierDomainValue(key, val, loop, 'unit pattern');
+    }
+  }
+
+  if (unit?.params !== undefined && typeof unit.params === 'object' && unit.params !== null && !Array.isArray(unit.params)) {
+    for (const [key, val] of Object.entries(unit.params)) {
+      if (!Object.hasOwn(paramTable, key)) throw new CollaborationError('param-unknown', `unknown parameter "${key}" in unit for loop "${loop}"`);
+      checkCarrierDomainValue(key, val, loop, 'unit');
+    }
+  }
+
+  if (unit && typeof unit === 'object') {
+    if (unit.seats !== undefined) {
+      if (!Object.hasOwn(paramTable, 'seats')) throw new CollaborationError('param-unknown', `unknown parameter "seats" in unit for loop "${loop}"`);
+      checkCarrierDomainValue('seats', unit.seats, loop, 'unit');
+    }
+    if (unit.roleTasks !== undefined) {
+      if (!Object.hasOwn(paramTable, 'roleTasks')) throw new CollaborationError('param-unknown', `unknown parameter "roleTasks" in unit for loop "${loop}"`);
+      checkCarrierDomainValue('roleTasks', unit.roleTasks, loop, 'unit');
+    }
   }
 
   const actDeclaredParams = Object.create(null);

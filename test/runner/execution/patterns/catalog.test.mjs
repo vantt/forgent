@@ -1767,3 +1767,228 @@ test('case dispatch without selectors inherits activity unit while empty dispatc
   assert.equal(resEmpty.loop, 'solo');
   assert.equal(resEmpty.pin.baseline.source, 'solo');
 });
+
+test('unit declarations shadowed by higher precedence slots are validated for unknown keys and invalid values', () => {
+  const shipped = shippedCatalog();
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      unit: {
+        pattern: { pattern: 'reviewed', params: { unknownParam: 123 } },
+        params: { maxRounds: 2 },
+      },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-unknown',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      unit: {
+        pattern: { pattern: 'reviewed', params: { maxRounds: -1 } },
+        params: { maxRounds: 2 },
+      },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      request: { params: { maxRounds: 3 } },
+      unit: {
+        pattern: { pattern: 'reviewed', params: { maxRounds: 0 } },
+        params: { maxRounds: 2 },
+      },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      unit: {
+        seats: 'invalid-not-an-array',
+        params: {
+          seats: [
+            { seat: 'author', role: 'producer' },
+            { seat: 'reviewer', role: 'reviewer' },
+          ],
+        },
+      },
+      shipped,
+    }),
+    (err) => err.code === 'invalid-seats',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      unit: {
+        pattern: { pattern: 'reviewed', params: { seats: 'invalid-not-an-array' } },
+        seats: [
+          { seat: 'author', role: 'producer' },
+          { seat: 'reviewer', role: 'reviewer' },
+        ],
+      },
+      shipped,
+    }),
+    (err) => err.code === 'invalid-seats',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      request: { params: { maxRounds: 3 } },
+      unit: {
+        params: { maxRounds: -1 },
+      },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+});
+
+test('malformed scalars in request refuse with param-invalid without escaping as TypeError and falsy present params take effect', () => {
+  const shipped = shippedCatalog();
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      request: { scalars: { maxRounds: {} } },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      request: { scalars: { maxRounds: [1, 2] } },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      request: { scalars: { maxRounds: null } },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      request: { scalars: { maxRounds: Object.create(null) } },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      request: { scalars: [[Object.create(null), '1']] },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      request: { scalars: [true] },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      request: { scalars: { maxRounds: false } },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      request: { scalars: [{}] },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      request: { scalars: { maxRounds: 0 } },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'reviewed' },
+      request: { scalars: { maxRounds: '' } },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'debate' },
+      request: { scalars: { rebuttal: 0 } },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'debate' },
+      request: { scalars: { rebuttal: '' } },
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+
+  const resFalsyParam = resolveCollaboration({
+    selectors: { callerString: 'debate' },
+    unit: {
+      seats: [
+        { seat: 'pro', role: 'producer' },
+        { seat: 'con', role: 'producer' },
+        { seat: 'referee', role: 'judge' },
+      ],
+    },
+    request: { params: { rebuttal: false } },
+    shipped,
+  });
+  assert.equal(resFalsyParam.params.rebuttal, false);
+  assert.equal(resFalsyParam.pin.provenance.params.rebuttal, 'request');
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'debate' },
+      unit: {
+        seats: [
+          { seat: 'pro', role: 'producer' },
+          { seat: 'con', role: 'producer' },
+          { seat: 'referee', role: 'judge' },
+        ],
+      },
+      request: { params: { rebuttal: false } },
+      inCase: true,
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'request-reason-required',
+  );
+});
