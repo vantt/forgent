@@ -246,3 +246,12 @@ test('no command yields no verify result', async () => {
   assert.equal(result.results.length, 1);
   assert.equal(result.results[0].seat, 'producer');
 });
+
+test('configured verification without verify hook rejects instead of silently passing', async () => {
+  const unit = { id: 'u-verify-missing-hook', objective: 'Missing verify hook', verify: 'npm test' };
+  const history = [{ seat: 'producer', round: 1, outcome: 'pass' }];
+  await assert.rejects(
+    runSolo(unit, {}, { history, runRole: async () => { throw new Error('should reuse history'); } }),
+    /verify hook is required when verification is configured/,
+  );
+});

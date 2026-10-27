@@ -64,21 +64,15 @@ export async function runSolo(unit, cfg, { runRole, verify, history } = {}, para
       outcome: vRes?.pass ? 'pass' : 'findings',
       findings: vRes?.findings || (vRes?.pass ? [] : ['Verification failed']),
     };
+  } else {
+    throw new TypeError('verify hook is required when verification is configured');
   }
 
-  if (verifyResult) {
-    results.push(verifyResult);
-    return {
-      outcome: verifyResult.outcome,
-      rounds: 1,
-      results,
-      ...(verifyResult.outcome === 'findings' ? { findings: verifyResult.findings || [] } : {}),
-    };
-  }
-
+  results.push(verifyResult);
   return {
-    outcome: result.outcome,
+    outcome: verifyResult.outcome,
     rounds: 1,
     results,
+    ...(verifyResult.outcome === 'findings' ? { findings: verifyResult.findings || [] } : {}),
   };
 }

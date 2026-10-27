@@ -14,7 +14,7 @@ import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs
 import { runUnit as coreRunUnit, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError, loadRunnerConfigForDir } from '../../../src/runner/dispatch/config.mjs';
 import { seatConfigDigestOf } from '../../../src/runner/execution/seat-policy.mjs';
-import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
+import { writeUnitSummary, buildUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { installCancelOnSignal, resetCancelRequest } from '../../../src/run-supervisor/cancel-registry.mjs';
 
@@ -1874,6 +1874,67 @@ test('a solo run needs no verify and does not claim to have skipped one', async 
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-solo-no-verify', pattern: 'solo' }, 'solo');
   assert.equal(res.outcome, 'pass');
   assert.equal(res.verify, undefined);
+});
+
+test('a solo record with a command does not settle before verify completes, while one without settles', async (t) => {
+  // Solo record with no command: once producer passes, it settles as pass
+  const noCmdFix = recordedUnitFixture(t);
+  const noCmdRunDir = path.join(noCmdFix.unitDir, 'producer', '1', 'runs', '01');
+  fs.mkdirSync(noCmdRunDir, { recursive: true });
+  fs.writeFileSync(path.join(noCmdRunDir, 'result.json'), JSON.stringify({
+    runId: 'settled-producer', settledAt: '2026-10-05T01:01:00Z', classification: { outcome: { category: 'ok' } },
+  }));
+  writeUnitSummary(noCmdFix.unitDir);
+  assert.equal(noCmdFix.readSummary().outcome, 'pass');
+
+  // Solo record with a verify command: producer passed but verify not run leaves derived outcome unknown, not pass
+  const cmdFix = recordedUnitFixture(t);
+  cmdFix.record.unit.verify = 'node -e "process.exit(0)"';
+  fs.writeFileSync(path.join(cmdFix.unitDir, 'unit.json'), JSON.stringify(cmdFix.record));
+  const cmdRunDir = path.join(cmdFix.unitDir, 'producer', '1', 'runs', '01');
+  fs.mkdirSync(cmdRunDir, { recursive: true });
+  fs.writeFileSync(path.join(cmdRunDir, 'result.json'), JSON.stringify({
+    runId: 'settled-producer', settledAt: '2026-10-05T01:01:00Z', classification: { outcome: { category: 'ok' } },
+  }));
+  const writeRes = writeUnitSummary(cmdFix.unitDir);
+  assert.equal(writeRes.skipped, 'unsettled');
+  assert.equal(fs.existsSync(path.join(cmdFix.unitDir, 'unit-summary.json')), false);
+  assert.equal(buildUnitSummary(cmdFix.unitDir).outcome, 'unknown');
+  // Resuming runs verify and settles with pass only after verify passes
+  const resumed = await runUnit({
+    repoRoot: cmdFix.repoRoot,
+    cwd: cmdFix.worktreeDir,
+    resumeUnitRunId: cmdFix.unitRunId,
+  });
+  assert.equal(resumed.outcome, 'pass');
+  assert.equal(resumed.results.filter((r) => r.seat === 'verify' && r.outcome === 'pass').length, 1);
+  assert.equal(cmdFix.readRecord().execution?.status, 'settled');
+  assert.equal(cmdFix.readRecord().settlement?.outcome, 'pass');
+  assert.equal(cmdFix.readSummary().outcome, 'pass');
+});
+
+test('a solo run with a failing verify command settles with findings and no second producer launch', async (t) => {
+  const fixture = recordedUnitFixture(t);
+  fixture.record.unit.verify = 'node -e "console.error(\'failed verify check\'); process.exit(2)"';
+  fs.writeFileSync(path.join(fixture.unitDir, 'unit.json'), JSON.stringify(fixture.record));
+  const runDir = path.join(fixture.unitDir, 'producer', '1', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({
+    runId: 'settled-producer', settledAt: '2026-10-05T01:01:00Z', classification: { outcome: { category: 'ok' } },
+  }));
+
+  const resumed = await runUnit({
+    repoRoot: fixture.repoRoot,
+    cwd: fixture.worktreeDir,
+    resumeUnitRunId: fixture.unitRunId,
+  });
+  assert.equal(resumed.outcome, 'findings');
+  assert.ok(resumed.findings.some((f) => /exited 2/.test(f) && /failed verify check/.test(f)));
+  assert.equal(resumed.results.filter((r) => r.seat === 'producer').length, 1);
+  assert.equal(resumed.results.filter((r) => r.seat === 'verify' && r.outcome === 'findings').length, 1);
+  assert.equal(fixture.readRecord().execution?.status, 'settled');
+  assert.equal(fixture.readRecord().settlement?.outcome, 'findings');
+  assert.equal(fixture.readSummary().outcome, 'findings');
 });
 
 test('conflicting explicit pattern selectors refuse selector-conflict before admission and reserve nothing', async () => {
