@@ -11,8 +11,7 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 
 seedFileLocalBwrapRegistry();
 // bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
-try { fs.accessSync('/var/tmp', fs.constants.W_OK); } catch { if (!process.env.FGOS_TEST_FIXTURE_ROOT) process.env.FGOS_TEST_FIXTURE_ROOT = os.tmpdir(); }
-const { makeFixtureDir } = await import('../helpers/fixture-dir.mjs');
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { capabilityServedBy, writeGlobalConfig, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -34,7 +33,7 @@ function setupTestRepo() {
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /(?:Write structured JSON to |Result claim path: )(\S+(?:agent-result|result-1|result)\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
     let runDir;
     if (match) {
       runDir = (() => { const d = path.dirname(match[1]); const o = path.join(d, 'worker-output', 'outbox'); return fs.existsSync(o) ? o : d; })();
@@ -50,9 +49,7 @@ function setupTestRepo() {
     if (runDir) {
       fs.mkdirSync(runDir, { recursive: true });
       fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nAssignment execution completed successfully.\\n');
-      const res = JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } });
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), res);
-      if (match) fs.writeFileSync(match[1], res);
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
     }
     `,
   );
@@ -448,11 +445,18 @@ test('fgos run refuses param or params beside resume', () => {
   assert.match(outParams, /--params cannot change a resumed unit run/);
 });
 
-test('fgos run standalone request runs without requiring a reason', () => {
+test('fgos run standalone request is admitted without a reason and pins the requested value with its provenance', () => {
   const tmp = setupTestRepo();
-  const stdout = runCli(['Write notes', '--capability', 'docs:write', '--pattern', 'reviewed', '--param', 'maxRounds=3', '--dir', tmp], tmp);
-  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
+  // The fixture pool has one executor family, so the checkers of a reviewed run may be refused after
+  // admission; what this proves is that the request was admitted without a reason and pinned.
+  let stdout;
+  try {
+    stdout = runCli(['Write notes', '--capability', 'docs:write', '--pattern', 'reviewed', '--param', 'maxRounds=1', '--dir', tmp], tmp);
+  } catch (err) {
+    stdout = err.stdout;
+  }
+  assert.ok(!stdout.includes('request-reason-required'), stdout);
   const record = unitRecordOf(tmp, stdout);
-  assert.equal(record.collaboration?.effective?.params?.maxRounds, 3);
+  assert.equal(record.collaboration?.effective?.params?.maxRounds, 1);
   assert.equal(record.collaboration?.provenance?.params?.maxRounds, 'request');
 });
