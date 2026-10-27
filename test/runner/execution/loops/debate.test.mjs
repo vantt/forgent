@@ -1,7 +1,7 @@
 import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runDebate } from '../../../../src/runner/execution/loops/debate.mjs';
+import { runDebate, PARAMS, DEFAULT_REBUTTAL } from '../../../../src/runner/execution/loops/debate.mjs';
 import { patternHistoryOutcome } from '../../../../src/runner/execution/loops/history-outcome.mjs';
 import { resolveSeats, seatLaunchesOf } from '../../../../src/runner/execution/seat-resolver.mjs';
 import { runPattern } from '../../../../src/runner/execution/loops/index.mjs';
@@ -12,7 +12,7 @@ const seats = [
   { seat: 'judge', role: 'judge' },
 ];
 const unit = { id: 'u-debate', objective: 'Should the cache be write-through?', seats };
-const resolved = (params) => resolveSeats({ pattern: { pattern: 'debate', params }, unit, runnerConfig: {} });
+const resolved = (params) => resolveSeats({ loop: 'debate', params, unit, runnerConfig: {} });
 const historyOutcome = (params, history) => patternHistoryOutcome({ patternName: 'debate', params, unit, cfg: {}, seats: resolved(params), history });
 
 function recorder(overrides = {}) {
@@ -172,4 +172,28 @@ test('runPattern dispatches the debate pattern by name and as a pattern object',
   const second = recorder();
   await runPattern({ pattern: 'debate', params: { rebuttal: false } }, unit, {}, { runRole: second.runRole });
   assert.equal(second.calls.length, 3);
+});
+
+test('debate module exports its param table and default rebuttal', () => {
+  assert.equal(DEFAULT_REBUTTAL, true);
+  assert.ok(PARAMS);
+  assert.deepEqual(Object.keys(PARAMS).sort(), ['rebuttal', 'roleTasks', 'seats'].sort());
+  assert.equal(PARAMS.seats.type, 'seats');
+  assert.equal(PARAMS.seats.scalar, false);
+  assert.equal(PARAMS.seats.requestable, true);
+  assert.equal(PARAMS.roleTasks.type, 'role-tasks');
+  assert.equal(PARAMS.roleTasks.scalar, false);
+  assert.equal(PARAMS.roleTasks.requestable, false);
+  assert.equal(PARAMS.rebuttal.type, 'boolean');
+  assert.equal(PARAMS.rebuttal.scalar, true);
+  assert.equal(PARAMS.rebuttal.requestable, true);
+});
+
+test('runDebate defaults rebuttal to DEFAULT_REBUTTAL when omitted', async () => {
+  const { calls, runRole } = recorder();
+  // params without rebuttal -> rebuttal is true (round 1 sides, round 2 sides, judge = 5 calls)
+  await runDebate(unit, {}, { runRole }, {});
+  assert.equal(calls.length, 5);
+  const round2Calls = calls.filter((c) => c.round === 2);
+  assert.equal(round2Calls.length, 2);
 });

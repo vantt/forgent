@@ -3,10 +3,10 @@
  * Dispatches units to collaboration pattern loops: solo, reviewed, panel, debate.
  */
 
-import { runSolo } from './solo.mjs';
-import { runReviewed } from './reviewed.mjs';
-import { runPanel } from './panel.mjs';
-import { runDebate } from './debate.mjs';
+import { runSolo, PARAMS as SOLO_PARAMS } from './solo.mjs';
+import { runReviewed, PARAMS as REVIEWED_PARAMS, DEFAULT_MAX_ROUNDS } from './reviewed.mjs';
+import { runPanel, PARAMS as PANEL_PARAMS } from './panel.mjs';
+import { runDebate, PARAMS as DEBATE_PARAMS, DEFAULT_REBUTTAL } from './debate.mjs';
 import { resolvePattern, PRESETS } from '../patterns/presets.mjs';
 
 export { runSolo } from './solo.mjs';
@@ -14,6 +14,26 @@ export { runReviewed } from './reviewed.mjs';
 export { runPanel } from './panel.mjs';
 export { runDebate } from './debate.mjs';
 export { resolvePattern, PRESETS } from '../patterns/presets.mjs';
+export { DEFAULT_MAX_ROUNDS } from './reviewed.mjs';
+export { DEFAULT_REBUTTAL } from './debate.mjs';
+
+const PARAM_TABLES = Object.freeze({
+  solo: SOLO_PARAMS,
+  reviewed: REVIEWED_PARAMS,
+  panel: PANEL_PARAMS,
+  debate: DEBATE_PARAMS,
+});
+
+/**
+ * Returns the param table for a given loop name, or null if unknown.
+ *
+ * @param {string|object} loop - Loop name ('solo', 'reviewed', 'panel', 'debate') or object containing loop/pattern.
+ * @returns {object|null}
+ */
+export function paramTableOf(loop) {
+  const name = typeof loop === 'string' ? loop : loop?.loop ?? loop?.pattern ?? loop?.patternName;
+  return PARAM_TABLES[name] ?? null;
+}
 
 export const VALID_OUTCOMES = Object.freeze([
   'pass',

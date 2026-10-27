@@ -24,6 +24,20 @@ const ERROR_OUTCOMES = Object.freeze([
   'blocked',
 ]);
 
+export const PARAMS = Object.freeze({
+  seats: Object.freeze({
+    type: 'seats',
+    scalar: false,
+    requestable: true,
+  }),
+  roleTasks: Object.freeze({
+    type: 'role-tasks',
+    domain: 'map seat-or-kind to text',
+    scalar: false,
+    requestable: false,
+  }),
+});
+
 /**
  * Run panel pattern for a unit.
  *
@@ -36,7 +50,7 @@ const ERROR_OUTCOMES = Object.freeze([
  * @returns {Promise<{ outcome: string, results: Array<object> }>}
  */
 export async function runPanel(unit, cfg, { runRole, verify, history } = {}, params = {}) {
-  const seats = resolveSeats({ pattern: { pattern: 'panel', params }, unit, runnerConfig: cfg });
+  const seats = resolveSeats({ loop: 'panel', params, unit, runnerConfig: cfg });
   const members = seats.filter((s) => s.posture.stance);
   const synthesizer = seats.find((s) => s.role === 'synthesizer');
   const prior = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);

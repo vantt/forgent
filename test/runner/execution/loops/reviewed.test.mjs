@@ -5,6 +5,8 @@ import {
   runReviewed,
   reviewedHistoryOutcome as historyOutcomeOf,
   verifyCommandOf,
+  DEFAULT_MAX_ROUNDS,
+  PARAMS,
 } from '../../../../src/runner/execution/loops/reviewed.mjs';
 import {
   DEFAULT_CHECKERS_BY_RIGOR,
@@ -14,7 +16,7 @@ import {
 
 // The history outcome of a reviewed unit is read over the seats the unit has.
 const reviewedHistoryOutcome = (unit, cfg, history, params = {}) =>
-  historyOutcomeOf(unit, cfg, history, params, resolveSeats({ pattern: { pattern: 'reviewed', params }, unit, runnerConfig: cfg }));
+  historyOutcomeOf(unit, cfg, history, params, resolveSeats({ loop: 'reviewed', params, unit, runnerConfig: cfg }));
 
 test('runReviewed passes on round 1 when all checkers pass', async () => {
   const calls = [];
@@ -514,4 +516,41 @@ test('reviewed at standard or low rigor keeps checkers independent of the produc
       assert.deepEqual(opts.independentOf, ['producer'], `${rigor} ${opts.seat.seat}`);
     }
   }
+});
+
+test('reviewed module exports its param table and default max rounds', () => {
+  assert.equal(DEFAULT_MAX_ROUNDS, 2);
+  assert.ok(PARAMS);
+  assert.deepEqual(Object.keys(PARAMS).sort(), ['maxRounds', 'minCheckers', 'roleTasks', 'seats'].sort());
+  assert.equal(PARAMS.maxRounds.type, 'integer');
+  assert.equal(PARAMS.maxRounds.scalar, true);
+  assert.equal(PARAMS.maxRounds.requestable, true);
+  assert.equal(PARAMS.minCheckers.type, 'checker-list');
+  assert.equal(PARAMS.minCheckers.scalar, false);
+  assert.equal(PARAMS.minCheckers.requestable, true);
+  assert.equal(PARAMS.seats.type, 'seats');
+  assert.equal(PARAMS.seats.scalar, false);
+  assert.equal(PARAMS.seats.requestable, true);
+  assert.equal(PARAMS.roleTasks.type, 'role-tasks');
+  assert.equal(PARAMS.roleTasks.scalar, false);
+  assert.equal(PARAMS.roleTasks.requestable, false);
+});
+
+test('runReviewed defaults maxRounds to DEFAULT_MAX_ROUNDS ignoring config tuning', async () => {
+  const unit = { id: 'u-default-rounds', objective: 'Test default rounds', capability: 'docs:write' };
+  let roundCount = 0;
+  const runRole = async (opts) => {
+    if (opts.seat.seat === 'producer') roundCount = Math.max(roundCount, opts.round ?? 1);
+    return {
+      seat: opts.seat.seat,
+      outcome: opts.seat.seat === 'producer' ? 'pass' : 'findings',
+      finding: 'Needs rework',
+    };
+  };
+  // cfg has loops.reviewed.maxRounds = 5, but loop ignores it and uses DEFAULT_MAX_ROUNDS (2)
+  const cfg = { loops: { reviewed: { maxRounds: 5 } } };
+  const res = await runReviewed(unit, cfg, { runRole });
+  assert.equal(res.rounds, DEFAULT_MAX_ROUNDS);
+  assert.equal(roundCount, DEFAULT_MAX_ROUNDS);
+  assert.equal(res.outcome, 'findings');
 });

@@ -33,6 +33,27 @@ const ERROR_OUTCOMES = Object.freeze([
   'blocked',
 ]);
 
+export const DEFAULT_REBUTTAL = true;
+
+export const PARAMS = Object.freeze({
+  seats: Object.freeze({
+    type: 'seats',
+    scalar: false,
+    requestable: true,
+  }),
+  roleTasks: Object.freeze({
+    type: 'role-tasks',
+    domain: 'map seat-or-kind to text',
+    scalar: false,
+    requestable: false,
+  }),
+  rebuttal: Object.freeze({
+    type: 'boolean',
+    scalar: true,
+    requestable: true,
+  }),
+});
+
 // The task each side is given, by its position in the declared order.
 const SIDE_KINDS = Object.freeze(['thesis', 'antithesis']);
 
@@ -50,10 +71,10 @@ const priorOf = (history) => (typeof history === 'function' ? history() : (Array
  * @returns {Promise<{ outcome: string, rounds: number, results: Array<object> }>}
  */
 export async function runDebate(unit, cfg, { runRole, history } = {}, params = {}) {
-  const seats = resolveSeats({ pattern: { pattern: 'debate', params }, unit, runnerConfig: cfg });
+  const seats = resolveSeats({ loop: 'debate', params, unit, runnerConfig: cfg });
   const sides = seats.filter((s) => s.role === 'producer');
   const judge = seats.find((s) => s.role === 'judge');
-  const rebuttal = params?.rebuttal !== false;
+  const rebuttal = params?.rebuttal ?? DEFAULT_REBUTTAL;
   const prior = priorOf(history);
   const sideIds = sides.map((s) => s.seat);
   const results = [];

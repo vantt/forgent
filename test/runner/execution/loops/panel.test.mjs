@@ -1,7 +1,7 @@
 import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runPanel } from '../../../../src/runner/execution/loops/panel.mjs';
+import { runPanel, PARAMS } from '../../../../src/runner/execution/loops/panel.mjs';
 
 const SEATS = [
   { seat: 'member-1', role: 'producer' },
@@ -179,4 +179,29 @@ test('panel.mjs declares seat intent only: no executor, family or tier names', a
   const fs = await import('node:fs/promises');
   const source = await fs.readFile(new URL('../../../../src/runner/execution/loops/panel.mjs', import.meta.url), 'utf8');
   assert.doesNotMatch(source, /\b(claude|openai|codex|gemini|xai|glm|nano|flagship|frontier)\b/i);
+});
+
+test('panel module exports its param table declaring seats and roleTasks', () => {
+  assert.ok(PARAMS);
+  assert.deepEqual(Object.keys(PARAMS).sort(), ['roleTasks', 'seats'].sort());
+  assert.equal(PARAMS.seats.type, 'seats');
+  assert.equal(PARAMS.seats.scalar, false);
+  assert.equal(PARAMS.seats.requestable, true);
+  assert.equal(PARAMS.roleTasks.type, 'role-tasks');
+  assert.equal(PARAMS.roleTasks.scalar, false);
+  assert.equal(PARAMS.roleTasks.requestable, false);
+});
+
+test('runPanel accepts params in loop-name shape', async () => {
+  const calls = [];
+  const unit = panelUnit();
+  const runRole = async (opts) => {
+    calls.push(opts);
+    return { seat: opts.seat.seat, outcome: 'pass', output: 'ok' };
+  };
+  const params = { roleTasks: { 'member-1': 'Special perspective' } };
+  const res = await runPanel(unit, {}, { runRole }, params);
+  assert.equal(res.outcome, 'pass');
+  const member1 = calls.find((c) => c.seat.seat === 'member-1');
+  assert.ok(member1.unit.objective.includes('Special perspective'));
 });

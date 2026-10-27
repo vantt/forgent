@@ -711,7 +711,8 @@ async function runUnitBody(options, scope) {
     const configSnapshot = snapshotRunnerConfig(mainRoot, liveConfig());
     // The seats the pattern fills, resolved once before anything exists: an undeclared or invalid seat
     // list refuses the run here, and the record keeps the list so a resume never recomputes it.
-    const seats = resolveSeats({ pattern: chosenPattern(options, unit), unit, runnerConfig: configSnapshot.runner });
+    const resolvedPattern = resolvePattern(chosenPattern(options, unit));
+    const seats = resolveSeats({ loop: resolvedPattern.patternName, params: resolvedPattern.params, unit, runnerConfig: configSnapshot.runner });
     // A pinned account is checked before the unit run exists: every seat it applies to must bind an
     // executor whose provider lists it, and it must not be quarantined now.
     await assertDoorChoicesBeforeRun(unit, withAccounts(configSnapshot.runner), options);
@@ -726,6 +727,7 @@ async function runUnitBody(options, scope) {
     if (writing && !caseRef) requireFreeWorktree(port, worktreePath);
     if (caseRef) {
       const pattern = chosenPattern(options, unit);
+      const { patternName: loop, params } = resolvePattern(pattern);
       const admitted = port.admit({
         unitRunId: unitRunIdAtAdmission,
         caseRef,
@@ -733,8 +735,8 @@ async function runUnitBody(options, scope) {
         writes: unit.writes,
         worktree: fs.realpathSync(worktreePath),
         readOnly: !writing,
-        pattern: resolvePattern(pattern).patternName,
-        seatLaunches: seatLaunchesOf({ pattern, unit, runnerConfig: configSnapshot.runner }),
+        pattern: loop,
+        seatLaunches: seatLaunchesOf({ loop, params, unit, runnerConfig: configSnapshot.runner }),
         blind: unit.blind === true,
         handoffRefs: unit.inputs,
         // The rigor the unit runs at (its own or its capability's, the stronger), so the frame's floor is

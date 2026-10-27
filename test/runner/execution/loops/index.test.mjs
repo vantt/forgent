@@ -1,7 +1,13 @@
 import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runPattern, VALID_OUTCOMES } from '../../../../src/runner/execution/loops/index.mjs';
+import {
+  runPattern,
+  paramTableOf,
+  DEFAULT_MAX_ROUNDS,
+  DEFAULT_REBUTTAL,
+  VALID_OUTCOMES,
+} from '../../../../src/runner/execution/loops/index.mjs';
 
 const PANEL_SEATS = [
   { seat: 'member-1', role: 'producer' },
@@ -172,4 +178,29 @@ test('VALID_OUTCOMES strictly contains allowed outcomes', () => {
     ['blocked', 'execution-failure', 'findings', 'pass', 'policy-refusal', 'provider-limit'].sort(),
   );
   assert.ok(!VALID_OUTCOMES.includes('failed'), 'failed must NEVER be an outcome');
+});
+
+test('paramTableOf returns the param table for each loop and null for unknown', () => {
+  assert.equal(DEFAULT_MAX_ROUNDS, 2);
+  assert.equal(DEFAULT_REBUTTAL, true);
+
+  const solo = paramTableOf('solo');
+  assert.ok(solo);
+  assert.deepEqual(Object.keys(solo), ['seats']);
+
+  const reviewed = paramTableOf('reviewed');
+  assert.ok(reviewed);
+  assert.deepEqual(Object.keys(reviewed).sort(), ['maxRounds', 'minCheckers', 'roleTasks', 'seats'].sort());
+
+  const panel = paramTableOf('panel');
+  assert.ok(panel);
+  assert.deepEqual(Object.keys(panel).sort(), ['roleTasks', 'seats'].sort());
+
+  const debate = paramTableOf('debate');
+  assert.ok(debate);
+  assert.deepEqual(Object.keys(debate).sort(), ['rebuttal', 'roleTasks', 'seats'].sort());
+
+  assert.equal(paramTableOf('nonexistent'), null);
+  assert.equal(paramTableOf(null), null);
+  assert.equal(paramTableOf({ loop: 'reviewed' }), reviewed);
 });

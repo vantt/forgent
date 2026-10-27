@@ -24,6 +24,34 @@ export const ERROR_OUTCOMES = Object.freeze([
   'blocked',
 ]);
 
+export const DEFAULT_MAX_ROUNDS = 2;
+
+export const PARAMS = Object.freeze({
+  maxRounds: Object.freeze({
+    type: 'integer',
+    domain: 'integer >= 1',
+    scalar: true,
+    requestable: true,
+  }),
+  minCheckers: Object.freeze({
+    type: 'checker-list',
+    domain: 'list of CHECKER_SEATS names',
+    scalar: false,
+    requestable: true,
+  }),
+  seats: Object.freeze({
+    type: 'seats',
+    scalar: false,
+    requestable: true,
+  }),
+  roleTasks: Object.freeze({
+    type: 'role-tasks',
+    domain: 'map seat-or-kind to text',
+    scalar: false,
+    requestable: false,
+  }),
+});
+
 /**
  * A producer, the writing seat, that claimed done but changed no files settles no-evidence and
  * inconclusive, which the history reads as an execution failure. Its work may already be committed, so
@@ -133,7 +161,7 @@ function assessRound(results, producerSeat) {
  * cannot establish completion and must remain unknown to the summary.
  */
 export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}, seats = []) {
-  const maxRounds = params?.maxRounds ?? cfg?.loops?.reviewed?.maxRounds ?? 2;
+  const maxRounds = params?.maxRounds ?? DEFAULT_MAX_ROUNDS;
   const producerSeat = seats.find((seat) => seat.role === 'producer')?.seat ?? 'producer';
   const checkerList = seats.filter((seat) => seat.role !== 'producer').map((seat) => seat.seat);
   const hasVerify = hasVerifyCommand(unit, cfg);
@@ -164,10 +192,10 @@ export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}, sea
  * @returns {Promise<{ outcome: string, rounds: number, results: Array<object>, findings: Array<string> }>}
  */
 export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaunchRoom } = {}, params = {}) {
-  const maxRounds = params?.maxRounds ?? cfg?.loops?.reviewed?.maxRounds ?? 2;
+  const maxRounds = params?.maxRounds ?? DEFAULT_MAX_ROUNDS;
   const priorResults = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
 
-  const seats = resolveSeats({ pattern: { pattern: 'reviewed', params }, unit, runnerConfig: cfg });
+  const seats = resolveSeats({ loop: 'reviewed', params, unit, runnerConfig: cfg });
   const producerSeat = seats.find((seat) => seat.role === 'producer');
   const checkerSeats = seats.filter((seat) => seat.role !== 'producer');
   const checkerList = checkerSeats.map((seat) => seat.seat);

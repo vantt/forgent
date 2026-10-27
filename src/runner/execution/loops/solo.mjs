@@ -14,6 +14,14 @@ export const VALID_OUTCOMES = Object.freeze([
   'blocked',
 ]);
 
+export const PARAMS = Object.freeze({
+  seats: Object.freeze({
+    type: 'seats',
+    scalar: false,
+    requestable: true,
+  }),
+});
+
 /**
  * Run solo pattern for a unit.
  *
@@ -27,7 +35,7 @@ export const VALID_OUTCOMES = Object.freeze([
  * @returns {Promise<{ outcome: string, rounds: number, results: Array<object> }>}
  */
 export async function runSolo(unit, cfg, { runRole, verify, history } = {}, params = {}) {
-  const [seat] = resolveSeats({ pattern: { pattern: 'solo', params }, unit, runnerConfig: cfg });
+  const [seat] = resolveSeats({ loop: 'solo', params, unit, runnerConfig: cfg });
   const prior = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
   const existing = prior?.find((r) => r.seat === seat.seat && r.outcome === 'pass');
 

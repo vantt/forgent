@@ -1,7 +1,7 @@
 import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runSolo, VALID_OUTCOMES } from '../../../../src/runner/execution/loops/solo.mjs';
+import { runSolo, PARAMS, VALID_OUTCOMES } from '../../../../src/runner/execution/loops/solo.mjs';
 
 test('runSolo dispatches the producer seat and returns outcome', async () => {
   const calls = [];
@@ -98,4 +98,26 @@ test('a solo unit may declare its one seat', async () => {
   assert.equal(result.results[0].seat, 'advisor');
 
   await assert.rejects(runSolo({ ...unit, seats: [{ seat: 'a', role: 'producer' }, { seat: 'b', role: 'producer' }] }, {}, { runRole }), /exactly one seat/);
+});
+
+test('solo module exports its param table declaring seats', () => {
+  assert.ok(PARAMS);
+  assert.deepEqual(Object.keys(PARAMS), ['seats']);
+  assert.equal(PARAMS.seats.type, 'seats');
+  assert.equal(PARAMS.seats.scalar, false);
+  assert.equal(PARAMS.seats.requestable, true);
+});
+
+test('runSolo honors declared seats passed through params', async () => {
+  const calls = [];
+  const unit = { id: 'u-param-seats', objective: 'Custom seat task' };
+  const runRole = async (opts) => {
+    calls.push(opts);
+    return { seat: opts.seat.seat, outcome: 'pass' };
+  };
+  const params = { seats: [{ seat: 'custom-producer', role: 'producer' }] };
+  const result = await runSolo(unit, {}, { runRole }, params);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].seat.seat, 'custom-producer');
+  assert.equal(result.results[0].seat, 'custom-producer');
 });
