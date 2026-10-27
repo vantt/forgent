@@ -1271,6 +1271,51 @@ test('parameter defaults chain resolves specific winners without leaking activit
   assert.equal(resUnitObj.loop, 'reviewed');
   assert.equal(resUnitObj.params.maxRounds, 5);
   assert.equal(resUnitObj.pin.provenance.params.maxRounds, 'unit');
+  const resUnitDirectRoleTasks = resolveCollaboration({
+    shipped,
+    unit: {
+      pattern: 'reviewed',
+      roleTasks: { reviewer: 'Check prose directly' },
+    },
+  });
+  assert.deepEqual({ ...resUnitDirectRoleTasks.roleTasks }, { reviewer: 'Check prose directly' });
+  assert.equal(resUnitDirectRoleTasks.params.roleTasks?.reviewer, 'Check prose directly');
+  assert.equal(resUnitDirectRoleTasks.pin.effective.roleTasks?.reviewer, 'Check prose directly');
+  assert.equal(resUnitDirectRoleTasks.pin.provenance.params.roleTasks, 'unit');
+
+  const resActivityDirectRoleTasks = resolveCollaboration({
+    shipped,
+    selectors: {
+      activityUnit: {
+        pattern: 'reviewed',
+        roleTasks: { reviewer: 'Review via activity declaration' },
+      },
+    },
+    inCase: true,
+  });
+  assert.deepEqual({ ...resActivityDirectRoleTasks.roleTasks }, { reviewer: 'Review via activity declaration' });
+  assert.equal(resActivityDirectRoleTasks.params.roleTasks?.reviewer, 'Review via activity declaration');
+  assert.equal(resActivityDirectRoleTasks.pin.effective.roleTasks?.reviewer, 'Review via activity declaration');
+  assert.equal(resActivityDirectRoleTasks.pin.provenance.params.roleTasks, 'activity');
+
+  const resUnitSeatsOverridesActivity = resolveCollaboration({
+    shipped,
+    selectors: {
+      activityUnit: {
+        pattern: 'reviewed',
+        seats: [{ seat: 'legacy-lead', role: 'producer' }, { seat: 'reviewer', role: 'reviewer' }],
+        params: { maxRounds: 3 },
+      },
+    },
+    unit: {
+      seats: [{ seat: 'custom-producer', role: 'producer' }, { seat: 'reviewer', role: 'reviewer' }],
+    },
+    inCase: true,
+  });
+  assert.equal(resUnitSeatsOverridesActivity.seats[0].seat, 'custom-producer');
+  assert.equal(resUnitSeatsOverridesActivity.pin.provenance.params.seats, 'unit');
+  assert.equal(resUnitSeatsOverridesActivity.params.maxRounds, 3);
+  assert.equal(resUnitSeatsOverridesActivity.pin.provenance.params.maxRounds, 'activity');
 });
 
 test('parameter validity on every carrier rejects unknown keys, invalid domains, and unrequestable parameters', () => {
@@ -1371,6 +1416,42 @@ test('parameter validity on every carrier rejects unknown keys, invalid domains,
       shipped,
     }),
     (err) => err.code === 'invalid-seats',
+  );
+  assert.throws(
+    () => resolveCollaboration({ selectors: { callerString: 'reviewed' }, unit: { params: 'not-an-object' }, shipped }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+  assert.throws(
+    () => resolveCollaboration({ selectors: { callerString: 'reviewed', activityUnit: { pattern: 'reviewed', params: 123 } }, inCase: true, shipped }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+  assert.throws(
+    () => resolveCollaboration({ selectors: { callerObject: { pattern: 'reviewed', params: [1, 2] } }, shipped }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+  assert.throws(
+    () => resolveCollaboration({ selectors: { callerString: 'reviewed' }, request: { scalars: 42 }, shipped }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+  assert.throws(
+    () => resolveCollaboration({ selectors: { callerString: 'reviewed' }, request: { scalars: [42] }, shipped }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+  assert.throws(
+    () => resolveCollaboration({ selectors: { callerString: 'reviewed' }, unit: { roleTasks: 'not-an-object' }, shipped }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+  assert.throws(
+    () => resolveCollaboration({ selectors: { callerString: 'reviewed', activityUnit: { pattern: 'reviewed', roleTasks: { reviewer: 123 } } }, inCase: true, shipped }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+  assert.throws(
+    () => resolveCollaboration({ selectors: { callerString: 'reviewed', activityUnit: { params: { maxRounds: 2 } } }, inCase: true, shipped }),
+    (err) => err instanceof CollaborationError && err.code === 'param-unknown',
+  );
+  assert.throws(
+    () => resolveCollaboration({ selectors: { callerString: 'solo' }, unit: { roleTasks: { reviewer: 'not-supported-in-solo' } }, shipped }),
+    (err) => err instanceof CollaborationError && err.code === 'param-unknown',
   );
 });
 
@@ -1542,6 +1623,53 @@ test('case dispatch pattern swap requires a reason and preserves activity patter
   assert.ok(resReviewedSwap.params.minCheckers.includes('red-team'));
   assert.equal(resReviewedSwap.pin.provenance.checkers['red-team'], 'pattern-invariant:code-change');
 });
+test('pattern fixed invariant preserves declared setting and rejects overriding requests with pattern-invariant-weakened', () => {
+  const shipped = shippedCatalog();
+  const config = {
+    patterns: {
+      'fixed-debate': {
+        loop: 'debate',
+        promise: 'Debate without rebuttal rounds.',
+        invariants: {
+          rebuttal: { fixed: false },
+        },
+      },
+    },
+  };
+
+  const res = resolveCollaboration({
+    selectors: { callerString: 'fixed-debate' },
+    unit: {
+      seats: [
+        { seat: 'side-a', role: 'producer' },
+        { seat: 'side-b', role: 'producer' },
+        { seat: 'judge', role: 'judge' },
+      ],
+    },
+    runnerConfig: config,
+    shipped,
+  });
+  assert.equal(res.params.rebuttal, false);
+  assert.equal(res.pin.provenance.params.rebuttal, 'pattern-invariant');
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: { callerString: 'fixed-debate' },
+      unit: {
+        seats: [
+          { seat: 'side-a', role: 'producer' },
+          { seat: 'side-b', role: 'producer' },
+          { seat: 'judge', role: 'judge' },
+        ],
+      },
+      request: { params: { rebuttal: true } },
+      runnerConfig: config,
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'pattern-invariant-weakened',
+  );
+});
+
 
 test('selection precedence chain enforces selector priority and rejects conflicting explicit selectors', () => {
   const shipped = shippedCatalog();
