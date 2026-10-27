@@ -293,6 +293,7 @@ test('parameter domain validation rejects invalid default values', () => {
 
   const resNonInteger = checkCatalog({
     shipped,
+    layers: { 'custom-reviewed': 'project' },
     effective: {
       'custom-reviewed': {
         promise: 'A reviewed pattern with bad maxRounds.',
@@ -301,8 +302,10 @@ test('parameter domain validation rejects invalid default values', () => {
       },
     },
   });
-  assert.ok(resNonInteger.problems.some((p) => p.code === 'param-invalid'));
-
+  const badMaxRounds = resNonInteger.problems.find((p) => p.code === 'param-invalid');
+  assert.ok(badMaxRounds);
+  assert.equal(badMaxRounds.source, 'project');
+  assert.match(badMaxRounds.message, /project/);
   const resUnknownChecker = checkCatalog({
     shipped,
     effective: {
@@ -537,6 +540,20 @@ test('declared seats in reviewed allow custom seat ids and reject invalid roles'
   };
   const resWrongRole = checkCatalog({ shipped, effective: effectiveWrongRole });
   assert.ok(resWrongRole.problems.some((p) => p.code === 'seat-multiplicity'));
+
+  const effectiveNoCheckers = {
+    'custom-reviewed-no-checkers': {
+      promise: 'Reviewed pattern declaring only producer.',
+      loop: 'reviewed',
+      defaults: {
+        seats: [
+          { seat: 'author', role: 'producer' },
+        ],
+      },
+    },
+  };
+  const resNoCheckers = checkCatalog({ shipped, effective: effectiveNoCheckers });
+  assert.ok(resNoCheckers.problems.some((p) => p.code === 'seat-multiplicity'));
 });
 
 test('loop seat cardinality checks enforce role multiplicities for panel and debate', () => {
@@ -643,6 +660,7 @@ test('roleTasks target validation accepts loop kinds and declared seats', () => 
           antithesis: 'Argue against.',
           'thesis-rebuttal': 'Rebut opponent points.',
           'antithesis-rebuttal': 'Rebut opponent points.',
+          'side-a-rebuttal': 'Rebut opponent points for side A.',
           judge: 'Render an impartial verdict.',
         },
       },
@@ -653,15 +671,59 @@ test('roleTasks target validation accepts loop kinds and declared seats', () => 
 
   const effectiveReviewed = {
     'custom-reviewed': {
-      promise: 'Reviewed pattern with checker kind.',
+      promise: 'Reviewed pattern with checker seats.',
       loop: 'reviewed',
       defaults: {
         roleTasks: {
-          checker: 'Review all outputs.',
+          producer: 'Produce the initial implementation.',
+          reviewer: 'Review all outputs.',
+          'red-team': 'Challenge edge cases.',
         },
       },
     },
   };
   const resReviewed = checkCatalog({ shipped, effective: effectiveReviewed });
   assert.deepEqual(resReviewed.problems, []);
+
+  const effectiveInvented = {
+    'custom-invented-reviewed': {
+      promise: 'Pattern with invented checker target.',
+      loop: 'reviewed',
+      defaults: {
+        roleTasks: {
+          checker: 'Invalid checker target.',
+        },
+      },
+    },
+    'custom-invented-panel': {
+      promise: 'Pattern with invented producer target in panel.',
+      loop: 'panel',
+      defaults: {
+        seats: [
+          { seat: 'member-1', role: 'producer' },
+          { seat: 'synthesizer', role: 'synthesizer' },
+        ],
+        roleTasks: {
+          producer: 'Invalid producer target in panel.',
+        },
+      },
+    },
+    'custom-invented-debate': {
+      promise: 'Pattern with invented producer target in debate.',
+      loop: 'debate',
+      defaults: {
+        seats: [
+          { seat: 'side-a', role: 'producer' },
+          { seat: 'side-b', role: 'producer' },
+          { seat: 'judge', role: 'judge' },
+        ],
+        roleTasks: {
+          producer: 'Invalid producer target in debate.',
+        },
+      },
+    },
+  };
+  const resInvented = checkCatalog({ shipped, effective: effectiveInvented });
+  assert.equal(resInvented.problems.length, 3);
+  assert.ok(resInvented.problems.every((p) => p.code === 'param-invalid' && /does not exist for loop/.test(p.message)));
 });
