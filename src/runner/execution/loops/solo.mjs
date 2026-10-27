@@ -21,6 +21,7 @@ export const PARAMS = Object.freeze({
     requestable: true,
   }),
 });
+export const VERIFY = true;
 
 /**
  * Run solo pattern for a unit.

@@ -4,9 +4,11 @@
 // seat runner that only calls bind().
 
 import { bind } from './bind.mjs';
-import { runPattern } from './loops/index.mjs';
+import { runLoop } from './loops/index.mjs';
 import { createSeatLedger } from './seat-ledger.mjs';
 import { workflowTierOf } from './seat-resolver.mjs';
+import { resolveCollaboration } from './patterns/catalog.mjs';
+import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
 
 /**
  * Bind every seat a unit's pattern would dispatch, in the order the pattern dispatches them,
@@ -22,7 +24,7 @@ import { workflowTierOf } from './seat-resolver.mjs';
  * @param {string} [options.workflowId] The workflow the unit belongs to, to name where a seat's recommended tier was declared.
  * @returns {Promise<{ outcome: string, seats: Array<{ seat: string, role: string, executor?: string, invocation?: string|null, tier?: string, loweredFrom?: { from: string, fromSource: string, reason: string }, account?: { provider: string, id: string }, sharesFamilyWith?: string[], refused?: { reason: string, detail: string } }> }>}
  */
-export async function simulateUnitBindings(unit, runnerConfig, { session = {}, overrides = [], raiseAuthorized = false, workflowId } = {}) {
+export async function simulateUnitBindings(unit, runnerConfig, { session = {}, overrides = [], raiseAuthorized = false, workflowId, collaboration } = {}) {
   const ledger = createSeatLedger();
   const seats = [];
   const runRole = async ({ seat, unit: seatUnit, independentOf = [], preferIndependentOf = [], batch }) => {
@@ -64,6 +66,17 @@ export async function simulateUnitBindings(unit, runnerConfig, { session = {}, o
       ? { outcome: 'policy-refusal', seat: seat.seat, role: seat.role, refused: record.refused }
       : { outcome: 'pass', seat: seat.seat, role: seat.role };
   };
-  const result = await runPattern(unit.pattern || 'solo', unit, runnerConfig, { runRole });
+  const normalizedRunnerConfig = runnerConfig?.runner ? runnerConfig : { runner: runnerConfig, ...runnerConfig };
+  const effectiveCollaboration = collaboration ?? resolveCollaboration({
+    unit,
+    selectors: {
+      callerObject: typeof unit?.pattern === 'object' && unit?.pattern !== null ? unit.pattern : null,
+      callerString: typeof unit?.pattern === 'string' ? unit.pattern : null,
+    },
+    runnerConfig: normalizedRunnerConfig,
+    shipped: shippedCatalog(),
+  });
+  const effective = effectiveCollaboration.pin?.effective ?? effectiveCollaboration.effective ?? effectiveCollaboration;
+  const result = await runLoop(effective, unit, runnerConfig, { runRole });
   return { outcome: result.outcome, seats };
 }

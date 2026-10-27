@@ -1813,6 +1813,55 @@ test('a solo run needs no verify and does not claim to have skipped one', async 
   assert.equal(res.verify, undefined);
 });
 
+test('conflicting explicit pattern selectors refuse selector-conflict before admission and reserve nothing', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  const unitData = { id: 'u-conflict', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'reviewed' };
+  await assert.rejects(
+    runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo' }),
+    (err) => err instanceof RunnerConfigError && err.code === 'selector-conflict',
+  );
+  assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'assignments')), false);
+});
+
+test('unit-explicit verify on panel or debate refuses before admission', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  await assert.rejects(
+    runUnit({
+      unitData: { id: 'u-panel-verify', objective: 'Panel with verify', capability: 'docs:write', writes: [], pattern: 'panel', verify: 'npm test', seats: panelSeats(3) },
+      repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'panel',
+    }),
+    (err) => err instanceof RunnerConfigError && err.code === 'verify-command-unsupported',
+  );
+  await assert.rejects(
+    runUnit({
+      unitData: { id: 'u-panel-opt-verify', objective: 'Panel with verify flag', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3) },
+      verify: 'npm test',
+      repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'panel',
+    }),
+    (err) => err instanceof RunnerConfigError && err.code === 'verify-command-unsupported',
+  );
+  assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'assignments')), false);
+});
+
+test('capability-level verify on panel is neither run nor refused', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
+  const cfg = readProjectConfig(repoRoot);
+  cfg.runner.capabilities['docs:write'].verify = 'node -e "process.exit(0)"';
+  writeProjectConfig(repoRoot, cfg);
+
+  const res = await runUnit({
+    unitData: { id: 'u-panel-cap-verify', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3) },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern: 'panel',
+  });
+  assert.equal(res.outcome, 'pass');
+  assert.equal(res.verify?.ran, false);
+  assert.equal(res.results.some((r) => r.seat === 'verify'), false);
+});
+
 // A signal handled the way the CLI does it, with a stand-in exit so the test process survives.
 async function withCancelHandlers(fn) {
   const exits = [];

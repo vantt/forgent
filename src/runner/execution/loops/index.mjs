@@ -3,10 +3,10 @@
  * Dispatches units to collaboration pattern loops: solo, reviewed, panel, debate.
  */
 
-import { runSolo, PARAMS as SOLO_PARAMS } from './solo.mjs';
-import { runReviewed, PARAMS as REVIEWED_PARAMS } from './reviewed.mjs';
-import { runPanel, PARAMS as PANEL_PARAMS } from './panel.mjs';
-import { runDebate, PARAMS as DEBATE_PARAMS } from './debate.mjs';
+import { runSolo, PARAMS as SOLO_PARAMS, VERIFY as SOLO_VERIFY } from './solo.mjs';
+import { runReviewed, PARAMS as REVIEWED_PARAMS, VERIFY as REVIEWED_VERIFY } from './reviewed.mjs';
+import { runPanel, PARAMS as PANEL_PARAMS, VERIFY as PANEL_VERIFY } from './panel.mjs';
+import { runDebate, PARAMS as DEBATE_PARAMS, VERIFY as DEBATE_VERIFY } from './debate.mjs';
 import { resolvePattern, PRESETS } from '../patterns/presets.mjs';
 
 export { runSolo } from './solo.mjs';
@@ -23,6 +23,24 @@ const PARAM_TABLES = Object.freeze(Object.assign(Object.create(null), {
   panel: PANEL_PARAMS,
   debate: DEBATE_PARAMS,
 }));
+export const VERIFY_CAPABILITY = Object.freeze(Object.assign(Object.create(null), {
+  solo: SOLO_VERIFY,
+  reviewed: REVIEWED_VERIFY,
+  panel: PANEL_VERIFY,
+  debate: DEBATE_VERIFY,
+}));
+
+/**
+ * Returns true if the loop executes verification.
+ *
+ * @param {string|object} loop - Loop name or effective object.
+ * @returns {boolean}
+ */
+export function loopRunsVerify(loop) {
+  const name = typeof loop === 'string' ? loop : (loop?.loop ?? loop?.pattern ?? loop?.patternName);
+  if (typeof name !== 'string') return false;
+  return Boolean(VERIFY_CAPABILITY[name]);
+}
 
 /**
  * Returns the param table for a given loop name, or null if unknown.
@@ -46,19 +64,19 @@ export const VALID_OUTCOMES = Object.freeze([
 ]);
 
 /**
- * Run a collaboration pattern for a unit.
+ * Run a collaboration loop for a unit.
  *
- * @param {string|object} nameOrPreset - Pattern name ('solo', 'reviewed', 'panel', 'debate') or preset name/object.
+ * @param {string|object} effective - Effective loop name ('solo', 'reviewed', 'panel', 'debate') or effective object with loop and params.
  * @param {object} unit - The unit data contract.
  * @param {object} cfg - Runner configuration snapshot.
  * @param {object} hooks - Injected execution hooks { runRole, verify, history }.
  * @returns {Promise<{ outcome: string, rounds?: number, results: Array<object>, findings?: Array<string> }>}
  */
-export async function runPattern(nameOrPreset, unit, cfg, hooks = {}) {
-  const patternInput = nameOrPreset || unit?.pattern || 'solo';
-  const { patternName, params } = resolvePattern(patternInput);
+export async function runLoop(effective, unit, cfg, hooks = {}) {
+  const loop = typeof effective === 'string' ? effective : (effective?.loop ?? effective?.pattern ?? effective?.patternName);
+  const params = typeof effective === 'object' && effective !== null ? (effective.params ?? {}) : {};
 
-  switch (patternName) {
+  switch (loop) {
     case 'solo':
       return await runSolo(unit, cfg, hooks, params);
     case 'reviewed':
@@ -68,6 +86,6 @@ export async function runPattern(nameOrPreset, unit, cfg, hooks = {}) {
     case 'debate':
       return await runDebate(unit, cfg, hooks, params);
     default:
-      throw new Error(`Unknown collaboration pattern: "${patternName}"`);
+      throw new Error(`Unknown collaboration loop: "${loop}"`);
   }
 }

@@ -16,7 +16,6 @@
 
 import { assertSeatId } from '../../convention/seat-id.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
-import { resolvePattern } from './patterns/presets.mjs';
 
 export const SEAT_ROLES = Object.freeze(['producer', 'synthesizer', 'reviewer', 'red-team', 'judge']);
 export const LOOP_NAMES = Object.freeze(['solo', 'reviewed', 'panel', 'debate']);
@@ -255,10 +254,10 @@ export function checkDeclaredSeats(raw, label = 'seats', { tiers } = {}) {
   });
 }
 
-/** The seats a unit or its pattern params declare; the unit's own win. Null when none are declared. */
+/** The seats a unit's pattern params declare. Null when none are declared. */
 function declaredSeatsOf(unit, params) {
-  const raw = params?.seats ?? unit?.seats;
-  return raw === undefined ? null : checkDeclaredSeats(raw, params?.seats !== undefined ? 'params.seats' : 'unit.seats');
+  const raw = params?.seats;
+  return raw === undefined ? null : checkDeclaredSeats(raw, 'params.seats');
 }
 
 const withDeclared = (declared, base) => Object.freeze({ ...base, ...(declared.persona ? { persona: declared.persona } : {}), ...(declared.tier ? { tier: declared.tier } : {}) });
@@ -297,11 +296,15 @@ function requireRoles(patternName, declared, expected) {
  */
 export function resolveSeats(options = {}) {
   let { loop, pattern, params, floors, unit, runnerConfig } = options;
-  let patternName = loop;
-  if (!patternName) {
-    const resolved = resolvePattern(pattern);
-    patternName = resolved.patternName;
-    params = params ?? resolved.params;
+  let patternName = loop ?? (typeof pattern === 'string' ? pattern : (pattern?.pattern ?? pattern?.patternName)) ?? 'solo';
+  if (patternName === 'research-fan-out') {
+    patternName = 'panel';
+    params = params ?? { seats: [{ seat: 'member-1', role: 'producer' }, { seat: 'member-2', role: 'producer' }, { seat: 'member-3', role: 'producer' }, { seat: 'synthesizer', role: 'synthesizer' }] };
+  }
+  const rawParams = params ?? (typeof pattern === 'object' && pattern !== null ? pattern.params : undefined);
+  params = rawParams === undefined || rawParams === null ? {} : { ...rawParams };
+  if (params.seats === undefined && unit?.seats !== undefined) {
+    params.seats = unit.seats;
   }
   const declared = declaredSeatsOf(unit, params);
   const readOnly = noWrites(unit);
@@ -389,12 +392,11 @@ export function resolveSeats(options = {}) {
  */
 export function seatLaunchesOf(options = {}) {
   let { loop, pattern, params, floors, unit, runnerConfig } = options;
-  let patternName = loop;
-  if (!patternName) {
-    const resolved = resolvePattern(pattern);
-    patternName = resolved.patternName;
-    params = params ?? resolved.params;
+  let patternName = loop ?? (typeof pattern === 'string' ? pattern : (pattern?.pattern ?? pattern?.patternName)) ?? 'solo';
+  if (patternName === 'research-fan-out') {
+    return 4;
   }
+  params = params ?? (typeof pattern === 'object' && pattern !== null ? pattern.params : undefined);
   if (!LOOP_NAMES.includes(patternName)) return null;
   const seats = resolveSeats({ loop: patternName, params, floors, unit, runnerConfig, slot: options.slot });
   switch (patternName) {

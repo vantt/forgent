@@ -292,3 +292,22 @@ test('the doctor, --seats and the runner start the same unit from a template', a
   assert.equal(unit.blind, true);
   assert.deepEqual(unit.prefer, ['alpha']);
 });
+
+test('dry bind accepts pre-resolved collaboration and binds project-declared pattern', async () => {
+  const config = runnerConfig({ 'fixture:draft': prefer('alpha') });
+  config.runner = {
+    ...config,
+    patterns: {
+      'custom-solo': {
+        promise: 'single worker draft',
+        loop: 'solo',
+      },
+    },
+  };
+  const unit = { id: 'u-custom', capability: 'fixture:draft', pattern: 'custom-solo', writes: [] };
+  const { outcome, seats: roles } = await simulateUnitBindings(unit, config);
+  assert.equal(outcome, 'pass');
+  assert.equal(roles.length, 1);
+  assert.equal(roles[0].seat, 'producer');
+  assert.equal(roles[0].executor, 'alpha');
+});

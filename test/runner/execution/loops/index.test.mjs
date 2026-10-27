@@ -2,11 +2,13 @@ import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  runPattern,
+  runLoop,
   paramTableOf,
   DEFAULT_MAX_ROUNDS,
   DEFAULT_REBUTTAL,
   VALID_OUTCOMES,
+  loopRunsVerify,
+  VERIFY_CAPABILITY,
 } from '../../../../src/runner/execution/loops/index.mjs';
 
 const PANEL_SEATS = [
@@ -16,28 +18,28 @@ const PANEL_SEATS = [
   { seat: 'synthesis', role: 'synthesizer' },
 ];
 
-test('runPattern dispatches solo pattern by default or name', async () => {
+test('runLoop dispatches solo loop by default or name', async () => {
   const calls = [];
   const runRole = async (opts) => {
     calls.push(opts);
     return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
   };
 
-  const res = await runPattern('solo', { id: 'u-1', objective: 'Solo task' }, {}, { runRole });
+  const res = await runLoop('solo', { id: 'u-1', objective: 'Solo task' }, {}, { runRole });
   assert.equal(res.outcome, 'pass');
   assert.equal(calls.length, 1);
   assert.equal(calls[0].seat.seat, 'producer');
 });
 
-test('runPattern dispatches reviewed pattern with parameters', async () => {
+test('runLoop dispatches reviewed loop with parameters', async () => {
   const calls = [];
   const runRole = async (opts) => {
     calls.push(opts);
     return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
   };
 
-  const res = await runPattern(
-    'reviewed',
+  const res = await runLoop(
+    { loop: 'reviewed', params: { minCheckers: ['reviewer', 'red-team'] } },
     { id: 'u-2', objective: 'Reviewed task', capability: 'code:implement' },
     {},
     { runRole },
@@ -49,48 +51,27 @@ test('runPattern dispatches reviewed pattern with parameters', async () => {
   assert.ok(calls.some((c) => c.seat.seat === 'red-team'));
 });
 
-test('runPattern dispatches panel pattern', async () => {
+test('runLoop dispatches panel loop with seats', async () => {
   const calls = [];
   const runRole = async (opts) => {
     calls.push(opts);
     return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
   };
 
-  const res = await runPattern('panel', { id: 'u-3', objective: 'Panel task', seats: PANEL_SEATS }, {}, { runRole });
+  const res = await runLoop({ loop: 'panel' }, { id: 'u-3', objective: 'Panel task', seats: PANEL_SEATS }, {}, { runRole });
   assert.equal(res.outcome, 'pass');
   assert.equal(calls.length, 4); // 3 members + 1 synthesizer
 });
 
-test('runPattern dispatches named preset "code-change"', async () => {
-  const calls = [];
-  const runRole = async (opts) => {
-    calls.push(opts);
-    return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
-  };
-  const verify = async () => ({ pass: true });
-
-  const res = await runPattern(
-    'code-change',
-    { id: 'u-4', objective: 'Change code' },
-    {},
-    { runRole, verify },
-  );
-
-  assert.equal(res.outcome, 'pass');
-  assert.ok(calls.some((c) => c.seat.seat === 'producer'));
-  assert.ok(calls.some((c) => c.seat.seat === 'reviewer'));
-  assert.ok(calls.some((c) => c.seat.seat === 'red-team'));
-});
-
-test('runPattern dispatches named preset "consult" with its advisor seat', async () => {
+test('runLoop dispatches effective parameters and custom seats', async () => {
   const calls = [];
   const runRole = async (opts) => {
     calls.push(opts);
     return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
   };
 
-  const res = await runPattern(
-    'consult',
+  const res = await runLoop(
+    { loop: 'solo', params: { seats: [{ seat: 'advisor', role: 'producer' }] } },
     { id: 'u-consult', objective: 'Consult' },
     {},
     { runRole },
@@ -102,74 +83,28 @@ test('runPattern dispatches named preset "consult" with its advisor seat', async
   assert.equal(calls[0].seat.role, 'producer');
 });
 
-test('runPattern dispatches named preset "research-fan-out" with researcher seats', async () => {
-  const calls = [];
-  const runRole = async (opts) => {
-    calls.push(opts);
-    return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
-  };
-
-  const res = await runPattern(
-    'research-fan-out',
-    { id: 'u-research', objective: 'Research' },
-    {},
-    { runRole },
-  );
-
-  assert.equal(res.outcome, 'pass');
-  assert.equal(calls.length, 4);
-  assert.equal(calls[0].seat.seat, 'researcher-1');
-  assert.equal(calls[1].seat.seat, 'researcher-2');
-  assert.equal(calls[2].seat.seat, 'researcher-3');
-  assert.equal(calls[3].seat.seat, 'synthesizer');
-});
-
-test('runPattern dispatches named preset "rfc" with reviewer and red-team checkers', async () => {
-  const calls = [];
-  const runRole = async (opts) => {
-    calls.push(opts);
-    return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
-  };
-
-  const res = await runPattern(
-    'rfc',
-    { id: 'u-rfc', objective: 'RFC review', capability: 'docs:write' },
-    {},
-    { runRole },
-  );
-
-  assert.equal(res.outcome, 'pass');
-  assert.equal(res.rounds, 1);
-  assert.ok(calls.some((c) => c.seat.seat === 'producer'));
-  assert.ok(calls.some((c) => c.seat.seat === 'reviewer'));
-  assert.ok(calls.some((c) => c.seat.seat === 'red-team'));
-});
-
-test('runPattern uses unit.pattern when nameOrPreset is omitted', async () => {
-  const calls = [];
-  const runRole = async (opts) => {
-    calls.push(opts);
-    return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
-  };
-
-  const res = await runPattern(
-    null,
-    { id: 'u-5', objective: 'From unit pattern', pattern: 'panel', seats: PANEL_SEATS },
-    {},
-    { runRole },
-  );
-
-  assert.equal(res.outcome, 'pass');
-  assert.equal(calls.length, 4);
-});
-
-test('runPattern rejects unknown pattern names', async () => {
+test('runLoop rejects unknown loop names', async () => {
   await assert.rejects(
     async () => {
-      await runPattern('non-existent-pattern', { id: 'u-6' }, {}, {});
+      await runLoop('non-existent-loop', { id: 'u-6' }, {}, {});
     },
-    /Unknown collaboration pattern: "non-existent-pattern"/,
+    /Unknown collaboration loop: "non-existent-loop"/,
   );
+});
+
+test('loopRunsVerify reports verify capability per loop kind', () => {
+  assert.equal(VERIFY_CAPABILITY.solo, true);
+  assert.equal(VERIFY_CAPABILITY.reviewed, true);
+  assert.equal(VERIFY_CAPABILITY.panel, false);
+  assert.equal(VERIFY_CAPABILITY.debate, false);
+
+  assert.equal(loopRunsVerify('solo'), true);
+  assert.equal(loopRunsVerify('reviewed'), true);
+  assert.equal(loopRunsVerify('panel'), false);
+  assert.equal(loopRunsVerify('debate'), false);
+  assert.equal(loopRunsVerify({ loop: 'solo' }), true);
+  assert.equal(loopRunsVerify({ loop: 'panel' }), false);
+  assert.equal(loopRunsVerify('unknown'), false);
 });
 
 test('VALID_OUTCOMES strictly contains allowed outcomes', () => {

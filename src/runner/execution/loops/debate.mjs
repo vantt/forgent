@@ -53,6 +53,7 @@ export const PARAMS = Object.freeze({
     requestable: true,
   }),
 });
+export const VERIFY = false;
 
 // The task each side is given, by its position in the declared order.
 const SIDE_KINDS = Object.freeze(['thesis', 'antithesis']);

@@ -19,11 +19,13 @@ import { assertPinnedAccountsUsable, runnerConfigForBinding } from './account-pi
 import { simulateUnitBindings } from './dry-bind.mjs';
 import { worktreeSnapshot, writesSince } from './partial-writes.mjs';
 import { createSeatLedger } from './seat-ledger.mjs';
-import { resolveSeats, assertNoSeatTier, effectiveRigorOf, workflowTierOf } from './seat-resolver.mjs';
+import { resolveSeats, assertNoSeatTier, effectiveRigorOf, workflowTierOf, SeatResolutionError } from './seat-resolver.mjs';
 import { isSeatRecord } from './legacy-seat-read.mjs';
 import { assertSeatId } from '../../convention/seat-id.mjs';
-import { runPattern } from './loops/index.mjs';
-import { resolvePattern } from './patterns/presets.mjs';
+import { runLoop, loopRunsVerify } from './loops/index.mjs';
+import { resolveCollaboration, CollaborationError } from './patterns/catalog.mjs';
+import { shippedCatalog, catalogLayersOf } from '../dispatch/shipped-catalog.mjs';
+import { canonicalJson } from '../../native/door.mjs';
 import { ERROR_OUTCOMES, verifyCommandOf } from './loops/reviewed.mjs';
 import { runCommand } from '../goal-check.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
@@ -286,7 +288,7 @@ function admissionIdentityFor(attempt, { unitRunId, assignmentId, worktree, assi
  * with the unit's write scope, and the unit runs `solo` (one assignment for one operation).
  * Returns the operation fields every producer assignment of the unit carries.
  */
-function declaredOperationOf(declared, unit, patternName, { taskSpecRoot } = {}) {
+function declaredOperationOf(declared, unit, loop, { taskSpecRoot } = {}) {
   if (!declared || typeof declared !== 'object') throw new RunnerConfigError('runUnit: declared must be an object');
   for (const key of ['workId', 'domain', 'stage', 'operation']) {
     if (typeof declared[key] !== 'string' || !declared[key].trim()) {
@@ -311,10 +313,8 @@ function declaredOperationOf(declared, unit, patternName, { taskSpecRoot } = {})
   if ((fields.mutation === 'read-only') !== unitReadOnly) {
     throw new RunnerConfigError(`runUnit: operation "${declared.operation}" is ${fields.mutation} but the unit ${unitReadOnly ? 'writes nothing' : 'declares writes'}`);
   }
-  // Through the same resolver the run uses, so a preset or an object form cannot slip past.
-  const { patternName: resolved } = resolvePattern(patternName);
-  if (resolved !== 'solo') {
-    throw new RunnerConfigError(`runUnit: a unit carrying operation "${declared.operation}" runs solo, not "${resolved}"`);
+  if (loop !== 'solo') {
+    throw new RunnerConfigError(`runUnit: a unit carrying operation "${declared.operation}" runs solo, not "${loop}"`);
   }
   return fields;
 }
@@ -359,15 +359,6 @@ function preflightRefusal(tag, round, { foreignMerge, foreignStaged }) {
   return foreignStaged.length > 0 ? foreignIndexRefusal(tag, round, foreignStaged) : null;
 }
 
-/**
- * The pattern a fresh run uses: an object form a caller passes wins over the unit's own, then the
- * caller's name, else solo. One computation for the declared-operation check, the pin check, the
- * admission ceiling and the run itself; a resume reads the one its unit.json recorded instead.
- */
-function chosenPattern(options, unit) {
-  const callerPattern = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
-  return callerPattern || unit.pattern || options.pattern || 'solo';
-}
 
 const portMissing = () => new RunnerConfigError(
   'runUnit: a Unit that writes (or names a case) needs the case admission port in options.caseAdmission; none was given',
@@ -417,16 +408,15 @@ async function assertDoorChoicesBeforeRun(unit, runnerConfig, options) {
     );
   }
   const pinsAccount = objects.some((o) => o.account !== undefined);
-  const mayRaise = objects.some((o) => o.tier !== undefined) || objects.some((o) => o.persona !== undefined);
-  if (!pinsAccount && !mayRaise) return;
   const { seats } = await simulateUnitBindings(
-    { ...unit, pattern: chosenPattern(options, unit) },
+    unit,
     runnerConfig,
     {
       session: { herdrPresent: options.session?.herdrPresent ?? detectHerdrPresent(), ...(options.session ?? {}) },
       overrides,
       raiseAuthorized: options.raiseAuthorized === true,
       workflowId: options.workflowId,
+      collaboration: options.collaboration,
     },
   );
   const unauthorized = seats.find((r) => r.refused?.reason === 'tier-escalation-unauthorized');
@@ -662,7 +652,7 @@ async function runUnitBody(options, scope) {
       runtimeDir: options.providerCapacityRuntimeDir,
       what: `cannot resume unit run "${unitRunId}"`,
     });
-    if (unitRecord.declared) declaredOp = declaredOperationOf(unitRecord.declared, unit, unitRecord.pattern);
+    if (unitRecord.declared) declaredOp = declaredOperationOf(unitRecord.declared, unit, unitRecord.collaboration?.effective?.loop ?? unitRecord.pattern);
   } else {
     if (options.declared === undefined && options.pinInputs !== undefined) {
       throw new RunnerConfigError('runUnit: pinInputs needs declared');
@@ -693,10 +683,54 @@ async function runUnitBody(options, scope) {
     if (!options.unitData) assertNoSeatTier(raw?.seats, 'a unit file');
     unit = validateUnit(options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.stanceOptions });
     assertRepositoryForWrites(roots, cwd, { writes: unit.writes.length > 0 || Boolean(unit.syncBase) });
+
+    const callerObject = typeof options.pattern === 'object' && options.pattern !== null
+      ? (options.pattern.patternName && !options.pattern.pattern
+        ? { ...options.pattern, pattern: options.pattern.patternName }
+        : options.pattern)
+      : null;
+    const callerString = typeof options.pattern === 'string' && options.pattern ? options.pattern : null;
+
+    let collaboration;
+    try {
+      collaboration = resolveCollaboration({
+        unit,
+        selectors: {
+          callerObject,
+          callerString,
+          activityUnit: options.activityUnit,
+        },
+        request: options.request ?? null,
+        inCase: Boolean(caseRef),
+        reason: caseRef?.reason ?? options.reason ?? null,
+        runnerConfig: liveConfig(),
+        shipped: shippedCatalog(),
+        layers: options.runnerConfig ? null : catalogLayersOf(mainRoot),
+      });
+    } catch (err) {
+      if (err instanceof CollaborationError || err instanceof SeatResolutionError) {
+        throw new RunnerConfigError(err.message, { code: err.code, phase: 'pre-admission' });
+      }
+      throw err;
+    }
+
+    const effective = collaboration.pin.effective;
+
+    const hasUnitExplicitVerify = Boolean(
+      (typeof options.verify === 'string' && options.verify.trim()) ||
+      (typeof unit.verify === 'string' && unit.verify.trim())
+    );
+    if (!loopRunsVerify(effective.loop) && hasUnitExplicitVerify) {
+      throw new RunnerConfigError(
+        `runUnit: loop "${effective.loop}" has no verify checkpoint; pass no --verify or set no unit.verify, or use a loop that verifies (solo, reviewed)`,
+        { code: 'verify-command-unsupported', phase: 'pre-admission' },
+      );
+    }
+
     // Checked before the unit directory exists: an operation the step does not allow leaves nothing
     // behind. The pattern checked is the one the run will use (see patternName below).
     if (options.declared !== undefined) {
-      declaredOp = declaredOperationOf(options.declared, unit, chosenPattern(options, unit), { taskSpecRoot: mainRoot });
+      declaredOp = declaredOperationOf(options.declared, unit, effective.loop, { taskSpecRoot: mainRoot });
     }
     // Policy wins before seedSync or preflight can touch a native Git port or borrow custody.
     if (unit.writes.length > 0 && resolveMutatingCwdPosture(worktreePath).reason === 'main-checkout') {
@@ -709,13 +743,10 @@ async function runUnitBody(options, scope) {
       if (ov && typeof ov === 'object' && ov.timeoutMs !== undefined) assertRunTimeoutMs(ov.timeoutMs, 'override timeoutMs');
     }
     const configSnapshot = snapshotRunnerConfig(mainRoot, liveConfig());
-    // The seats the pattern fills, resolved once before anything exists: an undeclared or invalid seat
-    // list refuses the run here, and the record keeps the list so a resume never recomputes it.
-    const resolvedPattern = resolvePattern(chosenPattern(options, unit));
-    const seats = resolveSeats({ loop: resolvedPattern.patternName, params: resolvedPattern.params, unit, runnerConfig: configSnapshot.runner });
+    const seats = collaboration.seats;
     // A pinned account is checked before the unit run exists: every seat it applies to must bind an
     // executor whose provider lists it, and it must not be quarantined now.
-    await assertDoorChoicesBeforeRun(unit, withAccounts(configSnapshot.runner), options);
+    await assertDoorChoicesBeforeRun(unit, withAccounts(configSnapshot.runner), options, collaboration);
     // A sync ref is resolved to its commit once, before the run exists; a resume merges that commit.
     const sync = seedSync(unit, { worktree: worktreePath, mainRoot });
     const writing = unit.writes.length > 0 || Boolean(sync);
@@ -726,22 +757,25 @@ async function runUnitBody(options, scope) {
     const unitRunIdAtAdmission = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     if (writing && !caseRef) requireFreeWorktree(port, worktreePath);
     if (caseRef) {
-      const pattern = chosenPattern(options, unit);
-      const { patternName: loop, params } = resolvePattern(pattern);
+      const loop = effective.loop;
       const admitted = port.admit({
         unitRunId: unitRunIdAtAdmission,
-        caseRef,
+        caseRef: {
+          ...caseRef,
+          ...(caseRef.reason ?? (options.reason ? { reason: options.reason } : {})),
+        },
         activity: caseRef.activity,
         writes: unit.writes,
         worktree: fs.realpathSync(worktreePath),
         readOnly: !writing,
         pattern: loop,
-        seatLaunches: seatLaunchesOf({ loop, params, unit, runnerConfig: configSnapshot.runner }),
+        seatLaunches: collaboration.launchBound,
         blind: unit.blind === true,
         handoffRefs: unit.inputs,
         // The rigor the unit runs at (its own or its capability's, the stronger), so the frame's floor is
         // judged against what the seats will actually bind at.
         rigor: effectiveRigorOf(unit, configSnapshot.runner),
+        reason: caseRef.reason ?? options.reason ?? null,
       });
       if (admitted.refused) throw new CaseAdmissionRefusedError(admitted.refused);
       scope.admission = { port, caseId: admitted.caseId, reservationId: admitted.reservationId, unitRunId: unitRunIdAtAdmission, started: false, settled: false };
@@ -780,10 +814,14 @@ async function runUnitBody(options, scope) {
       unit,
       seatSchema: 1,
       seats,
-      ...(typeof options.workflowId === 'string' && options.workflowId ? { workflowId: options.workflowId } : {}),
-      workflow: scope.admission ? normalizeWorkflowLink({ caseId: scope.admission.caseId, activity: caseRef.activity, reservationId: scope.admission.reservationId }) : null,
-      ...(admittedCeiling !== null ? { seatLaunchCeiling: admittedCeiling } : {}),
-      pattern: options.pattern ?? unit.pattern ?? 'solo',
+      collaboration: {
+        ...collaboration.pin,
+        pattern: {
+          ...collaboration.pin.pattern,
+          digest: crypto.createHash('sha256').update(canonicalJson(collaboration.entry)).digest('hex'),
+        },
+      },
+      pattern: collaboration.pin.pattern.name,
       overrides: options.overrides || [],
       configSnapshot,
       // The scope this run may write, widened once to the render targets of generated sources it
@@ -1443,13 +1481,8 @@ async function runUnitBody(options, scope) {
     };
   };
 
-  // A caller that passes `{ pattern, params }` is choosing the pattern's params as well as its
-  // name, so that object form wins over the unit's own pattern string.
-  // A resume runs the pattern its unit.json recorded, never one its caller names now.
-  const patternName = options.resumeUnitRunId && unitRecord.pattern
-    ? unitRecord.pattern
-    : chosenPattern(options, unit);
-  unitRecord.pattern = patternName;
+  const effective = unitRecord.collaboration?.effective
+    ?? { loop: unitRecord.pattern ?? 'solo', params: {} };
   persistUnitRecord();
 
   // A unit with a syncBase merges it before any seat runs. A refusal, or a sync-only unit whose
@@ -1464,7 +1497,7 @@ async function runUnitBody(options, scope) {
     }
   }
 
-  const patternResult = await runPattern(patternName, unit, unitRecord.configSnapshot.runner, {
+  const patternResult = await runLoop(effective, unit, unitRecord.configSnapshot.runner, {
     runRole,
     verify,
     history,
@@ -1479,7 +1512,11 @@ async function runUnitBody(options, scope) {
   settle(patternResult.outcome);
 
   // A reviewed run with nothing to verify says so: a pass without a verify is not a verified pass.
-  const unverified = resolvePattern(patternName).patternName === 'reviewed' && !verifyCommandOf(unit, unitRecord.configSnapshot.runner);
+  const loop = effective.loop;
+  const loopVerifies = loopRunsVerify(loop);
+  const verifyCmd = verifyCommandOf(unit, unitRecord.configSnapshot.runner);
+  const unverified = (loop === 'reviewed' && !verifyCmd)
+    || (!loopVerifies && Boolean(verifyCmd));
   return {
     unitRunId,
     outcome: patternResult.outcome,

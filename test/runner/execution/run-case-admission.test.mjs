@@ -338,3 +338,116 @@ test('the planned seat launches follow the pattern the run will use', () => {
   assert.throws(() => seatLaunchesOf({ pattern: 'panel', unit, runnerConfig: cfg }), /must declare its seats/);
   assert.equal(seatLaunchesOf({ pattern: 'unheard-of', unit, runnerConfig: cfg }), null);
 });
+
+test('case dispatch with no selector runs activity unit and records baseline source activity', async () => {
+  const { repoRoot, worktreeDir } = setup(['okay']);
+  const port = recordingPort();
+  const res = await runUnit({
+    unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
+    caseAdmission: port,
+    caseRef: { caseId: 'case-test', activity: 'scout' },
+    activityUnit: { pattern: 'solo' },
+    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  });
+  const admitCall = port.calls.find((c) => c[0] === 'admit');
+  assert.ok(admitCall);
+  assert.equal(admitCall[1].pattern, 'solo');
+  const record = unitJson(repoRoot, res.unitRunId);
+  assert.equal(record.collaboration.baseline.source, 'activity');
+  assert.equal(record.pattern, 'solo');
+});
+
+test('solo-shaped seats with no pattern on reviewed activity refuse seat-multiplicity', async () => {
+  const { repoRoot, worktreeDir } = setup(['okay']);
+  const port = recordingPort();
+  await assert.rejects(
+    runUnit({
+      unitData: { ...WRITE_UNIT, writes: [], objective: 'Read', seats: [{ seat: 'producer', role: 'producer' }] },
+      caseAdmission: port,
+      caseRef: { caseId: 'case-test', activity: 'review' },
+      activityUnit: { pattern: 'reviewed' },
+      repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+    }),
+    (err) => err instanceof RunnerConfigError && err.code === 'seat-multiplicity',
+  );
+  assert.equal(port.calls.filter((c) => c[0] === 'admit').length, 0);
+});
+
+test('pattern swap in case requires reason and records swap in pin', async () => {
+  const { repoRoot, worktreeDir } = setup(['okay']);
+  const port = recordingPort();
+
+  // Without reason: refuses before admission
+  await assert.rejects(
+    runUnit({
+      unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
+      pattern: 'solo',
+      caseAdmission: port,
+      caseRef: { caseId: 'case-test', activity: 'review' },
+      activityUnit: { pattern: 'reviewed' },
+      repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+    }),
+    (err) => err instanceof RunnerConfigError && err.code === 'request-reason-required',
+  );
+  assert.equal(port.calls.filter((c) => c[0] === 'admit').length, 0);
+
+  // With reason: runs and pin records swap
+  const res = await runUnit({
+    unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
+    pattern: 'solo',
+    reason: 'docs-only task',
+    caseAdmission: port,
+    caseRef: { caseId: 'case-test', activity: 'review' },
+    activityUnit: { pattern: 'reviewed' },
+    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  });
+  const record = unitJson(repoRoot, res.unitRunId);
+  assert.equal(record.pattern, 'solo');
+  assert.equal(record.collaboration.requested?.pattern, 'solo');
+  assert.equal(record.collaboration.requested?.reason, 'docs-only task');
+  assert.equal(record.collaboration.baseline.source, 'activity');
+});
+
+test('request exceeding seat launches per dispatch ceiling refuses at admission', async () => {
+  const { repoRoot, worktreeDir } = setup(['okay']);
+  const port = recordingPort({
+    admit: (proposal) => {
+      if (proposal.seatLaunches > 4) {
+        return {
+          refused: {
+            code: 'seat-launch-ceiling-exceeded',
+            detail: `proposal demands ${proposal.seatLaunches} seat launches, frame ceiling is 4`,
+          },
+        };
+      }
+      return { admitted: true, reservationId: 'rsv-ok', caseId: 'case-test', seatLaunchCeiling: 4 };
+    },
+  });
+
+  await assert.rejects(
+    runUnit({
+      unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
+      pattern: 'reviewed',
+      request: { params: { maxRounds: 5 } },
+      caseAdmission: port,
+      caseRef: { caseId: 'case-test', activity: 'review' },
+      repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+    }),
+    (err) => err instanceof CaseAdmissionRefusedError && err.refusal.code === 'seat-launch-ceiling-exceeded',
+  );
+});
+
+test('case request reason reaches admission proposal and route event', async () => {
+  const { repoRoot, worktreeDir } = setup(['okay']);
+  const port = recordingPort();
+  await runUnit({
+    unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
+    caseAdmission: port,
+    caseRef: { caseId: 'case-test', activity: 'scout', reason: 'diverging for fast scout' },
+    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  });
+  const admitCall = port.calls.find((c) => c[0] === 'admit');
+  assert.ok(admitCall);
+  assert.equal(admitCall[1].reason, 'diverging for fast scout');
+  assert.equal(admitCall[1].caseRef.reason, 'diverging for fast scout');
+});

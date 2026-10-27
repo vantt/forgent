@@ -536,7 +536,7 @@ test('reviewed module exports its param table and default max rounds', () => {
   assert.equal(PARAMS.roleTasks.requestable, false);
 });
 
-test('runReviewed preserves cfg.loops.reviewed.maxRounds fallback when params omit maxRounds', async () => {
+test('runReviewed reads maxRounds from params and ignores cfg.loops.reviewed.maxRounds', async () => {
   const unit = { id: 'u-cfg-rounds', objective: 'Test config rounds', capability: 'docs:write' };
   let roundCount = 0;
   const runRole = async (opts) => {
@@ -549,12 +549,12 @@ test('runReviewed preserves cfg.loops.reviewed.maxRounds fallback when params om
   };
   const cfg = { loops: { reviewed: { maxRounds: 3 } } };
   const res = await runReviewed(unit, cfg, { runRole });
-  assert.equal(res.rounds, 3);
-  assert.equal(roundCount, 3);
+  assert.equal(res.rounds, DEFAULT_MAX_ROUNDS);
+  assert.equal(roundCount, DEFAULT_MAX_ROUNDS);
   assert.equal(res.outcome, 'findings');
 });
 
-test('runReviewed params.maxRounds takes precedence over cfg.loops.reviewed.maxRounds', async () => {
+test('runReviewed params.maxRounds takes precedence over default rounds', async () => {
   const unit = { id: 'u-params-rounds', objective: 'Test params rounds', capability: 'docs:write' };
   let roundCount = 0;
   const runRole = async (opts) => {

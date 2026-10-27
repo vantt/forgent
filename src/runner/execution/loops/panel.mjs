@@ -37,6 +37,7 @@ export const PARAMS = Object.freeze({
     requestable: false,
   }),
 });
+export const VERIFY = false;
 
 /**
  * Run panel pattern for a unit.
