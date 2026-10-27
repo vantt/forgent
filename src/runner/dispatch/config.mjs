@@ -17,7 +17,7 @@
 // committed (per D2's durability policy) so it is reviewable like any other
 // source file, but that also means it carries the same trust level as code:
 // only apply it from a checkout you already trust.
-import { CHECKER_SEATS, SEAT_ROLES } from '../execution/seat-resolver.mjs';
+import { CHECKER_SEATS, SEAT_ROLES, LOOP_NAMES, checkDeclaredSeats } from '../execution/seat-resolver.mjs';
 import { isSeatId } from '../../convention/seat-id.mjs';
 import { definitionFileName } from '../../convention/definition-names.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
@@ -33,6 +33,7 @@ import { validateProviderAccountInventory } from './provider-capacity.mjs';
 // can validate adapter names without importing transport.mjs (cutting the
 // prior config.mjs <-> transport.mjs import cycle).
 import { EXECUTOR_ADAPTERS } from './adapters.mjs';
+import { assertNoRetiredKeys, checkDoorRefusalsForRetiredKeys } from './retired-config-keys.mjs';
 import { credentialStoreProblem } from './provider-capacity.mjs';
 import {
   BUILTIN_POLICIES,
@@ -202,7 +203,10 @@ export function loadRunnerConfigForDir(dir) {
   try {
     ({ value: { runner }, origins } = readConfig({ projectRoot: dir, sections: ['runner'], origins: ['runner.modelPolicies', 'runner.rigorToTier'] }));
   } catch (err) {
-    if (err instanceof ConfigDoorError) throw new RunnerConfigError(err.message, { code: err.code });
+    if (err instanceof ConfigDoorError) {
+      checkDoorRefusalsForRetiredKeys(err);
+      throw new RunnerConfigError(err.message, { code: err.code });
+    }
     throw err;
   }
   // The facade's objects have no prototype; the runner code and its callers take ordinary objects (a JSON round trip
@@ -235,6 +239,7 @@ export function loadRunnerConfig(configPath) {
     throw new RunnerConfigError(`runner config at "${configPath}" is not valid YAML: ${describeYamlError(err)}`);
   }
 
+  assertNoRetiredKeys(cfg.runner ?? cfg, configPath);
   validateRunnerConfigShape(cfg, configPath);
   normalizeConfigConfinement(cfg);
   return cfg;
@@ -243,9 +248,9 @@ export function loadRunnerConfig(configPath) {
 /** The capability entry keys that choose tier or taste per seat; they exist in the project config only. */
 const SEAT_BINDING_CAPABILITY_KEYS = Object.freeze(['tier', 'maxTier', 'roles', 'personas', 'seats']);
 
-/** The one value of `runner.patterns.seatBinding.schema` this release reads. */
-const SEAT_BINDING_SCHEMA_VERSION = 1;
-
+/** The values of `runner.patterns.seatBinding.schema` this release reads. */
+export const SEAT_BINDING_SCHEMA_VERSION = 2;
+export const READABLE_SEAT_BINDING_SCHEMA_VERSIONS = Object.freeze(new Set([1, 2]));
 /**
  * Shape-check one executor block ({command, args[], adapter?}) — shared by
  * the required global `cfg.executor` and every `executors.<executorId>`
@@ -1255,89 +1260,264 @@ export function validateRunnerPatternsShape(patterns, label) {
   if (!patterns || typeof patterns !== 'object' || Array.isArray(patterns)) {
     throw new RunnerConfigError(`runner config (${label}) must be an object when present.`);
   }
-  const ALLOWED_PATTERNS_KEYS = ['defaultRule', 'reviewed', 'seatBinding'];
-  for (const key of Object.keys(patterns)) {
-    if (!ALLOWED_PATTERNS_KEYS.includes(key)) {
-      throw new RunnerConfigError(`runner config (${label}) contains unknown key "${key}". Allowed keys: ${ALLOWED_PATTERNS_KEYS.join(', ')}.`);
-    }
-  }
-  // The schema marker: a release that does not know this key refuses the whole file (its patterns map is
-  // strict), which is what keeps an older release from binding seats against a config it cannot read.
+
+  // Schema marker
   if (patterns.seatBinding !== undefined) {
     const marker = patterns.seatBinding;
     if (!marker || typeof marker !== 'object' || Array.isArray(marker)) {
       throw new RunnerConfigError(`runner config (${label}.seatBinding) must be an object {schema: ${SEAT_BINDING_SCHEMA_VERSION}}.`);
     }
     for (const key of Object.keys(marker)) {
-      if (key !== 'schema') throw new RunnerConfigError(`runner config (${label}.seatBinding) contains unknown key "${key}". Allowed keys: schema.`);
-    }
-    if (marker.schema !== SEAT_BINDING_SCHEMA_VERSION) {
-      throw new RunnerConfigError(`runner config (${label}.seatBinding.schema) must be ${SEAT_BINDING_SCHEMA_VERSION}, got: ${JSON.stringify(marker.schema)}.`);
-    }
-  }
-  if (patterns.defaultRule !== undefined) {
-    if (!patterns.defaultRule || typeof patterns.defaultRule !== 'object' || Array.isArray(patterns.defaultRule)) {
-      throw new RunnerConfigError(`runner config (${label}.defaultRule) must be an object.`);
-    }
-    const ALLOWED_DEFAULT_RULE_KEYS = ['mutatingMinRigor'];
-    for (const key of Object.keys(patterns.defaultRule)) {
-      if (!ALLOWED_DEFAULT_RULE_KEYS.includes(key)) {
-        throw new RunnerConfigError(`runner config (${label}.defaultRule) contains unknown key "${key}". Allowed keys: ${ALLOWED_DEFAULT_RULE_KEYS.join(', ')}.`);
+      if (key !== 'schema') {
+        throw new RunnerConfigError(`runner config (${label}.seatBinding) contains unknown key "${key}". Allowed keys: schema.`);
       }
     }
-    if (patterns.defaultRule.mutatingMinRigor !== undefined) {
-      if (!RIGOR_VALUES.includes(patterns.defaultRule.mutatingMinRigor)) {
+    if (!READABLE_SEAT_BINDING_SCHEMA_VERSIONS.has(marker.schema)) {
+      throw new RunnerConfigError(
+        `runner config (${label}.seatBinding.schema) must be one of [${Array.from(READABLE_SEAT_BINDING_SCHEMA_VERSIONS).join(', ')}], got: ${JSON.stringify(marker.schema)}.`,
+      );
+    }
+  }
+
+  // Retired keys
+  if (patterns.defaultRule !== undefined) {
+    throw new RunnerConfigError(
+      `runner config (${label}.defaultRule) was retired; delete the key.`,
+      { code: 'config-key-retired' },
+    );
+  }
+  if (patterns['research-fan-out-gated'] !== undefined) {
+    throw new RunnerConfigError(
+      `runner config (${label}.research-fan-out-gated) was retired; use runner.patterns.research-fan-out instead.`,
+      { code: 'config-key-retired' },
+    );
+  }
+
+  const RESERVED_PATTERN_NAMES = new Set(['seatBinding', 'defaultRule']);
+
+  for (const [name, entry] of Object.entries(patterns)) {
+    if (name === 'seatBinding') continue;
+
+    if (name === 'reviewed') {
+      const hasTuning = entry && typeof entry === 'object' && !Array.isArray(entry) && ('maxRounds' in entry || 'checkersByRigor' in entry);
+      const hasCatalog = entry && typeof entry === 'object' && !Array.isArray(entry) && ('loop' in entry || 'defaults' in entry || 'promise' in entry || 'invariants' in entry);
+      if (hasTuning && hasCatalog) {
         throw new RunnerConfigError(
-          `runner config (${label}.defaultRule.mutatingMinRigor) must be one of ${RIGOR_VALUES.join('/')}, got: ${JSON.stringify(patterns.defaultRule.mutatingMinRigor)}.`,
+          `runner config (${label}.reviewed) cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.reviewed.`,
+        );
+      }
+      if (hasTuning && !hasCatalog) {
+        throw new RunnerConfigError(
+          `runner config (${label}.reviewed) was retired; use runner.loops.reviewed instead.`,
+          { code: 'config-key-retired' },
         );
       }
     }
-  }
-  if (patterns.reviewed !== undefined) {
-    if (!patterns.reviewed || typeof patterns.reviewed !== 'object' || Array.isArray(patterns.reviewed)) {
-      throw new RunnerConfigError(`runner config (${label}.reviewed) must be an object.`);
+
+    if (RESERVED_PATTERN_NAMES.has(name)) {
+      throw new RunnerConfigError(`runner config (${label}.${name}) uses reserved name "${name}" as a pattern name.`);
     }
-    const ALLOWED_REVIEWED_KEYS = ['maxRounds', 'checkersByRigor'];
-    for (const key of Object.keys(patterns.reviewed)) {
-      if (!ALLOWED_REVIEWED_KEYS.includes(key)) {
-        throw new RunnerConfigError(`runner config (${label}.reviewed) contains unknown key "${key}". Allowed keys: ${ALLOWED_REVIEWED_KEYS.join(', ')}.`);
+
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      throw new RunnerConfigError(`runner config (${label}.${name}) must be an object.`);
+    }
+
+    const ALLOWED_ENTRY_KEYS = ['promise', 'loop', 'defaults', 'invariants'];
+    for (const key of Object.keys(entry)) {
+      if (!ALLOWED_ENTRY_KEYS.includes(key)) {
+        throw new RunnerConfigError(
+          `runner config (${label}.${name}) contains unknown key "${key}". Allowed keys: ${ALLOWED_ENTRY_KEYS.join(', ')}.`,
+        );
       }
     }
-    if (patterns.reviewed.maxRounds !== undefined) {
-      const maxRounds = patterns.reviewed.maxRounds;
-      if (!Number.isInteger(maxRounds) || maxRounds <= 0) {
-        throw new RunnerConfigError(`runner config (${label}.reviewed.maxRounds) must be a positive integer.`);
+
+    if (entry.promise !== undefined && (typeof entry.promise !== 'string' || !entry.promise.trim())) {
+      throw new RunnerConfigError(`runner config (${label}.${name}.promise) must be a non-empty string when present.`);
+    }
+
+    if (entry.loop !== undefined) {
+      if (!LOOP_NAMES.includes(entry.loop)) {
+        throw new RunnerConfigError(
+          `runner config (${label}.${name}.loop) must be one of ${LOOP_NAMES.join('/')}, got: ${JSON.stringify(entry.loop)}.`,
+        );
       }
     }
-    if (patterns.reviewed.checkersByRigor !== undefined) {
-      const cbr = patterns.reviewed.checkersByRigor;
-      if (!cbr || typeof cbr !== 'object' || Array.isArray(cbr)) {
-        throw new RunnerConfigError(`runner config (${label}.reviewed.checkersByRigor) must be an object.`);
+
+    if (entry.defaults !== undefined) {
+      if (!entry.defaults || typeof entry.defaults !== 'object' || Array.isArray(entry.defaults)) {
+        throw new RunnerConfigError(`runner config (${label}.${name}.defaults) must be an object when present.`);
       }
-      for (const [rigor, checkers] of Object.entries(cbr)) {
-        if (!RIGOR_VALUES.includes(rigor)) {
-          throw new RunnerConfigError(`runner config (${label}.reviewed.checkersByRigor) contains unknown rigor "${rigor}".`);
-        }
-        if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKER_SEATS.has(c))) {
+      const ALLOWED_DEFAULT_KEYS = ['maxRounds', 'minCheckers', 'seats', 'roleTasks', 'rebuttal'];
+      for (const dKey of Object.keys(entry.defaults)) {
+        if (!ALLOWED_DEFAULT_KEYS.includes(dKey)) {
           throw new RunnerConfigError(
-            `runner config (${label}.reviewed.checkersByRigor.${rigor}) must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}].`,
+            `runner config (${label}.${name}.defaults) contains unknown key "${dKey}". Allowed keys: ${ALLOWED_DEFAULT_KEYS.join(', ')}.`,
           );
         }
       }
-      // Monotonic/cumulative check: checkers for stronger rigor MUST be a superset of weaker rigor
-      // standard <= high <= critical (and low <= standard if both present)
-      const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);
-      for (let i = 1; i < orderedRigors.length; i += 1) {
-        const weaker = orderedRigors[i - 1];
-        const stronger = orderedRigors[i];
-        const weakerSet = new Set(cbr[weaker]);
-        const strongerSet = new Set(cbr[stronger]);
-        for (const checker of weakerSet) {
-          if (!strongerSet.has(checker)) {
+      if (entry.defaults.maxRounds !== undefined) {
+        if (!Number.isInteger(entry.defaults.maxRounds) || entry.defaults.maxRounds <= 0) {
+          throw new RunnerConfigError(`runner config (${label}.${name}.defaults.maxRounds) must be a positive integer.`);
+        }
+      }
+      if (entry.defaults.minCheckers !== undefined) {
+        if (!Array.isArray(entry.defaults.minCheckers) || !entry.defaults.minCheckers.every((c) => VALID_CHECKER_SEATS.has(c))) {
+          throw new RunnerConfigError(
+            `runner config (${label}.${name}.defaults.minCheckers) must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}].`,
+          );
+        }
+      }
+      if (entry.defaults.seats !== undefined) {
+        if (!Array.isArray(entry.defaults.seats)) {
+          throw new RunnerConfigError(`runner config (${label}.${name}.defaults.seats) must be an array.`);
+        }
+        try {
+          checkDeclaredSeats(entry.defaults.seats, `${label}.${name}.defaults.seats`);
+        } catch (err) {
+          throw new RunnerConfigError(err.message);
+        }
+      }
+      if (entry.defaults.roleTasks !== undefined) {
+        if (!entry.defaults.roleTasks || typeof entry.defaults.roleTasks !== 'object' || Array.isArray(entry.defaults.roleTasks)) {
+          throw new RunnerConfigError(`runner config (${label}.${name}.defaults.roleTasks) must be an object.`);
+        }
+        for (const [k, v] of Object.entries(entry.defaults.roleTasks)) {
+          if (typeof v !== 'string' || !v.trim()) {
+            throw new RunnerConfigError(`runner config (${label}.${name}.defaults.roleTasks.${k}) must be a non-empty string.`);
+          }
+        }
+      }
+      if (entry.defaults.rebuttal !== undefined && typeof entry.defaults.rebuttal !== 'boolean') {
+        throw new RunnerConfigError(`runner config (${label}.${name}.defaults.rebuttal) must be a boolean.`);
+      }
+    }
+
+    if (entry.invariants !== undefined) {
+      if (!entry.invariants || typeof entry.invariants !== 'object' || Array.isArray(entry.invariants)) {
+        throw new RunnerConfigError(`runner config (${label}.${name}.invariants) must be an object when present.`);
+      }
+      for (const [param, inv] of Object.entries(entry.invariants)) {
+        const invLabel = `${label}.${name}.invariants.${param}`;
+        if (!inv || typeof inv !== 'object' || Array.isArray(inv)) {
+          throw new RunnerConfigError(`runner config (${invLabel}) must be an object.`);
+        }
+        const hasAtLeast = inv.atLeast !== undefined;
+        const hasFixed = inv.fixed !== undefined;
+        if ((hasAtLeast && hasFixed) || (!hasAtLeast && !hasFixed)) {
+          throw new RunnerConfigError(`runner config (${invLabel}) must declare exactly one of "atLeast" or "fixed".`);
+        }
+        const ALLOWED_INV_KEYS = ['atLeast', 'fixed'];
+        for (const k of Object.keys(inv)) {
+          if (!ALLOWED_INV_KEYS.includes(k)) {
+            throw new RunnerConfigError(`runner config (${invLabel}) contains unknown key "${k}". Allowed keys: atLeast, fixed.`);
+          }
+        }
+        if (hasAtLeast) {
+          if (!Array.isArray(inv.atLeast) || !inv.atLeast.every((item) => typeof item === 'string' && item.trim())) {
+            throw new RunnerConfigError(`runner config (${invLabel}.atLeast) must be an array of non-empty strings.`);
+          }
+        }
+      }
+    }
+  }
+}
+
+export function validateRunnerLoopsShape(loops, label) {
+  if (!loops || typeof loops !== 'object' || Array.isArray(loops)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object when present.`);
+  }
+
+  for (const [loopName, loopEntry] of Object.entries(loops)) {
+    if (!LOOP_NAMES.includes(loopName)) {
+      throw new RunnerConfigError(
+        `runner config (${label}) contains unknown loop "${loopName}". Allowed loops: ${LOOP_NAMES.join(', ')}.`,
+      );
+    }
+    if (!loopEntry || typeof loopEntry !== 'object' || Array.isArray(loopEntry)) {
+      throw new RunnerConfigError(`runner config (${label}.${loopName}) must be an object.`);
+    }
+
+    const allowedKeys = loopName === 'reviewed' ? ['maxRounds', 'checkersByRigor', 'bounds'] : ['bounds'];
+    for (const key of Object.keys(loopEntry)) {
+      if (!allowedKeys.includes(key)) {
+        throw new RunnerConfigError(
+          `runner config (${label}.${loopName}) contains unknown key "${key}". Allowed keys: ${allowedKeys.join(', ')}.`,
+        );
+      }
+    }
+
+    if (loopName === 'reviewed') {
+      if (loopEntry.maxRounds !== undefined) {
+        const maxRounds = loopEntry.maxRounds;
+        if (!Number.isInteger(maxRounds) || maxRounds <= 0) {
+          throw new RunnerConfigError(`runner config (${label}.reviewed.maxRounds) must be a positive integer.`);
+        }
+      }
+      if (loopEntry.checkersByRigor !== undefined) {
+        const cbr = loopEntry.checkersByRigor;
+        if (!cbr || typeof cbr !== 'object' || Array.isArray(cbr)) {
+          throw new RunnerConfigError(`runner config (${label}.reviewed.checkersByRigor) must be an object.`);
+        }
+        for (const [rigor, checkers] of Object.entries(cbr)) {
+          if (!RIGOR_VALUES.includes(rigor)) {
+            throw new RunnerConfigError(`runner config (${label}.reviewed.checkersByRigor) contains unknown rigor "${rigor}".`);
+          }
+          if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKER_SEATS.has(c))) {
             throw new RunnerConfigError(
-              `runner config (${label}.reviewed.checkersByRigor) is not cumulative: "${stronger}" does not include checker "${checker}" from weaker rigor "${weaker}".`,
+              `runner config (${label}.reviewed.checkersByRigor.${rigor}) must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}].`,
             );
           }
+        }
+        const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);
+        for (let i = 1; i < orderedRigors.length; i += 1) {
+          const weaker = orderedRigors[i - 1];
+          const stronger = orderedRigors[i];
+          const weakerSet = new Set(cbr[weaker]);
+          const strongerSet = new Set(cbr[stronger]);
+          for (const checker of weakerSet) {
+            if (!strongerSet.has(checker)) {
+              throw new RunnerConfigError(
+                `runner config (${label}.reviewed.checkersByRigor) is not cumulative: "${stronger}" does not include checker "${checker}" from weaker rigor "${weaker}".`,
+              );
+            }
+          }
+        }
+      }
+    }
+
+    if (loopEntry.bounds !== undefined) {
+      const bounds = loopEntry.bounds;
+      if (!bounds || typeof bounds !== 'object' || Array.isArray(bounds)) {
+        throw new RunnerConfigError(`runner config (${label}.${loopName}.bounds) must be an object.`);
+      }
+      const loopReadableParams = loopName === 'reviewed' ? ['maxRounds'] : [];
+      for (const [param, bound] of Object.entries(bounds)) {
+        if (!loopReadableParams.includes(param)) {
+          throw new RunnerConfigError(
+            `runner config (${label}.${loopName}.bounds.${param}) is not a parameter read by the "${loopName}" loop.`,
+          );
+        }
+        if (!bound || typeof bound !== 'object' || Array.isArray(bound)) {
+          throw new RunnerConfigError(`runner config (${label}.${loopName}.bounds.${param}) must be an object {min?, max?}.`);
+        }
+        const ALLOWED_BOUND_KEYS = ['min', 'max'];
+        for (const k of Object.keys(bound)) {
+          if (!ALLOWED_BOUND_KEYS.includes(k)) {
+            throw new RunnerConfigError(
+              `runner config (${label}.${loopName}.bounds.${param}) contains unknown key "${k}". Allowed keys: min, max.`,
+            );
+          }
+        }
+        if (bound.min !== undefined && !Number.isInteger(bound.min)) {
+          throw new RunnerConfigError(`runner config (${label}.${loopName}.bounds.${param}.min) must be an integer.`);
+        }
+        if (bound.max !== undefined && !Number.isInteger(bound.max)) {
+          throw new RunnerConfigError(`runner config (${label}.${loopName}.bounds.${param}.max) must be an integer.`);
+        }
+        if (bound.min !== undefined && bound.max !== undefined && bound.min > bound.max) {
+          throw new RunnerConfigError(
+            `runner config (${label}.${loopName}.bounds.${param}) min (${bound.min}) must be <= max (${bound.max}).`,
+          );
         }
       }
     }
@@ -1619,6 +1799,9 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   }
   if (cfg.patterns !== undefined) {
     validateRunnerPatternsShape(cfg.patterns, `${sourceLabel} patterns`);
+  }
+  if (cfg.loops !== undefined) {
+    validateRunnerLoopsShape(cfg.loops, `${sourceLabel} loops`);
   }
   if (cfg.generatedPaths !== undefined) {
     validateGeneratedPathsShape(cfg.generatedPaths, sourceLabel);

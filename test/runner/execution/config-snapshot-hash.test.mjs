@@ -32,6 +32,7 @@ test('the hash changes when any part of seat choice changes: the default tier, t
     'modelPolicies cell': (cfg) => { cfg.modelPolicies.claude.flagship = 'opus-2'; },
     'capability roles': (cfg) => { cfg.capabilities['code:*'].roles['red-team'].prefer = ['claude']; },
     'patterns.seatBinding': (cfg) => { cfg.patterns.seatBinding.schema = 2; },
+    'loops.reviewed.maxRounds': (cfg) => { cfg.loops = { reviewed: { maxRounds: 3 } }; },
   };
   for (const [name, change] of Object.entries(variants)) {
     const cfg = runner();

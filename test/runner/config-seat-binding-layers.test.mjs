@@ -69,13 +69,13 @@ test('a project with no runner section reads the standard with the schema marker
   withMachine({ project: {}, globalRunner: machineExecutor }, ({ repo, projectFile }) => {
     const before = bytes(projectFile);
     const loaded = loadRunnerConfigForDir(repo);
-    assert.equal(loaded.patterns.seatBinding.schema, 1);
+    assert.equal(loaded.patterns.seatBinding.schema, 2);
     assert.equal('rigorToTier' in loaded, false);
     assert.equal(bytes(projectFile), before, 'a read never writes');
   });
   withMachine({ project: undefined, globalRunner: machineExecutor }, ({ repo, projectFile }) => {
     const loaded = loadRunnerConfigForDir(repo);
-    assert.equal(loaded.patterns.seatBinding.schema, 1);
+    assert.equal(loaded.patterns.seatBinding.schema, 2);
     assert.equal(fs.existsSync(projectFile), false, 'a read creates no project file');
   });
 });

@@ -808,8 +808,7 @@ test('doctor check runner-patterns-config passes on the standard and on a valid 
   // Present and valid
   writeProjectConfig(tmpDir, {
       runner: {
-        patterns: {
-          defaultRule: { mutatingMinRigor: 'standard' },
+        loops: {
           reviewed: {
             maxRounds: 2,
             checkersByRigor: {
@@ -828,7 +827,7 @@ test('doctor check runner-patterns-config passes on the standard and on a valid 
   // Invalid (non-cumulative checkers)
   writeProjectConfig(tmpDir, {
       runner: {
-        patterns: {
+        loops: {
           reviewed: {
             checkersByRigor: {
               standard: ['reviewer'],

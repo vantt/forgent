@@ -19,6 +19,7 @@ import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
 
 export const SEAT_ROLES = Object.freeze(['producer', 'synthesizer', 'reviewer', 'red-team', 'judge']);
+export const LOOP_NAMES = Object.freeze(['solo', 'reviewed', 'panel', 'debate']);
 
 /**
  * The checker seats a reviewed unit can name, with the role each takes. `tester` is a seat of its own:

@@ -363,6 +363,8 @@
     "src/git/recovery.mjs": "infra",
     "src/runner/dispatch/executor-governance.mjs": "infra",
     "src/runner/dispatch/work-item-input.mjs": "infra",
+    "src/runner/dispatch/retired-config-keys.mjs": "infra",
+    "src/runner/dispatch/shipped-catalog.mjs": "infra",
     "src/runner/execution/seat-policy.mjs": "infra"
   }
 }

@@ -156,6 +156,7 @@ export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
     maxTier: cfg.maxTier ?? null,
     tierFallback: cfg.tierFallback || {},
     capabilities: cfg.capabilities || {},
+    loops: cfg.loops || {},
     patterns: cfg.patterns || {},
     modelPolicies: cfg.modelPolicies || {},
     executors: cfg.executors || {},

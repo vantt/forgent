@@ -165,13 +165,14 @@ test('an empty prefer list is a load error wherever prefer sits, and every prefe
   refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { reviewer: { prefer: [{ executor: 'claude', invocation: 'missing' }] } } } } }), /roles\.reviewer.*invocation "missing"/);
 });
 
-test('the schema marker is {schema: 1} inside patterns and nothing else', () => {
+test('the schema marker is {schema: 1|2} inside patterns and nothing else', () => {
   assert.equal(loadRunner(runnerWith({ patterns: { seatBinding: { schema: 1 } } })).cfg.patterns.seatBinding.schema, 1);
-  refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 2 } } }), /runner\.patterns\.seatBinding\.schema \(const\)/);
-  assert.equal(loadRunner(runnerWith({ patterns: { seatBinding: {} } })).cfg.patterns.seatBinding.schema, 1, 'a marker with no schema is filled by the standard');
+  assert.equal(loadRunner(runnerWith({ patterns: { seatBinding: { schema: 2 } } })).cfg.patterns.seatBinding.schema, 2);
+  refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 3 } } }), /runner\.patterns\.seatBinding\.schema/);
+  assert.equal(loadRunner(runnerWith({ patterns: { seatBinding: {} } })).cfg.patterns.seatBinding.schema, 2, 'a marker with no schema is filled by the standard');
   refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 1, extra: true } } }), /seatBinding.*unknown key "extra"/);
-  refusedLoad(runnerWith({ patterns: { seatBinding: 1 } }), /runner\.patterns\.seatBinding \(type\)/);
-  refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 1 }, somethingElse: {} } }), /patterns.*unknown key "somethingElse"/);
+  refusedLoad(runnerWith({ patterns: { seatBinding: 1 } }), /runner\.patterns\.seatBinding/);
+  refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 1 }, somethingElse: { extra: true } } }), /runner\.patterns\.somethingElse/);
 });
 
 test('the global layer keeps the keys it has always carried: maxTier, tierFallback, capability rigor and prefer; a rigorToTier there is refused by name', () => {

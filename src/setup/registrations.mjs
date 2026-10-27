@@ -82,7 +82,7 @@ import {
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
 import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
-import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPathsShape, validateRunnerPatternsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPathsShape, validateRunnerPatternsShape, validateRunnerLoopsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
@@ -474,8 +474,15 @@ export function checkRunnerGeneratedPathsConfig(cwd) {
 }
 
 export function checkRunnerPatternsConfig(cwd) {
+  let runner;
   try {
-    validateRunnerPatternsShape(effectiveSection(cwd, 'runner').patterns ?? {}, 'runner.patterns');
+    runner = effectiveSection(cwd, 'runner');
+  } catch (err) {
+    return { passed: false, message: err.message };
+  }
+  try {
+    validateRunnerPatternsShape(runner?.patterns ?? {}, 'runner.patterns');
+    validateRunnerLoopsShape(runner?.loops ?? {}, 'runner.loops');
   } catch (err) {
     return { passed: false, message: err.message };
   }
