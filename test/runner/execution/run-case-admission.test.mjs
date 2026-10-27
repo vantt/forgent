@@ -452,4 +452,17 @@ test('case request reason reaches admission proposal and route event', async () 
   assert.ok(admitCall);
   assert.equal(admitCall[1].reason, 'diverging for fast scout');
   assert.equal(admitCall[1].caseRef.reason, 'diverging for fast scout');
+
+  const portReq = recordingPort();
+  await runUnit({
+    unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
+    caseAdmission: portReq,
+    caseRef: { caseId: 'case-test', activity: 'scout' },
+    request: { reason: 'diverging via request reason' },
+    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  });
+  const reqAdmitCall = portReq.calls.find((c) => c[0] === 'admit');
+  assert.ok(reqAdmitCall);
+  assert.equal(reqAdmitCall[1].reason, 'diverging via request reason');
+  assert.equal(reqAdmitCall[1].caseRef.reason, 'diverging via request reason');
 });

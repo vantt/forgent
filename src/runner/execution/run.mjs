@@ -760,11 +760,12 @@ async function runUnitBody(options, scope) {
     if (writing && !caseRef) requireFreeWorktree(port, worktreePath);
     if (caseRef) {
       const loop = effective.loop;
+      const resolvedReason = caseRef.reason ?? options.reason ?? options.request?.reason ?? null;
       const admitted = port.admit({
         unitRunId: unitRunIdAtAdmission,
         caseRef: {
           ...caseRef,
-          ...(caseRef.reason ?? (options.reason ? { reason: options.reason } : {})),
+          ...(resolvedReason ? { reason: resolvedReason } : {}),
         },
         activity: caseRef.activity,
         writes: unit.writes,
@@ -777,7 +778,7 @@ async function runUnitBody(options, scope) {
         // The rigor the unit runs at (its own or its capability's, the stronger), so the frame's floor is
         // judged against what the seats will actually bind at.
         rigor: effectiveRigorOf(unit, configSnapshot.runner),
-        reason: caseRef.reason ?? options.reason ?? null,
+        reason: resolvedReason,
       });
       if (admitted.refused) throw new CaseAdmissionRefusedError(admitted.refused);
       scope.admission = { port, caseId: admitted.caseId, reservationId: admitted.reservationId, unitRunId: unitRunIdAtAdmission, started: false, settled: false };

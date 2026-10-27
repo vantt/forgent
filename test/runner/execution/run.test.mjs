@@ -1058,9 +1058,31 @@ test('unit summaries cover refusal, thrown execution and resume without duplicat
   assert.equal(readSummary().outcome, 'policy-refusal');
   assert.deepEqual(readSummary().seats, []);
   assert.equal(readSummary().workflow, null);
-  // An unknown pattern has no seats to resolve: the run is refused before any unit directory exists.
-  await assert.rejects(runUnit({ unitData, repoRoot, cwd: worktreeDir, pattern: 'nonexistent-pattern' }), /Unknown collaboration pattern/);
+  // An unknown pattern now refuses before admission: the run is refused before any unit directory exists.
+  await assert.rejects(
+    runUnit({ unitData, repoRoot, cwd: worktreeDir, pattern: 'nonexistent-pattern' }),
+    (err) => err instanceof RunnerConfigError && /not in the catalog/.test(err.message),
+  );
   assert.deepEqual(fs.readdirSync(path.dirname(dir)), [refused.unitRunId]);
+  // A thrown execution after admission publishes a summary with outcome execution-failure.
+  reviewedConfig(repoRoot, ['alpha']);
+  const failure = new Error('the producer attempt could not be prepared');
+  const mkdir = fs.mkdirSync;
+  const mockedMkdir = t.mock.method(fs, 'mkdirSync', (target, ...args) => {
+    if (typeof target === 'string' && target.includes(`${path.sep}producer${path.sep}`)) throw failure;
+    return mkdir(target, ...args);
+  });
+  const thrownUnitData = { id: 'summary-thrown', capability: 'docs:write', objective: 'Write docs', writes: [] };
+  await assert.rejects(
+    runUnit({ unitData: thrownUnitData, repoRoot, cwd: worktreeDir }),
+    (err) => err === failure,
+  );
+  mockedMkdir.mock.restore();
+  const thrownDir = fs.readdirSync(path.dirname(dir)).find((id) => id !== refused.unitRunId);
+  assert.ok(thrownDir);
+  const thrownSummary = JSON.parse(fs.readFileSync(path.join(path.dirname(dir), thrownDir, 'unit-summary.json'), 'utf8'));
+  assert.equal(thrownSummary.outcome, 'execution-failure');
+  assert.equal(thrownSummary.workflow, null);
   // A resumed solo uses settled history and never launches the unavailable executor.
   const runDir = path.join(dir, 'producer', '1', 'runs', '01');
   fs.mkdirSync(runDir, { recursive: true });
@@ -1082,11 +1104,22 @@ function recordedUnitFixture(t, pattern = 'solo') {
   const unitRunId = 'unit-run-recorded';
   const unitDir = path.join(repoRoot, '.fgos', 'assignments', unitRunId);
   fs.mkdirSync(unitDir, { recursive: true });
+  const patternName = typeof pattern === 'string' ? pattern : (pattern?.pattern ?? pattern?.name ?? 'solo');
+  const loop = patternName === 'rfc' ? 'reviewed' : patternName;
   const record = {
     unit: { id: 'recorded-question', objective: 'Answer the question', capability: 'unserved:answer',
-      writes: [], pattern, stanceOptions: ['a', 'b'], ...(pattern === 'panel' ? { seats: panelSeats(3) } : {}) },
-    pattern,
+      writes: [], pattern, stanceOptions: ['a', 'b'], ...(patternName === 'panel' ? { seats: panelSeats(3) } : {}) },
+    pattern: patternName,
     seatSchema: 1,
+    collaboration: {
+      effective: {
+        loop,
+        params: patternName === 'rfc'
+          ? { maxRounds: 1, minCheckers: ['reviewer', 'red-team'] }
+          : (loop === 'reviewed' ? { maxRounds: 1 } : {}),
+      },
+      pattern: { name: patternName },
+    },
     resolvedInputs: [],
     configSnapshot: snapshotRunnerConfig(repoRoot),
     overrides: [],
@@ -1256,7 +1289,7 @@ test('a failed settlement write never replaces the execution error that caused i
   const warning = t.mock.method(console, 'warn', () => {});
   await assert.rejects(runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
     resumeUnitRunId: fixture.unitRunId }),
-  (error) => /Unknown collaboration pattern: "nonexistent-pattern"/.test(error.message));
+  (error) => /Unknown collaboration (loop|pattern): "nonexistent-pattern"/.test(error.message));
   assert.equal(warning.mock.callCount(), 1);
   assert.match(warning.mock.calls[0].arguments[0], /could not record the failed settlement.*unit record storage unavailable/);
   assert.equal(fixture.readRecord().execution.status, 'running', 'the record keeps the last state that was written');
@@ -1834,7 +1867,9 @@ test('same name or one selector runs when explicit selectors do not conflict', a
     pattern: 'solo',
   });
   assert.equal(sameRes.outcome, 'pass');
-  assert.equal(sameRes.pattern, 'solo');
+  const readRecord = (unitRunId) => JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
+  assert.equal(readRecord(sameRes.unitRunId).collaboration?.pattern?.name, 'solo');
+  assert.equal(readRecord(sameRes.unitRunId).collaboration?.effective?.loop, 'solo');
 
   // One selector: caller pattern only, unit has no pattern
   const oneRes = await runUnit({
@@ -1843,7 +1878,8 @@ test('same name or one selector runs when explicit selectors do not conflict', a
     pattern: 'solo',
   });
   assert.equal(oneRes.outcome, 'pass');
-  assert.equal(oneRes.pattern, 'solo');
+  assert.equal(readRecord(oneRes.unitRunId).collaboration?.pattern?.name, 'solo');
+  assert.equal(readRecord(oneRes.unitRunId).collaboration?.effective?.loop, 'solo');
 });
 
 test('unit-explicit verify on panel or debate refuses before admission', async () => {
