@@ -78,7 +78,10 @@ export function resolveCollaboration(options = {}) {
   const callerObjPattern = typeof selectors?.callerObject === 'string'
     ? selectors.callerObject
     : (selectors?.callerObject?.pattern && typeof selectors.callerObject.pattern === 'string' ? selectors.callerObject.pattern : null);
-  const unitPattern = typeof unit?.pattern === 'string' && unit.pattern ? unit.pattern : null;
+  const unitPattern = typeof unit?.pattern === 'string' && unit.pattern
+    ? unit.pattern
+    : (unit?.pattern?.pattern && typeof unit.pattern.pattern === 'string' ? unit.pattern.pattern : null);
+  const unitParams = unit?.params ?? (typeof unit?.pattern === 'object' && unit?.pattern?.params ? unit.pattern.params : undefined);
   const callerStrPattern = typeof selectors?.callerString === 'string' && selectors.callerString ? selectors.callerString : null;
   const activityPattern = typeof selectors?.activityUnit?.pattern === 'string' && selectors.activityUnit.pattern ? selectors.activityUnit.pattern : null;
 
@@ -231,8 +234,8 @@ export function resolveCollaboration(options = {}) {
     }
   }
 
-  if (unit?.params && typeof unit.params === 'object' && !Array.isArray(unit.params)) {
-    for (const [key, val] of Object.entries(unit.params)) {
+  if (unitParams && typeof unitParams === 'object' && !Array.isArray(unitParams)) {
+    for (const [key, val] of Object.entries(unitParams)) {
       if (!Object.hasOwn(paramTable, key)) throw new CollaborationError('param-unknown', `unknown parameter "${key}" in unit for loop "${loop}"`);
       checkCarrierDomainValue(key, val, loop, 'unit');
     }
@@ -241,16 +244,30 @@ export function resolveCollaboration(options = {}) {
     checkCarrierDomainValue('seats', unit.seats, loop, 'unit');
   }
 
-  if (selectors?.activityUnit && !isSwap && baseline.source === 'activity') {
+  if (selectors?.activityUnit && typeof selectors.activityUnit === 'object') {
+    const actPattern = typeof selectors.activityUnit.pattern === 'string' && selectors.activityUnit.pattern
+      ? selectors.activityUnit.pattern
+      : null;
+    let actLoop = loop;
+    let actTable = paramTable;
+    if (actPattern) {
+      if (!Object.hasOwn(entries, actPattern)) {
+        throw new CollaborationError('unknown-pattern', `activity pattern "${actPattern}" is not in the catalog`);
+      }
+      actLoop = entries[actPattern].loop;
+      actTable = paramTableOf(actLoop);
+    }
     const actParams = selectors.activityUnit.params;
     if (actParams && typeof actParams === 'object' && !Array.isArray(actParams)) {
       for (const [key, val] of Object.entries(actParams)) {
-        if (!Object.hasOwn(paramTable, key)) throw new CollaborationError('param-unknown', `unknown parameter "${key}" in activity unit for loop "${loop}"`);
-        checkCarrierDomainValue(key, val, loop, 'activity unit');
+        if (!actTable || !Object.hasOwn(actTable, key)) {
+          throw new CollaborationError('param-unknown', `unknown parameter "${key}" in activity unit for loop "${actLoop}"`);
+        }
+        checkCarrierDomainValue(key, val, actLoop, 'activity unit');
       }
     }
     if (selectors.activityUnit.seats !== undefined) {
-      checkCarrierDomainValue('seats', selectors.activityUnit.seats, loop, 'activity unit');
+      checkCarrierDomainValue('seats', selectors.activityUnit.seats, actLoop, 'activity unit');
     }
   }
 
@@ -268,8 +285,11 @@ export function resolveCollaboration(options = {}) {
     } else if (selectors?.callerObject?.params && Object.hasOwn(selectors.callerObject.params, param)) {
       winningVal = deepClone(selectors.callerObject.params[param]);
       winningSlot = 'selector';
-    } else if (param === 'seats' && unit?.seats !== undefined) {
-      winningVal = deepClone(unit.seats);
+    } else if (param === 'seats' && (unit?.seats !== undefined || unitParams?.seats !== undefined)) {
+      winningVal = unit?.seats !== undefined ? deepClone(unit.seats) : deepClone(unitParams.seats);
+      winningSlot = 'unit';
+    } else if (unitParams && Object.hasOwn(unitParams, param)) {
+      winningVal = deepClone(unitParams[param]);
       winningSlot = 'unit';
     } else if (baseline.source === 'activity' && !isSwap && (
       (selectors?.activityUnit?.params && Object.hasOwn(selectors.activityUnit.params, param)) ||
@@ -374,10 +394,12 @@ export function resolveCollaboration(options = {}) {
     slot: provenanceParams.minCheckers,
   });
 
-  const launchBound = seatLaunchesOf(unit, runnerConfig, {
+  const launchBound = seatLaunchesOf({
     loop,
     params: effectiveParams,
     floors,
+    unit,
+    runnerConfig,
     slot: provenanceParams.minCheckers,
   });
 

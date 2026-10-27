@@ -365,7 +365,10 @@ export function checkCatalog(options = {}) {
   const throwOnError = Boolean(options?.throwOnError);
 
   const shippedPatterns = shippedInput?.patterns ?? shippedInput ?? {};
-  const effectivePatterns = effectiveInput?.runner?.patterns ?? effectiveInput?.patterns ?? effectiveInput ?? {};
+  const effectivePatterns = effectiveInput?.runner?.patterns
+    ?? effectiveInput?.patterns
+    ?? (effectiveInput && typeof effectiveInput === 'object' && ('loops' in effectiveInput || 'runner' in effectiveInput) ? {} : effectiveInput)
+    ?? {};
 
   const problems = [];
   const RESERVED_PATTERN_NAMES = new Set(['seatBinding', 'defaultRule']);

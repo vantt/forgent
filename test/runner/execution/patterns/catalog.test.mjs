@@ -1242,6 +1242,35 @@ test('parameter defaults chain resolves specific winners without leaking activit
   });
   assert.equal(resSeats.seats[0].seat, 'author');
   assert.equal(resSeats.pin.provenance.params.seats, 'request');
+  assert.equal(resDefault.launchBound, 2);
+  assert.equal(resDefault.pin.effective.launchBound, 2);
+  assert.equal(resRequest.launchBound, 6);
+  assert.equal(resRequest.pin.effective.launchBound, 6);
+  assert.equal(resSeats.launchBound, 1);
+  assert.equal(resSeats.pin.effective.launchBound, 1);
+
+  const resUnitRoleTasks = resolveCollaboration({
+    shipped,
+    unit: {
+      pattern: 'reviewed',
+      params: { roleTasks: { reviewer: 'Check the factual claims' } },
+    },
+  });
+  assert.deepEqual({ ...resUnitRoleTasks.roleTasks }, { reviewer: 'Check the factual claims' });
+  assert.equal(resUnitRoleTasks.params.roleTasks?.reviewer, 'Check the factual claims');
+  assert.equal(resUnitRoleTasks.pin.effective.roleTasks?.reviewer, 'Check the factual claims');
+  assert.equal(resUnitRoleTasks.pin.provenance.params.roleTasks, 'unit');
+  assert.equal(resUnitRoleTasks.launchBound, 4);
+
+  const resUnitObj = resolveCollaboration({
+    shipped,
+    unit: {
+      pattern: { pattern: 'reviewed', params: { maxRounds: 5 } },
+    },
+  });
+  assert.equal(resUnitObj.loop, 'reviewed');
+  assert.equal(resUnitObj.params.maxRounds, 5);
+  assert.equal(resUnitObj.pin.provenance.params.maxRounds, 'unit');
 });
 
 test('parameter validity on every carrier rejects unknown keys, invalid domains, and unrequestable parameters', () => {
@@ -1292,6 +1321,56 @@ test('parameter validity on every carrier rejects unknown keys, invalid domains,
   assert.throws(
     () => resolveCollaboration({ selectors: { callerString: 'reviewed' }, request: { params: { roleTasks: { reviewer: 'inspect code' } } }, shipped }),
     (err) => err instanceof CollaborationError && err.code === 'param-not-requestable',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: {
+        callerString: 'reviewed',
+        activityUnit: { pattern: 'code-change', params: { weird: 1 } },
+      },
+      inCase: true,
+      reason: 'testing carrier validation',
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-unknown',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: {
+        callerString: 'reviewed',
+        activityUnit: { pattern: 'reviewed', params: { typo: 1 } },
+      },
+      inCase: true,
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-unknown',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: {
+        callerString: 'reviewed',
+        activityUnit: { pattern: 'reviewed', params: { maxRounds: 0 } },
+      },
+      inCase: true,
+      shipped,
+    }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+
+  assert.throws(
+    () => resolveCollaboration({
+      selectors: {
+        callerString: 'reviewed',
+        activityUnit: { pattern: 'code-change', seats: 'bad' },
+      },
+      inCase: true,
+      reason: 'testing seat validation',
+      shipped,
+    }),
+    (err) => err.code === 'invalid-seats',
   );
 });
 
@@ -1389,6 +1468,23 @@ test('loop parameter bounds constrain request parameters while leaving declarati
   assert.equal(resDeclared.params.maxRounds, 4);
   assert.equal(resDeclared.pin.provenance.params.maxRounds, 'pattern-default');
 
+  const resActivityDeclared = resolveCollaboration({
+    selectors: { activityUnit: { pattern: 'multi-round-review' } },
+    inCase: true,
+    runnerConfig: config,
+    shipped,
+  });
+  assert.equal(resActivityDeclared.params.maxRounds, 4);
+  assert.equal(resActivityDeclared.pin.provenance.params.maxRounds, 'pattern-default');
+
+  const resActivityParam = resolveCollaboration({
+    selectors: { activityUnit: { pattern: 'reviewed', params: { maxRounds: 4 } } },
+    inCase: true,
+    runnerConfig: config,
+    shipped,
+  });
+  assert.equal(resActivityParam.params.maxRounds, 4);
+  assert.equal(resActivityParam.pin.provenance.params.maxRounds, 'activity');
   const resNoBounds = resolveCollaboration({
     selectors: { callerString: 'reviewed' },
     request: { params: { maxRounds: 5 } },

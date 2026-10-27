@@ -293,3 +293,13 @@ test('omitted loop and pattern options default to solo producer roster and launc
   assert.equal(seats[0].posture.writer, true);
   assert.equal(seatLaunchesOf({ unit: { writes: [] }, runnerConfig: {} }), 1);
 });
+
+test('seat launches calculation computes launch bounds from loop, params and floors', () => {
+  const launches = seatLaunchesOf({
+    loop: 'reviewed',
+    params: { maxRounds: 3 },
+    unit: {},
+    runnerConfig: {},
+  });
+  assert.equal(launches, 6);
+});

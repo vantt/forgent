@@ -396,7 +396,7 @@ export function seatLaunchesOf(options = {}) {
     params = params ?? resolved.params;
   }
   if (!LOOP_NAMES.includes(patternName)) return null;
-  const seats = resolveSeats({ loop: patternName, params, floors, unit, runnerConfig });
+  const seats = resolveSeats({ loop: patternName, params, floors, unit, runnerConfig, slot: options.slot });
   switch (patternName) {
     case 'reviewed': return seats.length * (params?.maxRounds ?? runnerConfig?.loops?.reviewed?.maxRounds ?? 2);
     case 'debate': return 2 * (params?.rebuttal === false ? 1 : 2) + 1;
