@@ -143,6 +143,7 @@ import { installClaudeCodeHook } from '../src/setup/claude-code-hooks.mjs';
 import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
 import { materializeSkillsIntoProject } from '../src/setup/skill-wrappers.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
+import { convertRunnerPatternsConfig, inspectGlobalRunnerConfig } from '../src/setup/runner-config-conversion.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
 // free-text submission has no verification plan yet — that is P15's job. The
@@ -4025,12 +4026,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           }
         }
       }
+      const runnerPatternsConversion = convertRunnerPatternsConfig(repoRoot);
       // Each scope gets its header-only config file when it has none (a legacy config.json counts as
       // present: it is migrated, never shadowed). Nothing else is written; the standard supplies every value.
       const { created: configCreated, file: configFile } = initConfigFile({ projectRoot: repoRoot, target: 'project' });
       const configPath = path.join(repoRoot, '.fgos', configFile);
       const { created: globalConfigCreated, file: globalConfigFile } = initConfigFile({ projectRoot: repoRoot, target: 'global' });
       const globalConfigPath = path.join(os.homedir(), '.fgos', globalConfigFile);
+      const globalRetiredNotice = inspectGlobalRunnerConfig(path.dirname(globalConfigPath));
       // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`
       // does — a second, non-npm-lifecycle-dependent activation path for the
       // main-checkout lock hook, since pnpm 10+ blocks `prepare` for a
@@ -4069,6 +4072,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         rcFilesInserted,
         rcFilesAlreadyConfigured,
         ...(rcWriteDeclinedReason !== null && { rcWriteDeclinedReason }),
+        runnerPatternsConversion,
+        ...(globalRetiredNotice && { globalRetiredNotice }),
         configPath,
         configCreated,
         globalConfigPath,
@@ -4715,6 +4720,24 @@ function renderPretty(verb, data) {
     }
     for (const kept of data.skillFilesKept ?? []) {
       lines.push(formatCheck(false, 'kept project skill file (newer version or uncommitted changes), not overwritten', kept));
+    }
+    if (data.runnerPatternsConversion?.status === 'converted') {
+      lines.push(
+        formatCheck(
+          true,
+          'converted runner patterns config to runner.loops (schema 2)',
+          data.runnerPatternsConversion.backup ? `backup: ${data.runnerPatternsConversion.backup}` : undefined,
+        ),
+      );
+    }
+    if (data.globalRetiredNotice) {
+      lines.push(
+        formatCheck(
+          false,
+          `global config holds retired keys; edit ${data.globalRetiredNotice.file} (${data.globalRetiredNotice.edits.join('; ')})`,
+          data.globalRetiredNotice.command,
+        ),
+      );
     }
   }
   return `${lines.join('\n')}\n`;

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d368bcd487bed4f0cfb2d760146664a2d976b8e9c46394d9e556fa31720f7b10",
+  "payloadDigest": "5d778ef7854dc9c2df40983e0d52df449cdbf57e8de5e094ce61980dbe7ad7b1",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -107,7 +107,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "fe8cac0ffb92d6bf8c6f8c001df35b66aeea4518192b2e22df060cd3266f9f83",
-    "bin/fgos.mjs": "7389e4ec1a346c43a1bf64a891d8771e64cb08a5a8a9d2cb9c5b885712c0f4ef",
+    "bin/fgos.mjs": "a92082e101b290d5e8b84d2f757f32e6bded3903754d3f07a6b4d2f4326913e3",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -1118,6 +1118,7 @@
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
     "src/setup/registrations.mjs": "4a93ba310e53c017e29753b4cf63e6e7b6764a8361064f72b33d948351d880a8",
     "src/setup/run-supervisor-checks.mjs": "b5919215aaa5f3910306a6f6edb53aa2eb9d60382c6505d46975776d44c369e9",
+    "src/setup/runner-config-conversion.mjs": "95bab59d2480a532787e107965cac25ffa02249ff52bd629882b8101030ec674",
     "src/setup/seat-binding-checks.mjs": "8eb709c6ef91ea0c4e24d1ad15adb3231f5d1441ebb260a42f0934e994b136f6",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
     "src/setup/skill-wrappers.mjs": "9e018016cfaa180f424886173f4c86a76ebc4e325ec783016862afce24449ea0",
@@ -2056,14 +2057,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3462,
+      "line": 3463,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3606,
+      "line": 3607,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
