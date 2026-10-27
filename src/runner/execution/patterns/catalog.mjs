@@ -85,6 +85,11 @@ export function resolveCollaboration(options = {}) {
   if (unit?.params !== undefined && (typeof unit.params !== 'object' || unit.params === null || Array.isArray(unit.params))) {
     throw new CollaborationError('param-invalid', 'unit params must be an object');
   }
+  if (typeof unit?.pattern === 'object' && unit?.pattern !== null && unit?.pattern?.params !== undefined) {
+    if (typeof unit.pattern.params !== 'object' || unit.pattern.params === null || Array.isArray(unit.pattern.params)) {
+      throw new CollaborationError('param-invalid', 'unit pattern params must be an object');
+    }
+  }
   const unitDeclaredParams = Object.create(null);
   if (unitParamsObj && typeof unitParamsObj === 'object' && !Array.isArray(unitParamsObj)) {
     for (const [k, v] of Object.entries(unitParamsObj)) {
@@ -163,6 +168,10 @@ export function resolveCollaboration(options = {}) {
   const parsedScalars = Object.create(null);
   const seenScalarKeys = new Set();
 
+  if (request !== null && request !== undefined && (typeof request !== 'object' || Array.isArray(request))) {
+    throw new CollaborationError('param-invalid', 'request must be an object');
+  }
+
   if (request?.scalars !== undefined) {
     if (typeof request.scalars !== 'object' || request.scalars === null) {
       throw new CollaborationError('param-invalid', 'request scalars must be an array or object');
@@ -225,8 +234,8 @@ export function resolveCollaboration(options = {}) {
   }
 
   const normalizedRequestParams = Object.create(null);
-  if (request?.params) {
-    if (typeof request.params !== 'object' || Array.isArray(request.params)) {
+  if (request?.params !== undefined) {
+    if (typeof request.params !== 'object' || request.params === null || Array.isArray(request.params)) {
       throw new CollaborationError('param-invalid', 'request params must be an object');
     }
     for (const [key, val] of Object.entries(request.params)) {
@@ -400,7 +409,7 @@ export function resolveCollaboration(options = {}) {
     for (const [param, bound] of Object.entries(bounds)) {
       if (provenanceParams[param] === 'request' && effectiveParams[param] !== undefined) {
         const val = effectiveParams[param];
-        if (typeof val === 'number') {
+        if (typeof val === 'number' && bound && typeof bound === 'object') {
           if (bound.min !== undefined && val < bound.min) {
             throw new CollaborationError('param-out-of-bounds', `requested "${param}" (${val}) is below loop bound min (${bound.min})`);
           }

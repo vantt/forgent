@@ -1453,6 +1453,18 @@ test('parameter validity on every carrier rejects unknown keys, invalid domains,
     () => resolveCollaboration({ selectors: { callerString: 'solo' }, unit: { roleTasks: { reviewer: 'not-supported-in-solo' } }, shipped }),
     (err) => err instanceof CollaborationError && err.code === 'param-unknown',
   );
+  assert.throws(
+    () => resolveCollaboration({ selectors: { callerString: 'reviewed' }, request: 'not-an-object', shipped }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+  assert.throws(
+    () => resolveCollaboration({ selectors: { callerString: 'reviewed' }, request: { params: null }, shipped }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
+  assert.throws(
+    () => resolveCollaboration({ selectors: { callerString: 'reviewed' }, unit: { pattern: { pattern: 'reviewed', params: 123 } }, shipped }),
+    (err) => err instanceof CollaborationError && err.code === 'param-invalid',
+  );
 });
 
 test('request scalar normalization enforces typing and rejects empty values or conflicts', () => {
@@ -1573,6 +1585,13 @@ test('loop parameter bounds constrain request parameters while leaving declarati
     shipped,
   });
   assert.equal(resNoBounds.params.maxRounds, 5);
+  const resNullBound = resolveCollaboration({
+    selectors: { callerString: 'reviewed' },
+    request: { params: { maxRounds: 3 } },
+    runnerConfig: { loops: { reviewed: { bounds: { maxRounds: null } } } },
+    shipped,
+  });
+  assert.equal(resNullBound.params.maxRounds, 3);
 });
 
 test('case dispatch pattern swap requires a reason and preserves activity pattern invariants', () => {
