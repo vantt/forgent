@@ -4040,21 +4040,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       // Each scope gets its header-only config file when it has none (a legacy config.json counts as
       // present: it is migrated, never shadowed). Nothing else is written; the standard supplies every value.
-      let configCreated = false;
-      let configFile = 'config.yaml';
-      try {
-        ({ created: configCreated, file: configFile } = initConfigFile({ projectRoot: repoRoot, target: 'project' }));
-      } catch {
-        // initConfigFile may fail if project or global config holds invalid/retired keys; do not crash setup before reporting guidance
-      }
+      const { created: configCreated, file: configFile } = initConfigFile({ projectRoot: repoRoot, target: 'project' });
       const configPath = path.join(repoRoot, '.fgos', configFile);
-      let globalConfigCreated = false;
-      let globalConfigFile = 'config.yaml';
-      try {
-        ({ created: globalConfigCreated, file: globalConfigFile } = initConfigFile({ projectRoot: repoRoot, target: 'global' }));
-      } catch {
-        // initConfigFile may fail if global config holds invalid/retired keys; do not crash setup before reporting guidance
-      }
+      const { created: globalConfigCreated, file: globalConfigFile } = initConfigFile({ projectRoot: repoRoot, target: 'global' });
       const globalConfigPath = path.join(os.homedir(), '.fgos', globalConfigFile);
       // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`
       // does — a second, non-npm-lifecycle-dependent activation path for the

@@ -296,6 +296,9 @@ test('converts configuration with modern reviewed override and retired maxRounds
             minCheckers: ['reviewer'],
           },
           maxRounds: 4,
+          checkersByRigor: {
+            standard: ['reviewer'],
+          },
         },
         seatBinding: {
           schema: 1,
@@ -312,11 +315,47 @@ test('converts configuration with modern reviewed override and retired maxRounds
 
     const loaded = loadRunnerConfigForDir(projectDir);
     assert.equal(loaded.loops?.reviewed?.maxRounds, 4, 'maxRounds must be migrated to runner.loops.reviewed');
+    assert.deepEqual(loaded.loops?.reviewed?.checkersByRigor?.standard, ['reviewer'], 'checkersByRigor must be migrated to runner.loops.reviewed');
     assert.equal(loaded.patterns?.reviewed?.promise, 'Multi-seat adversarial review loop', 'modern promise must be preserved');
     assert.equal(loaded.patterns?.reviewed?.loop, 'reviewed', 'modern loop must be preserved');
     assert.deepEqual(loaded.patterns?.reviewed?.defaults?.minCheckers, ['reviewer'], 'modern defaults must be preserved');
     assert.equal(loaded.patterns?.reviewed?.maxRounds, undefined, 'retired maxRounds must be unset from pattern entry');
+    assert.equal(loaded.patterns?.reviewed?.checkersByRigor, undefined, 'retired checkersByRigor must be unset from pattern entry');
     assert.equal(loaded.patterns?.seatBinding?.schema, 2, 'schema must be bumped to 2');
+  } finally {
+    process.env.HOME = prevHome;
+    cleanupDirs({ projectDir, homeDir });
+  }
+});
+
+test('blocks conversion without data loss when both retired research-fan-out-gated and modern research-fan-out exist', () => {
+  const { projectDir, homeDir } = makeTempDirs();
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const configWithCollision = {
+      patterns: {
+        'research-fan-out': {
+          promise: 'Modern research fan-out override',
+          defaults: { minCheckers: ['researcher'] },
+        },
+        'research-fan-out-gated': {
+          loop: 'solo',
+        },
+        seatBinding: {
+          schema: 1,
+        },
+      },
+    };
+    writeProjectConfig(projectDir, { runner: configWithCollision });
+    const originalText = readRawProjectConfig(projectDir);
+
+    const result = convertRunnerPatternsConfig(projectDir);
+    assert.equal(result.status, 'blocked', 'must block conversion when modern destination already exists');
+    assert.match(result.blocker, /research-fan-out/, 'blocker must name the colliding pattern key');
+
+    const currentText = readRawProjectConfig(projectDir);
+    assert.equal(currentText, originalText, 'source file must remain untouched');
   } finally {
     process.env.HOME = prevHome;
     cleanupDirs({ projectDir, homeDir });

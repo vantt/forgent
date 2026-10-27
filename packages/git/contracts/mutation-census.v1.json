@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "62e19d5205bb3b46d46a8744fad6e78f390de480ebfba7cbcab28d8e5f0c1ef9",
+  "payloadDigest": "ff75a11220a4c97b3184bdd112eebb2726113f70af0fddbaa53820c2c47bab25",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -107,7 +107,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "fe8cac0ffb92d6bf8c6f8c001df35b66aeea4518192b2e22df060cd3266f9f83",
-    "bin/fgos.mjs": "7eedd69a8c957b0e911db3496f383d3fbd6b18584c5cbff596aeb62e0ff85469",
+    "bin/fgos.mjs": "730909e1dbf213c2eb8f6817b7ff67b8940142ebcff0890a0e4d3bf3d594b893",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -1118,7 +1118,7 @@
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
     "src/setup/registrations.mjs": "4a93ba310e53c017e29753b4cf63e6e7b6764a8361064f72b33d948351d880a8",
     "src/setup/run-supervisor-checks.mjs": "b5919215aaa5f3910306a6f6edb53aa2eb9d60382c6505d46975776d44c369e9",
-    "src/setup/runner-config-conversion.mjs": "86d55f74f8e18c0ead84a0f9fbd18fe3816f4a81e6078d4333e886e67f4bef13",
+    "src/setup/runner-config-conversion.mjs": "2b070dcc9ff0a6947fcedba65c8030ab4a2d205a3543bb7802e9d98f50479db9",
     "src/setup/seat-binding-checks.mjs": "8eb709c6ef91ea0c4e24d1ad15adb3231f5d1441ebb260a42f0934e994b136f6",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
     "src/setup/skill-wrappers.mjs": "9e018016cfaa180f424886173f4c86a76ebc4e325ec783016862afce24449ea0",
@@ -3589,7 +3589,7 @@
     },
     {
       "path": "src/setup/runner-config-conversion.mjs",
-      "line": 170,
+      "line": 181,
       "spawn": "applyNativeConfigPatch -> src/setup/runner-config-conversion.mjs:31",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

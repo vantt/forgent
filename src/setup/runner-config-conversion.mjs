@@ -65,6 +65,8 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
     }
   }
 
+  // Side-read raw config text to extract values of retired keys (maxRounds, checkersByRigor, etc.)
+  // for patch edits; the validating door refuses to load configs holding retired keys.
   let originalText;
   try {
     originalText = fs.readFileSync(targetPath, 'utf8');
@@ -102,6 +104,7 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
   const now = new Date();
   const ts = now.toISOString().replace(/[-:.]/g, '');
   const backupPath = `${targetPath}.pre-patterns-catalog-${ts}`;
+  // Backup copy of the user's config file before applying edits; this and the restore below are the only raw writes in this module.
   fs.copyFileSync(targetPath, backupPath);
 
   const edits = [];
@@ -112,6 +115,14 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
   }
 
   if (patterns['research-fan-out-gated'] !== undefined) {
+    if (patterns['research-fan-out'] !== undefined) {
+      return {
+        status: 'blocked',
+        backup: backupPath,
+        blocker: 'cannot convert retired key runner.patterns.research-fan-out-gated: modern runner.patterns.research-fan-out already exists; reconcile duplicate pattern entries manually',
+        written: [],
+      };
+    }
     edits.push({ unset: 'runner.patterns.research-fan-out-gated' });
     edits.push({ set: 'runner.patterns.research-fan-out', value: patterns['research-fan-out-gated'] });
     written.push('runner.patterns.research-fan-out');
@@ -200,7 +211,7 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
         globalPending: true,
       };
     }
-    // Restores the user's own bytes from backup after a refused write; this is the one raw write in this module.
+    // Restores the user's own bytes from backup after a refused write; this and the backup copy are the only raw writes in this module.
     fs.copyFileSync(backupPath, targetPath);
     return {
       status: 'blocked',
