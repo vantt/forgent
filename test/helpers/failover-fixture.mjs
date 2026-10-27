@@ -148,7 +148,7 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
       tierFallback: tierFallback ?? Object.fromEntries(TIERS.map((tier) => [tier, [...new Set(Object.values(providers).map(({ family }) => family))]])),
       executors,
       capabilities: { 'docs:write': { prefer: poolEntries, rigor: 'standard', tier: 'standard' } },
-      patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' } },
+      patterns: { seatBinding: { schema: 1 } },
     },
   };
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });

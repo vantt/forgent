@@ -112,8 +112,8 @@ function setupProbeRepo(executorNames) {
         'docs:write': { prefer, rigor: 'standard', tier: 'standard' },
         'docs:review': { prefer, persona: 'code-reviewer', rigor: 'standard', tier: 'standard' },
       },
-      patterns: { seatBinding: { schema: 1 },
-        defaultRule: { mutatingMinRigor: 'standard' },
+      patterns: { seatBinding: { schema: 1 } },
+      loops: {
         reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'], high: ['reviewer'], critical: ['reviewer'] } },
       },
     },

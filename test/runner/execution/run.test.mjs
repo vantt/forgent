@@ -87,8 +87,8 @@ function setupGitRepo() {
           tier: 'frontier',
         },
       },
-      patterns: { seatBinding: { schema: 1 },
-        defaultRule: { mutatingMinRigor: 'standard' },
+      patterns: { seatBinding: { schema: 1 } },
+      loops: {
         reviewed: {
           maxRounds: 2,
           checkersByRigor: {

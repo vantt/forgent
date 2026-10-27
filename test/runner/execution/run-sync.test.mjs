@@ -71,7 +71,7 @@ function setup({ mainFiles = { 'base.txt': 'from main\n' }, branchFiles = { 'min
         },
       },
       capabilities: { 'docs:write': { prefer: [{ executor: 'alpha' }], rigor: 'standard', tier: 'standard' } },
-      patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' } },
+      patterns: { seatBinding: { schema: 1 } },
     },
   });
   prepareActivatedGitFixture(repoRoot);

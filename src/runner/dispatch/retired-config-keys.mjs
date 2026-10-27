@@ -141,36 +141,21 @@ export function checkDoorRefusalsForRetiredKeys(err, options = {}) {
         );
       }
       if (isReviewed) {
-        const candidates = [];
-        if (r.file?.startsWith('global:') || r.file?.startsWith('machine:')) {
-          const rel = r.file.replace(/^(global|machine):/, '');
-          candidates.push(path.join(process.env.HOME || os.homedir(), '.fgos', rel));
-        } else if (r.file?.startsWith('project:')) {
-          const rel = r.file.replace(/^project:/, '');
-          if (options.projectRoot) {
-            candidates.push(path.join(options.projectRoot, '.fgos', rel));
-            candidates.push(path.join(options.projectRoot, rel));
-          }
-          if (process.env.HOME) {
-            candidates.push(path.join(process.env.HOME, '.fgos', rel));
-          }
-          candidates.push(path.join(process.cwd(), '.fgos', rel));
-        } else if (r.file) {
-          candidates.push(r.file);
-          if (options.projectRoot) {
-            candidates.push(path.join(options.projectRoot, r.file));
-            candidates.push(path.join(options.projectRoot, '.fgos', r.file));
-          }
-        }
-
         let actualFile = null;
-        for (const candidate of candidates) {
-          if (candidate && fsp.existsSync(candidate)) {
-            actualFile = candidate;
-            break;
+        if (r.file?.startsWith('global:') || r.file?.startsWith('machine:')) {
+          actualFile = path.join(process.env.HOME || os.homedir(), '.fgos', r.file.replace(/^(global|machine):/, ''));
+        } else if (r.file?.startsWith('project:')) {
+          if (options.projectRoot) {
+            actualFile = path.join(options.projectRoot, '.fgos', r.file.replace(/^project:/, ''));
           }
+        } else if (r.file) {
+          actualFile = path.isAbsolute(r.file)
+            ? r.file
+            : (options.projectRoot ? path.join(options.projectRoot, r.file) : path.resolve(r.file));
         }
-
+        if (actualFile && !fsp.existsSync(actualFile)) {
+          actualFile = null;
+        }
         if (actualFile) {
           try {
             const raw = parseYaml(fsp.readFileSync(actualFile, 'utf8'), { filename: actualFile });

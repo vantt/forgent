@@ -109,7 +109,7 @@ export function effectiveRigorOf(unit, runnerConfig, { fallback } = {}) {
  */
 export function checkerSeatsOf(unit, runnerConfig, params = {}) {
   const rigor = effectiveRigorOf(unit, runnerConfig, { fallback: 'standard' });
-  const checkersByRigor = runnerConfig?.patterns?.reviewed?.checkersByRigor || DEFAULT_CHECKERS_BY_RIGOR;
+  const checkersByRigor = runnerConfig?.loops?.reviewed?.checkersByRigor || DEFAULT_CHECKERS_BY_RIGOR;
   const fromRigor = checkersByRigor[rigor] || DEFAULT_CHECKERS_BY_RIGOR[rigor] || ['reviewer'];
   const minFromCap = runnerConfig?.capabilities?.[unit?.capability]?.minCheckers || [];
   const minFromParams = Array.isArray(params?.minCheckers) ? params.minCheckers : (params?.minCheckers ? [params.minCheckers] : []);
@@ -260,7 +260,7 @@ export function seatLaunchesOf({ pattern, unit, runnerConfig }) {
   if (!['solo', 'reviewed', 'panel', 'debate'].includes(patternName)) return null;
   const seats = resolveSeats({ pattern, unit, runnerConfig });
   switch (patternName) {
-    case 'reviewed': return seats.length * (params?.maxRounds ?? runnerConfig?.patterns?.reviewed?.maxRounds ?? 2);
+    case 'reviewed': return seats.length * (params?.maxRounds ?? runnerConfig?.loops?.reviewed?.maxRounds ?? 2);
     case 'debate': return 2 * (params?.rebuttal === false ? 1 : 2) + 1;
     default: return seats.length;
   }

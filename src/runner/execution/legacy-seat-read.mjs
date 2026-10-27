@@ -34,7 +34,10 @@ const LEGACY_DEFAULT_CHECKERS = Object.freeze({
   low: ['reviewer'], standard: ['reviewer'], high: ['reviewer', 'red-team'], critical: ['reviewer', 'red-team'],
 });
 
-/** The checker names a pre-fence reviewed unit ran, by the unit's own rigor key (the rule it was written under). */
+/**
+ * The checker names a pre-fence reviewed unit ran, by the unit's own rigor key (the rule it was written under).
+ * Decodes stored records (pre-fence historical units), never live config; keeps reading cfg.patterns.reviewed untouched.
+ */
 function legacyCheckers(unit, cfg, params) {
   const rigor = unit?.rigor || 'standard';
   const byRigor = cfg?.patterns?.reviewed?.checkersByRigor || LEGACY_DEFAULT_CHECKERS;

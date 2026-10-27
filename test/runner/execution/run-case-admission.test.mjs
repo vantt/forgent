@@ -87,7 +87,8 @@ function setup(families = ['okay']) {
       tierFallback: Object.fromEntries(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier'].map((tier) => [tier, families])),
       executors,
       capabilities: { 'docs:write': { prefer, rigor: 'standard', tier: 'standard' } },
-      patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' }, reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } } },
+      patterns: { seatBinding: { schema: 1 } },
+      loops: { reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } } },
     },
   });
   return { repoRoot, worktreeDir };
@@ -307,7 +308,7 @@ test('a reviewed run that cannot launch its next round ends at the last evaluati
   const roles = [];
   const result = await runReviewed(
     { id: 'u', objective: 'x', capability: 'docs:write', writes: [] },
-    { patterns: { reviewed: { maxRounds: 2 } } },
+    { loops: { reviewed: { maxRounds: 2 } } },
     {
       runRole: async ({ seat, round = 1 }) => {
         roles.push(`${seat.seat}/${round}`);
@@ -323,7 +324,7 @@ test('a reviewed run that cannot launch its next round ends at the last evaluati
 });
 
 test('the planned seat launches follow the pattern the run will use', () => {
-  const cfg = { patterns: { reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'], high: ['reviewer', 'red-team'] } } } };
+  const cfg = { loops: { reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'], high: ['reviewer', 'red-team'] } } } };
   const unit = { id: 'u', writes: [], capability: 'docs:write' };
   assert.equal(seatLaunchesOf({ pattern: 'solo', unit, runnerConfig: cfg }), 1);
   assert.equal(seatLaunchesOf({ pattern: 'reviewed', unit, runnerConfig: cfg }), 4, 'producer and one checker, two rounds');

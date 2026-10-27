@@ -74,8 +74,8 @@ function setupTestRepo() {
       capabilities: {
         'docs:write': capabilityServedBy('test-node', 'docs:write'),
       },
-      patterns: { seatBinding: { schema: 1 },
-        defaultRule: { mutatingMinRigor: 'standard' },
+      patterns: { seatBinding: { schema: 1 } },
+      loops: {
         reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } },
       },
     },

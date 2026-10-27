@@ -81,8 +81,8 @@ export function setupWorkflowFixtureRepo({
         },
       },
       capabilities: Object.fromEntries(capabilities.map((name) => [name, capabilityServedBy('test-node', name)])),
-      patterns: { seatBinding: { schema: 1 },
-        defaultRule: { mutatingMinRigor: 'standard' },
+      patterns: { seatBinding: { schema: 1 } },
+      loops: {
         reviewed,
       },
     },

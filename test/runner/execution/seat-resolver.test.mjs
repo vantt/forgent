@@ -113,7 +113,7 @@ test('panel members carry the panel posture; a reviewed unit refuses declared se
 });
 
 test('admission counts launches from the same seats the run binds', () => {
-  const cfg = { patterns: { reviewed: { maxRounds: 2 } } };
+  const cfg = { loops: { reviewed: { maxRounds: 2 } } };
   assert.equal(seatLaunchesOf({ pattern: 'solo', unit, runnerConfig: cfg }), 1);
   assert.equal(seatLaunchesOf({ pattern: 'reviewed', unit: { ...unit, rigor: 'high' }, runnerConfig: cfg }), 6);
   assert.equal(seatLaunchesOf({ pattern: 'research-fan-out', unit, runnerConfig: cfg }), 4);

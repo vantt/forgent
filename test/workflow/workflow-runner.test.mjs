@@ -98,8 +98,8 @@ function setupTestRepo() {
         'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard', tier: 'standard' },
         'code:implement': { prefer: [{ executor: 'test-node' }], rigor: 'standard', tier: 'standard' },
       },
-      patterns: { seatBinding: { schema: 1 },
-        defaultRule: { mutatingMinRigor: 'standard' },
+      patterns: { seatBinding: { schema: 1 } },
+      loops: {
         reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } },
       },
     },

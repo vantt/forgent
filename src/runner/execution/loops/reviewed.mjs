@@ -133,7 +133,7 @@ function assessRound(results, producerSeat) {
  * cannot establish completion and must remain unknown to the summary.
  */
 export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}, seats = []) {
-  const maxRounds = params?.maxRounds ?? cfg?.patterns?.reviewed?.maxRounds ?? 2;
+  const maxRounds = params?.maxRounds ?? cfg?.loops?.reviewed?.maxRounds ?? 2;
   const producerSeat = seats.find((seat) => seat.role === 'producer')?.seat ?? 'producer';
   const checkerList = seats.filter((seat) => seat.role !== 'producer').map((seat) => seat.seat);
   const hasVerify = hasVerifyCommand(unit, cfg);
@@ -164,7 +164,7 @@ export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}, sea
  * @returns {Promise<{ outcome: string, rounds: number, results: Array<object>, findings: Array<string> }>}
  */
 export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaunchRoom } = {}, params = {}) {
-  const maxRounds = params?.maxRounds ?? cfg?.patterns?.reviewed?.maxRounds ?? 2;
+  const maxRounds = params?.maxRounds ?? cfg?.loops?.reviewed?.maxRounds ?? 2;
   const priorResults = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
 
   const seats = resolveSeats({ pattern: { pattern: 'reviewed', params }, unit, runnerConfig: cfg });

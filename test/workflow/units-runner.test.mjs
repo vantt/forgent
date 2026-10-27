@@ -94,7 +94,8 @@ function setupRepo({ effortCli = false } = {}) {
         },
       },
       capabilities: { 'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard', tier: 'standard' } },
-      patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' }, reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'] } } },
+      patterns: { seatBinding: { schema: 1 } },
+      loops: { reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'] } } },
     },
   });
   return tmp;
