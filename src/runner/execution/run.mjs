@@ -20,9 +20,9 @@ import { simulateUnitBindings } from './dry-bind.mjs';
 import { worktreeSnapshot, writesSince } from './partial-writes.mjs';
 import { createSeatLedger } from './seat-ledger.mjs';
 import { resolveSeats, assertNoSeatTier, effectiveRigorOf, workflowTierOf, SeatResolutionError } from './seat-resolver.mjs';
-import { isSeatRecord } from './legacy-seat-read.mjs';
+import { isSeatRecord, collaborationOfRecord } from './legacy-seat-read.mjs';
 import { assertSeatId } from '../../convention/seat-id.mjs';
-import { runLoop, loopRunsVerify } from './loops/index.mjs';
+import { runLoop, loopRunsVerify, paramTableOf } from './loops/index.mjs';
 import { resolveCollaboration, CollaborationError } from './patterns/catalog.mjs';
 import { shippedCatalog, catalogLayersOf } from '../dispatch/shipped-catalog.mjs';
 import { canonicalJson } from '../../native/door.mjs';
@@ -211,10 +211,10 @@ function leftByDeadController(attempt, assignmentsDir) {
   return prior !== null && fs.existsSync(path.join(prior.dir, 'envelope.json'));
 }
 
-/** The newest `seatSchema` of a unit record this release can resume. It writes schema 1, so a record
+/** The newest `seatSchema` of a unit record this release can resume. It writes schema 2, so a record
  * that carries a later one came from a newer release: resuming it here would run it under rules this
  * release does not know. Read-only inspection of the record is unaffected. */
-const KNOWN_SEAT_SCHEMA = 1;
+const KNOWN_SEAT_SCHEMA = 2;
 
 function assertRecordNotFromNewerRelease(unitRunId, unitRecord) {
   const schema = unitRecord?.seatSchema;
@@ -226,6 +226,51 @@ function assertRecordNotFromNewerRelease(unitRunId, unitRecord) {
   );
 }
 
+
+function assertCollaborationPinUsable(unitRunId, collaboration, configSnapshot, liveCfg) {
+  if (!collaboration || typeof collaboration !== 'object') {
+    throw new RunnerConfigError(
+      `cannot resume unit run "${unitRunId}": collaboration pin is unreadable`,
+      { code: 'collaboration-pin-unusable' },
+    );
+  }
+  const patternName = collaboration.pattern?.name;
+  if (!patternName || typeof patternName !== 'string') {
+    throw new RunnerConfigError(
+      `cannot resume unit run "${unitRunId}": collaboration pin has invalid pattern name`,
+      { code: 'collaboration-pin-unusable' },
+    );
+  }
+  const effective = collaboration.effective;
+  if (!effective || typeof effective !== 'object') {
+    throw new RunnerConfigError(
+      `cannot resume unit run "${unitRunId}": collaboration pin has invalid effective block`,
+      { code: 'collaboration-pin-unusable' },
+    );
+  }
+  const loop = effective.loop;
+  if (typeof loop !== 'string' || !paramTableOf(loop)) {
+    throw new RunnerConfigError(
+      `cannot resume unit run "${unitRunId}": collaboration pin names unregistered loop "${loop}"`,
+      { code: 'collaboration-pin-unusable' },
+    );
+  }
+  if (effective.params === null || typeof effective.params !== 'object' || Array.isArray(effective.params)) {
+    throw new RunnerConfigError(
+      `cannot resume unit run "${unitRunId}": collaboration pin has invalid effective params`,
+      { code: 'collaboration-pin-unusable' },
+    );
+  }
+  const shipped = shippedCatalog()?.patterns ?? {};
+  const inSnapshot = configSnapshot?.runner?.patterns ?? {};
+  const inLive = liveCfg?.patterns ?? liveCfg?.runner?.patterns ?? {};
+  if (!Object.hasOwn(shipped, patternName) && !Object.hasOwn(inSnapshot, patternName) && !Object.hasOwn(inLive, patternName)) {
+    throw new RunnerConfigError(
+      `cannot resume unit run "${unitRunId}": collaboration pin names unregistered pattern "${patternName}"`,
+      { code: 'collaboration-pin-unusable' },
+    );
+  }
+}
 /**
  * A resume never starts a second agent over an attempt the previous controller left: an attempt whose
  * supervisor still works (or an adopter) is named and refused, an attempt from before the run supervisor
@@ -589,6 +634,7 @@ async function runUnitBody(options, scope) {
   // unit.json so a resume and every seat's own inputs read the same.
   let acceptedReports = [];
   const assignmentsDir = path.join(mainRoot, '.fgos', 'assignments');
+  let runnerConfigForLoop = null;
 
   if (options.resumeUnitRunId) {
     unitRunId = options.resumeUnitRunId;
@@ -612,6 +658,14 @@ async function runUnitBody(options, scope) {
     scope.control = control;
     unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
     assertRecordNotFromNewerRelease(unitRunId, unitRecord);
+    if (unitRecord.collaboration) {
+      assertCollaborationPinUsable(unitRunId, unitRecord.collaboration, unitRecord.configSnapshot, liveConfig());
+      runnerConfigForLoop = unitRecord.configSnapshot?.runner ?? {};
+    } else {
+      const decoded = collaborationOfRecord(unitRecord, { shipped: shippedCatalog() });
+      unitRecord.collaboration = decoded.collaboration;
+      runnerConfigForLoop = decoded.runner;
+    }
     unit = validateUnit(unitRecord.unit);
     assertRepositoryForWrites(roots, cwd, { writes: unit.writes.length > 0 || Boolean(unitRecord.sync) });
     // A writing run is never resumed without the port, and a standalone one only into a free worktree.
@@ -815,7 +869,7 @@ async function runUnitBody(options, scope) {
 
     unitRecord = {
       unit,
-      seatSchema: 1,
+      seatSchema: 2,
       seats,
       ...(typeof options.workflowId === 'string' && options.workflowId ? { workflowId: options.workflowId } : {}),
       workflow: scope.admission ? normalizeWorkflowLink({ caseId: scope.admission.caseId, activity: caseRef.activity, reservationId: scope.admission.reservationId }) : null,
@@ -1503,7 +1557,7 @@ async function runUnitBody(options, scope) {
     }
   }
 
-  const patternResult = await runLoop(effective, unit, unitRecord.configSnapshot.runner, {
+  const patternResult = await runLoop(effective, unit, runnerConfigForLoop ?? unitRecord.configSnapshot.runner, {
     runRole,
     verify,
     history,

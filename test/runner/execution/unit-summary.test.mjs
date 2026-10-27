@@ -7,7 +7,7 @@ import path from 'node:path';
 import { buildUnitSummary, writeUnitSummary, extractStance } from '../../../src/runner/execution/unit-summary.mjs';
 import { readUnitRunHistory } from '../../../src/runner/execution/unit-run-history.mjs';
 import { backfillUnitSummaries } from '../../../scripts/backfill-unit-summaries.mjs';
-import { runPattern } from '../../../src/runner/execution/loops/index.mjs';
+import { runLoop } from '../../../src/runner/execution/loops/index.mjs';
 
 const startedAt = '2026-10-05T01:00:00Z';
 const settledAt = '2026-10-05T01:01:00Z';
@@ -175,7 +175,13 @@ test('panel summary kinds follow the dispatched membership for researcher preset
   for (const pattern of ['research-fan-out', 'research-fan-out-gated']) {
     const { root, dir, record } = fixture(t, { pattern });
     const dispatched = [];
-    const execution = await runPattern(pattern, record.unit, {}, {
+    const fanOutSeats = [
+      { seat: 'researcher-1', role: 'producer' },
+      { seat: 'researcher-2', role: 'producer' },
+      { seat: 'researcher-3', role: 'producer' },
+      { seat: 'synthesizer', role: 'synthesizer' },
+    ];
+    const execution = await runLoop({ loop: 'panel', params: { seats: fanOutSeats } }, record.unit, {}, {
       runRole: async ({ seat }) => {
         dispatched.push(seat.seat);
         result(dir, seat.seat, '1', '01');
@@ -420,4 +426,54 @@ test('a debate summary names each seat by its owner kind and derives the outcome
   assert.equal(summary.outcome, 'pass');
   const kinds = Object.fromEntries(summary.seats.filter((seat) => seat.round === 1).map((seat) => [seat.seat, [seat.role, seat.kind]]));
   assert.deepEqual(kinds, { antithesis: ['producer', 'producer'], judge: ['judge', 'judge'], thesis: ['producer', 'producer'] });
+});
+
+test('the summary shows the pin when present and older records keep their exact bytes', (t) => {
+  const collaboration = {
+    baseline: { source: 'unit', selector: 'code-change' },
+    pattern: { name: 'code-change', layer: 'shipped', digest: 'abc123' },
+    effective: {
+      loop: 'reviewed',
+      params: { maxRounds: 2, minCheckers: ['reviewer', 'red-team'] },
+      seats: [
+        { seat: 'producer', role: 'producer', posture: { writer: true } },
+        { seat: 'reviewer', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+        { seat: 'red-team', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+      ],
+    },
+    provenance: {
+      params: { maxRounds: 'pattern-default' },
+      checkers: { reviewer: 'pattern-invariant:code-change', 'red-team': 'pattern-invariant:code-change' },
+    },
+  };
+  const { dir } = fixture(t, {
+    pattern: 'code-change',
+    seatSchema: 2,
+    collaboration,
+    settlement: { outcome: 'pass', settledAt },
+  });
+  result(dir, 'producer', '1', '01');
+  result(dir, 'reviewer', '1', '01');
+  result(dir, 'red-team', '1', '01');
+
+  const summary = buildUnitSummary(dir);
+  assert.deepEqual(summary.collaboration, {
+    loop: 'reviewed',
+    params: { maxRounds: 2, minCheckers: ['reviewer', 'red-team'] },
+    provenance: {
+      params: { maxRounds: 'pattern-default' },
+      checkers: { reviewer: 'pattern-invariant:code-change', 'red-team': 'pattern-invariant:code-change' },
+    },
+  });
+
+  // Older record without collaboration has no collaboration key in summary
+  const older = fixture(t, {
+    pattern: 'code-change',
+    settlement: { outcome: 'pass', settledAt },
+  });
+  result(older.dir, 'producer', '1', '01');
+  result(older.dir, 'reviewer', '1', '01');
+  result(older.dir, 'red-team', '1', '01');
+  const olderSummary = buildUnitSummary(older.dir);
+  assert.equal('collaboration' in olderSummary, false, 'older records keep their exact bytes');
 });

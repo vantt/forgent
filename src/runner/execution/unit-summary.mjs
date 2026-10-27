@@ -4,7 +4,6 @@ import path from 'node:path';
 import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
 import { readUnitRunSeats } from './unit-run-history.mjs';
 import { normalizeWorkflowLink } from './unit.mjs';
-import { resolvePattern } from './patterns/presets.mjs';
 import { patternHistoryOutcome } from './loops/history-outcome.mjs';
 import { VALID_OUTCOMES } from './loops/panel.mjs';
 import { seatsOfRecord } from './legacy-seat-read.mjs';
@@ -18,6 +17,26 @@ export const UNIT_SUMMARY_CONTRACT = Object.freeze({ id: 'unit-summary', version
 
 /** A finished unit whose outcome cannot be derived from its records; never a pass or a failure. */
 export const UNDETERMINED_OUTCOME = 'undetermined';
+
+const LEGACY_PATTERNS = Object.freeze({
+  consult: { loop: 'solo', params: { role: 'advisor' } },
+  'code-change': { loop: 'reviewed', params: { minCheckers: ['reviewer', 'red-team'] } },
+  'research-fan-out': { loop: 'panel', params: { members: 3, role: 'researcher', synthesizeRole: 'synthesizer' } },
+  'research-fan-out-gated': { loop: 'panel', params: { members: 3, role: 'researcher', synthesizeRole: 'synthesizer', gated: true } },
+  rfc: { loop: 'reviewed', params: { maxRounds: 1, minCheckers: ['reviewer', 'red-team'] } },
+});
+
+function decodeLegacyPattern(pattern) {
+  if (!pattern) return { patternName: null, params: {} };
+  const raw = typeof pattern === 'string' ? pattern : pattern.pattern ?? pattern.patternName;
+  if (!raw) return { patternName: null, params: {} };
+  const legacy = Object.hasOwn(LEGACY_PATTERNS, raw) ? LEGACY_PATTERNS[raw] : null;
+  const callerParams = typeof pattern === 'object' && pattern !== null ? (pattern.params ?? {}) : {};
+  if (legacy) {
+    return { patternName: legacy.loop, params: { ...legacy.params, ...callerParams } };
+  }
+  return { patternName: raw, params: { ...callerParams } };
+}
 
 export function extractStance(agentClaim, options = []) {
   if (agentClaim?.stance === undefined) return { status: 'missing' };
@@ -68,8 +87,11 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   if (legacyCompletion && legacyCompletion.unitRunId !== unitRunId) throw new Error('completion belongs to another unit run');
   // Records written before the owner stored its pattern do not say which pattern ran (a caller's
   // --pattern was never kept), so the pattern stays unknown rather than defaulting to solo.
+  const pin = record.collaboration;
   const pattern = record.pattern ?? record.unit?.pattern ?? null;
-  const { patternName, params } = pattern === null ? { patternName: null, params: {} } : resolvePattern(pattern);
+  const decodedLegacy = pin ? null : decodeLegacyPattern(pattern);
+  const patternName = pin?.effective?.loop ?? decodedLegacy?.patternName ?? null;
+  const params = pin?.effective?.params ?? decodedLegacy?.params ?? {};
   const cfg = record.configSnapshot?.runner ?? {};
   const recordSeats = seatsOfRecord(record);
   const seatInfo = new Map(recordSeats.map((entry) => [entry.seat, entry]));
@@ -149,6 +171,13 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
     seats,
     ...(sharedFamilies.length > 0 ? { sharedFamilies } : {}),
     ...(legacy?.evidence && !settlement ? { derivation: legacy.evidence } : {}),
+    ...(pin ? {
+      collaboration: {
+        loop: pin.effective.loop,
+        params: pin.effective.params ?? {},
+        provenance: pin.provenance ?? { params: {}, checkers: {} },
+      },
+    } : {}),
   };
 }
 

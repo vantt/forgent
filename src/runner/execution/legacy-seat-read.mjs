@@ -7,7 +7,6 @@
 // resume. Readers do not branch on those names: they ask here which seats the old pattern had and
 // what each one was. This is the only module that knows the retired names.
 
-import { resolvePattern } from './patterns/presets.mjs';
 
 const posture = (fields) => Object.freeze({
   readOnly: false, writer: false, forceOutOfProcess: false, stance: false, verdict: false, ...fields,
@@ -52,17 +51,21 @@ function legacyCheckers(unit, cfg, params) {
 
 // The presets that carried role names as params before seats; a record that stored one by name must
 // still be read the way it ran.
-const LEGACY_PRESETS = Object.freeze({
+const HISTORICAL_PATTERNS = Object.freeze({
   consult: { pattern: 'solo', params: { role: 'advisor' } },
   'research-fan-out': { pattern: 'panel', params: { members: 3, role: 'researcher', synthesizeRole: 'synthesizer' } },
   'research-fan-out-gated': { pattern: 'panel', params: { members: 3, role: 'researcher', synthesizeRole: 'synthesizer', gated: true } },
+  'code-change': { pattern: 'reviewed', params: { minCheckers: ['reviewer', 'red-team'] } },
+  rfc: { pattern: 'reviewed', params: {} },
 });
 
 function legacyResolve(pattern) {
   const name = typeof pattern === 'string' ? pattern : pattern?.pattern ?? pattern?.patternName;
-  const preset = typeof name === 'string' && Object.hasOwn(LEGACY_PRESETS, name) ? LEGACY_PRESETS[name] : null;
-  if (!preset) return resolvePattern(pattern);
-  return { patternName: preset.pattern, params: { ...preset.params, ...(typeof pattern === 'object' ? pattern.params : {}) } };
+  const preset = typeof name === 'string' && Object.hasOwn(HISTORICAL_PATTERNS, name) ? HISTORICAL_PATTERNS[name] : null;
+  if (preset) {
+    return { patternName: preset.pattern, params: { ...preset.params, ...(typeof pattern === 'object' && pattern !== null ? pattern.params : {}) } };
+  }
+  return { patternName: name || 'solo', params: { ...(typeof pattern === 'object' && pattern !== null ? pattern.params : {}) } };
 }
 
 /**
@@ -116,4 +119,92 @@ export function isSeatRecord(record) {
 /** The seats of a record: its own list when fenced, else what its pattern had before the fence. */
 export function seatsOfRecord(record) {
   return isSeatRecord(record) ? (record.seats ?? []) : legacySeatsOf(record);
+}
+
+/**
+ * The single, pure record-read path for records with no `collaboration` (every in-flight unit at upgrade).
+ * Decodes stored selector to a catalog name, reads snapshot `patterns.reviewed.*` as loop tuning,
+ * uses shipped catalog for defaults, and presents snapshot `patterns.reviewed` as `loops.reviewed`.
+ *
+ * @param {object} record parsed `unit.json`
+ * @param {object} options
+ * @param {object} options.shipped shipped catalog from `shippedCatalog()`
+ * @returns {{ collaboration: object, effective: object, runner: object }}
+ */
+export function collaborationOfRecord(record, { shipped } = {}) {
+  if (record?.collaboration) {
+    return {
+      collaboration: record.collaboration,
+      effective: record.collaboration.effective,
+      runner: record.configSnapshot?.runner ?? {},
+    };
+  }
+
+  const rawPattern = record?.pattern ?? record?.unit?.pattern ?? 'solo';
+  let selectorName;
+  let selectorParams = {};
+  if (typeof rawPattern === 'string') {
+    selectorName = rawPattern;
+  } else if (rawPattern && typeof rawPattern === 'object') {
+    selectorName = rawPattern.pattern ?? rawPattern.patternName ?? 'solo';
+    selectorParams = rawPattern.params ?? {};
+  } else {
+    selectorName = 'solo';
+  }
+
+  const catalogName = selectorName === 'research-fan-out-gated' ? 'research-fan-out' : selectorName;
+
+  const shippedPatterns = shipped?.patterns ?? shipped ?? {};
+  const shippedEntry = shippedPatterns[catalogName] ?? {};
+  const loop = shippedEntry.loop ?? (['solo', 'reviewed', 'panel', 'debate'].includes(catalogName) ? catalogName : 'solo');
+  const patternDefaults = { ...(shippedEntry.defaults ?? {}), ...(shippedEntry.params ?? {}) };
+
+  const snapshotRunner = record?.configSnapshot?.runner ?? {};
+  const reviewedTuning = snapshotRunner?.patterns?.reviewed ?? snapshotRunner?.loops?.reviewed ?? {};
+
+  const effectiveParams = { ...patternDefaults, ...selectorParams };
+  if (loop === 'reviewed' && reviewedTuning.maxRounds !== undefined) {
+    effectiveParams.maxRounds = reviewedTuning.maxRounds;
+  }
+
+  const storedSeats = record?.seats ?? seatsOfRecord(record);
+  if (storedSeats && storedSeats.length > 0) {
+    effectiveParams.seats = storedSeats.map(({ seat, role, persona, tier }) => ({
+      seat,
+      ...(role ? { role } : {}),
+      ...(persona ? { persona } : {}),
+      ...(tier ? { tier } : {}),
+    }));
+  }
+
+  const runnerView = {
+    ...snapshotRunner,
+    loops: {
+      ...snapshotRunner.loops,
+      ...(snapshotRunner?.patterns?.reviewed ? {
+        reviewed: {
+          ...snapshotRunner.loops?.reviewed,
+          ...snapshotRunner.patterns.reviewed,
+        },
+      } : {}),
+    },
+  };
+
+  const collaboration = {
+    pattern: {
+      name: catalogName,
+      layer: 'shipped',
+    },
+    effective: {
+      loop,
+      params: effectiveParams,
+      seats: storedSeats,
+    },
+  };
+
+  return {
+    collaboration,
+    effective: collaboration.effective,
+    runner: runnerView,
+  };
 }

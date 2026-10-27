@@ -8,7 +8,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { legacySeatsOf, seatsOfRecord, seatKeyOf, isVerdictResult, isVerifyResult, isSeatRecord } from '../../../src/runner/execution/legacy-seat-read.mjs';
+import { legacySeatsOf, seatsOfRecord, seatKeyOf, isVerdictResult, isVerifyResult, isSeatRecord, collaborationOfRecord } from '../../../src/runner/execution/legacy-seat-read.mjs';
+import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
 import { buildUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { readUnitRunHistory } from '../../../src/runner/execution/unit-run-history.mjs';
 import { resolveUnitInputs } from '../../../src/runner/execution/handoff-refs.mjs';
@@ -138,4 +139,71 @@ test('a pre-fence record is refused on resume by name, whatever its execution sa
     assert.equal(fs.readFileSync(path.join(dir, 'unit.json'), 'utf8'), before);
     assert.equal(fs.existsSync(path.join(dir, 'unit-control')), false, 'no controller was taken for a record that cannot resume');
   }
+});
+
+test('collaborationOfRecord decodes an unpinned record reading snapshot patterns.reviewed.maxRounds as tuning', () => {
+  const shipped = shippedCatalog();
+  const record = {
+    seatSchema: 1,
+    pattern: 'reviewed',
+    unit: { id: 'u1', capability: 'code:implement', rigor: 'standard' },
+    configSnapshot: {
+      runner: {
+        patterns: {
+          reviewed: { maxRounds: 3 },
+        },
+      },
+    },
+    seats: [
+      { seat: 'producer', role: 'producer', posture: { writer: true } },
+      { seat: 'reviewer', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+    ],
+  };
+  const { collaboration, effective, runner } = collaborationOfRecord(record, { shipped });
+  assert.equal(effective.loop, 'reviewed');
+  assert.equal(effective.params.maxRounds, 3);
+  assert.equal(collaboration.pattern.name, 'reviewed');
+  assert.deepEqual(runner.loops.reviewed, { maxRounds: 3 });
+});
+
+test('collaborationOfRecord decodes stored research-fan-out-gated as research-fan-out', () => {
+  const shipped = shippedCatalog();
+  const record = {
+    seatSchema: 1,
+    pattern: 'research-fan-out-gated',
+    unit: { id: 'u2', capability: 'research' },
+    configSnapshot: { runner: {} },
+    seats: [
+      { seat: 'researcher-1', role: 'producer' },
+      { seat: 'researcher-2', role: 'producer' },
+      { seat: 'researcher-3', role: 'producer' },
+      { seat: 'synthesizer', role: 'synthesizer' },
+    ],
+  };
+  const { collaboration, effective } = collaborationOfRecord(record, { shipped });
+  assert.equal(effective.loop, 'panel');
+  assert.equal(collaboration.pattern.name, 'research-fan-out');
+  assert.equal(effective.seats.length, 4);
+});
+
+test('collaborationOfRecord presents snapshot patterns.reviewed with tester as loops.reviewed', () => {
+  const shipped = shippedCatalog();
+  const record = {
+    seatSchema: 1,
+    pattern: 'reviewed',
+    unit: { id: 'u3', capability: 'code:implement', rigor: 'critical' },
+    configSnapshot: {
+      runner: {
+        patterns: {
+          reviewed: {
+            checkersByRigor: {
+              critical: ['reviewer', 'red-team', 'tester'],
+            },
+          },
+        },
+      },
+    },
+  };
+  const { runner } = collaborationOfRecord(record, { shipped });
+  assert.deepEqual(runner.loops.reviewed.checkersByRigor.critical, ['reviewer', 'red-team', 'tester']);
 });

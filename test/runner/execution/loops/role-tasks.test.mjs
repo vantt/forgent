@@ -5,6 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { DEFAULT_ROLE_TASKS, roleUnit } from '../../../../src/runner/execution/loops/role-tasks.mjs';
+import { shippedCatalog } from '../../../../src/runner/dispatch/shipped-catalog.mjs';
 
 const unit = Object.freeze({ id: 'u1', capability: 'docs:write', objective: 'Replace the placeholder line in AGENTS.md', writes: ['AGENTS.md'] });
 
@@ -85,4 +86,18 @@ test('declared choices and the stance request reach a panelist only, never a syn
   }
   // No declared choices means nothing to ask.
   assert.equal(roleUnit(unit, { seat: 'member-1', kind: 'panelist', stance: true }), unit);
+});
+
+test('rfc checkers are briefed on the supplied artifact and the producer report, not the latest commit', () => {
+  const shipped = shippedCatalog();
+  const params = { roleTasks: shipped.patterns.rfc.defaults.roleTasks };
+  const rfcUnit = { id: 'u1', capability: 'advise', objective: 'Red-team the proposal in docs/pricing-v2.md' };
+  for (const seat of ['reviewer', 'red-team']) {
+    const { objective } = roleUnit(rfcUnit, { seat, params });
+    assert.ok(objective.includes(rfcUnit.objective), `${seat} still sees the original task`);
+    assert.match(objective, /Context refs/, `${seat} is pointed at the producer report`);
+    assert.doesNotMatch(objective, /git log|git show/, `${seat} is not sent to the latest commit`);
+    assert.match(objective, /do not change any file/i);
+  }
+  assert.notEqual(roleUnit(rfcUnit, { seat: 'reviewer', params }).objective, roleUnit(rfcUnit, { seat: 'red-team', params }).objective);
 });

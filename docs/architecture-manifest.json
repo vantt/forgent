@@ -303,7 +303,6 @@
     "src/runner/execution/loops/index.mjs": "domain",
     "src/runner/execution/loops/debate.mjs": "domain",
     "src/runner/execution/loops/panel.mjs": "domain",
-    "src/runner/execution/patterns/presets.mjs": "domain",
     "src/runner/execution/patterns/catalog.mjs": "domain",
     "src/runner/execution/patterns/catalog-entries.mjs": "domain",
     "src/runner/execution/loops/reviewed.mjs": "domain",

@@ -7,13 +7,11 @@ import { runSolo, PARAMS as SOLO_PARAMS, VERIFY as SOLO_VERIFY } from './solo.mj
 import { runReviewed, PARAMS as REVIEWED_PARAMS, VERIFY as REVIEWED_VERIFY } from './reviewed.mjs';
 import { runPanel, PARAMS as PANEL_PARAMS, VERIFY as PANEL_VERIFY } from './panel.mjs';
 import { runDebate, PARAMS as DEBATE_PARAMS, VERIFY as DEBATE_VERIFY } from './debate.mjs';
-import { resolvePattern, PRESETS } from '../patterns/presets.mjs';
 
 export { runSolo } from './solo.mjs';
 export { runReviewed } from './reviewed.mjs';
 export { runPanel } from './panel.mjs';
 export { runDebate } from './debate.mjs';
-export { resolvePattern, PRESETS } from '../patterns/presets.mjs';
 export { DEFAULT_MAX_ROUNDS } from './reviewed.mjs';
 export { DEFAULT_REBUTTAL } from './debate.mjs';
 

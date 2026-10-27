@@ -21,6 +21,7 @@ import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
 import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
+import { openCase, eventsOf } from '../../helpers/workflow-case-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -453,6 +454,16 @@ test('case request reason reaches admission proposal and route event', async () 
   assert.equal(admitCall[1].reason, 'diverging for fast scout');
   assert.equal(admitCall[1].caseRef.reason, 'diverging for fast scout');
 
+  const caseRun = openCase({ repoRoot });
+  const realPort = createCaseAdmissionPort({ repoRoot });
+  const answer = realPort.admit({
+    ...admitCall[1],
+    caseRef: { caseId: caseRun.caseId, activity: 'scout', reason: 'diverging for fast scout' },
+  });
+  assert.equal(answer.admitted, true);
+  const routeEvents = eventsOf(caseRun).filter((e) => e.type === 'route');
+  assert.ok(routeEvents.length > 0);
+  assert.equal(routeEvents.at(-1).payload.reason, 'diverging for fast scout');
   const portReq = recordingPort();
   await runUnit({
     unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
@@ -464,5 +475,12 @@ test('case request reason reaches admission proposal and route event', async () 
   const reqAdmitCall = portReq.calls.find((c) => c[0] === 'admit');
   assert.ok(reqAdmitCall);
   assert.equal(reqAdmitCall[1].reason, 'diverging via request reason');
+  const reqAnswer = realPort.admit({
+    ...reqAdmitCall[1],
+    caseRef: { caseId: caseRun.caseId, activity: 'scout' },
+  });
+  assert.equal(reqAnswer.admitted, true);
+  const reqRouteEvents = eventsOf(caseRun).filter((e) => e.type === 'route');
+  assert.equal(reqRouteEvents.at(-1).payload.reason, 'diverging via request reason');
   assert.equal(reqAdmitCall[1].caseRef.reason, 'diverging via request reason');
 });

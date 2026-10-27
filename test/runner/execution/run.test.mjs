@@ -8,6 +8,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 
+import crypto from 'node:crypto';
 import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { runUnit as coreRunUnit, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
@@ -639,12 +640,21 @@ test('a unit-run input reaches the roles as the absolute path of that role\'s re
 
   // A record carrying a seatSchema from a newer release is refused on resume and left untouched.
   const firstPath = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId, 'unit.json');
-  fs.writeFileSync(firstPath, JSON.stringify({ ...JSON.parse(fs.readFileSync(firstPath, 'utf8')), seatSchema: 2 }));
+  fs.writeFileSync(firstPath, JSON.stringify({ ...JSON.parse(fs.readFileSync(firstPath, 'utf8')), seatSchema: 3 }));
   await assert.rejects(
     () => run(undefined, { resumeUnitRunId: first.unitRunId }),
     (err) => err.code === 'record-from-newer-release' && /seatSchema/.test(err.message),
   );
-  assert.equal(JSON.parse(fs.readFileSync(firstPath, 'utf8')).seatSchema, 2, 'the refused record is left untouched');
+  assert.equal(JSON.parse(fs.readFileSync(firstPath, 'utf8')).seatSchema, 3, 'the refused record is left untouched');
+
+  // Schema 1 and 2 records are accepted by the fence
+  fs.writeFileSync(firstPath, JSON.stringify({ ...JSON.parse(fs.readFileSync(firstPath, 'utf8')), seatSchema: 1 }));
+  const resumed1 = await run(undefined, { resumeUnitRunId: first.unitRunId });
+  assert.equal(resumed1.outcome, 'pass');
+
+  fs.writeFileSync(firstPath, JSON.stringify({ ...JSON.parse(fs.readFileSync(firstPath, 'utf8')), seatSchema: 2 }));
+  const resumed2 = await run(undefined, { resumeUnitRunId: first.unitRunId });
+  assert.equal(resumed2.outcome, 'pass');
 });
 
 test('anonymizeInputs hands the role a copy under a neutral name, keeps the mapping in unit.json, and a resume reuses it', async () => {
@@ -1127,10 +1137,18 @@ function recordedUnitFixture(t, pattern = 'solo') {
     createdAt: '2026-10-05T01:00:00Z',
   };
   // A pattern the resolver does not know leaves a record with no seats, which a resume then refuses.
-  try {
-    record.seats = resolveSeats({ pattern, unit: record.unit, runnerConfig: record.configSnapshot.runner });
-  } catch {
-    record.seats = [];
+  if (patternName === 'rfc') {
+    record.seats = [
+      { seat: 'producer', role: 'producer', posture: { writer: true } },
+      { seat: 'reviewer', role: 'reviewer', posture: { readOnly: true, verdict: true, forceOutOfProcess: true } },
+      { seat: 'red-team', role: 'reviewer', posture: { readOnly: true, verdict: true, forceOutOfProcess: true } },
+    ];
+  } else {
+    try {
+      record.seats = resolveSeats({ pattern, unit: record.unit, runnerConfig: record.configSnapshot.runner });
+    } catch {
+      record.seats = [];
+    }
   }
   fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
   const readRecord = () => JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
@@ -2034,4 +2052,265 @@ throw new Error('controller never reached the native commit');
     fs.rmSync(tree, { recursive: true, force: true });
     fs.rmSync(main, { recursive: true, force: true });
   }
+});
+function settleSeat(repoRoot, unitDir, role, round = '1', run = '01') {
+  const runDir = path.join(unitDir, role, round, 'runs', run);
+  fs.mkdirSync(runDir, { recursive: true });
+  const reportPath = path.join(runDir, 'report.md');
+  const reportContent = '# Report\nDone\n';
+  fs.writeFileSync(reportPath, reportContent);
+  const sha = crypto.createHash('sha256').update(reportContent).digest('hex');
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({
+    runId: `${role}-${round}-${run}`,
+    outcome: 'pass',
+    settledAt: '2026-10-05T01:01:00Z',
+    classification: { outcome: { category: 'ok' } },
+    agentClaim: { summary: 'Done', assessment: { verdict: 'pass' } },
+    settleReports: [{ path: path.relative(repoRoot, reportPath), sha256: sha }],
+  }));
+}
+
+test('a pinned unit keeps its effective meaning after a catalog and a config edit', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', 'unit-run-pinned-edit');
+  fs.mkdirSync(unitDir, { recursive: true });
+  const record = {
+    unit: { id: 'u-pinned', capability: 'code:implement', writes: [], pattern: 'reviewed', objective: 'Do review' },
+    pattern: 'reviewed',
+    seatSchema: 2,
+    collaboration: {
+      baseline: { source: 'unit', selector: 'reviewed' },
+      pattern: { name: 'reviewed', layer: 'shipped', digest: 'abc123' },
+      effective: {
+        loop: 'reviewed',
+        params: { maxRounds: 1 },
+        seats: [
+          { seat: 'producer', role: 'producer', posture: { writer: true } },
+          { seat: 'reviewer', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+          { seat: 'red-team', role: 'red-team', posture: { readOnly: true, verdict: true } },
+        ],
+      },
+      provenance: { params: {}, checkers: {} },
+    },
+    seats: [
+      { seat: 'producer', role: 'producer', posture: { writer: true } },
+      { seat: 'reviewer', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+      { seat: 'red-team', role: 'red-team', posture: { readOnly: true, verdict: true } },
+    ],
+    resolvedInputs: [],
+    configSnapshot: snapshotRunnerConfig(repoRoot),
+    worktree: fs.realpathSync(worktreeDir),
+    createdAt: '2026-10-05T01:00:00Z',
+    settlement: { outcome: 'pass', settledAt: '2026-10-05T01:01:00Z' },
+  };
+  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
+  settleSeat(repoRoot, unitDir, 'producer');
+  settleSeat(repoRoot, unitDir, 'reviewer');
+  settleSeat(repoRoot, unitDir, 'red-team');
+
+  // Edit project config
+  const cfg = readProjectConfig(repoRoot);
+  cfg.runner.loops = { reviewed: { maxRounds: 5 } };
+  cfg.runner.patterns = { reviewed: { loop: 'reviewed', defaults: { maxRounds: 5 } } };
+  writeProjectConfig(repoRoot, cfg);
+
+  // Resume the pinned unit
+  const res = await coreRunUnit({
+    resumeUnitRunId: 'unit-run-pinned-edit',
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+  });
+  assert.equal(res.outcome, 'pass');
+  const stored = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
+  assert.equal(stored.collaboration.effective.params.maxRounds, 1);
+});
+
+test('an unreadable pin refuses collaboration-pin-unusable', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', 'unit-run-unreadable-pin');
+  fs.mkdirSync(unitDir, { recursive: true });
+  const record = {
+    unit: { id: 'u-unusable', capability: 'docs:write', writes: [], objective: 'Do write' },
+    pattern: 'solo',
+    seatSchema: 2,
+    collaboration: 'corrupted-string',
+    seats: [{ seat: 'producer', role: 'producer', posture: { writer: true } }],
+    resolvedInputs: [],
+    configSnapshot: snapshotRunnerConfig(repoRoot),
+    worktree: fs.realpathSync(worktreeDir),
+    createdAt: '2026-10-05T01:00:00Z',
+    settlement: { outcome: 'pass', settledAt: '2026-10-05T01:01:00Z' },
+  };
+  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
+
+  await assert.rejects(
+    () => coreRunUnit({
+      resumeUnitRunId: 'unit-run-unreadable-pin',
+      repoRoot,
+      cwd: worktreeDir,
+      worktree: worktreeDir,
+    }),
+    (err) => err instanceof RunnerConfigError && err.code === 'collaboration-pin-unusable',
+  );
+
+  // Unregistered loop refuses
+  record.collaboration = {
+    pattern: { name: 'solo' },
+    effective: { loop: 'unknown-loop', params: {} },
+  };
+  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
+  await assert.rejects(
+    () => coreRunUnit({
+      resumeUnitRunId: 'unit-run-unreadable-pin',
+      repoRoot,
+      cwd: worktreeDir,
+      worktree: worktreeDir,
+    }),
+    (err) => err instanceof RunnerConfigError && err.code === 'collaboration-pin-unusable',
+  );
+
+  // Unregistered pattern refuses
+  record.collaboration = {
+    pattern: { name: 'unknown-pattern-name' },
+    effective: { loop: 'solo', params: {} },
+  };
+  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
+  await assert.rejects(
+    () => coreRunUnit({
+      resumeUnitRunId: 'unit-run-unreadable-pin',
+      repoRoot,
+      cwd: worktreeDir,
+      worktree: worktreeDir,
+    }),
+    (err) => err instanceof RunnerConfigError && err.code === 'collaboration-pin-unusable',
+  );
+});
+
+test('resume ignores a caller --pattern', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', 'unit-run-caller-pattern');
+  fs.mkdirSync(unitDir, { recursive: true });
+  settleSeat(repoRoot, unitDir, 'producer');
+  const record = {
+    unit: { id: 'u-ignore-caller-pattern', capability: 'docs:write', writes: [], objective: 'Do solo' },
+    pattern: 'solo',
+    seatSchema: 2,
+    collaboration: {
+      pattern: { name: 'solo' },
+      effective: { loop: 'solo', params: {} },
+    },
+    seats: [{ seat: 'producer', role: 'producer', posture: { writer: true } }],
+    resolvedInputs: [],
+    configSnapshot: snapshotRunnerConfig(repoRoot),
+    worktree: fs.realpathSync(worktreeDir),
+    createdAt: '2026-10-05T01:00:00Z',
+    settlement: { outcome: 'pass', settledAt: '2026-10-05T01:01:00Z' },
+  };
+  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
+
+  const res = await coreRunUnit({
+    resumeUnitRunId: 'unit-run-caller-pattern',
+    pattern: 'panel', // caller pattern ignored
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+  });
+  assert.equal(res.outcome, 'pass');
+  assert.equal(res.unitRunId, 'unit-run-caller-pattern');
+});
+
+test('an unpinned schema-1 record resumes through the decoder', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', 'unit-run-unpinned-schema1');
+  fs.mkdirSync(unitDir, { recursive: true });
+  settleSeat(repoRoot, unitDir, 'researcher-1');
+  settleSeat(repoRoot, unitDir, 'researcher-2');
+  settleSeat(repoRoot, unitDir, 'researcher-3');
+  settleSeat(repoRoot, unitDir, 'synthesizer');
+  const record = {
+    unit: { id: 'u-unpinned', capability: 'code:implement', writes: [], pattern: 'research-fan-out-gated', objective: 'Do research' },
+    pattern: 'research-fan-out-gated',
+    seatSchema: 1,
+    // No collaboration field
+    seats: [
+      { seat: 'researcher-1', role: 'producer', posture: { readOnly: true } },
+      { seat: 'researcher-2', role: 'producer', posture: { readOnly: true } },
+      { seat: 'researcher-3', role: 'producer', posture: { readOnly: true } },
+      { seat: 'synthesizer', role: 'synthesizer', posture: {} },
+    ],
+    resolvedInputs: [],
+    configSnapshot: {
+      runner: {
+        patterns: {
+          reviewed: { maxRounds: 3 },
+        },
+      },
+    },
+    worktree: fs.realpathSync(worktreeDir),
+    createdAt: '2026-10-05T01:00:00Z',
+    settlement: { outcome: 'pass', settledAt: '2026-10-05T01:01:00Z' },
+  };
+  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
+
+  const res = await coreRunUnit({
+    resumeUnitRunId: 'unit-run-unpinned-schema1',
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+  });
+  assert.equal(res.outcome, 'pass');
+  // Stored research-fan-out-gated was decoded to research-fan-out (loop panel)
+  const stored = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
+  assert.equal(stored.collaboration.pattern.name, 'research-fan-out');
+  assert.equal(stored.collaboration.effective.loop, 'panel');
+
+  // Critical rigor record with snapshot listing tester resumes with tester seat
+  const critDir = path.join(repoRoot, '.fgos', 'assignments', 'unit-run-unpinned-crit');
+  fs.mkdirSync(critDir, { recursive: true });
+  const critRecord = {
+    unit: { id: 'u-crit', capability: 'code:implement', writes: [], pattern: 'reviewed', rigor: 'critical', objective: 'Critical fix' },
+    pattern: 'reviewed',
+    seatSchema: 1,
+    seats: [
+      { seat: 'producer', role: 'producer', posture: { writer: true } },
+      { seat: 'reviewer', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+      { seat: 'red-team', role: 'red-team', posture: { readOnly: true, verdict: true } },
+      { seat: 'tester', role: 'reviewer', posture: { readOnly: true } },
+    ],
+    resolvedInputs: [],
+    configSnapshot: {
+      runner: {
+        patterns: {
+          reviewed: {
+            checkersByRigor: {
+              critical: ['reviewer', 'red-team', 'tester'],
+            },
+          },
+        },
+      },
+    },
+    worktree: fs.realpathSync(worktreeDir),
+    createdAt: '2026-10-05T01:00:00Z',
+    settlement: { outcome: 'pass', settledAt: '2026-10-05T01:01:00Z' },
+  };
+  fs.writeFileSync(path.join(critDir, 'unit.json'), JSON.stringify(critRecord));
+  settleSeat(repoRoot, critDir, 'producer');
+  settleSeat(repoRoot, critDir, 'reviewer');
+  settleSeat(repoRoot, critDir, 'red-team');
+  settleSeat(repoRoot, critDir, 'tester');
+
+  const critRes = await coreRunUnit({
+    resumeUnitRunId: 'unit-run-unpinned-crit',
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+  });
+  assert.equal(critRes.outcome, 'pass');
+  const critStored = JSON.parse(fs.readFileSync(path.join(critDir, 'unit.json'), 'utf8'));
+  assert.ok(critStored.collaboration.effective.seats.some((s) => s.seat === 'tester'));
 });
