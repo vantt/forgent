@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "48c9712888b3589e8f0b56adf22fa1693bb659fdc23069c3a81e8555b1e8bf74",
+  "payloadDigest": "f97cddd61d5ddb2cfa20fad3241a9f2d6e3464da15b0c871bf61ae2cf2bfc472",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1040,16 +1040,17 @@
     "src/runner/execution/handoff-refs.mjs": "2514d408d19a7145239025f449b16a308d9a740e9edb8285ed328da941fd1678",
     "src/runner/execution/legacy-seat-read.mjs": "acdd428cf8f6f4798d3a0d8cc210ebf53c5d98582bf7e759f10c2c3f988232bc",
     "src/runner/execution/loops/debate.mjs": "726f3c6cfbb7f71029c2fad96808badf6dbc35c909083bb16cf7862b755686fb",
-    "src/runner/execution/loops/history-outcome.mjs": "596e7a2b6344ce9955b9c813c2811b79a16b8825aee51fe1cb3e40839cdcd048",
+    "src/runner/execution/loops/history-outcome.mjs": "4a099fc37d44fdf7e6cf370684e7dd4f992597014761d0c08248863675abc0dd",
     "src/runner/execution/loops/index.mjs": "70b423a489c27c95b4357b3504ce7ee549b09419c0d358fc56b7955b6e44e14b",
     "src/runner/execution/loops/panel.mjs": "f9ca5df5e5f7439fd3a9fb02863baa7ba884c3e9796b32f9e59445333307ed61",
-    "src/runner/execution/loops/reviewed.mjs": "f53a2aa81005ac4c9382a421ca9c42d382f4faf7147e7bb53bb9214699726b5b",
+    "src/runner/execution/loops/reviewed.mjs": "18b844fb57f768a826132e7bddb03b2e7aec7b933c7b6f2afe408280b4cca865",
     "src/runner/execution/loops/role-tasks.mjs": "6df89972192146084a969ed83d56acdd25969f9eff8fa4f1a71c1a4f103bf3e9",
-    "src/runner/execution/loops/solo.mjs": "e026d28daf61abb726a7681e0dae1cc3e71554961971177a691c806db012f915",
+    "src/runner/execution/loops/solo.mjs": "f17ec42daacc214c83b3a5c75cd6e65715fd14f193fccf30e51cd918486dc18e",
+    "src/runner/execution/loops/verify.mjs": "cd3901a540556757badad15781dd2a9ac86f432bc670891626a8b9bf3767dca7",
     "src/runner/execution/partial-writes.mjs": "9c7ab4a2f57852b93283b819ed8c4adcac2b71c9241cdd4c760e73960bc1c027",
     "src/runner/execution/patterns/catalog-entries.mjs": "165c3942afcaeecaee4b6ebafcf11e29bd461f0fca7e12c133b1f1bba05aea1a",
     "src/runner/execution/patterns/catalog.mjs": "3c7b86a9640a339cbcd62583ac3ff11077687a700534ac63f4b692c0d4eed308",
-    "src/runner/execution/run.mjs": "2ed61715f4a67cbce1a8e167c694abc321a82484854bdb5873761a1c59a5a874",
+    "src/runner/execution/run.mjs": "b229fb5738bfdedea9b4b74991f34ab74181ec660210f6e38aa0ec0f769420a0",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "6a0b9671a9ceb020be1e74d306ea2e277cb324244faf391e85feff10ee7d2eaf",
     "src/runner/execution/seat-resolver.mjs": "aace15091b746e8f41fbc2a08b4bcade8021d3173a603b9dd4e8101b8346ea6c",
@@ -3386,14 +3387,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1545,
+      "line": 1546,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1545,
+      "line": 1546,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"

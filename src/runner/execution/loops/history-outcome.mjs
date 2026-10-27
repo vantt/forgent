@@ -5,6 +5,8 @@
  */
 
 import { reviewedHistoryOutcome } from './reviewed.mjs';
+import { verifyCommandOf } from './verify.mjs';
+import { VERIFY_SEAT } from '../seat-resolver.mjs';
 
 const ERROR_OUTCOMES = Object.freeze(['execution-failure', 'policy-refusal', 'provider-limit', 'blocked']);
 
@@ -32,6 +34,18 @@ function panelOutcome(seats, history) {
   const synthesizer = seats.find((s) => s.role === 'synthesizer');
   return history.find((h) => h.seat === synthesizer?.seat)?.outcome ?? null;
 }
+function soloOutcome(unit, cfg, seats, history) {
+  const producerSeat = seats?.[0]?.seat ?? 'producer';
+  const prod = history.find((h) => h.seat === producerSeat && (h.round ?? 1) === 1) || history.find((h) => h.seat === producerSeat);
+  if (!verifyCommandOf(unit, cfg)) {
+    return prod?.outcome ?? null;
+  }
+  if (!prod) return null;
+  if (prod.outcome !== 'pass') return prod.outcome;
+  const ver = history.find((h) => h.seat === VERIFY_SEAT && (h.round ?? 1) === 1) || history.find((h) => h.seat === VERIFY_SEAT);
+  return ver?.outcome ?? null;
+}
+
 
 /**
  * @param {object} args
@@ -46,7 +60,7 @@ function panelOutcome(seats, history) {
 export function patternHistoryOutcome({ patternName, params, unit, cfg, seats, history }) {
   switch (patternName) {
     case 'reviewed': return reviewedHistoryOutcome(unit, cfg, history, params, seats);
-    case 'solo': return history.find((h) => h.seat === seats[0]?.seat)?.outcome ?? null;
+    case 'solo': return soloOutcome(unit, cfg, seats, history);
     case 'debate': return debateOutcome(params, seats, history);
     case 'panel': return panelOutcome(seats, history);
     default: return null;

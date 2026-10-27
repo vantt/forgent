@@ -3,7 +3,8 @@
  * One producer seat.
  */
 
-import { resolveSeats } from '../seat-resolver.mjs';
+import { resolveSeats, VERIFY_SEAT } from '../seat-resolver.mjs';
+import { verifyCommandOf } from './verify.mjs';
 
 export const VALID_OUTCOMES = Object.freeze([
   'pass',
@@ -42,9 +43,42 @@ export async function runSolo(unit, cfg, { runRole, verify, history } = {}, para
 
   const result = existing || await runRole({ seat, unit });
 
+  const results = [result];
+  if (result.outcome !== 'pass' || !verifyCommandOf(unit, cfg)) {
+    return {
+      outcome: result.outcome,
+      rounds: 1,
+      results,
+    };
+  }
+
+  const existingVer = prior?.find((h) => h.seat === VERIFY_SEAT && (h.round ?? 1) === 1 && h.outcome === 'pass');
+  let verifyResult;
+  if (existingVer) {
+    verifyResult = existingVer;
+  } else if (typeof verify === 'function') {
+    const vRes = await verify(unit);
+    verifyResult = {
+      seat: VERIFY_SEAT,
+      round: 1,
+      outcome: vRes?.pass ? 'pass' : 'findings',
+      findings: vRes?.findings || (vRes?.pass ? [] : ['Verification failed']),
+    };
+  }
+
+  if (verifyResult) {
+    results.push(verifyResult);
+    return {
+      outcome: verifyResult.outcome,
+      rounds: 1,
+      results,
+      ...(verifyResult.outcome === 'findings' ? { findings: verifyResult.findings || [] } : {}),
+    };
+  }
+
   return {
     outcome: result.outcome,
     rounds: 1,
-    results: [result],
+    results,
   };
 }

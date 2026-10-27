@@ -2,6 +2,8 @@ import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { runSolo, PARAMS, VALID_OUTCOMES } from '../../../../src/runner/execution/loops/solo.mjs';
+import { isVerifyResult } from '../../../../src/runner/execution/legacy-seat-read.mjs';
+import { patternHistoryOutcome } from '../../../../src/runner/execution/loops/history-outcome.mjs';
 
 test('runSolo dispatches the producer seat and returns outcome', async () => {
   const calls = [];
@@ -120,4 +122,127 @@ test('runSolo honors declared seats passed through params', async () => {
   assert.equal(calls.length, 1);
   assert.equal(calls[0].seat.seat, 'custom-producer');
   assert.equal(result.results[0].seat, 'custom-producer');
+});
+
+test('verify runs once after a passing producer', async () => {
+  const roleCalls = [];
+  const verifyCalls = [];
+  const unit = { id: 'u-verify', objective: 'Verify task', verify: 'npm test' };
+  const cfg = {};
+  const runRole = async (opts) => {
+    roleCalls.push(opts);
+    return { seat: opts.seat.seat, outcome: 'pass' };
+  };
+  const verify = async (targetUnit) => {
+    verifyCalls.push(targetUnit);
+    return { pass: true };
+  };
+
+  const result = await runSolo(unit, cfg, { runRole, verify });
+  assert.equal(roleCalls.length, 1);
+  assert.equal(verifyCalls.length, 1);
+  assert.equal(verifyCalls[0], unit);
+  assert.equal(result.outcome, 'pass');
+  assert.equal(result.results.length, 2);
+  assert.equal(result.results[0].seat, 'producer');
+  assert.equal(result.results[1].seat, 'verify');
+  assert.equal(result.results[1].outcome, 'pass');
+});
+
+test('pass yields a verify result and a harness receipt by result shape', async () => {
+  const unit = { id: 'u-verify-receipt', objective: 'Verify receipt', verify: 'make test' };
+  const runRole = async (opts) => ({ seat: opts.seat.seat, outcome: 'pass' });
+  const verify = async () => ({ pass: true });
+
+  const result = await runSolo(unit, {}, { runRole, verify });
+  assert.equal(result.results.length, 2);
+  const verifyResult = result.results[1];
+  assert.equal(verifyResult.seat, 'verify');
+  assert.equal(verifyResult.round, 1);
+  assert.equal(verifyResult.outcome, 'pass');
+  assert.ok(isVerifyResult(verifyResult));
+});
+
+test('fail yields findings and no second producer launch', async () => {
+  const roleCalls = [];
+  const unit = { id: 'u-verify-fail', objective: 'Failing verify', verify: 'pytest' };
+  const runRole = async (opts) => {
+    roleCalls.push(opts);
+    return { seat: opts.seat.seat, outcome: 'pass' };
+  };
+  const verify = async () => ({ pass: false, findings: ['test assertion failed on line 42'] });
+
+  const result = await runSolo(unit, {}, { runRole, verify });
+  assert.equal(roleCalls.length, 1, 'producer must not be launched a second time');
+  assert.equal(result.outcome, 'findings');
+  assert.equal(result.results.length, 2);
+  assert.equal(result.results[1].seat, 'verify');
+  assert.equal(result.results[1].outcome, 'findings');
+  assert.deepEqual(result.findings, ['test assertion failed on line 42']);
+});
+
+test('resume reuses a prior passing verify', async () => {
+  let verifyCalled = false;
+  const unit = { id: 'u-verify-resume', objective: 'Resume task', verify: 'cargo test' };
+  const history = [
+    { seat: 'producer', round: 1, outcome: 'pass' },
+    { seat: 'verify', round: 1, outcome: 'pass' },
+  ];
+  const runRole = async () => { throw new Error('should not be called'); };
+  const verify = async () => {
+    verifyCalled = true;
+    return { pass: true };
+  };
+
+  const result = await runSolo(unit, {}, { runRole, verify, history });
+  assert.equal(verifyCalled, false);
+  assert.equal(result.outcome, 'pass');
+  assert.equal(result.results.length, 2);
+  assert.equal(result.results[0].seat, 'producer');
+  assert.equal(result.results[1].seat, 'verify');
+});
+
+test('a producer result with no durable verify yields an incomplete history, not pass', async () => {
+  const unit = { id: 'u-crash', objective: 'Crashed before durable verify', verify: 'npm test' };
+  const cfg = {};
+  const seats = [{ seat: 'producer', role: 'producer' }];
+  const history = [{ seat: 'producer', round: 1, outcome: 'pass' }];
+
+  const historyOutcome = patternHistoryOutcome({
+    patternName: 'solo',
+    unit,
+    cfg,
+    seats,
+    history,
+  });
+  assert.equal(historyOutcome, null);
+
+  let verifyRunCount = 0;
+  const runRole = async () => { throw new Error('producer already passed'); };
+  const verify = async () => {
+    verifyRunCount += 1;
+    return { pass: true };
+  };
+
+  const resumed = await runSolo(unit, cfg, { runRole, verify, history });
+  assert.equal(verifyRunCount, 1);
+  assert.equal(resumed.outcome, 'pass');
+  assert.equal(resumed.results.length, 2);
+});
+
+test('no command yields no verify result', async () => {
+  let verifyCalled = false;
+  const unit = { id: 'u-no-cmd', objective: 'No verify command' };
+  const cfg = {};
+  const runRole = async (opts) => ({ seat: opts.seat.seat, outcome: 'pass' });
+  const verify = async () => {
+    verifyCalled = true;
+    return { pass: true };
+  };
+
+  const result = await runSolo(unit, cfg, { runRole, verify });
+  assert.equal(verifyCalled, false);
+  assert.equal(result.outcome, 'pass');
+  assert.equal(result.results.length, 1);
+  assert.equal(result.results[0].seat, 'producer');
 });

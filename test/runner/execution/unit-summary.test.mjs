@@ -480,3 +480,47 @@ test('the summary shows the pin when present and older records keep their exact 
   assert.equal(serialized.includes('"collaboration"'), false);
   assert.equal(serializeUnitSummary(JSON.parse(serialized)), serialized, 'older records keep their exact bytes');
 });
+
+test('solo derived outcome derives from verify when configured, and falls back to producer without verify', (t) => {
+  const passFix = fixture(t, {
+    pattern: 'solo',
+    unit: { id: 'u-solo-pass', capability: 'code:implement', verify: 'npm test' },
+  });
+  result(passFix.dir, 'producer', '1', '01');
+  result(passFix.dir, 'verify', '1', '01');
+  const passSummary = buildUnitSummary(passFix.dir);
+  assert.equal(passSummary.outcome, 'pass');
+
+  const findingsFix = fixture(t, {
+    pattern: 'solo',
+    unit: { id: 'u-solo-findings', capability: 'code:implement', verify: 'npm test' },
+  });
+  result(findingsFix.dir, 'producer', '1', '01');
+  result(findingsFix.dir, 'verify', '1', '01', { classification: { outcome: { category: 'verdict' }, assessment: { verdict: 'findings' } } });
+  const findingsSummary = buildUnitSummary(findingsFix.dir);
+  assert.equal(findingsSummary.outcome, 'findings');
+
+  const missingFix = fixture(t, {
+    pattern: 'solo',
+    unit: { id: 'u-solo-missing', capability: 'code:implement', verify: 'npm test' },
+  });
+  result(missingFix.dir, 'producer', '1', '01');
+  const missingSummary = buildUnitSummary(missingFix.dir);
+  assert.equal(missingSummary.outcome, 'unknown');
+
+  const failProdFix = fixture(t, {
+    pattern: 'solo',
+    unit: { id: 'u-solo-fail-prod', capability: 'code:implement', verify: 'npm test' },
+  });
+  result(failProdFix.dir, 'producer', '1', '01', { classification: { outcome: { category: 'blocked' } } });
+  const failProdSummary = buildUnitSummary(failProdFix.dir);
+  assert.equal(failProdSummary.outcome, 'blocked');
+
+  const noCmdFix = fixture(t, {
+    pattern: 'solo',
+    unit: { id: 'u-solo-no-cmd', capability: 'docs:write' },
+  });
+  result(noCmdFix.dir, 'producer', '1', '01');
+  const noCmdSummary = buildUnitSummary(noCmdFix.dir);
+  assert.equal(noCmdSummary.outcome, 'pass');
+});

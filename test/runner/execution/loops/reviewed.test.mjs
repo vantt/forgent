@@ -4,10 +4,10 @@ import assert from 'node:assert/strict';
 import {
   runReviewed,
   reviewedHistoryOutcome as historyOutcomeOf,
-  verifyCommandOf,
   DEFAULT_MAX_ROUNDS,
   PARAMS,
 } from '../../../../src/runner/execution/loops/reviewed.mjs';
+import { verifyCommandOf } from '../../../../src/runner/execution/loops/verify.mjs';
 import {
   DEFAULT_CHECKERS_BY_RIGOR,
   requiresDistinctFamilies,

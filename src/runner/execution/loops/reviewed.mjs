@@ -6,6 +6,7 @@
 import { roleUnit } from './role-tasks.mjs';
 import { resolveSeats, requiresDistinctFamilies, VERIFY_SEAT } from '../seat-resolver.mjs';
 import { createBindBarrier } from '../seat-ledger.mjs';
+import { verifyCommandOf, hasVerifyCommand } from './verify.mjs';
 
 export const VALID_OUTCOMES = Object.freeze([
   'pass',
@@ -75,29 +76,6 @@ function changedNothing(res, producerSeat) {
 /** An outcome that ends the round: an error outcome, except a producer that changed nothing. */
 const endsRound = (res, producerSeat) => ERROR_OUTCOMES.includes(res?.outcome) && !changedNothing(res, producerSeat);
 
-/**
- * The verify command of a unit: its own `verify`, else its capability's. Nothing else supplies one,
- * so a unit without either is not verified, and says so.
- *
- * @param {object} unit
- * @param {object} cfg
- * @returns {string|undefined}
- */
-export function verifyCommandOf(unit, cfg) {
-  const command = unit?.verify || cfg?.capabilities?.[unit?.capability]?.verify;
-  return typeof command === 'string' && command.trim() ? command : undefined;
-}
-
-/**
- * Check if a verify command exists on the unit or its capability.
- *
- * @param {object} unit
- * @param {object} cfg
- * @returns {boolean}
- */
-export function hasVerifyCommand(unit, cfg) {
-  return verifyCommandOf(unit, cfg) !== undefined;
-}
 
 /**
  * Extract findings array from a result object.
