@@ -98,17 +98,17 @@ export function resolveCollaboration(options = {}) {
       unitDeclaredParams[k] = v;
     }
   }
-  if (unit?.params && typeof unit.params === 'object' && !Array.isArray(unit.params)) {
-    for (const [k, v] of Object.entries(unit.params)) {
-      unitDeclaredParams[k] = v;
-    }
-  }
   if (unit && typeof unit === 'object') {
     if (unit.seats !== undefined) {
       unitDeclaredParams.seats = unit.seats;
     }
     if (unit.roleTasks !== undefined) {
       unitDeclaredParams.roleTasks = unit.roleTasks;
+    }
+  }
+  if (unit?.params && typeof unit.params === 'object' && !Array.isArray(unit.params)) {
+    for (const [k, v] of Object.entries(unit.params)) {
+      unitDeclaredParams[k] = v;
     }
   }
   const callerStrPattern = typeof selectors?.callerString === 'string' && selectors.callerString ? selectors.callerString : null;

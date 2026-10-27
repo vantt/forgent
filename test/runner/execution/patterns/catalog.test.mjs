@@ -1853,6 +1853,41 @@ test('unit declarations shadowed by higher precedence slots are validated for un
   );
 });
 
+test('unit params seats and roleTasks take precedence over top-level unit declarations when both are valid', () => {
+  const shipped = shippedCatalog();
+
+  const resolved = resolveCollaboration({
+    selectors: { callerString: 'reviewed' },
+    unit: {
+      seats: [
+        { seat: 'writer', role: 'producer' },
+        { seat: 'critic', role: 'reviewer' },
+      ],
+      roleTasks: {
+        critic: 'review from top-level',
+      },
+      params: {
+        seats: [
+          { seat: 'author', role: 'producer' },
+          { seat: 'reviewer', role: 'reviewer' },
+        ],
+        roleTasks: {
+          reviewer: 'review from params',
+        },
+      },
+    },
+    shipped,
+  });
+
+  assert.deepEqual(
+    resolved.seats.map((s) => s.seat),
+    ['author', 'reviewer'],
+  );
+  assert.deepEqual({ ...resolved.roleTasks }, {
+    reviewer: 'review from params',
+  });
+});
+
 test('malformed scalars in request refuse with param-invalid without escaping as TypeError and falsy present params take effect', () => {
   const shipped = shippedCatalog();
 
