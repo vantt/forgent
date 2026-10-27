@@ -844,3 +844,122 @@ test('checker name validation rejects inherited object properties as checker nam
   });
   assert.ok(resInvariants.problems.some((p) => p.code === 'param-invalid' && p.message.includes('not a valid checker seat')));
 });
+
+test('reviewed pattern with producer-only declared seats rejects built-in checker task targets', () => {
+  const shipped = shippedCatalog();
+
+  const effective = {
+    'custom-reviewed-producer-only': {
+      promise: 'Reviewed pattern declaring only a producer seat.',
+      loop: 'reviewed',
+      defaults: {
+        seats: [
+          { seat: 'author', role: 'producer' },
+        ],
+        roleTasks: {
+          author: 'Draft initial implementation.',
+          reviewer: 'Built-in checker target not in effective roster.',
+        },
+      },
+    },
+  };
+  const res = checkCatalog({ shipped, effective });
+  assert.ok(
+    res.problems.some(
+      (p) => p.code === 'param-invalid' && p.message.includes('target "reviewer" does not exist for loop "reviewed"'),
+    ),
+  );
+});
+
+test('parameter validation rejects inherited object properties as loop parameters', () => {
+  const shipped = shippedCatalog();
+
+  const effective = {
+    'custom-pattern-inherited-param': {
+      promise: 'Pattern with inherited property as parameter.',
+      loop: 'reviewed',
+      defaults: {
+        toString: 'should be rejected',
+        constructor: 'should be rejected',
+        valueOf: 'should be rejected',
+      },
+      invariants: {
+        hasOwnProperty: { fixed: 1 },
+      },
+    },
+  };
+  const res = checkCatalog({ shipped, effective });
+  assert.ok(res.problems.some((p) => p.code === 'param-unknown' && p.message.includes('toString')));
+  assert.ok(res.problems.some((p) => p.code === 'param-unknown' && p.message.includes('constructor')));
+  assert.ok(res.problems.some((p) => p.code === 'param-unknown' && p.message.includes('valueOf')));
+  assert.ok(res.problems.some((p) => p.code === 'param-unknown' && p.message.includes('hasOwnProperty')));
+});
+
+test('non-string checker names in minCheckers and seats are rejected with param-invalid', () => {
+  const shipped = shippedCatalog();
+
+  const effectiveMinCheckers = {
+    'bad-mincheckers-number': {
+      promise: 'Pattern with number checker name.',
+      loop: 'reviewed',
+      defaults: {
+        minCheckers: [123],
+      },
+    },
+    'bad-mincheckers-object': {
+      promise: 'Pattern with object checker name.',
+      loop: 'reviewed',
+      defaults: {
+        minCheckers: [{}],
+      },
+    },
+    'bad-mincheckers-null': {
+      promise: 'Pattern with null checker name.',
+      loop: 'reviewed',
+      defaults: {
+        minCheckers: [null],
+      },
+    },
+    'bad-mincheckers-inv': {
+      promise: 'Pattern with invariant non-string checker.',
+      loop: 'reviewed',
+      invariants: {
+        minCheckers: {
+          atLeast: [456, null, {}],
+        },
+      },
+    },
+  };
+  const resMinCheckers = checkCatalog({ shipped, effective: effectiveMinCheckers });
+  assert.ok(resMinCheckers.problems.length >= 4);
+  assert.ok(resMinCheckers.problems.every((p) => p.code === 'param-invalid'));
+
+  const effectiveSeats = {
+    'bad-seats-non-string': {
+      promise: 'Pattern with non-string seat name.',
+      loop: 'reviewed',
+      defaults: {
+        seats: [
+          { seat: 123, role: 'producer' },
+        ],
+      },
+    },
+    'bad-seats-null': {
+      promise: 'Pattern with null seat.',
+      loop: 'reviewed',
+      defaults: {
+        seats: [null],
+      },
+    },
+    'bad-seats-non-array': {
+      promise: 'Pattern with non-array seats.',
+      loop: 'reviewed',
+      defaults: {
+        seats: 123,
+      },
+    },
+  };
+  const resSeats = checkCatalog({ shipped, effective: effectiveSeats });
+  assert.ok(resSeats.problems.length >= 3);
+  assert.ok(resSeats.problems.every((p) => p.code === 'param-invalid'));
+});

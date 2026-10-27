@@ -101,14 +101,13 @@ function resolveLayer(layers, patternName, fieldPath) {
 
   if (fieldPath) {
     const fullPath = `runner.patterns.${patternName}.${fieldPath}`;
-    if (layers[fullPath]) return extractLayerName(layers[fullPath]);
+    if (Object.hasOwn(layers, fullPath) && layers[fullPath]) return extractLayerName(layers[fullPath]);
     const shortPath = `${patternName}.${fieldPath}`;
-    if (layers[shortPath]) return extractLayerName(layers[shortPath]);
+    if (Object.hasOwn(layers, shortPath) && layers[shortPath]) return extractLayerName(layers[shortPath]);
   }
-
   const patternPath = `runner.patterns.${patternName}`;
-  if (layers[patternPath]) return extractLayerName(layers[patternPath]);
-  if (layers[patternName]) return extractLayerName(layers[patternName]);
+  if (Object.hasOwn(layers, patternPath) && layers[patternPath]) return extractLayerName(layers[patternPath]);
+  if (Object.hasOwn(layers, patternName) && layers[patternName]) return extractLayerName(layers[patternName]);
 
   return null;
 }
@@ -135,7 +134,7 @@ function allowedRoleTaskTargets(loop, entry) {
   switch (loop) {
     case 'reviewed':
       targets.add('producer');
-      if (declaredCheckers.length === 0) {
+      if (allDeclared.length === 0) {
         for (const checkerName of Object.keys(CHECKER_SEATS)) {
           targets.add(checkerName);
         }
@@ -265,7 +264,13 @@ function checkParamDomain(patternName, loop, param, val, section, src, problems,
         ));
       } else {
         for (const chk of val) {
-          if (!Object.hasOwn(CHECKER_SEATS, chk)) {
+          if (typeof chk !== 'string') {
+            problems.push(new CollaborationError(
+              'param-invalid',
+              `${at} checker seat name must be a string, got ${typeof chk === 'object' ? JSON.stringify(chk) : String(chk)}${suffix}`,
+              { source: src },
+            ));
+          } else if (!Object.hasOwn(CHECKER_SEATS, chk)) {
             problems.push(new CollaborationError(
               'param-invalid',
               `${at} contains unknown checker seat "${chk}"; valid: [${Object.keys(CHECKER_SEATS).join(', ')}]${suffix}`,
@@ -291,8 +296,11 @@ function checkParamDomain(patternName, loop, param, val, section, src, problems,
         const declared = checkDeclaredSeats(val, `${at}`);
         checkLoopSeatCardinality(loop, declared, at);
       } catch (err) {
+        const code = (err.code === 'invalid-seats' || err.code === 'invalid-seat-id' || err.code === 'invalid-seat-role' || err.code === 'invalid-seat-tier')
+          ? 'param-invalid'
+          : (err.code ?? 'param-invalid');
         problems.push(new CollaborationError(
-          err.code ?? 'param-invalid',
+          code,
           `${err.message}${suffix}`,
           { source: src },
         ));
@@ -342,7 +350,7 @@ export function loopOf(name, options = {}) {
   const effective = options?.effective ?? options;
   const patterns = effective?.runner?.patterns ?? effective?.patterns ?? effective;
   if (!patterns || typeof patterns !== 'object') return null;
-  const entry = patterns[name];
+  const entry = Object.hasOwn(patterns, name) ? patterns[name] : undefined;
   if (entry && typeof entry.loop === 'string') {
     return entry.loop;
   }
@@ -392,7 +400,7 @@ export function checkCatalog(options = {}) {
   // 2. Reserved names and both-shapes check
   if (effectivePatterns.seatBinding !== undefined) {
     const sb = effectivePatterns.seatBinding;
-    if (sb && typeof sb === 'object' && ('loop' in sb || 'promise' in sb || 'defaults' in sb || 'invariants' in sb)) {
+    if (sb && typeof sb === 'object' && (Object.hasOwn(sb, 'loop') || Object.hasOwn(sb, 'promise') || Object.hasOwn(sb, 'defaults') || Object.hasOwn(sb, 'invariants'))) {
       const src = resolveLayer(layers, 'seatBinding');
       problems.push(new CollaborationError(
         'config-error',
@@ -424,8 +432,8 @@ export function checkCatalog(options = {}) {
       continue;
     }
 
-    const hasTuning = 'maxRounds' in entry || 'checkersByRigor' in entry;
-    const hasCatalog = 'loop' in entry || 'defaults' in entry || 'promise' in entry || 'invariants' in entry;
+    const hasTuning = Object.hasOwn(entry, 'maxRounds') || Object.hasOwn(entry, 'checkersByRigor');
+    const hasCatalog = Object.hasOwn(entry, 'loop') || Object.hasOwn(entry, 'defaults') || Object.hasOwn(entry, 'promise') || Object.hasOwn(entry, 'invariants');
     if (hasTuning && hasCatalog) {
       const src = resolveLayer(layers, name);
       problems.push(new CollaborationError(
@@ -629,7 +637,7 @@ export function checkCatalog(options = {}) {
         } else {
           for (const [param, val] of Object.entries(mergedEntry.defaults)) {
             const src = resolveLayer(layers, name, `defaults.${param}`) ?? resolveLayer(layers, name);
-            if (!(param in paramTable)) {
+            if (!Object.hasOwn(paramTable, param)) {
               problems.push(new CollaborationError(
                 'param-unknown',
                 `pattern "${name}" default parameter "${param}" is not read by loop "${loop}"${src ? ` (source layer: ${src})` : ''}`,
@@ -654,7 +662,7 @@ export function checkCatalog(options = {}) {
         } else {
           for (const [param, inv] of Object.entries(mergedEntry.invariants)) {
             const src = resolveLayer(layers, name, `invariants.${param}`) ?? resolveLayer(layers, name);
-            if (!(param in paramTable)) {
+            if (!Object.hasOwn(paramTable, param)) {
               problems.push(new CollaborationError(
                 'param-unknown',
                 `pattern "${name}" invariant parameter "${param}" is not read by loop "${loop}"${src ? ` (source layer: ${src})` : ''}`,
@@ -673,8 +681,8 @@ export function checkCatalog(options = {}) {
             }
 
             const invKeys = Object.keys(inv);
-            const hasAtLeast = 'atLeast' in inv;
-            const hasFixed = 'fixed' in inv;
+            const hasAtLeast = Object.hasOwn(inv, 'atLeast');
+            const hasFixed = Object.hasOwn(inv, 'fixed');
 
             if ((!hasAtLeast && !hasFixed) || (hasAtLeast && hasFixed) || invKeys.length !== 1) {
               problems.push(new CollaborationError(
@@ -701,7 +709,13 @@ export function checkCatalog(options = {}) {
                   ));
                 } else {
                   for (const chk of inv.atLeast) {
-                    if (!Object.hasOwn(CHECKER_SEATS, chk)) {
+                    if (typeof chk !== 'string') {
+                      problems.push(new CollaborationError(
+                        'param-invalid',
+                        `pattern "${name}" invariant atLeast for "${param}" checker seat name must be a string${src ? ` (source layer: ${src})` : ''}`,
+                        { source: src },
+                      ));
+                    } else if (!Object.hasOwn(CHECKER_SEATS, chk)) {
                       problems.push(new CollaborationError(
                         'param-invalid',
                         `pattern "${name}" invariant atLeast "${chk}" is not a valid checker seat [${Object.keys(CHECKER_SEATS).join(', ')}]${src ? ` (source layer: ${src})` : ''}`,
