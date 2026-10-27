@@ -56,6 +56,15 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
     return { status: 'absent', written: [] };
   }
 
+  if (typeof options.patchDoor !== 'function') {
+    try {
+      loadRunnerConfigForDir(projectDir);
+      return { status: 'unchanged', written: [] };
+    } catch {
+      // Configuration cannot be cleanly loaded by the runner; inspect file for retired keys.
+    }
+  }
+
   let originalText;
   try {
     originalText = fs.readFileSync(targetPath, 'utf8');
@@ -70,8 +79,23 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
     throw new Error(`cannot parse config file at ${targetPath}: ${err.message}`);
   }
 
-  const retired = retiredKeysIn(parsed, targetPath);
-  if (!retired || retired.length === 0) {
+  let retired = [];
+  try {
+    retired = retiredKeysIn(parsed, targetPath);
+  } catch (err) {
+    const rev = parsed?.runner?.patterns?.reviewed ?? parsed?.patterns?.reviewed;
+    const hasTuning = rev && typeof rev === 'object' && !Array.isArray(rev) && ('maxRounds' in rev || 'checkersByRigor' in rev);
+    if (!hasTuning) {
+      throw err;
+    }
+  }
+
+  const runner = parsed?.runner ?? parsed;
+  const patterns = runner?.patterns ?? {};
+  const rev = patterns?.reviewed;
+  const hasReviewedTuning = rev && typeof rev === 'object' && !Array.isArray(rev) && ('maxRounds' in rev || 'checkersByRigor' in rev);
+  const hasRetired = (retired && retired.length > 0) || hasReviewedTuning;
+  if (!hasRetired) {
     return { status: 'unchanged', written: [] };
   }
 
@@ -80,8 +104,6 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
   const backupPath = `${targetPath}.pre-patterns-catalog-${ts}`;
   fs.copyFileSync(targetPath, backupPath);
 
-  const runner = parsed?.runner ?? parsed;
-  const patterns = runner?.patterns ?? {};
   const edits = [];
   const written = [];
 
@@ -96,22 +118,32 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
   }
 
   if (patterns.reviewed !== undefined && typeof patterns.reviewed === 'object' && !Array.isArray(patterns.reviewed)) {
-    const rev = patterns.reviewed;
+    const hasTuning = 'maxRounds' in rev || 'checkersByRigor' in rev;
+    const hasModern = Object.keys(rev).some((k) => k !== 'maxRounds' && k !== 'checkersByRigor');
     if ('maxRounds' in rev) {
       edits.push({ set: 'runner.loops.reviewed.maxRounds', value: rev.maxRounds });
       written.push('runner.loops.reviewed.maxRounds');
+      if (hasModern) {
+        edits.push({ unset: 'runner.patterns.reviewed.maxRounds' });
+      }
     }
     if ('checkersByRigor' in rev) {
       edits.push({ set: 'runner.loops.reviewed.checkersByRigor', value: rev.checkersByRigor });
       written.push('runner.loops.reviewed.checkersByRigor');
+      if (hasModern) {
+        edits.push({ unset: 'runner.patterns.reviewed.checkersByRigor' });
+      }
     }
-    edits.push({ unset: 'runner.patterns.reviewed' });
-    written.push('runner.loops.reviewed');
+    if (hasTuning && !hasModern) {
+      edits.push({ unset: 'runner.patterns.reviewed' });
+    }
+    if (hasTuning) {
+      written.push('runner.loops.reviewed');
+    }
   }
 
   edits.push({ set: 'runner.patterns.seatBinding.schema', value: 2 });
   written.push('runner.patterns.seatBinding.schema');
-
   const reason = 'convert retired runner.patterns keys to runner.loops and schema 2';
 
   // Apply edits through Config write door (Branch A)
@@ -168,8 +200,14 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
         globalPending: true,
       };
     }
+    // Restores the user's own bytes from backup after a refused write; this is the one raw write in this module.
     fs.copyFileSync(backupPath, targetPath);
-    throw err;
+    return {
+      status: 'blocked',
+      backup: backupPath,
+      blocker: err.message ?? String(err),
+      written: [],
+    };
   }
 
   return {

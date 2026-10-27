@@ -13,7 +13,10 @@ import {
   readRawProjectConfig,
   readRawGlobalConfig,
   projectConfigPath,
+  projectConfigExists,
+  legacyProjectConfigPath,
 } from '../helpers/config-fixture.mjs';
+import { spawnSync } from 'node:child_process';
 
 function makeTempDirs() {
   const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-conv-test-project-'));
@@ -265,5 +268,129 @@ test('stops and reports blocked when config write door refuses without raw write
     assert.equal(currentText, originalText, 'file must not be rewritten around the door');
   } finally {
     cleanupDirs({ projectDir });
+  }
+});
+
+test('converts configuration with modern reviewed override and retired maxRounds, keeping override meaning and passing loader', () => {
+  const { projectDir, homeDir } = makeTempDirs();
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const configWithModernAndRetired = {
+      executor: { command: 'claude', args: ['{prompt}'] },
+      timeoutMs: 5000,
+      modelPolicies: {
+        claude: {
+          nano: 'haiku',
+          standard: 'sonnet',
+          advanced: 'sonnet',
+          flagship: 'opus',
+          frontier: 'opus',
+        },
+      },
+      patterns: {
+        reviewed: {
+          promise: 'Multi-seat adversarial review loop',
+          loop: 'reviewed',
+          defaults: {
+            minCheckers: ['reviewer'],
+          },
+          maxRounds: 4,
+        },
+        seatBinding: {
+          schema: 1,
+        },
+      },
+    };
+
+    writeProjectConfig(projectDir, { runner: configWithModernAndRetired });
+    writeGlobalConfig(homeDir, { defaults: { tier: 'standard' } });
+
+    const result = convertRunnerPatternsConfig(projectDir);
+    assert.equal(result.status, 'converted', 'conversion must succeed');
+    assert.ok(result.backup, 'backup must be created');
+
+    const loaded = loadRunnerConfigForDir(projectDir);
+    assert.equal(loaded.loops?.reviewed?.maxRounds, 4, 'maxRounds must be migrated to runner.loops.reviewed');
+    assert.equal(loaded.patterns?.reviewed?.promise, 'Multi-seat adversarial review loop', 'modern promise must be preserved');
+    assert.equal(loaded.patterns?.reviewed?.loop, 'reviewed', 'modern loop must be preserved');
+    assert.deepEqual(loaded.patterns?.reviewed?.defaults?.minCheckers, ['reviewer'], 'modern defaults must be preserved');
+    assert.equal(loaded.patterns?.reviewed?.maxRounds, undefined, 'retired maxRounds must be unset from pattern entry');
+    assert.equal(loaded.patterns?.seatBinding?.schema, 2, 'schema must be bumped to 2');
+  } finally {
+    process.env.HOME = prevHome;
+    cleanupDirs({ projectDir, homeDir });
+  }
+});
+
+test('refuses legacy json project file with retired keys as blocked, leaving original bytes untouched and reporting global guidance', () => {
+  const { projectDir, homeDir } = makeTempDirs();
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const originalText = `${JSON.stringify({ runner: oldPatternsConfig() }, null, 2)}\n`;
+    writeRawLegacyProjectConfig(projectDir, originalText);
+    writeGlobalConfig(homeDir, {
+      runner: {
+        patterns: {
+          defaultRule: { mutatingMinRigor: 'standard' },
+        },
+      },
+    });
+
+    const notice = inspectGlobalRunnerConfig(path.join(homeDir, '.fgos'));
+    assert.ok(notice, 'must return notice for retired keys in global config');
+    assert.ok(notice.file.includes('.fgos'), 'notice must identify the global config file');
+    assert.ok(notice.command, 'notice must supply guidance command');
+
+    const result = convertRunnerPatternsConfig(projectDir);
+    assert.equal(result.status, 'blocked', 'legacy json project file must be reported as blocked');
+    assert.ok(result.blocker, 'must report blocker reason');
+    assert.match(result.blocker, /config-format-legacy-json/, 'blocker must name config-format-legacy-json cause');
+
+    const currentText = fs.readFileSync(legacyProjectConfigPath(projectDir), 'utf8');
+    assert.equal(currentText, originalText, 'original legacy json file must be untouched');
+
+    assert.equal(projectConfigExists(projectDir), false, 'must not leave a half-written yaml file');
+  } finally {
+    process.env.HOME = prevHome;
+    cleanupDirs({ projectDir, homeDir });
+  }
+});
+
+test('setup CLI prints global guidance when both project and global files hold retired keys', () => {
+  const { projectDir, homeDir } = makeTempDirs();
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    writeProjectConfig(projectDir, { runner: oldPatternsConfig() });
+    writeGlobalConfig(homeDir, {
+      runner: {
+        patterns: {
+          defaultRule: { mutatingMinRigor: 'standard' },
+        },
+      },
+    });
+
+    const fgosBin = path.resolve('bin/fgos.mjs');
+    const result = spawnSync(process.execPath, [fgosBin, 'setup', '--dir', projectDir, '--pretty'], {
+      encoding: 'utf8',
+      env: { ...process.env, HOME: homeDir, USERPROFILE: homeDir },
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /global config holds retired keys/, 'must print global guidance');
+    assert.match(result.stdout, /runner patterns config conversion blocked/, 'must report project conversion blocked');
+
+    const jsonResult = spawnSync(process.execPath, [fgosBin, 'setup', '--dir', projectDir, '--json'], {
+      encoding: 'utf8',
+      env: { ...process.env, HOME: homeDir, USERPROFILE: homeDir },
+    });
+    assert.equal(jsonResult.status, 0, jsonResult.stderr);
+    const parsed = JSON.parse(jsonResult.stdout);
+    assert.ok(parsed.data?.globalRetiredNotice, 'json data must include globalRetiredNotice');
+    assert.equal(parsed.data?.runnerPatternsConversion?.status, 'blocked');
+  } finally {
+    process.env.HOME = prevHome;
+    cleanupDirs({ projectDir, homeDir });
   }
 });
