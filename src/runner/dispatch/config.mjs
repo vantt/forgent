@@ -204,7 +204,7 @@ export function loadRunnerConfigForDir(dir) {
     ({ value: { runner }, origins } = readConfig({ projectRoot: dir, sections: ['runner'], origins: ['runner.modelPolicies', 'runner.rigorToTier'] }));
   } catch (err) {
     if (err instanceof ConfigDoorError) {
-      checkDoorRefusalsForRetiredKeys(err);
+      checkDoorRefusalsForRetiredKeys(err, { projectRoot: dir });
       throw new RunnerConfigError(err.message, { code: err.code });
     }
     throw err;

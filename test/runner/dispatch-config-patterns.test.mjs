@@ -417,6 +417,53 @@ test('loadRunnerConfigForDir: other ConfigDoorError codes pass through unchanged
     () => loadRunnerConfigForDir(repo),
     (err) => err instanceof RunnerConfigError && err.code !== 'config-key-retired',
   );
+
+  // Catalog error under runner.patterns.reviewed.* passes through with original code
+  writeProjectConfig(repo, {
+    runner: {
+      patterns: {
+        reviewed: {
+          loop: 'not-a-loop',
+        },
+      },
+    },
+  });
+  assert.throws(
+    () => loadRunnerConfigForDir(repo),
+    (err) => err instanceof RunnerConfigError && err.code === 'config-schema',
+  );
+
+  // Project mixed shape throws plain error without config-key-retired code
+  writeProjectConfig(repo, {
+    runner: {
+      patterns: {
+        reviewed: {
+          loop: 'reviewed',
+          maxRounds: 3,
+        },
+      },
+    },
+  });
+  assert.throws(
+    () => loadRunnerConfigForDir(repo),
+    (err) => err instanceof RunnerConfigError && err.code !== 'config-key-retired' && /cannot combine pattern catalog fields with retired loop tuning/.test(err.message),
+  );
+
+  // Project pure retired key throws config-key-retired
+  writeProjectConfig(repo, {
+    runner: {
+      patterns: {
+        reviewed: {
+          maxRounds: 3,
+        },
+      },
+    },
+  });
+  assert.throws(
+    () => loadRunnerConfigForDir(repo),
+    (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /runner\.patterns\.reviewed\.maxRounds was retired/.test(err.message),
+  );
+
   fs.rmSync(repo, { recursive: true, force: true });
 });
 

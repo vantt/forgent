@@ -2,7 +2,6 @@
 // Keys that moved or were retired are refused with RunnerConfigError code
 // 'config-key-retired', naming the file and the replacement key, rather than
 // silently dropped in memory or translated.
-import fs from 'node:os';
 import fsp from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -92,14 +91,6 @@ export function retiredKeysIn(runnerRaw, file) {
             message: `${fileName}: runner.patterns.reviewed.checkersByRigor was retired; use runner.loops.reviewed.checkersByRigor instead.`,
           });
         }
-        if (!('maxRounds' in entry) && !('checkersByRigor' in entry)) {
-          findings.push({
-            key: 'runner.patterns.reviewed',
-            file: fileName,
-            replacement: 'runner.loops.reviewed',
-            message: `${fileName}: runner.patterns.reviewed was retired; use runner.loops.reviewed instead.`,
-          });
-        }
       }
     }
   }
@@ -122,7 +113,7 @@ export function assertNoRetiredKeys(runnerRaw, file) {
  * Maps a ConfigDoorError's refusals to a RunnerConfigError with code 'config-key-retired'
  * when the refusal path corresponds to a retired key.
  */
-export function checkDoorRefusalsForRetiredKeys(err) {
+export function checkDoorRefusalsForRetiredKeys(err, options = {}) {
   if (!err || !Array.isArray(err.refusals)) return;
   for (const r of err.refusals) {
     if (!r.path) continue;
@@ -150,10 +141,37 @@ export function checkDoorRefusalsForRetiredKeys(err) {
         );
       }
       if (isReviewed) {
-        const actualFile = r.file?.startsWith('global:')
-          ? path.join(process.env.HOME || os.homedir(), '.fgos', r.file.replace(/^global:/, ''))
-          : r.file;
-        if (actualFile && fsp.existsSync(actualFile)) {
+        const candidates = [];
+        if (r.file?.startsWith('global:') || r.file?.startsWith('machine:')) {
+          const rel = r.file.replace(/^(global|machine):/, '');
+          candidates.push(path.join(process.env.HOME || os.homedir(), '.fgos', rel));
+        } else if (r.file?.startsWith('project:')) {
+          const rel = r.file.replace(/^project:/, '');
+          if (options.projectRoot) {
+            candidates.push(path.join(options.projectRoot, '.fgos', rel));
+            candidates.push(path.join(options.projectRoot, rel));
+          }
+          if (process.env.HOME) {
+            candidates.push(path.join(process.env.HOME, '.fgos', rel));
+          }
+          candidates.push(path.join(process.cwd(), '.fgos', rel));
+        } else if (r.file) {
+          candidates.push(r.file);
+          if (options.projectRoot) {
+            candidates.push(path.join(options.projectRoot, r.file));
+            candidates.push(path.join(options.projectRoot, '.fgos', r.file));
+          }
+        }
+
+        let actualFile = null;
+        for (const candidate of candidates) {
+          if (candidate && fsp.existsSync(candidate)) {
+            actualFile = candidate;
+            break;
+          }
+        }
+
+        if (actualFile) {
           try {
             const raw = parseYaml(fsp.readFileSync(actualFile, 'utf8'), { filename: actualFile });
             const reviewed = raw?.runner?.patterns?.reviewed ?? raw?.patterns?.reviewed;
@@ -181,11 +199,20 @@ export function checkDoorRefusalsForRetiredKeys(err) {
           } catch (e) {
             if (e instanceof RunnerConfigError) throw e;
           }
+        } else {
+          if (r.path === 'runner.patterns.reviewed.maxRounds') {
+            throw new RunnerConfigError(
+              `${where}: runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.`,
+              { code: 'config-key-retired' },
+            );
+          }
+          if (r.path === 'runner.patterns.reviewed.checkersByRigor') {
+            throw new RunnerConfigError(
+              `${where}: runner.patterns.reviewed.checkersByRigor was retired; use runner.loops.reviewed.checkersByRigor instead.`,
+              { code: 'config-key-retired' },
+            );
+          }
         }
-        throw new RunnerConfigError(
-          `${where}: runner.patterns.reviewed was retired; use runner.loops.reviewed instead.`,
-          { code: 'config-key-retired' },
-        );
       }
     }
   }
