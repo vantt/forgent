@@ -7,7 +7,6 @@ import {
   verifyCommandOf,
 } from '../../../../src/runner/execution/loops/reviewed.mjs';
 import {
-  checkerSeatsOf as resolveCheckers,
   DEFAULT_CHECKERS_BY_RIGOR,
   requiresDistinctFamilies,
   resolveSeats,
@@ -16,47 +15,6 @@ import {
 // The history outcome of a reviewed unit is read over the seats the unit has.
 const reviewedHistoryOutcome = (unit, cfg, history, params = {}) =>
   historyOutcomeOf(unit, cfg, history, params, resolveSeats({ pattern: { pattern: 'reviewed', params }, unit, runnerConfig: cfg }));
-
-test('a checker name that is not a checker seat is refused', () => {
-  assert.throws(() => resolveCheckers({ capability: 'docs:write' }, {}, { minCheckers: ['domain-expert'] }), /not a checker seat/);
-});
-
-test('resolveCheckers derives checker set from rigor, capability, and params', () => {
-  // Low rigor defaults to reviewer
-  assert.deepEqual(resolveCheckers({ capability: 'docs:write', rigor: 'low' }, {}), ['reviewer']);
-
-  // Standard rigor defaults to reviewer
-  assert.deepEqual(resolveCheckers({ capability: 'docs:write', rigor: 'standard' }, {}), ['reviewer']);
-
-  // High rigor includes reviewer and red-team
-  assert.deepEqual(resolveCheckers({ capability: 'docs:write', rigor: 'high' }, {}), ['reviewer', 'red-team']);
-
-  // Code capabilities ALWAYS include red-team even at low rigor
-  const codeCheckers = resolveCheckers({ capability: 'code:implement', rigor: 'low' }, {});
-  assert.ok(codeCheckers.includes('reviewer'));
-  assert.ok(codeCheckers.includes('red-team'));
-
-  // Union with cfg.capabilities[cap].minCheckers
-  const cfg = {
-    capabilities: {
-      'custom:task': {
-        minCheckers: ['tester'],
-      },
-    },
-  };
-  const customCheckers = resolveCheckers({ capability: 'custom:task', rigor: 'standard' }, cfg);
-  assert.ok(customCheckers.includes('reviewer'));
-  assert.ok(customCheckers.includes('tester'));
-
-  // Union with preset params
-  const paramCheckers = resolveCheckers(
-    { capability: 'docs:write', rigor: 'standard' },
-    {},
-    { minCheckers: ['red-team'] },
-  );
-  assert.ok(paramCheckers.includes('reviewer'));
-  assert.ok(paramCheckers.includes('red-team'));
-});
 
 test('runReviewed passes on round 1 when all checkers pass', async () => {
   const calls = [];
