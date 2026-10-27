@@ -23,7 +23,8 @@ seedFileLocalBwrapRegistry();
 
 // Confined runs mount a private tmpfs over /tmp, so fixtures that the executor
 // must reach (command, worker script, worktree) live outside it.
-import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
+try { fs.accessSync('/var/tmp', fs.constants.W_OK); } catch { if (!process.env.FGOS_TEST_FIXTURE_ROOT) process.env.FGOS_TEST_FIXTURE_ROOT = os.tmpdir(); }
+const { makeFixtureDir } = await import('../../helpers/fixture-dir.mjs');
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
 import { writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
 
@@ -2123,8 +2124,10 @@ test('a pinned unit keeps its effective meaning after a catalog and a config edi
     worktree: worktreeDir,
   });
   assert.equal(res.outcome, 'pass');
+  assert.equal(res.rounds, 1, 'loop received pin maxRounds 1, not edited config maxRounds 5');
   const stored = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
   assert.equal(stored.collaboration.effective.params.maxRounds, 1);
+  assert.equal(stored.collaboration.effective.loop, 'reviewed');
 });
 
 test('an unreadable pin refuses collaboration-pin-unusable', async () => {
@@ -2221,6 +2224,9 @@ test('resume ignores a caller --pattern', async () => {
   });
   assert.equal(res.outcome, 'pass');
   assert.equal(res.unitRunId, 'unit-run-caller-pattern');
+  const stored = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
+  assert.equal(stored.collaboration.effective.loop, 'solo');
+  assert.equal(stored.pattern, 'solo');
 });
 
 test('an unpinned schema-1 record resumes through the decoder', async () => {
@@ -2313,4 +2319,18 @@ test('an unpinned schema-1 record resumes through the decoder', async () => {
   assert.equal(critRes.outcome, 'pass');
   const critStored = JSON.parse(fs.readFileSync(path.join(critDir, 'unit.json'), 'utf8'));
   assert.ok(critStored.collaboration.effective.seats.some((s) => s.seat === 'tester'));
+
+  // Second resume across a live config checker-policy change preserves the decoded pin and passes
+  const critCfg = readProjectConfig(repoRoot);
+  critCfg.runner.loops = { reviewed: { checkersByRigor: { critical: ['reviewer', 'red-team'] } } };
+  writeProjectConfig(repoRoot, critCfg);
+  const secondResume = await coreRunUnit({
+    resumeUnitRunId: 'unit-run-unpinned-crit',
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+  });
+  assert.equal(secondResume.outcome, 'pass');
+  const secondStored = JSON.parse(fs.readFileSync(path.join(critDir, 'unit.json'), 'utf8'));
+  assert.ok(secondStored.collaboration.effective.seats.some((s) => s.seat === 'tester'), 'tester seat preserved across second resume');
 });

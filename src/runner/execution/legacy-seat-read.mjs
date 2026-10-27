@@ -163,7 +163,7 @@ export function collaborationOfRecord(record, { shipped } = {}) {
   const reviewedTuning = snapshotRunner?.patterns?.reviewed ?? snapshotRunner?.loops?.reviewed ?? {};
 
   const effectiveParams = { ...patternDefaults, ...selectorParams };
-  if (loop === 'reviewed' && reviewedTuning.maxRounds !== undefined) {
+  if (loop === 'reviewed' && selectorParams.maxRounds === undefined && reviewedTuning.maxRounds !== undefined) {
     effectiveParams.maxRounds = reviewedTuning.maxRounds;
   }
 

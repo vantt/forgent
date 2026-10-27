@@ -207,3 +207,26 @@ test('collaborationOfRecord presents snapshot patterns.reviewed with tester as l
   const { runner } = collaborationOfRecord(record, { shipped });
   assert.deepEqual(runner.loops.reviewed.checkersByRigor.critical, ['reviewer', 'red-team', 'tester']);
 });
+
+test('collaborationOfRecord preserves stored selector maxRounds over snapshot tuning', () => {
+  const shipped = shippedCatalog();
+  const record = {
+    seatSchema: 1,
+    pattern: { pattern: 'reviewed', params: { maxRounds: 1 } },
+    unit: { id: 'u4', capability: 'code:implement' },
+    configSnapshot: {
+      runner: {
+        patterns: {
+          reviewed: { maxRounds: 3 },
+        },
+      },
+    },
+    seats: [
+      { seat: 'producer', role: 'producer', posture: { writer: true } },
+      { seat: 'reviewer', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+    ],
+  };
+  const { effective, runner } = collaborationOfRecord(record, { shipped });
+  assert.equal(effective.params.maxRounds, 1);
+  assert.deepEqual(runner.loops.reviewed, { maxRounds: 3 });
+});

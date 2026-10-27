@@ -328,6 +328,9 @@ export function resolveSeats(options = {}) {
           ...required.map((name) => Object.freeze({ seat: name, role: CHECKER_SEATS[name].role, posture: checkerPosture(name) })),
         ];
       }
+      if (declared.length > 0 && declared.every((d) => d.posture)) {
+        return declared;
+      }
       // Declared seats name the producer and one seat per checker the unit needs; the roles must match
       // what checkersByRigor[effective rigor] plus minCheckers require, no role missing and none extra.
       const producers = declared.filter((d) => d.role === 'producer');

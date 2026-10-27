@@ -665,6 +665,9 @@ async function runUnitBody(options, scope) {
       const decoded = collaborationOfRecord(unitRecord, { shipped: shippedCatalog() });
       unitRecord.collaboration = decoded.collaboration;
       runnerConfigForLoop = decoded.runner;
+      if (unitRecord.configSnapshot) {
+        unitRecord.configSnapshot.runner = decoded.runner;
+      }
     }
     unit = validateUnit(unitRecord.unit);
     assertRepositoryForWrites(roots, cwd, { writes: unit.writes.length > 0 || Boolean(unitRecord.sync) });
@@ -691,7 +694,17 @@ async function runUnitBody(options, scope) {
       for (const attempts of Object.values(unitRecord.bindings ?? {})) {
         for (const attempt of attempts) attempt.configHash ??= unitRecord.configSnapshot?.hash;
       }
-      unitRecord.configSnapshot = currentSnapshot;
+      const frozenLoops = runnerConfigForLoop?.loops ?? unitRecord.configSnapshot?.runner?.loops;
+      const frozenPatterns = runnerConfigForLoop?.patterns ?? unitRecord.configSnapshot?.runner?.patterns;
+      unitRecord.configSnapshot = {
+        ...currentSnapshot,
+        runner: {
+          ...currentSnapshot.runner,
+          ...(frozenLoops ? { loops: frozenLoops } : {}),
+          ...(frozenPatterns ? { patterns: frozenPatterns } : {}),
+        },
+      };
+      runnerConfigForLoop = unitRecord.configSnapshot.runner;
     }
 
     // A mutating dispatch holds the worktree's dispatch-cwd lock while its

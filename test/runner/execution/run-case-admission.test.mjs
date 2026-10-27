@@ -17,7 +17,8 @@ import { dispatchCwdHolder } from '../../../src/runner/dispatch/cwd-lock.mjs';
 import { createCaseAdmissionPort } from '../../../src/workflow/case-admission-port.mjs';
 import { createPendingBinding, commitBinding } from '../../../src/workflow/case-bindings.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
-import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
+try { fs.accessSync('/var/tmp', fs.constants.W_OK); } catch { if (!process.env.FGOS_TEST_FIXTURE_ROOT) process.env.FGOS_TEST_FIXTURE_ROOT = os.tmpdir(); }
+const { makeFixtureDir } = await import('../../helpers/fixture-dir.mjs');
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
 import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
@@ -477,7 +478,7 @@ test('case request reason reaches admission proposal and route event', async () 
   assert.equal(reqAdmitCall[1].reason, 'diverging via request reason');
   const reqAnswer = realPort.admit({
     ...reqAdmitCall[1],
-    caseRef: { caseId: caseRun.caseId, activity: 'scout' },
+    caseRef: { ...reqAdmitCall[1].caseRef, caseId: caseRun.caseId },
   });
   assert.equal(reqAnswer.admitted, true);
   const reqRouteEvents = eventsOf(caseRun).filter((e) => e.type === 'route');

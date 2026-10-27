@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { buildUnitSummary, writeUnitSummary, extractStance } from '../../../src/runner/execution/unit-summary.mjs';
+import { buildUnitSummary, writeUnitSummary, extractStance, serializeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { readUnitRunHistory } from '../../../src/runner/execution/unit-run-history.mjs';
 import { backfillUnitSummaries } from '../../../scripts/backfill-unit-summaries.mjs';
 import { runLoop } from '../../../src/runner/execution/loops/index.mjs';
@@ -475,5 +475,8 @@ test('the summary shows the pin when present and older records keep their exact 
   result(older.dir, 'reviewer', '1', '01');
   result(older.dir, 'red-team', '1', '01');
   const olderSummary = buildUnitSummary(older.dir);
-  assert.equal('collaboration' in olderSummary, false, 'older records keep their exact bytes');
+  assert.equal('collaboration' in olderSummary, false);
+  const serialized = serializeUnitSummary(olderSummary);
+  assert.equal(serialized.includes('"collaboration"'), false);
+  assert.equal(serializeUnitSummary(JSON.parse(serialized)), serialized, 'older records keep their exact bytes');
 });
