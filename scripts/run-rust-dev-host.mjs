@@ -45,11 +45,13 @@ export const STALE_RUN_DIR_MS = 10 * 60 * 1000;
 
 /**
  * Remove one invocation's staged host, unless a process still runs from it: a detached run supervisor
- * (or its gate) started by the host keeps executing it, and its attempt steps run it again by path.
+ * (or its gate) started by the host keeps executing it, and its attempt steps run it again by path. A
+ * detached `node bin/fgos.mjs` child (the event-store seal and publish children) runs nothing from it
+ * yet, but its FGOS_HOST_BIN names the staged host it will call.
  * @returns {boolean} whether the directory was removed
  */
 export function releaseRunDir(runtimeDir) {
-  if (processesInside(runtimeDir).length > 0) return false;
+  if (processesInside(runtimeDir, { envKeys: ['FGOS_HOST_BIN'] }).length > 0) return false;
   fs.rmSync(runtimeDir, { recursive: true, force: true });
   return true;
 }

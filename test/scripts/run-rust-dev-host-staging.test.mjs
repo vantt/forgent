@@ -26,23 +26,32 @@ function stagedRun(base, name) {
 
 const exited = (child) => new Promise((resolve) => (child.exitCode !== null || child.signalCode !== null ? resolve() : child.once('exit', resolve)));
 
-test('a staged host a detached process still runs from is kept, and pruned once that process has ended', { skip: linuxOnly }, async () => {
-  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'dev-host-'));
-  const { dir, host } = stagedRun(base, 'run-held');
-  const supervisor = spawn(host, ['300'], { detached: true, stdio: 'ignore' });
-  try {
-    assert.equal(releaseRunDir(dir), false, 'a running process keeps its staged host');
-    assert.ok(fs.existsSync(host));
+// Two holders: a run supervisor executing the staged host, and a detached `node bin/fgos.mjs` child (the
+// event-store publish child) that runs from elsewhere but names the staged host in FGOS_HOST_BIN.
+test('a staged host a detached process runs from or names as its host is kept, and pruned once that process has ended', { skip: linuxOnly }, async (t) => {
+  for (const [name, holder] of [
+    ['runs from it', ({ host }) => spawn(host, ['300'], { detached: true, stdio: 'ignore' })],
+    ['names it as its host', ({ host, base }) => spawn('/bin/sleep', ['300'], { cwd: base, detached: true, stdio: 'ignore', env: { ...process.env, FGOS_HOST_BIN: host } })],
+  ]) {
+    await t.test(name, async () => {
+      const base = fs.mkdtempSync(path.join(os.tmpdir(), 'dev-host-'));
+      const { dir, host } = stagedRun(base, 'run-held');
+      const supervisor = holder({ host, base });
+      try {
+        assert.equal(releaseRunDir(dir), false, 'a running holder keeps its staged host');
+        assert.ok(fs.existsSync(host));
 
-    // Old enough to prune, but still in use: a later invocation leaves it alone.
-    pruneRunDirs(base, { now: Date.now() + STALE_RUN_DIR_MS + 1000 });
-    assert.ok(fs.existsSync(host));
-  } finally {
-    supervisor.kill('SIGKILL');
-    await exited(supervisor);
+        // Old enough to prune, but still in use: a later invocation leaves it alone.
+        pruneRunDirs(base, { now: Date.now() + STALE_RUN_DIR_MS + 1000 });
+        assert.ok(fs.existsSync(host));
+      } finally {
+        supervisor.kill('SIGKILL');
+        await exited(supervisor);
+      }
+      pruneRunDirs(base, { now: Date.now() + STALE_RUN_DIR_MS + 1000 });
+      assert.equal(fs.existsSync(dir), false, 'pruned once nothing runs from it');
+    });
   }
-  pruneRunDirs(base, { now: Date.now() + STALE_RUN_DIR_MS + 1000 });
-  assert.equal(fs.existsSync(dir), false, 'pruned once nothing runs from it');
 });
 
 test('an unused staged host is removed at once, and a young one is never pruned by another invocation', { skip: linuxOnly }, () => {

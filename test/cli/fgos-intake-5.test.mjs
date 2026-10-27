@@ -17,6 +17,7 @@ import {
   addDiscovery,
   addGoalItem,
   addOk,
+  addViaCli,
   addOutcome,
   addWork,
   advanceThroughDiscoveryToPlanning,
@@ -239,7 +240,7 @@ test("submit tags the new item with workflowStep: 'discovery', visible via list"
 
 test('add stamps stage "discovery" by default (D1/D2, add-stage-default-gap; tsk-qod D1/D2: clarify retired, discovery is stages[0] now) — parity with submit, no longer the old implicit "executing"', () => {
   const cwd = tmpCwdFromTemplate();
-  // Raw run(), not addOk() -- addOk defaults its own --stage to 'executing'
+  // Raw run(), not addViaCli() -- addOk defaults its own --stage to 'executing'
   // for its many other callers' sake (see its own comment); this test is
   // specifically about the CLI's bare, flagless default.
   run(cwd, ['add', 'plain-add', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--description', 'tsk-535 fixture description.']);

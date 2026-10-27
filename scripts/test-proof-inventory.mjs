@@ -485,8 +485,48 @@ export function findSharedTitles(calls) {
 }
 
 export function readSuiteBaseline(baselinePath = SUITE_BASELINE_PATH) {
-  if (!fs.existsSync(baselinePath)) return { sha: null, files: null, tests: null, wallSeconds: null, knownClones: [] };
-  return { knownClones: [], ...JSON.parse(fs.readFileSync(baselinePath, 'utf8')) };
+  const empty = { sha: null, files: null, tests: null, rustTests: null, wallSeconds: null, cpuSeconds: null, fileCpu: {}, knownClones: [] };
+  if (!fs.existsSync(baselinePath)) return empty;
+  return { ...empty, ...JSON.parse(fs.readFileSync(baselinePath, 'utf8')) };
+}
+
+// Rust tests are counted by their attribute, as `cargo test` finds them; build output and archived code are not source.
+const RUST_TEST_ATTRIBUTE = /^\s*#\[(?:tokio::)?test(?:\(.*\))?\]\s*$/gm;
+const NOT_RUST_SOURCE = new Set(['target', 'node_modules', 'archive']);
+
+/** The number of Rust tests in the source tree under `cwd`. */
+export function countRustTests(cwd = REPO_ROOT) {
+  let count = 0;
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name.startsWith('.') || NOT_RUST_SOURCE.has(entry.name)) continue;
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.isFile() && entry.name.endsWith('.rs')) count += fs.readFileSync(full, 'utf8').match(RUST_TEST_ATTRIBUTE)?.length ?? 0;
+    }
+  };
+  walk(cwd);
+  return count;
+}
+
+// The last full run's measured cost, kept per checkout so `--write-baseline` can take a baseline from a real run.
+export const LAST_RUN_PATH = path.join(REPO_ROOT, '.fgos', 'runtime', 'test-suite-last-run.json');
+
+/** Records a finished full run's wall, CPU and per-file CPU, with the commit it ran on. */
+export function recordLastRun({ wallSeconds, cpuSeconds, fileCpu }, { cwd = REPO_ROOT, lastRunPath = LAST_RUN_PATH } = {}) {
+  const sha = inspectRepo(cwd).resolveCommit({ name: 'HEAD' });
+  fs.mkdirSync(path.dirname(lastRunPath), { recursive: true });
+  fs.writeFileSync(lastRunPath, `${JSON.stringify({ sha, wallSeconds, cpuSeconds, fileCpu })}\n`);
+}
+
+/** The last full run's cost when it ran on `sha`, else null (a run on another commit is not this tree's cost). */
+export function readLastRun(sha, lastRunPath = LAST_RUN_PATH) {
+  try {
+    const run = JSON.parse(fs.readFileSync(lastRunPath, 'utf8'));
+    return run.sha === sha ? run : null;
+  } catch {
+    return null;
+  }
 }
 
 /** The ref new admission-rule violations are measured against: where this branch left main. */
@@ -506,6 +546,25 @@ function formatWall(seconds) {
   return typeof seconds === 'number' ? `${Math.round(seconds)} s` : '? s';
 }
 
+// CPU per test() call may rise this much over the baseline before the report warns.
+const CPU_PER_TEST_TOLERANCE = 0.15;
+
+/** The warning lines when CPU per test() call rose more than the tolerance over the baseline, naming the files that grew most. */
+function cpuGrowthLines({ cpuSeconds, fileCpu = {}, tests }, baseline) {
+  if (typeof cpuSeconds !== 'number' || typeof baseline.cpuSeconds !== 'number' || !tests || !baseline.tests) return [];
+  const now = cpuSeconds / tests;
+  const before = baseline.cpuSeconds / baseline.tests;
+  if (now <= before * (1 + CPU_PER_TEST_TOLERANCE)) return [];
+  const lines = [`suite: warning: CPU per test() call is ${(now * 1000).toFixed(0)} ms, +${Math.round((now / before - 1) * 100)}% over the baseline's ${(before * 1000).toFixed(0)} ms; the files that grew most:`];
+  const grown = Object.entries(fileCpu)
+    .map(([file, seconds]) => ({ file, seconds, was: baseline.fileCpu[file] ?? 0 }))
+    .filter((f) => f.seconds > f.was)
+    .sort((a, b) => (b.seconds - b.was) - (a.seconds - a.was))
+    .slice(0, 3);
+  for (const f of grown) lines.push(`  ${f.file}: ${f.was.toFixed(1)} s -> ${f.seconds.toFixed(1)} s CPU`);
+  return lines;
+}
+
 /**
  * What `npm test` prints after the run: the suite size line against the
  * committed baseline, clone and shared-title findings, and new admission-rule
@@ -514,18 +573,23 @@ function formatWall(seconds) {
 export function suiteReport({
   files,
   wallSeconds = null,
+  cpuSeconds = null,
+  fileCpu = {},
   cwd = REPO_ROOT,
   baselinePath = SUITE_BASELINE_PATH,
   readFile = (f) => fs.readFileSync(f, 'utf8'),
   admission = () => checkAdmission(addedLinesFromGitDiff(['test'], { baseRef: admissionBaseRef({ cwd }), cwd })),
   change = () => ({ base: admissionBaseRef({ cwd }), ...suiteChange({ baseRef: admissionBaseRef({ cwd }), cwd }) }),
+  countRust = countRustTests,
 } = {}) {
   const calls = files.flatMap((file) => scanTestCalls(readFile(path.resolve(cwd, file)), path.relative(cwd, path.resolve(cwd, file)).replaceAll('\\', '/')));
   const baseline = readSuiteBaseline(baselinePath);
   const lines = [];
   const at = baseline.sha ? ` at ${baseline.sha.slice(0, 9)}` : '';
-  const base = baseline.tests === null ? 'no baseline' : `baseline ${baseline.files} / ${baseline.tests} / ${formatWall(baseline.wallSeconds)}${at}`;
-  lines.push(`suite: ${files.length} files, ${calls.length} test() calls, ${formatWall(wallSeconds)} wall (${base})`);
+  const rustTests = countRust(cwd);
+  const base = baseline.tests === null ? 'no baseline' : `baseline ${baseline.files} / ${baseline.tests} / ${baseline.rustTests ?? '?'} Rust / ${formatWall(baseline.wallSeconds)} / ${formatWall(baseline.cpuSeconds)} CPU${at}`;
+  lines.push(`suite: ${files.length} files, ${calls.length} test() calls, ${rustTests} Rust tests, ${formatWall(wallSeconds)} wall, ${formatWall(cpuSeconds)} CPU (${base})`);
+  lines.push(...cpuGrowthLines({ cpuSeconds, fileCpu, tests: calls.length }, baseline));
   try {
     const delta = change();
     if (delta) lines.push(`suite: this change against ${String(delta.base).slice(0, 9)}: +${delta.added} -${delta.removed} test() calls, ${delta.spawns} new CLI/host spawn site(s), ${delta.unexplained} without a reason`);
@@ -557,14 +621,18 @@ export function suiteReport({
   return { lines, status: newClones.length > 0 ? 1 : 0, calls, clones, newClones, gone, shared, violations };
 }
 
-/** The baseline for the current tree: sizes, HEAD and every clone present now. Keeps the old wall time unless one is given. */
-export function buildSuiteBaseline({ files, cwd = REPO_ROOT, sha, wallSeconds, previous = {}, readFile = (f) => fs.readFileSync(f, 'utf8') }) {
+/** The baseline for the current tree: sizes, HEAD and every clone present now, with the cost of `run` (the last full run on HEAD); without one it keeps the old cost. */
+export function buildSuiteBaseline({ files, cwd = REPO_ROOT, sha, wallSeconds, run = null, previous = {}, readFile = (f) => fs.readFileSync(f, 'utf8'), countRust = countRustTests }) {
   const calls = files.flatMap((file) => scanTestCalls(readFile(path.resolve(cwd, file)), path.relative(cwd, path.resolve(cwd, file)).replaceAll('\\', '/')));
+  const round = (seconds) => Math.round(seconds * 10) / 10;
   return {
     sha,
     files: files.length,
     tests: calls.length,
-    wallSeconds: wallSeconds ?? previous.wallSeconds ?? null,
+    rustTests: countRust(cwd),
+    wallSeconds: wallSeconds ?? (run ? Math.round(run.wallSeconds) : previous.wallSeconds ?? null),
+    cpuSeconds: run ? Math.round(run.cpuSeconds) : previous.cpuSeconds ?? null,
+    fileCpu: run ? Object.fromEntries(Object.entries(run.fileCpu).sort().map(([file, seconds]) => [file, round(seconds)])) : previous.fileCpu ?? {},
     knownClones: findCloneGroups(calls).map(({ hash, files: cloneFiles }) => ({ hash, files: cloneFiles })),
   };
 }
@@ -598,14 +666,17 @@ if (process.argv[1] === __filename) {
   if (args[0] === '--write-baseline') {
     const wallIdx = args.indexOf('--wall-seconds');
     const sha = inspectRepo(REPO_ROOT).resolveCommit({ name: 'HEAD' });
+    const run = readLastRun(sha);
+    if (!run) console.log(`no full \`npm test\` run recorded on ${String(sha).slice(0, 9)}; the baseline keeps its old wall and CPU`);
     const baseline = buildSuiteBaseline({
       files: discoverTestFiles(),
       sha,
       wallSeconds: wallIdx === -1 ? undefined : Number(args[wallIdx + 1]),
+      run,
       previous: readSuiteBaseline(),
     });
     fs.writeFileSync(SUITE_BASELINE_PATH, `${JSON.stringify(baseline, null, 2)}\n`);
-    console.log(`wrote ${path.relative(REPO_ROOT, SUITE_BASELINE_PATH)}: ${baseline.files} files, ${baseline.tests} test() calls, ${baseline.knownClones.length} known clone(s)`);
+    console.log(`wrote ${path.relative(REPO_ROOT, SUITE_BASELINE_PATH)}: ${baseline.files} files, ${baseline.tests} test() calls, ${baseline.rustTests} Rust tests, ${formatWall(baseline.cpuSeconds)} CPU, ${baseline.knownClones.length} known clone(s)`);
   } else if (args[0] === '--duplicates') {
     const report = suiteReport({ files: discoverTestFiles(), admission: () => [] });
     for (const group of report.clones) {

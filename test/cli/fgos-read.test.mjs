@@ -136,19 +136,6 @@ test('list on a fresh non-worktree dir with no store at all: exit 0, empty view,
 
 // --- list open-only default + --all (tsk-5oa D1/D2) -----------------------
 
-test.todo('list by default excludes a done item, but keeps a todo item - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list --all restores the done item alongside the open one - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list by default excludes a wontfix item, but keeps a todo item - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list --all restores the wontfix item alongside the open one - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list by default drops a child whose parent is visible, and badges the parent with childProgress - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list by default falls back to showing a child as a top-level row when its parent is resolved and hidden - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list by default never hides an awaiting-human child, even when its parent is visible - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list --all is untouched by the child-view gate: no rows dropped, no childProgress added - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list --json exposes parkReason on a blocked item, and omits it on a doing item - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list --id returns only that item, ignoring the open-only default and --all entirely - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list --id on a done item returns it without needing --all - migrated to test/direct/fgos-read.test.mjs');
-
-
 test('list --id on an unknown id is rejected as validation (not-found), exit 4 (tsk-42m D2)', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'open-item');
@@ -157,11 +144,6 @@ test('list --id on an unknown id is rejected as validation (not-found), exit 4 (
   assert.equal(result.status, 4);
   assert.match(result.stderr, /list: work "no-such-item" not found/);
 });
-
-
-test.todo('list --id scopes every id-keyed view section to just the requested item, excluding another item\'s data - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list --id --fields returns only named fields and omits all history side-log keys - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list --id without --fields is unchanged from today behavior - migrated to test/direct/fgos-read.test.mjs');
 
 
 test('list --id --fields with an invalid field name is rejected as validation error, exit 4 (tsk-4zr)', () => {
@@ -173,6 +155,4 @@ test('list --id --fields with an invalid field name is rejected as validation er
   assert.match(result.stderr, /list --fields: unknown field "invalidField"/);
 });
 
-
-test.todo('list default keeps an awaiting-human item visible - migrated to test/direct/fgos-read.test.mjs');
 

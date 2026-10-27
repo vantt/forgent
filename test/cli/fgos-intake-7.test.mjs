@@ -17,6 +17,7 @@ import {
   addDiscovery,
   addGoalItem,
   addOk,
+  addViaCli,
   addOutcome,
   addWork,
   advanceThroughDiscoveryToPlanning,
@@ -127,7 +128,7 @@ test('add --footprint persists the list; omitting the flag leaves footprint abse
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
   assert.equal(run(cwd, ['add', 'withfp', '--title', 'X', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/a.mjs,src/b.mjs', '--description', 'tsk-535 fixture description.']).status, 0);
-  assert.equal(addOk(cwd, 'nofp').status, 0);
+  assert.equal(addViaCli(cwd, 'nofp').status, 0);
   const view = stateView(cwd);
   assert.deepEqual(view.work.withfp.footprint, ['src/a.mjs', 'src/b.mjs']);
   assert.equal('footprint' in view.work.nofp, false, 'an omitted --footprint leaves the field absent, not []');

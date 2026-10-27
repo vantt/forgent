@@ -132,12 +132,15 @@ pub(crate) struct ConfigCache {
     formats: Option<(ObjectFormat, RefStorage)>,
 }
 
-// Both caches are per process, not per driver: each Node port opens its own
+// These caches are per process, not per driver: each Node port opens its own
 // driver, and a verb opens many. Every use still rechecks the source stamps;
 // the source list is keyed by the selected Git and the variables its answer
 // depends on.
 static CONFIG_SOURCES: Mutex<BTreeMap<(PathBuf, ConfigEnvironment), Vec<PathBuf>>> = Mutex::new(BTreeMap::new());
 static REPOSITORY_CONFIG: Mutex<BTreeMap<PathBuf, ConfigCache>> = Mutex::new(BTreeMap::new());
+// A main checkout's repository-scoped transport keys, valid exactly while the
+// config stamp they were listed under still matches.
+static TRANSPORT_POLICY: Mutex<BTreeMap<PathBuf, (ConfigStamp, Vec<String>)>> = Mutex::new(BTreeMap::new());
 
 fn io(error: std::io::Error) -> OperationError {
     failure(format!("git-driver-io: {error}"))
@@ -372,11 +375,11 @@ impl GitDriver {
         self.check_config(repo, &config)?;
         // Formats are config facts: reused exactly while the stamp that proved
         // them still matches, read afresh when the stamp moved.
-        let formats = match self.cached_formats(repo)? {
+        let formats = match self.config_entry(repo, |entry| entry.formats)?.flatten() {
             Some(formats) => formats,
             None => {
                 let formats = self.repository_formats(repo)?;
-                self.keep_formats(repo, formats)?;
+                self.config_entry(repo, |entry| entry.formats = Some(formats))?;
                 formats
             }
         };
@@ -389,26 +392,36 @@ impl GitDriver {
 
     // A checkout handle answers from its own operation-local cache, any other
     // handle from the process-wide one; both only ever hold a validated stamp.
-    fn cached_formats(&self, repo: &RepoHandle) -> Result<Option<(ObjectFormat, RefStorage)>> {
+    // `None` when no entry exists yet.
+    fn config_entry<T>(&self, repo: &RepoHandle, use_entry: impl FnOnce(&mut ConfigCache) -> T) -> Result<Option<T>> {
         if let Some(local) = &repo.checkout_config {
-            let local = local.lock().map_err(|_| failure("config-cache-poisoned"))?;
-            return Ok(local.as_ref().and_then(|entry| entry.formats));
+            return Ok(local.lock().map_err(|_| failure("config-cache-poisoned"))?.as_mut().map(use_entry));
         }
         Ok(REPOSITORY_CONFIG.lock().map_err(|_| failure("config-cache-poisoned"))?
-            .get(&repo.git_dir).and_then(|entry| entry.formats))
+            .get_mut(&repo.git_dir).map(use_entry))
     }
 
-    fn keep_formats(&self, repo: &RepoHandle, formats: (ObjectFormat, RefStorage)) -> Result<()> {
-        if let Some(local) = &repo.checkout_config {
-            if let Some(entry) = local.lock().map_err(|_| failure("config-cache-poisoned"))?.as_mut() {
-                entry.formats = Some(formats);
-            }
-        } else if let Some(entry) = REPOSITORY_CONFIG.lock()
-            .map_err(|_| failure("config-cache-poisoned"))?.get_mut(&repo.git_dir)
-        {
-            entry.formats = Some(formats);
+    /// Remote admission's question, asked once per config stamp of a main
+    /// checkout: its one listing reads exactly the files the validated listing
+    /// stamped. A linked handle also lists its main checkout's worktree policy,
+    /// which its own stamp does not cover, so it asks every time.
+    fn transport_policy(&self, repo: &RepoHandle) -> Result<Vec<String>> {
+        if repo.git_dir != repo.common_dir {
+            return self.untrusted_transport_config(repo);
         }
-        Ok(())
+        self.preflight(repo)?;
+        let Some(stamp) = self.config_entry(repo, |entry| entry.stamp.clone())? else {
+            return self.untrusted_transport_config(repo);
+        };
+        let poisoned = || failure("config-cache-poisoned");
+        if let Some((known, keys)) = TRANSPORT_POLICY.lock().map_err(|_| poisoned())?.get(&repo.git_dir) {
+            if *known == stamp {
+                return Ok(keys.clone());
+            }
+        }
+        let keys = self.untrusted_transport_config(repo)?;
+        TRANSPORT_POLICY.lock().map_err(|_| poisoned())?.insert(repo.git_dir.clone(), (stamp, keys.clone()));
+        Ok(keys)
     }
 
     fn repository_formats(&self, repo: &RepoHandle) -> Result<(ObjectFormat, RefStorage)> {
@@ -842,6 +855,15 @@ impl GitDriver {
         Ok(())
     }
 
+    /// Names a revision that is not a commit or tree. Asked only after a read
+    /// of it missed or failed, so a read that succeeds spends no call on it.
+    fn require_commit_or_tree(&self, repo: &RepoHandle, revision: &Oid) -> Result<()> {
+        let kind = self.checked(repo, &["cat-file", "-t", revision.as_str()], Policy::Inspect)?;
+        if kind != b"commit\n" && kind != b"tree\n" {
+            return Err(failure("revision-not-commit-or-tree"));
+        }
+        Ok(())
+    }
     pub(crate) fn checked(&self, repo: &RepoHandle, args: &[&str], policy: Policy) -> Result<Vec<u8>> {
         self.require_floor()?;
         self.preflight(repo)?;
@@ -1099,7 +1121,7 @@ impl GitDriver {
             if let Some(repo) = repo {
                 // Repository transport policy is untrusted, including URL-scoped
                 // values which outrank generic -c values. Refuse the whole family.
-                if let Some(key) = self.untrusted_transport_config(repo)?.first() {
+                if let Some(key) = self.transport_policy(repo)?.first() {
                     return Err(failure(format!(
                         "repository-transport-config-untrusted: {key}"
                     )));
@@ -2197,14 +2219,6 @@ impl Inspect for GitDriver {
         {
             return Err(failure("tree-cursor-query-mismatch"));
         }
-        let kind = self.checked(
-            repo,
-            &["cat-file", "-t", revision.as_str()],
-            Policy::Inspect,
-        )?;
-        if kind != b"commit\n" && kind != b"tree\n" {
-            return Err(failure("revision-not-commit-or-tree"));
-        }
         // Resolve the literal containing directory with NUL-framed byte input.
         // Git emits only that subtree, rather than the whole project each page.
         let directory = prefix
@@ -2220,6 +2234,7 @@ impl Inspect for GitDriver {
             input.push(0);
             let output = self.inspect_input(repo, &["cat-file", "--batch-check", "-Z"], &input)?;
             if output.ends_with(b" missing\0") {
+                self.require_commit_or_tree(repo, revision)?;
                 if let Some(cause) = object_gap_cause(&repo.layout) {
                     return Err(failure(cause));
                 }
@@ -2239,7 +2254,7 @@ impl Inspect for GitDriver {
             )
             .map_err(|_| failure("invalid-tree-oid"))?;
         }
-        let bytes = self.checked(
+        let bytes = match self.checked(
             repo,
             &[
                 "ls-tree",
@@ -2250,7 +2265,13 @@ impl Inspect for GitDriver {
                 tree_revision.as_str(),
             ],
             Policy::Inspect,
-        )?;
+        ) {
+            Ok(bytes) => bytes,
+            Err(error) => {
+                self.require_commit_or_tree(repo, revision)?;
+                return Err(error);
+            }
+        };
         let mut entries = Vec::new();
         for record in bytes.split(|b| *b == 0).filter(|r| !r.is_empty()) {
             let tab = record
@@ -2429,14 +2450,7 @@ impl Inspect for GitDriver {
             Err(miss) => miss,
         };
         // A missing root never becomes absent paths: name it before anything else.
-        let kind = self.checked(
-            repo,
-            &["cat-file", "-t", revision.as_str()],
-            Policy::Inspect,
-        )?;
-        if kind != b"commit\n" && kind != b"tree\n" {
-            return Err(failure("revision-not-commit-or-tree"));
-        }
+        self.require_commit_or_tree(repo, revision)?;
         Err(match miss {
             GroupMiss::Failed(error) => error,
             GroupMiss::Root => failure("path-read-failed"),
@@ -3227,6 +3241,58 @@ mod tests {
         )
         .unwrap();
         expect(causes(&resolve(&driver, &dir.0)), "alternate-object-unavailable");
+    }
+    #[test]
+    fn a_tree_listing_asks_the_object_kind_only_after_a_read_missed() {
+        let state = Temp::new();
+        let dir = Temp::new();
+        let logs = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        fs::create_dir(dir.0.join("d")).unwrap();
+        fs::write(dir.0.join("d/f"), "f").unwrap();
+        git(&dir.0, &["add", "."]);
+        git(&dir.0, &["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "root"]);
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        let log = log_git_children(&mut driver, &logs.0);
+        let repo = resolve(&driver, &dir.0);
+        let oid = |rev: &str| Oid::parse(String::from_utf8(git(&dir.0, &["rev-parse", rev])).unwrap().trim(), repo.object_format()).unwrap();
+        let kinds = || fs::read_to_string(&log).unwrap().lines().filter(|l| l.contains(" cat-file -t ")).count();
+        for prefix in [&b""[..], b"d/"] {
+            assert!(!driver.list_tree(&repo, &oid("HEAD"), prefix, None, 10).unwrap().entries.is_empty());
+        }
+        assert_eq!(kinds(), 0, "a commit's listing spends no call on its kind");
+        assert!(driver.list_tree(&repo, &oid("HEAD"), b"nope/x", None, 10).unwrap().entries.is_empty());
+        for prefix in [&b""[..], b"d/x"] {
+            let error = driver.list_tree(&repo, &oid("HEAD:d/f"), prefix, None, 10).unwrap_err();
+            assert_eq!(error.cause, "revision-not-commit-or-tree");
+        }
+        assert_eq!(kinds(), 3, "only the missed reads ask for the kind");
+    }
+    #[test]
+    fn a_main_checkout_lists_its_transport_policy_once_per_config_stamp() {
+        let state = Temp::new();
+        let dir = Temp::new();
+        let logs = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        git(&dir.0, &["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "root"]);
+        let linked = dir.0.join("linked");
+        git(&dir.0, &["worktree", "add", "-q", linked.to_str().unwrap()]);
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        driver.require_floor().unwrap();
+        let log = log_git_children(&mut driver, &logs.0);
+        let listings = || fs::read_to_string(&log).unwrap_or_default().lines().filter(|l| l.contains("--show-scope")).count();
+        let repo = resolve(&driver, &dir.0);
+        assert!(driver.transport_policy(&repo).unwrap().is_empty());
+        assert!(driver.transport_policy(&repo).unwrap().is_empty());
+        assert_eq!(listings(), 1, "an unchanged stamp answers from the first listing");
+        git(&dir.0, &["config", "http.sslCAInfo", "/unreachable"]);
+        assert_eq!(driver.transport_policy(&repo).unwrap(), vec!["http.sslcainfo"]);
+        assert_eq!(listings(), 2, "a config write is seen at once");
+        let linked = resolve(&driver, &linked);
+        let before = listings();
+        driver.transport_policy(&linked).unwrap();
+        driver.transport_policy(&linked).unwrap();
+        assert_eq!(listings() - before, 4, "a linked handle lists both contexts every time");
     }
     #[test]
     fn a_missing_tree_or_path_is_an_alternates_error_and_stays_absent_when_only_shallow() {

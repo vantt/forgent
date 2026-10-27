@@ -98,10 +98,6 @@ import {
 // reason this is a stderr line, never a JSON field: JSON.stringify drops
 // a named property set on an array).
 
-test.todo('list default on a store with only done items returns an empty work map, not an error - migrated to test/direct/fgos-read.test.mjs');
-
-
-
 test('list prints the current view as parseable envelope data, exit 0', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'listed');
@@ -334,8 +330,5 @@ test('ready --cursor rejects a stale cursor (id no longer in the current frontie
   assert.equal(result.status, 4);
   assert.match(result.stderr, /re-issue the call without --cursor/);
 });
-
-
-test.todo('list --limit paginates only the work map: view.work becomes {items, nextCursor} while other view keys are untouched - migrated to test/direct/fgos-read.test.mjs');
 
 

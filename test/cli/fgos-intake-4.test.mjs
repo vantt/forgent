@@ -124,7 +124,8 @@ The chosen mechanism determines security requirements and user authentication fl
 
 test('move doing -> awaiting-approval applies via the real CLI, exit 0', () => {
   const cwd = tmpCwd();
-  const result = toProposed(cwd, 'goal-checked');
+  addOk(cwd, 'goal-checked');
+  const result = run(cwd, ['move', 'goal-checked', '--to', 'awaiting-approval']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['goal-checked'].status, 'awaiting-approval');
 });

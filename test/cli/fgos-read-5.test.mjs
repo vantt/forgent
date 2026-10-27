@@ -105,15 +105,6 @@ import {
 
 // --- work-graph-intelligence S5: `fgos graph` read verb -------------------
 
-test.todo('graph verb: reports connected components (independent parallel tracks) in a fgos.v1 envelope, and is a pure read - migrated to test/direct/fgos-read.test.mjs');
-test.todo('graph use case --what-if <id>: reports what completing that item unblocks, pure read - migrated to test/direct/fgos-read.test.mjs');
-test.todo('graph use case --what-if on an unknown id: exists false, zero impact - migrated to test/direct/fgos-read.test.mjs');
-test.todo('stale verb: a freshly-claimed doing item is NOT stale - migrated to test/direct/fgos-read.test.mjs');
-test.todo('stale use case on a store with nothing in doing: empty advisory - migrated to test/direct/fgos-read.test.mjs');
-test.todo('stale use case: postDelivery is additive - migrated to test/direct/fgos-read.test.mjs');
-test.todo('stale verb: a just-delivered item is NOT flagged in postDelivery - migrated to test/direct/fgos-read.test.mjs');
-
-
 test('conflicts verb: two ready items sharing a footprint path are flagged with shared + suggestions, pure read', () => {
   const cwd = tmpCwdFast();
   assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/x.mjs,src/y.mjs', '--step', 'executing', '--description', 'tsk-535 fixture description.']).status, 0);
@@ -263,9 +254,4 @@ test('graph verb on an empty store: zero components, still a valid envelope, exi
   assert.deepEqual(data.components, []);
 });
 
-
-test.todo('list --limit paginates work into {items, nextCursor}, AND scopes every other view key to just the paged ids - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list --all --limit combined: scopes side-logs to the paged ids too - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list default (no flags at all) scopes side-logs to only the open (non-done) ids - migrated to test/direct/fgos-read.test.mjs');
-test.todo('list --all with NO pagination flags stays byte-identical and unscoped - migrated to test/direct/fgos-read.test.mjs');
 

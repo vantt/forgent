@@ -111,25 +111,8 @@ test('edit --verify-from-targets with empty targets throws a validation error in
 });
 
 
-// --- edit --docs-ref: docsRef can now be attached/changed after creation,
-// not only at `add` time -- closes the gap where an item created via
-// `submit` (no --docs-ref of its own before this) had no way to ever gain
-// this link. ---
-
-test.todo('edit --docs-ref sets docsRef on an item that had none, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
-
 // --- edit --merge-after (tsk-2u0, docs/history/
 //     tsk-3bn-merge-conductor-harness-v2/D4/D5) -----------------------------
-
-test.todo('edit --merge-after sets mergeAfter on an item that had none, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit --merge-after "" clears an existing mergeAfter, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
 
 test('edit --merge-after rejects a target id that does not exist, exit 4, item unchanged', () => {
   const cwd = tmpCwdFromTemplate();
@@ -163,17 +146,8 @@ test('edit --merge-after rejects a mergeAfter that would close a cycle mixed wit
 });
 
 
-test.todo('edit --merge-after does not require the deps field to have been touched (byte-identical to other list edits) - migrated to test/direct/fgos-edit.test.mjs');
-
-
 // --- edit --superseded-by / --duplicates (tsk-2ie, docs/history/
 //     tsk-2ie-duplicate-superseded-guard/ D1-D3) ---------------------------
-
-test.todo('edit --superseded-by sets supersededBy on an item that had none, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit --superseded-by "" clears an existing supersededBy, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
 
 test('edit --superseded-by rejects a target id that does not exist, exit 4, item unchanged', () => {
   const cwd = tmpCwdFromTemplate();
@@ -201,12 +175,6 @@ test('edit --superseded-by with no value is a validation error, exit 4', () => {
   assert.equal(result.status, 4);
   assert.match(result.stderr, /--superseded-by requires a value/);
 });
-
-
-test.todo('edit --duplicates sets duplicates on an item that had none, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
-
-
-test.todo('edit --duplicates "" clears an existing duplicates, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
 test('edit --duplicates rejects a target id that does not exist, exit 4, item unchanged', () => {

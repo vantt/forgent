@@ -17,6 +17,7 @@ import {
   addDiscovery,
   addGoalItem,
   addOk,
+  addViaCli,
   addOutcome,
   addWork,
   advanceThroughDiscoveryToPlanning,
@@ -131,7 +132,7 @@ test('add --parent "" (bare, no value) is rejected as a valueless flag, same as 
 
 test('add with no --priority/--intent leaves both fields absent (undefined), not null and not zero', () => {
   const cwd = tmpCwd();
-  addOk(cwd, 'add-no-priority-intent');
+  addViaCli(cwd, 'add-no-priority-intent');
   const item = stateView(cwd).work['add-no-priority-intent'];
   assert.equal(item.priority, undefined);
   assert.equal(item.intent, undefined);
@@ -156,7 +157,7 @@ test('add --urgent sets the item urgent field, exit 0', () => {
 
 test('add with no --urgent leaves the field absent (undefined), not a default of medium', () => {
   const cwd = tmpCwd();
-  addOk(cwd, 'add-no-urgent');
+  addViaCli(cwd, 'add-no-urgent');
   assert.equal(stateView(cwd).work['add-no-urgent'].urgent, undefined);
 });
 
@@ -267,14 +268,14 @@ test('add with retired --tier is rejected as validation with guidance, exit 4', 
 
 test('add without --size defaults to work.mjs DEFAULTS.size ("standard"), exit 0', () => {
   const cwd = tmpCwd();
-  const result = addOk(cwd, 'default-tier-item');
+  const result = addViaCli(cwd, 'default-tier-item');
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['default-tier-item'].size, 'standard');
 });
 
 test('add explicitly writes the size into the work.add event payload itself, not only the folded view', () => {
   const cwd = tmpCwd();
-  addOk(cwd, 'explicit-tier-item');
+  addViaCli(cwd, 'explicit-tier-item');
   const lines = eventLines(cwd);
   const addEvent = JSON.parse(lines[lines.length - 1]);
   assert.equal(addEvent.type, 'work.add');

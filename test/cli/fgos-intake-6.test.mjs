@@ -284,7 +284,8 @@ test('move to done via the real CLI stamps role "human" on the event payload and
   const cwd = tmpCwdFromTemplate();
   toProposed(cwd, 'close-actor-item');
 
-  const result = toDoneViaChain(cwd, 'close-actor-item');
+  for (const to of ['delivered', 'retrospective', 'cleanup']) assert.equal(run(cwd, ['move', 'close-actor-item', '--to', to]).status, 0);
+  const result = run(cwd, ['move', 'close-actor-item', '--to', 'done']);
   assert.equal(result.status, 0);
 
   const lines = eventLines(cwd);

@@ -17,6 +17,7 @@ import {
   addDiscovery,
   addGoalItem,
   addOk,
+  addViaCli,
   addOutcome,
   addWork,
   advanceThroughDiscoveryToPlanning,
@@ -135,7 +136,7 @@ for (const [label, badFlagArgs] of ADD_BAD_FLAG_CASES) {
 
 test('add without --domain leaves domain unset — the view still reads "coding" behavior unchanged, exit 0', () => {
   const cwd = tmpCwdFromTemplate();
-  const result = addOk(cwd, 'default-domain-item');
+  const result = addViaCli(cwd, 'default-domain-item');
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['default-domain-item'].domain, undefined);
 });
@@ -174,7 +175,7 @@ test('add --domain coding is explicit and behaves identically to omitting --doma
 
 test('add without --stage or --domain now defaults to stage "discovery" (was implicit "executing"), and is NOT frontier-ready, exit 0', () => {
   const cwd = tmpCwdFromTemplate();
-  // Raw run(), not addOk() -- addOk defaults its own --stage to 'executing'
+  // Raw run(), not addViaCli() -- addOk defaults its own --stage to 'executing'
   // for its many other callers' sake (see its own comment); this test is
   // specifically about the CLI's bare, flagless default.
   const result = run(cwd, ['add', 'default-stage-item', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
@@ -205,7 +206,7 @@ test('add --stage executing explicitly persists that stage and IS frontier-ready
 
 test('add without --discovered-from leaves discoveredFrom unset, exit 0', () => {
   const cwd = tmpCwdFromTemplate();
-  const result = addOk(cwd, 'no-discovered-item');
+  const result = addViaCli(cwd, 'no-discovered-item');
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['no-discovered-item'].discoveredFrom, undefined);
 });
@@ -213,7 +214,7 @@ test('add without --discovered-from leaves discoveredFrom unset, exit 0', () => 
 
 test('add --discovered-from persists discoveredFrom on the new item, exit 0', () => {
   const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'origin-item');
+  addViaCli(cwd, 'origin-item');
   const result = run(cwd, [
     'add', 'discovered-item',
     '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x',
@@ -228,7 +229,7 @@ test('add --discovered-from persists discoveredFrom on the new item, exit 0', ()
 
 test('add without --goal-tier/--targets leaves both fields unset, exit 0', () => {
   const cwd = tmpCwdFromTemplate();
-  const result = addOk(cwd, 'no-goal-item');
+  const result = addViaCli(cwd, 'no-goal-item');
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['no-goal-item'].goalTier, undefined);
   assert.equal(stateView(cwd).work['no-goal-item'].targets, undefined);
@@ -269,7 +270,7 @@ test('add with a bare --targets (no value) also parses to [], exit 0', () => {
 
 test('add without --docs-ref leaves docsRef unset, exit 0', () => {
   const cwd = tmpCwdFromTemplate();
-  const result = addOk(cwd, 'no-docs-ref-item');
+  const result = addViaCli(cwd, 'no-docs-ref-item');
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['no-docs-ref-item'].docsRef, undefined);
 });
