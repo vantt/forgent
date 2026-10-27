@@ -428,3 +428,27 @@ test('fgos run keeps --timeout: it raises no tier', () => {
   assert.equal(binding.timeoutMs, 300000);
   assert.equal(binding.tier, 'standard');
 });
+
+test('fgos run refuses conflicting parameters between param and params as param-request-conflict', () => {
+  const tmp = setupTestRepo();
+  const out = failCli(['Check it', '--capability', 'docs:write', '--param', 'maxRounds=2', '--params', '{"maxRounds": 3}', '--dir', tmp], tmp);
+  assert.match(out, /param-request-conflict/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
+test('fgos run refuses param or params beside resume', () => {
+  const tmp = setupTestRepo();
+  const outParam = failCli(['--resume', 'unit-run-1-abc', '--param', 'maxRounds=2', '--dir', tmp], tmp);
+  assert.match(outParam, /--param cannot change a resumed unit run/);
+
+  const outParams = failCli(['--resume', 'unit-run-1-abc', '--params', '{"maxRounds": 2}', '--dir', tmp], tmp);
+  assert.match(outParams, /--params cannot change a resumed unit run/);
+});
+
+test('fgos run standalone request runs without requiring a reason', () => {
+  const tmp = setupTestRepo();
+  const stdout = runCli(['Write notes', '--capability', 'docs:write', '--pattern', 'reviewed', '--param', 'maxRounds=2', '--dir', tmp], tmp);
+  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
+  const record = unitRecordOf(tmp, stdout);
+  assert.equal(record.collaboration?.effective?.params?.maxRounds, 2);
+});

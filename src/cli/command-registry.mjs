@@ -1550,7 +1550,7 @@ export const COMMAND_REGISTRY = [
   }),
   {
     name: 'run',
-    invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] [--input <a>,<b>] [--verify "<cmd>"] [--sync <ref>] | --sync <ref> --writes <a>,<b> | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--timeout <dur>] [--account <pool/account>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
+    invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] [--input <a>,<b>] [--verify "<cmd>"] [--sync <ref>] | --sync <ref> --writes <a>,<b> | --unit <file|-> | --resume <unitRunId>] [--pattern <name>] [--params <json>] [--param <k=v>] [--reason <text>] [--override <json>] [--effort <low|medium|high|max>] [--timeout <dur>] [--account <pool/account>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
     description: 'Door for one task: `fgos run "<prompt>"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel, debate); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`.',
     parameters: {
       type: 'object',
@@ -1567,7 +1567,9 @@ export const COMMAND_REGISTRY = [
         verify: { type: 'string', description: 'One-liner: shell command run in the worktree after each producing round of a reviewed run (Unit field verify); a non-zero exit, or running past runner.timeoutMs, is a failed verify. Without one, nothing is verified and the result says so.' },
         sync: { type: 'string', description: 'One-liner: a ref (branch, tag or commit) the runner merges into the worktree\'s branch before the worker runs (Unit field syncBase); needs --writes. Without a prompt: a sync-only Unit, no worker unless the merge conflicts. Conflicted paths join the write scope and the brief; the runner commits the merge, never the worker.' },
         unit: { type: 'string', description: 'Path to unit YAML/JSON file or "-" for stdin.' },
-        pattern: { type: 'string', description: 'Pattern name or preset (solo, reviewed, panel, debate, code-change).' },
+        pattern: { type: 'string', description: 'Collaboration pattern name from the catalog (solo, reviewed, panel, debate, code-change); differing explicit selectors refuse selector-conflict. The run record pins the effective pattern and parameters.' },
+        params: { type: 'string', description: 'Request parameters as a JSON object (typed against the loop\'s param table). In a case, requires --reason.' },
+        param: { type: 'array', items: { type: 'string' }, description: 'Repeatable scalar request parameter (key=value, split on first =); typed by the loop schema. In a case, requires --reason.' },
         override: { type: 'string', description: 'JSON-encoded array or object of overrides.' },
         effort: { type: 'string', description: 'Reasoning effort for this run (low, medium, high, max), rendered into the provider CLI\'s own flag; a level the bound executor does not declare refuses the binding.' },
         timeout: { type: 'string', description: 'Time each seat of this run may take instead of runner.timeoutMs: a whole number and a unit (ms, s, m, h), e.g. 90m or 5400s, from 1m to 4h (same as "timeoutMs" in --override, or a Unit\'s own timeoutMs, which it overrides). Kept in unit.json for resume; not with --resume.' },
@@ -1576,7 +1578,7 @@ export const COMMAND_REGISTRY = [
         case: { type: 'string', description: 'Admit this run into a Workflow case (its id) as an activity of its guide, before anything exists: entry milestones, the guide\'s MUST rules, write overlap with the case\'s live reservations and its frame are all checked, and a refusal names the condition. A Playbook case admits through its own proposer only. Needs --activity. Without --case a read-only run is standalone and uncounted, and a writing run needs a worktree no case owns.' },
         activity: { type: 'string', description: 'With --case: the activity of the case\'s guide this run is.' },
         route: { type: 'string', description: 'With --case: which route you take at the decision point, should, may-instead or unlisted; the guide decides which it is, and the ledger records what you said beside it.' },
-        reason: { type: 'string', description: 'With --case: why, when the route is not one the guide lists (required for an unlisted route).' },
+        reason: { type: 'string', description: 'With --case: why, when the route is not one the guide lists (required for an unlisted route), or reason for a requested pattern swap or parameter override.' },
         dir: { type: 'string', description: 'Main repository root directory. Storage follows it; workers start in the current directory, so run from inside that project or pass --worktree (a different project than the current directory is warned about as dir-differs-from-cwd).' },
         worktree: { type: 'string', description: 'Target worktree directory.' },
         json: { type: 'boolean', description: 'Emit machine-readable JSON output.' },

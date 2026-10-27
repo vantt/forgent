@@ -309,6 +309,7 @@
     "src/runner/execution/loops/role-tasks.mjs": "domain",
     "src/runner/execution/loops/solo.mjs": "domain",
     "src/runner/execution/loops/verify.mjs": "domain",
+    "src/runner/execution/run-request.mjs": "domain",
     "src/workflow/definition.mjs": "kernel",
     "src/workflow/guide-schema.mjs": "kernel",
     "src/workflow/dir-guard.mjs": "infra",

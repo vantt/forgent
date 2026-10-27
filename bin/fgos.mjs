@@ -2856,6 +2856,23 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // Where a writing unit would run: --worktree, else here. Only a linked worktree may be written.
         isLinkedWorktree: () => resolveGitRoots(worktree ? path.resolve(worktree) : process.cwd()).isLinkedWorktree,
       });
+      if (resumeUnitRunId) {
+        if (flags.params !== undefined) {
+          throw new StoreError('validation', '--params cannot change a resumed unit run: it keeps the request it was started with');
+        }
+        if (flags.param !== undefined) {
+          throw new StoreError('validation', '--param cannot change a resumed unit run: it keeps the request it was started with');
+        }
+      }
+      let request;
+      if (flags.params !== undefined || flags.param !== undefined) {
+        const { requestFromFlags } = await import('../src/runner/execution/run-request.mjs');
+        try {
+          request = requestFromFlags({ params: flags.params, param: flags.param });
+        } catch (err) {
+          throw new RunnerConfigError(`${err.code}: ${err.message}`, { code: err.code, phase: 'pre-admission' });
+        }
+      }
 
       // `--case <id> --activity <id>` names the case this run is an activity of: it is admitted into that
       // case (entry, MUST rules, write overlap, frame) before anything exists. Without them the run is
@@ -2878,27 +2895,36 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       // The Workflow's port, injected here so the Execution Core never imports the Workflow: a writing
       // run goes on only into a worktree no case owns.
-      const { createCaseAdmissionPort } = await import('../src/workflow/case-admission-port.mjs');
+      const { createCaseAdmissionPort, activityUnitOf } = await import('../src/workflow/case-admission-port.mjs');
       const portRoot = repoRoot ? path.resolve(repoRoot) : (() => { try { return resolveGitRoots(process.cwd()).mainCheckoutRoot; } catch { return null; } })();
+      const activityUnit = caseRef ? activityUnitOf({ mainRoot: portRoot, caseId: caseRef.caseId, activity: caseRef.activity }) : undefined;
 
-      return attachDirWarning(await runUnit({
-        unitPath,
-        unitData,
-        ...(portRoot ? { caseAdmission: createCaseAdmissionPort({ repoRoot: portRoot }) } : {}),
-        ...(caseRef ? { caseRef } : {}),
-        // No door of this release can attest a person, so an override tier above the resolved one, or an
-        // accepted dependence, is refused by name. A prompt-built unit's --capability and --persona are the
-        // unit's own declarations, like the same keys of a --unit file.
-        raiseAuthorized: false,
-        pattern,
-        stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
-        overrides,
-        resumeUnitRunId,
-        repoRoot,
-        worktree,
-      }), runWarning);
+      try {
+        return attachDirWarning(await runUnit({
+          unitPath,
+          unitData,
+          ...(portRoot ? { caseAdmission: createCaseAdmissionPort({ repoRoot: portRoot }) } : {}),
+          ...(caseRef ? { caseRef } : {}),
+          ...(activityUnit !== undefined ? { activityUnit } : {}),
+          ...(request !== undefined ? { request } : {}),
+          // No door of this release can attest a person, so an override tier above the resolved one, or an
+          // accepted dependence, is refused by name. A prompt-built unit's --capability and --persona are the
+          // unit's own declarations, like the same keys of a --unit file.
+          raiseAuthorized: false,
+          pattern,
+          stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
+          overrides,
+          resumeUnitRunId,
+          repoRoot,
+          worktree,
+        }), runWarning);
+      } catch (err) {
+        if (err instanceof RunnerConfigError && err.code && !err.message.includes(err.code)) {
+          err.message = `${err.code}: ${err.message}`;
+        }
+        throw err;
+      }
     }
-
 
 
     // `events sync|status|export|migrate|import-legacy` and `rebuild` are the Event Store's verbs; each use case owns its

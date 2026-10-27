@@ -74,3 +74,14 @@ test('fgos workflow start --case: a Playbook parent is refused by name, a missin
   assert.match(underMissing.stderr, /authority-context-invalid/);
   assert.equal(runs(), before, 'neither created a run');
 });
+
+test('fgos run --case with a request and no --reason refuses request-reason-required before admission', (t) => {
+  const tmp = repo(t);
+  const refusedParam = fgos(tmp, 'run', 'look', '--pattern', 'reviewed', '--case', 'wf-bogus', '--activity', 'scout', '--param', 'maxRounds=2');
+  assert.notEqual(refusedParam.status, 0);
+  assert.match(refusedParam.stderr, /request-reason-required/);
+
+  const refusedParams = fgos(tmp, 'run', 'look', '--pattern', 'reviewed', '--case', 'wf-bogus', '--activity', 'scout', '--params', '{"maxRounds": 2}');
+  assert.notEqual(refusedParams.status, 0);
+  assert.match(refusedParams.stderr, /request-reason-required/);
+});
