@@ -65,8 +65,7 @@ function deepEqual(a, b) {
 function deepClone(obj) {
   if (obj === null || typeof obj !== 'object') return obj;
   if (Array.isArray(obj)) return obj.map(deepClone);
-  const proto = Object.getPrototypeOf(obj);
-  const out = proto ? Object.create(proto) : Object.create(null);
+  const out = Object.create(null);
   for (const [k, v] of Object.entries(obj)) {
     Object.defineProperty(out, k, {
       value: deepClone(v),
@@ -127,7 +126,7 @@ function allowedRoleTaskTargets(loop, entry) {
   const declaredCheckers = [];
 
   for (const s of allDeclared) {
-    if (s?.seat) {
+    if (s && typeof s === 'object' && typeof s.seat === 'string' && s.seat.trim()) {
       targets.add(s.seat);
       if (s.role === 'producer') {
         declaredProducers.push(s.seat);
@@ -141,8 +140,14 @@ function allowedRoleTaskTargets(loop, entry) {
     case 'reviewed':
       targets.add('producer');
       if (allDeclared.length === 0) {
-        for (const checkerName of Object.keys(CHECKER_SEATS)) {
-          targets.add(checkerName);
+        targets.add('reviewer');
+        const minDefaults = Array.isArray(entry?.defaults?.minCheckers) ? entry.defaults.minCheckers : [];
+        const minInvAtLeast = Array.isArray(entry?.invariants?.minCheckers?.atLeast) ? entry.invariants.minCheckers.atLeast : [];
+        const minInvFixed = Array.isArray(entry?.invariants?.minCheckers?.fixed) ? entry.invariants.minCheckers.fixed : [];
+        for (const chk of [...minDefaults, ...minInvAtLeast, ...minInvFixed]) {
+          if (typeof chk === 'string' && Object.hasOwn(CHECKER_SEATS, chk)) {
+            targets.add(chk);
+          }
         }
       }
       break;
@@ -468,7 +473,7 @@ export function checkCatalog(options = {}) {
       }
     }
 
-    if (entry.defaults !== undefined) {
+    if (Object.hasOwn(entry, 'defaults')) {
       if (!entry.defaults || typeof entry.defaults !== 'object' || Array.isArray(entry.defaults)) {
         const src = resolveLayer(layers, name, 'defaults') ?? resolveLayer(layers, name);
         problems.push(new CollaborationError(
@@ -479,7 +484,7 @@ export function checkCatalog(options = {}) {
       }
     }
 
-    if (entry.invariants !== undefined) {
+    if (Object.hasOwn(entry, 'invariants')) {
       if (!entry.invariants || typeof entry.invariants !== 'object' || Array.isArray(entry.invariants)) {
         const src = resolveLayer(layers, name, 'invariants') ?? resolveLayer(layers, name);
         problems.push(new CollaborationError(
@@ -500,7 +505,7 @@ export function checkCatalog(options = {}) {
   allNames.delete('defaultRule');
   allNames.delete('research-fan-out-gated');
 
-  const mergedEntries = {};
+  const mergedEntries = Object.create(null);
 
   for (const name of allNames) {
     const shippedEntry = Object.hasOwn(shippedPatterns, name) ? shippedPatterns[name] : undefined;
@@ -526,26 +531,28 @@ export function checkCatalog(options = {}) {
       mergedEntry = deepClone(effectiveEntry);
     } else {
       mergedEntry = deepClone(shippedEntry);
-      if (effectiveEntry.promise !== undefined) mergedEntry.promise = effectiveEntry.promise;
-      if (effectiveEntry.loop !== undefined) mergedEntry.loop = effectiveEntry.loop;
+      if (Object.hasOwn(effectiveEntry, 'promise')) mergedEntry.promise = effectiveEntry.promise;
+      if (Object.hasOwn(effectiveEntry, 'loop')) mergedEntry.loop = effectiveEntry.loop;
 
-      if (effectiveEntry.defaults && typeof effectiveEntry.defaults === 'object' && !Array.isArray(effectiveEntry.defaults)) {
-        mergedEntry.defaults = {
-          ...(mergedEntry.defaults ?? {}),
-          ...deepClone(effectiveEntry.defaults),
-        };
+      if (Object.hasOwn(effectiveEntry, 'defaults') && effectiveEntry.defaults && typeof effectiveEntry.defaults === 'object' && !Array.isArray(effectiveEntry.defaults)) {
+        mergedEntry.defaults = Object.assign(
+          Object.create(null),
+          mergedEntry.defaults ?? {},
+          deepClone(effectiveEntry.defaults),
+        );
       }
-      if (effectiveEntry.invariants && typeof effectiveEntry.invariants === 'object' && !Array.isArray(effectiveEntry.invariants)) {
-        mergedEntry.invariants = {
-          ...(mergedEntry.invariants ?? {}),
-          ...deepClone(effectiveEntry.invariants),
-        };
+      if (Object.hasOwn(effectiveEntry, 'invariants') && effectiveEntry.invariants && typeof effectiveEntry.invariants === 'object' && !Array.isArray(effectiveEntry.invariants)) {
+        mergedEntry.invariants = Object.assign(
+          Object.create(null),
+          mergedEntry.invariants ?? {},
+          deepClone(effectiveEntry.invariants),
+        );
       }
     }
 
     // Shipped entry override weakening checks
     if (shippedEntry && hasEffective) {
-      if (effectiveEntry.loop !== undefined && effectiveEntry.loop !== shippedEntry.loop) {
+      if (Object.hasOwn(effectiveEntry, 'loop') && effectiveEntry.loop !== shippedEntry.loop) {
         const src = resolveLayer(layers, name, 'loop') ?? resolveLayer(layers, name);
         problems.push(new CollaborationError(
           'pattern-invariant-weakened',
@@ -554,7 +561,7 @@ export function checkCatalog(options = {}) {
         ));
       }
 
-      if (effectiveEntry.promise !== undefined && effectiveEntry.promise !== shippedEntry.promise) {
+      if (Object.hasOwn(effectiveEntry, 'promise') && effectiveEntry.promise !== shippedEntry.promise) {
         const src = resolveLayer(layers, name, 'promise') ?? resolveLayer(layers, name);
         problems.push(new CollaborationError(
           'pattern-invariant-weakened',
@@ -563,7 +570,7 @@ export function checkCatalog(options = {}) {
         ));
       }
 
-      if (shippedEntry.invariants && typeof effectiveEntry.invariants === 'object' && effectiveEntry.invariants !== null && !Array.isArray(effectiveEntry.invariants)) {
+      if (shippedEntry.invariants && Object.hasOwn(effectiveEntry, 'invariants') && typeof effectiveEntry.invariants === 'object' && effectiveEntry.invariants !== null && !Array.isArray(effectiveEntry.invariants)) {
         for (const [param, shippedInv] of Object.entries(shippedEntry.invariants)) {
           const src = resolveLayer(layers, name, `invariants.${param}`) ?? resolveLayer(layers, name, 'invariants') ?? resolveLayer(layers, name);
 

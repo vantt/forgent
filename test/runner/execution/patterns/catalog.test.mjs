@@ -450,7 +450,7 @@ test('tightening a shipped pattern by adding an invariant on another parameter i
   );
   assert.deepEqual(
     entries['code-change'].invariants.roleTasks.fixed,
-    { reviewer: 'Carefully review all touched files.' },
+    Object.assign(Object.create(null), { reviewer: 'Carefully review all touched files.' }),
   );
 });
 
@@ -682,6 +682,7 @@ test('roleTasks target validation accepts loop kinds and declared seats', () => 
       promise: 'Reviewed pattern with checker seats.',
       loop: 'reviewed',
       defaults: {
+        minCheckers: ['reviewer', 'red-team'],
         roleTasks: {
           producer: 'Produce the initial implementation.',
           reviewer: 'Review all outputs.',
@@ -965,4 +966,147 @@ test('non-string checker names in minCheckers and seats are rejected with param-
   const resSeats = checkCatalog({ shipped, effective: effectiveSeats });
   assert.ok(resSeats.problems.length >= 3);
   assert.ok(resSeats.problems.every((p) => p.code === 'param-invalid'));
+});
+
+test('reviewed pattern with no declared seats accepts only checkers added by minCheckers or invariants', () => {
+  const shipped = shippedCatalog();
+
+  const effectiveNoMin = {
+    'reviewed-no-min': {
+      promise: 'Reviewed pattern without minCheckers.',
+      loop: 'reviewed',
+      defaults: {
+        roleTasks: {
+          producer: 'Produce output.',
+          reviewer: 'Review output.',
+          'red-team': 'Challenge output.',
+        },
+      },
+    },
+  };
+  const resNoMin = checkCatalog({ shipped, effective: effectiveNoMin });
+  assert.ok(resNoMin.problems.some((p) => p.code === 'param-invalid' && p.message.includes('target "red-team" does not exist for loop "reviewed"')));
+
+  const effectiveWithDefaults = {
+    'reviewed-with-defaults': {
+      promise: 'Reviewed pattern with defaults minCheckers.',
+      loop: 'reviewed',
+      defaults: {
+        minCheckers: ['reviewer', 'red-team'],
+        roleTasks: {
+          producer: 'Produce output.',
+          reviewer: 'Review output.',
+          'red-team': 'Challenge output.',
+        },
+      },
+    },
+  };
+  const resWithDefaults = checkCatalog({ shipped, effective: effectiveWithDefaults });
+  assert.deepEqual(resWithDefaults.problems, []);
+
+  const effectiveRejectsTester = {
+    'reviewed-rejects-tester': {
+      promise: 'Reviewed pattern rejecting tester target.',
+      loop: 'reviewed',
+      defaults: {
+        minCheckers: ['reviewer', 'red-team'],
+        roleTasks: {
+          tester: 'Run tests.',
+        },
+      },
+    },
+  };
+  const resRejectsTester = checkCatalog({ shipped, effective: effectiveRejectsTester });
+  assert.ok(resRejectsTester.problems.some((p) => p.code === 'param-invalid' && p.message.includes('target "tester" does not exist for loop "reviewed"')));
+});
+
+test('cloned and merged entries preserve only own properties and ignore inherited prototype parameters', () => {
+  const shipped = shippedCatalog();
+
+  const proto = { strayParam: 'bad', defaults: { inheritedDefault: 'evil' } };
+  const custom = Object.create(proto);
+  custom.promise = 'Prototype test pattern.';
+  custom.loop = 'solo';
+  custom.defaults = Object.create({ inheritedNested: 'bad' });
+  custom.defaults.seats = [{ seat: 'solo-prod', role: 'producer' }];
+
+  const res = checkCatalog({ shipped, effective: { 'proto-pattern': custom } });
+  assert.deepEqual(res.problems, []);
+
+  const entry = res.entries['proto-pattern'];
+  assert.strictEqual(Object.getPrototypeOf(entry), null);
+  assert.strictEqual(entry.strayParam, undefined);
+  assert.strictEqual(Object.getPrototypeOf(entry.defaults), null);
+  assert.strictEqual(entry.defaults.inheritedNested, undefined);
+
+  const shippedOverride = Object.create({ strayKey: 'override-bad' });
+  shippedOverride.defaults = Object.create({ inheritedTuning: 123 });
+  shippedOverride.defaults.maxRounds = 3;
+
+  const resOverride = checkCatalog({ shipped, effective: { 'code-change': shippedOverride } });
+  assert.deepEqual(resOverride.problems, []);
+  assert.strictEqual(resOverride.entries['code-change'].defaults.inheritedTuning, undefined);
+  assert.strictEqual(resOverride.entries['code-change'].strayKey, undefined);
+});
+
+test('debate pattern with malformed seat ids and roleTasks refuses with param-invalid without escaping as TypeError', () => {
+  const shipped = shippedCatalog();
+
+  const testCases = [
+    {
+      name: 'non-string seat id',
+      seats: [
+        { seat: 123, role: 'producer' },
+        { seat: 'side-b', role: 'producer' },
+        { seat: 'judge-1', role: 'judge' },
+      ],
+    },
+    {
+      name: 'missing seat id',
+      seats: [
+        { role: 'producer' },
+        { seat: 'side-b', role: 'producer' },
+        { seat: 'judge-1', role: 'judge' },
+      ],
+    },
+    {
+      name: 'null seat id',
+      seats: [
+        { seat: null, role: 'producer' },
+        { seat: 'side-b', role: 'producer' },
+        { seat: 'judge-1', role: 'judge' },
+      ],
+    },
+    {
+      name: 'symbol seat id',
+      seats: [
+        { seat: Symbol('side-a'), role: 'producer' },
+        { seat: 'side-b', role: 'producer' },
+        { seat: 'judge-1', role: 'judge' },
+      ],
+    },
+  ];
+
+  for (const { seats } of testCases) {
+    const effective = {
+      'custom-debate': {
+        promise: 'Debate with malformed seats.',
+        loop: 'debate',
+        defaults: {
+          seats,
+          roleTasks: {
+            thesis: 'Argue thesis position.',
+          },
+        },
+      },
+    };
+
+    const res = checkCatalog({ shipped, effective, throwOnError: false });
+    assert.ok(res.problems.some((p) => p.code === 'param-invalid'));
+
+    assert.throws(
+      () => checkCatalog({ shipped, effective, throwOnError: true }),
+      (err) => err.name === 'CollaborationError' && err.code === 'param-invalid',
+    );
+  }
 });
