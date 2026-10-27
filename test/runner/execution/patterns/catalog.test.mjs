@@ -408,3 +408,260 @@ test('checkCatalog with throwOnError throws the first problem encountered', () =
     (err) => err instanceof CollaborationError && err.code === 'pattern-invariant-weakened',
   );
 });
+
+test('carrier validity refuses unknown key on pattern entry with param-unknown', () => {
+  const shipped = shippedCatalog();
+  const layers = [{ path: 'runner.patterns.custom-pattern.unexpectedKey', layer: 'project' }];
+  const effective = {
+    'custom-pattern': {
+      promise: 'A custom pattern with an unexpected key.',
+      loop: 'solo',
+      unexpectedKey: 'not-allowed',
+    },
+  };
+  const { problems } = checkCatalog({ shipped, effective, layers });
+  assert.ok(problems.length > 0);
+  const err = problems.find((p) => p.code === 'param-unknown');
+  assert.ok(err);
+  assert.equal(err.source, 'project');
+});
+
+test('tightening a shipped pattern by adding an invariant on another parameter is accepted', () => {
+  const shipped = shippedCatalog();
+  const effective = {
+    'code-change': {
+      invariants: {
+        roleTasks: {
+          fixed: {
+            reviewer: 'Carefully review all touched files.',
+          },
+        },
+      },
+    },
+  };
+  const { entries, problems } = checkCatalog({ shipped, effective });
+  assert.deepEqual(problems, []);
+  assert.deepEqual(
+    entries['code-change'].invariants.minCheckers.atLeast,
+    ['reviewer', 'red-team'],
+  );
+  assert.deepEqual(
+    entries['code-change'].invariants.roleTasks.fixed,
+    { reviewer: 'Carefully review all touched files.' },
+  );
+});
+
+test('invariant form validation requires form fitting the parameter and rejects invalid forms', () => {
+  const shipped = shippedCatalog();
+
+  const resListFixed = checkCatalog({
+    shipped,
+    effective: {
+      'custom-reviewed': {
+        promise: 'List param with fixed form.',
+        loop: 'reviewed',
+        invariants: {
+          minCheckers: {
+            fixed: ['reviewer'],
+          },
+        },
+      },
+    },
+  });
+  assert.ok(resListFixed.problems.some((p) => p.code === 'param-invalid'));
+
+  const resScalarAtLeast = checkCatalog({
+    shipped,
+    effective: {
+      'custom-debate': {
+        promise: 'Boolean param with atLeast form.',
+        loop: 'debate',
+        invariants: {
+          rebuttal: {
+            atLeast: [true],
+          },
+        },
+      },
+    },
+  });
+  assert.ok(resScalarAtLeast.problems.some((p) => p.code === 'param-invalid'));
+
+  const resExtraKeys = checkCatalog({
+    shipped,
+    effective: {
+      'custom-reviewed': {
+        promise: 'Invariant with extra unknown keys.',
+        loop: 'reviewed',
+        invariants: {
+          minCheckers: {
+            atLeast: ['reviewer'],
+            extraKey: true,
+          },
+        },
+      },
+    },
+  });
+  assert.ok(resExtraKeys.problems.some((p) => p.code === 'param-invalid'));
+});
+
+test('declared seats in reviewed allow custom seat ids and reject invalid roles', () => {
+  const shipped = shippedCatalog();
+
+  const effectiveOk = {
+    'custom-reviewed': {
+      promise: 'Reviewed pattern with custom checker seat ids.',
+      loop: 'reviewed',
+      defaults: {
+        seats: [
+          { seat: 'author', role: 'producer' },
+          { seat: 'security', role: 'red-team' },
+          { seat: 'quality', role: 'reviewer' },
+        ],
+      },
+    },
+  };
+  const resOk = checkCatalog({ shipped, effective: effectiveOk });
+  assert.deepEqual(resOk.problems, []);
+
+  const effectiveWrongRole = {
+    'custom-reviewed': {
+      promise: 'Reviewed pattern declaring synthesizer seat.',
+      loop: 'reviewed',
+      defaults: {
+        seats: [
+          { seat: 'author', role: 'producer' },
+          { seat: 'chair', role: 'synthesizer' },
+        ],
+      },
+    },
+  };
+  const resWrongRole = checkCatalog({ shipped, effective: effectiveWrongRole });
+  assert.ok(resWrongRole.problems.some((p) => p.code === 'seat-multiplicity'));
+});
+
+test('loop seat cardinality checks enforce role multiplicities for panel and debate', () => {
+  const shipped = shippedCatalog();
+
+  const panelNoSynth = {
+    'custom-panel': {
+      promise: 'Panel pattern without synthesizer.',
+      loop: 'panel',
+      defaults: {
+        seats: [
+          { seat: 'worker-1', role: 'producer' },
+          { seat: 'worker-2', role: 'producer' },
+        ],
+      },
+    },
+  };
+  const resPanel1 = checkCatalog({ shipped, effective: panelNoSynth });
+  assert.ok(resPanel1.problems.some((p) => p.code === 'seat-multiplicity'));
+
+  const panelInvalidRole = {
+    'custom-panel': {
+      promise: 'Panel pattern with judge role.',
+      loop: 'panel',
+      defaults: {
+        seats: [
+          { seat: 'worker-1', role: 'producer' },
+          { seat: 'synth', role: 'synthesizer' },
+          { seat: 'judge-seat', role: 'judge' },
+        ],
+      },
+    },
+  };
+  const resPanel2 = checkCatalog({ shipped, effective: panelInvalidRole });
+  assert.ok(resPanel2.problems.some((p) => p.code === 'seat-multiplicity'));
+
+  const debateOneProducer = {
+    'custom-debate': {
+      promise: 'Debate pattern with single producer.',
+      loop: 'debate',
+      defaults: {
+        seats: [
+          { seat: 'side-a', role: 'producer' },
+          { seat: 'referee', role: 'judge' },
+        ],
+      },
+    },
+  };
+  const resDebate1 = checkCatalog({ shipped, effective: debateOneProducer });
+  assert.ok(resDebate1.problems.some((p) => p.code === 'seat-multiplicity'));
+
+  const debateReservedVerifier = {
+    'custom-debate': {
+      promise: 'Debate pattern with reserved verifier seat.',
+      loop: 'debate',
+      defaults: {
+        seats: [
+          { seat: 'side-a', role: 'producer' },
+          { seat: 'verifier', role: 'producer' },
+          { seat: 'referee', role: 'judge' },
+        ],
+      },
+    },
+  };
+  const resDebate2 = checkCatalog({ shipped, effective: debateReservedVerifier });
+  assert.ok(resDebate2.problems.some((p) => p.code === 'param-invalid'));
+});
+
+test('roleTasks target validation accepts loop kinds and declared seats', () => {
+  const shipped = shippedCatalog();
+
+  const effectivePanel = {
+    'custom-panel': {
+      promise: 'Panel pattern with panelist roleTask and declared seat task.',
+      loop: 'panel',
+      defaults: {
+        seats: [
+          { seat: 'researcher-1', role: 'producer' },
+          { seat: 'synthesizer', role: 'synthesizer' },
+        ],
+        roleTasks: {
+          panelist: 'Investigate independently.',
+          'researcher-1': 'Special focus on data.',
+          synthesizer: 'Synthesize all findings.',
+        },
+      },
+    },
+  };
+  const resPanel = checkCatalog({ shipped, effective: effectivePanel });
+  assert.deepEqual(resPanel.problems, []);
+
+  const effectiveDebate = {
+    'custom-debate': {
+      promise: 'Debate pattern with rebuttal kinds.',
+      loop: 'debate',
+      defaults: {
+        seats: [
+          { seat: 'side-a', role: 'producer' },
+          { seat: 'side-b', role: 'producer' },
+          { seat: 'judge', role: 'judge' },
+        ],
+        roleTasks: {
+          thesis: 'Argue in favor.',
+          antithesis: 'Argue against.',
+          'thesis-rebuttal': 'Rebut opponent points.',
+          'antithesis-rebuttal': 'Rebut opponent points.',
+          judge: 'Render an impartial verdict.',
+        },
+      },
+    },
+  };
+  const resDebate = checkCatalog({ shipped, effective: effectiveDebate });
+  assert.deepEqual(resDebate.problems, []);
+
+  const effectiveReviewed = {
+    'custom-reviewed': {
+      promise: 'Reviewed pattern with checker kind.',
+      loop: 'reviewed',
+      defaults: {
+        roleTasks: {
+          checker: 'Review all outputs.',
+        },
+      },
+    },
+  };
+  const resReviewed = checkCatalog({ shipped, effective: effectiveReviewed });
+  assert.deepEqual(resReviewed.problems, []);
+});
