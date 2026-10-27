@@ -2146,7 +2146,7 @@ test('a pinned unit keeps its effective seats on resume after a snapshot refresh
   const unitDir = path.join(repoRoot, '.fgos', 'assignments', 'unit-run-pinned-roster');
   fs.mkdirSync(unitDir, { recursive: true });
   const record = {
-    unit: { id: 'u-pinned-roster', capability: 'code:implement', writes: [], pattern: 'reviewed', objective: 'Do review' },
+    unit: { id: 'u-pinned-roster', capability: 'docs:write', writes: [], pattern: 'reviewed', objective: 'Do review' },
     pattern: 'reviewed',
     seatSchema: 2,
     collaboration: {
@@ -2158,7 +2158,7 @@ test('a pinned unit keeps its effective seats on resume after a snapshot refresh
         seats: [
           { seat: 'producer', role: 'producer', posture: { writer: true } },
           { seat: 'reviewer', role: 'reviewer', posture: { readOnly: true, verdict: true } },
-          { seat: 'red-team', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+          { seat: 'red-team', role: 'red-team', posture: { readOnly: true, verdict: true } },
         ],
       },
       provenance: { params: {}, checkers: {} },
@@ -2166,7 +2166,7 @@ test('a pinned unit keeps its effective seats on resume after a snapshot refresh
     seats: [
       { seat: 'producer', role: 'producer', posture: { writer: true } },
       { seat: 'reviewer', role: 'reviewer', posture: { readOnly: true, verdict: true } },
-      { seat: 'red-team', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+      { seat: 'red-team', role: 'red-team', posture: { readOnly: true, verdict: true } },
     ],
     resolvedInputs: [],
     configSnapshot: snapshotRunnerConfig(repoRoot),
@@ -2179,7 +2179,9 @@ test('a pinned unit keeps its effective seats on resume after a snapshot refresh
   settleSeat(repoRoot, unitDir, 'reviewer');
   settleSeat(repoRoot, unitDir, 'red-team');
 
+  // Change live capability config: docs:write has no default minCheckers, and live config restricts to reviewer only
   const cfg = readProjectConfig(repoRoot);
+  cfg.runner.capabilities = { 'docs:write': { minCheckers: ['reviewer'] } };
   cfg.runner.loops = { reviewed: { checkersByRigor: { standard: ['reviewer'] } } };
   writeProjectConfig(repoRoot, cfg);
 
@@ -2190,8 +2192,18 @@ test('a pinned unit keeps its effective seats on resume after a snapshot refresh
     worktree: worktreeDir,
   });
   assert.equal(firstRes.outcome, 'pass');
+  assert.deepEqual(
+    firstRes.results.map((r) => r.seat),
+    ['producer', 'reviewer', 'red-team'],
+    'resumed loop must execute all pinned seats from effective.seats rather than recomputed live config',
+  );
   const firstStored = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
   assert.deepEqual(firstStored.collaboration.effective.seats.map((s) => s.seat), ['producer', 'reviewer', 'red-team']);
+
+  // Change live capability config again to trigger another snapshot refresh on second resume
+  const cfg2 = readProjectConfig(repoRoot);
+  cfg2.runner.capabilities = { 'docs:write': { minCheckers: [] } };
+  writeProjectConfig(repoRoot, cfg2);
 
   const secondRes = await coreRunUnit({
     resumeUnitRunId: 'unit-run-pinned-roster',
@@ -2200,6 +2212,11 @@ test('a pinned unit keeps its effective seats on resume after a snapshot refresh
     worktree: worktreeDir,
   });
   assert.equal(secondRes.outcome, 'pass');
+  assert.deepEqual(
+    secondRes.results.map((r) => r.seat),
+    ['producer', 'reviewer', 'red-team'],
+    'second resume after another snapshot refresh must preserve pinned effective seats',
+  );
   const secondStored = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
   assert.deepEqual(secondStored.collaboration.effective.seats.map((s) => s.seat), ['producer', 'reviewer', 'red-team']);
 });

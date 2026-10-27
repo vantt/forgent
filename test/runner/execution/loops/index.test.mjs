@@ -94,7 +94,7 @@ test('runLoop uses pin effective seats over recomputed config', async () => {
     seats: [
       { seat: 'producer', role: 'producer', posture: { writer: true } },
       { seat: 'reviewer', role: 'reviewer', posture: { readOnly: true, verdict: true } },
-      { seat: 'red-team', role: 'reviewer', posture: { readOnly: true, verdict: true } },
+      { seat: 'red-team', role: 'red-team', posture: { readOnly: true, verdict: true } },
     ],
   };
   const cfg = {
