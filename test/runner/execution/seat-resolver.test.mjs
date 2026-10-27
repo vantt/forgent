@@ -266,3 +266,10 @@ test('reviewed roster missing a loop-required role with no invariant refuses wit
     (err) => err.code === 'seat-multiplicity' && /missing \[red-team\]/.test(err.message),
   );
 });
+
+test('omitted loop and pattern options default to solo producer roster and launch count 1', () => {
+  const seats = resolveSeats({ unit: { writes: [] }, runnerConfig: {} });
+  assert.deepEqual(seats.map((s) => [s.seat, s.role]), [['producer', 'producer']]);
+  assert.equal(seats[0].posture.writer, true);
+  assert.equal(seatLaunchesOf({ unit: { writes: [] }, runnerConfig: {} }), 1);
+});

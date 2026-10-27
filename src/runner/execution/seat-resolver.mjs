@@ -49,6 +49,14 @@ export const DEFAULT_CAPABILITY_MIN_CHECKERS = Object.freeze({
   code: Object.freeze(['red-team']),
   'code:*': Object.freeze(['red-team']),
 });
+
+const DEFAULT_CAPABILITY_CONFIG = Object.freeze({
+  capabilities: Object.freeze(
+    Object.fromEntries(
+      Object.entries(DEFAULT_CAPABILITY_MIN_CHECKERS).map(([k, v]) => [k, Object.freeze({ minCheckers: v })]),
+    ),
+  ),
+});
 const DECLARED_KEYS = new Set(['seat', 'role', 'persona', 'tier']);
 
 /** Thrown when a unit's pattern cannot be given a valid seat list. */
@@ -151,11 +159,11 @@ export function checkerPlanOf(unit, runnerConfig, options = {}) {
     for (const seat of list) {
       addContribution(seat, `capability:${capEntry.key}`);
     }
-  } else if (typeof unit?.capability === 'string' && unit.capability) {
-    const keys = unit.capability.includes(':') ? [unit.capability, `${unit.capability.split(':')[0]}:*`] : [unit.capability];
-    const defaultKey = keys.find((k) => DEFAULT_CAPABILITY_MIN_CHECKERS[k] !== undefined);
-    if (defaultKey) {
-      const list = DEFAULT_CAPABILITY_MIN_CHECKERS[defaultKey] || [];
+  } else {
+    const defaultEntry = capabilityEntriesOf(DEFAULT_CAPABILITY_CONFIG, unit?.capability)
+      .find((e) => e.entry?.minCheckers !== undefined);
+    if (defaultEntry) {
+      const list = defaultEntry.entry.minCheckers;
       for (const seat of list) {
         addContribution(seat, 'code:default-red-team');
       }
@@ -284,7 +292,7 @@ function requireRoles(patternName, declared, expected) {
 export function resolveSeats(options = {}) {
   let { loop, pattern, params, floors, unit, runnerConfig } = options;
   let patternName = loop;
-  if (!patternName && pattern) {
+  if (!patternName) {
     const resolved = resolvePattern(pattern);
     patternName = resolved.patternName;
     params = params ?? resolved.params;
@@ -375,7 +383,7 @@ export function resolveSeats(options = {}) {
 export function seatLaunchesOf(options = {}) {
   let { loop, pattern, params, floors, unit, runnerConfig } = options;
   let patternName = loop;
-  if (!patternName && pattern) {
+  if (!patternName) {
     const resolved = resolvePattern(pattern);
     patternName = resolved.patternName;
     params = params ?? resolved.params;
