@@ -143,8 +143,7 @@ function allowedRoleTaskTargets(loop, entry) {
         targets.add('reviewer');
         const minDefaults = Array.isArray(entry?.defaults?.minCheckers) ? entry.defaults.minCheckers : [];
         const minInvAtLeast = Array.isArray(entry?.invariants?.minCheckers?.atLeast) ? entry.invariants.minCheckers.atLeast : [];
-        const minInvFixed = Array.isArray(entry?.invariants?.minCheckers?.fixed) ? entry.invariants.minCheckers.fixed : [];
-        for (const chk of [...minDefaults, ...minInvAtLeast, ...minInvFixed]) {
+        for (const chk of [...minDefaults, ...minInvAtLeast]) {
           if (typeof chk === 'string' && Object.hasOwn(CHECKER_SEATS, chk)) {
             targets.add(chk);
           }

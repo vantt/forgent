@@ -1018,6 +1018,46 @@ test('reviewed pattern with no declared seats accepts only checkers added by min
   };
   const resRejectsTester = checkCatalog({ shipped, effective: effectiveRejectsTester });
   assert.ok(resRejectsTester.problems.some((p) => p.code === 'param-invalid' && p.message.includes('target "tester" does not exist for loop "reviewed"')));
+
+  const effectiveWithInvariants = {
+    'reviewed-with-invariants': {
+      promise: 'Reviewed pattern with invariant minCheckers.',
+      loop: 'reviewed',
+      invariants: {
+        minCheckers: {
+          atLeast: ['red-team'],
+        },
+      },
+      defaults: {
+        roleTasks: {
+          producer: 'Produce output.',
+          reviewer: 'Review output.',
+          'red-team': 'Challenge output.',
+        },
+      },
+    },
+  };
+  const resWithInvariants = checkCatalog({ shipped, effective: effectiveWithInvariants });
+  assert.deepEqual(resWithInvariants.problems, []);
+
+  const effectiveInvariantsRejectsTester = {
+    'reviewed-invariants-rejects-tester': {
+      promise: 'Reviewed pattern with invariant minCheckers rejecting unlisted checker.',
+      loop: 'reviewed',
+      invariants: {
+        minCheckers: {
+          atLeast: ['red-team'],
+        },
+      },
+      defaults: {
+        roleTasks: {
+          tester: 'Run tests.',
+        },
+      },
+    },
+  };
+  const resInvariantsRejectsTester = checkCatalog({ shipped, effective: effectiveInvariantsRejectsTester });
+  assert.ok(resInvariantsRejectsTester.problems.some((p) => p.code === 'param-invalid' && p.message.includes('target "tester" does not exist for loop "reviewed"')));
 });
 
 test('cloned and merged entries preserve only own properties and ignore inherited prototype parameters', () => {
