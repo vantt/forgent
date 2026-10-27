@@ -878,14 +878,8 @@ test('parameter validation rejects inherited object properties as loop parameter
     'custom-pattern-inherited-param': {
       promise: 'Pattern with inherited property as parameter.',
       loop: 'reviewed',
-      defaults: {
-        toString: 'should be rejected',
-        constructor: 'should be rejected',
-        valueOf: 'should be rejected',
-      },
-      invariants: {
-        hasOwnProperty: { fixed: 1 },
-      },
+      defaults: JSON.parse('{"toString":"should be rejected","constructor":"should be rejected","valueOf":"should be rejected","__proto__":{"minCheckers":[null]}}'),
+      invariants: JSON.parse('{"hasOwnProperty":{"fixed":1},"__proto__":{"fixed":1}}'),
     },
   };
   const res = checkCatalog({ shipped, effective });
@@ -893,6 +887,15 @@ test('parameter validation rejects inherited object properties as loop parameter
   assert.ok(res.problems.some((p) => p.code === 'param-unknown' && p.message.includes('constructor')));
   assert.ok(res.problems.some((p) => p.code === 'param-unknown' && p.message.includes('valueOf')));
   assert.ok(res.problems.some((p) => p.code === 'param-unknown' && p.message.includes('hasOwnProperty')));
+  assert.ok(res.problems.some((p) => p.code === 'param-unknown' && p.message.includes('__proto__')));
+  assert.strictEqual(res.entries['custom-pattern-inherited-param'].defaults.minCheckers, undefined);
+});
+
+test('shipped pattern lookup does not read inherited properties or mutate global object', () => {
+  const effective = JSON.parse('{"constructor":{"loop":"reviewed","promise":"custom","defaults":{"maxRounds":2}}}');
+  const res = checkCatalog({ shipped: { patterns: {} }, effective });
+  assert.strictEqual(Object.isFrozen(Object), false);
+  assert.strictEqual(res.entries.constructor === Object, false);
 });
 
 test('non-string checker names in minCheckers and seats are rejected with param-invalid', () => {

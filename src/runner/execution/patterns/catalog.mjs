@@ -65,9 +65,15 @@ function deepEqual(a, b) {
 function deepClone(obj) {
   if (obj === null || typeof obj !== 'object') return obj;
   if (Array.isArray(obj)) return obj.map(deepClone);
-  const out = {};
+  const proto = Object.getPrototypeOf(obj);
+  const out = proto ? Object.create(proto) : Object.create(null);
   for (const [k, v] of Object.entries(obj)) {
-    out[k] = deepClone(v);
+    Object.defineProperty(out, k, {
+      value: deepClone(v),
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    });
   }
   return out;
 }
@@ -380,7 +386,7 @@ export function checkCatalog(options = {}) {
   const RESERVED_PATTERN_NAMES = new Set(['seatBinding', 'defaultRule']);
   const ALLOWED_PATTERN_ENTRY_KEYS = new Set(['promise', 'loop', 'defaults', 'invariants']);
   // 1. Retired keys checks
-  if (effectivePatterns.defaultRule !== undefined) {
+  if (Object.hasOwn(effectivePatterns, 'defaultRule')) {
     const src = resolveLayer(layers, 'defaultRule');
     problems.push(new CollaborationError(
       'config-key-retired',
@@ -388,7 +394,7 @@ export function checkCatalog(options = {}) {
       { source: src },
     ));
   }
-  if (effectivePatterns['research-fan-out-gated'] !== undefined) {
+  if (Object.hasOwn(effectivePatterns, 'research-fan-out-gated')) {
     const src = resolveLayer(layers, 'research-fan-out-gated');
     problems.push(new CollaborationError(
       'config-key-retired',
@@ -398,7 +404,7 @@ export function checkCatalog(options = {}) {
   }
 
   // 2. Reserved names and both-shapes check
-  if (effectivePatterns.seatBinding !== undefined) {
+  if (Object.hasOwn(effectivePatterns, 'seatBinding')) {
     const sb = effectivePatterns.seatBinding;
     if (sb && typeof sb === 'object' && (Object.hasOwn(sb, 'loop') || Object.hasOwn(sb, 'promise') || Object.hasOwn(sb, 'defaults') || Object.hasOwn(sb, 'invariants'))) {
       const src = resolveLayer(layers, 'seatBinding');
@@ -497,13 +503,18 @@ export function checkCatalog(options = {}) {
   const mergedEntries = {};
 
   for (const name of allNames) {
-    const shippedEntry = shippedPatterns[name];
+    const shippedEntry = Object.hasOwn(shippedPatterns, name) ? shippedPatterns[name] : undefined;
     const hasEffective = Object.hasOwn(effectivePatterns, name) && effectivePatterns[name] !== undefined;
-    const effectiveEntry = effectivePatterns[name];
+    const effectiveEntry = hasEffective ? effectivePatterns[name] : undefined;
 
     if (hasEffective && (!effectiveEntry || typeof effectiveEntry !== 'object' || Array.isArray(effectiveEntry))) {
       if (shippedEntry) {
-        mergedEntries[name] = Object.freeze(deepClone(shippedEntry));
+        Object.defineProperty(mergedEntries, name, {
+          value: Object.freeze(deepClone(shippedEntry)),
+          writable: true,
+          enumerable: true,
+          configurable: true,
+        });
       }
       continue;
     }
@@ -564,7 +575,7 @@ export function checkCatalog(options = {}) {
             continue;
           }
 
-          const effInv = effectiveEntry.invariants[param];
+          const effInv = Object.hasOwn(effectiveEntry.invariants, param) ? effectiveEntry.invariants[param] : undefined;
           if (effInv !== undefined) {
             if (shippedInv.atLeast !== undefined) {
               if (!effInv || typeof effInv !== 'object' || !Array.isArray(effInv.atLeast)) {
@@ -742,7 +753,12 @@ export function checkCatalog(options = {}) {
         }
       }
     }
-    mergedEntries[name] = Object.freeze(mergedEntry);
+    Object.defineProperty(mergedEntries, name, {
+      value: Object.freeze(mergedEntry),
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   if (throwOnError && problems.length > 0) {
