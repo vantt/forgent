@@ -398,7 +398,7 @@ function bindContextOf(unitRecord, seatUnit, seat, options = {}) {
  * - Each seat an `account` override applies to (bound the way the run would bind it) must take that
  *   account, at least one seat must, and the account must not be quarantined now.
  */
-async function assertDoorChoicesBeforeRun(unit, runnerConfig, options) {
+async function assertDoorChoicesBeforeRun(unit, runnerConfig, options, collaboration) {
   const overrides = options.overrides ?? [];
   const objects = overrides.filter((o) => o && typeof o === 'object');
   if (options.raiseAuthorized !== true && objects.some((o) => o.acceptDependence === true)) {
@@ -408,6 +408,8 @@ async function assertDoorChoicesBeforeRun(unit, runnerConfig, options) {
     );
   }
   const pinsAccount = objects.some((o) => o.account !== undefined);
+  const mayRaise = objects.some((o) => o.tier !== undefined) || objects.some((o) => o.persona !== undefined);
+  if (!pinsAccount && !mayRaise) return;
   const { seats } = await simulateUnitBindings(
     unit,
     runnerConfig,
@@ -416,7 +418,7 @@ async function assertDoorChoicesBeforeRun(unit, runnerConfig, options) {
       overrides,
       raiseAuthorized: options.raiseAuthorized === true,
       workflowId: options.workflowId,
-      collaboration: options.collaboration,
+      collaboration: collaboration ?? options.collaboration,
     },
   );
   const unauthorized = seats.find((r) => r.refused?.reason === 'tier-escalation-unauthorized');
@@ -702,7 +704,7 @@ async function runUnitBody(options, scope) {
         },
         request: options.request ?? null,
         inCase: Boolean(caseRef),
-        reason: caseRef?.reason ?? options.reason ?? null,
+        reason: caseRef?.reason ?? options.reason ?? options.request?.reason ?? null,
         runnerConfig: liveConfig(),
         shipped: shippedCatalog(),
         layers: options.runnerConfig ? null : catalogLayersOf(mainRoot),
@@ -814,6 +816,9 @@ async function runUnitBody(options, scope) {
       unit,
       seatSchema: 1,
       seats,
+      ...(typeof options.workflowId === 'string' && options.workflowId ? { workflowId: options.workflowId } : {}),
+      workflow: scope.admission ? normalizeWorkflowLink({ caseId: scope.admission.caseId, activity: caseRef.activity, reservationId: scope.admission.reservationId }) : null,
+      ...(admittedCeiling !== null ? { seatLaunchCeiling: admittedCeiling } : {}),
       collaboration: {
         ...collaboration.pin,
         pattern: {

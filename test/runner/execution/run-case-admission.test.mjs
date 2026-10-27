@@ -12,6 +12,7 @@ import { execFileSync } from 'node:child_process';
 import { runUnit } from '../../../src/runner/execution/run.mjs';
 import { runReviewed } from '../../../src/runner/execution/loops/reviewed.mjs';
 import { seatLaunchesOf, CaseAdmissionRefusedError } from '../../../src/runner/execution/case-admission-port.mjs';
+import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { dispatchCwdHolder } from '../../../src/runner/dispatch/cwd-lock.mjs';
 import { createCaseAdmissionPort } from '../../../src/workflow/case-admission-port.mjs';
 import { createPendingBinding, commitBinding } from '../../../src/workflow/case-bindings.mjs';
@@ -329,7 +330,7 @@ test('the planned seat launches follow the pattern the run will use', () => {
   assert.equal(seatLaunchesOf({ pattern: 'solo', unit, runnerConfig: cfg }), 1);
   assert.equal(seatLaunchesOf({ pattern: 'reviewed', unit, runnerConfig: cfg }), 4, 'producer and one checker, two rounds');
   assert.equal(seatLaunchesOf({ pattern: 'reviewed', unit: { ...unit, rigor: 'high' }, runnerConfig: cfg }), 6);
-  assert.equal(seatLaunchesOf({ pattern: 'code-change', unit, runnerConfig: cfg }) > 0, true);
+  assert.equal(seatLaunchesOf({ loop: 'reviewed', params: { maxRounds: 2 }, unit, runnerConfig: cfg }) > 0, true);
   const panelUnit = { ...unit, seats: [{ seat: 'a', role: 'producer' }, { seat: 'b', role: 'producer' }, { seat: 'c', role: 'producer' }, { seat: 'chair', role: 'synthesizer' }] };
   assert.equal(seatLaunchesOf({ pattern: 'panel', unit: panelUnit, runnerConfig: cfg }), 4, 'three members and the synthesizer');
   const debateUnit = { ...unit, seats: [{ seat: 'pro', role: 'producer' }, { seat: 'con', role: 'producer' }, { seat: 'judge', role: 'judge' }] };
@@ -428,6 +429,7 @@ test('request exceeding seat launches per dispatch ceiling refuses at admission'
     runUnit({
       unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
       pattern: 'reviewed',
+      reason: 'more review rounds needed',
       request: { params: { maxRounds: 5 } },
       caseAdmission: port,
       caseRef: { caseId: 'case-test', activity: 'review' },

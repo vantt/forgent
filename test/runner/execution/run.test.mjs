@@ -1823,6 +1823,29 @@ test('conflicting explicit pattern selectors refuse selector-conflict before adm
   assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'assignments')), false);
 });
 
+test('same name or one selector runs when explicit selectors do not conflict', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+
+  // Same name explicit selectors
+  const sameRes = await runUnit({
+    unitData: { id: 'u-same-name', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'solo' },
+    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+    pattern: 'solo',
+  });
+  assert.equal(sameRes.outcome, 'pass');
+  assert.equal(sameRes.pattern, 'solo');
+
+  // One selector: caller pattern only, unit has no pattern
+  const oneRes = await runUnit({
+    unitData: { id: 'u-one-selector', objective: 'Write docs', capability: 'docs:write', writes: [] },
+    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+    pattern: 'solo',
+  });
+  assert.equal(oneRes.outcome, 'pass');
+  assert.equal(oneRes.pattern, 'solo');
+});
+
 test('unit-explicit verify on panel or debate refuses before admission', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   await assert.rejects(

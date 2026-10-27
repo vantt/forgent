@@ -440,7 +440,7 @@ test('a declared operation refuses a non-solo pattern in object form, and no oth
   for (const pattern of [{ pattern: 'reviewed' }, { patternName: 'panel' }, { pattern: 'code-change' }]) {
     await assert.rejects(
       runUnit({
-        unitData: { id: 'u', objective: 'x', capability: 'review', writes: [], pattern: 'solo' },
+        unitData: { id: 'u', objective: 'x', capability: 'review', writes: [] },
         pattern,
         declared: { workId: 'w-obj', domain: 'coding', workflow: 'feature', stage: 'planning', operation: 'validate-plan', operations: ops },
         repoRoot: repo, cwd: repo, worktree: repo, session: { headless: true, herdrPresent: false },

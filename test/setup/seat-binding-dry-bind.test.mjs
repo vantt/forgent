@@ -9,6 +9,8 @@ import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { checkSeatBindingDryBind } from '../../src/setup/seat-binding-checks.mjs';
 import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { simulateUnitBindings } from '../../src/runner/execution/dry-bind.mjs';
+import { resolveCollaboration } from '../../src/runner/execution/patterns/catalog.mjs';
+import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 
 // Native-agent executors carry no spawned process, so bind() accepts them for any posture without
@@ -305,9 +307,21 @@ test('dry bind accepts pre-resolved collaboration and binds project-declared pat
     },
   };
   const unit = { id: 'u-custom', capability: 'fixture:draft', pattern: 'custom-solo', writes: [] };
-  const { outcome, seats: roles } = await simulateUnitBindings(unit, config);
+  const collaboration = resolveCollaboration({
+    unit,
+    selectors: { callerString: 'custom-solo' },
+    runnerConfig: config,
+    shipped: shippedCatalog(),
+  });
+  const { outcome, seats: roles } = await simulateUnitBindings(unit, config, { collaboration });
   assert.equal(outcome, 'pass');
   assert.equal(roles.length, 1);
   assert.equal(roles[0].seat, 'producer');
   assert.equal(roles[0].executor, 'alpha');
+
+  // Also verify resolution without passing pre-resolved collaboration resolves through unit.pattern
+  const fromPattern = await simulateUnitBindings(unit, config);
+  assert.equal(fromPattern.outcome, 'pass');
+  assert.equal(fromPattern.seats.length, 1);
+  assert.equal(fromPattern.seats[0].executor, 'alpha');
 });
