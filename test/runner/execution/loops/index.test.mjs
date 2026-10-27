@@ -201,6 +201,11 @@ test('paramTableOf returns the param table for each loop and null for unknown', 
   assert.deepEqual(Object.keys(debate).sort(), ['rebuttal', 'roleTasks', 'seats'].sort());
 
   assert.equal(paramTableOf('nonexistent'), null);
+  assert.equal(paramTableOf('toString'), null);
+  assert.equal(paramTableOf('constructor'), null);
+  assert.equal(paramTableOf('__proto__'), null);
   assert.equal(paramTableOf(null), null);
+  assert.equal(paramTableOf(undefined), null);
+  assert.equal(paramTableOf(123), null);
   assert.equal(paramTableOf({ loop: 'reviewed' }), reviewed);
 });

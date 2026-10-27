@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "31ac6765d21827a76f0e45767d3489c15f6d9f0809d942ebac0769f2c567b8f4",
+  "payloadDigest": "0c641f8a77a3f23ecf12ee4b4bca16c64884a487909839f4fc45d959e93c1487",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1039,9 +1039,9 @@
     "src/runner/execution/legacy-seat-read.mjs": "d6dd6765ab56b08377e89cbd4c2a2c2d1f501da2f1b50890f02cc35bc6358918",
     "src/runner/execution/loops/debate.mjs": "26f1758154632f5767a25d2783a37ef23446c5cc7d839c8ac15e31d2eb030727",
     "src/runner/execution/loops/history-outcome.mjs": "596e7a2b6344ce9955b9c813c2811b79a16b8825aee51fe1cb3e40839cdcd048",
-    "src/runner/execution/loops/index.mjs": "7bfc8560dc433b68dd568e779472a0ad313145d0394877a6d35c5cd190a95065",
+    "src/runner/execution/loops/index.mjs": "da461b2699cf8a6e6a4f656d40fbd96b1de58854a89f443b1e2085a9d7eb1193",
     "src/runner/execution/loops/panel.mjs": "4e75ad08f9fc279898d3d595d45283f4d741dd0a3a0a856b66f2563ccd81ae22",
-    "src/runner/execution/loops/reviewed.mjs": "300b1c135fb12eea53279228804af4be6d8370096e89cdcf32e8bae86f61a432",
+    "src/runner/execution/loops/reviewed.mjs": "64ce6294c2c9d1ba10e8fb8ddef7d681a2bb0d9ef0566009d45aae9aa04c4726",
     "src/runner/execution/loops/role-tasks.mjs": "6df89972192146084a969ed83d56acdd25969f9eff8fa4f1a71c1a4f103bf3e9",
     "src/runner/execution/loops/solo.mjs": "cca99675caed01e86f1df2f8010e80e3fbf519b242b3bb1eab360cfdd1abaa6f",
     "src/runner/execution/partial-writes.mjs": "9c7ab4a2f57852b93283b819ed8c4adcac2b71c9241cdd4c760e73960bc1c027",

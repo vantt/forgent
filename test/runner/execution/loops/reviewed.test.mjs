@@ -536,7 +536,43 @@ test('reviewed module exports its param table and default max rounds', () => {
   assert.equal(PARAMS.roleTasks.requestable, false);
 });
 
-test('runReviewed defaults maxRounds to DEFAULT_MAX_ROUNDS ignoring config tuning', async () => {
+test('runReviewed preserves cfg.loops.reviewed.maxRounds fallback when params omit maxRounds', async () => {
+  const unit = { id: 'u-cfg-rounds', objective: 'Test config rounds', capability: 'docs:write' };
+  let roundCount = 0;
+  const runRole = async (opts) => {
+    if (opts.seat.seat === 'producer') roundCount = Math.max(roundCount, opts.round ?? 1);
+    return {
+      seat: opts.seat.seat,
+      outcome: opts.seat.seat === 'producer' ? 'pass' : 'findings',
+      finding: 'Needs rework',
+    };
+  };
+  const cfg = { loops: { reviewed: { maxRounds: 3 } } };
+  const res = await runReviewed(unit, cfg, { runRole });
+  assert.equal(res.rounds, 3);
+  assert.equal(roundCount, 3);
+  assert.equal(res.outcome, 'findings');
+});
+
+test('runReviewed params.maxRounds takes precedence over cfg.loops.reviewed.maxRounds', async () => {
+  const unit = { id: 'u-params-rounds', objective: 'Test params rounds', capability: 'docs:write' };
+  let roundCount = 0;
+  const runRole = async (opts) => {
+    if (opts.seat.seat === 'producer') roundCount = Math.max(roundCount, opts.round ?? 1);
+    return {
+      seat: opts.seat.seat,
+      outcome: opts.seat.seat === 'producer' ? 'pass' : 'findings',
+      finding: 'Needs rework',
+    };
+  };
+  const cfg = { loops: { reviewed: { maxRounds: 5 } } };
+  const res = await runReviewed(unit, cfg, { runRole }, { maxRounds: 1 });
+  assert.equal(res.rounds, 1);
+  assert.equal(roundCount, 1);
+  assert.equal(res.outcome, 'findings');
+});
+
+test('runReviewed defaults maxRounds to DEFAULT_MAX_ROUNDS when params and cfg omit it', async () => {
   const unit = { id: 'u-default-rounds', objective: 'Test default rounds', capability: 'docs:write' };
   let roundCount = 0;
   const runRole = async (opts) => {
@@ -547,8 +583,7 @@ test('runReviewed defaults maxRounds to DEFAULT_MAX_ROUNDS ignoring config tunin
       finding: 'Needs rework',
     };
   };
-  // cfg has loops.reviewed.maxRounds = 5, but loop ignores it and uses DEFAULT_MAX_ROUNDS (2)
-  const cfg = { loops: { reviewed: { maxRounds: 5 } } };
+  const cfg = {};
   const res = await runReviewed(unit, cfg, { runRole });
   assert.equal(res.rounds, DEFAULT_MAX_ROUNDS);
   assert.equal(roundCount, DEFAULT_MAX_ROUNDS);

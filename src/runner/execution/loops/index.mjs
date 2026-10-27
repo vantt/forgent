@@ -4,9 +4,9 @@
  */
 
 import { runSolo, PARAMS as SOLO_PARAMS } from './solo.mjs';
-import { runReviewed, PARAMS as REVIEWED_PARAMS, DEFAULT_MAX_ROUNDS } from './reviewed.mjs';
+import { runReviewed, PARAMS as REVIEWED_PARAMS } from './reviewed.mjs';
 import { runPanel, PARAMS as PANEL_PARAMS } from './panel.mjs';
-import { runDebate, PARAMS as DEBATE_PARAMS, DEFAULT_REBUTTAL } from './debate.mjs';
+import { runDebate, PARAMS as DEBATE_PARAMS } from './debate.mjs';
 import { resolvePattern, PRESETS } from '../patterns/presets.mjs';
 
 export { runSolo } from './solo.mjs';
@@ -17,12 +17,12 @@ export { resolvePattern, PRESETS } from '../patterns/presets.mjs';
 export { DEFAULT_MAX_ROUNDS } from './reviewed.mjs';
 export { DEFAULT_REBUTTAL } from './debate.mjs';
 
-const PARAM_TABLES = Object.freeze({
+const PARAM_TABLES = Object.freeze(Object.assign(Object.create(null), {
   solo: SOLO_PARAMS,
   reviewed: REVIEWED_PARAMS,
   panel: PANEL_PARAMS,
   debate: DEBATE_PARAMS,
-});
+}));
 
 /**
  * Returns the param table for a given loop name, or null if unknown.
@@ -32,6 +32,7 @@ const PARAM_TABLES = Object.freeze({
  */
 export function paramTableOf(loop) {
   const name = typeof loop === 'string' ? loop : loop?.loop ?? loop?.pattern ?? loop?.patternName;
+  if (typeof name !== 'string') return null;
   return PARAM_TABLES[name] ?? null;
 }
 
