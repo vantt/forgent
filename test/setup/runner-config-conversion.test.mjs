@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { convertRunnerPatternsConfig } from '../../src/setup/runner-config-conversion.mjs';
+import { convertRunnerPatternsConfig, inspectGlobalRunnerConfig } from '../../src/setup/runner-config-conversion.mjs';
 import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import {
   writeProjectConfig,
@@ -12,7 +12,7 @@ import {
   writeRawLegacyProjectConfig,
   readRawProjectConfig,
   readRawGlobalConfig,
-  legacyProjectConfigPath,
+  projectConfigPath,
 } from '../helpers/config-fixture.mjs';
 
 function makeTempDirs() {
@@ -73,16 +73,8 @@ test('converts project configuration from retired patterns shape with a backup, 
     assert.equal(backupBytes, originalText, 'backup must be byte-identical to original content');
 
     const convertedBytes = readRawProjectConfig(projectDir);
-    assert.ok(convertedBytes.includes('$comment'), 'converted file must contain comment explanation');
-
-    const convertedParsed = JSON.parse(convertedBytes.replace(/^#[^\n]*\n+/g, ''));
-    assert.equal(convertedParsed.runner?.patterns?.reviewed, undefined, 'retired reviewed tuning deleted from file patterns');
-    assert.equal(convertedParsed.runner?.patterns?.defaultRule, undefined, 'retired defaultRule deleted from file patterns');
-    assert.equal(convertedParsed.runner?.loops?.reviewed?.maxRounds, 3);
-    assert.deepEqual(convertedParsed.runner?.loops?.reviewed?.checkersByRigor, {
-      standard: ['reviewer'],
-      high: ['reviewer', 'red-team'],
-    });
+    assert.equal(convertedBytes.includes('$comment'), false, 'must not contain forbidden $comment property');
+    assert.ok(convertedBytes.includes('@fgos:why'), 'must contain @fgos:why explanation comment');
 
     const loaded = loadRunnerConfigForDir(projectDir);
     assert.equal(loaded.loops?.reviewed?.maxRounds, 3);
@@ -100,43 +92,20 @@ test('converts project configuration from retired patterns shape with a backup, 
   }
 });
 
-test('converts legacy json project configuration with backup, comments and schema 2', () => {
-  const { projectDir } = makeTempDirs();
-  try {
-    const originalText = `${JSON.stringify({ runner: oldPatternsConfig() }, null, 2)}\n`;
-    writeRawLegacyProjectConfig(projectDir, originalText);
-
-    const result = convertRunnerPatternsConfig(projectDir);
-    assert.equal(result.status, 'converted');
-    assert.ok(result.backup);
-
-    const backupBytes = fs.readFileSync(result.backup, 'utf8');
-    assert.equal(backupBytes, originalText, 'backup must equal original bytes');
-
-    const loaded = loadRunnerConfigForDir(projectDir);
-    assert.equal(loaded.loops?.reviewed?.maxRounds, 3);
-    assert.equal(loaded.patterns?.seatBinding?.schema, 2);
-    assert.equal(loaded.patterns?.defaultRule, undefined);
-    assert.equal(loaded.patterns?.reviewed?.maxRounds, undefined);
-  } finally {
-    cleanupDirs({ projectDir });
-  }
-});
-
 test('running conversion a second time changes nothing and creates no additional backup', () => {
   const { projectDir, homeDir } = makeTempDirs();
   const prevHome = process.env.HOME;
   process.env.HOME = homeDir;
   try {
-    writeRawLegacyProjectConfig(projectDir, `${JSON.stringify({ runner: oldPatternsConfig() }, null, 2)}\n`);
+    writeProjectConfig(projectDir, { runner: oldPatternsConfig() });
 
     const firstResult = convertRunnerPatternsConfig(projectDir);
     assert.equal(firstResult.status, 'converted');
     assert.ok(firstResult.backup);
 
-    const legacyFile = legacyProjectConfigPath(projectDir);
-    const mtimeAfterFirst = fs.statSync(legacyFile).mtimeMs;
-    const fgosDir = path.dirname(legacyFile);
+    const targetFile = projectConfigPath(projectDir);
+    const mtimeAfterFirst = fs.statSync(targetFile).mtimeMs;
+    const fgosDir = path.dirname(targetFile);
     const backupsBeforeSecond = fs.readdirSync(fgosDir).filter((name) => name.includes('.pre-patterns-catalog-'));
     assert.equal(backupsBeforeSecond.length, 1);
 
@@ -144,7 +113,7 @@ test('running conversion a second time changes nothing and creates no additional
     assert.equal(secondResult.status, 'unchanged');
     assert.deepEqual(secondResult.written, []);
 
-    const mtimeAfterSecond = fs.statSync(legacyFile).mtimeMs;
+    const mtimeAfterSecond = fs.statSync(targetFile).mtimeMs;
     assert.equal(mtimeAfterSecond, mtimeAfterFirst, 'second run must not rewrite the file');
 
     const backupsAfterSecond = fs.readdirSync(fgosDir).filter((name) => name.includes('.pre-patterns-catalog-'));
@@ -238,6 +207,62 @@ test('project directory with no configuration returns absent status', () => {
     const result = convertRunnerPatternsConfig(projectDir);
     assert.equal(result.status, 'absent');
     assert.deepEqual(result.written, []);
+  } finally {
+    cleanupDirs({ projectDir });
+  }
+});
+
+test('handles retired keys in both project and global scopes without crashing setup', () => {
+  const { projectDir, homeDir } = makeTempDirs();
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    writeProjectConfig(projectDir, { runner: oldPatternsConfig() });
+    writeGlobalConfig(homeDir, {
+      runner: {
+        patterns: {
+          defaultRule: { mutatingMinRigor: 'standard' },
+        },
+      },
+    });
+    const globalBytesBefore = readRawGlobalConfig(homeDir);
+
+    const notice = inspectGlobalRunnerConfig(path.join(homeDir, '.fgos'));
+    assert.ok(notice, 'must return notice for retired keys in global config');
+    assert.ok(notice.file.includes('.fgos'), 'notice must identify the global config file');
+    assert.ok(notice.edits.length > 0, 'notice must describe the required edits');
+    assert.ok(notice.command, 'notice must supply guidance command');
+
+    const result = convertRunnerPatternsConfig(projectDir);
+    assert.equal(result.status, 'blocked', 'conversion is honestly reported as blocked by global retired keys refusing snapshot');
+    assert.ok(result.blocker, 'must report blocker reason');
+    assert.ok(result.backup, 'project backup must be preserved');
+    assert.ok(fs.existsSync(result.backup), 'project backup must exist');
+
+    const globalBytesAfter = readRawGlobalConfig(homeDir);
+    assert.equal(globalBytesAfter, globalBytesBefore, 'global file must not be modified by conversion');
+  } finally {
+    process.env.HOME = prevHome;
+    cleanupDirs({ projectDir, homeDir });
+  }
+});
+
+test('stops and reports blocked when config write door refuses without raw writes', () => {
+  const { projectDir } = makeTempDirs();
+  try {
+    writeProjectConfig(projectDir, { runner: oldPatternsConfig() });
+    const originalText = readRawProjectConfig(projectDir);
+
+    const result = convertRunnerPatternsConfig(projectDir, {
+      patchDoor: () => {
+        throw new Error('config-write-conflict: revision-changed');
+      },
+    });
+    assert.equal(result.status, 'blocked', 'door refusal must report blocked');
+    assert.ok(result.blocker.includes('config-write-conflict'), 'must report blocker reason');
+
+    const currentText = readRawProjectConfig(projectDir);
+    assert.equal(currentText, originalText, 'file must not be rewritten around the door');
   } finally {
     cleanupDirs({ projectDir });
   }

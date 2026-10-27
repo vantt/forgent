@@ -5,23 +5,40 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { parseYaml } from '../util/yaml.mjs';
 import { retiredKeysIn } from '../runner/dispatch/retired-config-keys.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import * as facade from '../config/facade.mjs';
-
-const CONFIG_BASE = 'config';
-const YAML_EXT = '.yaml';
-const JSON_EXT = '.json';
+import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 
 function findProjectConfigFile(projectDir) {
   const fgosDir = path.join(projectDir, '.fgos');
-  if (!fs.existsSync(fgosDir)) return null;
-  const yamlPath = path.join(fgosDir, `${CONFIG_BASE}${YAML_EXT}`);
-  if (fs.existsSync(yamlPath)) return yamlPath;
-  const jsonPath = path.join(fgosDir, `${CONFIG_BASE}${JSON_EXT}`);
-  if (fs.existsSync(jsonPath)) return jsonPath;
+  try {
+    const entries = fs.readdirSync(fgosDir);
+    if (entries.includes('config.yaml')) return path.join(fgosDir, 'config.yaml');
+    if (entries.includes('config.json')) return path.join(fgosDir, 'config.json');
+  } catch {
+    return null;
+  }
   return null;
+}
+
+function applyNativeConfigPatch(hostBin, projectDir, edits, reason) {
+  const tmpPatch = path.join(os.tmpdir(), `fgos-patch-${Date.now()}-${Math.random().toString(36).slice(2)}.json`);
+  try {
+    fs.writeFileSync(tmpPatch, JSON.stringify(edits), 'utf8');
+    execFileSync(hostBin, ['config', 'patch', tmpPatch, '--reason', reason, '--dir', projectDir], {
+      encoding: 'utf8',
+      env: process.env,
+    });
+  } finally {
+    try {
+      if (fs.existsSync(tmpPatch)) fs.unlinkSync(tmpPatch);
+    } catch {
+      // ignore tmp cleanup error
+    }
+  }
 }
 
 /**
@@ -29,15 +46,23 @@ function findProjectConfigFile(projectDir) {
  * Idempotent: returns 'unchanged' when no retired keys are present.
  *
  * @param {string} projectDir
- * @returns {{ status: 'absent'|'unchanged'|'converted', backup?: string, written: string[] }}
+ * @param {object} [options]
+ * @param {Function} [options.patchDoor]
+ * @returns {{ status: 'absent'|'unchanged'|'converted'|'blocked', backup?: string, written: string[], blocker?: string }}
  */
-export function convertRunnerPatternsConfig(projectDir) {
+export function convertRunnerPatternsConfig(projectDir, options = {}) {
   const targetPath = findProjectConfigFile(projectDir);
   if (!targetPath) {
     return { status: 'absent', written: [] };
   }
 
-  const originalText = fs.readFileSync(targetPath, 'utf8');
+  let originalText;
+  try {
+    originalText = fs.readFileSync(targetPath, 'utf8');
+  } catch {
+    return { status: 'absent', written: [] };
+  }
+
   let parsed;
   try {
     parsed = parseYaml(originalText, { filename: targetPath });
@@ -50,93 +75,99 @@ export function convertRunnerPatternsConfig(projectDir) {
     return { status: 'unchanged', written: [] };
   }
 
-  // If the facade provides an applyPatch or patch door, writes go through it
-  if (typeof facade.applyPatch === 'function' || typeof facade.patch === 'function') {
-    const doorPatch = facade.applyPatch ?? facade.patch;
-    try {
-      doorPatch({
-        projectRoot: projectDir,
-        target: 'project',
-        reason: 'convert retired runner.patterns keys to runner.loops and schema 2',
-      });
-    } catch (err) {
-      if (err?.code === 'config-key-retired') {
-        throw err;
-      }
-      throw err;
-    }
-  }
-
   const now = new Date();
   const ts = now.toISOString().replace(/[-:.]/g, '');
   const backupPath = `${targetPath}.pre-patterns-catalog-${ts}`;
   fs.copyFileSync(targetPath, backupPath);
 
-  const runner = parsed.runner ?? parsed;
+  const runner = parsed?.runner ?? parsed;
+  const patterns = runner?.patterns ?? {};
+  const edits = [];
   const written = [];
 
-  runner.loops = runner.loops ?? {};
-  runner.patterns = runner.patterns ?? {};
-
-  if (runner.patterns.reviewed && typeof runner.patterns.reviewed === 'object' && !Array.isArray(runner.patterns.reviewed)) {
-    const rev = runner.patterns.reviewed;
-    const hasTuning = 'maxRounds' in rev || 'checkersByRigor' in rev;
-    if (hasTuning) {
-      runner.loops.reviewed = runner.loops.reviewed ?? {};
-      if ('maxRounds' in rev) {
-        runner.loops.reviewed.maxRounds = rev.maxRounds;
-        delete rev.maxRounds;
-        written.push('runner.loops.reviewed.maxRounds');
-      }
-      if ('checkersByRigor' in rev) {
-        runner.loops.reviewed.checkersByRigor = rev.checkersByRigor;
-        delete rev.checkersByRigor;
-        written.push('runner.loops.reviewed.checkersByRigor');
-      }
-      written.push('runner.loops.reviewed');
-      if (Object.keys(rev).length === 0) {
-        delete runner.patterns.reviewed;
-      }
-    }
+  if (patterns.defaultRule !== undefined) {
+    edits.push({ unset: 'runner.patterns.defaultRule' });
   }
 
-  if ('defaultRule' in runner.patterns) {
-    delete runner.patterns.defaultRule;
-  }
-
-  if ('research-fan-out-gated' in runner.patterns) {
-    runner.patterns['research-fan-out'] = runner.patterns['research-fan-out-gated'];
-    delete runner.patterns['research-fan-out-gated'];
+  if (patterns['research-fan-out-gated'] !== undefined) {
+    edits.push({ unset: 'runner.patterns.research-fan-out-gated' });
+    edits.push({ set: 'runner.patterns.research-fan-out', value: patterns['research-fan-out-gated'] });
     written.push('runner.patterns.research-fan-out');
   }
 
-  runner.patterns.seatBinding = runner.patterns.seatBinding ?? {};
-  runner.patterns.seatBinding.schema = 2;
+  if (patterns.reviewed !== undefined && typeof patterns.reviewed === 'object' && !Array.isArray(patterns.reviewed)) {
+    const rev = patterns.reviewed;
+    if ('maxRounds' in rev) {
+      edits.push({ set: 'runner.loops.reviewed.maxRounds', value: rev.maxRounds });
+      written.push('runner.loops.reviewed.maxRounds');
+    }
+    if ('checkersByRigor' in rev) {
+      edits.push({ set: 'runner.loops.reviewed.checkersByRigor', value: rev.checkersByRigor });
+      written.push('runner.loops.reviewed.checkersByRigor');
+    }
+    edits.push({ unset: 'runner.patterns.reviewed' });
+    written.push('runner.loops.reviewed');
+  }
+
+  edits.push({ set: 'runner.patterns.seatBinding.schema', value: 2 });
   written.push('runner.patterns.seatBinding.schema');
 
-  const explanation = 'runner.loops.reviewed: tuning of the reviewed loop, moved from runner.patterns.reviewed; runner.patterns.seatBinding.schema: 2 marks collaboration patterns and loops.';
-  runner.$comment = explanation;
-  if (parsed !== runner && parsed && typeof parsed === 'object') {
-    parsed.$comment = explanation;
-  }
+  const reason = 'convert retired runner.patterns keys to runner.loops and schema 2';
 
-  let nextContent;
-  if (targetPath.endsWith(YAML_EXT)) {
-    let header = '# @fgos:v1\n\n';
-    if (originalText.startsWith('# @fgos:')) {
-      const match = originalText.match(/^(#[^\n]*\n+)/);
-      if (match) header = match[1];
+  // Apply edits through Config write door (Branch A)
+  try {
+    if (typeof options.patchDoor === 'function') {
+      options.patchDoor({
+        projectRoot: projectDir,
+        target: 'project',
+        edits,
+        reason,
+        backupPath,
+      });
+    } else if (typeof facade.applyPatch === 'function' || typeof facade.patch === 'function') {
+      const door = facade.applyPatch ?? facade.patch;
+      door({
+        projectRoot: projectDir,
+        target: 'project',
+        edits,
+        reason,
+      });
+    } else {
+      const host = resolveActiveHostBin({ cwd: projectDir });
+      if (host?.bin) {
+        applyNativeConfigPatch(host.bin, projectDir, edits, reason);
+      } else {
+        return {
+          status: 'blocked',
+          backup: backupPath,
+          blocker: 'config-write-door-unavailable: Config write door (facade.applyPatch or native fgos config patch) is unavailable; question U6 requires Branch A conversion to go through the Config write door and not write around it',
+          written: [],
+        };
+      }
     }
-    nextContent = `${header}${JSON.stringify(parsed, null, 2)}\n`;
-  } else {
-    nextContent = `${JSON.stringify(parsed, null, 2)}\n`;
+  } catch (err) {
+    return {
+      status: 'blocked',
+      backup: backupPath,
+      blocker: err.message ?? String(err),
+      written: [],
+    };
   }
-
-  fs.writeFileSync(targetPath, nextContent, 'utf8');
 
   try {
     loadRunnerConfigForDir(projectDir);
   } catch (err) {
+    const isGlobalOnlyRefusal =
+      (err instanceof facade.ConfigDoorError && err.refusals?.every((r) => r.file?.startsWith('global:'))) ||
+      (typeof err.message === 'string' && (err.message.includes('~/.fgos/') || err.message.includes('global:')));
+    if (isGlobalOnlyRefusal) {
+      return {
+        status: 'converted',
+        backup: backupPath,
+        written,
+        globalPending: true,
+      };
+    }
     fs.copyFileSync(backupPath, targetPath);
     throw err;
   }
@@ -156,25 +187,37 @@ export function convertRunnerPatternsConfig(projectDir) {
  */
 export function inspectGlobalRunnerConfig(globalDir = path.join(os.homedir(), '.fgos')) {
   if (!fs.existsSync(globalDir)) return null;
-  const yamlPath = path.join(globalDir, `${CONFIG_BASE}${YAML_EXT}`);
-  const jsonPath = path.join(globalDir, `${CONFIG_BASE}${JSON_EXT}`);
-  const filePath = fs.existsSync(yamlPath) ? yamlPath : (fs.existsSync(jsonPath) ? jsonPath : null);
-  if (!filePath) return null;
 
   try {
-    const raw = fs.readFileSync(filePath, 'utf8');
-    const parsed = parseYaml(raw, { filename: filePath });
-    const retired = retiredKeysIn(parsed, filePath);
-    if (!retired || retired.length === 0) return null;
-    return {
-      file: filePath,
-      edits: [
-        'move runner.patterns.reviewed.{maxRounds,checkersByRigor} to runner.loops.reviewed.*',
-        'delete runner.patterns.defaultRule',
-      ],
-      command: 'fgos config patch <patch-file> --global --reason "convert retired keys to runner.loops"',
-    };
-  } catch {
+    facade.readMachineConfig({ globalDir });
+    return null;
+  } catch (err) {
+    if (err instanceof facade.ConfigDoorError && Array.isArray(err.refusals)) {
+      const retiredRefusals = err.refusals.filter((r) =>
+        r.path && (
+          r.path.startsWith('runner.patterns.defaultRule') ||
+          r.path.startsWith('runner.patterns.reviewed') ||
+          r.path.startsWith('runner.patterns.research-fan-out-gated')
+        )
+      );
+      if (retiredRefusals.length === 0) return null;
+      const file = retiredRefusals[0].file?.replace(/^(global|machine):/, '') ?? 'config.yaml';
+      const edits = [];
+      if (retiredRefusals.some((r) => r.path.startsWith('runner.patterns.defaultRule'))) {
+        edits.push('delete runner.patterns.defaultRule');
+      }
+      if (retiredRefusals.some((r) => r.path.startsWith('runner.patterns.reviewed'))) {
+        edits.push('move runner.patterns.reviewed to runner.loops.reviewed');
+      }
+      if (retiredRefusals.some((r) => r.path.startsWith('runner.patterns.research-fan-out-gated'))) {
+        edits.push('rename runner.patterns.research-fan-out-gated to runner.patterns.research-fan-out');
+      }
+      return {
+        file: path.join(globalDir, file),
+        edits,
+        command: 'fgos config patch <patch-file> --global --reason "convert retired keys to runner.loops"',
+      };
+    }
     return null;
   }
 }

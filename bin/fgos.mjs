@@ -4026,6 +4026,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           }
         }
       }
+      const globalConfigDir = path.join(os.homedir(), '.fgos');
+      const globalRetiredNotice = inspectGlobalRunnerConfig(globalConfigDir);
       const runnerPatternsConversion = convertRunnerPatternsConfig(repoRoot);
       // Each scope gets its header-only config file when it has none (a legacy config.json counts as
       // present: it is migrated, never shadowed). Nothing else is written; the standard supplies every value.
@@ -4033,7 +4035,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const configPath = path.join(repoRoot, '.fgos', configFile);
       const { created: globalConfigCreated, file: globalConfigFile } = initConfigFile({ projectRoot: repoRoot, target: 'global' });
       const globalConfigPath = path.join(os.homedir(), '.fgos', globalConfigFile);
-      const globalRetiredNotice = inspectGlobalRunnerConfig(path.dirname(globalConfigPath));
       // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`
       // does — a second, non-npm-lifecycle-dependent activation path for the
       // main-checkout lock hook, since pnpm 10+ blocks `prepare` for a
@@ -4727,6 +4728,13 @@ function renderPretty(verb, data) {
           true,
           'converted runner patterns config to runner.loops (schema 2)',
           data.runnerPatternsConversion.backup ? `backup: ${data.runnerPatternsConversion.backup}` : undefined,
+        ),
+      );
+    } else if (data.runnerPatternsConversion?.status === 'blocked') {
+      lines.push(
+        formatCheck(
+          false,
+          `runner patterns config conversion blocked (${data.runnerPatternsConversion.blocker})`,
         ),
       );
     }
