@@ -14,6 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { resolveConfinementTempRoot } from './cleanup.mjs';
+import { createGitInspect, gitPortOptions } from '../../../git/inspect.mjs';
 import { userRuntimeDir } from '../../../run-supervisor/runtime-dir.mjs';
 
 /**
@@ -244,43 +245,23 @@ export function canonicalizeAndVerifySubpath(targetPath, declaredRoot, resourceN
 }
 
 /**
- * Resolve git metadata path for a workspace.
- * Resolves per-worktree gitdir pointer if .git is a file.
+ * Resolve git metadata path for a workspace: the git directory of the checkout rooted at
+ * `workspaceRoot` (a linked worktree's own git directory, not the shared one), or null when
+ * `workspaceRoot` is not itself a checkout root.
  */
 export function resolveWorkspaceGitMetadata(workspaceRoot) {
-  const dotGit = path.join(workspaceRoot, '.git');
-  if (!fs.existsSync(dotGit)) {
-    return null;
+  if (!fs.existsSync(path.join(workspaceRoot, '.git'))) return null;
+  let facts;
+  try {
+    facts = createGitInspect(gitPortOptions(workspaceRoot)).resolveRepo();
+  } catch (err) {
+    throw new ConfinementResourceError(
+      'confinement-grant-invalid',
+      `git metadata of workspace "${workspaceRoot}" is unreadable: ${err.message}`,
+    );
   }
-
-  let realDotGit = fs.realpathSync(dotGit);
-  const stat = fs.statSync(dotGit);
-
-  if (stat.isFile()) {
-    // Worktree .git file containing "gitdir: <path>"
-    const content = fs.readFileSync(dotGit, 'utf8').trim();
-    const match = content.match(/^gitdir:\s*(.+)$/m);
-    if (!match) {
-      throw new ConfinementResourceError(
-        'confinement-grant-invalid',
-        `malformed .git file in workspace "${workspaceRoot}": ${content}`,
-      );
-    }
-    const rawGitDir = match[1].trim();
-    const resolvedGitDir = path.isAbsolute(rawGitDir)
-      ? path.resolve(rawGitDir)
-      : path.resolve(workspaceRoot, rawGitDir);
-
-    if (!fs.existsSync(resolvedGitDir)) {
-      throw new ConfinementResourceError(
-        'confinement-grant-invalid',
-        `worktree gitdir does not exist: "${resolvedGitDir}"`,
-      );
-    }
-    realDotGit = fs.realpathSync(resolvedGitDir);
-  }
-
-  return realDotGit;
+  if (facts.notARepository || !facts.gitDir || !facts.worktreeRoot) return null;
+  return fs.realpathSync(facts.gitDir);
 }
 
 /** Where the private homes of this machine's dispatches live. */

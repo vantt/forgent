@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "bf8a8438a31f1b8c1195af3fbc440cbf504b9a92a022981a8539975a6f2a5e16",
+  "payloadDigest": "5ec14d2cc2fbde7837dcf9c023b2d3adfb3f2f1a66f96a58f5fa138f0097f623",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -977,7 +977,7 @@
     "src/runner/dispatch/confinement/policies.mjs": "8d7341c02c6f3d664030347d1047315a4ddbccfb2c264c49b8bea0d9b6d9f008",
     "src/runner/dispatch/confinement/probes/harness.mjs": "8ddb1a0fae627adb6f8df409697dec45cf6e89d22fec30b726db96755f93826a",
     "src/runner/dispatch/confinement/request.mjs": "aba50726b489db9763742539c462cf269461943576472c71e84d2d7fe248f185",
-    "src/runner/dispatch/confinement/resources.mjs": "52e8a4f06adbc8ed9b146b47c55afdd4cd99d5d2157ebedf7354ecb6f6428df8",
+    "src/runner/dispatch/confinement/resources.mjs": "a4b4b75881a130bcaf8f073ba71d73c96bef04471347149c56df3b1f7f1e76bb",
     "src/runner/dispatch/cwd-lock.mjs": "3ea87d04c00433f2d410b02fc5b971d681acbc744de6d3587269bc20f57b2e23",
     "src/runner/dispatch/dispatch-error.mjs": "a23e9b79cd73a43eb1e0b9d9afc5710e9210514079515007d36fbbce089e4cbd",
     "src/runner/dispatch/effective-execution-contract.mjs": "2c9f4561cb879685614677eaee0c417b536943059c8c6c36ee567d91cfb54adf",
