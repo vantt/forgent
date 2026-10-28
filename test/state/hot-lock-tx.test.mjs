@@ -54,18 +54,15 @@ test('bare transactions refuse appends without a consumer and revoke every write
   } finally { f.cleanup(); }
 });
 
-test('an append keeps a given ISO time and refuses one that is not an ISO time; without one it is stamped now', () => {
+// A time named by the caller is not kept: the import path that honoured one is gone, so every append is stamped now.
+test('an append is stamped when it is acknowledged, whatever time the caller names', () => {
   const f = fixture();
   try {
     let committed;
     withStateTx(f.fgosDir, (tx) => {
-      assert.equal(tx.append({ type: 'work.add', payload: {}, ts: '2026-10-21T16:42:06.810Z' }).ts, '2026-10-21T16:42:06.810Z');
-      for (const ts of ['Oct 21 2026', '2026-10-21', 'not a time', 7]) {
-        assert.throws(() => tx.append({ type: 'work.add', payload: {}, ts }), { code: 'validation' }, String(ts));
-      }
-      assert.match(tx.append({ type: 'work.add', payload: {} }).ts, /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/);
+      assert.match(tx.append({ type: 'work.add', payload: {}, ts: '2026-10-21T16:42:06.810Z' }).ts, /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/);
     }, { prefetched: { ...writer, stageEffects: true, commitEvents: (tx, events) => { committed = events; } } });
-    assert.deepEqual(committed.map(e => e.ts.slice(0, 10)), ['2026-10-21', committed[1].ts.slice(0, 10)]);
+    assert.notEqual(committed[0].ts, '2026-10-21T16:42:06.810Z');
   } finally {
     f.cleanup();
   }
