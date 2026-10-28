@@ -1036,7 +1036,7 @@ test('doctor check runner-patterns-config: a global catalog entry warns', () => 
     fs.rmSync(repo, { recursive: true, force: true });
   }
 });
-test('doctor check runner-patterns-config: child-path retired key fails with retired advice and custom patterns named loop and loops are accepted', () => {
+test('doctor check runner-patterns-config: retired pattern key fails with retired advice and custom patterns named loop and loops are accepted', () => {
   const tmpDir = mkTempDir();
   const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
   writeProjectConfig(tmpDir, {

@@ -8,11 +8,12 @@ import { globalConfigPath, projectConfigPath, writeGlobalConfig, writeProjectCon
 import {
   loadRunnerConfig,
   loadRunnerConfigForDir,
+  checkDoorRefusalsForRetiredKeys,
   RunnerConfigError,
   validateRunnerPatternsShape,
   validateRunnerLoopsShape,
 } from '../../src/runner/dispatch/config.mjs';
-import { readStandardValue } from '../../src/config/facade.mjs';
+import { readStandardValue, ConfigDoorError } from '../../src/config/facade.mjs';
 import { catalogLayersOf, shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog, resolveCollaboration } from '../../src/runner/execution/patterns/catalog.mjs';
 import { resolveLayer } from '../../src/runner/execution/patterns/catalog-entries.mjs';
@@ -382,6 +383,22 @@ test('retired keys refusal: refuses with config-key-retired naming file and repl
     loop: { loop: 'solo', promise: 'promise for loop' },
     loops: { loop: 'solo', promise: 'promise for loops' },
   }, 'patterns'));
+
+  // 10. Descendant dotted path in door refusal is detected and mapped to parent retired key
+  const err = new ConfigDoorError({
+    id: 'config-schema',
+    file: 'project:config.yaml',
+    path: 'runner.patterns.research-fan-out-gated.loop',
+    line: 10,
+    column: 5,
+  });
+  assert.throws(
+    () => checkDoorRefusalsForRetiredKeys(err, { projectRoot: '/fake/dir' }),
+    (thrown) => thrown instanceof RunnerConfigError
+      && thrown.code === 'config-key-retired'
+      && /runner\.patterns\.research-fan-out-gated was retired/.test(thrown.message)
+      && /use runner\.patterns\.research-fan-out instead/.test(thrown.message),
+  );
 });
 test('named config with panel holding maxRounds is refused as an unknown key without retired advice', () => {
   const { configPath } = mkTempConfig({

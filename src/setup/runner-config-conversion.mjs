@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { parseYaml } from '../util/yaml.mjs';
-import { RETIRED_CONFIG_KEYS, detectRetiredPatternKeys } from '../runner/execution/patterns/retired-keys.mjs';
+import { detectRetiredPatternKeys } from '../runner/execution/patterns/retired-keys.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import * as facade from '../config/facade.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
@@ -242,9 +242,10 @@ export function formatGlobalRetiredNotice(notice) {
   if (!notice) return '';
   const patchStr = notice.patchBody ?? (notice.patch ? JSON.stringify(notice.patch) : '');
   const warnPart = notice.warning ? `; ${notice.warning}` : '';
+  const covPart = notice.coverageNote ? `; ${notice.coverageNote}` : '';
   const cmdPart = notice.command ? `; ${notice.command}` : '';
   const patchPart = patchStr ? `; patch body: ${patchStr}` : '';
-  return `global config holds retired keys; edit ${notice.file} (${notice.edits.join('; ')})${warnPart}${cmdPart}${patchPart}`;
+  return `global config holds retired keys; edit ${notice.file} (${notice.edits.join('; ')})${warnPart}${covPart}${cmdPart}${patchPart}`;
 }
 
 /**
@@ -328,38 +329,55 @@ export function inspectGlobalRunnerConfig(options = {}) {
   const edits = [];
   const patch = [];
 
+  const hasGlobalDestination = (destinationPath) => {
+    if (globalFindings.some((f) => f.path === destinationPath || f.path?.startsWith(`${destinationPath}.`))) {
+      return true;
+    }
+    if (Array.isArray(snapshotOrigins) && snapshotOrigins.some((o) =>
+      (o.layer === 'global' || o.file?.startsWith('global:')) && (o.path === destinationPath || o.path?.startsWith(`${destinationPath}.`)),
+    )) {
+      return true;
+    }
+    return false;
+  };
+
   if (retiredKeys.has('runner.patterns.defaultRule')) {
     edits.push('delete runner.patterns.defaultRule');
     patch.push({ unset: 'runner.patterns.defaultRule' });
   }
 
   if (retiredKeys.has('runner.patterns.reviewed.maxRounds')) {
-    edits.push('move runner.patterns.reviewed.maxRounds to runner.loops.reviewed.maxRounds');
-    const val = snapshotValue?.runner?.patterns?.reviewed?.maxRounds ?? snapshotValue?.patterns?.reviewed?.maxRounds;
-    if (val !== undefined) {
-      patch.push({ set: 'runner.loops.reviewed.maxRounds', value: val });
+    if (hasGlobalDestination('runner.loops.reviewed.maxRounds')) {
+      edits.push('cannot move retired key runner.patterns.reviewed.maxRounds: modern runner.loops.reviewed.maxRounds already exists; reconcile duplicate entries manually');
     } else {
-      patch.push({ set: 'runner.loops.reviewed.maxRounds', value: '<value>' });
+      edits.push('move runner.patterns.reviewed.maxRounds to runner.loops.reviewed.maxRounds');
+      const val = snapshotValue?.runner?.patterns?.reviewed?.maxRounds ?? snapshotValue?.patterns?.reviewed?.maxRounds;
+      if (val !== undefined) {
+        patch.push({ set: 'runner.loops.reviewed.maxRounds', value: val });
+      } else {
+        patch.push({ set: 'runner.loops.reviewed.maxRounds', value: '<value>' });
+      }
+      patch.push({ unset: 'runner.patterns.reviewed.maxRounds' });
     }
-    patch.push({ unset: 'runner.patterns.reviewed.maxRounds' });
   }
 
   if (retiredKeys.has('runner.patterns.reviewed.checkersByRigor')) {
-    edits.push('move runner.patterns.reviewed.checkersByRigor to runner.loops.reviewed.checkersByRigor');
-    const val = snapshotValue?.runner?.patterns?.reviewed?.checkersByRigor ?? snapshotValue?.patterns?.reviewed?.checkersByRigor;
-    if (val !== undefined) {
-      patch.push({ set: 'runner.loops.reviewed.checkersByRigor', value: val });
+    if (hasGlobalDestination('runner.loops.reviewed.checkersByRigor')) {
+      edits.push('cannot move retired key runner.patterns.reviewed.checkersByRigor: modern runner.loops.reviewed.checkersByRigor already exists; reconcile duplicate entries manually');
     } else {
-      patch.push({ set: 'runner.loops.reviewed.checkersByRigor', value: '<value>' });
+      edits.push('move runner.patterns.reviewed.checkersByRigor to runner.loops.reviewed.checkersByRigor');
+      const val = snapshotValue?.runner?.patterns?.reviewed?.checkersByRigor ?? snapshotValue?.patterns?.reviewed?.checkersByRigor;
+      if (val !== undefined) {
+        patch.push({ set: 'runner.loops.reviewed.checkersByRigor', value: val });
+      } else {
+        patch.push({ set: 'runner.loops.reviewed.checkersByRigor', value: '<value>' });
+      }
+      patch.push({ unset: 'runner.patterns.reviewed.checkersByRigor' });
     }
-    patch.push({ unset: 'runner.patterns.reviewed.checkersByRigor' });
   }
 
   if (retiredKeys.has('runner.patterns.research-fan-out-gated')) {
-    const modernInGlobal = Array.isArray(snapshotOrigins) && snapshotOrigins.some((o) =>
-      (o.layer === 'global' || o.file?.startsWith('global:')) && (o.path === 'runner.patterns.research-fan-out' || o.path?.startsWith('runner.patterns.research-fan-out.')),
-    );
-    if (modernInGlobal) {
+    if (hasGlobalDestination('runner.patterns.research-fan-out')) {
       edits.push('cannot rename retired key runner.patterns.research-fan-out-gated: modern runner.patterns.research-fan-out already exists; reconcile duplicate pattern entries manually');
     } else {
       edits.push('rename runner.patterns.research-fan-out-gated to runner.patterns.research-fan-out');
@@ -374,7 +392,7 @@ export function inspectGlobalRunnerConfig(options = {}) {
   }
 
   const isIncomplete = patch.some((p) => p.value === '<value>');
-  const warning = isIncomplete ? 'Copy the existing values to their replacement keys before removing the old keys.' : undefined;
+  const warning = isIncomplete ? 'Copy the existing values to their replacement keys before removing the old keys. Where a replacement already exists, reconcile the values before applying.' : undefined;
   const patchBody = JSON.stringify(patch, null, 2);
   const notice = {
     file: path.join(globalDir, globalConfigFile),

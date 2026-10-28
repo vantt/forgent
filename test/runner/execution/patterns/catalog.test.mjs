@@ -8,6 +8,7 @@ import {
   resolveCollaboration,
 } from '../../../../src/runner/execution/patterns/catalog.mjs';
 import { shippedCatalog } from '../../../../src/runner/dispatch/shipped-catalog.mjs';
+import { detectRetiredPatternKeys } from '../../../../src/runner/execution/patterns/retired-keys.mjs';
 
 test('CollaborationError carries error code, message and optional source layer', () => {
   const errWithSource = new CollaborationError(
@@ -225,6 +226,17 @@ test('retired pattern key in checkCatalog reports config-key-retired with source
   assert.ok(error);
   assert.equal(error.source, 'project');
   assert.match(error.message, /source layer: project/);
+});
+
+test('detectRetiredPatternKeys matches descendant dotted paths', () => {
+  const descendantHits = detectRetiredPatternKeys('runner.patterns.research-fan-out-gated.loop');
+  assert.equal(descendantHits.length, 1);
+  assert.equal(descendantHits[0].key, 'runner.patterns.research-fan-out-gated');
+  assert.equal(descendantHits[0].replacement, 'runner.patterns.research-fan-out');
+
+  const tuningHits = detectRetiredPatternKeys('runner.patterns.reviewed.maxRounds.child');
+  assert.equal(tuningHits.length, 1);
+  assert.equal(tuningHits[0].key, 'runner.patterns.reviewed.maxRounds');
 });
 test('checkCatalog reports param-unknown without retired advice for tuning under non-reviewed patterns', () => {
   const shipped = shippedCatalog();

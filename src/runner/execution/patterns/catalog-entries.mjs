@@ -353,8 +353,8 @@ function checkParamDomain(name, loop, param, val, section, src, problems, entry)
  * Validates pattern catalog entries and merges them.
  *
  * @param {object} options
- * @param {object} options.shipped - Bundled standard catalog { patterns, loops }
- * @param {object} options.effective - Effective merged configuration
+ * @param {object} options.shipped - Explicit shipped patterns map
+ * @param {object} options.effective - Explicit effective patterns map
  * @param {object} [options.layers] - Origin layer map per pattern or field path
  * @param {boolean} [options.throwOnError] - Throw first problem if true
  * @returns {{ entries: object, merged: object, problems: Array<CollaborationError> }}

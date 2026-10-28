@@ -4753,6 +4753,7 @@ function renderPretty(verb, data) {
       const patchStr = notice.patchBody ?? (notice.patch ? JSON.stringify(notice.patch) : '');
       const noteParts = [];
       if (notice.warning) noteParts.push(notice.warning);
+      if (notice.coverageNote) noteParts.push(notice.coverageNote);
       if (notice.command) noteParts.push(notice.command);
       if (patchStr) noteParts.push(`patch body:\n${patchStr}`);
       const note = noteParts.join('\n');

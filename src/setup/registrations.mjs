@@ -87,7 +87,7 @@ import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPat
 import { shippedCatalog, catalogLayersOf } from '../runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
 import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
-import { RETIRED_CONFIG_KEYS, detectRetiredPatternKeys } from '../runner/execution/patterns/retired-keys.mjs';
+import { detectRetiredPatternKeys } from '../runner/execution/patterns/retired-keys.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';

@@ -438,7 +438,7 @@ test('setup CLI prints global guidance when both project and global files hold r
     assert.ok(parsed.data?.globalRetiredNotice, 'json data must include globalRetiredNotice');
     assert.match(parsed.data.globalRetiredNotice.message, /global config holds retired keys/);
     assert.match(parsed.data.globalRetiredNotice.command, /from a directory outside any fgOS project/);
-    assert.equal(parsed.data.globalRetiredNotice.warning, 'Copy the existing values to their replacement keys before removing the old keys.');
+    assert.equal(parsed.data.globalRetiredNotice.warning, 'Copy the existing values to their replacement keys before removing the old keys. Where a replacement already exists, reconcile the values before applying.');
     assert.ok(Array.isArray(parsed.data.globalRetiredNotice.patch));
     assert.deepEqual(parsed.data.globalRetiredNotice.patch, [
       { set: 'runner.loops.reviewed.maxRounds', value: '<value>' },
@@ -454,6 +454,7 @@ test('setup CLI prints global guidance when both project and global files hold r
     assert.match(humanResult.stdout, /from a directory outside any fgOS project/);
     assert.match(humanResult.stdout, /Copy the existing values to their replacement keys before removing the old keys\./);
     assert.match(humanResult.stdout, /patch body/);
+    assert.match(humanResult.stdout, /Refused tuning keys, defaultRule and gated entries are detected/);
     assert.match(humanResult.stdout, /runner\.patterns\.reviewed\.maxRounds/);
   } finally {
     process.env.HOME = prevHome;
@@ -495,7 +496,7 @@ test('global config inspection detects all four retired key families with explic
     assert.ok(maxRoundsNotice);
     assert.ok(maxRoundsNotice.patch.some((p) => p.unset === 'runner.patterns.reviewed.maxRounds'));
     assert.ok(!maxRoundsNotice.patch.some((p) => p.unset === 'runner.patterns.reviewed'), 'must unset only child path so catalog fields survive');
-    assert.equal(maxRoundsNotice.warning, 'Copy the existing values to their replacement keys before removing the old keys.');
+    assert.equal(maxRoundsNotice.warning, 'Copy the existing values to their replacement keys before removing the old keys. Where a replacement already exists, reconcile the values before applying.');
 
     // 3. reviewed.checkersByRigor
     writeGlobalConfig(homeDir, {
@@ -510,7 +511,7 @@ test('global config inspection detects all four retired key families with explic
     const checkersNotice = inspectGlobalRunnerConfig({ projectRoot: projectDir, globalDir });
     assert.ok(checkersNotice);
     assert.ok(checkersNotice.patch.some((p) => p.unset === 'runner.patterns.reviewed.checkersByRigor'));
-    assert.equal(checkersNotice.warning, 'Copy the existing values to their replacement keys before removing the old keys.');
+    assert.equal(checkersNotice.warning, 'Copy the existing values to their replacement keys before removing the old keys. Where a replacement already exists, reconcile the values before applying.');
 
     // 4. Fully documented gated pattern: schema-valid snapshot preserves values
     writeGlobalConfig(homeDir, {
@@ -551,6 +552,42 @@ test('global config inspection detects all four retired key families with explic
     const collisionNotice = inspectGlobalRunnerConfig({ projectRoot: projectDir, globalDir });
     assert.ok(collisionNotice);
     assert.ok(collisionNotice.edits.some((e) => e.includes('reconcile duplicate pattern entries manually')));
+
+    // 6. Gated pattern collision with refused snapshot (e.g. defaultRule present) still requires reconciliation
+    writeGlobalConfig(homeDir, {
+      runner: {
+        patterns: {
+          defaultRule: { mutatingMinRigor: 'standard' },
+          'research-fan-out-gated': {
+            loop: 'panel',
+            promise: 'Old gated representation',
+          },
+          'research-fan-out': {
+            loop: 'panel',
+            promise: 'Modern representation',
+          },
+        },
+      },
+    });
+    const refusedCollisionNotice = inspectGlobalRunnerConfig({ projectRoot: projectDir, globalDir });
+    assert.ok(refusedCollisionNotice);
+    assert.ok(refusedCollisionNotice.edits.some((e) => e.includes('reconcile duplicate pattern entries manually')));
+
+    // 7. Reviewed tuning collision with modern runner.loops entry requires reconciliation
+    writeGlobalConfig(homeDir, {
+      runner: {
+        loops: {
+          reviewed: { maxRounds: 7 },
+        },
+        patterns: {
+          reviewed: { maxRounds: 3 },
+        },
+      },
+    });
+    const tuningCollisionNotice = inspectGlobalRunnerConfig({ projectRoot: projectDir, globalDir });
+    assert.ok(tuningCollisionNotice);
+    assert.ok(tuningCollisionNotice.edits.some((e) => e.includes('reconcile duplicate entries manually')));
+    assert.ok(!tuningCollisionNotice.patch.some((p) => p.set === 'runner.loops.reviewed.maxRounds'));
   } finally {
     cleanupDirs({ projectDir, homeDir });
   }
