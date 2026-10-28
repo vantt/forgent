@@ -27,6 +27,7 @@ pub struct Registry {
     types: BTreeMap<String, Registration>,
 }
 use crate::errors::invalid;
+include!(concat!(env!("OUT_DIR"), "/consumer_contracts.rs"));
 impl Default for Registry {
     fn default() -> Self {
         let promote = Registration {
@@ -49,6 +50,18 @@ impl Registry {
             return Err(invalid("historical type scope changed"));
         }
         Ok(())
+    }
+
+    /// Every consumer `contracts/consumers.v1.json` lists, embedded at build time, so a native
+    /// caller registers the same streams as the payload without searching a release layout.
+    pub fn shipped() -> Result<Self, Error> {
+        let mut registry = Self::default();
+        for text in CONSUMER_CONTRACTS {
+            let contract: ConsumerContract =
+                serde_json::from_str(text).map_err(|e| invalid(e.to_string()))?;
+            registry.register(contract)?;
+        }
+        Ok(registry)
     }
 
     /// Load transactionally: a bad file never leaves a partial registration set.

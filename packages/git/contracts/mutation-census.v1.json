@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "08a16242b7a82af06fccce5f3325f1e9fbedc64a30a7a697fd423e68ff54333f",
+  "payloadDigest": "cdba5a4fed8af10804b1a0d71f110d419cc1ee4a1818ac42e76cb2cb1558b401",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -86,7 +86,7 @@
     "apps/fgos/src/cli_projector.rs": "3fa24a9ac92790d07161590ff49839e4323091a5302932f7d7495adf503a62fa",
     "apps/fgos/src/legacy_exec.rs": "6aa96ac09b3c577b03317d3b9292104c8af977b2890eb7e5ef45a13598770a22",
     "apps/fgos/src/main.rs": "c1e3b805b2a7a7dfd13ced045eb9f738ff2a3a72ad5df872ea3e0e2d7a98acd2",
-    "apps/fgos/src/wiring/identity_log.rs": "efa3fbe17345fa782a49bde2881fdd82f35cb33e5de70640690b391a432add2e",
+    "apps/fgos/src/wiring/identity_log.rs": "00ceb467e4291f5fc724afdb1f87fd61575b9b851663b7ed7b1a6e0c90e94970",
     "apps/fgos/src/wiring/mailbox_config.rs": "36b417d911da3ca1bb1985ddd74ed3ffb3db2628f937fd081a90abc893c79725",
     "apps/fgos/src/wiring/mailbox_hook.rs": "c36e424754b1c4e3e6735cbf43ec35b76cd79730ff26ecaba28d27b303c105c1",
     "apps/fgos/src/wiring/mailbox_hook_unsupported.rs": "42f2aa9df8c530b5a1534696b2dba99e8410552598691748a6518ede830d674e",
@@ -97,7 +97,7 @@
     "apps/fgos/src/wiring/mailbox_verbs_unsupported.rs": "3432cb4e6ec45ff3e6ad31c282ad75e25d40a39f2ecd54af8f5989a51a0405b3",
     "apps/fgos/src/wiring/metrics_sources.rs": "504e2c72b52a5da8d8d23a862403d47986811234809f364ee6006c6957f6c583",
     "apps/fgos/src/wiring/mod.rs": "35f0dc0d298c554ce20f66b72a68c9e7c52d32936c259d989b074a7eaa812945",
-    "apps/fgos/tests/cli_tests.rs": "613e4d71d15e3fec6f81cfc819eff954f05b2df8dbc139b49d65716502ec2464",
+    "apps/fgos/tests/cli_tests.rs": "f7af8fc450eb6581a996748f61e0c10e6a6d9bc7f110202735245b4ff2a759b3",
     "apps/fgos/tests/internal_lock_routes.rs": "70aa38db75a1257e00b500549a2cf22b57032aff4a6d7b51d992d4a3f95d274a",
     "apps/fgos/tests/mailbox_routes.rs": "a934c6d6c93acb5c38e3c864a8bc3f75fa03be52d079e182b9ed09b5e40a418f",
     "apps/fgos/tests/windows_borrow.rs": "59258d09ea0b2420b7cecfe73fd9b67d61f83bb3a4d97feaa770aa6d26a05521",
@@ -284,7 +284,7 @@
     "packages/durable-file/rust/tests/beneath.rs": "640a72d38f8b5360f3ba8ebf825877742b7f28c64d9c5fde4dcfd6f3bfcc4f59",
     "packages/durable-file/rust/tests/creation_modes.rs": "eaa469ec9d3091c882e3801243b4c7901878ec0243bfb101ea8d42ba9e97e4a7",
     "packages/durable-file/rust/tests/install.rs": "96c695200ff51256788f0655cf49130420cac48091de1df2d11a9b8d85ac647b",
-    "packages/event-store/rust/build.rs": "38ef607f803934266807e0cc329f9b6796904a9f86199e8c9e4efb6c5dfe337f",
+    "packages/event-store/rust/build.rs": "d7ce69e381e9c3ee7d25ae6abc3b26eedd821895dfaecaa62baab04f7d06d5f7",
     "packages/event-store/rust/examples/distribution_digest_audit.rs": "3793a8a4d92cfc469eb3b6220d15b709b662990c801d082870ad1c7fc289f089",
     "packages/event-store/rust/src/append.rs": "8916b163dac4498a3dddd6ff5eee72a72445d589e11c06bb076608b13783c624",
     "packages/event-store/rust/src/checkpoint.rs": "0a66f45971c102a178f2bc633c1aa1ccd2315119f531f5e2d97018397442ec1f",
@@ -311,7 +311,7 @@
     "packages/event-store/rust/src/reconcile.rs": "31016bcb05e3d8bd85ab849a43602027a1a988f2052132c5ea8c35e0c0984a2f",
     "packages/event-store/rust/src/refs.rs": "27b0244496cb4c6169a2f43d95a666697a553c173883a8f86c01e1f905dda2e4",
     "packages/event-store/rust/src/refspec.rs": "6b6e65a57ff159b845906d768fe4eec9a9af761115b990f4315c3219f7b2451b",
-    "packages/event-store/rust/src/registry.rs": "18b9030411bc40c5761a213ca407b0053aacfc3e920c022be364a21ab37b99f9",
+    "packages/event-store/rust/src/registry.rs": "4dff23fd6e894bbe7fda1a5ca79b2dcd73c171baa19afb72ad42239d651b3d01",
     "packages/event-store/rust/src/rotate.rs": "6daf009b38713e7083eccae22dc88a2d609d3a6b74aa93791718d64f89bb9de9",
     "packages/event-store/rust/src/seal.rs": "680bc8941b22d07a287ba137d5a923a2bd8b447cb324f8744c03e13fa09a1d26",
     "packages/event-store/rust/src/sync.rs": "abb271596ff517ac64a80730e5350459ebfc987607ee75d799b75cd8f677bbc4",
@@ -335,7 +335,7 @@
     "packages/event-store/rust/tests/reader_review_regressions.rs": "c34d8d03bb0f67d212c37b980a8bf48adfaf40b1ccf3e71d14205cc9c3cb1067",
     "packages/event-store/rust/tests/reader_seal_stress.rs": "3fd1a487e4a7e6b6febaed97113d02966de5b085aff4ae10b0059152948f09b2",
     "packages/event-store/rust/tests/reader_support/mod.rs": "a19abce9d60866441e61020fb66f48b38e2d75e9fd0338f0b4955f33f18e31b7",
-    "packages/event-store/rust/tests/registry_identity_layout.rs": "99f3c965ad57b147123233794298070a75006c4f552becbb5ecffdb5247d2f89",
+    "packages/event-store/rust/tests/registry_identity_layout.rs": "8acc75eb0044bee309529cc773976d3bc921e238774873bab231089e4e5181e7",
     "packages/event-store/rust/tests/registry_rows.rs": "4afd0326e26d038e1a2b7962cacc19bc140cd5afbb3416088b2e4798572519bb",
     "packages/event-store/rust/tests/review_fixes.rs": "d3aa5b3493b5f55d8fe3cd8809d63e9abe69598a5d26166addabd63bd1b617bb",
     "packages/event-store/rust/tests/seal_cas_race.rs": "11f9f9bd62131b0d069cfd91bc7da8f3ee313ffd101f9cce275d6d9a92f8973c",
@@ -1844,35 +1844,35 @@
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1683,
+      "line": 1679,
       "spawn": "Command::new",
       "binary": "/usr/bin/git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1725,
+      "line": 1721,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1786,
+      "line": 1782,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1827,
+      "line": 1823,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1859,
+      "line": 1855,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"

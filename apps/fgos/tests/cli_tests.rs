@@ -1425,7 +1425,7 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
     use fgos_event_store::{
         append::{append, AppendRequest, EventInput},
         layout::{Layout, StreamId},
-        registry::{ConsumerContract, Registry},
+        registry::Registry,
         sync::{sync, SyncRequest},
     };
     use fgos_git::{GitDriver, ResolveRepo};
@@ -1531,16 +1531,12 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
         remote: None,
     };
     let payload = published_payload(&bravo_state, &listed, &MachineRef { id: "bravo-bbbbbb".into(), handle: "bravo".into() }).unwrap();
-    let mut registry = Registry::default();
-    let contract = include_str!("../../../packages/identity/contracts/identity-event-streams.v1.json");
-    let sealed: Vec<bool> = serde_json::from_str::<serde_json::Value>(contract).unwrap()["types"]
-        .as_array()
-        .unwrap()
+    let registry = Registry::shipped().unwrap();
+    let sealed: Vec<bool> = ["identity.session-published", "identity.session-ended"]
         .iter()
-        .map(|t| t["sealOnWrite"].as_bool().unwrap())
+        .map(|t| registry.get(t).unwrap().seal_on_write)
         .collect();
     assert_eq!(sealed, [false, false], "the host appends and never seals, so the contract says so");
-    registry.register(serde_json::from_str::<ConsumerContract>(contract).unwrap()).unwrap();
     append(
         &bravo_layout,
         &registry,

@@ -1,8 +1,8 @@
 //! The Event Store behind Identity's shared directory: the adapter of the
 //! `EntryLog` port for stream `project:identity` of the clone a verb runs in.
 //! The host links the store directly (Identity cannot: the store depends on
-//! Identity), and the type contract is embedded the way the routes descriptor
-//! is, so no release layout has to be searched at runtime.
+//! Identity) and registers the stream through the store's consumer manifest,
+//! which the store embeds at build time.
 
 use fgos_event_store::{
     append::{append, AppendRequest, EventInput},
@@ -10,7 +10,7 @@ use fgos_event_store::{
     legacy_import::write_readiness,
     layout::{Layout, StreamId},
     read::{read, ReadRequest},
-    registry::{ConsumerContract, Registry},
+    registry::Registry,
     sync::sync_status,
 };
 use fgos_git::{GitDriver, Inspect, ResolveRepo};
@@ -19,8 +19,6 @@ use fgos_identity::text::{iso_utc, iso_utc_now};
 use fgos_identity::Refusal;
 use serde_json::Value;
 use std::path::{Path, PathBuf};
-
-const CONTRACT: &str = include_str!("../../../../packages/identity/contracts/identity-event-streams.v1.json");
 
 fn store_fault(reason: &'static str, error: impl std::fmt::Debug) -> Refusal {
     Refusal { reason, detail: format!("{error:?}"), candidates: Vec::new() }
@@ -61,9 +59,7 @@ impl LogDoor for StoreLogDoor {
         let configured = driver.machine_id(&repo).map_err(|e| fault(&e))?;
         let configured = configured.as_ref().map(|fact| std::str::from_utf8(&fact.value)).transpose().map_err(|e| fault(&e))?;
         let machine = machine_id(configured, &state).map_err(|e| fault(&e))?;
-        let contract: ConsumerContract = serde_json::from_str(CONTRACT).map_err(|e| fault(&e))?;
-        let mut registry = Registry::default();
-        registry.register(contract).map_err(|e| fault(&e))?;
+        let registry = Registry::shipped().map_err(|e| fault(&e))?;
         let stream = StreamId::parse(shared::STREAM).map_err(|e| fault(&e))?;
         Ok(Some(Box::new(StoreLog { driver, repo, layout, registry, stream, machine, writer: writer.to_owned(), dir: dir.to_owned() })))
     }
