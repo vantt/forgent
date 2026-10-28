@@ -27,8 +27,13 @@ All named in the commit bodies. Highlights: Node migrate, migrate-cutover-grant,
 ## D13 decision
 Left alone. No committed evidence that the "section 23.2 candidate run" happened: the only runs on record (plans/reports/verification-261022-2203-work-cutover-branch-proofs.md:24, verification-261023-1630-...:161) are the branch-proof runs of `settle-host-proof.mjs --host` itself, and those scripts remain the only owner of the ENOSPC/SIGKILL settle-fault proof.
 
+## Review fixes (second round)
+- Wording correction to `eb7ad4e13`: reads do not authenticate the pinned legacy history. Reads check only that the tracked fence and the legacy refs agree. Only the doctor's `legacy_layout` calls `verify_legacy_tree`.
+- `1c4c5f0a0` removes the pre-commit event-log shrink guard (its only purpose was protecting what `events migrate` imported) and its five tests, and rewords `forge-probe.sh`.
+- `6ee4230b3` builds `legacy_import.rs` on `reader_support::fenced_legacy` (real data-tree id), adds the unfenced-HEAD admission proof, and names the retired facade moved-history assertion (behaviour removed; the new-fence case is owned by `a_legacy_history_that_appears_after_a_read_forces_a_rebuild_even_when_v4_order_is_unchanged`).
+
 ## Behaviour change to know
-A clone whose HEAD still tracks legacy event files and has no fence is no longer refused for writes; its tracked legacy files are ignored. The owner said no such clone exists.
+A clone whose HEAD still tracks legacy event files and has no fence is no longer refused for writes; its tracked legacy files are ignored. The change rests on the owner's 2026-10-24 23:3x line in the ES plan ("3 máy sync hết rồi, các project kia xong hết rồi") and the approved package of 2026-10-25 20:57 (decision 43).
 
 ## Left out
 - `internal quiesce-scan` route and Git `cutoverGrant`: S5 asked the T0/T2 seats to confirm. quiesce-scan still has callers (fgctl, distribution git_gate); cutoverGrant untouched (test/git/cutover-grant.test.mjs).
