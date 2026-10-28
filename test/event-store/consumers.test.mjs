@@ -13,7 +13,7 @@ test('the dormant registry matches the shipped manifest without import-time regi
   assert.throws(() => loadRebuildModule('missing'), { code: 'event-store-consumer-registry' });
 });
 
-test('every contract file the manifest names ships in the release payload', { skip: process.platform !== 'linux' }, () => {
+test('every contract file the manifest names ships in the release payload', () => {
   const manifest = JSON.parse(fs.readFileSync(new URL('../../packages/event-store/contracts/consumers.v1.json', import.meta.url)));
   const { files } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)));
   const shipped = file => files.some(entry => file === entry || file.startsWith(`${entry}/`));
