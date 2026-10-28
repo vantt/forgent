@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3ebda97e1fa1aefe7e74a9694e9260a0ee53f5de14da1af12f11edb64be3ac34",
+  "payloadDigest": "7bd475cbf6081d1159f9749dc7ac2286e63e901a6d511d8d9cc36906edce94bf",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1103,7 +1103,7 @@
     "src/setup/event-store-fixes.mjs": "6075174c2a02253e34dda0b021cf46bd33b61f75917fe07d70967fd94e6e3052",
     "src/setup/executor-posture-coverage.mjs": "cab23a4fa399353344a74cd88230b0c72ed267dc02edbbdde725c435e21b89af",
     "src/setup/executor-profile-warnings.mjs": "159ece46c6c50e80b3ba5aae80a14c11387f1a4b3384a0d80e0ad4b969ea7b48",
-    "src/setup/git-checks.mjs": "f2e7366ea85484c310815a42bd68894dafd39adc5529b569482c9126e4e32ebf",
+    "src/setup/git-checks.mjs": "2b092c35cb01372fe7069a6022c232ff484275d1cbaf1402f0fdf523d5b177ee",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
     "src/setup/git-retention-note.mjs": "8e4bacd772c5562a964c4beeea95d9ee808f41e122a7b6adc09fee81c96949fd",
     "src/setup/holder-lock-checks.mjs": "278f2a01cafeecd7e7d88408677aa8f86d663155b2280297db6405b526bb522d",
@@ -1114,7 +1114,7 @@
     "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
     "src/setup/model-pool-checks.mjs": "a770f17808c6a02cd2d5e50e145711635587f78eddf0639eb5525a7d442a9246",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "9cfccb456995cfd836b128c79c76d523511dfd30b0dc033309c1e5986203ab19",
+    "src/setup/registrations.mjs": "a25b902aed09366fabfde5a827de4ade676544d3f3243114756ae8d34116686a",
     "src/setup/run-supervisor-checks.mjs": "44e8b33ffdb5fee2f178549160ba25d94bc698056469852c6306e6352c1bdd3d",
     "src/setup/runner-config-conversion.mjs": "ce13ea5858718576a2f80497757fee98cd7ff47a5fa2d89c36069d49c2aab1ca",
     "src/setup/seat-binding-checks.mjs": "1620c36971e9f1ba1e113715b334b1b3b326dd62bfd2d557656fade19aa73691",
