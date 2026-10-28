@@ -88,6 +88,9 @@ None of these says to look for an owning test first. 51 plans under `plans/` nam
 
 ### 2. Every fix and every review finding adds one more test (≈21% of what was added; 14% traceable to review rounds)
 
+> **Correction 2026-10-28 (verification [report](research-261028-1530-verify-agentkit-skills-cause-test-growth.md)).** The AgentKit attribution in this cause is not supported. On this machine (10-15 to 10-28 transcripts, 35% of the window's commits), no committing session ever loaded `ak:fix` or `ak:code-review`. Fix commits added the same number of tests with or without an AgentKit reviewer (1.01 vs 1.00). The rate of tests per fix commit follows the `AGENTS.md` L5 change (3.09 before 10-20 17:50, 1.19 after). The "add a test" asks came from lead briefs, HARDEN red-test plans and `fgos run` review reports. In a 60-test sample, 0 fix-added tests duplicated an existing proof. Most proved a behaviour no test proved before, and 23% were renames or rewrites. The 21% is therefore mostly legitimate regression proof, not growth that breaks principle 8.
+
+
 **Mechanism.** A review returns findings phrased as "no test covers X, add a test". The lane fixes each finding in its own `fix` commit and adds a regression test for it, usually in the existing file. The text that says to do this:
 - `ak-fix/references/workflow-standard.md:79`: "**Regression test:** Add/update test(s) covering the fixed issue. Test MUST fail without fix, pass with fix." It sits in a "**Mandatory skill chain**".
 - `ak-fix/references/workflow-deep.md:114`: "**Regression test:** Add comprehensive tests."
