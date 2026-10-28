@@ -540,7 +540,7 @@
                             },
                             "cutoverGrant": {
                               "type": "null",
-                              "description": "Retired. Intents written by earlier releases carry it as null; new intents omit it."
+                              "description": "Retired. Ordinary intents written by earlier releases carry it as null; new intents omit it. A grant object, written only by the retired events migrate, is refused."
                             }
                           },
                           "required": [

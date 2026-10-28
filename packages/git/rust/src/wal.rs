@@ -151,8 +151,11 @@ pub struct ScopedCommitIntent {
     pub paths: PathSet,
     pub tree: String,
     /// Intents written before the cutover grant was removed carry
-    /// `"cutoverGrant": null`. The key is read back as written so their record
-    /// digests still verify; new intents omit it. Only `null` ever existed.
+    /// `"cutoverGrant": null`, or a grant object written only by the retired
+    /// `fgos events migrate`. `null` is read back as written so those record
+    /// digests still verify; new intents omit the key. An intent carrying a
+    /// grant object is refused on purpose, with no reader for that dead shape:
+    /// resolve such an operation with the previous release before upgrading.
     #[serde(
         default,
         rename = "cutoverGrant",
@@ -2978,8 +2981,9 @@ mod tests {
     }
     #[test]
     fn scoped_commit_intent_written_with_a_null_cutover_grant_keeps_its_digest() {
-        // Earlier releases wrote `"cutoverGrant": null` into every intent, and a
+        // Earlier releases wrote `"cutoverGrant": null` into ordinary intents, and a
         // record verifies only if re-serializing it reproduces the bytes it was hashed from.
+        // The grant object only the retired `events migrate` wrote stays refused.
         let intent = ScopedCommitIntent {
             worktree: "/w".into(),
             baseline: "{}".into(),

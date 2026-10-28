@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9e165de21c9f898635c5abd9ad472536af1a2ded05fb48d01b0593aaa556b7ad",
+  "payloadDigest": "8ca0b7b58d7c46bdf5d1443a7b27d99286e0e0ea647ac031b14c702194d6dd55",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -392,7 +392,7 @@
     "packages/git/rust/src/scoped_commit.rs": "ce9da96151f3f30e098c66a96147e290de0f9e73bd0302487bd0be3d805b48a1",
     "packages/git/rust/src/sequence.rs": "02ca2ff90ac57645df2377e1b7746f88037091a8f1f9b005057be1158e7f28eb",
     "packages/git/rust/src/sync.rs": "7145ac2efdbab252b4418a27fae9668f6db933b799d0ca3d8e27c064cca6f3cd",
-    "packages/git/rust/src/wal.rs": "04106c6965f60b5508741f8e8212acbf3a83283986f325181a73b8e8bbfb6a19",
+    "packages/git/rust/src/wal.rs": "59f68c1450e1e16e91044dcf46a04e3de351b0e12df8e45fe2e62d939c5c7b80",
     "packages/git/rust/src/worktree.rs": "1448b50a2fbe3bda3cb0738195f86d029f076321f9d91d255af1ab11f55c8123",
     "packages/git/rust/tests/borrow_deadline.rs": "6a0db6afad96b62ded1253324e862a29a88129e115bd133292ee30ac5482fa07",
     "packages/git/rust/tests/contracts.rs": "1a6e7d417ed0254cb4a395035122a35275cdb6364424e65634c8fc2949f298b6",
@@ -2281,7 +2281,7 @@
     },
     {
       "path": "packages/git/rust/src/wal.rs",
-      "line": 3302,
+      "line": 3306,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
