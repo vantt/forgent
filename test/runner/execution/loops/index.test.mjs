@@ -8,6 +8,10 @@ import {
   loopRunsVerify,
   VERIFY_CAPABILITY,
 } from '../../../../src/runner/execution/loops/index.mjs';
+import { PARAMS as SOLO_PARAMS } from '../../../../src/runner/execution/loops/solo.mjs';
+import { PARAMS as REVIEWED_PARAMS } from '../../../../src/runner/execution/loops/reviewed.mjs';
+import { PARAMS as PANEL_PARAMS } from '../../../../src/runner/execution/loops/panel.mjs';
+import { PARAMS as DEBATE_PARAMS } from '../../../../src/runner/execution/loops/debate.mjs';
 
 const PANEL_SEATS = [
   { seat: 'member-1', role: 'producer' },
@@ -152,5 +156,13 @@ test('paramTableOf returns the param table for each loop and null for unknown', 
   assert.equal(paramTableOf(null), null);
   assert.equal(paramTableOf(undefined), null);
   assert.equal(paramTableOf(123), null);
-  assert.ok(paramTableOf({ loop: 'reviewed' }));
+
+  assert.strictEqual(paramTableOf('solo'), SOLO_PARAMS);
+  assert.strictEqual(paramTableOf({ loop: 'solo' }), SOLO_PARAMS);
+  assert.strictEqual(paramTableOf('reviewed'), REVIEWED_PARAMS);
+  assert.strictEqual(paramTableOf({ loop: 'reviewed' }), REVIEWED_PARAMS);
+  assert.strictEqual(paramTableOf('panel'), PANEL_PARAMS);
+  assert.strictEqual(paramTableOf({ loop: 'panel' }), PANEL_PARAMS);
+  assert.strictEqual(paramTableOf('debate'), DEBATE_PARAMS);
+  assert.strictEqual(paramTableOf({ loop: 'debate' }), DEBATE_PARAMS);
 });

@@ -34,6 +34,7 @@ import { validateProviderAccountInventory } from './provider-capacity.mjs';
 // prior config.mjs <-> transport.mjs import cycle).
 import { EXECUTOR_ADAPTERS } from './adapters.mjs';
 import { assertNoRetiredKeys, checkDoorRefusalsForRetiredKeys } from './retired-config-keys.mjs';
+import { detectRetiredPatternKeys } from '../execution/patterns/retired-keys.mjs';
 import { credentialStoreProblem } from './provider-capacity.mjs';
 import {
   BUILTIN_POLICIES,
@@ -1279,40 +1280,37 @@ export function validateRunnerPatternsShape(patterns, label) {
     }
   }
 
-  // Retired keys
-  if (patterns.defaultRule !== undefined) {
-    throw new RunnerConfigError(
-      `runner config (${label}.defaultRule) was retired; delete the key.`,
-      { code: 'config-key-retired' },
-    );
-  }
-  if (patterns['research-fan-out-gated'] !== undefined) {
-    throw new RunnerConfigError(
-      `runner config (${label}.research-fan-out-gated) was retired; use runner.patterns.research-fan-out instead.`,
-      { code: 'config-key-retired' },
-    );
+  // Retired keys via shared leaf detector
+  for (const finding of detectRetiredPatternKeys(patterns)) {
+    if (finding.kind === 'both-shapes') {
+      throw new RunnerConfigError(
+        `runner config (${label}.${finding.name}) cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.${finding.name}.`,
+      );
+    }
+    if (finding.kind === 'defaultRule') {
+      throw new RunnerConfigError(
+        `runner config (${label}.defaultRule) was retired; delete the key.`,
+        { code: 'config-key-retired' },
+      );
+    }
+    if (finding.kind === 'gated') {
+      throw new RunnerConfigError(
+        `runner config (${label}.${finding.name}) was retired; use runner.patterns.research-fan-out instead.`,
+        { code: 'config-key-retired' },
+      );
+    }
+    if (finding.kind === 'tuning-only') {
+      throw new RunnerConfigError(
+        `runner config (${label}.${finding.name}) was retired; use runner.loops.${finding.name} instead.`,
+        { code: 'config-key-retired' },
+      );
+    }
   }
 
   const RESERVED_PATTERN_NAMES = new Set(['seatBinding', 'defaultRule']);
 
   for (const [name, entry] of Object.entries(patterns)) {
     if (name === 'seatBinding') continue;
-
-    if (name === 'reviewed') {
-      const hasTuning = entry && typeof entry === 'object' && !Array.isArray(entry) && ('maxRounds' in entry || 'checkersByRigor' in entry);
-      const hasCatalog = entry && typeof entry === 'object' && !Array.isArray(entry) && ('loop' in entry || 'defaults' in entry || 'promise' in entry || 'invariants' in entry);
-      if (hasTuning && hasCatalog) {
-        throw new RunnerConfigError(
-          `runner config (${label}.reviewed) cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.reviewed.`,
-        );
-      }
-      if (hasTuning && !hasCatalog) {
-        throw new RunnerConfigError(
-          `runner config (${label}.reviewed) was retired; use runner.loops.reviewed instead.`,
-          { code: 'config-key-retired' },
-        );
-      }
-    }
 
     if (RESERVED_PATTERN_NAMES.has(name)) {
       throw new RunnerConfigError(`runner config (${label}.${name}) uses reserved name "${name}" as a pattern name.`);

@@ -104,14 +104,17 @@ export function checkDoorRefusalsForRetiredKeys(err, options = {}) {
       const where = `${displayFile}${pos}`;
 
       if (isDefaultRule) {
+        const meta = RETIRED_CONFIG_KEYS['runner.patterns.defaultRule'];
         throw new RunnerConfigError(
-          `${where}: runner.patterns.defaultRule was retired; delete the key.`,
+          `${where}: runner.patterns.defaultRule was retired; ${meta?.instruction ?? 'delete the key'}.`,
           { code: 'config-key-retired' },
         );
       }
       if (isResearchFanOutGated) {
+        const key = 'runner.patterns.research-fan-out-gated';
+        const meta = RETIRED_CONFIG_KEYS[key];
         throw new RunnerConfigError(
-          `${where}: runner.patterns.research-fan-out-gated was retired; use runner.patterns.research-fan-out instead.`,
+          `${where}: ${key} was retired; ${meta?.instruction ?? 'use runner.patterns.research-fan-out instead'}.`,
           { code: 'config-key-retired' },
         );
       }
@@ -134,41 +137,46 @@ export function checkDoorRefusalsForRetiredKeys(err, options = {}) {
         if (actualFile) {
           try {
             const raw = parseYaml(fsp.readFileSync(actualFile, 'utf8'), { filename: actualFile });
-            const reviewed = raw?.runner?.patterns?.reviewed ?? raw?.patterns?.reviewed;
+            const patterns = raw?.runner?.patterns ?? raw?.patterns;
+            const reviewed = patterns?.reviewed;
             if (reviewed && typeof reviewed === 'object' && !Array.isArray(reviewed)) {
-              const hasTuning = 'maxRounds' in reviewed || 'checkersByRigor' in reviewed;
-              const hasCatalog = 'loop' in reviewed || 'defaults' in reviewed || 'promise' in reviewed || 'invariants' in reviewed;
-              if (hasTuning && hasCatalog) {
-                throw new RunnerConfigError(
-                  `${where}: runner.patterns.reviewed cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.reviewed.`,
-                );
-              }
-              if ('maxRounds' in reviewed) {
-                throw new RunnerConfigError(
-                  `${where}: runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.`,
-                  { code: 'config-key-retired' },
-                );
-              }
-              if ('checkersByRigor' in reviewed) {
-                throw new RunnerConfigError(
-                  `${where}: runner.patterns.reviewed.checkersByRigor was retired; use runner.loops.reviewed.checkersByRigor instead.`,
-                  { code: 'config-key-retired' },
-                );
+              const findings = detectRetiredPatternKeys({ reviewed });
+              for (const f of findings) {
+                if (f.kind === 'both-shapes') {
+                  throw new RunnerConfigError(
+                    `${where}: runner.patterns.reviewed cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.reviewed.`,
+                  );
+                }
+                if (f.kind === 'tuning-only') {
+                  if (f.hasMaxRounds) {
+                    const meta = RETIRED_CONFIG_KEYS['runner.patterns.reviewed.maxRounds'];
+                    throw new RunnerConfigError(
+                      `${where}: runner.patterns.reviewed.maxRounds was retired; ${meta?.instruction ?? 'use runner.loops.reviewed.maxRounds instead'}.`,
+                      { code: 'config-key-retired' },
+                    );
+                  }
+                  if (f.hasCheckersByRigor) {
+                    const meta = RETIRED_CONFIG_KEYS['runner.patterns.reviewed.checkersByRigor'];
+                    throw new RunnerConfigError(
+                      `${where}: runner.patterns.reviewed.checkersByRigor was retired; ${meta?.instruction ?? 'use runner.loops.reviewed.checkersByRigor instead'}.`,
+                      { code: 'config-key-retired' },
+                    );
+                  }
+                  throw new RunnerConfigError(
+                    `${where}: runner.patterns.reviewed was retired; ${f.instruction}.`,
+                    { code: 'config-key-retired' },
+                  );
+                }
               }
             }
           } catch (e) {
             if (e instanceof RunnerConfigError) throw e;
           }
         } else {
-          if (r.path === 'runner.patterns.reviewed.maxRounds') {
+          const meta = RETIRED_CONFIG_KEYS[r.path];
+          if (meta) {
             throw new RunnerConfigError(
-              `${where}: runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.`,
-              { code: 'config-key-retired' },
-            );
-          }
-          if (r.path === 'runner.patterns.reviewed.checkersByRigor') {
-            throw new RunnerConfigError(
-              `${where}: runner.patterns.reviewed.checkersByRigor was retired; use runner.loops.reviewed.checkersByRigor instead.`,
+              `${where}: ${r.path} was retired; ${meta.instruction}.`,
               { code: 'config-key-retired' },
             );
           }

@@ -45,27 +45,30 @@ export function detectRetiredPatternKeys(patternsRaw) {
 
   const findings = [];
 
-  if (Object.hasOwn(patternsRaw, 'defaultRule') || patternsRaw.defaultRule !== undefined) {
+  if (Object.hasOwn(patternsRaw, 'defaultRule')) {
+    const meta = RETIRED_CONFIG_KEYS['runner.patterns.defaultRule'];
     findings.push({
       key: 'runner.patterns.defaultRule',
       name: 'defaultRule',
       code: 'config-key-retired',
       kind: 'defaultRule',
-      replacement: null,
-      instruction: 'delete the key',
-      baseMessage: 'runner.patterns.defaultRule was retired; delete the key',
+      replacement: meta?.replacement ?? null,
+      instruction: meta?.instruction ?? 'delete the key',
+      baseMessage: `runner.patterns.defaultRule was retired; ${meta?.instruction ?? 'delete the key'}`,
     });
   }
 
-  if (Object.hasOwn(patternsRaw, RETIRED_GATED_NAME) || patternsRaw[RETIRED_GATED_NAME] !== undefined) {
+  if (Object.hasOwn(patternsRaw, RETIRED_GATED_NAME)) {
+    const key = `runner.patterns.${RETIRED_GATED_NAME}`;
+    const meta = RETIRED_CONFIG_KEYS[key];
     findings.push({
-      key: `runner.patterns.${RETIRED_GATED_NAME}`,
+      key,
       name: RETIRED_GATED_NAME,
       code: 'config-key-retired',
       kind: 'gated',
-      replacement: 'runner.patterns.research-fan-out',
-      instruction: 'use runner.patterns.research-fan-out instead',
-      baseMessage: `runner.patterns.${RETIRED_GATED_NAME} was retired; use runner.patterns.research-fan-out instead`,
+      replacement: meta?.replacement ?? 'runner.patterns.research-fan-out',
+      instruction: meta?.instruction ?? 'use runner.patterns.research-fan-out instead',
+      baseMessage: `${key} was retired; ${meta?.instruction ?? 'use runner.patterns.research-fan-out instead'}`,
     });
   }
 
@@ -73,18 +76,13 @@ export function detectRetiredPatternKeys(patternsRaw) {
     if (name === 'defaultRule' || name === RETIRED_GATED_NAME || name === 'seatBinding') continue;
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
 
-    const hasTuning = Object.hasOwn(entry, 'maxRounds')
-      || Object.hasOwn(entry, 'checkersByRigor')
-      || 'maxRounds' in entry
-      || 'checkersByRigor' in entry;
+    const hasMaxRounds = Object.hasOwn(entry, 'maxRounds');
+    const hasCheckersByRigor = Object.hasOwn(entry, 'checkersByRigor');
+    const hasTuning = hasMaxRounds || hasCheckersByRigor;
     const hasCatalog = Object.hasOwn(entry, 'loop')
       || Object.hasOwn(entry, 'defaults')
       || Object.hasOwn(entry, 'promise')
-      || Object.hasOwn(entry, 'invariants')
-      || 'loop' in entry
-      || 'defaults' in entry
-      || 'promise' in entry
-      || 'invariants' in entry;
+      || Object.hasOwn(entry, 'invariants');
 
     if (hasTuning && hasCatalog) {
       findings.push({
@@ -105,8 +103,8 @@ export function detectRetiredPatternKeys(patternsRaw) {
         replacement: `runner.loops.${name}`,
         instruction: `use runner.loops.${name} instead`,
         baseMessage: `runner.patterns.${name} was retired; use runner.loops.${name} instead`,
-        hasMaxRounds: Object.hasOwn(entry, 'maxRounds') || 'maxRounds' in entry,
-        hasCheckersByRigor: Object.hasOwn(entry, 'checkersByRigor') || 'checkersByRigor' in entry,
+        hasMaxRounds,
+        hasCheckersByRigor,
       });
     }
   }

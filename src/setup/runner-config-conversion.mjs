@@ -229,10 +229,21 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
 }
 
 /**
+ * Formats a global retired config notice into human-readable guidance text.
+ *
+ * @param {{ file: string, edits: string[] }} notice
+ * @returns {string}
+ */
+export function formatGlobalRetiredNotice(notice) {
+  if (!notice) return '';
+  return `global config holds retired keys; edit ${notice.file} (${notice.edits.join('; ')})`;
+}
+
+/**
  * Inspects the global config file for retired runner.patterns keys without modifying it.
  *
  * @param {string} [globalDir]
- * @returns {{ file: string, edits: string[], command: string }|null}
+ * @returns {{ file: string, edits: string[], command: string, message: string }|null}
  */
 export function inspectGlobalRunnerConfig(globalDir = path.join(os.homedir(), '.fgos')) {
   if (!fs.existsSync(globalDir)) return null;
@@ -261,11 +272,13 @@ export function inspectGlobalRunnerConfig(globalDir = path.join(os.homedir(), '.
       if (retiredRefusals.some((r) => r.path.startsWith('runner.patterns.research-fan-out-gated'))) {
         edits.push('rename runner.patterns.research-fan-out-gated to runner.patterns.research-fan-out');
       }
-      return {
+      const notice = {
         file: path.join(globalDir, file),
         edits,
         command: 'fgos config patch <patch-file> --global --reason "convert retired keys to runner.loops"',
       };
+      notice.message = formatGlobalRetiredNotice(notice);
+      return notice;
     }
     return null;
   }

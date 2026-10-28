@@ -1065,6 +1065,13 @@ test('cloned and merged entries preserve only own properties and ignore inherite
 
   const ctorRes = checkCatalog({ shipped: { patterns: {} }, effective: JSON.parse('{"constructor":{"loop":"reviewed","promise":"custom","defaults":{"maxRounds":2}}}') });
   assert.strictEqual(ctorRes.entries.constructor !== Object, true);
+
+  const inheritedRetired = Object.assign(Object.create({ maxRounds: 2 }), {
+    loop: 'solo',
+    promise: 'Custom',
+  });
+  const resInherited = checkCatalog({ shipped: { patterns: {} }, effective: { custom: inheritedRetired } });
+  assert.deepEqual(resInherited.problems, []);
 });
 
 test('debate pattern with malformed seat ids and roleTasks refuses with param-invalid without escaping as TypeError', () => {

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { convertRunnerPatternsConfig, inspectGlobalRunnerConfig } from '../../src/setup/runner-config-conversion.mjs';
+import { convertRunnerPatternsConfig, inspectGlobalRunnerConfig, formatGlobalRetiredNotice } from '../../src/setup/runner-config-conversion.mjs';
 import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import {
   writeProjectConfig,
@@ -235,7 +235,8 @@ test('handles retired keys in both project and global scopes without crashing se
     assert.ok(notice.file.includes('.fgos'), 'notice must identify the global config file');
     assert.ok(notice.edits.length > 0, 'notice must describe the required edits');
     assert.ok(notice.command, 'notice must supply guidance command');
-
+    assert.match(notice.message, /global config holds retired keys/, 'notice must format guidance text');
+    assert.match(formatGlobalRetiredNotice(notice), /global config holds retired keys/, 'formatter must output guidance text');
     const result = convertRunnerPatternsConfig(projectDir);
     assert.equal(result.status, 'blocked', 'conversion is honestly reported as blocked by global retired keys refusing snapshot');
     assert.ok(result.blocker, 'must report blocker reason');
@@ -420,6 +421,7 @@ test('setup CLI prints global guidance when both project and global files hold r
     assert.equal(jsonResult.status, 0, jsonResult.stderr);
     const parsed = JSON.parse(jsonResult.stdout);
     assert.ok(parsed.data?.globalRetiredNotice, 'json data must include globalRetiredNotice');
+    assert.match(parsed.data.globalRetiredNotice.message, /global config holds retired keys/);
     assert.equal(parsed.data?.runnerPatternsConversion?.status, 'blocked');
   } finally {
     process.env.HOME = prevHome;
