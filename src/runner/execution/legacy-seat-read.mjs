@@ -155,7 +155,8 @@ export function collaborationOfRecord(record, { shipped } = {}) {
   const catalogName = selectorName === 'research-fan-out-gated' ? 'research-fan-out' : selectorName;
 
   const shippedPatterns = shipped?.patterns ?? shipped ?? {};
-  const shippedEntry = shippedPatterns[catalogName] ?? {};
+  const hist = Object.hasOwn(HISTORICAL_PATTERNS, catalogName) ? HISTORICAL_PATTERNS[catalogName] : null;
+  const shippedEntry = shippedPatterns[catalogName] ?? (hist ? { loop: hist.pattern, defaults: hist.params } : {});
   const loop = shippedEntry.loop ?? (['solo', 'reviewed', 'panel', 'debate'].includes(catalogName) ? catalogName : 'solo');
   const patternDefaults = { ...(shippedEntry.defaults ?? {}), ...(shippedEntry.params ?? {}) };
 

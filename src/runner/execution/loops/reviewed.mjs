@@ -167,7 +167,7 @@ export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}, sea
  * @param {Function} hooks.runRole - Function to dispatch a role out-of-process.
  * @param {Function} [hooks.verify] - Deterministic verify hook.
  * @param {Function|Array} [hooks.history] - Prior attempts/results.
- * @param {object} [params] - Pattern parameters (from preset or caller).
+ * @param {object} [params] - Pattern parameters (from pattern or caller).
  * @returns {Promise<{ outcome: string, rounds: number, results: Array<object>, findings: Array<string> }>}
  */
 export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaunchRoom } = {}, params = {}) {

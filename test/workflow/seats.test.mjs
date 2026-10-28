@@ -7,8 +7,14 @@ import path from 'node:path';
 
 import { loadWorkflow } from '../../src/workflow/loader.mjs';
 import { validateWorkflow } from '../../src/workflow/definition.mjs';
-import { expandWorkflowSeats, normalizeSeats, seatTask } from '../../src/workflow/seats.mjs';
+import { expandWorkflowSeats as rawExpandWorkflowSeats, normalizeSeats, seatTask } from '../../src/workflow/seats.mjs';
+import { loopOf } from '../../src/runner/execution/patterns/catalog.mjs';
+import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 
+const defaultLoopOf = (name) => loopOf(name, { effective: shippedCatalog() });
+function expandWorkflowSeats(b, raw, options = {}) {
+  return rawExpandWorkflowSeats(b, raw, { loopOf: defaultLoopOf, ...options });
+}
 const ROOT = path.resolve('.');
 const base = (id) => loadWorkflow(id, { packageRoot: ROOT });
 const LENSES = ['cash flow and payback', 'delivery capacity and lock-in', 'renewal leverage'];
@@ -20,7 +26,7 @@ function withoutSeatFields(definition) {
   for (const step of plain.steps) {
     for (const unit of step.units) {
       const { template } = unit;
-      if (template.pattern === 'panel') {
+      if (template.pattern === 'panel' || defaultLoopOf(template.pattern) === 'panel') {
         // The expansion re-seats the generic members: their seats and the tasks keyed by them are the seat fields.
         template.seats = (template.seats ?? []).filter((seat) => seat.role !== 'producer');
         for (const seat of Object.keys(template.params?.roleTasks ?? {})) if (/^member-\d+$/.test(seat)) delete template.params.roleTasks[seat];
@@ -201,4 +207,68 @@ test('bases with curated seats or no generic panel are refused with a reason', (
     ] }],
   });
   assert.throws(() => expandWorkflowSeats(mixed, LENSES, {}), /unit "curated"/);
+});
+
+test('a pattern whose loop is panel expands under seats and non-panel is refused', () => {
+  const customPanelWf = validateWorkflow({
+    id: 'custom-panel-wf',
+    steps: [{
+      id: 's',
+      units: [{ id: 'u', template: { capability: 'docs:write', pattern: 'custom-panel' } }],
+    }],
+  });
+  const customSoloWf = validateWorkflow({
+    id: 'custom-solo-wf',
+    steps: [{
+      id: 's',
+      units: [{ id: 'u', template: { capability: 'docs:write', pattern: 'custom-solo' } }],
+    }],
+  });
+
+  const customLoopOf = (name) => {
+    if (name === 'custom-panel') return 'panel';
+    if (name === 'custom-solo') return 'solo';
+    return defaultLoopOf(name);
+  };
+
+  // Custom pattern whose loop is panel expands under --seats
+  const { workflow } = rawExpandWorkflowSeats(customPanelWf, LENSES, { loopOf: customLoopOf });
+  assert.equal(workflow.steps[0].units[0].template.seats.filter((s) => s.role === 'producer').length, 3);
+
+  // Pattern whose loop is not panel is refused
+  assert.throws(
+    () => rawExpandWorkflowSeats(customSoloWf, LENSES, { loopOf: customLoopOf }),
+    /has no panel unit that accepts --seats/,
+  );
+
+  // Generic research-fan-out resolves to panel and expands
+  const fanOutWf = validateWorkflow({
+    id: 'fan-out-wf',
+    steps: [{
+      id: 's',
+      units: [{ id: 'u', template: { capability: 'docs:write', pattern: 'research-fan-out' } }],
+    }],
+  });
+  const { workflow: fanOutExpanded } = rawExpandWorkflowSeats(fanOutWf, LENSES, { loopOf: defaultLoopOf });
+  assert.equal(fanOutExpanded.steps[0].units[0].template.seats.filter((s) => s.role === 'producer').length, 3);
+
+  // Curated custom panel with member persona or tier is refused
+  const curatedCustomPanel = validateWorkflow({
+    id: 'curated-custom-panel',
+    steps: [{
+      id: 's',
+      units: [{
+        id: 'u',
+        template: {
+          capability: 'docs:write',
+          pattern: 'custom-panel',
+          seats: [{ seat: 'm1', role: 'producer', persona: 'analyst' }, { seat: 'chair', role: 'synthesizer' }],
+        },
+      }],
+    }],
+  });
+  assert.throws(
+    () => rawExpandWorkflowSeats(curatedCustomPanel, LENSES, { loopOf: customLoopOf }),
+    /fixes its own seats/,
+  );
 });

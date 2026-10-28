@@ -86,9 +86,10 @@ function digestOf(workflow) {
   return crypto.createHash('sha256').update(JSON.stringify(workflow)).digest('hex');
 }
 
-/** Panel units of a workflow as { step, unit }; a unit counts as a panel only when its pattern is the literal `panel`. */
-function panelUnits(workflow) {
-  return workflow.steps.flatMap((step) => step.units.filter((unit) => unit.template.pattern === 'panel').map((unit) => ({ step, unit })));
+/** Panel units of a workflow as { step, unit }. A unit counts as a panel only when loopOf returns 'panel'. */
+function panelUnits(workflow, { loopOf } = {}) {
+  const isPanel = typeof loopOf === 'function' ? (p) => loopOf(p) === 'panel' : () => false;
+  return workflow.steps.flatMap((step) => step.units.filter((unit) => isPanel(unit.template.pattern)).map((unit) => ({ step, unit })));
 }
 
 /** The seat id of the n-th generic member seat (1-based). */
@@ -130,7 +131,7 @@ function curatedReason(template) {
  *   the resolved definition of every `@name` entry, by name
  * @returns {{ workflow: object, provenance: { seats: string[], baseId: string, baseDigest: string, refs: string[], personas?: object[] } }}
  */
-export function expandWorkflowSeats(base, rawSeats, { contextRefs = [], personas = {} } = {}) {
+export function expandWorkflowSeats(base, rawSeats, { contextRefs = [], personas = {}, loopOf } = {}) {
   const seats = normalizeSeats(rawSeats);
   const pinned = [];
   seats.forEach((entry, index) => {
@@ -140,7 +141,7 @@ export function expandWorkflowSeats(base, rawSeats, { contextRefs = [], personas
     if (!found) throw new RunnerConfigError(`seat ${index + 1} names persona "${name}" but it was not resolved`);
     pinned.push({ seat: memberSeat(index + 1), name, tier: found.tier, source: found.source, identity: found.identity, digest: found.digest, text: found.text });
   });
-  const panels = panelUnits(base);
+  const panels = panelUnits(base, { loopOf });
   if (panels.length === 0) {
     throw new RunnerConfigError(`workflow "${base.id}" has no panel unit that accepts --seats; use group-cognition, business-discussion, nominal-group or delphi, or drop --seats`);
   }
@@ -153,10 +154,11 @@ export function expandWorkflowSeats(base, rawSeats, { contextRefs = [], personas
 
   const draft = structuredClone(base);
   const refs = [...contextRefs];
+  const isPanel = typeof loopOf === 'function' ? (p) => loopOf(p) === 'panel' : () => false;
   for (const step of draft.steps) {
     for (const unit of step.units) {
       const { template } = unit;
-      if (template.pattern === 'panel') {
+      if (isPanel(template.pattern)) {
         const roleTasks = { ...(template.params?.roleTasks ?? {}) };
         // A named persona carries its own posture, so its seat keeps the unit's objective as its task.
         seats.forEach((lens, index) => {
@@ -182,6 +184,6 @@ export function expandWorkflowSeats(base, rawSeats, { contextRefs = [], personas
 }
 
 /** The panel units an expansion touched, as the units a run would start (see `unitFieldsOfTemplate`). */
-export function seatedPanelUnits(workflow) {
-  return panelUnits(workflow).map(({ unit }) => ({ id: unit.id, objective: unit.template.objective ?? '', ...unitFieldsOfTemplate(unit.template) }));
+export function seatedPanelUnits(workflow, { loopOf } = {}) {
+  return panelUnits(workflow, { loopOf }).map(({ unit }) => ({ id: unit.id, objective: unit.template.objective ?? '', ...unitFieldsOfTemplate(unit.template) }));
 }

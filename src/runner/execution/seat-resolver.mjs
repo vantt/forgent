@@ -265,16 +265,16 @@ function declaredSeatsOf(unit, params) {
 
 const withDeclared = (declared, base) => Object.freeze({ ...base, ...(declared.persona ? { persona: declared.persona } : {}), ...(declared.tier ? { tier: declared.tier } : {}) });
 
-function requireRoles(patternName, declared, expected) {
+function requireRoles(loop, declared, expected) {
   const counts = new Map();
   for (const { role } of declared) counts.set(role, (counts.get(role) ?? 0) + 1);
   for (const [role, n] of Object.entries(expected)) {
     const have = counts.get(role) ?? 0;
     const ok = n === '+' ? have >= 1 : have === n;
-    if (!ok) throw new SeatResolutionError(`a ${patternName} unit needs ${n === '+' ? 'at least one' : n} seat(s) with role "${role}", has ${have}`, 'seat-multiplicity');
+    if (!ok) throw new SeatResolutionError(`a ${loop} unit needs ${n === '+' ? 'at least one' : n} seat(s) with role "${role}", has ${have}`, 'seat-multiplicity');
   }
   for (const role of counts.keys()) {
-    if (!(role in expected)) throw new SeatResolutionError(`a ${patternName} unit has no use for a seat with role "${role}"`, 'seat-multiplicity');
+    if (!(role in expected)) throw new SeatResolutionError(`a ${loop} unit has no use for a seat with role "${role}"`, 'seat-multiplicity');
   }
 }
 
@@ -290,7 +290,7 @@ function requireRoles(patternName, declared, expected) {
  * - debate: the declared seats; two producer sides, then one judge.
  *
  * @param {object} options
- * @param {string} [options.loop] loop name; when absent the loop comes from `options.pattern` (a pattern name or preset, as `unit.pattern`)
+ * @param {string} [options.loop] loop name; when absent the loop comes from `options.pattern` (a pattern name, as `unit.pattern`)
  * @param {object} [options.params] expanded loop params (declared seats, `minCheckers`)
  * @param {{ minCheckers?: Array<{ name: string, source: string }> }} [options.floors] checker floors with their source
  * @param {object} [options.unit]
@@ -299,9 +299,9 @@ function requireRoles(patternName, declared, expected) {
  */
 export function resolveSeats(options = {}) {
   let { loop, pattern, params, floors, unit, runnerConfig } = options;
-  let patternName = loop ?? (typeof pattern === 'string' ? pattern : (pattern?.pattern ?? pattern?.patternName)) ?? 'solo';
-  if (patternName === 'research-fan-out') {
-    patternName = 'panel';
+  let resolvedLoop = loop ?? (typeof pattern === 'string' ? pattern : pattern?.pattern) ?? 'solo';
+  if (resolvedLoop === 'research-fan-out') {
+    resolvedLoop = 'panel';
     params = params ?? { seats: [{ seat: 'member-1', role: 'producer' }, { seat: 'member-2', role: 'producer' }, { seat: 'member-3', role: 'producer' }, { seat: 'synthesizer', role: 'synthesizer' }] };
   }
   const rawParams = params ?? (typeof pattern === 'object' && pattern !== null ? pattern.params : undefined);
@@ -314,7 +314,7 @@ export function resolveSeats(options = {}) {
     return declared;
   }
   const readOnly = noWrites(unit);
-  switch (patternName) {
+  switch (resolvedLoop) {
     case 'solo': {
       if (declared) {
         if (declared.length !== 1 || declared[0].role !== 'producer') throw new SeatResolutionError('a solo unit declares exactly one seat, with role "producer"', 'seat-multiplicity');
@@ -391,7 +391,7 @@ export function resolveSeats(options = {}) {
       return [...declared.filter((d) => d.role === 'producer').map(seatOf), ...declared.filter((d) => d.role === 'judge').map(seatOf)];
     }
     default:
-      throw new SeatResolutionError(`Unknown collaboration pattern: "${patternName}"`, 'unknown-pattern');
+      throw new SeatResolutionError(`Unknown collaboration pattern: "${resolvedLoop}"`, 'unknown-pattern');
   }
 }
 
@@ -401,14 +401,14 @@ export function resolveSeats(options = {}) {
  */
 export function seatLaunchesOf(options = {}) {
   let { loop, pattern, params, floors, unit, runnerConfig } = options;
-  let patternName = loop ?? (typeof pattern === 'string' ? pattern : (pattern?.pattern ?? pattern?.patternName)) ?? 'solo';
-  if (patternName === 'research-fan-out') {
+  let resolvedLoop = loop ?? (typeof pattern === 'string' ? pattern : pattern?.pattern) ?? 'solo';
+  if (resolvedLoop === 'research-fan-out') {
     return 4;
   }
   params = params ?? (typeof pattern === 'object' && pattern !== null ? pattern.params : undefined);
-  if (!LOOP_NAMES.includes(patternName)) return null;
-  const seats = resolveSeats({ loop: patternName, params, floors, unit, runnerConfig, slot: options.slot });
-  switch (patternName) {
+  if (!LOOP_NAMES.includes(resolvedLoop)) return null;
+  const seats = resolveSeats({ loop: resolvedLoop, params, floors, unit, runnerConfig, slot: options.slot });
+  switch (resolvedLoop) {
     case 'reviewed': return seats.length * (params?.maxRounds ?? runnerConfig?.loops?.reviewed?.maxRounds ?? 2);
     case 'debate': return 2 * (params?.rebuttal === false ? 1 : 2) + 1;
     default: return seats.length;

@@ -35,7 +35,7 @@ export const VERIFY_CAPABILITY = Object.freeze(Object.assign(Object.create(null)
  * @returns {boolean}
  */
 export function loopRunsVerify(loop) {
-  const name = typeof loop === 'string' ? loop : (loop?.loop ?? loop?.pattern ?? loop?.patternName);
+  const name = typeof loop === 'string' ? loop : (loop?.loop ?? loop?.pattern);
   if (typeof name !== 'string') return false;
   return Boolean(VERIFY_CAPABILITY[name]);
 }
@@ -47,7 +47,7 @@ export function loopRunsVerify(loop) {
  * @returns {object|null}
  */
 export function paramTableOf(loop) {
-  const name = typeof loop === 'string' ? loop : loop?.loop ?? loop?.pattern ?? loop?.patternName;
+  const name = typeof loop === 'string' ? loop : loop?.loop ?? loop?.pattern;
   if (typeof name !== 'string') return null;
   return PARAM_TABLES[name] ?? null;
 }
@@ -71,7 +71,7 @@ export const VALID_OUTCOMES = Object.freeze([
  * @returns {Promise<{ outcome: string, rounds?: number, results: Array<object>, findings?: Array<string> }>}
  */
 export async function runLoop(effective, unit, cfg, hooks = {}) {
-  const loop = typeof effective === 'string' ? effective : (effective?.loop ?? effective?.pattern ?? effective?.patternName);
+  const loop = typeof effective === 'string' ? effective : (effective?.loop ?? effective?.pattern);
   const rawParams = typeof effective === 'object' && effective !== null ? (effective.params ?? {}) : {};
   const params = {
     ...rawParams,

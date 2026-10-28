@@ -2290,7 +2290,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           throw new StoreError('validation', 'workflow start requires exactly one of <workflowId> or --units <file>');
         }
         if (unitsPath !== undefined && flags.seats !== undefined) {
-          throw new StoreError('validation', '--seats rebuilds a registered panel preset; it cannot be used with --units (give each unit its own persona or prefer instead)');
+          throw new StoreError('validation', '--seats rebuilds a registered panel pattern; it cannot be used with --units (give each unit its own persona or prefer instead)');
         }
         const startParams = {
           workflowId,

@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { parseYaml } from '../util/yaml.mjs';
 import { validateUnit } from '../runner/execution/unit.mjs';
-
+import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 // capability-plan-lint.mjs — static/read-only harness (docs/history/
 // agent-coordination-foundation/plan.md): checks a plan's own text against
 // the shared planning-capability-awareness doctrine without touching Work
@@ -55,16 +55,22 @@ const DISALLOWED_G2_FIELDS = Object.freeze([
   'overrides',
 ]);
 
-const KNOWN_PATTERNS = Object.freeze(new Set([
-  'solo',
-  'reviewed',
-  'panel',
-  'debate',
-  'code-change',
-  'consult',
-  'research-fan-out',
-  'rfc',
-]));
+function effectivePatternNames(config) {
+  let shipped = {};
+  try {
+    shipped = shippedCatalog()?.patterns ?? {};
+  } catch {
+    shipped = {};
+  }
+  const configPatterns = config?.runner?.patterns ?? config?.patterns ?? {};
+  const names = new Set([
+    ...Object.keys(shipped),
+    ...Object.keys(configPatterns),
+  ]);
+  names.delete('seatBinding');
+  names.delete('defaultRule');
+  return names;
+}
 
 export function resolvePhaseFile(dirPath, phase) {
   if (!fs.existsSync(dirPath) || !fs.statSync(dirPath).isDirectory()) {
@@ -473,6 +479,7 @@ export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
 
   // Capability catalog check
   const catalog = config?.runner?.capabilities ?? config?.capabilities ?? (config && typeof config === 'object' && !('runner' in config) && !('capabilities' in config) ? config : null);
+  const knownPatterns = effectivePatternNames(config);
   for (const u of units) {
     const cap = u.capability;
     if (cap) {
@@ -497,7 +504,7 @@ export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
       }
     }
 
-    if (u.pattern && !KNOWN_PATTERNS.has(u.pattern)) {
+    if (u.pattern && knownPatterns.size > 0 && !knownPatterns.has(u.pattern)) {
       pushFinding({
         line: u.line,
         unit: u.id,

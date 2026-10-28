@@ -182,7 +182,8 @@ export function unitOverridesOf(unit, seatPersonas = [], options = {}) {
   const unitTimeoutMs = unit.timeoutMs ?? unit.template?.timeoutMs;
   const applyTimeout = unitTimeoutMs === undefined && timeoutMs !== null;
 
-  const seatScoped = unit.template?.pattern === 'panel'
+  const isPanel = typeof options?.loopOf === 'function' ? options.loopOf(unit.template?.pattern) === 'panel' : false;
+  const seatScoped = isPanel
     ? seatPersonas.map(({ seat, name, digest, text, identity }) => ({
       scope: { unit: unit.id, seat },
       persona: name,
@@ -242,7 +243,7 @@ function writeBaseOf(workflow, stepId) {
 
 /**
  * Refuse a units file where a writing unit builds on more than one writing unit, before any run
- * exists. A preset or plan with that shape keeps starting such a unit from HEAD, as before.
+ * exists. A pattern or plan with that shape keeps starting such a unit from HEAD, as before.
  */
 export function assertWriteChains(workflow) {
   for (const step of workflow.steps) {

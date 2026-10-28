@@ -1523,3 +1523,92 @@ test('Event Store keeps consumer boundaries and one native export importer', () 
   }
   assert.deepEqual(violations, []);
 });
+
+test('pattern vocabulary rename is complete with no live retired aliases or deleted modules', () => {
+  const forbidden = [
+    '\\bPRESETS\\b',
+    '\\bresolvePattern\\b',
+    '\\brunPattern\\b',
+    '\\bchosenPattern\\b',
+    '\\bKNOWN_PATTERNS\\b',
+    '\\bALLOWED_PATTERNS_KEYS\\b',
+  ];
+  const forbiddenPattern = new RegExp(forbidden.join('|'));
+  const dirs = ['src', 'bin', 'scripts'];
+  const violations = [];
+
+  function scan(dir) {
+    const abs = path.join(root, dir);
+    if (!fs.existsSync(abs)) return;
+    for (const ent of fs.readdirSync(abs, { withFileTypes: true })) {
+      const rel = path.join(dir, ent.name);
+      if (ent.isDirectory()) {
+        scan(rel);
+      } else if (ent.isFile() && /\.(?:mjs|js|cjs)$/.test(ent.name)) {
+        const content = fs.readFileSync(path.join(root, rel), 'utf8');
+        const match = forbiddenPattern.exec(content);
+        if (match) {
+          violations.push(`${rel} contains forbidden symbol "${match[0]}"`);
+        }
+      }
+    }
+  }
+
+  for (const d of dirs) scan(d);
+  assert.deepEqual(violations, []);
+
+  assert.ok(!fs.existsSync(path.join(root, 'src/runner/execution/patterns/presets.mjs')), 'presets.mjs must not exist');
+});
+
+test('retired pattern literals appear only in permitted refusal, setup, and decoder paths', () => {
+  const allowed = new Set([
+    'src/runner/dispatch/config.mjs',
+    'src/runner/dispatch/retired-config-keys.mjs',
+    'src/runner/execution/legacy-seat-read.mjs',
+    'src/runner/execution/patterns/catalog-entries.mjs',
+    'src/setup/runner-config-conversion.mjs',
+  ]);
+
+  const targetPattern = /\b(?:research-fan-out-gated|unknown-checker-seat)\b/;
+  const dirs = ['src', 'bin', 'scripts'];
+  const violations = [];
+
+  function scan(dir) {
+    const abs = path.join(root, dir);
+    if (!fs.existsSync(abs)) return;
+    for (const ent of fs.readdirSync(abs, { withFileTypes: true })) {
+      const rel = path.join(dir, ent.name);
+      if (ent.isDirectory()) {
+        scan(rel);
+      } else if (ent.isFile() && /\.(?:mjs|js|cjs)$/.test(ent.name)) {
+        if (allowed.has(rel)) continue;
+        const content = fs.readFileSync(path.join(root, rel), 'utf8');
+        const match = targetPattern.exec(content);
+        if (match) {
+          violations.push(`${rel} contains retired literal "${match[0]}"`);
+        }
+      }
+    }
+  }
+
+  for (const d of dirs) scan(d);
+  assert.deepEqual(violations, []);
+});
+
+test('loops and patterns architecture manifest paths exist and all files on disk are declared', () => {
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, 'docs/architecture-manifest.json'), 'utf8'));
+  const declared = Object.keys(manifest.files).filter((f) => f.startsWith('src/runner/execution/loops/') || f.startsWith('src/runner/execution/patterns/'));
+
+  for (const p of declared) {
+    assert.ok(fs.existsSync(path.join(root, p)), `declared file "${p}" must exist on disk`);
+  }
+
+  for (const d of ['src/runner/execution/loops', 'src/runner/execution/patterns']) {
+    for (const ent of fs.readdirSync(path.join(root, d), { withFileTypes: true })) {
+      if (ent.isFile() && ent.name.endsWith('.mjs')) {
+        const rel = `${d}/${ent.name}`;
+        assert.ok(manifest.files[rel] !== undefined, `file "${rel}" on disk must be declared in architecture-manifest.json`);
+      }
+    }
+  }
+});

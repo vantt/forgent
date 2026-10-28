@@ -12,6 +12,8 @@ import { createWorkflowRun, appendWorkflowEvent, readWorkflowEvents, projectWork
 import { translateUnitsToWorkflow } from './units-source.mjs';
 import { snapshotRunnerConfig, resolveGitRoots, assertRepositoryForWrites, detectHerdrPresent } from '../runner/execution/run.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
+import { loopOf, resolveCollaboration } from '../runner/execution/patterns/catalog.mjs';
+import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { expandWorkflowSeats, normalizeSeats, personaNameOf, seatedPanelUnits } from './seats.mjs';
 import { digestContextRefs, digestText } from './ref-digests.mjs';
 import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
@@ -156,7 +158,7 @@ function resolveStart(params) {
     throw new RunnerConfigError('startWorkflow requires workflowId, workflow, or unitsPath');
   }
   if (params.unitsPath) {
-    if (params.seats !== undefined) throw new RunnerConfigError('--seats rebuilds a registered panel preset; it cannot be used with a units file');
+    if (params.seats !== undefined) throw new RunnerConfigError('--seats rebuilds a registered panel pattern; it cannot be used with a units file');
     assertWriteChains(workflow);
   }
   // Only a read-only workflow runs outside a repository: a unit that declares writes still needs one.
@@ -181,6 +183,9 @@ function resolveStart(params) {
   }
 
   const contextRefs = normalizeContextRefs(params.contextRefs);
+  const runnerConfig = loadRunnerConfigForDir(mainRoot);
+  const loopFn = (name) => loopOf(name, { effective: runnerConfig });
+  assertWorkflowAcceptOutcomes(workflow, runnerConfig);
   let seats;
   if (params.seats !== undefined) {
     // Names are resolved (and a missing or duplicated one refused) here, before any run exists; the
@@ -192,7 +197,7 @@ function resolveStart(params) {
       const name = personaNameOf(entry);
       if (name !== null) personas[name] = resolveAgentDefinition(name, { projectRoot: worktreePath, workflow: personaScope });
     }
-    ({ workflow, provenance: seats } = expandWorkflowSeats(workflow, params.seats, { contextRefs, personas }));
+    ({ workflow, provenance: seats } = expandWorkflowSeats(workflow, params.seats, { contextRefs, personas, loopOf: loopFn }));
     seats = { ...seats, refDigests: digestContextRefs(contextRefs, worktreePath) };
   }
   const allRefs = [...contextRefs, ...workflow.steps.flatMap((step) => step.units.flatMap((unit) => unit.template.contextRefs || []))];
@@ -216,11 +221,18 @@ export async function preflightWorkflowSeats(params = {}) {
   if (params.seats === undefined) return { warnings: [] };
   const { mainRoot, workflow } = resolveStart(params);
   const runnerConfig = loadRunnerConfigForDir(mainRoot);
+  const loopFn = (name) => loopOf(name, { effective: runnerConfig });
   const session = { headless: true, herdrPresent: detectHerdrPresent() };
   const warnings = [];
   const refused = [];
-  for (const unit of seatedPanelUnits(workflow)) {
-    const { seats } = await simulateUnitBindings(unit, runnerConfig, { session });
+  for (const unit of seatedPanelUnits(workflow, { loopOf: loopFn })) {
+    const collaboration = resolveCollaboration({
+      unit,
+      selectors: { callerString: unit.pattern },
+      runnerConfig,
+      shipped: shippedCatalog(),
+    });
+    const { seats } = await simulateUnitBindings(unit, runnerConfig, { session, collaboration });
     for (const seat of seats) {
       if (seat.refused) refused.push(`${unit.id}/${seat.seat}: ${seat.refused.reason}: ${seat.refused.detail}`);
       else if (seat.sharesFamilyWith?.length) warnings.push(`${unit.id}/${seat.seat}=${seat.executor} shares a provider family with ${seat.sharesFamilyWith.join(', ')}`);
@@ -230,6 +242,23 @@ export async function preflightWorkflowSeats(params = {}) {
     throw new RunnerConfigError(`--seats cannot be served by the current pools, no run was created: ${refused.join('; ')}`);
   }
   return { warnings };
+}
+
+export function assertWorkflowAcceptOutcomes(workflow, runnerConfig) {
+  const loopFn = (name) => loopOf(name, { effective: runnerConfig });
+  for (const step of workflow.steps ?? []) {
+    for (const u of step.units ?? []) {
+      if (u.template?.acceptOutcomes !== undefined) {
+        const pattern = u.template.pattern;
+        const loop = loopFn(pattern) ?? (['solo', 'reviewed', 'panel', 'debate'].includes(pattern) ? pattern : 'solo');
+        if (loop !== 'reviewed') {
+          throw new RunnerConfigError(
+            `workflow "${workflow.id}" step "${step.id}" unit "${u.id}".acceptOutcomes requires a reviewed template and unique pass/findings outcomes`,
+          );
+        }
+      }
+    }
+  }
 }
 
 /**

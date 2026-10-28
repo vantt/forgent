@@ -340,8 +340,7 @@ export function validateWorkflow(raw, { source } = {}) {
         const acceptOutcomes = template.acceptOutcomes === undefined ? ['pass'] : template.acceptOutcomes;
         if (!Array.isArray(acceptOutcomes) || !acceptOutcomes.length ||
           acceptOutcomes.some((outcome) => !['pass', 'findings'].includes(outcome)) ||
-          new Set(acceptOutcomes).size !== acceptOutcomes.length ||
-          (template.acceptOutcomes !== undefined && template.pattern !== 'reviewed')) {
+          new Set(acceptOutcomes).size !== acceptOutcomes.length) {
           throw new WorkflowDefinitionError(`${unitLabel}.acceptOutcomes requires a reviewed template and unique pass/findings outcomes`);
         }
 
@@ -380,7 +379,9 @@ export function validateWorkflow(raw, { source } = {}) {
               params: template.params === undefined ? undefined : structuredClone(template.params),
               ...(template.seats !== undefined ? { seats: Object.freeze(template.seats.map((entry) => Object.freeze({ ...entry }))) } : {}),
               contextRefs,
-              ...(template.pattern === 'reviewed' ? { acceptOutcomes: Object.freeze([...acceptOutcomes]) } : {}),
+              ...(template.acceptOutcomes !== undefined
+                ? { acceptOutcomes: Object.freeze([...acceptOutcomes]) }
+                : (template.pattern === 'reviewed' ? { acceptOutcomes: Object.freeze(['pass']) } : {})),
               ...(stanceOptions === undefined ? {} : { stanceOptions: Object.freeze(stanceOptions) }),
               anonymizeInputs: template.anonymizeInputs === true ? true : undefined,
               blind: template.blind === true ? true : undefined,

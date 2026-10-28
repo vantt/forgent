@@ -658,6 +658,32 @@ test('lintPhaseUnits warns on unknown pattern', () => {
   assert.equal(unknownPattern[0].severity, 'warn');
 });
 
+test('lintPhaseUnits accepts a pattern defined in the project catalog and flags a typo', () => {
+  const text = `## Units
+- unit: u-valid
+  capability: docs:write
+  objective: "Run custom pattern"
+  pattern: custom-analysis
+- unit: u-typo
+  capability: docs:write
+  objective: "Typo in pattern"
+  pattern: reviwed
+`;
+  const config = {
+    runner: {
+      capabilities: { 'docs:write': { description: 'Write documentation' } },
+      patterns: {
+        'custom-analysis': { loop: 'solo' },
+      },
+    },
+  };
+  const result = lintPhaseUnits(text, { config });
+  const unknown = result.findings.filter((f) => f.code === 'pattern.unknown');
+  assert.equal(unknown.length, 1);
+  assert.equal(unknown[0].unit, 'u-typo');
+  assert.match(unknown[0].message, /reviwed/);
+});
+
 test('lintPhaseUnits flags missing objective as hard error', () => {
   const text = `## Units
 - unit: u1

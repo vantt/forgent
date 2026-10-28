@@ -6,7 +6,7 @@ import { readUnitRunSeats } from './unit-run-history.mjs';
 import { normalizeWorkflowLink } from './unit.mjs';
 import { patternHistoryOutcome } from './loops/history-outcome.mjs';
 import { VALID_OUTCOMES } from './loops/panel.mjs';
-import { seatsOfRecord } from './legacy-seat-read.mjs';
+import { seatsOfRecord, collaborationOfRecord } from './legacy-seat-read.mjs';
 import { seatKind, VERIFY_SEAT } from './seat-resolver.mjs';
 
 // Version 2: every seat carries an owner-written kind, and a finished unit whose pattern was never
@@ -18,25 +18,7 @@ export const UNIT_SUMMARY_CONTRACT = Object.freeze({ id: 'unit-summary', version
 /** A finished unit whose outcome cannot be derived from its records; never a pass or a failure. */
 export const UNDETERMINED_OUTCOME = 'undetermined';
 
-const LEGACY_PATTERNS = Object.freeze({
-  consult: { loop: 'solo', params: { role: 'advisor' } },
-  'code-change': { loop: 'reviewed', params: { minCheckers: ['reviewer', 'red-team'] } },
-  'research-fan-out': { loop: 'panel', params: { members: 3, role: 'researcher', synthesizeRole: 'synthesizer' } },
-  'research-fan-out-gated': { loop: 'panel', params: { members: 3, role: 'researcher', synthesizeRole: 'synthesizer', gated: true } },
-  rfc: { loop: 'reviewed', params: { maxRounds: 1, minCheckers: ['reviewer', 'red-team'] } },
-});
 
-function decodeLegacyPattern(pattern) {
-  if (!pattern) return { patternName: null, params: {} };
-  const raw = typeof pattern === 'string' ? pattern : pattern.pattern ?? pattern.patternName;
-  if (!raw) return { patternName: null, params: {} };
-  const legacy = Object.hasOwn(LEGACY_PATTERNS, raw) ? LEGACY_PATTERNS[raw] : null;
-  const callerParams = typeof pattern === 'object' && pattern !== null ? (pattern.params ?? {}) : {};
-  if (legacy) {
-    return { patternName: legacy.loop, params: { ...legacy.params, ...callerParams } };
-  }
-  return { patternName: raw, params: { ...callerParams } };
-}
 
 export function extractStance(agentClaim, options = []) {
   if (agentClaim?.stance === undefined) return { status: 'missing' };
@@ -89,18 +71,18 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   // --pattern was never kept), so the pattern stays unknown rather than defaulting to solo.
   const pin = record.collaboration;
   const pattern = record.pattern ?? record.unit?.pattern ?? null;
-  const decodedLegacy = pin ? null : decodeLegacyPattern(pattern);
-  const patternName = pin?.effective?.loop ?? decodedLegacy?.patternName ?? null;
-  const params = pin?.effective?.params ?? decodedLegacy?.params ?? {};
+  const decoded = (pin || pattern === null) ? null : collaborationOfRecord(record);
+  const loop = pin?.effective?.loop ?? decoded?.effective?.loop ?? null;
+  const params = pin?.effective?.params ?? decoded?.effective?.params ?? {};
   const cfg = record.configSnapshot?.runner ?? {};
   const recordSeats = seatsOfRecord(record);
   const seatInfo = new Map(recordSeats.map((entry) => [entry.seat, entry]));
   const kindOf = (seatId) => {
     const known = seatInfo.get(seatId);
     if (known) return seatKind(known);
-    if (patternName === null) return 'unknown';
+    if (loop === null) return 'unknown';
     if (seatId === VERIFY_SEAT || seatId === 'verifier') return 'verifier';
-    return patternName === 'reviewed' ? 'checker' : 'unknown';
+    return loop === 'reviewed' ? 'checker' : 'unknown';
   };
   const options = record.unit?.stanceOptions ?? [];
   const rawSeats = readUnitRunSeats(unitDir);
@@ -149,9 +131,9 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   const validCompletion = (completion) => VALID_OUTCOMES.includes(completion?.outcome) && timestamp(completion?.settledAt);
   const settlement = validCompletion(record.settlement) ? record.settlement : null;
   const legacy = validCompletion(legacyCompletion) ? legacyCompletion : null;
-  const derivedOutcome = patternName === null ? UNDETERMINED_OUTCOME
+  const derivedOutcome = loop === null ? UNDETERMINED_OUTCOME
     : patternHistoryOutcome({
-      patternName, params, unit: record.unit, cfg, seats: recordSeats,
+      loop, params, unit: record.unit, cfg, seats: recordSeats,
       history: rawSeats.filter((seat) => seat.final).map((seat) => ({
         seat: seat.seat, round: seat.round, outcome: seat.final.outcome,
       })),
@@ -161,7 +143,7 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
     contract: UNIT_SUMMARY_CONTRACT,
     unitRunId,
     workflow: workflowLink(record.workflow) ?? workflowLink(legacyCompletion?.workflow),
-    pattern: pattern === null || typeof pattern === 'string' ? pattern : pattern.pattern ?? pattern.patternName ?? null,
+    pattern: pattern === null || typeof pattern === 'string' ? pattern : pattern.pattern ?? null,
     capability: record.unit?.capability ?? null,
     outcome,
     startedAt: timestamp(record.createdAt),

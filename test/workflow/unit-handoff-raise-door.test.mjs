@@ -63,7 +63,7 @@ test('the overrides a workflow start implies carry no origin that claims a perso
 });
 
 test('a persona chosen for a seat at the door that lifts the seat above its tier is refused by name; the other seats bind', async () => {
-  const overrides = unitOverridesOf({ ...unit, template: { pattern: 'panel' } }, seatPersonas, {});
+  const overrides = unitOverridesOf({ ...unit, template: { pattern: 'panel' } }, seatPersonas, { loopOf: (p) => p === 'panel' ? 'panel' : 'solo' });
   const refused = await simulateUnitBindings(unit, runnerConfig('frontier'), { overrides, session: { headless: true } });
   const member = refused.seats.find((seat) => seat.seat === 'member-1');
   assert.equal(member.refused.reason, 'tier-escalation-unauthorized');
@@ -72,7 +72,7 @@ test('a persona chosen for a seat at the door that lifts the seat above its tier
 });
 
 test('the same persona at or below the tier the seat resolves to is not a raise, and an authorized door may make the choice', async () => {
-  const overrides = unitOverridesOf({ ...unit, template: { pattern: 'panel' } }, seatPersonas, {});
+  const overrides = unitOverridesOf({ ...unit, template: { pattern: 'panel' } }, seatPersonas, { loopOf: (p) => p === 'panel' ? 'panel' : 'solo' });
   const same = await simulateUnitBindings(unit, runnerConfig('standard'), { overrides, session: { headless: true } });
   assert.equal(same.seats.every((seat) => !seat.refused), true, JSON.stringify(same.seats.filter((seat) => seat.refused)));
   const authorized = await simulateUnitBindings(unit, runnerConfig('frontier'), { overrides, session: { headless: true }, raiseAuthorized: true });
@@ -80,7 +80,7 @@ test('the same persona at or below the tier the seat resolves to is not a raise,
 });
 
 test('--effort, --timeout and --account reach every seat as overrides that raise no tier', async () => {
-  const overrides = unitOverridesOf({ ...unit, template: { pattern: 'panel' } }, [], { effort: 'high', timeoutMs: 60_000 });
+  const overrides = unitOverridesOf({ ...unit, template: { pattern: 'panel' } }, [], { effort: 'high', timeoutMs: 60_000, loopOf: (p) => p === 'panel' ? 'panel' : 'solo' });
   const result = await simulateUnitBindings(unit, runnerConfig('frontier'), { overrides, session: { headless: true } });
   assert.equal(result.seats.every((seat) => !seat.refused), true, JSON.stringify(result.seats.filter((seat) => seat.refused)));
 });

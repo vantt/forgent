@@ -5,7 +5,7 @@
 // The pattern owns what its roles mean, so the pattern wraps the objective for the role; the runner
 // only honours the unit it is handed and knows no role names.
 //
-// OVERRIDE. `params.roleTasks[seat]` (or `[kind]`) replaces the default text, so a preset or a
+// OVERRIDE. `params.roleTasks[seat]` (or `[kind]`) replaces the default text, so a pattern or a
 // Workflow can supply its own. `{objective}` in a task stands for the unit's original objective.
 
 export const DEFAULT_ROLE_TASKS = Object.freeze({

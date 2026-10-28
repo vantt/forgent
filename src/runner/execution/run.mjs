@@ -235,8 +235,8 @@ function assertCollaborationPinUsable(unitRunId, collaboration, configSnapshot, 
       { code: 'collaboration-pin-unusable' },
     );
   }
-  const patternName = collaboration.pattern?.name;
-  if (!patternName || typeof patternName !== 'string') {
+  const pattern = collaboration.pattern?.name;
+  if (!pattern || typeof pattern !== 'string') {
     throw new RunnerConfigError(
       `cannot resume unit run "${unitRunId}": collaboration pin has invalid pattern name`,
       { code: 'collaboration-pin-unusable' },
@@ -265,9 +265,9 @@ function assertCollaborationPinUsable(unitRunId, collaboration, configSnapshot, 
   const shipped = shippedCatalog()?.patterns ?? {};
   const inSnapshot = configSnapshot?.runner?.patterns ?? {};
   const inLive = liveCfg?.patterns ?? liveCfg?.runner?.patterns ?? {};
-  if (!Object.hasOwn(shipped, patternName) && !Object.hasOwn(inSnapshot, patternName) && !Object.hasOwn(inLive, patternName)) {
+  if (!Object.hasOwn(shipped, pattern) && !Object.hasOwn(inSnapshot, pattern) && !Object.hasOwn(inLive, pattern)) {
     throw new RunnerConfigError(
-      `cannot resume unit run "${unitRunId}": collaboration pin names unregistered pattern "${patternName}"`,
+      `cannot resume unit run "${unitRunId}": collaboration pin names unregistered pattern "${pattern}"`,
       { code: 'collaboration-pin-unusable' },
     );
   }
@@ -487,7 +487,7 @@ async function assertDoorChoicesBeforeRun(unit, runnerConfig, options, collabora
  * @param {object} options
  * @param {string} [options.unitPath] Path to unit YAML/JSON file or '-' for stdin
  * @param {object} [options.unitData] Raw unit object (in-memory)
- * @param {string} [options.pattern] Pattern name or preset
+ * @param {string} [options.pattern] Pattern name
  * @param {Array} [options.overrides] Array of overrides [{scope, origin, executor, invocation, tier, persona, reasoningEffort, account, timeoutMs}]
  * @param {boolean} [options.raiseAuthorized] Whether the calling door may raise a tier or accept a dependence.
  *   No door is authorized yet: every caller passes false (the default)
@@ -755,9 +755,7 @@ async function runUnitBody(options, scope) {
     assertRepositoryForWrites(roots, cwd, { writes: unit.writes.length > 0 || Boolean(unit.syncBase) });
 
     const callerObject = typeof options.pattern === 'object' && options.pattern !== null
-      ? (options.pattern.patternName && !options.pattern.pattern
-        ? { ...options.pattern, pattern: options.pattern.patternName }
-        : options.pattern)
+      ? options.pattern
       : null;
     const callerString = typeof options.pattern === 'string' && options.pattern ? options.pattern : null;
 
@@ -798,7 +796,7 @@ async function runUnitBody(options, scope) {
     }
 
     // Checked before the unit directory exists: an operation the step does not allow leaves nothing
-    // behind. The pattern checked is the one the run will use (see patternName below).
+    // behind. The loop checked is the one the run will use (effective.loop).
     if (options.declared !== undefined) {
       declaredOp = declaredOperationOf(options.declared, unit, effective.loop, { taskSpecRoot: mainRoot });
     }

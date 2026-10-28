@@ -83,36 +83,36 @@ export function extractLayerName(val) {
   return null;
 }
 
-export function resolveLayer(layers, patternName, fieldPath) {
+export function resolveLayer(layers, name, fieldPath) {
   if (!layers) return null;
   if (typeof layers === 'string') return layers;
   if (Array.isArray(layers)) {
     if (fieldPath) {
-      const fullPath = `runner.patterns.${patternName}.${fieldPath}`;
+      const fullPath = `runner.patterns.${name}.${fieldPath}`;
       const foundField = layers.find((o) => o?.path === fullPath || o?.path?.startsWith(`${fullPath}.`));
       if (foundField) return extractLayerName(foundField);
-      const shortPath = `${patternName}.${fieldPath}`;
+      const shortPath = `${name}.${fieldPath}`;
       const foundShort = layers.find((o) => o?.path === shortPath || o?.path?.startsWith(`${shortPath}.`));
       if (foundShort) return extractLayerName(foundShort);
     }
-    const patternPath = `runner.patterns.${patternName}`;
+    const patternPath = `runner.patterns.${name}`;
     const foundPattern = layers.find((o) => o?.path === patternPath || o?.path?.startsWith(`${patternPath}.`));
     if (foundPattern) return extractLayerName(foundPattern);
-    const foundShortPattern = layers.find((o) => o?.path === patternName || o?.path?.startsWith(`${patternName}.`));
+    const foundShortPattern = layers.find((o) => o?.path === name || o?.path?.startsWith(`${name}.`));
     if (foundShortPattern) return extractLayerName(foundShortPattern);
     return null;
   }
   if (typeof layers !== 'object') return null;
 
   if (fieldPath) {
-    const fullPath = `runner.patterns.${patternName}.${fieldPath}`;
+    const fullPath = `runner.patterns.${name}.${fieldPath}`;
     if (Object.hasOwn(layers, fullPath) && layers[fullPath]) return extractLayerName(layers[fullPath]);
-    const shortPath = `${patternName}.${fieldPath}`;
+    const shortPath = `${name}.${fieldPath}`;
     if (Object.hasOwn(layers, shortPath) && layers[shortPath]) return extractLayerName(layers[shortPath]);
   }
-  const patternPath = `runner.patterns.${patternName}`;
+  const patternPath = `runner.patterns.${name}`;
   if (Object.hasOwn(layers, patternPath) && layers[patternPath]) return extractLayerName(layers[patternPath]);
-  if (Object.hasOwn(layers, patternName) && layers[patternName]) return extractLayerName(layers[patternName]);
+  if (Object.hasOwn(layers, name) && layers[name]) return extractLayerName(layers[name]);
 
   return null;
 }
@@ -251,8 +251,8 @@ function checkLoopSeatCardinality(loop, declaredSeats, label) {
   }
 }
 
-function checkParamDomain(patternName, loop, param, val, section, src, problems, entry) {
-  const at = `pattern "${patternName}" ${section}.${param}`;
+function checkParamDomain(name, loop, param, val, section, src, problems, entry) {
+  const at = `pattern "${name}" ${section}.${param}`;
   const suffix = src ? ` (source layer: ${src})` : '';
   switch (param) {
     case 'maxRounds': {

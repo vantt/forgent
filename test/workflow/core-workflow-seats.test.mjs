@@ -102,13 +102,14 @@ test('every core workflow loads and dry-binds each of its units through the reso
 
 test('--seats re-seats only generic member seats and leaves curated lenses alone', () => {
   const generic = workflows.find((w) => w.id === 'group-cognition');
-  const { workflow, provenance } = expandWorkflowSeats(generic, ['first lens', 'second lens', 'third lens', 'fourth lens']);
+  const loopFn = (name) => loopOf(name, { effective: shippedCatalog() });
+  const { workflow, provenance } = expandWorkflowSeats(generic, ['first lens', 'second lens', 'third lens', 'fourth lens'], { loopOf: loopFn });
   const panel = unitsOf(workflow).find(({ u }) => u.template.pattern === 'panel').u;
   assert.deepEqual(panel.template.seats.map((s) => s.seat), ['member-1', 'member-2', 'member-3', 'member-4', 'synthesis']);
   assert.match(panel.template.params.roleTasks['member-4'], /fourth lens/);
   assert.equal(provenance.seats.length, 4);
   const curated = workflows.find((w) => w.id === 'architecture-advisory');
-  assert.throws(() => expandWorkflowSeats(curated, ['a lens', 'b lens']), /fixes its own seats/);
+  assert.throws(() => expandWorkflowSeats(curated, ['a lens', 'b lens'], { loopOf: loopFn }), /fixes its own seats/);
 });
 
 test('a units file may declare seats but never a seat tier', () => {

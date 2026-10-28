@@ -1610,10 +1610,54 @@ test('workflow context refs and reviewed outcome contracts refuse unsafe inputs'
     assert.deepEqual(validateWorkflow(normalized), normalized, 'a loader-normalized workflow remains valid when started');
   }
   assert.deepEqual(validateWorkflow(make({ pattern: 'reviewed', acceptOutcomes: ['pass', 'findings'] })).steps[0].units[0].template.acceptOutcomes, ['pass', 'findings']);
+  assert.deepEqual(validateWorkflow(make({ pattern: 'solo', acceptOutcomes: ['pass'] })).steps[0].units[0].template.acceptOutcomes, ['pass']);
   for (const acceptOutcomes of [[], ['execution-failure'], ['pass', 'pass'], 'pass', null]) {
     assert.throws(() => validateWorkflow(make({ pattern: 'reviewed', acceptOutcomes })), /acceptOutcomes/);
   }
-  assert.throws(() => validateWorkflow(make({ pattern: 'solo', acceptOutcomes: ['pass'] })), /reviewed/);
+});
+
+test('workflow start enforces acceptOutcomes requires reviewed loop at execution boundary without seats or account', async (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  const cfg = readProjectConfig(tmp);
+  cfg.runner.patterns = {
+    ...(cfg.runner.patterns ?? {}),
+    'custom-reviewed': { loop: 'reviewed' },
+    'custom-solo': { loop: 'solo' },
+  };
+  writeProjectConfig(tmp, cfg);
+
+  const makeWf = (pattern, acceptOutcomes) => ({
+    id: `wf-${pattern}`,
+    steps: [{
+      id: 'root',
+      gate: { kind: 'human', mode: 'input', question: 'Start?' },
+      units: [{
+        id: 'u1',
+        template: {
+          capability: 'docs:write',
+          pattern,
+          ...(acceptOutcomes !== undefined ? { acceptOutcomes } : {}),
+        },
+      }],
+    }],
+  });
+
+  // Non-reviewed (shipped solo) with acceptOutcomes is refused at start
+  await assert.rejects(
+    () => startWorkflow({ workflow: makeWf('solo', ['pass']), repoRoot: tmp, cwd: tmp }),
+    /acceptOutcomes requires a reviewed template/,
+  );
+
+  // Custom non-reviewed with acceptOutcomes is refused at start
+  await assert.rejects(
+    () => startWorkflow({ workflow: makeWf('custom-solo', ['pass']), repoRoot: tmp, cwd: tmp }),
+    /acceptOutcomes requires a reviewed template/,
+  );
+
+  // Custom reviewed with acceptOutcomes is accepted at start
+  const started = await startWorkflow({ workflow: makeWf('custom-reviewed', ['pass', 'findings']), repoRoot: tmp, cwd: tmp });
+  assert.equal(started.workflowId, 'wf-custom-reviewed');
 });
 
 test('workflow root context refs persist and reach only root Units across resume', async (t) => {

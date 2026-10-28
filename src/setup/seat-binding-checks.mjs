@@ -1,7 +1,7 @@
 // Doctor row for Seat Binding: `seat-binding-dry-bind` (every seat of every Workflow unit binds under the committed config).
 
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
-import { resolveCollaboration } from '../runner/execution/patterns/catalog.mjs';
+import { resolveCollaboration, loopOf } from '../runner/execution/patterns/catalog.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots, workflowUnitContract } from './workflow-definition-files.mjs';
 const MAX_LISTED = 8;
@@ -70,6 +70,14 @@ export async function checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConf
         if (typeof unit.capability !== 'string') continue;
         units += 1;
         const label = `${wf.id}/${step.id}/${u.id} (capability "${unit.capability}")`;
+        if (u.template?.acceptOutcomes !== undefined) {
+          const pattern = u.template.pattern;
+          const loop = loopOf(pattern, { effective: runnerConfig }) ?? (['solo', 'reviewed', 'panel', 'debate'].includes(pattern) ? pattern : 'solo');
+          if (loop !== 'reviewed') {
+            problems.push(`${label}: acceptOutcomes requires a reviewed template and unique pass/findings outcomes`);
+            continue;
+          }
+        }
         let seats;
         try {
           ({ seats } = await simulateUnitBindings(unit, runnerConfig, { session: DRY_BIND_SESSION, workflowId: wf.id }));

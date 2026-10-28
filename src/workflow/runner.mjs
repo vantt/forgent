@@ -46,8 +46,9 @@ import { closeCaseUnderHold } from './case-close.mjs';
 import { workflowPersonaScope } from './loader.mjs';
 import { unitFieldsOfTemplate } from './steps.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
+import { loopOf, resolveCollaboration } from '../runner/execution/patterns/catalog.mjs';
+import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { RunnerConfigError, loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
-
 /** One log line for the events that mark a step's progress, null for every other event. */
 function progressLine({ ts, type, payload }) {
   const step = payload?.stepId;
@@ -350,6 +351,17 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
               // Reports a fresh approval stands behind may be handed over although their bytes changed after
               // settlement; an edit no approval covers is still refused by the Execution Core.
               const fresh = reread();
+              const runnerConfig = loadRunnerConfigForDir(mainRoot);
+              const loopFn = (name) => loopOf(name, { effective: runnerConfig });
+              if (u.template?.acceptOutcomes !== undefined) {
+                const pattern = unitPatternOf(u.template);
+                const loop = loopFn(pattern) ?? (['solo', 'reviewed', 'panel', 'debate'].includes(pattern) ? pattern : 'solo');
+                if (loop !== 'reviewed') {
+                  throw new RunnerConfigError(
+                    `workflow "${workflow.id}" step "${step.id}" unit "${u.id}".acceptOutcomes requires a reviewed template and unique pass/findings outcomes`,
+                  );
+                }
+              }
               const runOptions = {
                 unitData,
                 acceptedReports: approvedReportDigests({ events: fresh.events, state: fresh.state, workflow, mainRoot }),
@@ -362,16 +374,22 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                 overrides: await (async () => {
                   let unitAccount = state.account ?? null;
                   if (unitAccount !== null) {
-                    const runnerConfig = loadRunnerConfigForDir(mainRoot);
                     const testOverrides = unitOverridesOf(u, state.seats?.personas, {
                       effort: state.effort,
                       timeoutMs: state.timeoutMs,
                       account: unitAccount,
+                      loopOf: loopFn,
+                    });
+                    const collaboration = resolveCollaboration({
+                      unit: unitData,
+                      selectors: { callerString: unitPatternOf(u.template) },
+                      runnerConfig,
+                      shipped: shippedCatalog(),
                     });
                     const dry = await simulateUnitBindings(
                       { ...unitData, pattern: unitPatternOf(u.template) || 'solo' },
                       runnerConfig,
-                      { session: { headless: true, herdrPresent: detectHerdrPresent() }, overrides: testOverrides },
+                      { session: { headless: true, herdrPresent: detectHerdrPresent() }, overrides: testOverrides, collaboration },
                     );
                     if (!dry.seats.some((r) => r.account)) {
                       // No seat of this unit runs on the account's provider: the unit runs unpinned,
@@ -388,6 +406,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                     effort: state.effort,
                     timeoutMs: state.timeoutMs,
                     account: unitAccount,
+                    loopOf: loopFn,
                   });
                 })(),
                 caseAdmission: port,

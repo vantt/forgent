@@ -129,7 +129,7 @@ function isSyncRef(ref) {
  * - rigor?: optional ('low'|'standard'|'high'|'critical')
  * - writes: array of repo-relative paths in worktree (empty = read-only; no absolute, no '..')
  * - dependsOn: array of unit ids
- * - pattern?: optional string (e.g. 'solo', 'reviewed', 'panel', or preset name)
+ * - pattern?: optional string (e.g. 'solo', 'reviewed', 'panel', or pattern name)
  * - inputs: array of repo-relative paths or 'unit-run:<id>/<role>' refs
  * - anonymizeInputs?: optional boolean; copy the 'unit-run:' reports under neutral names (seat-A, ...)
  * - blind?: optional boolean; every role of the unit runs with hostRead: blind (no peer run state
