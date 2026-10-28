@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8ca0b7b58d7c46bdf5d1443a7b27d99286e0e0ea647ac031b14c702194d6dd55",
+  "payloadDigest": "bf8a8438a31f1b8c1195af3fbc440cbf504b9a92a022981a8539975a6f2a5e16",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -389,9 +389,9 @@
     "packages/git/rust/src/remote.rs": "e53761592bb96509fda62e0362e0f035b991e278aedf54f5c9f4b4740714708a",
     "packages/git/rust/src/repository_config.rs": "40a9792c910b87a3fd8f7756de5a78674a3572cb492e8de8dcfb9bb1ddd46ed9",
     "packages/git/rust/src/restore.rs": "e74165f44133cf722772851a9183121870cac0bcc1b490abdb46a2beb54a0741",
-    "packages/git/rust/src/scoped_commit.rs": "ce9da96151f3f30e098c66a96147e290de0f9e73bd0302487bd0be3d805b48a1",
+    "packages/git/rust/src/scoped_commit.rs": "67a7630eedb6221d54ac6327ccbc2adaa8089a0d245b9d8c0e5343a3ecbf708b",
     "packages/git/rust/src/sequence.rs": "02ca2ff90ac57645df2377e1b7746f88037091a8f1f9b005057be1158e7f28eb",
-    "packages/git/rust/src/sync.rs": "7145ac2efdbab252b4418a27fae9668f6db933b799d0ca3d8e27c064cca6f3cd",
+    "packages/git/rust/src/sync.rs": "674365922f23442d5d541b893a2148db6f4fa469db5a688368fc8551cdee8717",
     "packages/git/rust/src/wal.rs": "59f68c1450e1e16e91044dcf46a04e3de351b0e12df8e45fe2e62d939c5c7b80",
     "packages/git/rust/src/worktree.rs": "1448b50a2fbe3bda3cb0738195f86d029f076321f9d91d255af1ab11f55c8123",
     "packages/git/rust/tests/borrow_deadline.rs": "6a0db6afad96b62ded1253324e862a29a88129e115bd133292ee30ac5482fa07",
@@ -408,7 +408,7 @@
     "packages/git/rust/tests/refs_remote.rs": "0740609cdc54853897a2a67bd753e07ed128b06e7f59ccea1e9735f9df4c64a5",
     "packages/git/rust/tests/repository_config.rs": "71d201335b087e0dae4080e147421618693940a2007f7c6819f10b1a3dc8202a",
     "packages/git/rust/tests/safe_restore.rs": "17d2b23fcfee07473574f3d3f420aba4ca2cbf901480737247fd1f054d792c08",
-    "packages/git/rust/tests/scoped_commit_sync.rs": "128e008c4766901e796975071f1438ec2d43cc1ff8f258da3a4851aab016b937",
+    "packages/git/rust/tests/scoped_commit_sync.rs": "647e46d3b4ce78538caf52ba7f005fdc9747b4a59f477ff542e2a9930de5d78f",
     "packages/git/rust/tests/sequence.rs": "40fd63b603f193c20ade1d1dd20bc309c2defc1ce902deda9b4241693f777df1",
     "packages/git/rust/tests/ssh_transport.rs": "0c49c0d61922fc89472a7168711b8d27c1266a50bece8fc200534c1f5b6e8d41",
     "packages/git/rust/tests/support/land.rs": "46bec8c0928eb4b53d6db71204661638b626b6dfe199d39f4890444c1b14ac07",

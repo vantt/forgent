@@ -262,28 +262,6 @@ fn sync_clean_and_conflict_resolution_have_exact_parents() {
     }
 }
 #[test]
-fn a_sync_commit_hook_reads_the_operation_id_the_way_a_scoped_commit_hook_does() {
-    use std::os::unix::fs::PermissionsExt;
-    let f = Fixture::new();
-    fs::write(f.main.join("incoming"), "target\n").unwrap();
-    git(&f.main, &["add", "."]);
-    git(&f.main, &["commit", "-qm", "target"]);
-    let target = Oid::parse(&git(&f.main, &["rev-parse", "HEAD"]), ObjectFormat::Sha1).unwrap();
-    let seen = f.temp.join("seen");
-    let hooks = f.main.join("hooks");
-    fs::create_dir(&hooks).unwrap();
-    let hook = hooks.join("pre-commit");
-    fs::write(&hook, format!("#!/bin/sh\ngit config --get fgos.operationId > '{}'\n", seen.display())).unwrap();
-    fs::set_permissions(&hook, fs::Permissions::from_mode(0o755)).unwrap();
-    git(&f.main, &["config", "core.hooksPath", "hooks"]);
-    let done = f
-        .driver
-        .start_sync(&f.repo, f.held(), &target, "consumer sync", "fixture", "sync-hook")
-        .unwrap();
-    assert_eq!(done.state, "done");
-    assert_eq!(fs::read_to_string(seen).unwrap().trim(), "sync-hook");
-}
-#[test]
 fn sync_prepare_applies_declared_bytes_for_a_store_path_the_producer_deleted() {
     for finish in [true, false] {
         let f = Fixture::new();

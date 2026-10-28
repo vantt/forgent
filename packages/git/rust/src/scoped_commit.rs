@@ -1115,20 +1115,17 @@ impl GitDriver {
         }
         Ok((skipped, tracked))
     }
-    /// `git commit` with the message on stdin; the operation id rides in config,
-    /// where the hook reads it.
+    /// `git commit` with the message on stdin.
     pub(crate) fn commit_message(
         &self,
         repo: &RepoHandle,
         scope: &LockScope<'_>,
-        id: &str,
         message: &str,
     ) -> Result<Output> {
-        let context = format!("fgos.operationId={id}");
         self.checkout_call(
             repo,
             scope,
-            &durable_args(&["-c", &context, "commit", "-q", "--cleanup=verbatim", "-F", "-"]),
+            &durable_args(&["commit", "-q", "--cleanup=verbatim", "-F", "-"]),
             message.as_bytes(),
             true,
         )
@@ -1553,7 +1550,7 @@ impl GitDriver {
                         next: chain.intent().next.clone(),
                     },
                 )?;
-            let out = self.commit_message(repo, scope, id, &request.message)?;
+            let out = self.commit_message(repo, scope, &request.message)?;
             // One immutable observation binds oid, tree, parents and the committed
             // paths together: the paths are the commit's own change against its
             // parent, which is the baseline whenever the parent check below holds.

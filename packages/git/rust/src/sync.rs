@@ -905,7 +905,7 @@ impl GitDriver {
         let tree = self.checkout_text(repo, scope, &["write-tree"])?;
         let attempted = wal
             .append(chain, Phase::SyncCommitAttempt { tree: tree.clone() })?;
-        let out = self.commit_message(repo, scope, &chain.last().operation_id, message)?;
+        let out = self.commit_message(repo, scope, message)?;
         let observed = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
         if &observed == head {
             if !out.success {
