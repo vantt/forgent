@@ -259,6 +259,6 @@ worktreeSetup:
     - for d in .claude/skills .agents/skills .omp/skills .pi/skills .grok/skills; do [ -d "$FGOS_REPO_ROOT/$d" ] || continue; mkdir -p "$d"; for s in "$FGOS_REPO_ROOT/$d"/ak-*; do [ -d "$s" ] && cp -R "$s" "$d/"; done; done; true
 # @fgos:doc Limits of the agent mailbox, and whether a project opts in to its hooks.
 mailbox:
-  # @fgos:doc Whether fgos setup and doctor --fix install the mailbox hook rows into this project's Claude Code and Codex hook files; false removes the rows they installed. Off by default: the mailbox is opt-in until the owner decides spec section 16 item 23. Default: false.
+  # @fgos:doc Whether fgos setup and doctor --fix install the mailbox hook rows into this project's Claude Code and Codex hook files; false removes the rows they installed. On by default (owner decision 2026-10-28): a project opts out with mailbox.enabled: false. Default: true.
   # @fgos:why [9514b261-1778-4cbd-a231-bec51e3e04d9] owner 2026-10-25: turn the agent mailbox on for the forgent project
   enabled: true

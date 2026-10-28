@@ -2268,7 +2268,7 @@ function checkMailboxHook(cwd) {
     return { passed: true, message: `opt-in unknown: ${refusedConfigName(optIn)} is refused (${optIn.reason}${optIn.file ? ` in ${optIn.file}` : ''}); the config rows name it, and fgos setup leaves the mailbox hook rows as they are` };
   }
   if (optIn.state === 'off') {
-    return { passed: true, message: 'not enabled: set mailbox.enabled: true in the project config (fgos config set), then run fgos doctor --fix, to install the mailbox hook rows (provisional opt-in, spec §16 item 23)' };
+    return { passed: true, message: 'not enabled: mailbox.enabled is false in the config; set it to true (fgos config set), then run fgos doctor --fix, to install the mailbox hook rows' };
   }
   const enabled = 'enabled: the Claude Code and Codex hook checks require the mailbox rows; limits: fgos config show --path mailbox (the standard is fgos config standard --path mailbox)';
   const { data, why } = mailboxRecordVerdict(cwd);

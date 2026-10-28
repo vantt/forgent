@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Agent mailbox is now on by default: `mailbox.enabled` defaults to true, so `fgos setup` and `fgos doctor --fix` install the mailbox hook rows into a project's Claude Code and Codex hook files unless the project sets `mailbox.enabled: false` (which removes exactly the rows they installed). The cross-machine path stays off. Run `fgos doctor --fix` in an existing project to install the rows.
 - The runner's collaboration patterns are now a catalog in config: `runner.patterns` names each pattern (its loop, defaults and promise) and `runner.loops` holds the tuning of each loop (`maxRounds`, `checkersByRigor` for `reviewed`). A run, a workflow unit and `fgos doctor` all resolve a pattern through that one catalog, and the resolution a run used is pinned in its record so `--resume` replays it.
 - `fgos run` takes `--params` (a JSON object) and `--param key=value` to change one dispatch's parameters, and a case dispatch passes the activity's own unit by default, so `--pattern` is only needed to change the degree and then needs `--reason`. Two selectors that disagree are refused with `selector-conflict`; out-of-range parameter values are refused with the bound named.
 - A `solo` run that is given `--verify` now runs the command once after the producer and leaves a receipt; `panel` and `debate` refuse it with `verify-command-unsupported`. A writing activity that declares no unit no longer has to be forced to `reviewed` by the caller.

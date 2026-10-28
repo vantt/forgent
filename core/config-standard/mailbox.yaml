@@ -84,5 +84,5 @@ mailbox:
   verbs:
     # @fgos:doc Longest wait of fgos mailbox send, inbox and inbox --claim for the mailbox lock, polling with backoff, before they answer lock-busy; a person or agent waits on these verbs, so they outwait a hook call holding the lock (a registering call writes and fsyncs) instead of refusing at the hook's skip budget. In milliseconds. About 15 times the longest measured hold: a registering hook call held the lock up to 135 ms at p95 on ext4 under load. Minimum: 0. Default: 2000.
     lockWaitMs: 2000
-  # @fgos:doc Whether fgos setup and doctor --fix install the mailbox hook rows into this project's Claude Code and Codex hook files; false removes the rows they installed. Off by default: the mailbox is opt-in until the owner decides spec section 16 item 23. Default: false.
-  enabled: false
+  # @fgos:doc Whether fgos setup and doctor --fix install the mailbox hook rows into this project's Claude Code and Codex hook files; false removes the rows they installed. On by default (owner decision 2026-10-28): a project opts out with mailbox.enabled: false. Default: true.
+  enabled: true

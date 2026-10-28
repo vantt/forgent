@@ -991,18 +991,19 @@ test('doctor check runner-patterns-config: two identical-meaning patterns hint',
   assert.match(res.message, /identical/i);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
-test('the mailbox check passes as not enabled until the project opts in, and names the opt-in', () => {
+test('the mailbox check is enabled by default, passes as not enabled once the project opts out, and names the opt-out', () => {
   const check = DOCTOR_CHECKS.find((c) => c.id === 'mailbox-hook');
   assert.ok(check, 'a mailbox check is registered');
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mailbox-check-'));
   try {
     const absent = check.check(temp);
     assert.equal(absent.passed, true);
-    assert.match(absent.message, /not enabled/);
-    assert.match(absent.message, /mailbox\.enabled/);
+    assert.match(absent.message, /^enabled/);
     fs.mkdirSync(path.join(temp, '.fgos'));
     writeProjectConfig(temp, { mailbox: { enabled: false } });
-    assert.match(check.check(temp).message, /not enabled/);
+    const off = check.check(temp);
+    assert.match(off.message, /not enabled/);
+    assert.match(off.message, /mailbox\.enabled/);
     writeProjectConfig(temp, { mailbox: { enabled: true } });
     const on = check.check(temp);
     assert.equal(on.passed, true);
