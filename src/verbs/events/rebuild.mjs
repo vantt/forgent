@@ -27,7 +27,8 @@ function coverOf(root, entry) {
 /** The store part of the rebuild door: every consumer refolds from the store and replaces its own cache atomically. */
 export async function rebuildStoreUseCase(ctx, options = {}) {
   const { store, config, heldRanks, facts } = eventsContext(ctx, options);
-  const entries = consumers();
+  // A registry-only consumer keeps no view, so there is nothing of it to rebuild.
+  const entries = consumers().filter(entry => entry.rebuildModule !== undefined);
   // Resolve every module before invoking any consumer: an incomplete cutover fails early.
   const modules = await Promise.all(entries.map(entry => loadRebuildModule(entry.id)));
   for (let i = 0; i < entries.length; i++) if (typeof modules[i].rebuildFromStore !== 'function') throw new Error(`event-store-consumer-registry: ${entries[i].id} lacks rebuildFromStore`);

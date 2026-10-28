@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "eccebeebf65eff2cf6df36c797a0ece79f99b8914859c3ff09d3fae83493fb51",
+  "payloadDigest": "e9e10a73de66418e5f05ecace7f619fdc6556676052463b73c83e0c41bed2c9d",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -894,7 +894,7 @@
     "src/convention/identifier-rules.mjs": "f3b0fed979b522c53be7c6b756b49425723121a587fe056b1bf616deef81b615",
     "src/convention/seat-id.mjs": "034caeb689c869e09acc0a3cd748757742c3f36b2eb331ddd0302515c25b0f83",
     "src/event-store/config.mjs": "81217ccc8a1e7d45a3ce420a5072fb231033862a3903e7dad113075075e9cb9b",
-    "src/event-store/consumers.mjs": "c47969fb96a24a3a31c001c1155d75bd72c13fa59fc084df5d199ebc69577b42",
+    "src/event-store/consumers.mjs": "81cd05ec92cd75056954051715c0778daac2e620bfd578dc9e3a62d70d4057be",
     "src/event-store/index.mjs": "4432a0299d564d1c4edcd747d834fcb1ad76da2421d9658d419fca4f03289fae",
     "src/event-store/maintenance.mjs": "bfba47317edcae43436ed59afe23eda3c50ad41c6dfca23b946232cd14845a5c",
     "src/event-store/native.mjs": "475ca3d03942cb16c7ccf5e1f2380a07efc43d05315333eab3a73e0759ab457e",
@@ -1181,7 +1181,7 @@
     "src/verbs/events/import-legacy.mjs": "47e540ea66e0a058a59aa04bfad4280ea60761473f6cf798e4ea4077ed126708",
     "src/verbs/events/migrate.mjs": "75a2c2f35000ef9e27ad801888ac2d0a7f58b088b0c7bdfd008bc8092cb3290d",
     "src/verbs/events/parity.mjs": "6431bfc150b5876ec83bf6ff63023aeee9fe3c0b33d2e8ed54114b443e088ed7",
-    "src/verbs/events/rebuild.mjs": "4e6f58a44c3546b7b30249e430c2bef861bd451dc14c0afe497c48508228d08d",
+    "src/verbs/events/rebuild.mjs": "878c422f69b2aef971be694291a2ddfa7f5c705442b662e18f8d9df61720eae5",
     "src/verbs/events/seal.mjs": "0651dbaca85800a74027dc30144d0d8e0f45378ea06e81eda25994be2c859474",
     "src/verbs/events/status.mjs": "6fb73280f473c45dc2de55c1ad4514235a0f5e9563ebf7e2801d7b4c072ffc6f",
     "src/verbs/events/sync.mjs": "3456dd8965673bb8cfa92a253ecab3feebbd27984df8274c4e644bc4f5ab29ae",
